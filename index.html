@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Roulette Generator</title>
+    <title>Ultimate Randomizer v2</title>
     <style>
         :root {
             --bg-color: #000000;
-            --card-bg: #1c1c1e;
+            --card-bg: #111111;
             --text-main: #ffffff;
-            --text-secondary: #8e8e93;
-            --accent: #ff9900; /* Цвет акцента (меняется JS) */
+            --accent: #ff9900;
         }
 
         body {
@@ -23,256 +22,253 @@
             justify-content: center;
             min-height: 100vh;
             margin: 0;
-            padding: 20px;
+            padding: 15px;
             box-sizing: border-box;
-            overflow: hidden; /* Чтобы вспышка не дергала скролл */
+            overflow: hidden;
         }
 
         .container {
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             display: flex;
             flex-direction: column;
             gap: 15px;
             position: relative;
-            z-index: 2;
+            z-index: 1;
         }
 
-        /* БЛОК С КАРТИНКОЙ */
-        #image-container {
-            width: 100%;
-            height: 280px;
-            background-color: #111;
-            border-radius: 22px;
-            overflow: hidden;
-            position: relative;
-            box-shadow: inset 0 0 40px rgba(0,0,0,0.8);
-            border: 1px solid #333;
-            transition: all 0.3s ease;
-        }
-
-        #preview-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0;
-            transition: opacity 1s ease-in-out; /* Плавное появление после вспышки */
-        }
-        
-        #preview-img.visible {
-            opacity: 1;
-        }
-
-        /* Анимация "Помехи" (Static Noise) пока крутится рулетка */
-        .static-noise {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif'); /* ГИФка шума */
-            background-size: cover;
+        /* === РУЛЕТКА === */
+        .roulette-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             opacity: 0;
             pointer-events: none;
-            mix-blend-mode: overlay;
             transition: opacity 0.3s;
         }
-        .static-noise.active {
-            opacity: 0.2;
+
+        .roulette-overlay.active {
+            opacity: 1;
+            pointer-events: all;
         }
 
-        /* БЛОК ТЕКСТА (РЕЗУЛЬТАТ) */
+        .orbit-ring {
+            width: 300px;
+            height: 300px;
+            position: relative;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .orbit-item {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid var(--accent);
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .orbit-item img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+
+        /* === ВЫБОР САЙТА === */
+        select {
+            width: 100%;
+            padding: 12px;
+            background: #222;
+            color: #fff;
+            border: 1px solid #444;
+            border-radius: 12px;
+            font-size: 16px;
+            text-align: center;
+            text-align-last: center;
+            appearance: none;
+            -webkit-appearance: none;
+            margin-bottom: 10px;
+        }
+
+        /* === РЕЗУЛЬТАТ === */
         #result-box {
             background-color: var(--card-bg);
-            border-radius: 22px;
-            padding: 20px;
+            border: 1px solid #333;
+            border-radius: 20px;
+            padding: 25px 15px;
             text-align: center;
             min-height: 100px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 4px 30px rgba(0,0,0,0.5);
-            position: relative;
-            overflow: hidden;
+            transition: box-shadow 0.2s, transform 0.2s;
         }
 
-        /* ЭФФЕКТ ВСПЫШКИ (ИСКРА) */
-        #flash-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #fff;
-            opacity: 0;
-            pointer-events: none;
-            z-index: 10;
-        }
-        
-        @keyframes flash-animation {
-            0% { opacity: 1; transform: scale(1.5); }
-            100% { opacity: 0; transform: scale(1); }
-        }
-
-        .do-flash {
-            animation: flash-animation 0.6s ease-out forwards;
+        #result-box.spark {
+            box-shadow: 0 0 50px 10px #fff;
+            transform: scale(1.02);
+            background-color: #222;
         }
 
         #result-id {
-            color: var(--text-secondary);
-            font-size: 14px;
-            font-weight: 700;
-            margin-bottom: 5px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
+            color: #666; font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 5px;
         }
 
         #result-name {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 800;
-            line-height: 1.1;
-            background: linear-gradient(90deg, #fff, #bbb);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+            word-wrap: break-word;
         }
 
-        /* СЕЛЕКТОР */
-        .select-wrapper {
-            position: relative;
-            background-color: var(--card-bg);
-            border-radius: 16px;
+        /* === МОДИФИКАТОРЫ === */
+        .modifiers-label {
+            font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-left: 5px;
         }
 
-        select {
-            width: 100%;
-            padding: 16px;
-            font-size: 17px;
-            background-color: transparent;
-            color: var(--text-main);
-            border: none;
-            border-radius: 16px;
-            appearance: none;
-            -webkit-appearance: none;
+        .modifiers-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+        }
+
+        .mod-btn {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: #888;
+            padding: 8px 12px;
+            border-radius: 18px;
+            font-size: 13px;
             font-weight: 600;
-            text-align: center;
-            text-align-last: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
         }
 
-        .select-arrow {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-secondary);
-            font-size: 12px;
-            pointer-events: none;
+        .mod-btn.active {
+            background: var(--accent);
+            color: #000;
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
         }
 
-        /* КНОПКИ */
-        .btn {
+        /* === КНОПКИ ДЕЙСТВИЙ === */
+        .btn-main {
+            background-color: #fff;
+            color: #000;
             border: none;
             padding: 18px;
-            font-size: 18px;
-            font-weight: 700;
+            font-size: 20px;
+            font-weight: 800;
             border-radius: 16px;
             cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 20px rgba(255,255,255,0.15);
+            margin-top: 10px;
+        }
+        .btn-main:active { transform: scale(0.98); }
+
+        /* Контейнер для кнопок перехода */
+        .links-container {
+            display: flex;
+            gap: 10px;
+            display: none; /* Скрыто до результата */
+        }
+        .links-container.visible { display: flex; }
+
+        .btn-link {
             text-decoration: none;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 16px;
+            text-align: center;
+            padding: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.1s, opacity 0.2s;
-        }
-
-        .btn:active {
-            transform: scale(0.96);
-        }
-
-        .btn-generate {
-            background-color: var(--text-main);
-            color: #000;
-            box-shadow: 0 0 20px rgba(255,255,255,0.1);
-        }
-        
-        .btn-generate:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .actions-row {
-            display: flex;
-            gap: 12px;
-            opacity: 0.3;
-            pointer-events: none;
-            transition: opacity 0.5s;
-        }
-
-        .actions-row.ready {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .btn-video {
-            flex: 2;
-            background-color: #2c2c2e;
-            color: var(--accent); /* Цвет зависит от выбора */
             border: 1px solid #333;
+        }
+
+        .btn-watch {
+            flex: 2;
+            background: var(--accent);
+            color: #000;
+            text-transform: uppercase;
         }
 
         .btn-img {
             flex: 1;
-            background-color: #2c2c2e;
+            background: #222;
             color: #4ea8de;
-            border: 1px solid #333;
         }
 
     </style>
 </head>
 <body>
 
+    <!-- Всплывающая рулетка -->
+    <div class="roulette-overlay" id="roulette-layer">
+        <div class="orbit-ring" id="orbit"></div>
+    </div>
+
     <div class="container">
         
-        <!-- Блок картинки -->
-        <div id="image-container">
-            <div class="static-noise" id="noise"></div>
-            <img id="preview-img" alt="">
-        </div>
-
-        <!-- Блок текста с эффектом вспышки -->
-        <div id="result-box">
-            <div id="flash-overlay"></div> <!-- Слой для вспышки -->
-            <div id="result-id">Генератор</div>
-            <div id="result-name">Жми кнопку</div>
-        </div>
-
         <!-- Выбор сайта -->
-        <div class="select-wrapper">
-            <select id="platform-select" onchange="changeTheme()">
-                <option value="xh">xHamster</option>
-                <option value="ph">Pornhub</option>
-                <option value="xv">xVideos</option>
-            </select>
-            <span class="select-arrow">▼</span>
+        <select id="platform-select" onchange="updateThemeAndLink()">
+            <option value="xh">xHamster</option>
+            <option value="ph">Pornhub</option>
+            <option value="xv">xVideos</option>
+            <option value="sb">SpankBang</option>
+            <option value="yp">YouPorn</option>
+            <option value="rt">RedTube</option>
+            <option value="hqp">HQPorner</option>
+        </select>
+
+        <!-- Результат -->
+        <div id="result-box">
+            <div id="result-id">Генератор</div>
+            <div id="result-name">Нажми Старт</div>
         </div>
 
-        <!-- Главная кнопка -->
-        <button class="btn btn-generate" id="gen-btn" onclick="startRoulette()">Крутить (5 сек)</button>
+        <!-- Модификаторы -->
+        <div class="modifiers-label">Добавить к запросу:</div>
+        <div class="modifiers-grid" id="mod-container"></div>
 
-        <!-- Кнопки действий -->
-        <div class="actions-row" id="actions">
-            <a href="#" target="_blank" id="link-video" class="btn btn-video">Смотреть</a>
-            <a href="#" target="_blank" id="link-img" class="btn btn-img">Картинки</a>
+        <!-- Кнопка запуска -->
+        <button class="btn-main" onclick="startSpin()">Сгенерировать</button>
+
+        <!-- Кнопки перехода -->
+        <div class="links-container" id="links-block">
+            <a href="#" target="_blank" class="btn-link btn-watch" id="watch-link">Видео</a>
+            <a href="#" target="_blank" class="btn-link btn-img" id="img-link">Картинки</a>
         </div>
 
     </div>
 
     <script>
         // === НАСТРОЙКИ ===
-        const ANIMATION_DURATION = 5000; // 5 секунд
+        const SPIN_TIME = 1000; 
+        const IMAGES_COUNT = 10; 
         
-        // Переменные состояния
-        let intervalId = null;
-        let finalItem = null;
-        let fetchedImageUrl = null;
+        const modifiers = [
+            "Shemale", "BBW", "Squirt", "Oiled", "Amateur", 
+            "Anal", "Teen", "Milf", "Hardcore", "Lesbian", 
+            "Pov", "Hentai", "Solo", "Group", "Ebony", "Asian"
+        ];
 
-        // ПОЛНЫЙ СПИСОК (ВСЕ ID 1-1121 ИЗ PDF)
+        let activeMods = new Set();
+        let currentItem = null;
+
+        // ПОЛНЫЙ СПИСОК ФЕТИШЕЙ
         const data = [
             {"id": 1, "slug": "masturbation", "name": "Masturbation"},
             {"id": 2, "slug": "milf", "name": "Milf"},
@@ -1368,157 +1364,145 @@
             {"id": 1118, "slug": "foot-fetish", "name": "Foot fetish"},
             {"id": 1119, "slug": "gentle-sex", "name": "Gentle sex"},
             {"id": 1120, "slug": "role-playing", "name": "Role playing"},
-            {"id": 1121, "slug": "squirt", "name": "Squirt"}
+            {"id": 1121, "slug": "squirt", "name": "Squirt"},
+            // === TRANS ===
+            {"id": 1122, "slug": "shemale", "name": "Shemale"},
+            {"id": 1123, "slug": "tranny", "name": "Tranny"},
+            {"id": 1124, "slug": "ladyboy", "name": "Ladyboy"},
+            {"id": 1125, "slug": "t-girl", "name": "T-Girl"},
+            {"id": 1126, "slug": "shemale-fucks-girl", "name": "Shemale Fucks Girl"},
+            {"id": 1127, "slug": "shemale-fucks-guy", "name": "Shemale Fucks Shemale"},
+            {"id": 1128, "slug": "shemale-solo", "name": "Shemale Solo"},
+            {"id": 1129, "slug": "transgender", "name": "Transgender"},
+            {"id": 1130, "slug": "shemale-on-shemale", "name": "Shemale selfsuck"}
         ];
 
-        // Инициализация при загрузке
-        changeTheme();
+        window.onload = () => {
+            createModifiers();
+            prepareRouletteImages();
+            updateThemeAndLink();
+        };
 
-        function startRoulette() {
-            // Блокируем кнопку
-            const btn = document.getElementById("gen-btn");
-            btn.disabled = true;
-            btn.innerText = "Генерирую...";
-
-            // Скрываем прошлый результат/картинку/кнопки
-            const actions = document.getElementById("actions");
-            const imageContainer = document.getElementById("image-container");
-            const previewImg = document.getElementById("preview-img");
-            const noise = document.getElementById("noise");
-            const resultBox = document.getElementById("result-box");
-            const flash = document.getElementById("flash-overlay");
-
-            actions.classList.remove("ready");
-            previewImg.classList.remove("visible");
-            flash.classList.remove("do-flash"); // сброс анимации вспышки
-            
-            // Запускаем "шум"
-            noise.classList.add("active");
-
-            // Выбираем случайный финальный элемент
-            const randomIndex = Math.floor(Math.random() * data.length);
-            finalItem = data[randomIndex];
-
-            // Начинаем фоновую загрузку картинки с Reddit
-            fetchedImageUrl = null;
-            fetchImage(finalItem.name);
-
-            // Анимация рулетки (смена текста)
-            let counter = 0;
-            intervalId = setInterval(() => {
-                const tempIndex = Math.floor(Math.random() * data.length);
-                document.getElementById("result-id").innerText = "ID #" + data[tempIndex].id;
-                document.getElementById("result-name").innerText = data[tempIndex].name;
-                counter++;
-            }, 60); // Скорость обновления текста
-
-            // Таймер окончания (5 секунд)
-            setTimeout(() => {
-                finishRoulette();
-            }, ANIMATION_DURATION);
-        }
-
-        function finishRoulette() {
-            clearInterval(intervalId); // Стоп рулетка
-
-            // Показываем финальный текст
-            document.getElementById("result-id").innerText = "ID #" + finalItem.id;
-            document.getElementById("result-name").innerText = finalItem.name;
-
-            // Эффект вспышки
-            const flash = document.getElementById("flash-overlay");
-            flash.classList.add("do-flash");
-
-            // Убираем шум
-            const noise = document.getElementById("noise");
-            noise.classList.remove("active");
-
-            // Показываем картинку (если загрузилась)
-            const previewImg = document.getElementById("preview-img");
-            if (fetchedImageUrl) {
-                previewImg.src = fetchedImageUrl;
-                previewImg.onload = () => {
-                    previewImg.classList.add("visible");
+        function createModifiers() {
+            const container = document.getElementById('mod-container');
+            modifiers.forEach(mod => {
+                const btn = document.createElement('div');
+                btn.className = 'mod-btn';
+                btn.innerText = mod;
+                btn.onclick = () => {
+                    btn.classList.toggle('active');
+                    if (activeMods.has(mod)) activeMods.delete(mod);
+                    else activeMods.add(mod);
+                    
+                    // Обновляем результат сразу при клике
+                    updateThemeAndLink(); 
                 };
-                // Если картинка уже была в кеше
-                if (previewImg.complete) previewImg.classList.add("visible");
-            }
-
-            // Обновляем ссылки
-            updateLinks();
-
-            // Разблокируем интерфейс
-            document.getElementById("actions").classList.add("ready");
-            const btn = document.getElementById("gen-btn");
-            btn.disabled = false;
-            btn.innerText = "Крутить снова";
+                container.appendChild(btn);
+            });
         }
 
-        function changeTheme() {
-            const platform = document.getElementById("platform-select").value;
+        function prepareRouletteImages() {
+            const orbit = document.getElementById('orbit');
+            const radius = 130;
+            
+            for (let i = 1; i <= IMAGES_COUNT; i++) {
+                const div = document.createElement('div');
+                div.className = 'orbit-item';
+                const angle = (i / IMAGES_COUNT) * 2 * Math.PI;
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+                div.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+                
+                const img = document.createElement('img');
+                img.src = `${i}.png`;
+                div.appendChild(img);
+                orbit.appendChild(div);
+            }
+        }
+
+        function startSpin() {
+            document.getElementById('roulette-layer').classList.add('active');
+            document.getElementById('links-block').classList.remove('visible');
+            document.getElementById('result-box').classList.remove('spark');
+
+            let textInterval = setInterval(() => {
+                const rand = data[Math.floor(Math.random() * data.length)];
+                document.getElementById('result-id').innerText = "#" + rand.id;
+                document.getElementById('result-name').innerText = rand.name;
+            }, 50);
+
+            setTimeout(() => {
+                clearInterval(textInterval);
+                finishSpin();
+            }, SPIN_TIME);
+        }
+
+        function finishSpin() {
+            document.getElementById('roulette-layer').classList.remove('active');
+            const randIndex = Math.floor(Math.random() * data.length);
+            currentItem = data[randIndex];
+
+            // Искра
+            const box = document.getElementById('result-box');
+            box.classList.remove('spark');
+            void box.offsetWidth;
+            box.classList.add('spark');
+
+            document.getElementById('links-block').classList.add('visible');
+            updateThemeAndLink();
+        }
+
+        function updateThemeAndLink() {
+            const platform = document.getElementById('platform-select').value;
             const root = document.documentElement;
             
-            if (platform === "ph") {
-                root.style.setProperty('--accent', '#ff9900');
-            } else if (platform === "xv") {
-                root.style.setProperty('--accent', '#de2828');
+            // Цвета
+            let color = '#ff9900'; 
+            if (platform === 'xh') color = '#5aaaff';
+            if (platform === 'xv') color = '#de2828';
+            if (platform === 'sb') color = '#ffd700';
+            if (platform === 'yp') color = '#ff3366';
+            if (platform === 'rt') color = '#ff0000';
+            if (platform === 'hqp') color = '#8a2be2';
+
+            root.style.setProperty('--accent', color);
+
+            if (!currentItem) return;
+
+            // 1. Формируем список слов (Категория + Модификаторы)
+            let queryParts = [currentItem.name];
+            activeMods.forEach(mod => queryParts.push(mod));
+
+            // 2. Обновляем текст на экране
+            // Если есть модификаторы, показываем их через "+"
+            if (activeMods.size > 0) {
+                document.getElementById('result-name').innerText = currentItem.name + " + " + Array.from(activeMods).join(" + ");
             } else {
-                root.style.setProperty('--accent', '#5aaaff'); // xHamster blue
+                document.getElementById('result-name').innerText = currentItem.name;
             }
+            document.getElementById('result-id').innerText = "ID #" + currentItem.id;
+
+            // 3. Формируем URL для видео
+            let encodedQuery = encodeURIComponent(queryParts.join(" "));
+            let plusQuery = queryParts.join("+").toLowerCase(); 
+
+            let url = "";
+            switch(platform) {
+                case 'xh': url = `https://xhamster.com/search/${plusQuery}`; break;
+                case 'ph': url = `https://www.pornhub.com/video/search?search=${plusQuery}`; break;
+                case 'xv': url = `https://www.xvideos.com/?k=${plusQuery}`; break;
+                case 'sb': url = `https://spankbang.com/s/${plusQuery}/`; break;
+                case 'yp': url = `https://www.youporn.com/search/?query=${plusQuery}`; break;
+                case 'rt': url = `https://www.redtube.com/?search=${plusQuery}`; break;
+                case 'hqp': url = `https://hqporner.com/?q=${encodedQuery}`; break;
+            }
+
+            document.getElementById('watch-link').href = url;
             
-            // Если уже есть результат, обновить ссылку
-            if (finalItem) updateLinks();
-        }
-
-        function updateLinks() {
-            if (!finalItem) return;
-
-            const platform = document.getElementById("platform-select").value;
-            const term = finalItem.slug.replace(/-/g, "+");
-            let videoUrl = "";
-
-            if (platform === "xh") {
-                videoUrl = "https://xhamster.com/search/" + term;
-            } else if (platform === "ph") {
-                videoUrl = "https://www.pornhub.com/video/search?search=" + term;
-            } else if (platform === "xv") {
-                videoUrl = "https://www.xvideos.com/?k=" + term;
-            }
-
-            document.getElementById("link-video").href = videoUrl;
-            
-            const imgQuery = encodeURIComponent(finalItem.name + " porn");
-            document.getElementById("link-img").href = "https://www.google.com/search?tbm=isch&q=" + imgQuery;
-        }
-
-        // Логика загрузки с Reddit через прокси
-        async function fetchImage(query) {
-            // Ищем: NSFW контент, сортировка по релевантности, картинка
-            const redditUrl = `https://www.reddit.com/search.json?q=${encodeURIComponent(query + " nsfw")}&include_over_18=on&limit=5&sort=relevance`;
-            const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(redditUrl);
-
-            try {
-                const response = await fetch(proxyUrl);
-                const data = await response.json();
-                const redditData = JSON.parse(data.contents);
-                const posts = redditData.data.children;
-
-                for (let post of posts) {
-                    const url = post.data.url;
-                    // Ищем прямую ссылку на картинку
-                    if (url && (url.endsWith('.jpg') || url.endsWith('.png') || url.endsWith('.jpeg'))) {
-                        fetchedImageUrl = url;
-                        break;
-                    }
-                    // Или превью
-                    if (post.data.preview && post.data.preview.images) {
-                        fetchedImageUrl = post.data.preview.images[0].source.url.replace('&amp;', '&');
-                        break;
-                    }
-                }
-            } catch (e) {
-                console.error("Не удалось найти картинку:", e);
-            }
+            // 4. Формируем URL для картинок (Google Images)
+            // Добавляем "porn" для надежности поиска
+            let imgQuery = encodeURIComponent(queryParts.join(" ") + " porn");
+            document.getElementById('img-link').href = `https://www.google.com/search?tbm=isch&q=${imgQuery}`;
         }
     </script>
 </body>
