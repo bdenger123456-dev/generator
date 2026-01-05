@@ -12,11 +12,10 @@
             --bg-color: #050505;
             --sidebar-bg: #101010;
             --card-bg: #141414;
-            --nav-bg: #1a1a1a; /* Mobile Nav */
+            --nav-bg: #1a1a1a;
             --text-main: #ffffff;
             --text-secondary: #888888;
             --accent: #ff9900;
-            --blue: #3498db;
             --border: #2a2a2a;
             --highlight-green: #2ecc71;
             --highlight-red: #e74c3c;
@@ -51,7 +50,6 @@
         /* === 2. LAYOUT === */
         .app-layout { display: flex; height: 100%; width: 100%; }
 
-        /* --- SIDEBAR (PC ONLY) --- */
         .sidebar {
             width: 340px;
             background: var(--sidebar-bg);
@@ -74,17 +72,6 @@
         }
         .logo span { color: var(--accent); }
 
-        .sidebar-section { margin-bottom: 25px; }
-        .sidebar-title {
-            font-size: 11px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            font-weight: 700;
-            margin-bottom: 10px;
-            padding-left: 5px;
-        }
-
-        /* --- MAIN CONTENT --- */
         .main-content {
             flex: 1;
             position: relative;
@@ -94,7 +81,6 @@
             flex-direction: column;
         }
 
-        /* Tabs (Mobile Switching) */
         .tab-content {
             flex: 1;
             display: flex;
@@ -102,36 +88,33 @@
             align-items: center;
             overflow-y: auto;
             padding: 20px;
-            padding-bottom: 80px; /* Space for Bottom Nav */
+            padding-bottom: 80px;
             width: 100%;
-            display: none; /* Hidden by default */
+            display: none; 
         }
-        
         .tab-content.active { display: flex; }
 
-        /* Center Wrapper for PC */
         .center-wrapper {
             width: 100%;
             max-width: 550px;
             display: flex;
             flex-direction: column;
-            margin: auto; /* Center Vertically on PC */
+            margin: auto; 
         }
 
-        /* MOBILE FIXED HEADER (Logo) */
+        /* Mobile Header */
         .mobile-header {
             display: none;
             width: 100%;
-            background: var(--bg-color); /* Match body */
+            background: var(--bg-color);
             text-align: center;
             padding: 15px 0;
-            border-bottom: 1px solid transparent;
             z-index: 20;
             position: sticky;
             top: 0;
         }
 
-        /* MOBILE BOTTOM NAV */
+        /* Bottom Nav */
         .bottom-nav {
             display: none;
             position: fixed;
@@ -144,40 +127,25 @@
             align-items: center;
         }
         .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            color: var(--text-secondary);
-            width: 50%;
-            height: 100%;
-            cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-size: 10px; color: var(--text-secondary); width: 50%; height: 100%; cursor: pointer;
         }
         .nav-item.active { color: var(--accent); }
         .nav-icon { font-size: 20px; margin-bottom: 4px; }
 
-        /* --- COMPONENTS --- */
-
-        /* Animation Text (Top) */
-        .animation-text-box {
-            text-align: center;
-            min-height: 24px;
-            margin-bottom: 10px;
-            width: 100%;
-        }
-        .animation-text {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--accent);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
+        /* === COMPONENTS === */
+        
+        /* Top Text */
+        .animation-text-box { text-align: center; min-height: 20px; margin-bottom: 5px; width: 100%; }
+        .animation-text { font-size: 14px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; opacity: 0; transition: opacity 0.2s; }
         .animation-text.visible { opacity: 1; }
 
-        /* CARD */
+        .explanation-text {
+            font-size: 11px; color: var(--text-secondary); text-transform: uppercase;
+            letter-spacing: 0.5px; margin-bottom: 10px; text-align: center; min-height: 14px;
+        }
+
+        /* Card */
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border);
@@ -187,7 +155,7 @@
             position: relative;
             margin-bottom: 20px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            min-height: 300px;
+            min-height: 320px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -196,88 +164,70 @@
             width: 100%;
         }
 
+        /* Badges */
+        .badge-container { position: absolute; top: 15px; right: 15px; display: flex; gap: 5px; }
+        .warning-badge { font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; color: #fff; }
+        .badge-extreme { background: var(--highlight-red); }
+        .badge-lgbt { background: #9b59b6; }
+        .badge-niche { background: #34495e; }
+
         #result-text {
             font-size: clamp(28px, 6vw, 64px);
             font-weight: 800;
             line-height: 1.1;
             word-wrap: break-word;
-            overflow-wrap: break-word;
-            hyphens: auto;
-            max-width: 100%;
-            padding: 0 10px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
+        .related-tags {
+            font-size: 11px; color: var(--text-secondary); margin-top: 10px;
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;
+        }
+        .related-tag { background: rgba(128,128,128,0.1); padding: 3px 8px; border-radius: 4px; }
+
         .card.shuffling #result-text { opacity: 0.5; transform: scale(0.95); color: var(--accent); }
 
-        /* Card Actions (Bottom of card) */
-        .card-actions {
-            display: flex;
-            gap: 10px;
-            width: 100%;
-            justify-content: center;
-        }
-
+        .card-actions { display: flex; gap: 10px; width: 100%; justify-content: center; margin-top: 20px;}
         .btn-action {
-            flex: 1;
-            padding: 12px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            background: transparent;
-            color: var(--text-secondary);
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.2s;
-            max-width: 140px;
+            flex: 1; padding: 12px; border-radius: 12px; border: 1px solid var(--border);
+            background: transparent; color: var(--text-secondary); font-size: 13px; font-weight: 700;
+            cursor: pointer; transition: 0.2s; max-width: 140px;
         }
-        
-        .btn-action.ban:hover, .btn-action.ban.active {
-            border-color: var(--highlight-red); color: var(--highlight-red); background: rgba(231, 76, 60, 0.05);
-        }
-        .btn-action.fav:hover, .btn-action.fav.active {
-            border-color: var(--highlight-green); color: var(--highlight-green); background: rgba(46, 204, 113, 0.05);
-        }
-        .btn-action.ban.active { background: rgba(231, 76, 60, 0.15); }
-        .btn-action.fav.active { background: rgba(46, 204, 113, 0.15); }
+        .btn-action.ban:hover, .btn-action.ban.active { border-color: var(--highlight-red); color: var(--highlight-red); background: rgba(231, 76, 60, 0.05); }
+        .btn-action.fav:hover, .btn-action.fav.active { border-color: var(--highlight-green); color: var(--highlight-green); background: rgba(46, 204, 113, 0.05); }
 
-        /* Comment (Bottom) */
         .result-comment {
-            text-align: center;
-            font-size: 14px;
-            color: var(--text-secondary);
-            font-style: italic;
-            margin-bottom: 20px;
-            min-height: 20px;
+            text-align: center; font-size: 14px; color: var(--text-secondary);
+            font-style: italic; margin-bottom: 20px; min-height: 20px;
         }
 
-        /* Buttons Group */
         .btn-group { display: flex; gap: 10px; margin-bottom: 15px; width: 100%; }
         .btn-watch, .btn-photo {
             flex: 1; display: flex; align-items: center; justify-content: center;
             text-decoration: none; padding: 16px; border-radius: 16px;
             font-weight: 800; font-size: 15px; text-transform: uppercase;
-            transition: opacity 0.3s;
         }
         .btn-watch { background: var(--accent); color: #000; }
         .btn-photo { background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); }
-        .btn-photo:hover { border-color: var(--blue); color: var(--blue); }
 
-        /* Generate Button */
+        /* Generators */
+        .gen-controls { display: flex; gap: 10px; width: 100%; margin-bottom: 15px; }
         .btn-gen {
-            width: 100%; padding: 22px; background: var(--text-main); color: var(--bg-color);
-            border: none; border-radius: 16px; font-size: 20px; font-weight: 900;
+            flex: 1; padding: 22px; background: var(--text-main); color: var(--bg-color);
+            border: none; border-radius: 16px; font-size: 18px; font-weight: 900;
             cursor: pointer; text-transform: uppercase;
             box-shadow: 0 4px 15px rgba(255,255,255,0.1);
-            transition: transform 0.1s; margin-bottom: 15px;
         }
-        .btn-gen:active { transform: scale(0.98); }
-
-        /* Accordions */
+        .btn-gen.secondary {
+            background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border);
+            font-size: 16px; flex: 0.8;
+        }
+        
+        /* Accordion */
         .accordion {
             background: var(--card-bg); border: 1px solid var(--border);
             border-radius: 16px; overflow: hidden; margin-bottom: 15px; width: 100%;
@@ -287,9 +237,7 @@
             color: var(--text-secondary); display: flex; justify-content: space-between;
             align-items: center; cursor: pointer; text-transform: uppercase;
         }
-        .accordion-body {
-            display: none; padding: 0 15px 15px; flex-wrap: wrap; gap: 8px;
-        }
+        .accordion-body { display: none; padding: 0 15px 15px; flex-wrap: wrap; gap: 8px; }
         .accordion-body.open { display: flex; }
 
         .tag {
@@ -298,34 +246,21 @@
             font-weight: 600; opacity: 0.7; flex-grow: 1; text-align: center;
         }
         .tag.selected { background: var(--accent); color: #000; border-color: var(--accent); opacity: 1; }
-        
-        /* Filter Btn styles for Sidebar */
-        .filter-group-container { display: flex; gap: 5px; flex-wrap: wrap; width: 100%; }
 
-        /* Settings Widgets */
-        .platform-box {
+        /* Settings Items */
+        .platform-box, .toggle-wrapper, .intensity-control {
             background: var(--card-bg); border: 1px solid var(--border);
-            border-radius: 16px; padding: 12px 15px; display: flex;
-            align-items: center; justify-content: space-between; margin-bottom: 15px;
+            border-radius: 16px; padding: 12px 15px; margin-bottom: 10px;
         }
-        .platform-label { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); }
+        .platform-box, .toggle-wrapper { display: flex; align-items: center; justify-content: space-between; }
+        .platform-label, .toggle-text { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); }
+        
         select.platform-select {
             background: transparent; color: var(--text-main); border: none;
             font-size: 15px; font-weight: 600; text-align: right; width: 100%; cursor: pointer;
         }
 
-        .toggle-wrapper {
-            display: flex; align-items: center; justify-content: space-between;
-            background: var(--card-bg); padding: 12px; border-radius: 12px;
-            border: 1px solid var(--border); margin-bottom: 10px;
-        }
-        .toggle-text { font-size: 13px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;}
-        .toggle-text.active { color: var(--text-main); }
-        .toggle-label-simple { font-size: 13px; font-weight: 700; color: var(--text-main); }
-
-        .switch {
-            position: relative; display: inline-block; width: 44px; height: 24px; margin: 0 5px; flex-shrink: 0;
-        }
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; margin: 0 5px; flex-shrink: 0; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider {
             position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
@@ -342,13 +277,35 @@
             display: flex; align-items: center; justify-content: space-between; width: 100%;
             padding: 12px; margin-bottom: 8px; background: var(--card-bg);
             border: 1px solid var(--border); color: var(--text-main); border-radius: 12px;
-            cursor: pointer; font-size: 14px; font-weight: 600; transition: 0.2s;
+            cursor: pointer; font-size: 14px; font-weight: 600;
         }
-        .sidebar-btn:hover { border-color: var(--accent); }
+
+        /* Intensity Slider */
+        .intensity-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; }
+        .range-slider { width: 100%; cursor: pointer; }
+        .intensity-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-secondary); margin-top: 5px; font-weight: 600; }
+        
+        /* History Section */
+        .history-section {
+            margin-top: 30px; border-top: 1px solid var(--border); padding-top: 15px;
+        }
+        .history-title {
+            font-size: 12px; font-weight: 700; color: var(--text-secondary); 
+            text-transform: uppercase; margin-bottom: 10px; padding-left: 5px;
+        }
+        .history-list {
+            display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto;
+        }
+        .history-item {
+            background: var(--bg-color); padding: 10px; border-radius: 10px; border: 1px solid var(--border);
+            font-size: 13px; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between;
+        }
+        .history-item:hover { border-color: var(--accent); }
+        .history-time { color: var(--text-secondary); font-size: 11px; }
 
         .hidden-initial { display: none !important; }
 
-        /* --- MODAL (Favorites Catalog) --- */
+        /* Modal */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--modal-bg); z-index: 1000; display: none;
@@ -358,14 +315,10 @@
         .modal {
             background: var(--sidebar-bg); width: 90%; max-width: 500px; max-height: 80%;
             border-radius: 20px; border: 1px solid var(--border); display: flex;
-            flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            flex-direction: column; overflow: hidden;
         }
-        .modal-header {
-            padding: 20px; border-bottom: 1px solid var(--border); display: flex;
-            justify-content: space-between; font-weight: 800; font-size: 18px;
-        }
+        .modal-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; font-weight: 800; font-size: 18px; }
         .modal-body { padding: 10px; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start; }
-        
         .catalog-item {
             padding: 8px 14px; background: var(--bg-color); border: 1px solid var(--border);
             border-radius: 8px; font-size: 12px; color: var(--text-secondary); cursor: pointer;
@@ -373,13 +326,11 @@
         }
         .catalog-item.active { background: var(--highlight-green); color: #fff; border-color: var(--highlight-green); }
 
-        /* --- MEDIA QUERIES --- */
         @media (max-width: 768px) {
             .sidebar { display: none; }
             .mobile-header { display: block; }
             .bottom-nav { display: flex; }
             .main-content { padding: 0; }
-            .tab-content { padding-top: 10px; }
         }
     </style>
 </head>
@@ -387,96 +338,99 @@
 
 <div class="app-layout">
 
-    <!-- SIDEBAR (PC ONLY) -->
+    <!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
         <div class="logo">x<span>Fetish</span>Hub</div>
-        
-        <!-- PC: Settings & Filters live here -->
-        <div id="pc-settings-mount">
-            <!-- JS will move content here -->
-        </div>
+        <div id="pc-settings-mount"></div>
     </div>
 
     <!-- MAIN CONTENT -->
     <div class="main-content">
-        
-        <!-- Mobile Logo (Fixed Top) -->
         <div class="mobile-header">
             <div class="logo">x<span>Fetish</span>Hub</div>
         </div>
 
-        <!-- TAB 1: HOME (Generator) -->
+        <!-- TAB 1: HOME -->
         <div id="tab-home" class="tab-content active">
             <div class="center-wrapper">
                 
-                <!-- Animation Text (Top) -->
                 <div class="animation-text-box">
                     <div id="anim-text" class="animation-text"></div>
                 </div>
 
-                <!-- RESULT CARD -->
+                <!-- CARD -->
                 <div class="card" id="card-block">
-                    <div id="result-text">...</div>
+                    <div class="badge-container" id="badges"></div>
+                    <div class="explanation-text" id="explanation-text"></div>
                     
+                    <div id="result-text">...</div>
+                    <div class="related-tags" id="related-tags"></div>
+
                     <div class="card-actions hidden-initial">
                         <button class="btn-action ban" id="btn-ban" onclick="toggleBlacklist()">To Blacklist</button>
                         <button class="btn-action fav" id="btn-fav" onclick="toggleFavorite()">To Favorites</button>
                     </div>
                 </div>
 
-                <!-- Comment (Below Card) -->
                 <div class="result-comment" id="result-comment"></div>
 
-                <!-- BUTTONS GROUP -->
                 <div class="btn-group hidden-initial">
-                    <a href="#" target="_blank" class="btn-watch" id="watch-link" data-key="watch">Go to Watch</a>
-                    <a href="#" target="_blank" class="btn-photo" id="photo-link" data-key="photo">Photos</a>
+                    <a href="#" target="_blank" class="btn-watch" id="watch-link" data-key="watch" onclick="handleOutboundClick()">Watch</a>
+                    <a href="#" target="_blank" class="btn-photo" id="photo-link" data-key="photo" onclick="handleOutboundClick()">Photos</a>
                 </div>
 
                 <!-- ADD GENRE -->
                 <div class="accordion hidden-initial" id="mods-block">
                     <div class="accordion-head" onclick="toggleAccordion('mod-container')">
-                        <span data-key="add_genre">Add Genre</span>
-                        <span>▼</span>
+                        <span data-key="add_genre">Add Genre</span> <span>▼</span>
                     </div>
                     <div class="accordion-body" id="mod-container"></div>
                 </div>
 
-                <!-- GENERATE BUTTON -->
-                <button class="btn-gen" id="btn-gen" onclick="startGeneration()" data-key="generate">Random Genre</button>
-            </div>
-        </div>
-
-        <!-- TAB 2: SETTINGS (Mobile Only) -->
-        <div id="tab-settings" class="tab-content">
-            <div class="center-wrapper">
-                <div id="mobile-settings-mount">
-                    <!-- JS will move content here on Mobile -->
+                <!-- GENERATE BUTTONS -->
+                <div class="gen-controls">
+                    <button class="btn-gen secondary hidden-initial" id="btn-similar" onclick="startGeneration('similar')" data-key="btn_similar">Similar</button>
+                    <button class="btn-gen" id="btn-gen" onclick="startGeneration('random')" data-key="generate">Random Genre</button>
                 </div>
             </div>
         </div>
 
+        <!-- TAB 2: SETTINGS (Mobile) -->
+        <div id="tab-settings" class="tab-content">
+            <div class="center-wrapper">
+                <div id="mobile-settings-mount"></div>
+            </div>
+        </div>
     </div>
 
-    <!-- MOBILE BOTTOM NAV -->
     <div class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('home')" id="nav-home">
-            <span class="nav-icon">🎲</span>
-            <span data-key="nav_home">Home</span>
+            <span class="nav-icon">🎲</span> <span data-key="nav_home">Home</span>
         </div>
         <div class="nav-item" onclick="switchTab('settings')" id="nav-settings">
-            <span class="nav-icon">⚙️</span>
-            <span data-key="nav_settings">Settings</span>
+            <span class="nav-icon">⚙️</span> <span data-key="nav_settings">Settings</span>
         </div>
     </div>
-
 </div>
 
-<!-- REUSABLE SETTINGS CONTENT (Moved by JS) -->
+<!-- SETTINGS BUNDLE -->
 <div style="display:none;">
     <div id="settings-bundle">
         
-        <!-- Platform -->
+        <!-- Exploration Mode -->
+        <div class="intensity-control">
+            <div class="intensity-header">
+                <span data-key="exploration_mode">Exploration Mode</span>
+                <span id="intensity-val-label" style="color:var(--highlight-green)">SAFE</span>
+            </div>
+            <input type="range" min="1" max="3" value="1" class="range-slider" id="intensity-slider" oninput="updateIntensity(this.value)">
+            <div class="intensity-labels">
+                <span>Safe</span>
+                <span>Spicy</span>
+                <span>Extreme</span>
+            </div>
+        </div>
+
         <div class="platform-box">
             <span class="platform-label" data-key="site_label">Pornsite</span>
             <select id="platform" class="platform-select" onchange="updateLink()">
@@ -489,71 +443,66 @@
             </select>
         </div>
 
-        <!-- Favorites Catalog Button -->
         <div class="sidebar-btn" onclick="openFavoritesCatalog()">
             <span data-key="favorites_catalog">Favorites Catalog</span>
             <span class="badge" id="count-fav">0</span>
         </div>
 
-        <!-- Filters: Include -->
+        <!-- Filters -->
         <div class="accordion">
             <div class="accordion-head" onclick="toggleAccordion('filter-include')">
-                <span data-key="filter_include">Include (Show)</span>
-                <span>▼</span>
+                <span data-key="filter_include">Include</span> <span>▼</span>
             </div>
-            <div class="accordion-body" id="filter-include">
-                <!-- Injected via JS -->
-            </div>
+            <div class="accordion-body" id="filter-include"></div>
         </div>
 
-        <!-- Filters: Exclude -->
         <div class="accordion">
             <div class="accordion-head" onclick="toggleAccordion('filter-exclude')">
-                <span data-key="filter_exclude">Exclude (Hide)</span>
-                <span>▼</span>
+                <span data-key="filter_exclude">Exclude</span> <span>▼</span>
             </div>
-            <div class="accordion-body" id="filter-exclude">
-                <!-- Injected via JS -->
-            </div>
+            <div class="accordion-body" id="filter-exclude"></div>
         </div>
 
-        <!-- Theme -->
+        <!-- Toggles -->
         <div class="toggle-wrapper">
-            <span class="toggle-text" id="label-dark">Dark</span>
-            <label class="switch">
-                <input type="checkbox" id="theme-toggle" onchange="toggleTheme()">
-                <span class="slider"></span>
-            </label>
-            <span class="toggle-text" id="label-light">Light</span>
+            <span class="toggle-text">Dark</span>
+            <label class="switch"><input type="checkbox" id="theme-toggle" onchange="toggleTheme()"><span class="slider"></span></label>
+            <span class="toggle-text">Light</span>
         </div>
 
-        <!-- Lang -->
         <div class="toggle-wrapper">
-            <span class="toggle-text" id="label-en">EN</span>
-            <label class="switch">
-                <input type="checkbox" id="lang-toggle" onchange="toggleLang()">
-                <span class="slider"></span>
-            </label>
-            <span class="toggle-text" id="label-ru">RU</span>
+            <span class="toggle-text">EN</span>
+            <label class="switch"><input type="checkbox" id="lang-toggle" onchange="toggleLang()"><span class="slider"></span></label>
+            <span class="toggle-text">RU</span>
         </div>
 
-        <!-- Search EN -->
         <div id="comp-search" class="toggle-wrapper" style="display:none;">
-            <span class="toggle-label-simple" data-key="search_en_label">Search in English</span>
-            <label class="switch">
-                <input type="checkbox" id="force-en" checked onchange="updateLink()">
-                <span class="slider"></span>
-            </label>
+            <span class="toggle-text" data-key="search_en_label">Search EN</span>
+            <label class="switch"><input type="checkbox" id="force-en" checked onchange="updateLink()"><span class="slider"></span></label>
+        </div>
+
+        <!-- Import/Export -->
+        <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top:15px;">
+            <div class="sidebar-btn" onclick="exportData()" data-key="btn_export">💾 Export Data</div>
+            <div class="sidebar-btn" onclick="importData()" data-key="btn_import">📂 Import Data</div>
+        </div>
+
+        <!-- History -->
+        <div class="history-section">
+            <div class="history-title" data-key="history_title">History</div>
+            <div class="history-list" id="history-list">
+                <!-- Items injected here -->
+            </div>
         </div>
 
     </div>
 </div>
 
-<!-- Modal: Favorites Catalog -->
+<!-- Modal -->
 <div class="modal-overlay" id="modal-overlay" onclick="closeList(event)">
     <div class="modal">
         <div class="modal-header">
-            <span data-key="favorites_catalog">Favorites Catalog</span>
+            <span data-key="favorites_catalog">Favorites</span>
             <span style="cursor:pointer" onclick="closeList(null, true)">✕</span>
         </div>
         <div class="modal-body" id="modal-catalog-body"></div>
@@ -564,25 +513,32 @@
     // === STATE ===
     let currentLang = 'en';
     let currentItem = null;
+    let lastGeneratedItem = null; // Used to track logic for "different" vs "similar"
+    let hasInteractedWithCurrent = false; // To prevent double scoring
+
     let activeMods = new Set();
     let isGenerating = false;
     let isFirstGen = true;
+    let currentIntensity = 1; // 1=Safe, 2=Spicy, 3=Extreme
 
-    // Filters Sets
-    let includeTags = new Set(); // Empty means ALL
+    let includeTags = new Set(); 
     let excludeTags = new Set(); 
 
     const STORAGE = {
         THEME: 'xch_theme',
         LANG: 'xch_lang',
-        BLACKLIST: 'xch_blacklist', // Internal ID blacklist
-        FAVORITES: 'xch_favorites'
+        BLACKLIST: 'xch_blacklist',
+        FAVORITES: 'xch_favorites',
+        INTENSITY: 'xch_intensity',
+        TAG_SCORES: 'xch_tag_scores',
+        HISTORY: 'xch_history'
     };
 
     let blacklist = JSON.parse(localStorage.getItem(STORAGE.BLACKLIST)) || [];
     let favorites = JSON.parse(localStorage.getItem(STORAGE.FAVORITES)) || [];
+    let tagScores = JSON.parse(localStorage.getItem(STORAGE.TAG_SCORES)) || {};
+    let historyData = JSON.parse(localStorage.getItem(STORAGE.HISTORY)) || [];
 
-    // === Pornushka ===
     const data = [
             {id: 1, name: "Masturbation", name_ru: "Мастурбация", slug: "masturbation", tags: ["universal", "solo"]},
             {id: 2, name: "Milf", name_ru: "MILF (Мамочки)", slug: "milf", tags: ["straight", "lesbian", "trans"]},
@@ -1701,7 +1657,6 @@
             {id: 1148, name: "Femme", name_ru: "Фем (Женственная лесбиянка)", slug: "femme", tags: ["lesbian", "feminine"]},
             {id: 1153, name: "Drag Queen", name_ru: "Дрэг-квин", slug: "drag-queen", tags: ["gay", "crossdresser", "show"]},
             {id: 1154, name: "Fag", name_ru: "Педик", slug: "fag", tags: ["gay", "dirty-talk", "slang"]},
-            {id: 1156, name: "Gloryhole (Gay)", name_ru: "Гей Глорихоул", slug: "gay-gloryhole", tags: ["gay", "public", "anonymous"]},
             {id: 1159, name: "Gay Spanking", name_ru: "Гей-порка", slug: "gay-spanking", tags: ["gay", "bdsm"]},
             {id: 1160, name: "Bi Male", name_ru: "Бисексуальный мужчина", slug: "bi-male", tags: ["bi", "gay", "straight"]},
             
@@ -1800,7 +1755,7 @@
             {id: 1236, name: "No Makeup Look", name_ru: "Без макияжа", tags: ["visual", "natural", "casual"]},
 
         ];
-        
+
     const modifiersData = [
         {key: 'Amateur', en: 'Amateur', ru: 'Любительское'},
         {key: 'POV', en: 'POV', ru: 'POV'},
@@ -1812,97 +1767,101 @@
         {key: 'Lesbian', en: 'Lesbian', ru: 'Лесби'},
         {key: 'Threesome', en: 'Threesome', ru: 'Тройничок'},
         {key: 'Orgy', en: 'Orgy', ru: 'Оргия'},
-        {key: 'Compilation', en: 'Compilation', ru: 'Сборник'},
         {key: 'VR', en: 'VR', ru: 'VR'},
         {key: 'Cosplay', en: 'Cosplay', ru: 'Косплей'},
         {key: 'Vintage', en: 'Vintage', ru: 'Ретро'},
-        {key: 'Hentai', en: 'Hentai', ru: 'Хентай'},
         {key: 'Solo', en: 'Solo', ru: 'Соло'},
-        {key: 'Trans', en: 'Trans', ru: 'Трансы'},
         {key: 'AI', en: 'AI', ru: 'ИИ'},
     ];
 
     const welcomePhrases = {
-        en: [
-            "Ready to find your genre? 😈",
-            "What will it be today?",
-            "Spin the wheel of lust!",
-            "Don't know what to watch?",
-            "Let fate decide..."
-        ],
-        ru: [
-            "Привет! Ну что, готов узнать свой сегодняшний жанр 😈? Тогда жми!",
-            "У меня для тебя сегодня приготовлен сюрприз 😅. Жми на кнопку, чтобы узнать какой!",
-            "Крути барабан желаний! Быть может сегодня ты для себя откроешь что-то новое 😊",
-            "Думаю, тебе сегодня сильно повезёт с жанром 😏. Жми!",
-            "Пусть судьба решит что тебя сегодня ждёт 😄. Нажимай!"
-        ]
+        en: ["Ready to find your genre? 😈", "What will it be today?", "Spin the wheel of lust!", "Let fate decide..."],
+        ru: ["Привет! Готов узнать свой жанр 😈?", "Крути барабан желаний!", "Думаю, тебе сегодня повезёт 😏", "Судьба решит, что тебя ждёт 😄"]
     };
 
     const animationPhrases = {
         en: ["Finding your fetish...", "Scanning the hub...", "And the winner is...", "Looking for spicy stuff..."],
-        ru: ["И твой сегодняшний фетиш...", "Ищем что-то горячее...", "Сканируем базу...", "Твоя судьба на сегодня..."]
+        ru: ["Твой сегодняшний фетиш...", "Ищем что-то горячее...", "Сканируем базу...", "Твоя судьба на сегодня..."]
     };
 
     const resultComments = {
         en: ["Like it? Go watch 😈", "Not bad, huh? 😏", "Enjoy your time 🔥", "Go for it! 😀"],
-        ru: ["Заинтересовало? Тогда иди смотри 😈", "Неплохой фетиш, а? 😏", "Приятного просмотра, сладкий 🔥", "Ну всё, беги смотреть! 😀"]
+        ru: ["Заинтересовало? Иди смотри 😈", "Неплохой фетиш, а? 😏", "Приятного просмотра 🔥", "Ну всё, беги смотреть! 😀"]
     };
 
     const langData = {
         en: {
             generate: "Random Genre",
-            generate_again: "Another Random Genre",
-            watch: "Go to Watch",
+            generate_again: "Different Genre",
+            btn_similar: "Similar Genre",
+            watch: "Watch",
             photo: "Photos",
-            add_genre: "Add Genre",
-            empty: "List is empty (Check filters)!",
+            add_genre: "Add Modifiers",
+            empty: "List is empty (Check filters/Safety)!",
             search_en_label: "Search in English",
             site_label: "Pornsite",
             favorites_catalog: "Favorites Catalog",
-            settings: "Settings",
-            filter_include: "Include filter (Match Any)",
-            filter_exclude: "Exclude filter (Match None)",
+            filter_include: "Include Tags",
+            filter_exclude: "Exclude Tags",
             tag_straight: "Straight",
             tag_gay: "Gay",
             tag_lesbian: "Lesbian",
             tag_trans: "Trans",
             tag_fav: "Favorites",
-            btn_fav_add: "❤️",
-            btn_fav_remove: "❤️",
-            btn_ban_add: "🚫",
-            btn_ban_remove: "🚫",
             nav_home: "Home",
-            nav_settings: "Settings"
+            nav_settings: "Settings",
+            btn_ban_add: "To Blacklist",
+            btn_ban_remove: "In Blacklist",
+            btn_fav_add: "To Favorites",
+            btn_fav_remove: "In Favorites",
+            exploration_mode: "Safety Level",
+            btn_export: "💾 Export Data",
+            btn_import: "📂 Import Data",
+            expl_fav: "Because you like ",
+            expl_sim: "Related to previous",
+            expl_rand: "Fate",
+            related_label: "Related themes:",
+            history_title: "History (Click to restore)"
         },
         ru: {
             generate: "Случайный жанр",
-            generate_again: "Ещё случайный жанр",
-            watch: "Перейти к просмотру",
-            photo: "Смотреть фото",
-            add_genre: "Добавить жанр",
-            empty: "Список пуст (Проверь фильтры)!",
-            search_en_label: "Искать на английском",
-            site_label: "Порносайт",
-            favorites_catalog: "Каталог для избранного",
-            settings: "Настройки",
-            filter_include: "Включить в фильтр",
-            filter_exclude: "Исключить из фильтра",
+            generate_again: "Другой жанр",
+            btn_similar: "Похожий жанр",
+            watch: "Смотреть",
+            photo: "Фото",
+            add_genre: "Модификаторы",
+            empty: "Пусто (Проверь фильтры/Уровень)!",
+            search_en_label: "Искать на EN",
+            site_label: "Сайт",
+            favorites_catalog: "Каталог Избранного",
+            filter_include: "Включить (Теги)",
+            filter_exclude: "Исключить (Теги)",
             tag_straight: "Гетеро",
             tag_gay: "Гей",
             tag_lesbian: "Лесби",
             tag_trans: "Транс",
             tag_fav: "Избранное",
-            btn_fav_add: "❤️",
-            btn_fav_remove: "❤️",
-            btn_ban_add: "🚫",
-            btn_ban_remove: "🚫",
             nav_home: "Главная",
-            nav_settings: "Настройки"
+            nav_settings: "Настройки",
+            btn_ban_add: "В ЧС",
+            btn_ban_remove: "В ЧС",
+            btn_fav_add: "В Избранное",
+            btn_fav_remove: "В Избранном",
+            exploration_mode: "Откровенность",
+            btn_export: "💾 Сохранить данные",
+            btn_import: "📂 Загрузить данные",
+            expl_fav: "Потому что ты любишь ",
+            expl_sim: "Похоже на предыдущее",
+            expl_rand: "Воля случая",
+            related_label: "Связанные темы:",
+            history_title: "История (Нажми для возврата)"
         }
     };
 
-    // Filter Categories
+    const EXTREME_TAGS = ['extreme', 'blood', 'scat', 'piss', 'pain', 'torture', 'vomit', 'enema', 'fisting', 'needle-play'];
+    const SPICY_TAGS = ['bdsm', 'kinky', 'fetish', 'bondage', 'domination', 'submission', 'spanking'];
+    const LGBT_TAGS = ['gay', 'trans', 'shemale', 'lesbian', 'bi', 'crossdresser'];
+
     const filterCats = [
         { id: 'straight', key: 'tag_straight' },
         { id: 'gay', key: 'tag_gay' },
@@ -1913,137 +1872,128 @@
     window.onload = () => {
         initLanguage();
         initTheme();
+        initIntensity();
         setInitialText();
         renderModifiers();
         renderFilters();
+        renderHistory();
         updateCounts();
         checkLayout();
         window.addEventListener('resize', checkLayout);
     };
 
-    // === TABS (MOBILE) ===
-    function switchTab(tab) {
-        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        
-        document.getElementById('tab-' + tab).classList.add('active');
-        document.getElementById('nav-' + tab).classList.add('active');
+    // === SCORING SYSTEM ===
+    
+    function adjustTagScores(item, delta) {
+        if(!item || !item.tags) return;
+        let changed = false;
+        item.tags.forEach(tag => {
+            if(['universal', 'straight'].includes(tag)) return; // Don't score generic tags heavily
+            if(!tagScores[tag]) tagScores[tag] = 0;
+            tagScores[tag] += delta;
+            changed = true;
+        });
+        if(changed) localStorage.setItem(STORAGE.TAG_SCORES, JSON.stringify(tagScores));
     }
 
-    // === LAYOUT LOGIC ===
-    function checkLayout() {
-        const isPC = window.innerWidth > 768;
-        const bundle = document.getElementById('settings-bundle');
-        const pcMount = document.getElementById('pc-settings-mount');
-        const mobileMount = document.getElementById('mobile-settings-mount');
+    // Weighted Random Selection
+    function getWeightedRandom(items) {
+        // Calculate weights: Base 10 + Score. Minimum weight 0.1
+        let totalWeight = 0;
+        const candidates = items.map(item => {
+            let itemScore = 0;
+            item.tags.forEach(t => itemScore += (tagScores[t] || 0));
+            // Weight formula: ensure it doesn't go below 0.1
+            const weight = Math.max(0.1, 10 + itemScore);
+            totalWeight += weight;
+            return { item, weight };
+        });
 
-        if (isPC) {
-            pcMount.appendChild(bundle);
-            // Hide bottom nav via CSS media query already handles it
-        } else {
-            mobileMount.appendChild(bundle);
+        let random = Math.random() * totalWeight;
+        for (const candidate of candidates) {
+            if (random < candidate.weight) return candidate.item;
+            random -= candidate.weight;
         }
+        return items[Math.floor(Math.random() * items.length)]; // Fallback
     }
 
-    // === FILTER RENDER ===
-    function renderFilters() {
-        // Include
-        const incCont = document.getElementById('filter-include');
-        incCont.innerHTML = '';
-        
-        // Add "Favs" to Include
-        const favBtn = createFilterBtn('fav', 'tag_fav', includeTags.has('fav'));
-        favBtn.onclick = () => toggleInclude('fav');
-        incCont.appendChild(favBtn);
+    // === GENERATION LOGIC ===
 
-        filterCats.forEach(cat => {
-            const btn = createFilterBtn(cat.id, cat.key, includeTags.has(cat.id));
-            btn.onclick = () => toggleInclude(cat.id);
-            incCont.appendChild(btn);
-        });
-
-        // Exclude
-        const excCont = document.getElementById('filter-exclude');
-        excCont.innerHTML = '';
-        filterCats.forEach(cat => {
-            const btn = createFilterBtn(cat.id, cat.key, excludeTags.has(cat.id));
-            btn.onclick = () => toggleExclude(cat.id);
-            excCont.appendChild(btn);
-        });
-        
-        applyLanguage();
-    }
-
-    function createFilterBtn(id, key, isActive) {
-        const div = document.createElement('div');
-        div.className = 'tag';
-        if(isActive) div.classList.add('selected');
-        div.setAttribute('data-key', key);
-        return div;
-    }
-
-    function toggleInclude(id) {
-        if(includeTags.has(id)) includeTags.delete(id);
-        else includeTags.add(id);
-        renderFilters();
-    }
-
-    function toggleExclude(id) {
-        if(excludeTags.has(id)) excludeTags.delete(id);
-        else excludeTags.add(id);
-        renderFilters();
-    }
-
-    // === GENERATION ===
-    function startGeneration() {
+    function startGeneration(mode) {
         if(isGenerating) return;
 
-        const filtered = filterData();
+        // SCORING: If we click "Random" (Different) while a previous item exists 
+        // and we haven't interacted with it (fav/watch), it means we didn't like it.
+        // Decrease score.
+        if (mode === 'random' && currentItem && !hasInteractedWithCurrent) {
+            adjustTagScores(currentItem, -1);
+        }
+        
+        // SCORING: If Similar, boost previous
+        if (mode === 'similar' && currentItem) {
+            adjustTagScores(currentItem, 1);
+        }
+
+        let filtered = filterData();
+        
+        if (mode === 'similar' && lastGeneratedItem) {
+            const subset = filtered.filter(item => {
+                if(item.id === lastGeneratedItem.id) return false;
+                const intersection = item.tags.filter(t => lastGeneratedItem.tags.includes(t));
+                return intersection.length >= 2;
+            });
+            if(subset.length > 0) filtered = subset;
+        }
+
         if(filtered.length === 0) {
             document.getElementById('result-text').innerText = langData[currentLang].empty;
             return;
         }
 
         isGenerating = true;
+        hasInteractedWithCurrent = false; // Reset interaction flag
+
+        // UI Animation setup
         const btn = document.getElementById('btn-gen');
         const card = document.getElementById('card-block');
         const resText = document.getElementById('result-text');
         const animText = document.getElementById('anim-text');
 
         btn.style.opacity = "0.5";
-        btn.style.pointerEvents = "none";
         card.classList.add('shuffling');
 
-        // Show Animation Text above card
         const anims = animationPhrases[currentLang];
         animText.innerText = anims[Math.floor(Math.random() * anims.length)];
         animText.classList.add('visible');
 
-        let duration = 2000;
+        let duration = 800;
         let interval = setInterval(() => {
             const rand = filtered[Math.floor(Math.random() * filtered.length)];
             resText.innerText = (currentLang === 'ru' && rand.name_ru) ? rand.name_ru : rand.name;
-        }, 80);
+        }, 60);
 
         setTimeout(() => {
             clearInterval(interval);
-            finishGeneration(filtered);
+            // Select based on weights
+            const finalItem = getWeightedRandom(filtered);
+            finishGeneration(finalItem, mode);
         }, duration);
     }
 
-    function finishGeneration(filtered) {
+    function finishGeneration(item, mode) {
         isGenerating = false;
-        const btn = document.getElementById('btn-gen');
+        currentItem = item;
+        lastGeneratedItem = item;
+
+        addToHistory(item);
+
         const card = document.getElementById('card-block');
+        const btn = document.getElementById('btn-gen');
         const animText = document.getElementById('anim-text');
-
-        const randIndex = Math.floor(Math.random() * filtered.length);
-        currentItem = filtered[randIndex];
-
+        
         card.classList.remove('shuffling');
         btn.style.opacity = "1";
-        btn.style.pointerEvents = "all";
-        animText.classList.remove('visible'); // Hide anim text
+        animText.classList.remove('visible');
 
         if(isFirstGen) {
             isFirstGen = false;
@@ -2051,65 +2001,170 @@
             document.querySelector('[data-key="generate"]').innerText = langData[currentLang].generate_again;
         }
 
-        updateUI();
+        renderResultUI(mode);
+        updateLink();
+    }
+
+    function renderResultUI(mode) {
+        renderResultName();
         
-        // Random bottom comment
+        // Explanation
+        const explText = document.getElementById('explanation-text');
+        const t = langData[currentLang];
+        let reason = t.expl_rand;
+        if (mode === 'similar') reason = t.expl_sim;
+        else {
+            // Check fav intersection
+            const favTags = new Set();
+            favorites.forEach(fid => {
+                const fItem = data.find(x => x.id === fid);
+                if(fItem) fItem.tags.forEach(tag => favTags.add(tag));
+            });
+            const shared = currentItem.tags.find(tag => favTags.has(tag) && !['universal','straight'].includes(tag));
+            if(shared) reason = t.expl_fav + shared;
+        }
+        explText.innerText = reason;
+
+        // Badges
+        const badgesEl = document.getElementById('badges');
+        badgesEl.innerHTML = '';
+        const isExtreme = currentItem.tags.some(t => EXTREME_TAGS.includes(t));
+        const isLGBT = currentItem.tags.some(t => ['gay','trans','shemale','lesbian'].includes(t));
+        const isNiche = currentItem.tags.includes('fetish') || currentItem.tags.includes('scat');
+
+        if(isExtreme) badgesEl.innerHTML += `<div class="warning-badge badge-extreme">Extreme</div>`;
+        if(isLGBT) badgesEl.innerHTML += `<div class="warning-badge badge-lgbt">LGBT</div>`;
+        else if(isNiche) badgesEl.innerHTML += `<div class="warning-badge badge-niche">Niche</div>`;
+
+        // Related Tags (Interest Graph)
+        const relatedEl = document.getElementById('related-tags');
+        relatedEl.innerHTML = '';
+        const niceTags = currentItem.tags.filter(t => !['universal','straight','gay'].includes(t)).slice(0, 5);
+        if(niceTags.length > 0) {
+            niceTags.forEach(tag => {
+               relatedEl.innerHTML += `<span class="related-tag">${tag}</span>`; 
+            });
+        }
+
+        updateActionButtons();
+        
         const comments = resultComments[currentLang];
         document.getElementById('result-comment').innerText = comments[Math.floor(Math.random() * comments.length)];
     }
 
-    function filterData() {
-        return data.filter(item => {
-            // 1. Internal Blacklist (specific item ban)
-            if (blacklist.includes(item.id)) return false;
+    // === USER INTERACTION HANDLERS ===
+    
+    function toggleFavorite() {
+        if(!currentItem) return;
+        const id = currentItem.id;
+        
+        if (favorites.includes(id)) {
+            // Removing from fav
+            favorites = favorites.filter(x => x !== id);
+        } else {
+            // Adding to fav -> Boost score heavily
+            favorites.push(id); 
+            blacklist = blacklist.filter(x => x !== id);
+            adjustTagScores(currentItem, 5); // +5 Points!
+            hasInteractedWithCurrent = true;
+        }
+        saveLists(); updateActionButtons(); updateCounts();
+    }
 
-            // 2. EXCLUDE (Tags)
-            // If item has ANY tag that is in excludeTags -> hide
-            // Tags to check: straight, gay, lesbian, trans
-            for(let t of item.tags) {
-                if(excludeTags.has(t)) return false;
-            }
+    function handleOutboundClick() {
+        if(!currentItem) return;
+        // Watch/Photos clicked -> Boost score
+        if(!hasInteractedWithCurrent) {
+            adjustTagScores(currentItem, 3); // +3 Points!
+            hasInteractedWithCurrent = true;
+        }
+    }
 
-            // 3. INCLUDE
-            // If includeTags is empty -> Show All (unless excluded)
-            // If includeTags has 'fav' -> Must be in favorites
-            // If includeTags has categories -> Item must match AT LEAST ONE
+    // === HISTORY SYSTEM ===
+
+    function addToHistory(item) {
+        // Add to beginning, keep max 30
+        const entry = { id: item.id, timestamp: Date.now() };
+        // Remove duplicate if exists to bump it to top
+        historyData = historyData.filter(x => x.id !== item.id);
+        historyData.unshift(entry);
+        if(historyData.length > 30) historyData.pop();
+        localStorage.setItem(STORAGE.HISTORY, JSON.stringify(historyData));
+        renderHistory();
+    }
+
+    function renderHistory() {
+        const list = document.getElementById('history-list');
+        list.innerHTML = '';
+        historyData.forEach(entry => {
+            const item = data.find(x => x.id === entry.id);
+            if(!item) return;
             
-            // Handle Favs
-            if(includeTags.has('fav')) {
-                if(!favorites.includes(item.id)) return false;
-            }
-
-            // If no category filters are selected, we are done (Universal logic applied by default if no blacklist)
-            const catFilters = new Set(includeTags);
-            catFilters.delete('fav'); // Remove fav from cat check
-
-            if(catFilters.size === 0) return true;
-
-            // Check if item matches any selected category OR is universal
-            const hasMatch = item.tags.some(t => catFilters.has(t));
-            // Universal items should show if 'straight' is selected? Usually yes, or "All". 
-            // Let's say Universal matches everything unless excluded.
-            // Simplified: If categories selected, item must match one OR be universal.
-            const isUniversal = item.tags.includes('universal') || 
-                                ['clothing', 'fetish', 'shoes', 'toys', 'roleplay', 'makeup', 'hair', 'furniture', 'food', 'medical'].some(t => item.tags.includes(t));
+            const div = document.createElement('div');
+            div.className = 'history-item';
+            const name = (currentLang === 'ru' && item.name_ru) ? item.name_ru : item.name;
             
-            if (isUniversal) return true; // Show universal stuff always if not excluded
-            return hasMatch;
+            div.innerHTML = `<span>${name}</span> <span class="history-time">↺</span>`;
+            div.onclick = () => restoreHistoryItem(item);
+            list.appendChild(div);
         });
     }
 
-    function updateUI() {
-        if(!currentItem) return;
-        renderResultName();
-        updateActionButtons();
+    function restoreHistoryItem(item) {
+        currentItem = item;
+        lastGeneratedItem = item;
+        hasInteractedWithCurrent = true; // Treating restored history as "interacted" so we don't penalize it on next random
+        
+        switchTab('home');
+        
+        // Ensure UI is visible
+        if(isFirstGen) {
+            isFirstGen = false;
+            document.querySelectorAll('.hidden-initial').forEach(el => el.classList.remove('hidden-initial'));
+            document.querySelector('[data-key="generate"]').innerText = langData[currentLang].generate_again;
+        }
+        
+        renderResultUI('history');
         updateLink();
+    }
+
+    // === STANDARD HELPERS ===
+
+    function filterData() {
+        return data.filter(item => {
+            if (blacklist.includes(item.id)) return false;
+            // Safety
+            if (currentIntensity === 1) {
+                if (item.tags.some(t => EXTREME_TAGS.includes(t))) return false;
+                if (item.tags.some(t => SPICY_TAGS.includes(t))) return false;
+                if (item.tags.some(t => LGBT_TAGS.includes(t))) return false; 
+            }
+            if (currentIntensity === 2) {
+                if (item.tags.some(t => EXTREME_TAGS.includes(t))) return false;
+            }
+            // Tags
+            for(let t of item.tags) {
+                if(excludeTags.has(t)) return false;
+            }
+            if(includeTags.has('fav')) {
+                if(!favorites.includes(item.id)) return false;
+            }
+            const catFilters = new Set(includeTags);
+            catFilters.delete('fav');
+            if(catFilters.size === 0) return true;
+            
+            const isUniversal = item.tags.includes('universal') || 
+                                ['clothing', 'fetish', 'shoes'].some(t => item.tags.includes(t));
+            if (isUniversal && currentIntensity > 1) return true;
+            if (item.tags.some(t => catFilters.has(t))) return true;
+
+            return false;
+        });
     }
 
     function renderResultName() {
         if (!currentItem) return;
         let displayName = (currentLang === 'ru' && currentItem.name_ru) ? currentItem.name_ru : currentItem.name;
-        
         const searchEn = document.getElementById('force-en').checked;
         const useRu = (currentLang === 'ru' && !searchEn);
 
@@ -2125,22 +2180,17 @@
 
     function updateLink() {
         if(!currentItem) return;
-        
         const platform = document.getElementById('platform').value;
         const forceEn = document.getElementById('force-en').checked;
         const root = document.documentElement;
-
         let color = '#ff9900';
-        if(platform === 'xh') color = '#5aaaff';
-        if(platform === 'xv') color = '#de2828';
-        if(platform === 'sb') color = '#ffd700';
-        if(platform === 'yp') color = '#ff3366';
+        if(platform === 'xh') color = '#5aaaff'; if(platform === 'xv') color = '#de2828';
+        if(platform === 'sb') color = '#ffd700'; if(platform === 'yp') color = '#ff3366';
         if(platform === 'rt') color = '#ff0000';
         root.style.setProperty('--accent', color);
 
         const useRu = (currentLang === 'ru' && !forceEn);
         let queryName = useRu ? (currentItem.name_ru || currentItem.name) : currentItem.name;
-        
         let queryParts = [queryName];
         activeMods.forEach(key => {
             const mod = modifiersData.find(m => m.key === key);
@@ -2161,25 +2211,14 @@
         
         let googleQuery = queryName + " " + Array.from(activeMods).join(" ") + " porn";
         document.getElementById('photo-link').href = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(googleQuery)}`;
-        
-        renderResultName();
     }
 
-    // === ACTIONS ===
     function toggleBlacklist() {
         if(!currentItem) return;
         const id = currentItem.id;
         if (blacklist.includes(id)) blacklist = blacklist.filter(x => x !== id);
         else { blacklist.push(id); favorites = favorites.filter(x => x !== id); }
         saveLists(); updateActionButtons();
-    }
-
-    function toggleFavorite() {
-        if(!currentItem) return;
-        const id = currentItem.id;
-        if (favorites.includes(id)) favorites = favorites.filter(x => x !== id);
-        else { favorites.push(id); blacklist = blacklist.filter(x => x !== id); }
-        saveLists(); updateActionButtons(); updateCounts();
     }
 
     function saveLists() {
@@ -2192,106 +2231,154 @@
         const btnBan = document.getElementById('btn-ban');
         const btnFav = document.getElementById('btn-fav');
         const t = langData[currentLang];
-        btnBan.classList.remove('active');
-        btnFav.classList.remove('active');
-
+        btnBan.classList.remove('active'); btnFav.classList.remove('active');
         if (blacklist.includes(currentItem.id)) {
             btnBan.classList.add('active'); btnBan.innerText = t.btn_ban_remove;
         } else btnBan.innerText = t.btn_ban_add;
-
         if (favorites.includes(currentItem.id)) {
             btnFav.classList.add('active'); btnFav.innerText = t.btn_fav_remove;
         } else btnFav.innerText = t.btn_fav_add;
     }
 
-    function updateCounts() {
-        document.getElementById('count-fav').innerText = favorites.length;
+    function updateCounts() { document.getElementById('count-fav').innerText = favorites.length; }
+
+    function exportData() {
+        const exportObj = {
+            blacklist, favorites, tagScores, history: historyData,
+            settings: { lang: currentLang, theme: localStorage.getItem(STORAGE.THEME), intensity: currentIntensity }
+        };
+        prompt("Copy:", JSON.stringify(exportObj));
     }
 
-    // === UTILS ===
-    function setInitialText() {
-        const phrases = welcomePhrases[currentLang];
-        document.getElementById('result-text').innerText = phrases[Math.floor(Math.random() * phrases.length)];
+    function importData() {
+        const str = prompt("Paste data:");
+        if(!str) return;
+        try {
+            const obj = JSON.parse(str);
+            if(obj.blacklist) blacklist = obj.blacklist;
+            if(obj.favorites) favorites = obj.favorites;
+            if(obj.tagScores) tagScores = obj.tagScores;
+            if(obj.history) historyData = obj.history;
+            if(obj.settings) currentIntensity = obj.settings.intensity || 1;
+            
+            saveLists();
+            localStorage.setItem(STORAGE.TAG_SCORES, JSON.stringify(tagScores));
+            localStorage.setItem(STORAGE.HISTORY, JSON.stringify(historyData));
+            localStorage.setItem(STORAGE.INTENSITY, currentIntensity);
+            
+            alert("Done! Reloading..."); location.reload();
+        } catch(e) { alert("Error!"); }
     }
 
-    function toggleAccordion(id) {
-        document.getElementById(id).classList.toggle('open');
+    // Filters UI
+    function renderFilters() {
+        const incCont = document.getElementById('filter-include'); incCont.innerHTML = '';
+        const favBtn = createFilterBtn('fav', 'tag_fav', includeTags.has('fav'));
+        favBtn.onclick = () => toggleInclude('fav'); incCont.appendChild(favBtn);
+        filterCats.forEach(cat => {
+            const btn = createFilterBtn(cat.id, cat.key, includeTags.has(cat.id));
+            btn.onclick = () => toggleInclude(cat.id); incCont.appendChild(btn);
+        });
+
+        const excCont = document.getElementById('filter-exclude'); excCont.innerHTML = '';
+        filterCats.forEach(cat => {
+            const btn = createFilterBtn(cat.id, cat.key, excludeTags.has(cat.id));
+            btn.onclick = () => toggleExclude(cat.id); excCont.appendChild(btn);
+        });
+        applyLanguage();
+    }
+    function createFilterBtn(id, key, isActive) {
+        const div = document.createElement('div'); div.className = 'tag';
+        if(isActive) div.classList.add('selected'); div.setAttribute('data-key', key); return div;
+    }
+    function toggleInclude(id) {
+        if(includeTags.has(id)) includeTags.delete(id); else includeTags.add(id);
+        renderFilters();
+    }
+    function toggleExclude(id) {
+        if(excludeTags.has(id)) excludeTags.delete(id); else excludeTags.add(id);
+        renderFilters();
     }
 
     function renderModifiers() {
-        const container = document.getElementById('mod-container');
-        container.innerHTML = '';
+        const container = document.getElementById('mod-container'); container.innerHTML = '';
         const searchEn = document.getElementById('force-en').checked;
         const useRu = (currentLang === 'ru' && !searchEn);
-
-        const sortedMods = [...modifiersData].sort((a, b) => {
-            const aActive = activeMods.has(a.key);
-            const bActive = activeMods.has(b.key);
-            if (aActive === bActive) return 0;
-            return aActive ? -1 : 1;
-        });
-
-        sortedMods.forEach(mod => {
-            const tag = document.createElement('div');
-            tag.className = 'tag';
+        modifiersData.forEach(mod => {
+            const tag = document.createElement('div'); tag.className = 'tag';
             if(activeMods.has(mod.key)) tag.classList.add('selected');
             tag.innerText = useRu ? mod.ru : mod.en;
             tag.onclick = () => {
-                if(activeMods.has(mod.key)) activeMods.delete(mod.key); 
-                else activeMods.add(mod.key);
+                if(activeMods.has(mod.key)) activeMods.delete(mod.key); else activeMods.add(mod.key);
                 renderModifiers(); renderResultName(); updateLink();
             };
             container.appendChild(tag);
         });
     }
 
+    function initIntensity() {
+        const saved = localStorage.getItem(STORAGE.INTENSITY);
+        if(saved) currentIntensity = parseInt(saved);
+        document.getElementById('intensity-slider').value = currentIntensity;
+        updateIntensity(currentIntensity);
+    }
+    function updateIntensity(val) {
+        currentIntensity = parseInt(val);
+        localStorage.setItem(STORAGE.INTENSITY, currentIntensity);
+        const label = document.getElementById('intensity-val-label');
+        if(currentIntensity === 1) { label.innerText = "SAFE"; label.style.color = "#2ecc71"; }
+        else if(currentIntensity === 2) { label.innerText = "SPICY"; label.style.color = "#f39c12"; }
+        else { label.innerText = "EXTREME"; label.style.color = "#e74c3c"; }
+    }
+
+    function setInitialText() {
+        const phrases = welcomePhrases[currentLang];
+        document.getElementById('result-text').innerText = phrases[Math.floor(Math.random() * phrases.length)];
+    }
+    function checkLayout() {
+        const isPC = window.innerWidth > 768;
+        const bundle = document.getElementById('settings-bundle');
+        const pcMount = document.getElementById('pc-settings-mount');
+        const mobileMount = document.getElementById('mobile-settings-mount');
+        if (isPC) pcMount.appendChild(bundle); else mobileMount.appendChild(bundle);
+    }
+    function toggleAccordion(id) { document.getElementById(id).classList.toggle('open'); }
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        document.getElementById('tab-' + tab).classList.add('active');
+        document.getElementById('nav-' + tab).classList.add('active');
+    }
     function initTheme() {
         const isLight = localStorage.getItem(STORAGE.THEME) === 'light';
         if(isLight) document.body.classList.add('light-theme');
         document.getElementById('theme-toggle').checked = isLight;
         updateToggleLabels();
     }
-    
     function toggleTheme() {
-        const checkbox = document.getElementById('theme-toggle');
-        if(checkbox.checked) document.body.classList.add('light-theme');
-        else document.body.classList.remove('light-theme');
-        localStorage.setItem(STORAGE.THEME, checkbox.checked ? 'light' : 'dark');
+        const cb = document.getElementById('theme-toggle');
+        document.body.classList.toggle('light-theme', cb.checked);
+        localStorage.setItem(STORAGE.THEME, cb.checked ? 'light' : 'dark');
         updateToggleLabels();
     }
-
     function initLanguage() {
         const saved = localStorage.getItem(STORAGE.LANG);
         currentLang = saved || (navigator.language.includes('ru') ? 'ru' : 'en');
         document.getElementById('lang-toggle').checked = (currentLang === 'ru');
-        applyLanguage();
-        updateToggleLabels();
+        applyLanguage(); updateToggleLabels();
     }
-
     function toggleLang() {
-        const checkbox = document.getElementById('lang-toggle');
-        currentLang = checkbox.checked ? 'ru' : 'en';
+        currentLang = document.getElementById('lang-toggle').checked ? 'ru' : 'en';
         localStorage.setItem(STORAGE.LANG, currentLang);
-        applyLanguage();
+        applyLanguage(); renderHistory();
         if(currentItem) { renderResultName(); updateLink(); updateActionButtons(); }
         else setInitialText();
-        renderModifiers();
-        renderFilters();
-        updateToggleLabels();
+        renderModifiers(); renderFilters(); updateToggleLabels();
     }
-
     function updateToggleLabels() {
         const isRu = (currentLang === 'ru');
-        document.getElementById('label-ru').classList.toggle('active', isRu);
-        document.getElementById('label-en').classList.toggle('active', !isRu);
-        
-        const isLight = document.body.classList.contains('light-theme');
-        document.getElementById('label-light').classList.toggle('active', isLight);
-        document.getElementById('label-dark').classList.toggle('active', !isLight);
-        
         document.getElementById('comp-search').style.display = isRu ? 'flex' : 'none';
     }
-
     function applyLanguage() {
         const t = langData[currentLang];
         document.querySelectorAll('[data-key]').forEach(el => {
@@ -2299,53 +2386,37 @@
             if(t[key]) el.innerText = t[key];
         });
     }
-
-    // === FAVORITES CATALOG ===
     function openFavoritesCatalog() {
         const modal = document.getElementById('modal-overlay');
         const body = document.getElementById('modal-catalog-body');
         body.innerHTML = '';
-
-        // Sort data: favorites first, then alphabetical
         const sortedData = [...data].sort((a, b) => {
-            const aFav = favorites.includes(a.id);
-            const bFav = favorites.includes(b.id);
-            if(aFav && !bFav) return -1;
-            if(!aFav && bFav) return 1;
+            const aFav = favorites.includes(a.id); const bFav = favorites.includes(b.id);
+            if(aFav && !bFav) return -1; if(!aFav && bFav) return 1;
             const aName = (currentLang === 'ru' && a.name_ru) ? a.name_ru : a.name;
             const bName = (currentLang === 'ru' && b.name_ru) ? b.name_ru : b.name;
             return aName.localeCompare(bName);
         });
-
         sortedData.forEach(item => {
             const div = document.createElement('div');
             div.className = 'catalog-item';
-            const isFav = favorites.includes(item.id);
-            if(isFav) div.classList.add('active');
-            
+            if(favorites.includes(item.id)) div.classList.add('active');
             div.innerText = (currentLang === 'ru' && item.name_ru) ? item.name_ru : item.name;
-            
             div.onclick = () => {
-                // Toggle Fav
                 if(favorites.includes(item.id)) favorites = favorites.filter(x => x !== item.id);
                 else { favorites.push(item.id); blacklist = blacklist.filter(x => x !== item.id); }
-                
-                div.classList.toggle('active');
-                saveLists(); updateCounts();
+                div.classList.toggle('active'); saveLists(); updateCounts();
                 if(currentItem && currentItem.id === item.id) updateActionButtons();
             };
             body.appendChild(div);
         });
-
         modal.classList.add('open');
     }
-
     function closeList(e, force) {
         if (force || e.target.id === 'modal-overlay') {
             document.getElementById('modal-overlay').classList.remove('open');
         }
     }
-
 </script>
 </body>
 </html>
