@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>xChoiceHub</title>
+    <title>xFetishHub</title>
     <meta name="theme-color" content="#050505">
     
     <style>
@@ -389,7 +389,7 @@
 
     <!-- SIDEBAR (PC ONLY) -->
     <div class="sidebar" id="sidebar">
-        <div class="logo">x<span>Choice</span>Hub</div>
+        <div class="logo">x<span>Fetish</span>Hub</div>
         
         <!-- PC: Settings & Filters live here -->
         <div id="pc-settings-mount">
@@ -402,7 +402,7 @@
         
         <!-- Mobile Logo (Fixed Top) -->
         <div class="mobile-header">
-            <div class="logo">x<span>Choice</span>Hub</div>
+            <div class="logo">x<span>Fetish</span>Hub</div>
         </div>
 
         <!-- TAB 1: HOME (Generator) -->
@@ -480,9 +480,9 @@
         <div class="platform-box">
             <span class="platform-label" data-key="site_label">Pornsite</span>
             <select id="platform" class="platform-select" onchange="updateLink()">
-                <option value="xh">xHamster</option>
                 <option value="ph">Pornhub</option>
                 <option value="xv">xVideos</option>
+                <option value="xh">xHamster</option>
                 <option value="sb">SpankBang</option>
                 <option value="yp">YouPorn</option>
                 <option value="rt">RedTube</option>
@@ -582,7 +582,7 @@
     let blacklist = JSON.parse(localStorage.getItem(STORAGE.BLACKLIST)) || [];
     let favorites = JSON.parse(localStorage.getItem(STORAGE.FAVORITES)) || [];
 
-    // === DATA PLACEHOLDER ===
+    // === Pornushka ===
     const data = [
             {id: 1, name: "Masturbation", name_ru: "Мастурбация", slug: "masturbation", tags: ["universal", "solo"]},
             {id: 2, name: "Milf", name_ru: "MILF (Мамочки)", slug: "milf", tags: ["straight", "lesbian", "trans"]},
@@ -661,7 +661,7 @@
             {id: 75, name: "Hooker", name_ru: "Проститутка", slug: "hooker", tags: ["straight", "trans"]},
             {id: 76, name: "Maid", name_ru: "Горничная", slug: "maid", tags: ["straight", "lesbian", "trans", "crossdresser"]},
             {id: 77, name: "Eating", name_ru: "Еда", slug: "eating", tags: ["universal"]},
-            {id: 78, name: "Reverse Cowgirl", name_ru: "Наездница наоборот", slug: "reverse-cowgirl", tags: ["straight", "trans", "gay"]},
+            {id: 78, name: "Reverse Cowgirl", name_ru: "Наездница наоборот", slug: "reverse-cowgirl", tags: ["straight"]},
             {id: 79, name: "Shaving", name_ru: "Бритье", slug: "shaving", tags: ["universal"]},
             {id: 80, name: "GILF", name_ru: "GILF (Бабушки)", slug: "gilf", tags: ["straight", "lesbian"]},
             {id: 81, name: "Music", name_ru: "Музыка", slug: "music", tags: ["universal"]},
@@ -672,7 +672,7 @@
             {id: 86, name: "Stranger", name_ru: "Незнакомец", slug: "stranger", tags: ["universal"]},
             {id: 87, name: "Leather", name_ru: "Кожа", slug: "leather", tags: ["universal", "bdsm"]},
             {id: 88, name: "Foot Worship", name_ru: "Фут-фетиш (Поклонение ногам)", slug: "foot-worship", tags: ["universal"]},
-            {id: 89, name: "Fellatio", name_ru: "Фелляция (минет)", slug: "fellatio", tags: ["straight", "gay", "trans"]},
+            {id: 89, name: "Fellatio (Blowjob)", name_ru: "Фелляция (минет)", slug: "fellatio", tags: ["straight", "gay", "trans"]},
             {id: 90, name: "Submission", name_ru: "Подчинение", slug: "submission", tags: ["universal", "bdsm"]},
             {id: 91, name: "Toilet", name_ru: "Туалет", slug: "toilet", tags: ["universal", "scat"]},
             {id: 92, name: "Medical", name_ru: "Медики", slug: "medical", tags: ["universal", "roleplay"]},
@@ -684,7 +684,7 @@
             {id: 98, name: "Queen", name_ru: "Королева", slug: "queen", tags: ["straight", "bi", "domination"]},
             {id: 99, name: "Dominatrix", name_ru: "Госпожа (Доминатрикс)", slug: "dominatrix", tags: ["straight", "lesbian", "bi"]},
             {id: 100, name: "Fishnet", name_ru: "В сетку", slug: "fishnet", tags: ["straight", "lesbian", "trans", "crossdresser"]},
-            {id: 101, name: "Ballbusting", name_ru: "Баллбастинг (Битье по яйцам)", slug: "ballbusting", tags: ["straight", "gay", "trans", "bdsm"]},
+            {id: 101, name: "Ballbusting", name_ru: "Баллбастинг (Битье по яйцам)", slug: "ballbusting", tags: ["straight", "gay", "bdsm"]},
             {id: 103, name: "Fucking Machine", name_ru: "Секс-машина", slug: "fucking-machine", tags: ["universal", "toys"]},
             {id: 104, name: "Ass Shaking", name_ru: "Тряска попой (Тверк)", slug: "ass-shaking", tags: ["universal"]},
             {id: 105, name: "Whipping", name_ru: "Порка кнутом", slug: "whipping", tags: ["universal", "bdsm"]},
@@ -731,7 +731,7 @@
             {id: 147, name: "Tug Job", name_ru: "Дрочка (Tug Job)", slug: "tug-job", tags: ["gay", "straight"]},
             {id: 148, name: "White Booty", name_ru: "Белая попка", slug: "white-booty", tags: ["straight", "lesbian"]},
             {id: 149, name: "Ass Play", name_ru: "Игры с попой", slug: "ass-play", tags: ["universal"]},
-            {id: 150, name: "Sandwich", name_ru: "Сэндвич (Двойное проникновение)", slug: "sandwich", tags: ["straight", "gay", "bi"]},
+            {id: 150, name: "Sandwich (Double Penetration)", name_ru: "Сэндвич (Двойное проникновение)", slug: "sandwich", tags: ["straight", "gay", "bi"]},
             {id: 151, name: "Tickling", name_ru: "Щекотка", slug: "tickling", tags: ["universal", "fetish"]},
             {id: 152, name: "Enema", name_ru: "Клизма", slug: "enema", tags: ["universal", "kinky", "medical"]},
             {id: 153, name: "Gloves", name_ru: "Перчатки", slug: "gloves", tags: ["universal", "fetish", "medical"]},
@@ -792,15 +792,15 @@
             {id: 210, name: "Begging", name_ru: "Упрашивание (Begging)", slug: "begging", tags: ["bdsm", "universal"]},
             {id: 211, name: "Velvet", name_ru: "Бархат", slug: "velvet", tags: ["fetish"]},
             {id: 212, name: "Choking", name_ru: "Удушение", slug: "choking", tags: ["bdsm", "kinky"]},
-            {id: 213, name: "Spit Roast (Cocks in the mouth and behind the girl)", name_ru: "Вертел (Члены во рту и сзади девушки)", slug: "spit-roast", tags: ["straight", "gay", "bi"]},
-            {id: 214, name: "Prostate Massage", name_ru: "Массаж простаты", slug: "prostate-massage", tags: ["gay", "bi", "medical"]},
+            {id: 213, name: "Spit Roast (Cocks in the mouth and behind the girl)", name_ru: "Вертел (Члены во рту и сзади девушки)", slug: "spit-roast", tags: ["straight"]},
+            {id: 214, name: "Prostate Massage", name_ru: "Массаж простаты", slug: "prostate-massage", tags: ["universal"]},
             {id: 215, name: "Freckles", name_ru: "Веснушки", slug: "freckles", tags: ["universal"]},
             {id: 216, name: "Attention", name_ru: "Внимание", slug: "attention", tags: ["universal"]},
             {id: 217, name: "Trampling", name_ru: "Топтание (Трамплинг)", slug: "trampling", tags: ["fetish", "bdsm"]},
             {id: 218, name: "Multiple Orgasm", name_ru: "Мультиоргазм", slug: "multiple-orgasm", tags: ["universal"]},
             {id: 219, name: "Crying", name_ru: "Плач", slug: "crying", tags: ["fetish", "bdsm"]},
             {id: 220, name: "Spread Eagle", name_ru: "Поза \"Орел\" (Ноги широко)", slug: "spread-eagle", tags: ["universal"]},
-            {id: 221, name: "Suck Off", name_ru: "Отсос", slug: "suck-off", tags: ["gay", "straight"]},
+            {id: 221, name: "Suck Off", name_ru: "Отсос", slug: "suck-off", tags: ["straight"]},
             {id: 222, name: "Feminization", name_ru: "Феминизация", slug: "feminization", tags: ["trans", "sissy", "cd"]},
             {id: 223, name: "Futanari", name_ru: "Футанари", slug: "futanari", tags: ["hentai", "trans"]},
             {id: 224, name: "Plastic", name_ru: "Пластик", slug: "plastic", tags: ["fetish"]},
@@ -810,7 +810,7 @@
             {id: 228, name: "Uniform", name_ru: "Униформа", slug: "uniform", tags: ["roleplay"]},
             {id: 229, name: "Sounding", name_ru: "Саундинг (Уретра)", slug: "sounding", tags: ["fetish", "extreme"]},
             {id: 230, name: "Dirty Feet", name_ru: "Грязные ноги", slug: "dirty-feet", tags: ["foot-worship", "fetish"]},
-            {id: 231, name: "Mutual Masturbation", name_ru: "Взаимная мастурбация", slug: "mutual-masturbation", tags: ["universal", "gay", "lesbian"]},
+            {id: 231, name: "Mutual Masturbation", name_ru: "Взаимная мастурбация", slug: "mutual-masturbation", tags: ["universal"]},
             {id: 232, name: "Jumping", name_ru: "Прыжки", slug: "jumping", tags: ["universal"]},
             {id: 233, name: "Leotard", name_ru: "Купальник / Трико", slug: "leotard", tags: ["fetish"]},
             {id: 234, name: "Shaft", name_ru: "Ствол члена", slug: "shaft", tags: ["gay", "straight"]},
@@ -967,7 +967,7 @@
             {id: 387, name: "Cutting", name_ru: "Каттинг (Порезы)", slug: "cutting", tags: ["extreme", "bdsm"]},
             {id: 388, name: "Desperation", name_ru: "Отчаяние (Нужда в туалете)", slug: "desperation", tags: ["fetish", "omorashi"]},
             {id: 389, name: "Handicap", name_ru: "Инвалидность", slug: "handicap", tags: ["fetish"]},
-            {id: 390, name: "Breast Expansion", name_ru: "Увеличение груди (Фантазии)", slug: "breast-expansion", tags: ["fantasy"]},
+            {id: 390, name: "Breast Expansion", name_ru: "Увеличение груди", slug: "breast-expansion", tags: ["fantasy"]},
             {id: 391, name: "Butter Face", name_ru: "Страшненькая (Butterface)", slug: "butter-face", tags: ["amateur"]},
             {id: 392, name: "Degradation", name_ru: "Унижение / Деградация", slug: "degradation", tags: ["bdsm"]},
             {id: 393, name: "Tickle Torture", name_ru: "Пытка щекоткой", slug: "tickle-torture", tags: ["bdsm", "tickling"]},
@@ -1092,7 +1092,7 @@
             {id: 516, name: "Straitjacket", name_ru: "Смирительная рубашка", slug: "straitjacket", tags: ["bondage", "medical"]},
             {id: 517, name: "Under Boob", name_ru: "Нижняя часть груди", slug: "under-boob", tags: ["clothing", "boobs"]},
             {id: 518, name: "Artistic Cutting", name_ru: "Художественные порезы", slug: "artistic-cutting", tags: ["extreme", "art"]},
-            {id: 519, name: "Autofellatio", name_ru: "Аутофелляция (Самоотсос)", slug: "autofellatio", tags: ["gay", "solo", "flexible"]},
+            {id: 519, name: "Autofellatio (Self-suck)", name_ru: "Аутофелляция (Самоотсос)", slug: "autofellatio", tags: ["gay", "trans", "solo", "flexible"]},
             {id: 520, name: "Bag Popping", name_ru: "Лопанье пакетов", slug: "bag-popping", tags: ["sound", "fetish"]},
             {id: 521, name: "Ballet Boots And Shoes", name_ru: "Балетные сапоги", slug: "ballet-boots-and-shoes", tags: ["shoes", "fetish"]},
             {id: 522, name: "Ballet Slippers", name_ru: "Балетки / Пуанты", slug: "ballet-slippers", tags: ["shoes", "fetish"]},
@@ -1148,7 +1148,7 @@
             {id: 575, name: "Riding Lawn Mower", name_ru: "Езда на газонокосилке", slug: "riding-lawn-mower", tags: ["vibration"]},
             {id: 576, name: "Ritual", name_ru: "Ритуал", slug: "ritual", tags: ["occult", "fetish"]},
             {id: 577, name: "Scent", name_ru: "Запах", slug: "scent", tags: ["smell"]},
-            {id: 578, name: "Self Sucking", name_ru: "Самоотсос", slug: "self-sucking", tags: ["autofellatio", "gay", "solo"]},
+            {id: 578, name: "Self Sucking", name_ru: "Самоотсос", slug: "self-sucking", tags: ["autofellatio", "gay", "solo", "trans"]},
             {id: 579, name: "Sex In The Cemetery", name_ru: "Секс на кладбище", slug: "sex-in-the-cemetery", tags: ["public", "goth"]},
             {id: 580, name: "Sex In Videostore Porn Room", name_ru: "Секс в видеопрокате", slug: "sex-in-videostore-porn-room", tags: ["public", "retro"]},
             {id: 581, name: "Sex Online", name_ru: "Секс онлайн", slug: "sex-online", tags: ["webcam", "chat"]},
@@ -1348,16 +1348,16 @@
             {id: 779, name: "Fear", name_ru: "Страх", slug: "fear", tags: ["bdsm", "psychological"]},
             {id: 780, name: "Feather", name_ru: "Перья", slug: "feather", tags: ["tickling", "soft"]},
             {id: 781, name: "Feet Fight", name_ru: "Борьба ногами", slug: "feet-fight", tags: ["fighting", "foot-fetish"]},
-            {id: 782, name: "Feet Joi", name_ru: "Фут-JOI", slug: "feet-joi", tags: ["joi", "foot-worship"]},
+            {id: 782, name: "Feet JOI", name_ru: "Инструкция по дрочке ногами", slug: "feet-joi", tags: ["joi", "foot-worship"]},
             {id: 783, name: "Female Boxing", name_ru: "Женский бокс", slug: "female-boxing", tags: ["fighting", "catfight"]},
-            {id: 784, name: "Fetnight", name_ru: "Фетнайт (Вечеринка)", slug: "fetnight", tags: ["latex", "event"]},
+            {id: 784, name: "Fetnight", name_ru: "Фетиш-ночь", slug: "fetnight", tags: ["latex", "event"]},
             {id: 785, name: "Finger", name_ru: "Палец", slug: "finger", tags: ["hands", "fetish"]},
             {id: 786, name: "Finger Brushing", name_ru: "Касание пальцами", slug: "finger-brushing", tags: ["sensual", "hands"]},
             {id: 787, name: "Finger Nail Polishing", name_ru: "Полировка ногтей", slug: "finger-nail-polishing", tags: ["hands", "grooming"]},
             {id: 788, name: "Fire Cupping", name_ru: "Огненный массаж банками", slug: "fire-cupping", tags: ["medical", "sensation"]},
             {id: 789, name: "Fire Flogging", name_ru: "Огненная порка", slug: "fire-flogging", tags: ["extreme", "fire"]},
             {id: 790, name: "Fire Play", name_ru: "Игры с огнем", slug: "fire-play", tags: ["extreme", "danger"]},
-            {id: 791, name: "Fish Hook", name_ru: "Рыболовный крючок (БДСМ)", slug: "fish-hook", tags: ["bdsm", "pain"]},
+            {id: 791, name: "Fish Hook (BDSM)", name_ru: "Рыболовный крючок (БДСМ)", slug: "fish-hook", tags: ["bdsm", "pain"]},
             {id: 792, name: "Flesh Hook", name_ru: "Крюки в плоти", slug: "flesh-hook", tags: ["extreme", "suspension"]},
             {id: 793, name: "Food", name_ru: "Еда", slug: "food", tags: ["sploshing", "mess"]},
             {id: 794, name: "Food Stuffing", name_ru: "Набивание едой", slug: "food-stuffing", tags: ["feeder", "kinky"]},
@@ -1366,6 +1366,7 @@
             {id: 797, name: "Foot Slave Training", name_ru: "Тренировка раба ногами", slug: "foot-slave-training", tags: ["foot-worship", "femdom"]},
             {id: 798, name: "Foot Smelling Handjob", name_ru: "Хэндджоб с нюханием ног", slug: "foot-smelling-handjob", tags: ["foot-fetish", "handjob"]},
             {id: 799, name: "Foot Tickling", name_ru: "Щекотка ног", slug: "foot-tickling", tags: ["tickling", "foot-fetish"]},
+            {id: 800, name: "Foot Torture", name_ru: "Пытка ног", slug: "foot-torture", tags: ["foot-fetish", "bdsm", "extreme"]},
             {id: 801, name: "Footjob", name_ru: "Футджоб", slug: "footjob", tags: ["foot-fetish", "straight", "gay"]},
             {id: 802, name: "Footsie", name_ru: "Футси (Заигрывание ногами)", slug: "footsie", tags: ["flirting", "legs"]},
             {id: 807, name: "Forced Orgasm", name_ru: "Принудительный оргазм", slug: "forced-orgasm", tags: ["bdsm", "control"]},
@@ -1388,7 +1389,7 @@
             {id: 824, name: "Glamour Gown", name_ru: "Вечернее платье", slug: "glamour-gown", tags: ["clothing", "elegance"]},
             {id: 825, name: "Glass Dildo", name_ru: "Стеклянный дилдо", slug: "glass-dildo", tags: ["toys", "glass"]},
             {id: 827, name: "Graphoerotica", name_ru: "Графоэротика (Письмена на теле)", slug: "graphoerotica", tags: ["body-writing", "art"]},
-            {id: 828, name: "Growth", name_ru: "Рост (Увеличение)", slug: "growth", tags: ["giantess", "fantasy", "inflation"]},
+            {id: 828, name: "Growth", name_ru: "Увеличение", slug: "growth", tags: ["giantess", "fantasy", "inflation"]},
             {id: 829, name: "Hair", name_ru: "Волосы", slug: "hair", tags: ["fetish", "hairy"]},
             {id: 830, name: "Hair Bleaching", name_ru: "Обесцвечивание волос", slug: "hair-bleaching", tags: ["hair", "transformation"]},
             {id: 831, name: "Hair Bondage", name_ru: "Бондаж волосами", slug: "hair-bondage", tags: ["bondage", "hair"]},
@@ -1502,7 +1503,7 @@
             {id: 940, name: "Panty Sniffing", name_ru: "Нюхает трусики", slug: "panty-sniffing", tags: ["fetish", "scent"]},
             {id: 941, name: "Penis Plug", name_ru: "Уретральный плаг", slug: "penis-plug", tags: ["sounding", "toys"]},
             {id: 942, name: "Percussion Play", name_ru: "Перкуссия (Ударные игры)", slug: "percussion-play", tags: ["impact", "bdsm"]},
-            {id: 943, name: "Perm Rods And Roller Set", name_ru: "Бигуди", slug: "perm-rods-and-roller-set", tags: ["hair", "retro"]},
+            {id: 943, name: "Perm Rods And Roller Set", name_ru: "Коклюшки и Бигуди", slug: "perm-rods-and-roller-set", tags: ["hair", "retro"]},
             {id: 944, name: "Petticoat", name_ru: "Нижняя юбка", slug: "petticoat", tags: ["clothing", "retro"]},
             {id: 945, name: "Photography", name_ru: "Фотография", slug: "photography", tags: ["voyeur", "art"]},
             {id: 946, name: "Piercing", name_ru: "Пирсинг", slug: "piercing", tags: ["modification", "fetish"]},
@@ -1652,7 +1653,7 @@
             {id: 1094, name: "Vintage Porn", name_ru: "Винтажное порно", slug: "vintage-porn", tags: ["retro"]},
             {id: 1095, name: "Vinyl", name_ru: "Винил", slug: "vinyl", tags: ["clothing", "fetish"]},
             {id: 1096, name: "Voice Play", name_ru: "Игры с голосом", slug: "voice-play", tags: ["audio", "joi"]},
-            {id: 1097, name: "Vore", name_ru: "Пожирание", slug: "vore", tags: ["fantasy", "fetish"]},
+            {id: 1097, name: "Vore", name_ru: "Пожирание", slug: "vore", tags: ["fantasy", "fetish", "extreme"]},
             {id: 1098, name: "Wartenberg Pinwheel", name_ru: "Колесо Вартенберга", slug: "wartenberg-pinwheel", tags: ["bdsm", "medical"]},
             {id: 1099, name: "Wax", name_ru: "Воск", slug: "wax", tags: ["wax-play", "bdsm"]},
             {id: 1100, name: "Wear", name_ru: "Ношение", slug: "wear", tags: ["clothing"]},
@@ -1677,58 +1678,138 @@
             {id: 1119, name: "Gentle sex", name_ru: "Нежный секс", slug: "gentle-sex", tags: ["romance"]},
             {id: 1120, name: "Role playing", name_ru: "Ролевые игры", slug: "role-playing", tags: ["roleplay"]},
             {id: 1121, name: "Squirt", name_ru: "Сквирт", slug: "squirt", tags: ["wet"]},
-            {id: 1161, name: "AI", name_ru: "ИИ", slug: "ии", tags: ["ai"]},
+            {id: 1124, name: "AI", name_ru: "ИИ", slug: "ai", tags: ["ai"]},
             // === LGBT ===
             {id: 1122, name: "Shemale", name_ru: "Транс с членом", slug: "shemale", tags: ["trans", "pornstar"]},
-            {id: 1123, name: "Tranny", name_ru: "Транс", slug: "tranny", tags: ["trans", "slang"]},
-            {id: 1124, name: "Ladyboy", name_ru: "Ледибой", slug: "ladyboy", tags: ["trans", "asian"]},
-            {id: 1125, name: "T-Girl", name_ru: "Транс-девушка (T-Girl)", slug: "t-girl", tags: ["trans"]},
+            {id: 1123, name: "FTM", name_ru: "ФТМ (Из женщины в мужчину)", slug: "ftm", tags: ["trans"]},
             {id: 1126, name: "Shemale Fucks Girl", name_ru: "Транс трахает девушку", slug: "shemale-fucks-girl", tags: ["trans", "straight"]},
             {id: 1127, name: "Shemale Fucks Shemale", name_ru: "Транс трахает транса", slug: "shemale-fucks-shemale", tags: ["trans", "lesbian"]},
-            {id: 1128, name: "Shemale Solo", name_ru: "Транс соло", slug: "shemale-solo", tags: ["trans", "solo"]},
             {id: 1129, name: "Transgender", name_ru: "Трансгендер", slug: "transgender", tags: ["trans"]},
-            {id: 1130, name: "Shemale selfsuck", name_ru: "Транс самоотсос", slug: "shemale-on-shemale", tags: ["trans", "autofellatio"]},
             {id: 1131, name: "Twink", name_ru: "Твинк (Молодой, без волос)", slug: "twink", tags: ["gay", "slim", "young"]},
             {id: 1132, name: "Bear", name_ru: "Медведь (Волосатый крупный гей)", slug: "bear", tags: ["gay", "hairy", "chubby"]},
             {id: 1133, name: "Otter", name_ru: "Выдра (Худой и волосатый)", slug: "otter", tags: ["gay", "hairy", "slim"]},
             {id: 1134, name: "Jock", name_ru: "Спортсмен (Гей)", slug: "jock", tags: ["gay", "muscle", "fitness"]},
-            {id: 1135, name: "Gay Daddy", name_ru: "Папик (Гей)", slug: "gay-daddy", tags: ["gay", "older", "roleplay"]},
-            {id: 1136, name: "Chubby Gay", name_ru: "Толстячки (Геи)", slug: "chubby-gay", tags: ["gay", "bbw", "bear"]},
             {id: 1137, name: "Frotting", name_ru: "Фроттинг (Трение членами)", slug: "frotting", tags: ["gay", "safe-sex", "fetish"]},
             {id: 1138, name: "Docking", name_ru: "Докинг (Стыковка крайних плотей)", slug: "docking", tags: ["gay", "uncut", "fetish"]},
             {id: 1139, name: "Snowballing", name_ru: "Снежок (Передача спермы изо рта в рот)", slug: "snowballing", tags: ["gay", "universal", "cum"]},
-            {id: 1140, name: "Straight Turned Gay", name_ru: "Натурал стал геем (Фантазия)", slug: "straight-turned-gay", tags: ["gay", "bi", "fantasy"]},
-            {id: 1141, name: "Gay Massage", name_ru: "Гей-массаж", slug: "gay-massage", tags: ["gay", "massage", "relax"]},
-            {id: 1142, name: "Gay Military", name_ru: "Военные (Геи)", slug: "gay-military", tags: ["gay", "uniform", "roleplay"]},
+            {id: 1140, name: "Straight Turned Gay", name_ru: "Натурал стал геем", slug: "straight-turned-gay", tags: ["gay", "bi", "fantasy"]},
             {id: 1143, name: "Gay Baitbus", name_ru: "Гей-автобус (Fake Taxi)", slug: "gay-baitbus", tags: ["gay", "public", "reality"]},
             {id: 1144, name: "Raw", name_ru: "Без презерватива (Raw)", slug: "raw", tags: ["gay", "bareback", "risk"]},
             {id: 1145, name: "Scissoring", name_ru: "Ножницы", slug: "scissoring", tags: ["lesbian", "tribadism"]},
             {id: 1146, name: "Tribadism", name_ru: "Трибадизм (Трение)", slug: "tribadism", tags: ["lesbian", "rubbing"]},
             {id: 1147, name: "Butch", name_ru: "Буч (Мужеподобная лесбиянка)", slug: "butch", tags: ["lesbian", "masculine"]},
             {id: 1148, name: "Femme", name_ru: "Фем (Женственная лесбиянка)", slug: "femme", tags: ["lesbian", "feminine"]},
-            {id: 1149, name: "Lipstick Lesbian", name_ru: "Глам-лесби (Липстик)", slug: "lipstick-lesbian", tags: ["lesbian", "makeup"]},
-            {id: 1150, name: "Lesbian Strap-on", name_ru: "Лесбиянки со страпоном", slug: "lesbian-strap-on", tags: ["lesbian", "toys", "pegging"]},
-            {id: 1151, name: "Lesbian Domination", name_ru: "Лесби-доминация", slug: "lesbian-domination", tags: ["lesbian", "femdom"]},
-            {id: 1152, name: "Lesbian Seduction", name_ru: "Лесбийское соблазнение", slug: "lesbian-seduction", tags: ["lesbian", "softcore"]},
             {id: 1153, name: "Drag Queen", name_ru: "Дрэг-квин", slug: "drag-queen", tags: ["gay", "crossdresser", "show"]},
             {id: 1154, name: "Fag", name_ru: "Педик", slug: "fag", tags: ["gay", "dirty-talk", "slang"]},
-            {id: 1155, name: "Breeding (Gay)", name_ru: "Бридинг (Залив спермы в гея)", slug: "gay-breeding", tags: ["gay", "creampie", "bareback"]},
             {id: 1156, name: "Gloryhole (Gay)", name_ru: "Гей Глорихоул", slug: "gay-gloryhole", tags: ["gay", "public", "anonymous"]},
-            {id: 1157, name: "Lesbian Squirt", name_ru: "Лесби-сквирт", slug: "lesbian-squirt", tags: ["lesbian", "wet"]},
-            {id: 1158, name: "Lesbian Fisting", name_ru: "Лесби-фистинг", slug: "lesbian-fisting", tags: ["lesbian", "extreme"]},
             {id: 1159, name: "Gay Spanking", name_ru: "Гей-порка", slug: "gay-spanking", tags: ["gay", "bdsm"]},
-            {id: 1160, name: "Bi Male", name_ru: "Бисексуальный мужчина", slug: "bi-male", tags: ["bi", "gay", "straight"]}
-        ];
+            {id: 1160, name: "Bi Male", name_ru: "Бисексуальный мужчина", slug: "bi-male", tags: ["bi", "gay", "straight"]},
+            
+            // 1. Sensory & Body
+            {id: 1162, name: "Temperature Play", name_ru: "Игра с температурой", tags: ["sensory", "kinky", "erotic"]},
+            {id: 1163, name: "Sensory Deprivation", name_ru: "Сенсорная депривация", tags: ["sensory", "bdsm", "hood", "blindfold"]},
+            {id: 1164, name: "Blindfold", name_ru: "Повязка на глаза", tags: ["sensory", "bondage", "soft-bdsm"]},
+            {id: 1165, name: "Ear Focus", name_ru: "Фокус на ушах", tags: ["sensory", "body-part", "fetish"]},
+            {id: 1166, name: "Skin Scratching", name_ru: "Царапание кожи", tags: ["sensory", "marking", "soft-pain"]},
+            {id: 1167, name: "Goosebumps", name_ru: "Мурашки", tags: ["sensory", "visual", "reaction"]},
+            {id: 1168, name: "Texture Play", name_ru: "Игра с текстурами", tags: ["sensory", "material", "touch"]},
+            {id: 1169, name: "ASMR Erotic", name_ru: "Эротический ASMR", tags: ["sensory", "audio", "voice"]},
+            {id: 1170, name: "Whispering", name_ru: "Шёпот", tags: ["sensory", "audio", "soft"]},
 
+            // 2. Attention & Control
+            {id: 1171, name: "Praise Kink", name_ru: "Кинк на похвалу", tags: ["attention", "verbal", "soft"]},
+            {id: 1172, name: "Degradation Kink", name_ru: "Кинк на унижение", tags: ["attention", "verbal", "humiliation", "bdsm"]},
+            {id: 1173, name: "Ignoring", name_ru: "Игнорирование", tags: ["attention", "denial", "psychological"]},
+            {id: 1174, name: "Tease & Denial", name_ru: "Дразнение и отказ", tags: ["control", "edging", "frustration"]},
+            {id: 1175, name: "Power Imbalance", name_ru: "Дисбаланс власти", tags: ["control", "dynamic", "roleplay"]},
+            {id: 1176, name: "Ownership Fantasy", name_ru: "Фантазия обладания", tags: ["control", "possessive", "relationship"]},
+            {id: 1177, name: "Authority Dynamic", name_ru: "Динамика авторитета", tags: ["control", "roleplay", "uniform"]},
+
+            // 3. Clothing / Fashion
+            {id: 1178, name: "Office Wear", name_ru: "Офисная одежда", tags: ["clothing", "roleplay", "professional"]},
+            {id: 1179, name: "Business Suit", name_ru: "Деловой костюм", tags: ["clothing", "formal", "power"]},
+            {id: 1180, name: "Pencil Skirt", name_ru: "Юбка-карандаш", tags: ["clothing", "legs", "office"]},
+            {id: 1181, name: "Blazer", name_ru: "Блейзер", tags: ["clothing", "formal"]},
+            {id: 1182, name: "Sheer Clothing", name_ru: "Полупрозрачная одежда", tags: ["clothing", "see-through", "tease"]},
+            {id: 1183, name: "See-Through", name_ru: "Прозрачная одежда", tags: ["clothing", "voyeur", "revealing"]},
+            {id: 1184, name: "Tight Dress", name_ru: "Обтягивающее платье", tags: ["clothing", "shape", "visual"]},
+            {id: 1185, name: "Crop Top", name_ru: "Кроп-топ", tags: ["clothing", "tease", "belly"]},
+            {id: 1186, name: "Open Shirt", name_ru: "Расстёгнутая рубашка", tags: ["clothing", "casual", "tease"]},
+            {id: 1187, name: "Rolled Sleeves", name_ru: "Закатанные рукава", tags: ["clothing", "hands", "forearms"]},
+            {id: 1188, name: "Knee Socks", name_ru: "Гольфы до колен", tags: ["clothing", "legs", "youthful"]},
+
+            // 4. Body Detail
+            {id: 1189, name: "Veins", name_ru: "Вены", tags: ["body-detail", "vascularity", "hands"]},
+            {id: 1191, name: "Hip Dips", name_ru: "Впадины на бёдрах", tags: ["body-detail", "shape", "hips"]},
+            {id: 1192, name: "Soft Belly", name_ru: "Мягкий живот", tags: ["body-detail", "belly", "comfort"]},
+            {id: 1193, name: "Love Handles", name_ru: "Бока", tags: ["body-detail", "shape", "grabbing"]},
+            {id: 1194, name: "Shoulder Focus", name_ru: "Акцент на плечах", tags: ["body-detail", "body-part"]},
+            {id: 1195, name: "Collarbone", name_ru: "Ключицы", tags: ["body-detail", "body-part", "elegant"]},
+            {id: 1196, name: "Back Arch", name_ru: "Прогиб спины", tags: ["body-detail", "pose", "flexibility"]},
+            {id: 1197, name: "Thigh Gap", name_ru: "Зазор между бёдрами", tags: ["body-detail", "legs", "shape"]},
+            {id: 1198, name: "Thick Thighs", name_ru: "Полные бёдра", tags: ["body-detail", "legs", "curvy"]},
+
+            // 5. Psychological
+            {id: 1199, name: "Anticipation", name_ru: "Предвкушение", tags: ["psychological", "tension", "slow"]},
+            {id: 1200, name: "Tension", name_ru: "Напряжение", tags: ["psychological", "atmosphere"]},
+            {id: 1201, name: "Forbidden Fantasy", name_ru: "Запретная фантазия", tags: ["psychological", "taboo", "meta"]},
+            {id: 1202, name: "Voyeur Tension", name_ru: "Вуайеристское напряжение", tags: ["psychological", "voyeur", "risk"]},
+            {id: 1203, name: "Caught Fantasy", name_ru: "Фантазия быть пойманным", tags: ["psychological", "risk", "public"]},
+            {id: 1204, name: "Almost Exposed", name_ru: "Почти раскрыто", tags: ["psychological", "clothing", "tease"]},
+            {id: 1205, name: "Slow Build", name_ru: "Медленное нарастание", tags: ["psychological", "pacing", "sensual"]},
+            {id: 1206, name: "Emotional Intimacy", name_ru: "Эмоциональная близость", tags: ["psychological", "romantic", "connection"]},
+            {id: 1207, name: "Eye Contact", name_ru: "Зрительный контакт", tags: ["psychological", "intense", "connection"]},
+
+            // 6. Movement
+            {id: 1208, name: "Stretch Pose", name_ru: "Поза растяжки", tags: ["movement", "flexibility", "visual"]},
+            {id: 1209, name: "Arching", name_ru: "Прогибание", tags: ["movement", "pose", "body-detail"]},
+            {id: 1210, name: "Slow Movement", name_ru: "Медленные движения", tags: ["movement", "sensual", "pacing"]},
+            {id: 1211, name: "Freezing", name_ru: "Замирание", tags: ["movement", "control", "stillness"]},
+            {id: 1212, name: "Natural Movement", name_ru: "Естественные движения", tags: ["movement", "candid", "reality"]},
+            {id: 1213, name: "Lazy Posture", name_ru: "Расслабленная поза", tags: ["movement", "relaxed", "casual"]},
+
+            // 7. Voice
+            {id: 1214, name: "Voice Focus", name_ru: "Фокус на голосе", tags: ["audio", "voice", "fetish"]},
+            {id: 1215, name: "Breathing Sounds", name_ru: "Звуки дыхания", tags: ["audio", "intimacy", "asmr"]},
+            {id: 1216, name: "Lip Sounds", name_ru: "Звуки губ", tags: ["audio", "kissing", "asmr"]},
+            {id: 1217, name: "Mouth Sounds", name_ru: "Звуки рта", tags: ["audio", "oral", "wet"]},
+            {id: 1218, name: "Laughter", name_ru: "Смех", tags: ["audio", "emotion", "happy"]},
+
+            // 8. Meta
+            {id: 1219, name: "First Time Seeing This", name_ru: "Вижу это впервые", tags: ["meta", "curiosity", "discovery"]},
+            {id: 1220, name: "Unexpected Attraction", name_ru: "Неожиданное влечение", tags: ["meta", "confusion", "new"]},
+            {id: 1221, name: "Confusion Kink", name_ru: "Кинк на замешательство", tags: ["meta", "psychological"]},
+            {id: 1222, name: "Awakening Kink", name_ru: "Кинк пробуждения", tags: ["meta", "discovery", "new"]},
+            {id: 1223, name: "Why Is This Hot?", name_ru: "Почему это заводит?", tags: ["meta", "questioning", "confusion"]},
+
+            // 9. Social
+            {id: 1224, name: "Public Tension", name_ru: "Публичное напряжение", tags: ["social", "public", "risk"]},
+            {id: 1225, name: "Semi-Public", name_ru: "Полупублично", tags: ["social", "risky", "outdoor"]},
+            {id: 1226, name: "Risk Of Being Seen", name_ru: "Риск быть замеченным", tags: ["social", "thrill", "voyeur"]},
+            {id: 1227, name: "Crowd Presence", name_ru: "Присутствие толпы", tags: ["social", "exhibitionism", "public"]},
+            {id: 1228, name: "Social Pressure", name_ru: "Социальное давление", tags: ["social", "psychological", "taboo"]},
+
+            // 10. Format / Visual
+            {id: 1229, name: "POV Realism", name_ru: "Реализм от первого лица", tags: ["visual", "pov", "immersive"]},
+            {id: 1230, name: "Eye-Level POV", name_ru: "POV на уровне глаз", tags: ["visual", "pov", "intimacy"]},
+            {id: 1231, name: "Close-Up Focus", name_ru: "Крупный план", tags: ["visual", "detail", "macro"]},
+            {id: 1232, name: "Slow Zoom", name_ru: "Медленный зум", tags: ["visual", "cinematic", "focus"]},
+            {id: 1233, name: "Natural Lighting", name_ru: "Естественное освещение", tags: ["visual", "aesthetic", "realism"]},
+            {id: 1234, name: "Amateur Aesthetic", name_ru: "Любительская эстетика", tags: ["visual", "homemade", "reality"]},
+            {id: 1235, name: "Imperfect Body", name_ru: "Несовершенное тело", tags: ["visual", "real-body", "natural"]},
+            {id: 1236, name: "No Makeup Look", name_ru: "Без макияжа", tags: ["visual", "natural", "casual"]},
+
+        ];
+        
     const modifiersData = [
         {key: 'Amateur', en: 'Amateur', ru: 'Любительское'},
         {key: 'POV', en: 'POV', ru: 'POV'},
         {key: 'Hardcore', en: 'Hardcore', ru: 'Жесткое'},
         {key: 'Homemade', en: 'Homemade', ru: 'Домашнее'},
         {key: 'Oiled', en: 'Oiled', ru: 'В масле'},
-        {key: 'Rough', en: 'Rough', ru: 'Грубое'},
+        {key: 'Gay', en: 'Gay', ru: 'Геи'},
         {key: 'Romantic', en: 'Romantic', ru: 'Романтика'},
-        {key: 'Creampie', en: 'Creampie', ru: 'Кремпай'},
+        {key: 'Lesbian', en: 'Lesbian', ru: 'Лесби'},
         {key: 'Threesome', en: 'Threesome', ru: 'Тройничок'},
         {key: 'Orgy', en: 'Orgy', ru: 'Оргия'},
         {key: 'Compilation', en: 'Compilation', ru: 'Сборник'},
@@ -1737,11 +1818,8 @@
         {key: 'Vintage', en: 'Vintage', ru: 'Ретро'},
         {key: 'Hentai', en: 'Hentai', ru: 'Хентай'},
         {key: 'Solo', en: 'Solo', ru: 'Соло'},
-        {key: 'Group', en: 'Group', ru: 'Групповое'},
+        {key: 'Trans', en: 'Trans', ru: 'Трансы'},
         {key: 'AI', en: 'AI', ru: 'ИИ'},
-        {key: 'Ebony', en: 'Ebony', ru: 'Эбони'},
-        {key: 'Asian', en: 'Asian', ru: 'Азиатки'},
-        {key: 'Latina', en: 'Latina', ru: 'Латинки'}
     ];
 
     const welcomePhrases = {
@@ -1767,8 +1845,8 @@
     };
 
     const resultComments = {
-        en: ["Like it? Go watch 😈", "Not bad, huh?", "Enjoy your time 🔥", "Go for it!"],
-        ru: ["Понравился? Тогда иди смотри 😈", "Неплохой выбор, а? 😏", "Приятного просмотра 🔥", "Ну всё, беги смотреть!"]
+        en: ["Like it? Go watch 😈", "Not bad, huh? 😏", "Enjoy your time 🔥", "Go for it! 😀"],
+        ru: ["Заинтересовало? Тогда иди смотри 😈", "Неплохой фетиш, а? 😏", "Приятного просмотра, сладкий 🔥", "Ну всё, беги смотреть! 😀"]
     };
 
     const langData = {
@@ -1790,10 +1868,10 @@
             tag_lesbian: "Lesbian",
             tag_trans: "Trans",
             tag_fav: "Favorites",
-            btn_fav_add: "To Favorites",
-            btn_fav_remove: "In Favorites",
-            btn_ban_add: "To Blacklist",
-            btn_ban_remove: "Blacklisted",
+            btn_fav_add: "❤️",
+            btn_fav_remove: "❤️",
+            btn_ban_add: "🚫",
+            btn_ban_remove: "🚫",
             nav_home: "Home",
             nav_settings: "Settings"
         },
@@ -1815,10 +1893,10 @@
             tag_lesbian: "Лесби",
             tag_trans: "Транс",
             tag_fav: "Избранное",
-            btn_fav_add: "В Избранное",
-            btn_fav_remove: "В Избранном",
-            btn_ban_add: "В ЧС",
-            btn_ban_remove: "В ЧС",
+            btn_fav_add: "❤️",
+            btn_fav_remove: "❤️",
+            btn_ban_add: "🚫",
+            btn_ban_remove: "🚫",
             nav_home: "Главная",
             nav_settings: "Настройки"
         }
@@ -2072,9 +2150,9 @@
         let plusQuery = queryParts.join("+").toLowerCase();
         let url = "";
         switch(platform) {
-            case 'xh': url = `https://xhamster.com/search/${plusQuery}`; break;
             case 'ph': url = `https://www.pornhub.com/video/search?search=${plusQuery}`; break;
             case 'xv': url = `https://www.xvideos.com/?k=${plusQuery}`; break;
+            case 'xh': url = `https://xhamster.com/search/${plusQuery}`; break;
             case 'sb': url = `https://spankbang.com/s/${plusQuery}/`; break;
             case 'yp': url = `https://www.youporn.com/search/?query=${plusQuery}`; break;
             case 'rt': url = `https://www.redtube.com/?search=${plusQuery}`; break;
