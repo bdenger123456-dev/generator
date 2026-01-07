@@ -39,7 +39,6 @@
             --text-secondary: #666666;
             --border: #d1d1d6;
             --modal-bg: rgba(255, 255, 255, 0.95);
-            --accent: #ff9900;
 
             /* iOS Colors Light */
             --ios-bg: #F2F2F7;
@@ -244,8 +243,15 @@
         .site-capsule select { font-weight: 600; color: var(--accent) !important; font-size: 17px; background: transparent; border: none; text-align: right; }
 
         /* Support Banner */
+        /*  Динамический баннер поддержки */
+        :root {
+            /* Добавляем переменную для светлого оттенка акцента */
+            --accent-light: #ffbd55; 
+        }
+
         .support-banner {
-            background: linear-gradient(135deg, #ff9900, #ff5e00);
+            /* Градиент теперь использует переменные */
+            background: linear-gradient(135deg, var(--accent-light), var(--accent));
             border-radius: 22px;
             padding: 15px 20px;
             display: flex;
@@ -253,13 +259,142 @@
             align-items: center;
             width: 100%;
             margin-bottom: 20px;
-            box-shadow: 0 8px 20px rgba(255, 153, 0, 0.25);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Тень сделаем нейтральной */
             cursor: pointer;
             transition: transform 0.2s;
+            text-align: center;
         }
-        .support-banner:active { transform: scale(0.98); }
         .support-banner span {
-            color: white; font-weight: 800; font-size: 16px; text-transform: uppercase; letter-spacing: 0.5px;
+            color: #fff; /* Текст всегда белый для контраста */
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        /* Кнопка Boosty (стиль как у баннера) */
+        .boosty-btn {
+            width: 100%;
+            margin-top: auto; /* Прижать к низу */
+            padding: 15px;
+            border-radius: 16px;
+            font-weight: 800;
+            font-size: 16px;
+            text-transform: uppercase;
+            color: #fff;
+            border: none;
+            background: linear-gradient(135deg, var(--accent-light), var(--accent));
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            cursor: pointer;
+        }
+
+        /* Новая статистика (Графики и Капсула) */
+        .stats-modal-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .chart-container {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            height: 200px;
+            width: 100%;
+            padding: 10px 0 30px 0; /* Место для подписей снизу */
+            border-bottom: 1px solid var(--border);
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .chart-bar-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            flex: 1;
+            height: 100%;
+            position: relative;
+        }
+
+        .chart-bar {
+            width: 12px; /* Тонкие столбики */
+            background: var(--accent);
+            border-radius: 4px 4px 0 0;
+            transition: height 0.5s ease;
+            min-height: 4px;
+            position: relative;
+        }
+        /* Двойные бары для активности */
+        .chart-bar.secondary {
+            background: var(--text-secondary);
+            margin-right: 2px;
+        }
+        .bar-wrapper {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 2px;
+            height: 100%;
+        }
+
+        .chart-label-x {
+            position: absolute;
+            bottom: -25px;
+            font-size: 9px;
+            color: var(--text-secondary);
+            text-align: center;
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .chart-value-y {
+            position: absolute;
+            top: -20px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* Капсула навигации в статистике */
+        .stats-nav-capsule {
+            background: var(--ios-card);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            height: 50px;
+            display: flex;
+            padding: 4px;
+            margin: 10px 20px 20px 20px; /* Отступы снизу */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            flex-shrink: 0;
+        }
+
+        .stats-nav-item {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .stats-nav-item.active {
+            background: var(--nav-bg);
+            color: var(--text-main);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Иконка поделиться в шапке */
+        .header-icon-btn {
+            cursor: pointer;
+            font-size: 20px;
+            margin-right: 15px;
+            color: var(--accent);
         }
 
         /* Switch */
@@ -611,7 +746,6 @@
         <!-- GROUP 1: PREFERENCES -->
         <div class="ios-header" style="display:flex; justify-content:space-between;">
             <span data-key="header_prefs">Preferences</span>
-            <span class="ios-header-info" id="explored-count"></span>
         </div>
         <div class="ios-group">
             
@@ -674,6 +808,10 @@
         <!-- GROUP 3: DATA -->
         <div class="ios-header" data-key="header_data">Data</div>
         <div class="ios-group">
+            <div class="ios-row">
+                <span data-key="explored_label">Explored</span>
+                <span style="color:var(--text-secondary); font-size:16px;" id="explored-count">0 / 0</span>
+            </div>
             <div class="ios-row clickable" onclick="openFavoritesCatalog()">
                 <span data-key="favorites_catalog">Liked</span>
                 <span class="badge" id="count-fav" style="color:var(--text-secondary); font-size:17px;">0</span>
@@ -746,44 +884,45 @@
 
 <!-- Modal Stats -->
 <div class="modal-overlay" id="modal-stats-overlay" onclick="closeStats(event)">
-    <div class="modal">
+    <div class="modal" style="height: 500px;"> <!-- Фиксированная высота для красоты графика -->
         <div class="modal-header">
             <span data-key="btn_stats">Statistics</span>
-            <span style="cursor:pointer" onclick="closeStats(null, true)">✕</span>
+            <div style="display:flex; align-items:center;">
+                <!-- Кнопка Share теперь иконка -->
+                <span class="header-icon-btn" onclick="shareStats()">⤤</span>
+                <span style="cursor:pointer" onclick="closeStats(null, true)">✕</span>
+            </div>
         </div>
-        <div class="stats-controls">
-            <div class="stats-tab active" id="tab-stats-tags" onclick="switchStatsTab('tags')">Tags</div>
-            <div class="stats-tab" id="tab-stats-activity" onclick="switchStatsTab('activity')">Activity</div>
+        
+        <!-- Тело статистики с графиком -->
+        <div class="stats-modal-body" id="modal-stats-body">
+            <!-- Сюда JS будет рендерить Timeframe селектор и сам График -->
         </div>
-        <div class="modal-body" id="modal-stats-body" style="flex-direction: column; gap: 10px; padding:15px;"></div>
-        <div style="padding:15px; border-top:1px solid var(--border);">
-            <button class="btn-gen" onclick="shareStats()" data-key="share_btn" style="padding:15px; font-size:16px;">Share</button>
+
+        <!-- Капсула навигации СНИЗУ -->
+        <div class="stats-nav-capsule">
+            <div class="stats-nav-item active" id="stat-nav-prefs" onclick="switchStatsTab('tags')">
+                <span data-key="stats_prefs">Preferences</span>
+            </div>
+            <div class="stats-nav-item" id="stat-nav-activity" onclick="switchStatsTab('activity')">
+                <span data-key="stats_activity">Activity</span>
+            </div>
         </div>
     </div>
 </div>
 
 <!-- Modal Support -->
 <div class="modal-overlay" id="modal-support-overlay" onclick="closeSupport(event)">
-    <div class="modal">
+    <div class="modal" style="height: auto; max-height: 90%;">
         <div class="modal-header">
             <span data-key="support_banner">Support</span>
             <span style="cursor:pointer" onclick="closeSupport(null, true)">✕</span>
         </div>
-        <div class="modal-body" style="padding:20px; font-size:15px; line-height:1.5; color:var(--text-secondary);">
-            <p data-key="support_text_1">This project is free, ad-free, and contains no referral links. I develop it in my free time.</p>
-            <p data-key="support_text_2">If you like it, please consider supporting development!</p>
+        <div class="modal-body" style="padding:20px; font-size:15px; line-height:1.5; color:var(--text-secondary); display:flex; flex-direction:column; height:100%;">
+            <!-- Контент теперь генерируется JS для локализации -->
+            <div id="support-content"></div>
             
-            <h4 style="color:var(--text-main); margin:15px 0 10px 0;">Roadmap:</h4>
-            <ul style="padding-left:20px; margin:0;">
-                <li>Server Sync & Backup</li>
-                <li>Global User Statistics</li>
-                <li>Deep Customization</li>
-                <li>PWA Improvements</li>
-            </ul>
-            
-            <p style="margin-top:15px;">Supporters will be listed in the <b>Sponsors</b> tab!</p>
-            
-            <button class="btn-watch" onclick="window.open('https://boosty.to/xfetishhub', '_blank')" style="margin-top:20px; width:100%;">
+            <button class="boosty-btn" onclick="window.open('https://boosty.to/xfetishhub', '_blank')">
                 Boosty
             </button>
         </div>
@@ -11643,18 +11782,26 @@
             expl_tag_click: "You chose tag: ",
             tag_straight: "Straight", tag_gay: "Gay", tag_lesbian: "Lesbian", tag_trans: "Trans",
             dark_mode: "Dark Mode",
-            share_btn: "Share as Image",
+            share_btn: "Share",
             tooltip_extreme: "Contains hardcore or intense content.",
             tooltip_lgbt: "Contains same-sex or trans content.",
             tooltip_niche: "Specific interests not mainstream.",
-            explored_txt: "You've explored {n} / {t} categories",
-            support_banner: "✨ Support the Project",
+            
+            explored_label: "Explored",
+            explored_txt: "{n} / {t} categories",
+            support_banner: "✨ Support Project",
             sponsors: "Sponsors",
             report_issue: "Report Issue",
-            support_text_1: "This project is free, ad-free, and contains no referral links. I develop it in my free time.",
-            support_text_2: "If you like it, please consider supporting development!",
-            tf_week: "Week", tf_month: "Month", tf_year: "Year", tf_all: "All Time",
-            act_gen: "Generations", act_watch: "Watched"
+            
+            stats_prefs: "Preferences",
+            stats_activity: "Activity",
+            tf_week: "Week", tf_month: "Month", tf_year: "Year", tf_all: "All",
+            act_gen: "Gens", act_watch: "Views",
+
+            support_intro: "👋 <b>Hi there!</b><br><br>This project is completely <b>free</b>, ad-free, and I develop it in my spare time out of pure enthusiasm.",
+            support_why: "💡 <b>Why support?</b><br>Your support helps keep the motivation high to add cool new features and keep the app updated.",
+            support_roadmap_title: "🚀 <b>Roadmap:</b>",
+            support_roadmap_list: "<li>☁️ Cloud Sync & Backup</li><li>📊 Global Statistics</li><li>🎨 Deep Customization</li><li>📱 PWA Improvements</li>"
         },
         ru: {
             subtitle: "Твой дом для взрослых предпочтений",
@@ -11697,18 +11844,26 @@
             expl_tag_click: "Выбрана категория: ",
             tag_straight: "Гетеро", tag_gay: "Гей", tag_lesbian: "Лесби", tag_trans: "Транс",
             dark_mode: "Темная тема",
-            share_btn: "Поделиться картинкой",
+            share_btn: "Поделиться",
             tooltip_extreme: "Содержит жесткий или интенсивный контент.",
             tooltip_lgbt: "Содержит ЛГБТ контент.",
             tooltip_niche: "Специфические интересы, не мейнстрим.",
-            explored_txt: "Вы открыли {n} из {t} категорий",
+            
+            explored_label: "Открыто",
+            explored_txt: "{n} из {t} категорий",
             support_banner: "✨ Поддержи проект",
             sponsors: "Спонсоры",
             report_issue: "Сообщить о проблеме",
-            support_text_1: "Этот проект полностью бесплатный, без рекламы и реферальных ссылок. Я разрабатываю его в свободное время.",
-            support_text_2: "Если вам нравится сайт, пожалуйста, поддержите разработку!",
-            tf_week: "Неделя", tf_month: "Месяц", tf_year: "Год", tf_all: "Всё время",
-            act_gen: "Генерации", act_watch: "Просмотры"
+
+            stats_prefs: "Предпочтения",
+            stats_activity: "Активность",
+            tf_week: "Неделя", tf_month: "Месяц", tf_year: "Год", tf_all: "Всё",
+            act_gen: "Генер.", act_watch: "Просм.",
+
+            support_intro: "👋 <b>Привет!</b><br><br>Этот проект полностью <b>бесплатный</b>, без рекламы, и я разрабатываю его в свободное время на чистом энтузиазме.",
+            support_why: "💡 <b>Зачем поддерживать?</b><br>Твоя поддержка мотивирует меня пилить новые фичи и не забрасывать проект.",
+            support_roadmap_title: "🚀 <b>Планы:</b>",
+            support_roadmap_list: "<li>☁️ Облачная синхронизация</li><li>📊 Глобальная статистика</li><li>🎨 Глубокая кастомизация</li><li>📱 Улучшение PWA</li>"
         },
         es: {
             subtitle: "Tu hogar para preferencias adultas",
@@ -11751,18 +11906,26 @@
             expl_tag_click: "Elegiste etiqueta: ",
             tag_straight: "Hetero", tag_gay: "Gay", tag_lesbian: "Lesbiana", tag_trans: "Trans",
             dark_mode: "Modo Oscuro",
-            share_btn: "Compartir imagen",
+            share_btn: "Compartir",
             tooltip_extreme: "Contiene contenido intenso.",
             tooltip_lgbt: "Contiene contenido LGBT.",
             tooltip_niche: "Intereses específicos.",
-            explored_txt: "Exploraste {n} / {t} categorías",
-            support_banner: "✨ Apoyar el Proyecto",
+            
+            explored_label: "Explorado",
+            explored_txt: "{n} / {t} categorías",
+            support_banner: "✨ Apoyar Proyecto",
             sponsors: "Patrocinadores",
             report_issue: "Reportar Problema",
-            support_text_1: "Este proyecto es gratuito, sin anuncios y sin enlaces de referencia.",
-            support_text_2: "Si te gusta, ¡considera apoyar el desarrollo!",
+
+            stats_prefs: "Preferencias",
+            stats_activity: "Actividad",
             tf_week: "Semana", tf_month: "Mes", tf_year: "Año", tf_all: "Todo",
-            act_gen: "Generaciones", act_watch: "Vistas"
+            act_gen: "Gener.", act_watch: "Vistas",
+
+            support_intro: "👋 <b>¡Hola!</b><br><br>Este proyecto es completamente <b>gratuito</b>, sin anuncios, y lo desarrollo en mi tiempo libre por puro entusiasmo.",
+            support_why: "💡 <b>¿Por qué apoyar?</b><br>Tu apoyo mantiene alta la motivación para añadir nuevas funciones y mantener la app actualizada.",
+            support_roadmap_title: "🚀 <b>Hoja de ruta:</b>",
+            support_roadmap_list: "<li>☁️ Sincronización en la nube</li><li>📊 Estadísticas globales</li><li>🎨 Personalización profunda</li><li>📱 Mejoras PWA</li>"
         },
         de: {
             subtitle: "Dein Zuhause für Erwachsenen-Vorlieben",
@@ -11805,21 +11968,29 @@
             expl_tag_click: "Tag gewählt: ",
             tag_straight: "Hetero", tag_gay: "Schwul", tag_lesbian: "Lesbisch", tag_trans: "Trans",
             dark_mode: "Dunkelmodus",
-            share_btn: "Als Bild teilen",
+            share_btn: "Teilen",
             tooltip_extreme: "Enthält extreme Inhalte.",
             tooltip_lgbt: "Enthält LGBT-Inhalte.",
             tooltip_niche: "Spezifische Nischen.",
-            explored_txt: "Du hast {n} / {t} Kategorien erkundet",
-            support_banner: "✨ Projekt unterstützen",
+            
+            explored_label: "Erforscht",
+            explored_txt: "{n} / {t} Kategorien",
+            support_banner: "✨ Unterstützen",
             sponsors: "Sponsoren",
             report_issue: "Problem melden",
-            support_text_1: "Dieses Projekt ist kostenlos, werbefrei und enthält keine Empfehlungslinks.",
-            support_text_2: "Wenn es dir gefällt, unterstütze bitte die Entwicklung!",
+
+            stats_prefs: "Vorlieben",
+            stats_activity: "Aktivität",
             tf_week: "Woche", tf_month: "Monat", tf_year: "Jahr", tf_all: "Gesamt",
-            act_gen: "Generationen", act_watch: "Angeschaut"
+            act_gen: "Gener.", act_watch: "Ansichten",
+
+            support_intro: "👋 <b>Hallo!</b><br><br>Dieses Projekt ist komplett <b>kostenlos</b>, werbefrei und ich entwickle es in meiner Freizeit aus reinem Enthusiasmus.",
+            support_why: "💡 <b>Warum unterstützen?</b><br>Deine Unterstützung hält die Motivation hoch, coole neue Funktionen hinzuzufügen.",
+            support_roadmap_title: "🚀 <b>Roadmap:</b>",
+            support_roadmap_list: "<li>☁️ Cloud-Synchronisierung</li><li>📊 Globale Statistiken</li><li>🎨 Tiefe Anpassung</li><li>📱 PWA-Verbesserungen</li>"
         }
     };
-
+    
     const EXTREME_TAGS = ['extreme', 'blood', 'scat', 'piss', 'pain', 'torture', 'vomit', 'enema', 'fisting', 'needle-play'];
     const SPICY_TAGS = ['bdsm', 'kinky', 'fetish', 'bondage', 'domination', 'submission', 'spanking'];
     const LGBT_TAGS = ['gay', 'trans', 'shemale', 'lesbian', 'bi', 'crossdresser'];
@@ -11841,6 +12012,7 @@
         renderHistory();
         updateCounts();
         checkLayout();
+        updateLink(); 
         window.addEventListener('resize', checkLayout);
     };
 
@@ -12312,20 +12484,33 @@
     }
 
     function updateLink() {
-        if(!currentItem) return;
+        // 1. ЛОГИКА ЦВЕТОВ (Выполняется всегда)
         const platform = document.getElementById('platform').value;
-        const forceEn = document.getElementById('force-en').checked;
-        const btnWatch = document.getElementById('watch-link');
         const root = document.documentElement;
         
-        let color = '#ff9900';
-        if(platform === 'xh') color = '#5aaaff'; if(platform === 'xv') color = '#de2828';
-        if(platform === 'sb') color = '#ffd700'; if(platform === 'yp') color = '#ff3366';
-        if(platform === 'rt') color = '#ff0000'; if(platform === 'google') color = '#4285F4';
-        
-        root.style.setProperty('--accent', color);
+        // Цвета: Основной / Светлый (для градиента)
+        const colors = {
+            'ph': ['#ff9900', '#ffbd55'], // Pornhub
+            'xv': ['#de2828', '#ff6b6b'], // xVideos
+            'xh': ['#5aaaff', '#8bc1ff'], // xHamster
+            'sb': ['#ffd700', '#ffe666'], // SpankBang
+            'yp': ['#ff3366', '#ff668a'], // YouPorn
+            'rt': ['#ff0000', '#ff4d4d'], // RedTube
+            'google': ['#4285F4', '#7aaafc'] // Google
+        };
 
+        const [mainColor, lightColor] = colors[platform] || colors['ph'];
+        
+        root.style.setProperty('--accent', mainColor);
+        root.style.setProperty('--accent-light', lightColor);
+
+        // 2. ЛОГИКА ССЫЛКИ (Только если есть результат)
+        if(!currentItem) return;
+
+        const btnWatch = document.getElementById('watch-link');
+        const forceEn = document.getElementById('force-en').checked;
         const useRu = (currentLang === 'ru' && !forceEn);
+        
         let queryName = useRu ? (currentItem.name_ru || currentItem.name) : currentItem.name;
         let queryParts = [queryName];
         activeMods.forEach(key => {
@@ -12652,13 +12837,9 @@
 
     function switchStatsTab(tab) {
         currentStatsTab = tab;
-        document.getElementById('tab-stats-tags').classList.toggle('active', tab === 'tags');
-        document.getElementById('tab-stats-activity').classList.toggle('active', tab === 'activity');
-        renderStatsContent();
-    }
-
-    function switchTimeframe(tf) {
-        currentStatsTimeframe = tf;
+        // Обновляем классы капсулы
+        document.getElementById('stat-nav-prefs').classList.toggle('active', tab === 'tags');
+        document.getElementById('stat-nav-activity').classList.toggle('active', tab === 'activity');
         renderStatsContent();
     }
 
@@ -12667,93 +12848,156 @@
         body.innerHTML = '';
         const t = langData[currentLang];
 
-        // Filter Logic
-        const now = Date.now();
-        let cutoff = 0;
-        if(currentStatsTimeframe === 'week') cutoff = now - 7*24*60*60*1000;
-        if(currentStatsTimeframe === 'month') cutoff = now - 30*24*60*60*1000;
-        if(currentStatsTimeframe === 'year') cutoff = now - 365*24*60*60*1000;
-
-        const filteredLog = activityLog.filter(log => log.ts >= cutoff);
-
-        // Timeframe Selector HTML
+        // Временной селектор
         const tfHtml = `
-            <div class="timeframe-selector">
+            <div class="timeframe-selector" style="margin-bottom:20px;">
                 <span class="tf-opt ${currentStatsTimeframe==='week'?'active':''}" onclick="switchTimeframe('week')">${t.tf_week}</span>
                 <span class="tf-opt ${currentStatsTimeframe==='month'?'active':''}" onclick="switchTimeframe('month')">${t.tf_month}</span>
                 <span class="tf-opt ${currentStatsTimeframe==='year'?'active':''}" onclick="switchTimeframe('year')">${t.tf_year}</span>
-                <span class="tf-opt ${currentStatsTimeframe==='all'?'active':''}" onclick="switchTimeframe('all')">${t.tf_all}</span>
             </div>
         `;
         body.innerHTML = tfHtml;
 
+        // Фильтрация логов по времени
+        const now = Date.now();
+        let cutoff = 0;
+        // Для активности нам нужны диапазоны
+        let xLabels = [];
+        let dataGen = [];
+        let dataWatch = [];
+        let labels = []; // Для графика тегов
+
         if (currentStatsTab === 'tags') {
-            // Calc Tag Scores from Filtered Log
+            // == ГРАФИК ПРЕДПОЧТЕНИЙ (ТОП ТЕГОВ) ==
+            if(currentStatsTimeframe === 'week') cutoff = now - 7*24*60*60*1000;
+            if(currentStatsTimeframe === 'month') cutoff = now - 30*24*60*60*1000;
+            if(currentStatsTimeframe === 'year') cutoff = now - 365*24*60*60*1000;
+            
+            const filteredLog = activityLog.filter(log => log.ts >= cutoff);
             const tempScores = {};
             const ignoreStats = ['universal', 'straight', 'gay', 'lesbian', 'trans'];
             
             filteredLog.forEach(log => {
                 if (log.tags) {
-                    let weight = 0;
-                    if(log.type === 'watch') weight = 3;
-                    if(log.type === 'like') weight = 5;
-                    if(log.type === 'gen') weight = 1;
-                    
-                    if(weight > 0) {
-                        log.tags.forEach(tag => {
-                            if(!ignoreStats.includes(tag)) {
-                                tempScores[tag] = (tempScores[tag] || 0) + weight;
-                            }
-                        });
-                    }
+                    let weight = (log.type === 'watch') ? 3 : (log.type === 'like' ? 5 : 1);
+                    log.tags.forEach(tag => {
+                        if(!ignoreStats.includes(tag)) tempScores[tag] = (tempScores[tag] || 0) + weight;
+                    });
                 }
             });
 
-            const sortedTags = Object.entries(tempScores).sort((a, b) => b[1] - a[1]).slice(0, 10);
-
-            if (sortedTags.length === 0) {
-                body.innerHTML += '<div style="text-align:center; padding:20px; color:#888;">No data for this period</div>';
+            const sortedTags = Object.entries(tempScores).sort((a, b) => b[1] - a[1]).slice(0, 7); // Топ 7 для красоты
+            
+            // Рисуем график
+            let chartHTML = '<div class="chart-container">';
+            if(sortedTags.length === 0) {
+                chartHTML = '<div style="text-align:center; width:100%; margin-top:50px; color:#666;">No data</div>';
             } else {
-                sortedTags.forEach(([tag, score], index) => {
-                    const div = document.createElement('div');
-                    div.className = 'stat-card';
-                    let rankHtml = '';
-                    if(index === 0) { div.classList.add('rank-1'); rankHtml = '🥇'; }
-                    else if(index === 1) { div.classList.add('rank-2'); rankHtml = '🥈'; }
-                    else if(index === 2) { div.classList.add('rank-3'); rankHtml = '🥉'; }
-                    else { rankHtml = `<span style="font-size:14px; color:var(--text-secondary); opacity:0.5;">#${index+1}</span>`; }
-
-                    div.innerHTML = `
-                        <div style="display:flex; align-items:center;">
-                            <div class="stat-rank">${rankHtml}</div>
-                            <span class="stat-name">${tag}</span>
+                const maxVal = Math.max(...sortedTags.map(x => x[1]));
+                
+                sortedTags.forEach(([tag, score]) => {
+                    const height = Math.max(5, (score / maxVal) * 100); // Мин 5% высоты
+                    // Ограничиваем длину названия тега
+                    const shortTag = tag.length > 8 ? tag.substring(0, 6)+'..' : tag; 
+                    
+                    chartHTML += `
+                        <div class="chart-bar-group">
+                            <div class="chart-value-y">${score}</div>
+                            <div class="chart-bar" style="height:${height}%"></div>
+                            <div class="chart-label-x">${shortTag}</div>
                         </div>
                     `;
-                    div.onclick = () => { closeStats(null, true); searchByTag(tag); };
-                    body.appendChild(div);
                 });
             }
-        } else {
-            // Activity Tab
-            const genCount = filteredLog.filter(x => x.type === 'gen').length;
-            const watchCount = filteredLog.filter(x => x.type === 'watch').length;
-            const total = genCount + watchCount || 1;
-            const genPerc = (genCount / total) * 100;
-            const watchPerc = (watchCount / total) * 100;
+            chartHTML += '</div>';
+            body.innerHTML += chartHTML;
+            body.innerHTML += `<div style="text-align:center; font-size:12px; color:var(--text-secondary); margin-top:10px;">${t.stats_header} (Y: Points)</div>`;
 
+        } else {
+            // == ГРАФИК АКТИВНОСТИ (Activity) ==
+            const days = 7; // Default week
+            let grouping = 'day';
+            let steps = 7;
+            
+            if(currentStatsTimeframe === 'week') { grouping = 'day'; steps = 7; }
+            if(currentStatsTimeframe === 'month') { grouping = 'day'; steps = 30; } // Или 'week' (4 недели)
+            if(currentStatsTimeframe === 'year') { grouping = 'month'; steps = 12; }
+
+            // Инициализация массивов
+            const aggregated = {}; // Key -> {gen: 0, watch: 0}
+            
+            // Генерация ключей и лейблов
+            for(let i=steps-1; i>=0; i--) {
+                const d = new Date();
+                let key, label;
+                
+                if(grouping === 'day') {
+                    d.setDate(d.getDate() - i);
+                    key = d.toISOString().split('T')[0]; // YYYY-MM-DD
+                    label = d.getDate().toString(); // Просто число
+                } else {
+                    d.setMonth(d.getMonth() - i);
+                    key = `${d.getFullYear()}-${d.getMonth()}`;
+                    const months = ['J','F','M','A','M','J','J','A','S','O','N','D'];
+                    label = months[d.getMonth()];
+                }
+                
+                xLabels.push({key, label});
+                aggregated[key] = {gen: 0, watch: 0};
+            }
+
+            // Заполнение данными
+            activityLog.forEach(log => {
+                const date = new Date(log.ts);
+                let key;
+                if(grouping === 'day') key = date.toISOString().split('T')[0];
+                else key = `${date.getFullYear()}-${date.getMonth()}`;
+                
+                if(aggregated[key]) {
+                    if(log.type === 'gen') aggregated[key].gen++;
+                    if(log.type === 'watch') aggregated[key].watch++;
+                }
+            });
+
+            // Находим макс значение для масштаба Y
+            let maxVal = 0;
+            xLabels.forEach(x => {
+                const d = aggregated[x.key];
+                if(d.gen > maxVal) maxVal = d.gen;
+                if(d.watch > maxVal) maxVal = d.watch;
+            });
+            if(maxVal === 0) maxVal = 1;
+
+            // Рисуем график
+            let chartHTML = '<div class="chart-container">';
+            xLabels.forEach(x => {
+                const data = aggregated[x.key];
+                const hGen = (data.gen / maxVal) * 100;
+                const hWatch = (data.watch / maxVal) * 100;
+                
+                chartHTML += `
+                    <div class="chart-bar-group">
+                        <div class="bar-wrapper">
+                            <div class="chart-bar secondary" style="height:${hGen}%; width:6px;"></div>
+                            <div class="chart-bar" style="height:${hWatch}%; width:6px;"></div>
+                        </div>
+                        <div class="chart-label-x">${x.label}</div>
+                    </div>
+                `;
+            });
+            chartHTML += '</div>';
+            body.innerHTML += chartHTML;
+            
+            // Легенда
             body.innerHTML += `
-                <div class="stat-card" style="display:block;">
-                    <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:700;">
+                <div style="display:flex; justify-content:center; gap:15px; margin-top:15px; font-size:12px;">
+                    <div style="display:flex; align-items:center; gap:5px;">
+                        <div style="width:10px; height:10px; background:var(--text-secondary); border-radius:2px;"></div>
                         <span>${t.act_gen}</span>
-                        <span>${genCount}</span>
                     </div>
-                    <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:700; margin-top:5px;">
+                    <div style="display:flex; align-items:center; gap:5px;">
+                        <div style="width:10px; height:10px; background:var(--accent); border-radius:2px;"></div>
                         <span>${t.act_watch}</span>
-                        <span>${watchCount}</span>
-                    </div>
-                    <div class="activity-bar">
-                        <div class="bar-gen" style="width:${genPerc}%"></div>
-                        <div class="bar-watch" style="width:${watchPerc}%"></div>
                     </div>
                 </div>
             `;
@@ -12775,6 +13019,18 @@
     }
 
     function openSupportModal() {
+        const t = langData[currentLang];
+        const contentDiv = document.getElementById('support-content');
+        
+        contentDiv.innerHTML = `
+            <p>${t.support_intro}</p>
+            <p>${t.support_why}</p>
+            <h4 style="color:var(--text-main); margin:15px 0 10px 0;">${t.support_roadmap_title}</h4>
+            <ul style="padding-left:20px; margin:0;">
+                ${t.support_roadmap_list}
+            </ul>
+        `;
+        
         document.getElementById('modal-support-overlay').classList.add('open');
     }
     function closeSupport(e, force) {
