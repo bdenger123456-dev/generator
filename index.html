@@ -286,24 +286,112 @@
         }
 
         /* Новая статистика (Графики и Капсула) */
+        /* Контейнер графика с отступами для осей */
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding-left: 20px; /* Место для оси Y */
+            padding-bottom: 20px; /* Место для оси X */
+        }
+
+        /* Ось Y (Текст вертикально) */
+        .axis-label-y {
+            position: absolute;
+            left: -15px;
+            top: 50%;
+            transform: translateY(-50%) rotate(-90deg);
+            font-size: 10px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        /* Ось X (Текст снизу) */
+        .axis-label-x-title {
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        /* Контейнер баров */
+        .chart-container {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            height: 250px;
+            width: 100%;
+            border-bottom: 1px solid var(--border);
+            border-left: 1px solid var(--border);
+            position: relative;
+        }
+
+        /* Значения над колонками */
+        .bar-value-top {
+            position: absolute;
+            top: -18px;
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--text-main);
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Капсула ДАТ (Timeframe) - стиль как у нижней, но компактнее */
+        .stats-tf-capsule {
+            background: var(--ios-card);
+            border: 1px solid var(--border);
+            border-radius: 50px; /* Полное скругление как у нижней */
+            height: 36px; /* Чуть ниже основной */
+            display: flex;
+            padding: 3px;
+            margin-bottom: 8px; /* Прижат к нижней капсуле */
+            width: 100%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .stats-tf-item {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 40px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+
+        .stats-tf-item.active {
+            background: var(--nav-bg); /* Как у нижней */
+            color: var(--text-main);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* Обновляем нижнюю капсулу для единообразия */
+        .stats-nav-capsule {
+            margin: 0 !important; /* Убираем лишние отступы */
+            width: 100%;
+        }
+
         .stats-modal-body {
             flex: 1;
             display: flex;
             flex-direction: column;
             padding: 15px;
             overflow-y: auto;
-        }
-
-        .chart-container {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            height: 200px;
-            width: 100%;
-            padding: 10px 0 30px 0; /* Место для подписей снизу */
-            border-bottom: 1px solid var(--border);
-            margin-top: 20px;
-            position: relative;
         }
 
         .chart-bar-group {
@@ -340,14 +428,14 @@
         .chart-label-x {
             position: absolute;
             bottom: -25px;
-            font-size: 9px;
+            font-size: 10px; /* Чуть крупнее */
             color: var(--text-secondary);
             text-align: center;
-            width: 100%;
-            overflow: hidden;
+            width: 140%; /* Шире, чтобы текст влезал */
+            left: -20%;
             white-space: nowrap;
-            text-overflow: ellipsis;
         }
+        
 
         .chart-value-y {
             position: absolute;
@@ -365,7 +453,7 @@
             height: 50px;
             display: flex;
             padding: 4px;
-            margin: 10px 20px 20px 20px; /* Отступы снизу */
+            margin: 0px 20px 20px 20px; /* Отступы снизу */
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             flex-shrink: 0;
         }
@@ -478,10 +566,21 @@
         .animation-text.visible { opacity: 1; }
 
         .card {
-            background: var(--card-bg); border: 1px solid var(--border); padding: 25px 20px;
-            text-align: center; position: relative; margin-bottom: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            min-height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: all 0.3s ease-out; width: 100%; overflow: visible;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 15px 20px 25px 20px; 
+            text-align: center;
+            position: relative;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease-out;
+            width: 100%;
+            overflow: visible;
         }
         .card.has-results { min-height: 0; height: auto; justify-content: flex-start; gap: 15px; padding-bottom: 30px; }
         .card.flash-active { background-color: #fff !important; border-color: #fff !important; transform: scale(1.02); }
@@ -491,29 +590,22 @@
         .fade-hidden { opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease; display: none; }
         .fade-visible { opacity: 1; transform: translateY(0); display: flex; }
         
-        /* Badges New Layout */
-        .badge-wrapper {
-            display: flex; align-items: center; justify-content: center; gap: 6px;
-            margin-bottom: 10px; width: 100%; position: relative; z-index: 5;
-        }
         .warning-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; color: #fff; cursor: default; }
         .badge-extreme { background: var(--highlight-red); }
         .badge-lgbt { background: #9b59b6; }
         .badge-niche { background: #34495e; }
+        /* Показываем тултип при наведении на сам бейдж */
+        .warning-badge:hover .badge-tooltip,
+        .warning-badge:active .badge-tooltip {
+            opacity: 1;
+            pointer-events: auto;
+        }
         
         .badge-help {
             width: 16px; height: 16px; border-radius: 50%;
             background: rgba(255,255,255,0.1); color: var(--text-secondary);
             font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center;
             cursor: pointer; position: relative;
-        }
-        /* Tooltip */
-        .badge-tooltip {
-            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
-            background: rgba(0,0,0,0.9); color: #fff; padding: 8px 12px; border-radius: 10px;
-            font-size: 12px; width: 180px; text-align: center; pointer-events: none;
-            opacity: 0; transition: opacity 0.2s; margin-bottom: 8px; border: 1px solid var(--border);
-            z-index: 100; font-weight: 400;
         }
         .badge-help:hover .badge-tooltip, .badge-help.active .badge-tooltip { opacity: 1; }
 
@@ -528,7 +620,56 @@
         .result-description { font-size: 15px; font-weight: 400; color: var(--text-secondary); line-height: 1.4; max-width: 95%; margin: 0; display: none; }
         .result-description.fade-visible:not(:empty) { display: block; }
         
-        .result-comment { text-align: center; font-size: 14px; color: var(--text-secondary); font-style: italic; margin-bottom: 20px; min-height: 20px; width: 100%; display: block; }
+        .result-comment {
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-bottom: 12px;
+            min-height: 20px;
+            width: 100%;
+            display: block;
+        }
+
+        /* Бейджи привязаны к названию (над слотом) */
+        .badge-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 2px;
+            margin-top: 5px;    
+            width: 100%;
+            position: relative;
+            z-index: 5;
+            min-height: 0; 
+        }
+
+        /* Обновленный тултип для длинных описаний */
+        .badge-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(20, 20, 20, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: #fff;
+            padding: 12px;
+            border-radius: 14px;
+            font-size: 13px;
+            line-height: 1.4;
+            width: 220px; /* Делаем шире для текста */
+            text-align: left; /* Текст слева для читаемости */
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            margin-bottom: 10px;
+            border: 1px solid var(--border);
+            z-index: 100;
+            font-weight: 400;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
 
         /* Action Buttons (Thumbs) */
         .card-actions { display: flex; gap: 15px; width: 100%; justify-content: center; margin-top: 20px; }
@@ -543,7 +684,33 @@
 
         .related-section { width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 10px; margin-bottom: 20px; text-align: center; }
         .related-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 10px; opacity: 0.8; width: 100%; display: block; }
-        .related-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; width: 100%; }
+        .related-tags {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .related-tags {
+                flex-wrap: nowrap; /* Запрет переноса */
+                overflow-x: auto; /* Горизонтальный скролл */
+                justify-content: flex-start; /* Выравнивание по левому краю */
+                padding-bottom: 10px; /* Место под скроллбар */
+                padding-left: 5px; 
+                padding-right: 5px;
+                -webkit-overflow-scrolling: touch; /* Плавность на iOS */
+                /* Маска для красивого исчезновения краев */
+                mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+                -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+            }
+            
+            .related-item-btn {
+                flex-shrink: 0; /* Чтобы кнопки не сжимались */
+                white-space: nowrap;
+            }
+        }
         .related-item-btn { background: var(--card-bg); border: 1px solid var(--border); padding: 8px 14px; border-radius: 12px; font-size: 13px; font-weight: 600; color: var(--text-main); cursor: pointer; transition: 0.2s; display: inline-block; }
         .related-item-btn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
 
@@ -554,7 +721,15 @@
         .btn-gen { flex: 1; padding: 22px; background: var(--text-main); color: var(--bg-color); border: none; border-radius: 16px; font-size: 18px; font-weight: 900; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 15px rgba(255,255,255,0.1); }
         .btn-gen.secondary { background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border); font-size: 16px; flex: 0.8; }
 
-        .explanation-text { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; text-align: center; min-height: 14px; }
+        .explanation-text {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0; /* Убираем лишний отступ снизу */
+            text-align: center;
+            min-height: 14px;
+        }
 
         /* Add Genre Capsule Button Style */
         .capsule-accordion-head {
@@ -623,6 +798,42 @@
             .main-content { padding: 0; }
             .center-wrapper { padding-left: 20px; padding-right: 20px; width: 100%; }
         }
+
+        /* Тег в онбординге с кнопкой удаления */
+        .onb-tag {
+            background: var(--accent);
+            color: #000;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: popIn 0.3s ease;
+        }
+
+        .onb-tag-remove {
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+            opacity: 0.6;
+        }
+        .onb-tag-remove:hover { opacity: 1; }
+
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .onb-error {
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
     </style>
 </head>
 <body>
@@ -653,38 +864,44 @@
                     <div id="anim-text" class="animation-text"></div>
                 </div>
 
+                <div class="result-comment" id="result-comment"></div>
+
                 <!-- CARD -->
                 <div class="card" id="card-block">
+                    
+                    <!-- 2. Объяснение (внутри карточки первым) -->
+                    <div class="explanation-text" id="explanation-text" style="margin-top: 5px;"></div>
+
+                    <!-- 3. Бейджи (над слотом) -->
                     <div class="badge-wrapper" id="badge-wrapper"></div>
                     
-                    <div class="explanation-text" id="explanation-text"></div>
-                    
+                    <!-- 4. Слот-машина -->
                     <div class="slot-window">
                         <div id="slot-reel" class="slot-reel">
                             <div class="slot-item" id="result-text">Press Generate</div>
                         </div>
                     </div>
                     
+                    <!-- 5. Описание -->
                     <div id="result-desc" class="result-description"></div>
 
+                    <!-- 6. Действия -->
                     <div class="card-actions hidden-initial">
                         <button class="btn-action ban" id="btn-ban" onclick="toggleBlacklist()">👎</button>
                         <button class="btn-action fav" id="btn-fav" onclick="toggleFavorite()">👍</button>
                     </div>
                 </div>
 
+                <!-- Похожие (горизонтальный скролл на мобильных уже в CSS) -->
                 <div class="related-section hidden-initial" id="related-block">
                     <div class="related-title" data-key="related_header">You might also like:</div>
                     <div class="related-tags" id="related-tags"></div>
                 </div>
 
-                <div class="result-comment" id="result-comment"></div>
-
                 <div class="btn-group hidden-initial">
                     <a href="#" target="_blank" class="btn-watch" id="watch-link" data-key="watch" onclick="handleOutboundClick()">Watch</a>
                 </div>
 
-                <!-- ADD GENRE CAPSULE -->
                 <div id="mods-block" class="hidden-initial" style="width:100%">
                     <div class="capsule-accordion-head" onclick="toggleAccordion('mod-container')">
                         <span data-key="add_genre">Add Genre</span> <span>▼</span>
@@ -884,29 +1101,41 @@
 
 <!-- Modal Stats -->
 <div class="modal-overlay" id="modal-stats-overlay" onclick="closeStats(event)">
-    <div class="modal" style="height: 500px;"> <!-- Фиксированная высота для красоты графика -->
+    <div class="modal" style="height: 600px; max-height: 90vh; display:flex; flex-direction:column;">
+        <!-- Хедер -->
         <div class="modal-header">
             <span data-key="btn_stats">Statistics</span>
             <div style="display:flex; align-items:center;">
-                <!-- Кнопка Share теперь иконка -->
                 <span class="header-icon-btn" onclick="shareStats()">⤤</span>
                 <span style="cursor:pointer" onclick="closeStats(null, true)">✕</span>
             </div>
         </div>
         
-        <!-- Тело статистики с графиком -->
-        <div class="stats-modal-body" id="modal-stats-body">
-            <!-- Сюда JS будет рендерить Timeframe селектор и сам График -->
+        <!-- Тело с графиком (скроллится) -->
+        <div class="stats-modal-body" id="modal-stats-body" style="flex:1; padding:20px; position:relative;">
+            <!-- График рендерится сюда -->
         </div>
 
-        <!-- Капсула навигации СНИЗУ -->
-        <div class="stats-nav-capsule">
-            <div class="stats-nav-item active" id="stat-nav-prefs" onclick="switchStatsTab('tags')">
-                <span data-key="stats_prefs">Preferences</span>
+        <!-- Футер с переключателями (фиксирован снизу) -->
+        <div class="stats-footer" style="padding: 10px 20px 20px 20px; background: var(--sidebar-bg); border-top: 1px solid var(--border);">
+            
+            <!-- Капсула ДАТ (сверху) -->
+            <div class="stats-tf-capsule">
+                <div class="stats-tf-item active" id="tf-week" onclick="switchTimeframe('week')"></div>
+                <div class="stats-tf-item" id="tf-month" onclick="switchTimeframe('month')"></div>
+                <div class="stats-tf-item" id="tf-year" onclick="switchTimeframe('year')"></div>
             </div>
-            <div class="stats-nav-item" id="stat-nav-activity" onclick="switchStatsTab('activity')">
-                <span data-key="stats_activity">Activity</span>
+
+            <!-- Капсула РАЗДЕЛОВ (снизу) -->
+            <div class="stats-nav-capsule">
+                <div class="stats-nav-item active" id="stat-nav-tags" onclick="switchStatsTab('tags')">
+                    <span data-key="stats_prefs">Preferences</span>
+                </div>
+                <div class="stats-nav-item" id="stat-nav-activity" onclick="switchStatsTab('activity')">
+                    <span data-key="stats_activity">Activity</span>
+                </div>
             </div>
+
         </div>
     </div>
 </div>
@@ -925,6 +1154,60 @@
             <button class="boosty-btn" onclick="window.open('https://boosty.to/xfetishhub', '_blank')">
                 Boosty
             </button>
+        </div>
+    </div>
+</div>
+
+<!-- AGE GATE OVERLAY -->
+<div id="age-gate" class="modal-overlay" style="z-index: 20000; background: var(--bg-color);">
+    <div class="center-wrapper" style="text-align:center; padding:20px;">
+        <div class="logo" style="margin-bottom:10px; font-size:40px;">18+</div>
+        <h2 style="margin-bottom:10px;" data-key="age_title">Age Verification</h2>
+        <p style="color:var(--text-secondary); margin-bottom:30px; line-height:1.5;" data-key="age_desc">
+            This website contains age-restricted materials. Are you 18 years or older?
+        </p>
+        <div style="display:flex; gap:15px; width:100%; max-width:300px; justify-content:center;">
+            <button class="btn-gen secondary" onclick="blockAccess()" data-key="age_no">No, I am under 18</button>
+            <button class="btn-gen" onclick="passAgeGate()" style="background:var(--accent); color:#000;" data-key="age_yes">Yes, I am 18+</button>
+        </div>
+    </div>
+</div>
+
+<!-- BLOCKED SCREEN -->
+<div id="age-block" class="modal-overlay" style="z-index: 20001; background: #000; display:none;">
+    <div class="center-wrapper" style="text-align:center;">
+        <div style="font-size:50px; margin-bottom:20px;">⛔</div>
+        <h2 style="color:#fff;" data-key="age_block_msg">This website is only for users over 18 years of age.</h2>
+    </div>
+</div>
+
+<!-- ONBOARDING OVERLAY -->
+<div id="onboarding-overlay" class="modal-overlay" style="z-index: 19000;">
+    <div class="modal" style="max-width: 400px;">
+        <div class="modal-header">
+            <span data-key="onb_title">Preferences</span>
+        </div>
+        <div class="modal-body" style="padding:20px; display:flex; flex-direction:column; gap:15px;">
+            <p style="color:var(--text-secondary); font-size:14px; text-align:center;" data-key="onb_desc">
+                Tell us what you like in one sentence, and we will set up the feed for you.
+            </p>
+            
+            <textarea id="onb-input" rows="3" 
+                style="width:100%; background:var(--bg-color); border:1px solid var(--border); border-radius:12px; padding:10px; color:var(--text-main); font-size:16px; resize:none;"
+                placeholder="e.g. I like milf, anal and big tits..."></textarea>
+            
+            <button class="btn-gen" onclick="processOnboardingText()" data-key="onb_btn_check" style="padding:12px; font-size:14px;">Check</button>
+
+            <!-- Результаты поиска -->
+            <div id="onb-results" style="display:none; flex-direction:column; gap:10px; margin-top:10px; border-top:1px solid var(--border); padding-top:15px;">
+                <div style="font-size:12px; color:var(--text-secondary); text-transform:uppercase; text-align:center;" data-key="onb_found">Found:</div>
+                <div id="onb-tags-container" style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;"></div>
+                <button class="btn-watch" onclick="finishOnboarding()" data-key="onb_btn_confirm" style="margin-top:10px;">Confirm & Start</button>
+            </div>
+            
+            <div style="text-align:center; margin-top:5px;">
+                <span style="font-size:12px; color:var(--text-secondary); text-decoration:underline; cursor:pointer;" onclick="skipOnboarding()" data-key="onb_skip">Skip</span>
+            </div>
         </div>
     </div>
 </div>
@@ -1042,10 +1325,10 @@
                 id: 9, 
                 name: "BDSM", name_ru: "БДСМ", name_es: "BDSM", name_de: "BDSM",
                 slug: "bdsm", tags: ["universal", "kinky"],
-                desc_en: "Bondage, Discipline, Sadism, and Masochism.",
-                desc_ru: "Бондаж, Дисциплина, Садизм и Мазохизм.",
-                desc_es: "Bondage, Disciplina, Sadismo y Masoquismo.",
-                desc_de: "Bondage, Disziplin, Sadismus und Masochismus."
+                desc_en: "Dynamics of power exchange, restraint, and intense sensation play.",
+                desc_ru: "Динамика обмена властью, связывание и игры с интенсивными ощущениями.",
+                desc_es: "Dinámicas de intercambio de poder, ataduras y juego de sensaciones.",
+                desc_de: "Dynamik des Machtaustauschs, Fesselung und intensives Empfindungsspiel."
             },
             {
                 id: 10, 
@@ -1105,10 +1388,10 @@
                 id: 16, 
                 name: "Creampie", name_ru: "Кремпай", name_es: "Creampie (Adentro)", name_de: "Creampie",
                 slug: "creampie", tags: ["straight", "gay", "trans"],
-                desc_en: "Ejaculation inside the partner's body.",
-                desc_ru: "Эякуляция внутрь тела партнера.",
-                desc_es: "Eyaculación dentro del cuerpo de la pareja.",
-                desc_de: "Ejakulation im Körper des Partners."
+                desc_en: "The visual and messy aftermath of internal ejaculation.",
+                desc_ru: "Визуальный и «грязный» финал с семяизвержением внутрь партнера.",
+                desc_es: "El resultado visual y desordenado de la eyaculación interna.",
+                desc_de: "Das visuelle und „unordentliche“ Nachspiel der inneren Ejakulation."
             },
             {
                 id: 17, 
@@ -1132,10 +1415,10 @@
                 id: 19, 
                 name: "Cuckold", name_ru: "Куколд", name_es: "Cornudo (Cuckold)", name_de: "Cuckold",
                 slug: "cuckold", tags: ["straight", "bi"],
-                desc_en: "Partner watching their significant other have sex with someone else.",
-                desc_ru: "Партнер наблюдает, как его половинка занимается сексом с другим.",
-                desc_es: "Pareja viendo a su compañero tener sexo con otra persona.",
-                desc_de: "Partner sieht zu, wie der andere Sex mit jemand anderem hat."
+                desc_en: "The thrill of watching a romantic partner having sex with someone else.",
+                desc_ru: "Азарт и возбуждение от наблюдения за сексом партнера с другим.",
+                desc_es: "La emoción de ver a tu pareja tener sexo con otra persona.",
+                desc_de: "Der Nervenkitzel, dem Partner beim Sex mit jemand anderem zuzusehen."
             },
             {
                 id: 20, 
@@ -1195,10 +1478,10 @@
                 id: 26, 
                 name: "Orgasm", name_ru: "Оргазм", name_es: "Orgasmo", name_de: "Orgasmus",
                 slug: "orgasm", tags: ["universal"],
-                desc_en: "Focus on the climax of sexual excitement.",
-                desc_ru: "Акцент на пике сексуального удовольствия.",
-                desc_es: "Enfoque en el clímax de la excitación sexual.",
-                desc_de: "Fokus auf den Höhepunkt der sexuellen Erregung."
+                desc_en: "Intense focus on the moment of climax and physical release.",
+                desc_ru: "Акцент на моменте пика, дрожи и физической разрядке.",
+                desc_es: "Enfoque intenso en el momento del clímax y la liberación física.",
+                desc_de: "Intensiver Fokus auf den Moment des Höhepunktes und der Entladung."
             },
             {
                 id: 27, 
@@ -1213,10 +1496,10 @@
                 id: 28, 
                 name: "Squirting", name_ru: "Сквирт", name_es: "Squirting", name_de: "Squirting",
                 slug: "squirting", tags: ["straight", "lesbian", "trans"],
-                desc_en: "Female ejaculation during orgasm.",
-                desc_ru: "Женская эякуляция во время оргазма.",
-                desc_es: "Eyaculación femenina durante el orgasmo.",
-                desc_de: "Weibliche Ejakulation beim Orgasmus."
+                desc_en: "Intense female orgasm accompanied by a copious release of fluid.",
+                desc_ru: "Интенсивный женский оргазм, сопровождающийся обильным выделением влаги.",
+                desc_es: "Orgasmo femenino intenso acompañado de una liberación copiosa de fluido.",
+                desc_de: "Intensiver weiblicher Orgasmus begleitet von reichlicher Flüssigkeitsfreisetzung."
             },
             {
                 id: 29, 
@@ -1258,10 +1541,10 @@
                 id: 33, 
                 name: "Swingers", name_ru: "Свингеры", name_es: "Intercambio de Parejas", name_de: "Swinger",
                 slug: "swingers", tags: ["straight", "bi"],
-                desc_en: "Couples swapping partners for sex.",
-                desc_ru: "Пары меняются партнерами для секса.",
-                desc_es: "Parejas intercambiando compañeros para sexo.",
-                desc_de: "Paare tauschen Partner für Sex."
+                desc_en: "Adventurous couples exploring partner swapping and shared intimacy.",
+                desc_ru: "Авантюрные пары, исследующие обмен партнерами и совместное удовольствие.",
+                desc_es: "Parejas aventureras explorando el intercambio de parejas e intimidad compartida.",
+                desc_de: "Abenteuerlustige Paare, die Partnertausch und gemeinsame Intimität erkunden."
             },
             {
                 id: 34, 
@@ -1510,10 +1793,10 @@
                 id: 61, 
                 name: "Teacher", name_ru: "Учитель / Учительница", name_es: "Profesor/a", name_de: "Lehrer/in",
                 slug: "teacher", tags: ["universal"],
-                desc_en: "Roleplay involving instructors and students.",
-                desc_ru: "Ролевая игра с участием преподавателей и студентов.",
-                desc_es: "Juego de rol involucrando instructores y estudiantes.",
-                desc_de: "Rollenspiel mit Lehrern und Schülern."
+                desc_en: "The classic authority fantasy of classroom discipline and 'extra credit'.",
+                desc_ru: "Классическая фантазия о власти, дисциплине и «дополнительных занятиях».",
+                desc_es: "La clásica fantasía de autoridad, disciplina en el aula y 'créditos extra'.",
+                desc_de: "Die klassische Autoritätsfantasie von Klassenzimmerdisziplin und 'Zusatzaufgaben'."
             },
             {
                 id: 62, 
@@ -1555,19 +1838,19 @@
                 id: 66, 
                 name: "Hentai", name_ru: "Хентай", name_es: "Hentai", name_de: "Hentai",
                 slug: "hentai", tags: ["universal"],
-                desc_en: "Japanese animated pornography.",
-                desc_ru: "Японская анимированная порнография.",
-                desc_es: "Pornografía animada japonesa.",
-                desc_de: "Japanische animierte Pornografie."
+                desc_en: "Limitless japanese illustrated fantasies where real-world physics don't apply.",
+                desc_ru: "Безграничные японские рисованные фантазии, где не действуют законы физики.",
+                desc_es: "Fantasías japonesas ilimitadas dibujadas a mano donde las leyes de la física no se aplican.",
+                desc_de: "Grenzenlose japanische, handgezeichnete Fantasiewelten, in denen die Gesetze der Physik außer Kraft gesetzt sind."
             },
             {
                 id: 67, 
                 name: "Smoking", name_ru: "Курение", name_es: "Fumar", name_de: "Rauchen",
                 slug: "smoking", tags: ["universal", "fetish"],
-                desc_en: "Sexual arousal from smoking cigarettes.",
-                desc_ru: "Сексуальное возбуждение от курения сигарет.",
-                desc_es: "Excitación sexual por fumar cigarrillos.",
-                desc_de: "Sexuelle Erregung durch Rauchen von Zigaretten."
+                desc_en: "The aesthetic of inhaling, exhaling smoke, and holding cigarettes.",
+                desc_ru: "Эстетика затяжек, выдыхания дыма и манеры держать сигарету.",
+                desc_es: "La estética de inhalar, exhalar humo y sostener cigarrillos.",
+                desc_de: "Die Ästhetik des Inhalierens, Ausatmens und Haltens von Zigaretten."
             },
             {
                 id: 68, 
@@ -1591,10 +1874,10 @@
                 id: 70, 
                 name: "Dirty Talk", name_ru: "Грязные разговоры", name_es: "Lenguaje Sucio", name_de: "Dirty Talk",
                 slug: "dirty-talk", tags: ["universal"],
-                desc_en: "Using lewd language to enhance arousal.",
-                desc_ru: "Использование непристойных слов для возбуждения.",
-                desc_es: "Usar lenguaje lascivo para aumentar la excitación.",
-                desc_de: "Verwendung obszöner Sprache zur Steigerung der Erregung."
+                desc_en: "Fueling the fire with explicit, whispered, or shouted words of desire.",
+                desc_ru: "Разжигание страсти откровенными, шепотом или криком сказанными словами.",
+                desc_es: "Avivar el fuego con palabras de deseo explícitas, susurradas o gritadas.",
+                desc_de: "Das Feuer mit expliziten, geflüsterten oder geschrienen Worten der Begierde anheizen."
             },
             {
                 id: 71, 
@@ -1816,10 +2099,10 @@
                 id: 95, 
                 name: "Nudity", name_ru: "Нагота", name_es: "Desnudez", name_de: "Nacktheit",
                 slug: "nudity", tags: ["universal"],
-                desc_en: "Full body exposure without clothes.",
-                desc_ru: "Полное обнажение тела без одежды.",
-                desc_es: "Exposición de cuerpo completo sin ropa.",
-                desc_de: "Vollständige Körperentblößung ohne Kleidung."
+                desc_en: "Complete natural nakedness, posing or moving without sexual acts.",
+                desc_ru: "Полная естественная нагота, позирование без полового акта.",
+                desc_es: "Desnudez natural completa, posando o moviéndose sin actos sexuales.",
+                desc_de: "Vollständige natürliche Nacktheit, Posieren ohne sexuelle Handlungen."
             },
             {
                 id: 96, 
@@ -1915,10 +2198,10 @@
                 id: 107, 
                 name: "Exhibitionism", name_ru: "Эксгибиционизм", name_es: "Exhibicionismo", name_de: "Exhibitionismus",
                 slug: "exhibitionism", tags: ["universal"],
-                desc_en: "Getting aroused by being watched.",
-                desc_ru: "Возбуждение от наблюдения посторонними.",
-                desc_es: "Exicitarse al ser observado.",
-                desc_de: "Erregung durch Beobachtetwerden."
+                desc_en: "The thrill of exposing oneself or having sex in view of others.",
+                desc_ru: "Азарт от оголения или секса на виду у посторонних.",
+                desc_es: "La emoción de exponerse o tener sexo a la vista de otros.",
+                desc_de: "Der Nervenkitzel, sich zu entblößen oder Sex vor anderen zu haben."
             },
             {
                 id: 108, 
@@ -2086,10 +2369,10 @@
                 id: 126, 
                 name: "Gonzo", name_ru: "Гонзо (Реализм)", name_es: "Gonzo", name_de: "Gonzo",
                 slug: "gonzo", tags: ["universal"],
-                desc_en: "Raw filming style, often acknowledging camera.",
-                desc_ru: "Реалистичная съемка, часто с обращением к камере.",
-                desc_es: "Estilo de filmación crudo, reconociendo la cámara.",
-                desc_de: "Roher Filmstil, oft mit Blick in die Kamera."
+                desc_en: "Unscripted, raw action where performers interact with the camera.",
+                desc_ru: "Непостановочный, сырой экшен с взаимодействием с камерой.",
+                desc_es: "Acción cruda y sin guion donde interactúan con la cámara.",
+                desc_de: "Unvorbereitete, rohe Action mit Interaktion zur Kamera."
             },
             {
                 id: 128, 
@@ -2149,10 +2432,10 @@
                 id: 134, 
                 name: "Outdoor Sex", name_ru: "Секс на улице", name_es: "Sexo al Aire Libre", name_de: "Outdoor-Sex",
                 slug: "outdoor-sex", tags: ["universal"],
-                desc_en: "Sexual acts performed outside.",
-                desc_ru: "Сексуальные действия на открытом воздухе.",
-                desc_es: "Actos sexuales realizados afuera.",
-                desc_de: "Sexuelle Handlungen im Freien."
+                desc_en: "The adrenaline rush of intimacy in public, wild, or risky settings.",
+                desc_ru: "Адреналин и азарт от близости в общественных, диких или рискованных местах.",
+                desc_es: "La descarga de adrenalina de la intimidad en entornos públicos, salvajes o arriesgados.",
+                desc_de: "Der Adrenalinkick von Intimität in öffentlichen, wilden oder riskanten Umgebungen."
             },
             {
                 id: 135, 
@@ -2950,10 +3233,10 @@
                 id: 225, 
                 name: "Role Play", name_ru: "Ролевые игры", name_es: "Juego de Rol", name_de: "Rollenspiel",
                 slug: "role-play", tags: ["universal"],
-                desc_en: "Acting out specific fantasy characters.",
-                desc_ru: "Отыгрыш конкретных фантазийных персонажей.",
-                desc_es: "Actuar personajes de fantasía específicos.",
-                desc_de: "Ausspielen bestimmter Fantasiecharaktere."
+                desc_en: "Acting out sexual fantasies and scenarios in character or costume.",
+                desc_ru: "Отыгрыш сексуальных фантазий и сценариев в образах или костюмах.",
+                desc_es: "Representar fantasías y escenarios sexuales en personaje o disfraz.",
+                desc_de: "Ausspielen sexueller Fantasien und Szenarien in Charakter oder Kostüm."
             },
             {
                 id: 226, 
@@ -5377,6 +5660,15 @@
                 desc_de: "Erregung durch Schamgefühl."
             },
             {
+                id: 500, 
+                name: "Taboo / Incest", name_ru: "Инцест / Табу", name_es: "Tabú / Incesto", name_de: "Tabu / Inzest",
+                slug: "family-taboo", tags: ["taboo", "roleplay", "straight"],
+                desc_en: "The ultimate forbidden fantasy involving family dynamics and breaking boundaries.",
+                desc_ru: "Главная запретная фантазия: нарушение границ и секреты внутри семьи.",
+                desc_es: "La máxima fantasía prohibida que involucra dinámicas familiares y romper límites.",
+                desc_de: "Die ultimative verbotene Fantasie über Familiendynamik und Grenzüberschreitung."
+            },
+            {
                 id: 501, 
                 name: "Small Penis Humiliation", name_ru: "Унижение маленького члена", name_es: "Humillación de Pene Pequeño", name_de: "Kleiner Penis Erniedrigung",
                 slug: "small-penis-humiliation", tags: ["sph", "humiliation", "bi"],
@@ -5744,6 +6036,15 @@
                 desc_ru: "Секс через интернет-чат или веб-камеру.",
                 desc_es: "Sexo vía chat de internet o webcam.",
                 desc_de: "Sex über Internet-Chat oder Webcam."
+            },
+            {
+                id: 542, 
+                name: "Step Sister", name_ru: "Сводная сестра", name_es: "Hermanastra", name_de: "Stiefschwester",
+                slug: "step-sister", tags: ["taboo", "roleplay", "teens"],
+                desc_en: "Sexual tension, teasing, and secret encounters under the same roof.",
+                desc_ru: "Сексуальное напряжение, дразнилки и тайные встречи под одной крышей.",
+                desc_es: "Tensión sexual, burlas y encuentros secretos bajo el mismo techo.",
+                desc_de: "Sexuelle Spannung, Necken und heimliche Begegnungen unter einem Dach."
             },
             {
                 id: 543, 
@@ -6275,6 +6576,15 @@
                 desc_ru: "Акцент на мышцах живота.",
                 desc_es: "Enfoque en los músculos del estómago.",
                 desc_de: "Fokus auf die Bauchmuskeln."
+            },
+            {
+                id: 604, 
+                name: "Step Mom", name_ru: "Мачеха", name_es: "Madrastra", name_de: "Stiefmutter",
+                slug: "step-mom", tags: ["taboo", "milf", "roleplay"],
+                desc_en: "Crossing the line with the older, authoritative woman of the house.",
+                desc_ru: "Переход черты с опытной женщиной, которая должна быть главной в доме.",
+                desc_es: "Cruzar la línea con la mujer mayor y autoritaria de la casa.",
+                desc_de: "Die Grenze überschreiten mit der älteren, autoritären Frau des Hauses."
             },
             {
                 id: 605, 
@@ -10808,15 +11118,6 @@
                 desc_de: "Ausspielen von Fantasieszenarien."
             },
             {
-                id: 1121, 
-                name: "Squirt", name_ru: "Сквирт", name_es: "Squirt", name_de: "Squirt",
-                slug: "squirt", tags: ["wet"],
-                desc_en: "Female ejaculation.",
-                desc_ru: "Женская эякуляция.",
-                desc_es: "Eyaculación femenina.",
-                desc_de: "Weibliche Ejakulation."
-            },
-            {
                 id: 1124, 
                 name: "AI", name_ru: "ИИ", name_es: "IA (Inteligencia Artificial)", name_de: "KI (Künstliche Intelligenz)",
                 slug: "ai", tags: ["ai"],
@@ -11783,9 +12084,17 @@
             tag_straight: "Straight", tag_gay: "Gay", tag_lesbian: "Lesbian", tag_trans: "Trans",
             dark_mode: "Dark Mode",
             share_btn: "Share",
-            tooltip_extreme: "Contains hardcore or intense content.",
-            tooltip_lgbt: "Contains same-sex or trans content.",
-            tooltip_niche: "Specific interests not mainstream.",
+            badge_extreme: "Extreme",
+            badge_desc_extreme: "⚠️ <b>High Intensity</b><br>This category contains rough, intense, or hardcore elements. Not suitable for vanilla preferences.",
+            
+            badge_lgbt: "LGBT",
+            badge_desc_lgbt: "🏳️‍🌈 <b>LGBTQ+ Content</b><br>Includes same-sex relationships (Gay/Lesbian) or Transgender content.",
+            
+            badge_niche: "Niche",
+            badge_desc_niche: "🔍 <b>Specific Fetish</b><br>A distinct interest that focuses on specific body parts, objects, or scenarios rather than general sex.",
+            
+            badge_bdsm: "BDSM",
+            badge_desc_bdsm: "⛓️ <b>BDSM & Kink</b><br>Involves bondage, dominance, submission, or sensation play.",
             
             explored_label: "Explored",
             explored_txt: "{n} / {t} categories",
@@ -11796,7 +12105,24 @@
             stats_prefs: "Preferences",
             stats_activity: "Activity",
             tf_week: "Week", tf_month: "Month", tf_year: "Year", tf_all: "All",
-            act_gen: "Gens", act_watch: "Views",
+            act_gen: "Generations", act_watch: "Watched",
+
+            chart_prefs_x: "Preferences",
+            chart_points_y: "Points",
+            chart_count_y: "Count",
+
+            age_title: "Age Verification",
+            age_desc: "This website contains age-restricted materials. Are you 18 years or older?",
+            age_yes: "Yes, I am 18+",
+            age_no: "No, Exit",
+            age_block_msg: "This website is only for users over 18 years of age.",
+            
+            onb_title: "Quick Setup",
+            onb_desc: "Describe your tastes in one sentence (e.g. 'I love milf, anal and stockings'). We will auto-detect categories.",
+            onb_btn_check: "Find Categories",
+            onb_found: "We found:",
+            onb_btn_confirm: "Add to Favorites",
+            onb_skip: "Skip setup",
 
             support_intro: "👋 <b>Hi there!</b><br><br>This project is completely <b>free</b>, ad-free, and I develop it in my spare time out of pure enthusiasm.",
             support_why: "💡 <b>Why support?</b><br>Your support helps keep the motivation high to add cool new features and keep the app updated.",
@@ -11845,9 +12171,17 @@
             tag_straight: "Гетеро", tag_gay: "Гей", tag_lesbian: "Лесби", tag_trans: "Транс",
             dark_mode: "Темная тема",
             share_btn: "Поделиться",
-            tooltip_extreme: "Содержит жесткий или интенсивный контент.",
-            tooltip_lgbt: "Содержит ЛГБТ контент.",
-            tooltip_niche: "Специфические интересы, не мейнстрим.",
+            badge_extreme: "Экстрим",
+            badge_desc_extreme: "⚠️ <b>Высокая интенсивность</b><br>Категория содержит жесткие или специфические практики. Не для любителей 'ванильного' контента.",
+            
+            badge_lgbt: "ЛГБТ",
+            badge_desc_lgbt: "🏳️‍🌈 <b>ЛГБТ+ Контент</b><br>Включает однополые отношения (Гей/Лесби) или Транс-тематику.",
+            
+            badge_niche: "Ниша",
+            badge_desc_niche: "🔍 <b>Специфичный фетиш</b><br>Узконаправленный интерес, фокусирующийся на определенных частях тела, предметах или сценариях.",
+            
+            badge_bdsm: "БДСМ",
+            badge_desc_bdsm: "⛓️ <b>БДСМ и Кинк</b><br>Связывание, доминирование, подчинение и игры с ощущениями.",
             
             explored_label: "Открыто",
             explored_txt: "{n} из {t} категорий",
@@ -11858,7 +12192,24 @@
             stats_prefs: "Предпочтения",
             stats_activity: "Активность",
             tf_week: "Неделя", tf_month: "Месяц", tf_year: "Год", tf_all: "Всё",
-            act_gen: "Генер.", act_watch: "Просм.",
+            act_gen: "Генераций", act_watch: "Просмотров",
+
+            chart_prefs_x: "Предпочтения",
+            chart_points_y: "Очки",
+            chart_count_y: "Кол-во",
+
+            age_title: "Проверка возраста",
+            age_desc: "Этот сайт содержит материалы для взрослых. Вам уже исполнилось 18 лет?",
+            age_yes: "Да, мне 18+",
+            age_no: "Нет, выйти",
+            age_block_msg: "Этот сайт предназначен только для пользователей старше 18 лет.",
+            
+            onb_title: "Быстрая настройка",
+            onb_desc: "Опишите свои вкусы одним предложением (напр. 'Люблю милф, анал и чулки'). Мы автоматически подберем категории.",
+            onb_btn_check: "Найти категории",
+            onb_found: "Мы нашли:",
+            onb_btn_confirm: "Добавить в избранное",
+            onb_skip: "Пропустить", 
 
             support_intro: "👋 <b>Привет!</b><br><br>Этот проект полностью <b>бесплатный</b>, без рекламы, и я разрабатываю его в свободное время на чистом энтузиазме.",
             support_why: "💡 <b>Зачем поддерживать?</b><br>Твоя поддержка мотивирует меня пилить новые фичи и не забрасывать проект.",
@@ -11907,9 +12258,14 @@
             tag_straight: "Hetero", tag_gay: "Gay", tag_lesbian: "Lesbiana", tag_trans: "Trans",
             dark_mode: "Modo Oscuro",
             share_btn: "Compartir",
-            tooltip_extreme: "Contiene contenido intenso.",
-            tooltip_lgbt: "Contiene contenido LGBT.",
-            tooltip_niche: "Intereses específicos.",
+            badge_extreme: "Extremo",
+            badge_desc_extreme: "⚠️ <b>Alta Intensidad</b><br>Contenido rudo o intenso.",
+            badge_lgbt: "LGBT",
+            badge_desc_lgbt: "🏳️‍🌈 <b>Contenido LGBTQ+</b><br>Relaciones del mismo sexo o Trans.",
+            badge_niche: "Nicho",
+            badge_desc_niche: "🔍 <b>Fetiche Específico</b><br>Interés particular no convencional.",
+            badge_bdsm: "BDSM",
+            badge_desc_bdsm: "⛓️ <b>BDSM</b><br>Bondage, dominación y sumisión.",
             
             explored_label: "Explorado",
             explored_txt: "{n} / {t} categorías",
@@ -11920,7 +12276,25 @@
             stats_prefs: "Preferencias",
             stats_activity: "Actividad",
             tf_week: "Semana", tf_month: "Mes", tf_year: "Año", tf_all: "Todo",
-            act_gen: "Gener.", act_watch: "Vistas",
+            act_gen: "Generaciones", act_watch: "Vistas",
+
+            chart_prefs_x: "Preferencias",
+            chart_points_y: "Puntos",
+            chart_count_y: "Cantidad",
+
+            age_title: "Verificación de edad",
+            age_desc: "Este sitio web contiene material para adultos. ¿Tienes 18 años o más?",
+            age_yes: "Sí, tengo 18+",
+            age_no: "No, Salir",
+            age_block_msg: "Este sitio web es solo para usuarios mayores de 18 años.",
+            
+            // Onboarding
+            onb_title: "Configuración rápida",
+            onb_desc: "Describe tus gustos en una frase (ej. 'Me gusta milf, anal y medias'). Detectaremos las categorías automáticamente.",
+            onb_btn_check: "Buscar Categorías",
+            onb_found: "Encontramos:",
+            onb_btn_confirm: "Añadir a Favoritos",
+            onb_skip: "Saltar configuración",
 
             support_intro: "👋 <b>¡Hola!</b><br><br>Este proyecto es completamente <b>gratuito</b>, sin anuncios, y lo desarrollo en mi tiempo libre por puro entusiasmo.",
             support_why: "💡 <b>¿Por qué apoyar?</b><br>Tu apoyo mantiene alta la motivación para añadir nuevas funciones y mantener la app actualizada.",
@@ -11969,9 +12343,14 @@
             tag_straight: "Hetero", tag_gay: "Schwul", tag_lesbian: "Lesbisch", tag_trans: "Trans",
             dark_mode: "Dunkelmodus",
             share_btn: "Teilen",
-            tooltip_extreme: "Enthält extreme Inhalte.",
-            tooltip_lgbt: "Enthält LGBT-Inhalte.",
-            tooltip_niche: "Spezifische Nischen.",
+            badge_extreme: "Extrem",
+            badge_desc_extreme: "⚠️ <b>Hohe Intensität</b><br>Raue oder intensive Inhalte.",
+            badge_lgbt: "LGBT",
+            badge_desc_lgbt: "🏳️‍🌈 <b>LGBTQ+ Inhalt</b><br>Gleichgeschlechtliche oder Trans-Inhalte.",
+            badge_niche: "Nische",
+            badge_desc_niche: "🔍 <b>Spezifischer Fetisch</b><br>Besondere Interessen, kein Mainstream.",
+            badge_bdsm: "BDSM",
+            badge_desc_bdsm: "⛓️ <b>BDSM</b><br>Fesselspiele, Dominanz und Unterwerfung.",
             
             explored_label: "Erforscht",
             explored_txt: "{n} / {t} Kategorien",
@@ -11982,7 +12361,25 @@
             stats_prefs: "Vorlieben",
             stats_activity: "Aktivität",
             tf_week: "Woche", tf_month: "Monat", tf_year: "Jahr", tf_all: "Gesamt",
-            act_gen: "Gener.", act_watch: "Ansichten",
+            act_gen: "Generationen", act_watch: "Angeschaut",
+
+            chart_prefs_x: "Vorlieben",
+            chart_points_y: "Punkte",
+            chart_count_y: "Anzahl",
+
+            age_title: "Altersprüfung",
+            age_desc: "Diese Website enthält Material für Erwachsene. Sind Sie 18 Jahre oder älter?",
+            age_yes: "Ja, ich bin 18+",
+            age_no: "Nein, Verlassen",
+            age_block_msg: "Diese Website ist nur für Nutzer über 18 Jahre bestimmt.",
+            
+            // Onboarding
+            onb_title: "Schnelleinrichtung",
+            onb_desc: "Beschreibe deine Vorlieben in einem Satz (z.B. 'Ich mag Milf, Anal und Strümpfe'). Wir finden die Kategorien automatisch.",
+            onb_btn_check: "Kategorien suchen",
+            onb_found: "Wir haben gefunden:",
+            onb_btn_confirm: "Zu Favoriten hinzufügen",
+            onb_skip: "Überspringen",
 
             support_intro: "👋 <b>Hallo!</b><br><br>Dieses Projekt ist komplett <b>kostenlos</b>, werbefrei und ich entwickle es in meiner Freizeit aus reinem Enthusiasmus.",
             support_why: "💡 <b>Warum unterstützen?</b><br>Deine Unterstützung hält die Motivation hoch, coole neue Funktionen hinzuzufügen.",
@@ -12013,6 +12410,7 @@
         updateCounts();
         checkLayout();
         updateLink(); 
+        initAgeGate();
         window.addEventListener('resize', checkLayout);
     };
 
@@ -12032,11 +12430,17 @@
 
     function updateExploredCount() {
         const total = data.length;
-        // Count unique IDs in history
-        const uniqueExplored = new Set(historyData.map(h => h.id)).size;
+        
+        // Берем уникальные ID из полного лога активности, а не из короткой истории
+        const uniqueExplored = new Set(activityLog.map(h => h.id)).size;
+        
         const t = langData[currentLang];
-        const text = t.explored_txt.replace('{n}', uniqueExplored).replace('{t}', total);
-        document.getElementById('explored-count').innerText = text;
+        // Используем локализованную строку
+        if (t && t.explored_txt) {
+            const text = t.explored_txt.replace('{n}', uniqueExplored).replace('{t}', total);
+            const el = document.getElementById('explored-count');
+            if(el) el.innerText = text;
+        }
     }
 
     function adjustTagScores(item, delta) {
@@ -12134,11 +12538,12 @@
         
         for (let i = 0; i < spinLength; i++) {
             const randomItem = filtered[Math.floor(Math.random() * filtered.length)];
-            const name = (currentLang === 'ru' && randomItem.name_ru) ? randomItem.name_ru : randomItem.name;
+            const name = getLocalizedName(randomItem); 
             reelHTML += `<div class="slot-item" style="height:${itemHeight}px">${name}</div>`;
         }
         
-        let winnerName = finalItem.name;
+        // И для победителя внизу барабана:
+        let winnerName = getLocalizedName(finalItem);
         if (currentLang === 'ru' && finalItem.name_ru) winnerName = finalItem.name_ru;
         else if (currentLang === 'es' && finalItem.name_es) winnerName = finalItem.name_es;
         else if (currentLang === 'de' && finalItem.name_de) winnerName = finalItem.name_de;
@@ -12180,10 +12585,7 @@
         lastGeneratedItem = item;
         
         const reel = document.getElementById('slot-reel');
-        let winnerName = item.name;
-        if (currentLang === 'ru' && item.name_ru) winnerName = item.name_ru;
-        else if (currentLang === 'es' && item.name_es) winnerName = item.name_es;
-        else if (currentLang === 'de' && item.name_de) winnerName = item.name_de;
+        const winnerName = getLocalizedName(item);
 
         reel.innerHTML = `<div class="slot-item" id="result-text" style="color:var(--accent);">${winnerName}</div>`;
         reel.style.transition = 'none';
@@ -12242,16 +12644,25 @@
 
     function forceShowResult(item, mode = 'history') {
         isGenerating = false;
+        
+        // Скролл наверх
         const mainContent = document.querySelector('.main-content') || document.querySelector('.tab-content.active');
         if(mainContent) mainContent.scrollTop = 0;
         
         addToHistory(item);
+        
+        // === аписываем в лог, чтобы обновился счетчик ===
+        // Используем тип 'gen', так как это открытие новой карточки
+        logActivity('gen', item.id, item.tags);
+        // ============================================================
+
         renderResultUI(item, mode);
     }
 
     function renderBadges() {
         const badgeWrapper = document.getElementById('badge-wrapper');
         badgeWrapper.innerHTML = '';
+        const t = langData[currentLang];
         
         const safetyTags = ['straight', 'universal', 'vanilla'];
         const isSafe = currentItem.tags.some(t => safetyTags.includes(t));
@@ -12261,37 +12672,32 @@
         const showLgbt = hasLgbtTag && !isSafe;
         const isNiche = currentItem.tags.includes('fetish') || currentItem.tags.includes('scat');
 
-        let tooltipText = "";
-        let badgeType = "";
+        // Функция для создания HTML бейджа с тултипом
+        const createBadge = (className, label, desc) => {
+            return `
+                <div class="warning-badge ${className}" style="position:relative; overflow:visible; cursor:help;">
+                    ${label}
+                    <div class="badge-tooltip">${desc}</div>
+                </div>
+            `;
+        };
 
+        // Логика добавления бейджей (теперь с тултипами внутри)
+        // Добавляем класс 'has-tooltip' для обработки кликов на мобильных (опционально через CSS :hover)
+        
         if(isExtreme) { 
-            badgeWrapper.innerHTML += `<div class="warning-badge badge-extreme">Extreme</div>`; 
-            tooltipText = langData[currentLang].tooltip_extreme;
+            badgeWrapper.innerHTML += createBadge('badge-extreme', t.badge_extreme, t.badge_desc_extreme);
         }
         else if(isBDSM) { 
-            badgeWrapper.innerHTML += `<div class="warning-badge" style="background:#333;">BDSM</div>`; 
-            tooltipText = "BDSM content";
+            badgeWrapper.innerHTML += createBadge('', t.badge_bdsm, t.badge_desc_bdsm); // Default dark style
+            // Добавим стиль для BDSM если его нет в CSS
+            badgeWrapper.lastElementChild.style.background = "#333";
         }
         else if(showLgbt) { 
-            badgeWrapper.innerHTML += `<div class="warning-badge badge-lgbt">LGBT</div>`; 
-            tooltipText = langData[currentLang].tooltip_lgbt;
+            badgeWrapper.innerHTML += createBadge('badge-lgbt', t.badge_lgbt, t.badge_desc_lgbt);
         }
         else if(isNiche) {
-            badgeWrapper.innerHTML += `<div class="warning-badge badge-niche">Niche</div>`;
-            tooltipText = langData[currentLang].tooltip_niche;
-        }
-
-        if(tooltipText) {
-            const helpIcon = document.createElement('div');
-            helpIcon.className = 'badge-help';
-            helpIcon.innerText = '?';
-            helpIcon.innerHTML += `<div class="badge-tooltip">${tooltipText}</div>`;
-            helpIcon.onclick = (e) => {
-                e.stopPropagation();
-                helpIcon.classList.toggle('active');
-                setTimeout(()=> helpIcon.classList.remove('active'), 2000);
-            };
-            badgeWrapper.appendChild(helpIcon);
+            badgeWrapper.innerHTML += createBadge('badge-niche', t.badge_niche, t.badge_desc_niche);
         }
     }
 
@@ -12327,24 +12733,39 @@
         const btnSimilar = document.getElementById('btn-similar');
         
         relatedEl.innerHTML = '';
+        
         const ignoreTags = ['straight']; 
+        
         let currentTags = currentItem.tags.filter(t => !ignoreTags.includes(t));
         if (currentTags.length === 0) currentTags = currentItem.tags;
 
         let candidates = data.map(item => {
             if (item.id === currentItem.id) return null;
+            
+            // Ищем пересечения тегов
             const intersection = item.tags.filter(t => currentTags.includes(t));
+            
             if (intersection.length === 0) return null;
             return { item: item, score: intersection.length };
         }).filter(x => x !== null);
 
+        // === РАНДОМИЗАЦИЯ ===
+        // Сначала перемешиваем весь список случайным образом
+        candidates.sort(() => Math.random() - 0.5);
+
+        // А затем сортируем по очкам (релевантности).
+        // Так как массив уже перемешан, элементы с ОДИНАКОВЫМ счетом
+        // останутся в случайном порядке относительно друг друга.
         candidates.sort((a, b) => b.score - a.score);
+
+        // Берем топ-5
         const topCandidates = candidates.slice(0, 5);
 
         if (topCandidates.length > 0) {
             topCandidates.forEach(cand => {
                 const item = cand.item;
-                const name = (currentLang === 'ru' && item.name_ru) ? item.name_ru : item.name;
+                const name = getLocalizedName(item); // Используем наш хелпер локализации
+                
                 const btn = document.createElement('div');
                 btn.className = 'related-item-btn';
                 btn.innerText = name;
@@ -12395,6 +12816,15 @@
         updateExploredCount();
     }
 
+    // Универсальная функция для получения названия на нужном языке
+    function getLocalizedName(item) {
+        if (!item) return "";
+        if (currentLang === 'ru' && item.name_ru) return item.name_ru;
+        if (currentLang === 'es' && item.name_es) return item.name_es;
+        if (currentLang === 'de' && item.name_de) return item.name_de;
+        return item.name; // По умолчанию английский
+    }
+
     function renderHistory() {
         const list = document.getElementById('history-list');
         list.innerHTML = '';
@@ -12409,7 +12839,9 @@
             if(!item) return;
             const div = document.createElement('div');
             div.className = 'history-item-ios'; 
-            const name = (currentLang === 'ru' && item.name_ru) ? item.name_ru : item.name;
+            
+            const name = getLocalizedName(item);
+            
             div.innerHTML = `<span>${name}</span><span style="color:var(--accent); font-size:18px;">↺</span>`;
             div.onclick = () => { switchTab('home'); forceShowResult(item, 'history'); };
             list.appendChild(div);
@@ -12466,16 +12898,14 @@
 
     function renderResultName() {
         if (!currentItem) return;
-        let displayName = currentItem.name;
+        
+        const displayName = getLocalizedName(currentItem);
+        
+        // Логика описания остается через if, т.к. там разные ключи (desc_ru, desc_es...)
         let desc = currentItem.desc_en;
-
-        if (currentLang === 'ru') {
-            displayName = currentItem.name_ru || currentItem.name; desc = currentItem.desc_ru;
-        } else if (currentLang === 'es') {
-            displayName = currentItem.name_es || currentItem.name; desc = currentItem.desc_es;
-        } else if (currentLang === 'de') {
-            displayName = currentItem.name_de || currentItem.name; desc = currentItem.desc_de;
-        }
+        if (currentLang === 'ru') desc = currentItem.desc_ru;
+        else if (currentLang === 'es') desc = currentItem.desc_es;
+        else if (currentLang === 'de') desc = currentItem.desc_de;
 
         const titleEl = document.getElementById('result-text');
         if (titleEl) titleEl.innerText = displayName;
@@ -12639,16 +13069,21 @@
             if(activeMods.has(mod.key)) tag.classList.add('selected');
             
             let text = mod.en;
+            
+            // Если галочка "Search EN" НЕ стоит, пытаемся найти перевод
             if (!searchEn) {
-                if (currentLang === 'ru') text = mod.ru;
-                else if (currentLang === 'es') text = mod.es;
-                else if (currentLang === 'de') text = mod.de;
+                // Если в объекте модификатора есть ключ, соответствующий currentLang (ru, es, de)
+                if (mod[currentLang]) {
+                    text = mod[currentLang];
+                }
             }
             
             tag.innerText = text;
             tag.onclick = () => {
                 if(activeMods.has(mod.key)) activeMods.delete(mod.key); else activeMods.add(mod.key);
-                renderModifiers(); renderResultName(); updateLink();
+                renderModifiers(); 
+                renderResultName(); 
+                updateLink();
             };
             container.appendChild(tag);
         });
@@ -12752,20 +13187,22 @@
         
         const likedData = data.filter(item => favorites.includes(item.id));
         
+        // Сортировка с учетом языка
         const sortedData = likedData.sort((a, b) => {
-            const aName = (currentLang === 'ru' && a.name_ru) ? a.name_ru : a.name;
-            const bName = (currentLang === 'ru' && b.name_ru) ? b.name_ru : b.name;
+            const aName = getLocalizedName(a);
+            const bName = getLocalizedName(b);
             return aName.localeCompare(bName);
         });
 
         if(sortedData.length === 0) {
-            body.innerHTML = '<div style="text-align:center; padding:20px; color:#888;">No favorites yet</div>';
+            body.innerHTML = '<div style="text-align:center; padding:20px; color:#888;">...</div>';
         }
 
         sortedData.forEach(item => {
             const div = document.createElement('div');
             div.className = 'catalog-item active'; 
-            div.innerText = (currentLang === 'ru' && item.name_ru) ? item.name_ru : item.name;
+            div.innerText = getLocalizedName(item);
+            
             div.onclick = () => {
                 favorites = favorites.filter(x => x !== item.id);
                 saveLists(); updateCounts();
@@ -12785,8 +13222,8 @@
         const dislikedData = data.filter(item => blacklist.includes(item.id));
         
         const sortedData = dislikedData.sort((a, b) => {
-            const aName = (currentLang === 'ru' && a.name_ru) ? a.name_ru : a.name;
-            const bName = (currentLang === 'ru' && b.name_ru) ? b.name_ru : b.name;
+            const aName = getLocalizedName(a);
+            const bName = getLocalizedName(b);
             return aName.localeCompare(bName);
         });
 
@@ -12797,7 +13234,7 @@
         sortedData.forEach(item => {
             const div = document.createElement('div');
             div.className = 'catalog-item ban-active'; 
-            div.innerText = (currentLang === 'ru' && item.name_ru) ? item.name_ru : item.name;
+            div.innerText = getLocalizedName(item);
             div.onclick = () => {
                 blacklist = blacklist.filter(x => x !== item.id);
                 saveLists();
@@ -12828,18 +13265,32 @@
         forceShowResult(selected, 'tag_click');
     }
 
-    // === NEW STATS SYSTEM ===
+    // === STATS SYSTEM ===
     function openStatistics() {
-        const modal = document.getElementById('modal-stats-overlay');
-        modal.classList.add('open');
+        // Устанавливаем тексты на кнопках дат при открытии
+        const t = langData[currentLang];
+        document.getElementById('tf-week').innerText = t.tf_week;
+        document.getElementById('tf-month').innerText = t.tf_month;
+        document.getElementById('tf-year').innerText = t.tf_year;
+
+        document.getElementById('modal-stats-overlay').classList.add('open');
         renderStatsContent();
     }
 
     function switchStatsTab(tab) {
         currentStatsTab = tab;
-        // Обновляем классы капсулы
-        document.getElementById('stat-nav-prefs').classList.toggle('active', tab === 'tags');
+        // Переключаем классы кнопок навигации
+        document.getElementById('stat-nav-tags').classList.toggle('active', tab === 'tags');
         document.getElementById('stat-nav-activity').classList.toggle('active', tab === 'activity');
+        renderStatsContent();
+    }
+
+    function switchTimeframe(tf) {
+        currentStatsTimeframe = tf;
+        // Переключаем классы кнопок дат
+        document.getElementById('tf-week').classList.toggle('active', tf === 'week');
+        document.getElementById('tf-month').classList.toggle('active', tf === 'month');
+        document.getElementById('tf-year').classList.toggle('active', tf === 'year');
         renderStatsContent();
     }
 
@@ -12848,32 +13299,66 @@
         body.innerHTML = '';
         const t = langData[currentLang];
 
-        // Временной селектор
-        const tfHtml = `
-            <div class="timeframe-selector" style="margin-bottom:20px;">
-                <span class="tf-opt ${currentStatsTimeframe==='week'?'active':''}" onclick="switchTimeframe('week')">${t.tf_week}</span>
-                <span class="tf-opt ${currentStatsTimeframe==='month'?'active':''}" onclick="switchTimeframe('month')">${t.tf_month}</span>
-                <span class="tf-opt ${currentStatsTimeframe==='year'?'active':''}" onclick="switchTimeframe('year')">${t.tf_year}</span>
-            </div>
-        `;
-        body.innerHTML = tfHtml;
-
-        // Фильтрация логов по времени
         const now = Date.now();
-        let cutoff = 0;
-        // Для активности нам нужны диапазоны
+        const oneDay = 24 * 60 * 60 * 1000;
         let xLabels = [];
-        let dataGen = [];
-        let dataWatch = [];
-        let labels = []; // Для графика тегов
+        let aggregated = {};
+
+        // 1. Подготовка дат (Ось X)
+        if (currentStatsTimeframe === 'week') {
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(now - i * oneDay);
+                const key = d.toISOString().split('T')[0];
+                const label = d.toLocaleDateString(currentLang, { weekday: 'short' });
+                xLabels.push({ key, label, showLabel: true });
+                aggregated[key] = (currentStatsTab === 'tags') ? {} : { gen: 0, watch: 0 };
+            }
+        } 
+        else if (currentStatsTimeframe === 'month') {
+            for (let i = 29; i >= 0; i--) {
+                const d = new Date(now - i * oneDay);
+                const key = d.toISOString().split('T')[0];
+                const day = String(d.getDate()).padStart(2, '0');
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const label = `${day}.${month}`;
+                // Показываем каждую 3-ю дату
+                xLabels.push({ key, label, showLabel: (i % 3 === 0) });
+                aggregated[key] = (currentStatsTab === 'tags') ? {} : { gen: 0, watch: 0 };
+            }
+        } 
+        else if (currentStatsTimeframe === 'year') {
+            const currDate = new Date();
+            for (let i = 11; i >= 0; i--) {
+                const d = new Date(currDate.getFullYear(), currDate.getMonth() - i, 1);
+                const key = `${d.getFullYear()}-${d.getMonth()}`;
+                let label = d.toLocaleDateString(currentLang, { month: 'short' });
+                label = label.replace('.', ''); // Убираем точку для красоты
+                xLabels.push({ key, label, showLabel: true });
+                aggregated[key] = (currentStatsTab === 'tags') ? {} : { gen: 0, watch: 0 };
+            }
+        }
+
+        // Фильтр логов
+        const cutoff = (currentStatsTimeframe === 'week') ? now - 7*oneDay : 
+                       (currentStatsTimeframe === 'month') ? now - 30*oneDay : 
+                       now - 365*oneDay;
+        
+        const filteredLog = activityLog.filter(log => log.ts >= cutoff);
+
+        // --- РЕНДЕРИНГ ГРАФИКА ---
+        
+        // Лейблы осей
+        const yAxisTitle = (currentStatsTab === 'tags') ? t.chart_points_y : t.chart_count_y;
+        const xAxisTitle = (currentStatsTab === 'tags') ? t.chart_prefs_x : ""; // Для активности дата понятна сама по себе
+
+        let html = `
+            <div class="chart-wrapper">
+                <div class="axis-label-y">${yAxisTitle}</div>
+                <div class="chart-container">
+        `;
 
         if (currentStatsTab === 'tags') {
-            // == ГРАФИК ПРЕДПОЧТЕНИЙ (ТОП ТЕГОВ) ==
-            if(currentStatsTimeframe === 'week') cutoff = now - 7*24*60*60*1000;
-            if(currentStatsTimeframe === 'month') cutoff = now - 30*24*60*60*1000;
-            if(currentStatsTimeframe === 'year') cutoff = now - 365*24*60*60*1000;
-            
-            const filteredLog = activityLog.filter(log => log.ts >= cutoff);
+            // === ГРАФИК ПРЕДПОЧТЕНИЙ ===
             const tempScores = {};
             const ignoreStats = ['universal', 'straight', 'gay', 'lesbian', 'trans'];
             
@@ -12886,80 +13371,56 @@
                 }
             });
 
-            const sortedTags = Object.entries(tempScores).sort((a, b) => b[1] - a[1]).slice(0, 7); // Топ 7 для красоты
+            const sortedTags = Object.entries(tempScores).sort((a, b) => b[1] - a[1]).slice(0, 8);
             
-            // Рисуем график
-            let chartHTML = '<div class="chart-container">';
             if(sortedTags.length === 0) {
-                chartHTML = '<div style="text-align:center; width:100%; margin-top:50px; color:#666;">No data</div>';
+                html += '<div style="width:100%; text-align:center; align-self:center; color:#666;">No data</div>';
             } else {
                 const maxVal = Math.max(...sortedTags.map(x => x[1]));
                 
                 sortedTags.forEach(([tag, score]) => {
-                    const height = Math.max(5, (score / maxVal) * 100); // Мин 5% высоты
-                    // Ограничиваем длину названия тега
-                    const shortTag = tag.length > 8 ? tag.substring(0, 6)+'..' : tag; 
-                    
-                    chartHTML += `
+                    const height = Math.max(5, (score / maxVal) * 100);
+                    // Локализация имени
+                    const item = data.find(x => x.slug === tag || x.tags.includes(tag));
+                    let tagName = item ? getLocalizedName(item) : tag;
+                    if(tagName.length > 9) tagName = tagName.substring(0, 7) + '..';
+
+                    html += `
                         <div class="chart-bar-group">
                             <div class="chart-value-y">${score}</div>
-                            <div class="chart-bar" style="height:${height}%"></div>
-                            <div class="chart-label-x">${shortTag}</div>
+                            <div class="chart-bar" style="height:${height}%; width:18px;"></div>
+                            <div class="chart-label-x" style="width:140%; left:-20%;">${tagName}</div>
                         </div>
                     `;
                 });
             }
-            chartHTML += '</div>';
-            body.innerHTML += chartHTML;
-            body.innerHTML += `<div style="text-align:center; font-size:12px; color:var(--text-secondary); margin-top:10px;">${t.stats_header} (Y: Points)</div>`;
+            
+            html += `</div>`; // Закрываем chart-container
+            if(xAxisTitle) html += `<div class="axis-label-x-title">${xAxisTitle}</div>`;
+            
+            // Легенда для тегов
+            html += `
+                <div style="margin-top:40px; display:flex; justify-content:center; gap:15px; font-size:11px; color:var(--text-secondary);">
+                    <div>Generate = 1pt</div>
+                    <div>Watch = 3pts</div>
+                    <div>Like = 5pts</div>
+                </div>
+            `;
 
         } else {
-            // == ГРАФИК АКТИВНОСТИ (Activity) ==
-            const days = 7; // Default week
-            let grouping = 'day';
-            let steps = 7;
-            
-            if(currentStatsTimeframe === 'week') { grouping = 'day'; steps = 7; }
-            if(currentStatsTimeframe === 'month') { grouping = 'day'; steps = 30; } // Или 'week' (4 недели)
-            if(currentStatsTimeframe === 'year') { grouping = 'month'; steps = 12; }
-
-            // Инициализация массивов
-            const aggregated = {}; // Key -> {gen: 0, watch: 0}
-            
-            // Генерация ключей и лейблов
-            for(let i=steps-1; i>=0; i--) {
-                const d = new Date();
-                let key, label;
-                
-                if(grouping === 'day') {
-                    d.setDate(d.getDate() - i);
-                    key = d.toISOString().split('T')[0]; // YYYY-MM-DD
-                    label = d.getDate().toString(); // Просто число
-                } else {
-                    d.setMonth(d.getMonth() - i);
-                    key = `${d.getFullYear()}-${d.getMonth()}`;
-                    const months = ['J','F','M','A','M','J','J','A','S','O','N','D'];
-                    label = months[d.getMonth()];
-                }
-                
-                xLabels.push({key, label});
-                aggregated[key] = {gen: 0, watch: 0};
-            }
-
-            // Заполнение данными
-            activityLog.forEach(log => {
-                const date = new Date(log.ts);
+            // === ГРАФИК АКТИВНОСТИ ===
+            filteredLog.forEach(log => {
+                const d = new Date(log.ts);
                 let key;
-                if(grouping === 'day') key = date.toISOString().split('T')[0];
-                else key = `${date.getFullYear()}-${date.getMonth()}`;
-                
-                if(aggregated[key]) {
+                if (currentStatsTimeframe === 'year') key = `${d.getFullYear()}-${d.getMonth()}`;
+                else key = d.toISOString().split('T')[0];
+
+                if (aggregated[key]) {
                     if(log.type === 'gen') aggregated[key].gen++;
                     if(log.type === 'watch') aggregated[key].watch++;
                 }
             });
 
-            // Находим макс значение для масштаба Y
             let maxVal = 0;
             xLabels.forEach(x => {
                 const d = aggregated[x.key];
@@ -12968,42 +13429,50 @@
             });
             if(maxVal === 0) maxVal = 1;
 
-            // Рисуем график
-            let chartHTML = '<div class="chart-container">';
             xLabels.forEach(x => {
-                const data = aggregated[x.key];
-                const hGen = (data.gen / maxVal) * 100;
-                const hWatch = (data.watch / maxVal) * 100;
+                const d = aggregated[x.key];
+                const hGen = (d.gen / maxVal) * 80; // Максимум 80% высоты, чтобы цифры влезли
+                const hWatch = (d.watch / maxVal) * 80;
                 
-                chartHTML += `
-                    <div class="chart-bar-group">
-                        <div class="bar-wrapper">
-                            <div class="chart-bar secondary" style="height:${hGen}%; width:6px;"></div>
-                            <div class="chart-bar" style="height:${hWatch}%; width:6px;"></div>
+                const valGen = d.gen > 1 ? `<div class="bar-value-top" style="bottom:${hGen+2}%">${d.gen}</div>` : '';
+                const valWatch = d.watch > 1 ? `<div class="bar-value-top" style="bottom:${hWatch+2}%">${d.watch}</div>` : '';
+
+                // Минимальная высота для визуализации
+                const styleGen = d.gen > 0 ? `height:${hGen}%` : 'height:1px; opacity:0.1;';
+                const styleWatch = d.watch > 0 ? `height:${hWatch}%` : 'height:1px; opacity:0.1;';
+
+                html += `
+                    <div class="chart-bar-group" style="flex:1;">
+                        <div class="bar-wrapper" style="width:100%; gap:2px; position:relative; height:100%;">
+                            <div class="chart-bar secondary" style="${styleGen}; width:40%; position:relative;">${valGen}</div>
+                            <div class="chart-bar" style="${styleWatch}; width:40%; position:relative;">${valWatch}</div>
                         </div>
-                        <div class="chart-label-x">${x.label}</div>
+                        ${x.showLabel ? `<div class="chart-label-x">${x.label}</div>` : ''}
                     </div>
                 `;
             });
-            chartHTML += '</div>';
-            body.innerHTML += chartHTML;
+
+            html += `</div>`; // Закрываем chart-container
             
-            // Легенда
-            body.innerHTML += `
-                <div style="display:flex; justify-content:center; gap:15px; margin-top:15px; font-size:12px;">
-                    <div style="display:flex; align-items:center; gap:5px;">
+            // Легенда для активности
+            html += `
+                <div style="margin-top:40px; display:flex; justify-content:center; gap:20px; font-size:12px;">
+                    <div style="display:flex; align-items:center; gap:6px;">
                         <div style="width:10px; height:10px; background:var(--text-secondary); border-radius:2px;"></div>
                         <span>${t.act_gen}</span>
                     </div>
-                    <div style="display:flex; align-items:center; gap:5px;">
+                    <div style="display:flex; align-items:center; gap:6px;">
                         <div style="width:10px; height:10px; background:var(--accent); border-radius:2px;"></div>
                         <span>${t.act_watch}</span>
                     </div>
                 </div>
             `;
         }
-    }
 
+        html += `</div>`; // Закрываем chart-wrapper
+        body.innerHTML = html;
+    }
+    
     function shareStats() {
         const modalBody = document.getElementById('modal-stats-body');
         if(!modalBody) return;
@@ -13044,6 +13513,150 @@
             document.getElementById('modal-stats-overlay').classList.remove('open');
         }
     }
+
+    // === AGE GATE & ONBOARDING LOGIC ===
+
+    let onboardingSelectedIds = [];
+
+    function initAgeGate() {
+        const isVerified = localStorage.getItem('xch_age_verified');
+        const isOnboarded = localStorage.getItem('xch_onboarding_done');
+
+        if (!isVerified) {
+            document.getElementById('age-gate').classList.add('open');
+        } else if (!isOnboarded) {
+            // Если возраст подтвержден, но онбординг не пройден -> показываем онбординг
+            document.getElementById('onboarding-overlay').classList.add('open');
+        }
+    }
+
+    function passAgeGate() {
+        localStorage.setItem('xch_age_verified', 'true');
+        document.getElementById('age-gate').classList.remove('open');
+        // Сразу открываем онбординг
+        document.getElementById('onboarding-overlay').classList.add('open');
+    }
+
+    function blockAccess() {
+        document.getElementById('age-block').style.display = 'flex';
+        // На всякий случай блокируем скролл и всё остальное
+        document.body.style.overflow = 'hidden';
+    }
+
+    function skipOnboarding() {
+        localStorage.setItem('xch_onboarding_done', 'true');
+        document.getElementById('onboarding-overlay').classList.remove('open');
+    }
+
+    function processOnboardingText() {
+        const inputField = document.getElementById('onb-input');
+        const rawInput = inputField.value.toLowerCase();
+        
+        // Очищаем ввод от знаков препинания и добавляем пробелы по краям для поиска целых слов
+        // Например: "hello, anal!" -> " hello anal "
+        const cleanInput = " " + rawInput.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, " ") + " ";
+
+        if (!rawInput.trim()) return;
+
+        const container = document.getElementById('onb-tags-container');
+        const resultsBlock = document.getElementById('onb-results');
+        
+        // Убираем сообщение об ошибке, если оно было
+        const existingError = container.querySelector('.onb-error');
+        if(existingError) existingError.remove();
+
+        const foundItems = [];
+
+        // Вспомогательная функция для разбиения строки на ключевые слова
+        const getKeywords = (str) => {
+            if (!str) return [];
+            // Разбиваем по пробелам, слэшам, дефисам
+            return str.toLowerCase().split(/[\s\/,\-]+/)
+                      .filter(w => w.length > 2); // Игнорируем слова короче 3 букв (в, на, in, at)
+        };
+
+        data.forEach(item => {
+            // Если этот тег уже добавлен в список, пропускаем его
+            if (onboardingSelectedIds.includes(item.id)) return;
+
+            // Собираем все ключевые слова для этого фетиша из всех языков
+            const keywords = [
+                ...getKeywords(item.name),
+                ...getKeywords(item.name_ru),
+                ...getKeywords(item.name_es),
+                ...getKeywords(item.name_de),
+                ...getKeywords(item.slug) // slug часто содержит полезные слова (step-mom -> step, mom)
+            ];
+
+            // Проверяем: есть ли хотя бы одно ключевое слово фетиша в тексте пользователя?
+            // Ищем с пробелами по краям, чтобы "anal" не нашлось внутри "analyst" (хотя тут это редкость, но надежнее)
+            const isMatch = keywords.some(word => cleanInput.includes(" " + word + " "));
+
+            if (isMatch) {
+                foundItems.push(item);
+            }
+        });
+
+        if (foundItems.length > 0) {
+            foundItems.forEach(item => {
+                onboardingSelectedIds.push(item.id);
+                renderOnbTag(item, container);
+            });
+            // Показываем блок результатов
+            resultsBlock.style.display = 'flex';
+            // Очищаем поле ввода для следующей фразы
+            inputField.value = "";
+            inputField.placeholder = "... anything else?"; // Подсказка
+        } else {
+            // Если ничего не нашли И список пуст (первый ввод)
+            if (onboardingSelectedIds.length === 0) {
+                resultsBlock.style.display = 'flex';
+                container.innerHTML = '<span class="onb-error" style="color:var(--highlight-red); font-size:13px; width:100%; text-align:center; padding:10px;">No matches found. Try simpler words (e.g. "anal", "feet").</span>';
+            }
+        }
+    }
+
+    function renderOnbTag(item, container) {
+        const name = getLocalizedName(item);
+        const div = document.createElement('div');
+        div.className = 'onb-tag';
+        div.innerHTML = `
+            ${name}
+            <span class="onb-tag-remove" onclick="removeOnbTag(${item.id}, this)">✕</span>
+        `;
+        container.appendChild(div);
+    }
+
+    function removeOnbTag(id, el) {
+        onboardingSelectedIds = onboardingSelectedIds.filter(x => x !== id);
+        el.parentElement.remove();
+    }
+
+    function finishOnboarding() {
+        if (onboardingSelectedIds.length > 0) {
+            onboardingSelectedIds.forEach(id => {
+                if (!favorites.includes(id)) {
+                    favorites.push(id);
+                    // Добавляем вес тегам
+                    const item = data.find(x => x.id === id);
+                    if (item) adjustTagScores(item, 5);
+                }
+            });
+            saveLists();
+            updateCounts();
+        }
+        
+        localStorage.setItem('xch_onboarding_done', 'true');
+        document.getElementById('onboarding-overlay').classList.remove('open');
+        
+        // Опционально: сразу сгенерировать что-то похожее на выбор
+        if (favorites.length > 0) {
+            // Найти первый из добавленных
+            const firstFav = data.find(x => x.id === favorites[0]);
+            if (firstFav) forceShowResult(firstFav, 'similar'); // Показать результат
+        }
+    }
+
 </script>
 </body>
 </html>
