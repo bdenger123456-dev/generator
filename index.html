@@ -197,7 +197,9 @@
             font-size: 13px;
             color: var(--ios-header);
             text-transform: uppercase;
+            display: flex; justify-content: space-between; align-items: center;
         }
+        .ios-header-info { font-size: 11px; opacity: 0.7; text-transform: none; margin-right: 20px; }
 
         .ios-row {
             display: flex; align-items: center; justify-content: space-between;
@@ -240,6 +242,25 @@
         }
         .site-capsule span { font-weight: 600; font-size: 16px; color: var(--text-main); }
         .site-capsule select { font-weight: 600; color: var(--accent) !important; font-size: 17px; background: transparent; border: none; text-align: right; }
+
+        /* Support Banner */
+        .support-banner {
+            background: linear-gradient(135deg, #ff9900, #ff5e00);
+            border-radius: 22px;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 20px rgba(255, 153, 0, 0.25);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .support-banner:active { transform: scale(0.98); }
+        .support-banner span {
+            color: white; font-weight: 800; font-size: 16px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
 
         /* Switch */
         .switch { position: relative; display: inline-block; width: 44px; height: 24px; margin: 0 5px; flex-shrink: 0; }
@@ -284,10 +305,12 @@
         }
         .tag.selected { background: var(--accent); color: #000; border-color: var(--accent); opacity: 1; }
 
-        /* Bottom Nav */
+        /* Bottom Nav - Fix 1 */
         .bottom-nav {
             display: none; position: fixed;
-            bottom: calc(20px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
+            /* Ignore safe area, set explicit bottom margin */
+            bottom: 15px; 
+            left: 50%; transform: translateX(-50%);
             width: 60%; min-width: 240px; max-width: 320px; height: 65px;
             background: rgba(20, 20, 20, 0.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 50px; z-index: 9999;
@@ -323,7 +346,7 @@
             background: var(--card-bg); border: 1px solid var(--border); padding: 25px 20px;
             text-align: center; position: relative; margin-bottom: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.3);
             min-height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: all 0.3s ease-out; width: 100%; overflow: visible; /* Fixed clipped badges */
+            transition: all 0.3s ease-out; width: 100%; overflow: visible;
         }
         .card.has-results { min-height: 0; height: auto; justify-content: flex-start; gap: 15px; padding-bottom: 30px; }
         .card.flash-active { background-color: #fff !important; border-color: #fff !important; transform: scale(1.02); }
@@ -376,13 +399,11 @@
         .card-actions { display: flex; gap: 15px; width: 100%; justify-content: center; margin-top: 20px; }
         .btn-action { 
             flex: 1; padding: 15px; border-radius: 18px; border: 1px solid var(--border); 
-            background: transparent; color: var(--text-secondary); font-size: 24px; /* Emoji size */
+            background: transparent; color: var(--text-secondary); font-size: 24px;
             font-weight: 700; cursor: pointer; transition: all 0.2s; max-width: 80px;
             display: flex; align-items: center; justify-content: center;
         }
-        /* Dislike Active */
         .btn-action.ban:hover, .btn-action.ban.active { border-color: var(--highlight-red); background: rgba(231, 76, 60, 0.15); color: var(--highlight-red); transform: scale(1.05); }
-        /* Like Active */
         .btn-action.fav:hover, .btn-action.fav.active { border-color: var(--highlight-green); background: rgba(46, 204, 113, 0.15); color: var(--highlight-green); transform: scale(1.05); }
 
         .related-section { width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 10px; margin-bottom: 20px; text-align: center; }
@@ -428,7 +449,15 @@
         .catalog-item.active { background: var(--highlight-green); color: #fff; border-color: var(--highlight-green); }
         .catalog-item.ban-active { background: var(--highlight-red); color: #fff; border-color: var(--highlight-red); }
 
-        /* Beautiful Stats */
+        /* Stats Controls */
+        .stats-controls { display: flex; gap: 5px; padding: 10px 15px; border-bottom: 1px solid var(--border); overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .stats-tab { padding: 6px 12px; border-radius: 15px; font-size: 12px; font-weight: 700; color: var(--text-secondary); background: var(--bg-color); border: 1px solid var(--border); cursor: pointer; white-space: nowrap; }
+        .stats-tab.active { background: var(--accent); color: #000; border-color: var(--accent); }
+        
+        .timeframe-selector { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; padding: 0 15px; }
+        .tf-opt { font-size: 11px; font-weight: 600; color: var(--text-secondary); cursor: pointer; text-transform: uppercase; }
+        .tf-opt.active { color: var(--text-main); text-decoration: underline; }
+
         .stat-card {
             width: 100%; background: var(--card-bg); border-radius: 12px; padding: 10px 15px;
             display: flex; align-items: center; justify-content: space-between;
@@ -439,6 +468,10 @@
         .stat-card.rank-1 { border: 2px solid #FFD700; background: linear-gradient(90deg, rgba(255, 215, 0, 0.1), transparent); }
         .stat-card.rank-2 { border: 2px solid #C0C0C0; background: linear-gradient(90deg, rgba(192, 192, 192, 0.1), transparent); }
         .stat-card.rank-3 { border: 2px solid #CD7F32; background: linear-gradient(90deg, rgba(205, 127, 50, 0.1), transparent); }
+
+        .activity-bar { width: 100%; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; margin-top: 5px; display: flex; }
+        .bar-gen { height: 100%; background: var(--text-secondary); }
+        .bar-watch { height: 100%; background: var(--accent); }
 
         .bottom-gradient-mask {
             display: none; position: fixed; bottom: 0; left: 0; width: 100%; height: 120px; z-index: 9000; pointer-events: none;
@@ -555,7 +588,12 @@
 <!-- SETTINGS BUNDLE -->
 <div style="display:none;">
     <div id="settings-bundle">
-    
+        
+        <!-- SUPPORT BANNER -->
+        <div class="support-banner" onclick="openSupportModal()">
+            <span data-key="support_banner">✨ Support the Project</span>
+        </div>
+
         <!-- SITE CAPSULE -->
         <div class="site-capsule">
             <span data-key="site_label">Site</span>
@@ -571,7 +609,10 @@
         </div>
 
         <!-- GROUP 1: PREFERENCES -->
-        <div class="ios-header" data-key="header_prefs">Preferences</div>
+        <div class="ios-header" style="display:flex; justify-content:space-between;">
+            <span data-key="header_prefs">Preferences</span>
+            <span class="ios-header-info" id="explored-count"></span>
+        </div>
         <div class="ios-group">
             
             <div class="ios-row" style="display:block; padding-bottom: 15px; padding-top:15px;">
@@ -621,7 +662,7 @@
                 </div>
                 <div class="accordion-body" id="filter-include"></div>
             </div>
-            <!-- SEPARATOR VIA CSS -->
+            <!-- SEPARATOR -->
             <div class="accordion">
                 <div class="accordion-head" onclick="toggleAccordion('filter-exclude')">
                     <span data-key="filter_exclude">Exclude</span> <span style="color:var(--text-secondary)">▼</span>
@@ -652,6 +693,23 @@
             <div class="ios-row clickable" onclick="importData()">
                 <span data-key="btn_import">Import</span>
                 <span style="color:var(--text-secondary)">↑</span>
+            </div>
+        </div>
+
+        <!-- GROUP 4: EXTRAS -->
+        <div class="ios-header" data-key="header_extras">Extras</div>
+        <div class="ios-group">
+            <div class="ios-row clickable" onclick="window.open('https://reddit.com', '_blank')">
+                <span>Reddit</span>
+                <span style="color:var(--text-secondary)">↗</span>
+            </div>
+            <div class="ios-row clickable">
+                <span data-key="sponsors">Sponsors</span>
+                <span style="color:var(--text-secondary)">❤</span>
+            </div>
+            <div class="ios-row clickable" onclick="window.open('mailto:support@xfetishhub.com')">
+                <span data-key="report_issue">Report Issue</span>
+                <span style="color:var(--text-secondary)">✉</span>
             </div>
         </div>
 
@@ -690,12 +748,44 @@
 <div class="modal-overlay" id="modal-stats-overlay" onclick="closeStats(event)">
     <div class="modal">
         <div class="modal-header">
-            <span data-key="stats_header">Your Favorite Categories</span>
+            <span data-key="btn_stats">Statistics</span>
             <span style="cursor:pointer" onclick="closeStats(null, true)">✕</span>
+        </div>
+        <div class="stats-controls">
+            <div class="stats-tab active" id="tab-stats-tags" onclick="switchStatsTab('tags')">Tags</div>
+            <div class="stats-tab" id="tab-stats-activity" onclick="switchStatsTab('activity')">Activity</div>
         </div>
         <div class="modal-body" id="modal-stats-body" style="flex-direction: column; gap: 10px; padding:15px;"></div>
         <div style="padding:15px; border-top:1px solid var(--border);">
             <button class="btn-gen" onclick="shareStats()" data-key="share_btn" style="padding:15px; font-size:16px;">Share</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Support -->
+<div class="modal-overlay" id="modal-support-overlay" onclick="closeSupport(event)">
+    <div class="modal">
+        <div class="modal-header">
+            <span data-key="support_banner">Support</span>
+            <span style="cursor:pointer" onclick="closeSupport(null, true)">✕</span>
+        </div>
+        <div class="modal-body" style="padding:20px; font-size:15px; line-height:1.5; color:var(--text-secondary);">
+            <p data-key="support_text_1">This project is free, ad-free, and contains no referral links. I develop it in my free time.</p>
+            <p data-key="support_text_2">If you like it, please consider supporting development!</p>
+            
+            <h4 style="color:var(--text-main); margin:15px 0 10px 0;">Roadmap:</h4>
+            <ul style="padding-left:20px; margin:0;">
+                <li>Server Sync & Backup</li>
+                <li>Global User Statistics</li>
+                <li>Deep Customization</li>
+                <li>PWA Improvements</li>
+            </ul>
+            
+            <p style="margin-top:15px;">Supporters will be listed in the <b>Sponsors</b> tab!</p>
+            
+            <button class="btn-watch" onclick="window.open('https://boosty.to/xfetishhub', '_blank')" style="margin-top:20px; width:100%;">
+                Boosty
+            </button>
         </div>
     </div>
 </div>
@@ -714,6 +804,10 @@
 
     let includeTags = new Set(); 
     let excludeTags = new Set(); 
+    
+    // STATS STATE
+    let currentStatsTab = 'tags';
+    let currentStatsTimeframe = 'all';
 
     const STORAGE = {
         THEME: 'xch_theme',
@@ -722,13 +816,15 @@
         FAVORITES: 'xch_favorites',
         INTENSITY: 'xch_intensity',
         TAG_SCORES: 'xch_tag_scores',
-        HISTORY: 'xch_history'
+        HISTORY: 'xch_history',
+        ACTIVITY_LOG: 'xch_activity_log' // New log
     };
 
     let blacklist = JSON.parse(localStorage.getItem(STORAGE.BLACKLIST)) || [];
     let favorites = JSON.parse(localStorage.getItem(STORAGE.FAVORITES)) || [];
     let tagScores = JSON.parse(localStorage.getItem(STORAGE.TAG_SCORES)) || {};
     let historyData = JSON.parse(localStorage.getItem(STORAGE.HISTORY)) || [];
+    let activityLog = JSON.parse(localStorage.getItem(STORAGE.ACTIVITY_LOG)) || [];
 
     const data = [
             {
@@ -11478,7 +11574,7 @@
         { key: 'Trans', en: 'Trans', ru: 'Транс', es: 'Trans', de: 'Trans' },
         { key: 'Orgy', en: 'Orgy', ru: 'Оргия', es: 'Orgía', de: 'Orgie' },
         { key: 'VR', en: 'VR', ru: 'VR', es: 'RV (VR)', de: 'VR' },
-        { key: 'Hentai', en: 'Hentai', ru: 'Хентай', es: 'Hentai', de: 'Hentai' },
+        { key: 'Cosplay', en: 'Cosplay', ru: 'Косплей', es: 'Cosplay', de: 'Cosplay' },
         { key: 'Vintage', en: 'Vintage', ru: 'Ретро', es: 'Vintage', de: 'Vintage' },
         { key: 'Solo', en: 'Solo', ru: 'Соло', es: 'Solo', de: 'Solo' },
         { key: 'AI', en: 'AI', ru: 'ИИ', es: 'IA', de: 'KI' },
@@ -11512,6 +11608,7 @@
             header_prefs: "Preferences",
             header_data: "Data",
             header_filters: "Filters",
+            header_extras: "Extras",
             generate: "Random Genre",
             generate_again: "Different Genre",
             btn_similar: "Similar",
@@ -11549,7 +11646,15 @@
             share_btn: "Share as Image",
             tooltip_extreme: "Contains hardcore or intense content.",
             tooltip_lgbt: "Contains same-sex or trans content.",
-            tooltip_niche: "Specific interests not mainstream."
+            tooltip_niche: "Specific interests not mainstream.",
+            explored_txt: "You've explored {n} / {t} categories",
+            support_banner: "✨ Support the Project",
+            sponsors: "Sponsors",
+            report_issue: "Report Issue",
+            support_text_1: "This project is free, ad-free, and contains no referral links. I develop it in my free time.",
+            support_text_2: "If you like it, please consider supporting development!",
+            tf_week: "Week", tf_month: "Month", tf_year: "Year", tf_all: "All Time",
+            act_gen: "Generations", act_watch: "Watched"
         },
         ru: {
             subtitle: "Твой дом для взрослых предпочтений",
@@ -11557,6 +11662,7 @@
             header_prefs: "Настройки",
             header_data: "Данные",
             header_filters: "Фильтры",
+            header_extras: "Дополнительно",
             generate: "Случайный жанр",
             generate_again: "Другой жанр",
             btn_similar: "Похожий",
@@ -11594,7 +11700,15 @@
             share_btn: "Поделиться картинкой",
             tooltip_extreme: "Содержит жесткий или интенсивный контент.",
             tooltip_lgbt: "Содержит ЛГБТ контент.",
-            tooltip_niche: "Специфические интересы, не мейнстрим."
+            tooltip_niche: "Специфические интересы, не мейнстрим.",
+            explored_txt: "Вы открыли {n} из {t} категорий",
+            support_banner: "✨ Поддержи проект",
+            sponsors: "Спонсоры",
+            report_issue: "Сообщить о проблеме",
+            support_text_1: "Этот проект полностью бесплатный, без рекламы и реферальных ссылок. Я разрабатываю его в свободное время.",
+            support_text_2: "Если вам нравится сайт, пожалуйста, поддержите разработку!",
+            tf_week: "Неделя", tf_month: "Месяц", tf_year: "Год", tf_all: "Всё время",
+            act_gen: "Генерации", act_watch: "Просмотры"
         },
         es: {
             subtitle: "Tu hogar para preferencias adultas",
@@ -11602,6 +11716,7 @@
             header_prefs: "Preferencias",
             header_data: "Datos",
             header_filters: "Filtros",
+            header_extras: "Extras",
             generate: "Género Aleatorio",
             generate_again: "Otro Género",
             btn_similar: "Similar",
@@ -11639,7 +11754,15 @@
             share_btn: "Compartir imagen",
             tooltip_extreme: "Contiene contenido intenso.",
             tooltip_lgbt: "Contiene contenido LGBT.",
-            tooltip_niche: "Intereses específicos."
+            tooltip_niche: "Intereses específicos.",
+            explored_txt: "Exploraste {n} / {t} categorías",
+            support_banner: "✨ Apoyar el Proyecto",
+            sponsors: "Patrocinadores",
+            report_issue: "Reportar Problema",
+            support_text_1: "Este proyecto es gratuito, sin anuncios y sin enlaces de referencia.",
+            support_text_2: "Si te gusta, ¡considera apoyar el desarrollo!",
+            tf_week: "Semana", tf_month: "Mes", tf_year: "Año", tf_all: "Todo",
+            act_gen: "Generaciones", act_watch: "Vistas"
         },
         de: {
             subtitle: "Dein Zuhause für Erwachsenen-Vorlieben",
@@ -11647,6 +11770,7 @@
             header_prefs: "Einstellungen",
             header_data: "Daten",
             header_filters: "Filter",
+            header_extras: "Extras",
             generate: "Zufallsgenre",
             generate_again: "Anderes Genre",
             btn_similar: "Ähnlich",
@@ -11684,7 +11808,15 @@
             share_btn: "Als Bild teilen",
             tooltip_extreme: "Enthält extreme Inhalte.",
             tooltip_lgbt: "Enthält LGBT-Inhalte.",
-            tooltip_niche: "Spezifische Nischen."
+            tooltip_niche: "Spezifische Nischen.",
+            explored_txt: "Du hast {n} / {t} Kategorien erkundet",
+            support_banner: "✨ Projekt unterstützen",
+            sponsors: "Sponsoren",
+            report_issue: "Problem melden",
+            support_text_1: "Dieses Projekt ist kostenlos, werbefrei und enthält keine Empfehlungslinks.",
+            support_text_2: "Wenn es dir gefällt, unterstütze bitte die Entwicklung!",
+            tf_week: "Woche", tf_month: "Monat", tf_year: "Jahr", tf_all: "Gesamt",
+            act_gen: "Generationen", act_watch: "Angeschaut"
         }
     };
 
@@ -11711,6 +11843,29 @@
         checkLayout();
         window.addEventListener('resize', checkLayout);
     };
+
+    function logActivity(type, itemId, tags) {
+        const logEntry = {
+            type: type, // 'gen', 'watch', 'like', 'dislike'
+            id: itemId,
+            tags: tags || [],
+            ts: Date.now()
+        };
+        activityLog.push(logEntry);
+        // Trim log if too big (optional, keep last 5000)
+        if (activityLog.length > 5000) activityLog = activityLog.slice(-5000);
+        localStorage.setItem(STORAGE.ACTIVITY_LOG, JSON.stringify(activityLog));
+        updateExploredCount();
+    }
+
+    function updateExploredCount() {
+        const total = data.length;
+        // Count unique IDs in history
+        const uniqueExplored = new Set(historyData.map(h => h.id)).size;
+        const t = langData[currentLang];
+        const text = t.explored_txt.replace('{n}', uniqueExplored).replace('{t}', total);
+        document.getElementById('explored-count').innerText = text;
+    }
 
     function adjustTagScores(item, delta) {
         if(!item || !item.tags) return;
@@ -11801,7 +11956,7 @@
         animText.classList.add('visible');
 
         let reelHTML = '';
-        const spinLength = 30; // Increased length to ensure scroll covers duration
+        const spinLength = 30; // Increased length
         const itemHeight = 150;
         const animationTime = 1.8; // Duration in seconds
         
@@ -11904,6 +12059,7 @@
         isGenerating = false;
         document.getElementById('anim-text').classList.remove('visible');
         addToHistory(item);
+        logActivity('gen', item.id, item.tags);
         
         const card = document.getElementById('card-block');
         card.classList.add('flash-active');
@@ -12043,6 +12199,7 @@
             blacklist = blacklist.filter(x => x !== id);
             adjustTagScores(currentItem, 5); 
             hasInteractedWithCurrent = true;
+            logActivity('like', id, currentItem.tags);
         }
         saveLists(); updateActionButtons(); updateCounts();
     }
@@ -12052,6 +12209,7 @@
         if(!hasInteractedWithCurrent) {
             adjustTagScores(currentItem, 3);
             hasInteractedWithCurrent = true;
+            logActivity('watch', currentItem.id, currentItem.tags);
         }
     }
 
@@ -12062,6 +12220,7 @@
         if(historyData.length > 30) historyData.pop();
         localStorage.setItem(STORAGE.HISTORY, JSON.stringify(historyData));
         renderHistory();
+        updateExploredCount();
     }
 
     function renderHistory() {
@@ -12198,7 +12357,11 @@
         if(!currentItem) return;
         const id = currentItem.id;
         if (blacklist.includes(id)) blacklist = blacklist.filter(x => x !== id);
-        else { blacklist.push(id); favorites = favorites.filter(x => x !== id); }
+        else { 
+            blacklist.push(id); 
+            favorites = favorites.filter(x => x !== id); 
+            logActivity('dislike', id, currentItem.tags);
+        }
         saveLists(); updateActionButtons();
     }
 
@@ -12326,6 +12489,7 @@
         const reel = document.getElementById('slot-reel');
         reel.innerHTML = `<div class="slot-item" id="result-text">${text}</div>`;
     }
+    
     function checkLayout() {
         const isPC = window.innerWidth > 768;
         const bundle = document.getElementById('settings-bundle');
@@ -12333,13 +12497,14 @@
         const mobileMount = document.getElementById('mobile-settings-mount');
         if (isPC) {
             pcMount.appendChild(bundle);
-            // Force main tab on desktop
+            // Fix 1: Force main tab on desktop layout
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.getElementById('tab-home').classList.add('active');
         } else {
             mobileMount.appendChild(bundle);
         }
     }
+    
     function toggleAccordion(id) { document.getElementById(id).classList.toggle('open'); }
     function switchTab(tab) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -12379,6 +12544,7 @@
         if(currentItem) { renderResultUI(currentItem, null); updateLink(); } 
         else { setInitialText(); }
         updateToggleLabels();
+        updateExploredCount();
     }
     function updateToggleLabels() {
         const isRu = (currentLang === 'ru');
@@ -12390,6 +12556,7 @@
             const key = el.getAttribute('data-key');
             if(t[key]) el.innerText = t[key];
         });
+        updateExploredCount();
     }
 
     // === LISTS AND STATS ===
@@ -12476,41 +12643,121 @@
         forceShowResult(selected, 'tag_click');
     }
 
+    // === NEW STATS SYSTEM ===
     function openStatistics() {
         const modal = document.getElementById('modal-stats-overlay');
+        modal.classList.add('open');
+        renderStatsContent();
+    }
+
+    function switchStatsTab(tab) {
+        currentStatsTab = tab;
+        document.getElementById('tab-stats-tags').classList.toggle('active', tab === 'tags');
+        document.getElementById('tab-stats-activity').classList.toggle('active', tab === 'activity');
+        renderStatsContent();
+    }
+
+    function switchTimeframe(tf) {
+        currentStatsTimeframe = tf;
+        renderStatsContent();
+    }
+
+    function renderStatsContent() {
         const body = document.getElementById('modal-stats-body');
         body.innerHTML = '';
-        const ignoreStats = ['universal', 'straight', 'gay', 'lesbian', 'trans'];
-        
-        const sortedTags = Object.entries(tagScores)
-            .filter(([tag, score]) => score > 0 && !ignoreStats.includes(tag))
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 10);
+        const t = langData[currentLang];
 
-        if (sortedTags.length === 0) {
-            body.innerHTML = '<div style="text-align:center; padding:20px; color:#888;">No stats yet. Start liking items!</div>';
-        } else {
-            sortedTags.forEach(([tag, score], index) => {
-                const div = document.createElement('div');
-                div.className = 'stat-card';
-                
-                let rankHtml = '';
-                if(index === 0) { div.classList.add('rank-1'); rankHtml = '🥇'; }
-                else if(index === 1) { div.classList.add('rank-2'); rankHtml = '🥈'; }
-                else if(index === 2) { div.classList.add('rank-3'); rankHtml = '🥉'; }
-                else { rankHtml = `<span style="font-size:14px; color:var(--text-secondary); opacity:0.5;">#${index+1}</span>`; }
+        // Filter Logic
+        const now = Date.now();
+        let cutoff = 0;
+        if(currentStatsTimeframe === 'week') cutoff = now - 7*24*60*60*1000;
+        if(currentStatsTimeframe === 'month') cutoff = now - 30*24*60*60*1000;
+        if(currentStatsTimeframe === 'year') cutoff = now - 365*24*60*60*1000;
 
-                div.innerHTML = `
-                    <div style="display:flex; align-items:center;">
-                        <div class="stat-rank">${rankHtml}</div>
-                        <span class="stat-name">${tag}</span>
-                    </div>
-                `;
-                div.onclick = () => { closeStats(null, true); searchByTag(tag); };
-                body.appendChild(div);
+        const filteredLog = activityLog.filter(log => log.ts >= cutoff);
+
+        // Timeframe Selector HTML
+        const tfHtml = `
+            <div class="timeframe-selector">
+                <span class="tf-opt ${currentStatsTimeframe==='week'?'active':''}" onclick="switchTimeframe('week')">${t.tf_week}</span>
+                <span class="tf-opt ${currentStatsTimeframe==='month'?'active':''}" onclick="switchTimeframe('month')">${t.tf_month}</span>
+                <span class="tf-opt ${currentStatsTimeframe==='year'?'active':''}" onclick="switchTimeframe('year')">${t.tf_year}</span>
+                <span class="tf-opt ${currentStatsTimeframe==='all'?'active':''}" onclick="switchTimeframe('all')">${t.tf_all}</span>
+            </div>
+        `;
+        body.innerHTML = tfHtml;
+
+        if (currentStatsTab === 'tags') {
+            // Calc Tag Scores from Filtered Log
+            const tempScores = {};
+            const ignoreStats = ['universal', 'straight', 'gay', 'lesbian', 'trans'];
+            
+            filteredLog.forEach(log => {
+                if (log.tags) {
+                    let weight = 0;
+                    if(log.type === 'watch') weight = 3;
+                    if(log.type === 'like') weight = 5;
+                    if(log.type === 'gen') weight = 1;
+                    
+                    if(weight > 0) {
+                        log.tags.forEach(tag => {
+                            if(!ignoreStats.includes(tag)) {
+                                tempScores[tag] = (tempScores[tag] || 0) + weight;
+                            }
+                        });
+                    }
+                }
             });
+
+            const sortedTags = Object.entries(tempScores).sort((a, b) => b[1] - a[1]).slice(0, 10);
+
+            if (sortedTags.length === 0) {
+                body.innerHTML += '<div style="text-align:center; padding:20px; color:#888;">No data for this period</div>';
+            } else {
+                sortedTags.forEach(([tag, score], index) => {
+                    const div = document.createElement('div');
+                    div.className = 'stat-card';
+                    let rankHtml = '';
+                    if(index === 0) { div.classList.add('rank-1'); rankHtml = '🥇'; }
+                    else if(index === 1) { div.classList.add('rank-2'); rankHtml = '🥈'; }
+                    else if(index === 2) { div.classList.add('rank-3'); rankHtml = '🥉'; }
+                    else { rankHtml = `<span style="font-size:14px; color:var(--text-secondary); opacity:0.5;">#${index+1}</span>`; }
+
+                    div.innerHTML = `
+                        <div style="display:flex; align-items:center;">
+                            <div class="stat-rank">${rankHtml}</div>
+                            <span class="stat-name">${tag}</span>
+                        </div>
+                    `;
+                    div.onclick = () => { closeStats(null, true); searchByTag(tag); };
+                    body.appendChild(div);
+                });
+            }
+        } else {
+            // Activity Tab
+            const genCount = filteredLog.filter(x => x.type === 'gen').length;
+            const watchCount = filteredLog.filter(x => x.type === 'watch').length;
+            const total = genCount + watchCount || 1;
+            const genPerc = (genCount / total) * 100;
+            const watchPerc = (watchCount / total) * 100;
+
+            body.innerHTML += `
+                <div class="stat-card" style="display:block;">
+                    <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:700;">
+                        <span>${t.act_gen}</span>
+                        <span>${genCount}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:700; margin-top:5px;">
+                        <span>${t.act_watch}</span>
+                        <span>${watchCount}</span>
+                    </div>
+                    <div class="activity-bar">
+                        <div class="bar-gen" style="width:${genPerc}%"></div>
+                        <div class="bar-watch" style="width:${watchPerc}%"></div>
+                    </div>
+                </div>
+            `;
         }
-        modal.classList.add('open');
     }
 
     function shareStats() {
@@ -12525,6 +12772,15 @@
             link.href = canvas.toDataURL();
             link.click();
         });
+    }
+
+    function openSupportModal() {
+        document.getElementById('modal-support-overlay').classList.add('open');
+    }
+    function closeSupport(e, force) {
+        if (force || e.target.id === 'modal-support-overlay') {
+            document.getElementById('modal-support-overlay').classList.remove('open');
+        }
     }
 
     function closeStats(e, force) {
