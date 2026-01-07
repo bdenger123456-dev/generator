@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>xFetishHub</title>
+    <link rel="icon" type="image/png" href="logo.png">
     <meta name="theme-color" content="#050505">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     
@@ -60,6 +61,71 @@
         button, select, input { font-family: inherit; outline: none; }
         a { text-decoration: none; color: inherit; }
 
+        /* === LOGO STYLES === */
+        .logo {
+            display: flex;
+            align-items: center; /* Выравнивание по центру по вертикали */
+            justify-content: center; /* Центрирование */
+            font-size: 28px;
+            font-weight: 900;
+            margin-bottom: 5px; 
+            letter-spacing: -1px;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .logo-img {
+            height: 48px;
+            width: auto;
+            margin-right: 0px;
+            display: block;
+            object-fit: contain;
+            transform: translateY(-8px);
+        }
+
+        /* Стили для подзаголовка */
+        .subtitle {
+            font-size: 11px; 
+            color: var(--text-secondary); 
+            text-transform: uppercase;
+            letter-spacing: 1px; 
+            text-align: center; 
+            margin-top: 0; 
+            margin-bottom: 25px;
+            font-weight: 600; 
+            opacity: 0.7; 
+            max-width: 240px; 
+            margin-left: auto; 
+            margin-right: auto; 
+            line-height: 1.4;
+        }
+
+        /* === МОБИЛЬНЫЙ ХЕДЕР === */
+        .mobile-header .logo {
+            font-size: 20px;
+            margin-bottom: 2px;
+        }
+        /* Увеличиваем лого на мобильных */
+        .mobile-header .logo-img {
+            height: 34px; /* Значительно больше текста (20px) */
+            margin-right: 5px;
+        }
+        .mobile-header .subtitle {
+            margin-bottom: 0;
+            font-size: 9px;
+        }
+
+        /* === AGE GATE (ПРОВЕРКА ВОЗРАСТА) === */
+        #age-gate .logo {
+            font-size: 40px;
+            margin-bottom: 20px;
+        }
+        /* Делаем логотип огромным на экране входа */
+        #age-gate .logo-img {
+            height: 70px; /* Намного больше текста (40px) */
+            margin-right: 10px;
+        }
+
         /* === 2. LAYOUT === */
         .app-layout { display: flex; height: 100%; width: 100%; }
 
@@ -75,14 +141,6 @@
             z-index: 10;
         }
 
-        .logo {
-            font-size: 28px;
-            font-weight: 900;
-            margin-bottom: 20px;
-            letter-spacing: -1px;
-            cursor: pointer;
-            text-align: center;
-        }
         .logo span { color: var(--accent); }
 
         .main-content {
@@ -157,7 +215,6 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
-        .mobile-header .logo { font-size: 20px; margin: 0; line-height: 1.1; }
         .mobile-header .subtitle { font-size: 9px; margin: 2px 0 0 0; opacity: 0.6; padding: 0; white-space: nowrap; }
 
         /* === GRADIENTS === */
@@ -755,9 +812,95 @@
         .modal { background: var(--sidebar-bg); width: 90%; max-width: 500px; max-height: 80%; border-radius: 20px; border: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
         .modal-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; font-weight: 800; font-size: 18px; }
         .modal-body { padding: 10px; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start; }
-        .catalog-item { padding: 8px 14px; background: var(--bg-color); border: 1px solid var(--border); border-radius: 8px; font-size: 12px; color: var(--text-secondary); cursor: pointer; font-weight: 600; flex-grow: 1; text-align: center; }
-        .catalog-item.active { background: var(--highlight-green); color: #fff; border-color: var(--highlight-green); }
-        .catalog-item.ban-active { background: var(--highlight-red); color: #fff; border-color: var(--highlight-red); }
+
+
+        /* === СТИЛИ ДЛЯ КАТАЛОГОВ (Like/Dislike) === */
+
+        /* Поле поиска в модалке */
+        .modal-search-box {
+            width: 100%;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .modal-search-input {
+            width: 100%;
+            background: var(--ios-card); /* Контрастный фон */
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 16px;
+            color: var(--text-main);
+            outline: none;
+        }
+
+        /* Список подсказок при поиске */
+        .modal-suggestions {
+            display: none; /* Скрыт по умолчанию */
+            flex-direction: column;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-top: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            position: absolute;
+            width: 100%;
+            z-index: 100;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .suggestion-row {
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+            color: var(--text-main);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+        }
+        .suggestion-row:active { background: var(--nav-bg); }
+        .suggestion-row span { color: var(--accent); font-weight: 700; }
+
+        /* Обновленный стиль тега (как в онбординге) */
+        .catalog-item {
+            padding: 8px 12px;
+            border-radius: 20px; /* Более круглые */
+            font-size: 13px;
+            font-weight: 600;
+            cursor: default; /* Сам тег не кликабелен, только крестик */
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            border: none; /* Убираем бордер для чистоты */
+            flex-grow: 0; /* Не растягиваем */
+            width: auto;
+        }
+
+        /* Цвета для лайков */
+        .catalog-item.active {
+            background: rgba(46, 204, 113, 0.2); 
+            color: #2ecc71; 
+            border: 1px solid #2ecc71;
+        }
+
+        /* Цвета для дизлайков */
+        .catalog-item.ban-active {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+            border: 1px solid #e74c3c;
+        }
+
+        /* Крестик удаления */
+        .catalog-remove-btn {
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+            opacity: 0.6;
+            padding: 0 4px;
+        }
+        .catalog-remove-btn:hover { opacity: 1; transform: scale(1.2); }
 
         /* Stats Controls */
         .stats-controls { display: flex; gap: 5px; padding: 10px 15px; border-bottom: 1px solid var(--border); overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -844,8 +987,15 @@
 
     <!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
-        <div class="logo">x<span>Fetish</span>Hub</div>
+        <!-- Логотип: Картинка + Текст -->
+        <div class="logo">
+            <img src="logo.png" alt="X" class="logo-img">
+            <span>Fetish</span>Hub
+        </div>
+        
+        <!-- Подзаголовок (Обязательно оставляем) -->
         <div class="subtitle" data-key="subtitle">Your home for adult preferences</div>
+        
         <div id="pc-settings-mount"></div>
     </div>
 
@@ -853,7 +1003,10 @@
     <div class="main-content">
         
         <div class="mobile-header">
-            <div class="logo">x<span>Fetish</span>Hub</div>
+            <div class="logo">
+                <img src="logo.png" alt="X" class="logo-img">
+                <span>Fetish</span>Hub
+            </div>
             <div class="subtitle" data-key="subtitle">Your home for adult preferences</div>
         </div>
 
@@ -1049,6 +1202,10 @@
                 <span data-key="btn_import">Import</span>
                 <span style="color:var(--text-secondary)">↑</span>
             </div>
+            <div class="ios-row clickable" onclick="resetAppHistory()" style="color: var(--highlight-red);">
+                <span data-key="btn_reset">Reset Data</span>
+                <span>✕</span>
+            </div>
         </div>
 
         <!-- GROUP 4: EXTRAS -->
@@ -1079,12 +1236,13 @@
 
 <!-- Modal Favorites -->
 <div class="modal-overlay" id="modal-overlay" onclick="closeList(event)">
-    <div class="modal">
+    <div class="modal"> <!-- Уберите max-height, если он мешает поиску -->
         <div class="modal-header">
             <span data-key="favorites_catalog">Liked</span>
             <span style="cursor:pointer" onclick="closeList(null, true)">✕</span>
         </div>
-        <div class="modal-body" id="modal-catalog-body"></div>
+        <div class="modal-body" id="modal-catalog-body" style="overflow:visible;">
+        </div>
     </div>
 </div>
 
@@ -1095,7 +1253,8 @@
             <span data-key="blacklist_catalog">Disliked</span>
             <span style="cursor:pointer" onclick="closeBlacklist(null, true)">✕</span>
         </div>
-        <div class="modal-body" id="modal-blacklist-body"></div>
+        <div class="modal-body" id="modal-blacklist-body" style="overflow:visible;">
+        </div>
     </div>
 </div>
 
@@ -1161,11 +1320,19 @@
 <!-- AGE GATE OVERLAY -->
 <div id="age-gate" class="modal-overlay" style="z-index: 20000; background: var(--bg-color);">
     <div class="center-wrapper" style="text-align:center; padding:20px;">
-        <div class="logo" style="margin-bottom:10px; font-size:40px;">18+</div>
+        
+        <!-- Логотип с картинкой -->
+        <div class="logo">
+            <img src="logo.png" alt="X" class="logo-img">
+            <span>Fetish</span>Hub
+        </div>
+
         <h2 style="margin-bottom:10px;" data-key="age_title">Age Verification</h2>
+        
         <p style="color:var(--text-secondary); margin-bottom:30px; line-height:1.5;" data-key="age_desc">
             This website contains age-restricted materials. Are you 18 years or older?
         </p>
+        
         <div style="display:flex; gap:15px; width:100%; max-width:300px; justify-content:center;">
             <button class="btn-gen secondary" onclick="blockAccess()" data-key="age_no">No, I am under 18</button>
             <button class="btn-gen" onclick="passAgeGate()" style="background:var(--accent); color:#000;" data-key="age_yes">Yes, I am 18+</button>
@@ -12124,6 +12291,10 @@
             onb_btn_confirm: "Add to Favorites",
             onb_skip: "Skip setup",
 
+            btn_reset: "Reset Data",
+            confirm_reset: "Are you sure? This will delete your history, statistics, and preferences learning. This cannot be undone.",
+            reset_done: "Data has been reset.",
+
             support_intro: "👋 <b>Hi there!</b><br><br>This project is completely <b>free</b>, ad-free, and I develop it in my spare time out of pure enthusiasm.",
             support_why: "💡 <b>Why support?</b><br>Your support helps keep the motivation high to add cool new features and keep the app updated.",
             support_roadmap_title: "🚀 <b>Roadmap:</b>",
@@ -12211,6 +12382,10 @@
             onb_btn_confirm: "Добавить в избранное",
             onb_skip: "Пропустить", 
 
+            btn_reset: "Сброс данных",
+            confirm_reset: "Вы уверены? Это удалит историю, статистику и обучение алгоритма. Это действие нельзя отменить.",
+            reset_done: "Данные сброшены.",
+
             support_intro: "👋 <b>Привет!</b><br><br>Этот проект полностью <b>бесплатный</b>, без рекламы, и я разрабатываю его в свободное время на чистом энтузиазме.",
             support_why: "💡 <b>Зачем поддерживать?</b><br>Твоя поддержка мотивирует меня пилить новые фичи и не забрасывать проект.",
             support_roadmap_title: "🚀 <b>Планы:</b>",
@@ -12296,6 +12471,10 @@
             onb_btn_confirm: "Añadir a Favoritos",
             onb_skip: "Saltar configuración",
 
+            btn_reset: "Restablecer datos",
+            confirm_reset: "¿Estás seguro? Esto borrará tu historial y estadísticas. No se puede deshacer.",
+            reset_done: "Datos restablecidos.",
+
             support_intro: "👋 <b>¡Hola!</b><br><br>Este proyecto es completamente <b>gratuito</b>, sin anuncios, y lo desarrollo en mi tiempo libre por puro entusiasmo.",
             support_why: "💡 <b>¿Por qué apoyar?</b><br>Tu apoyo mantiene alta la motivación para añadir nuevas funciones y mantener la app actualizada.",
             support_roadmap_title: "🚀 <b>Hoja de ruta:</b>",
@@ -12380,6 +12559,10 @@
             onb_found: "Wir haben gefunden:",
             onb_btn_confirm: "Zu Favoriten hinzufügen",
             onb_skip: "Überspringen",
+
+            btn_reset: "Daten zurücksetzen",
+            confirm_reset: "Bist du sicher? Dies löscht Verlauf und Statistiken. Kann nicht rückgängig gemacht werden.",
+            reset_done: "Daten zurückgesetzt.",
 
             support_intro: "👋 <b>Hallo!</b><br><br>Dieses Projekt ist komplett <b>kostenlos</b>, werbefrei und ich entwickle es in meiner Freizeit aus reinem Enthusiasmus.",
             support_why: "💡 <b>Warum unterstützen?</b><br>Deine Unterstützung hält die Motivation hoch, coole neue Funktionen hinzuzufügen.",
@@ -12971,10 +13154,21 @@
     function toggleBlacklist() {
         if(!currentItem) return;
         const id = currentItem.id;
-        if (blacklist.includes(id)) blacklist = blacklist.filter(x => x !== id);
+        
+        if (blacklist.includes(id)) {
+            // Если разблокируем (убираем из ЧС)
+            blacklist = blacklist.filter(x => x !== id);
+            // Опционально: можно не логировать снятие бана, или логировать как нейтральное действие
+        }
         else { 
+            // Если добавляем в ЧС
             blacklist.push(id); 
             favorites = favorites.filter(x => x !== id); 
+            
+            // Влияние на веса рандома
+            adjustTagScores(currentItem, -5);
+            
+            // Запись в статистику
             logActivity('dislike', id, currentItem.tags);
         }
         saveLists(); updateActionButtons();
@@ -13179,73 +13373,189 @@
         updateExploredCount();
     }
 
-    // === LISTS AND STATS ===
+    // === ЛОГИКА КАТАЛОГОВ (LIKE / DISLIKE) ===
+
+    // Открыть список лайков
     function openFavoritesCatalog() {
-        const modal = document.getElementById('modal-overlay');
-        const body = document.getElementById('modal-catalog-body');
-        body.innerHTML = '';
-        
-        const likedData = data.filter(item => favorites.includes(item.id));
-        
-        // Сортировка с учетом языка
-        const sortedData = likedData.sort((a, b) => {
-            const aName = getLocalizedName(a);
-            const bName = getLocalizedName(b);
-            return aName.localeCompare(bName);
-        });
-
-        if(sortedData.length === 0) {
-            body.innerHTML = '<div style="text-align:center; padding:20px; color:#888;">...</div>';
-        }
-
-        sortedData.forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'catalog-item active'; 
-            div.innerText = getLocalizedName(item);
-            
-            div.onclick = () => {
-                favorites = favorites.filter(x => x !== item.id);
-                saveLists(); updateCounts();
-                openFavoritesCatalog(); 
-                if(currentItem && currentItem.id === item.id) updateActionButtons();
-            };
-            body.appendChild(div);
-        });
-        modal.classList.add('open');
+        renderListModal('fav');
     }
 
+    // Открыть черный список
     function openBlacklistCatalog() {
-        const modal = document.getElementById('modal-blacklist-overlay');
-        const body = document.getElementById('modal-blacklist-body');
+        renderListModal('ban');
+    }
+
+    // Универсальная функция рендера
+    function renderListModal(type) {
+        const isFav = (type === 'fav');
+        const modalId = isFav ? 'modal-overlay' : 'modal-blacklist-overlay';
+        const bodyId = isFav ? 'modal-catalog-body' : 'modal-blacklist-body';
+        const listData = isFav ? favorites : blacklist;
+        const t = langData[currentLang];
+
+        const modal = document.getElementById(modalId);
+        const body = document.getElementById(bodyId);
+        
+        // Очищаем и строим структуру
         body.innerHTML = '';
-        
-        const dislikedData = data.filter(item => blacklist.includes(item.id));
-        
-        const sortedData = dislikedData.sort((a, b) => {
-            const aName = getLocalizedName(a);
-            const bName = getLocalizedName(b);
-            return aName.localeCompare(bName);
-        });
+        body.style.display = 'block'; // Сбрасываем flex, если был
+        body.style.padding = '15px';
 
-        if(sortedData.length === 0) {
-            body.innerHTML = '<div style="text-align:center; padding:20px; color:#888;">No disliked items</div>';
-        }
+        // 1. Поле поиска
+        const searchBox = document.createElement('div');
+        searchBox.className = 'modal-search-box';
+        const placeholder = isFav ? "Add to Favorites..." : "Block a genre..."; // Можно добавить в langData
+        
+        searchBox.innerHTML = `
+            <input type="text" class="modal-search-input" placeholder="${placeholder}" id="search-${type}">
+            <div class="modal-suggestions" id="suggest-${type}"></div>
+        `;
+        body.appendChild(searchBox);
 
-        sortedData.forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'catalog-item ban-active'; 
-            div.innerText = getLocalizedName(item);
-            div.onclick = () => {
-                blacklist = blacklist.filter(x => x !== item.id);
-                saveLists();
-                openBlacklistCatalog(); 
-                if(currentItem && currentItem.id === item.id) updateActionButtons();
-            };
-            body.appendChild(div);
-        });
+        // 2. Контейнер для тегов
+        const tagsContainer = document.createElement('div');
+        tagsContainer.style.display = 'flex';
+        tagsContainer.style.flexWrap = 'wrap';
+        tagsContainer.style.gap = '8px';
+        tagsContainer.id = `tags-container-${type}`;
+        body.appendChild(tagsContainer);
+
+        // 3. Рендер существующих тегов
+        renderCurrentTags(type, listData, tagsContainer);
+
+        // 4. Логика поиска
+        const input = document.getElementById(`search-${type}`);
+        const suggestBox = document.getElementById(`suggest-${type}`);
+
+        input.oninput = (e) => {
+            const val = e.target.value.toLowerCase().trim();
+            if (val.length < 2) {
+                suggestBox.style.display = 'none';
+                return;
+            }
+
+            // Фильтруем данные:
+            // 1. Не должно быть уже в списке
+            // 2. Должно совпадать по названию (EN, RU, ES, DE)
+            const matches = data.filter(item => {
+                if (listData.includes(item.id)) return false;
+                
+                const terms = [
+                    item.name, 
+                    item.name_ru || "", 
+                    item.name_es || "", 
+                    item.name_de || "",
+                    item.slug
+                ].map(x => x.toLowerCase());
+
+                return terms.some(term => term.includes(val));
+            }).slice(0, 10); // Максимум 10 подсказок
+
+            // Рендер подсказок
+            suggestBox.innerHTML = '';
+            if (matches.length > 0) {
+                suggestBox.style.display = 'flex';
+                matches.forEach(item => {
+                    const row = document.createElement('div');
+                    row.className = 'suggestion-row';
+                    const localName = getLocalizedName(item);
+                    row.innerHTML = `${localName} <span>+</span>`;
+                    
+                    row.onclick = () => {
+                        // ДОБАВЛЕНИЕ
+                        if (isFav) {
+                            favorites.push(item.id);
+                            if (blacklist.includes(item.id)) blacklist = blacklist.filter(x => x !== item.id);
+                            adjustTagScores(item, 5);
+                            
+                            // ДОБАВЛЕНО: Лог лайка
+                            logActivity('like', item.id, item.tags);
+                            
+                        } else {
+                            // БЛОКИРОВКА
+                            blacklist.push(item.id);
+                            if (favorites.includes(item.id)) favorites = favorites.filter(x => x !== item.id);
+                            adjustTagScores(item, -5); // Уменьшаем вес для рандома
+                            
+                            // ДОБАВЛЕНО: Лог дизлайка
+                            logActivity('dislike', item.id, item.tags);
+                        }
+                        
+                        saveLists();
+                        updateCounts();
+                        input.value = ''; 
+                        suggestBox.style.display = 'none';
+                        renderListModal(type);
+                        if(currentItem && currentItem.id === item.id) updateActionButtons();
+                    };
+                    suggestBox.appendChild(row);
+                });
+            } else {
+                suggestBox.style.display = 'none';
+            }
+        };
+
         modal.classList.add('open');
     }
 
+    function renderCurrentTags(type, listIds, container) {
+        container.innerHTML = '';
+        
+        if (listIds.length === 0) {
+            container.innerHTML = '<div style="width:100%; text-align:center; color:var(--text-secondary); margin-top:20px; font-size:14px;">List is empty</div>';
+            return;
+        }
+
+        // Сортировка по имени
+        const sortedIds = [...listIds].sort((a, b) => {
+            const itemA = data.find(x => x.id === a);
+            const itemB = data.find(x => x.id === b);
+            if (!itemA || !itemB) return 0;
+            return getLocalizedName(itemA).localeCompare(getLocalizedName(itemB));
+        });
+
+        sortedIds.forEach(id => {
+            const item = data.find(x => x.id === id);
+            if (!item) return;
+
+            const div = document.createElement('div');
+            const isFav = (type === 'fav');
+            // Классы: ban-active или active
+            div.className = `catalog-item ${isFav ? 'active' : 'ban-active'}`;
+            
+            div.innerHTML = `
+                ${getLocalizedName(item)}
+                <span class="catalog-remove-btn">✕</span>
+            `;
+
+            // Удаление при клике на крестик
+            div.querySelector('.catalog-remove-btn').onclick = (e) => {
+                e.stopPropagation(); // Чтобы не сработало что-то еще
+                
+                if (isFav) {
+                    favorites = favorites.filter(x => x !== id);
+                } else {
+                    blacklist = blacklist.filter(x => x !== id);
+                }
+                
+                saveLists();
+                updateCounts();
+                
+                // Анимация удаления
+                div.style.opacity = '0';
+                div.style.transform = 'scale(0.8)';
+                setTimeout(() => {
+                    renderCurrentTags(type, isFav ? favorites : blacklist, container);
+                }, 200);
+
+                if(currentItem && currentItem.id === id) updateActionButtons();
+            };
+
+            container.appendChild(div);
+        });
+    }
+
+    // Закрытие модалок
     function closeList(e, force) {
         if (force || e.target.id === 'modal-overlay') {
             document.getElementById('modal-overlay').classList.remove('open');
@@ -13358,38 +13668,57 @@
         `;
 
         if (currentStatsTab === 'tags') {
-            // === ГРАФИК ПРЕДПОЧТЕНИЙ ===
+            // === ГРАФИК ПРЕДПОЧТЕНИЙ (ТЕГИ) ===
             const tempScores = {};
-            const ignoreStats = ['universal', 'straight', 'gay', 'lesbian', 'trans'];
+            // Игнорируем технические или слишком общие теги
+            const ignoreStats = ['universal', 'straight', 'gay', 'lesbian', 'trans', 'bi'];
             
             filteredLog.forEach(log => {
                 if (log.tags) {
-                    let weight = (log.type === 'watch') ? 3 : (log.type === 'like' ? 5 : 1);
-                    log.tags.forEach(tag => {
-                        if(!ignoreStats.includes(tag)) tempScores[tag] = (tempScores[tag] || 0) + weight;
-                    });
+                    let weight = 0;
+                    // Система очков
+                    if (log.type === 'like') weight = 5;
+                    else if (log.type === 'watch') weight = 3;
+                    else if (log.type === 'gen') weight = 1;
+                    else if (log.type === 'dislike') weight = -5; // Отнимаем очки
+
+                    if (weight !== 0) {
+                        log.tags.forEach(tag => {
+                            if(!ignoreStats.includes(tag)) {
+                                tempScores[tag] = (tempScores[tag] || 0) + weight;
+                            }
+                        });
+                    }
                 }
             });
 
-            const sortedTags = Object.entries(tempScores).sort((a, b) => b[1] - a[1]).slice(0, 8);
+            // Сортируем: от большего к меньшему
+            const sortedTags = Object.entries(tempScores)
+                .sort((a, b) => b[1] - a[1])
+                .filter(x => x[1] > 0) // Показываем только положительные интересы
+                .slice(0, 8); // Топ 8
             
             if(sortedTags.length === 0) {
-                html += '<div style="width:100%; text-align:center; align-self:center; color:#666;">No data</div>';
+                html += '<div style="width:100%; text-align:center; align-self:center; color:var(--text-secondary);">No data yet</div>';
             } else {
                 const maxVal = Math.max(...sortedTags.map(x => x[1]));
                 
                 sortedTags.forEach(([tag, score]) => {
+                    // Нормализация высоты (минимум 5%)
                     const height = Math.max(5, (score / maxVal) * 100);
-                    // Локализация имени
-                    const item = data.find(x => x.slug === tag || x.tags.includes(tag));
-                    let tagName = item ? getLocalizedName(item) : tag;
-                    if(tagName.length > 9) tagName = tagName.substring(0, 7) + '..';
+                    
+                    // Красивое форматирование тега (bdsm -> BDSM, roleplay -> Roleplay)
+                    let displayTag = tag.charAt(0).toUpperCase() + tag.slice(1);
+                    if (tag === 'bdsm' || tag === 'pov' || tag === 'joi' || tag === 'bbw') displayTag = tag.toUpperCase();
+                    
+                    // Обрезка, если слишком длинный
+                    if(displayTag.length > 9) displayTag = displayTag.substring(0, 7) + '..';
 
                     html += `
                         <div class="chart-bar-group">
                             <div class="chart-value-y">${score}</div>
                             <div class="chart-bar" style="height:${height}%; width:18px;"></div>
-                            <div class="chart-label-x" style="width:140%; left:-20%;">${tagName}</div>
+                            <div class="chart-label-x" style="width:140%; left:-20%;">${displayTag}</div>
                         </div>
                     `;
                 });
@@ -13398,15 +13727,15 @@
             html += `</div>`; // Закрываем chart-container
             if(xAxisTitle) html += `<div class="axis-label-x-title">${xAxisTitle}</div>`;
             
-            // Легенда для тегов
+            // Легенда
             html += `
                 <div style="margin-top:40px; display:flex; justify-content:center; gap:15px; font-size:11px; color:var(--text-secondary);">
-                    <div>Generate = 1pt</div>
-                    <div>Watch = 3pts</div>
-                    <div>Like = 5pts</div>
+                    <div>Gen = 1</div>
+                    <div>Watch = 3</div>
+                    <div>Like = 5</div>
+                    <div>Ban = -5</div>
                 </div>
             `;
-
         } else {
             // === ГРАФИК АКТИВНОСТИ ===
             filteredLog.forEach(log => {
@@ -13637,9 +13966,12 @@
             onboardingSelectedIds.forEach(id => {
                 if (!favorites.includes(id)) {
                     favorites.push(id);
-                    // Добавляем вес тегам
                     const item = data.find(x => x.id === id);
-                    if (item) adjustTagScores(item, 5);
+                    if (item) {
+                        adjustTagScores(item, 5);
+                        // ДОБАВЛЕНО: Запись в лог для статистики
+                        logActivity('like', item.id, item.tags);
+                    }
                 }
             });
             saveLists();
@@ -13649,11 +13981,47 @@
         localStorage.setItem('xch_onboarding_done', 'true');
         document.getElementById('onboarding-overlay').classList.remove('open');
         
-        // Опционально: сразу сгенерировать что-то похожее на выбор
         if (favorites.length > 0) {
-            // Найти первый из добавленных
             const firstFav = data.find(x => x.id === favorites[0]);
-            if (firstFav) forceShowResult(firstFav, 'similar'); // Показать результат
+            if (firstFav) forceShowResult(firstFav, 'similar');
+        }
+    }
+
+    function resetAppHistory() {
+        const t = langData[currentLang];
+        
+        // Системное подтверждение (надежнее и привычнее для таких действий)
+        if (confirm(t.confirm_reset)) {
+            
+            // 1. Очищаем основные данные
+            localStorage.removeItem(STORAGE.HISTORY);
+            localStorage.removeItem(STORAGE.ACTIVITY_LOG);
+            localStorage.removeItem(STORAGE.TAG_SCORES);
+            
+            // Опционально: Очистить лайки и черный список?
+            // Обычно "Сброс данных" подразумевает и это. Если хотите оставить лайки, закомментируйте 2 строчки ниже.
+            localStorage.removeItem(STORAGE.BLACKLIST);
+            localStorage.removeItem(STORAGE.FAVORITES);
+            
+            // 2. Сбрасываем переменные в памяти
+            historyData = [];
+            activityLog = [];
+            tagScores = {};
+            blacklist = [];
+            favorites = [];
+            
+            // 3. Обновляем интерфейс без перезагрузки страницы
+            updateCounts();
+            updateExploredCount();
+            renderHistory();
+            
+            // Сбрасываем график статистики, если он открыт
+            const modalBody = document.getElementById('modal-stats-body');
+            if (modalBody && document.getElementById('modal-stats-overlay').classList.contains('open')) {
+                renderStatsContent();
+            }
+
+            alert(t.reset_done);
         }
     }
 
