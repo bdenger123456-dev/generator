@@ -9,7 +9,9 @@
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     
     <style>
-        /* === 1. CSS VARIABLES & RESET === */
+        /* =========================================
+        1. VARIABLES & RESET & THEMES
+        ========================================= */
         :root {
             --bg-color: #050505;
             --sidebar-bg: #101010;
@@ -25,7 +27,7 @@
             --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             --modal-bg: rgba(0, 0, 0, 0.9);
             
-            /* iOS Colors Dark */
+            /* iOS Style Colors */
             --ios-bg: #000000;
             --ios-card: #1C1C1E;
             --ios-separator: #38383A;
@@ -60,7 +62,86 @@
         button, select, input { font-family: inherit; outline: none; }
         a { text-decoration: none; color: inherit; }
 
-        /* === 2. LAYOUT & SIDEBAR === */
+        /* === CUSTOMIZATION === */
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 2 колонки */
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .theme-item {
+            background: var(--ios-card);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 12px;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.2s, border-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            overflow: hidden;
+        }
+
+        .theme-item.active {
+            border-color: var(--accent);
+            background: var(--nav-bg);
+        }
+        
+        .theme-item.locked {
+            opacity: 0.6;
+        }
+
+        /* Квадраты предпросмотра */
+        .theme-preview-box {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid rgba(128,128,128,0.2);
+            position: relative;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* Кружок цвета внутри квадрата */
+        .theme-preview-dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .theme-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .theme-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+        
+        .theme-type {
+            font-size: 10px;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        .lock-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+        }
+
+        /* =========================================
+        2. MAIN LAYOUT (Sidebar & Content)
+        ========================================= */
         .app-layout { display: flex; height: 100%; width: 100%; }
 
         .sidebar {
@@ -87,7 +168,7 @@
 
         .tab-content {
             flex: 1;
-            display: none; /* Скрыты по умолчанию */
+            display: none;
             flex-direction: column;
             align-items: center;
             overflow-y: auto;
@@ -95,7 +176,7 @@
             -webkit-overflow-scrolling: touch; 
             padding: 20px 15px;
             padding-bottom: 120px;
-            padding-top: 110px; /* Место под градиент/хедер */
+            padding-top: 110px; /* Место под хедер на мобильных */
             width: 100%;
             box-sizing: border-box;
         }
@@ -111,7 +192,9 @@
             margin: 0 auto;
         }
 
-        /* === 3. LOGO === */
+        /* =========================================
+        3. HEADERS, LOGO & MASKS
+        ========================================= */
         .logo {
             display: flex;
             align-items: center;
@@ -131,6 +214,7 @@
             object-fit: contain;
             transform: translateY(-8px);
         }
+        
         .subtitle {
             font-size: 11px; 
             color: var(--text-secondary); 
@@ -146,174 +230,99 @@
             line-height: 1.4;
         }
 
-        /* === 4. GRADIENTS & MASKS === */
+        /* Градиентные маски для скролла */
         .top-gradient-mask {
-            display: none; /* Показываем только на мобильных */
-            position: fixed;
-            top: -50px; /* Перекрываем safe-area */
-            left: 0; width: 100%; height: 160px;
+            display: none;
+            position: fixed; top: -50px; left: 0; width: 100%; height: 160px;
             z-index: 9000; pointer-events: none;
             background: linear-gradient(to bottom, var(--bg-color) 40%, transparent 100%);
         }
         .bottom-gradient-mask {
             display: none; 
-            position: fixed; 
-            bottom: -50px; 
-            left: 0; width: 100%; height: 160px;
+            position: fixed; bottom: -50px; left: 0; width: 100%; height: 160px;
             z-index: 9000; pointer-events: none;
             background: linear-gradient(to top, var(--bg-color) 40%, transparent 100%);
         }
 
-        /* === 5. CARD & GENERATION === */
+        /* =========================================
+        4. GENERATOR CARD & SLOT MACHINE
+        ========================================= */
         .animation-text-box { text-align: center; min-height: 20px; margin-bottom: 5px; width: 100%; }
-        .animation-text { font-size: 14px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; opacity: 0; transition: opacity 0.2s; }
+        .animation-text { font-size: 14px; font-weight: 700; color: var(--accent); text-transform: uppercase; opacity: 0; transition: opacity 0.2s; }
         .animation-text.visible { opacity: 1; }
 
-        /* Единый статус над карточкой */
         .status-text-combined {
-            text-align: center;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            
-            /* Увеличиваем шрифт */
-            font-size: 18px; 
-            font-weight: 800; 
-            color: var(--text-main); /* Белый цвет для важности */
-            
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 20px; /* Отступ до окна результатов */
-            min-height: 24px;
-            width: 100%;
-            white-space: normal;
-            line-height: 1.3;
-            opacity: 1; /* Полная видимость */
-            padding: 0 10px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5); /* Тень для объема */
+            text-align: center; display: flex; justify-content: center; align-items: center;
+            font-size: 18px; font-weight: 800; color: var(--text-main);
+            text-transform: uppercase; letter-spacing: 1px;
+            margin-bottom: 20px; min-height: 24px; width: 100%;
+            line-height: 1.3; text-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
 
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border);
             padding: 15px 20px 25px 20px; 
-            text-align: center;
-            position: relative;
-            margin-bottom: 20px;
+            position: relative; margin-bottom: 20px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
             border-radius: 22px;
-            min-height: 180px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            min-height: 180px; width: 100%;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
             transition: all 0.3s ease-out;
-            width: 100%;
         }
         .card.has-results { min-height: 0; height: auto; justify-content: flex-start; gap: 15px; padding-bottom: 30px; }
-        .card.flash-active { background-color: #fff !important; border-color: #fff !important; transform: scale(1.02); }
-
-        /* Slot Machine */
+        
+        /* Slot Window */
         .slot-window {
-            height: 140px; /* Фиксированная высота для одного элемента */
+            height: 140px;
             width: 100%;
             overflow: hidden;
             position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            display: flex; justify-content: center; align-items: center;
             flex-shrink: 0;
-            /* Маска, чтобы было видно появление сверху/снизу */
-            mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
+            /* Маска отключена, чтобы не было исчезания */
+            border-top: 1px solid transparent; 
+            border-bottom: 1px solid transparent;
         }
-        .card.has-results .slot-window { height: auto !important; margin-bottom: 5px; mask-image: none; -webkit-mask-image: none; overflow: visible; }
+        .card.has-results .slot-window { height: auto !important; margin-bottom: 5px; overflow: visible; }
+
         .slot-reel {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transform: translateY(0);
-            width: 100%;
+            display: flex; flex-direction: column; align-items: center;
+            transform: translateY(0); width: 100%;
             will-change: transform;
-            filter: blur(0);       
-            opacity: 1;
         }
 
-        /* Элементы слота */
         .slot-item {
-            height: 140px; /* Должно совпадать с окном */
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            line-height: 1.1;
-            padding: 0 5px;
-            /* Шрифт адаптивный, но крупный */
-            font-size: clamp(32px, 6vw, 52px); 
-            font-weight: 800;
-            color: var(--text-main);
-            flex-shrink: 0;
-            box-sizing: border-box;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Пружинистый зум */
+            height: 140px; width: 100%;
+            display: flex; align-items: center; justify-content: center;
+            text-align: center; line-height: 1.1; padding: 0 5px;
+            font-size: clamp(32px, 6vw, 52px); font-weight: 800; color: var(--text-main);
+            flex-shrink: 0; box-sizing: border-box;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .card.has-results .slot-item { height: auto !important; padding: 10px 0; }
-        #result-text { color: var(--accent); }
-
-        /* Состояние "Уменьшен" перед стартом */
-        .slot-item.shrunk {
-            transform: scale(0.8);
-            opacity: 0.7;
+        
+        /* Animations & Effects */
+        .slot-item.shrunk { transform: scale(0.8); opacity: 0.7; }
+        .slot-item.zoomed { transform: scale(1.2); color: var(--accent); text-shadow: 0 0 20px rgba(255, 153, 0, 0.4); }
+        
+        .card.flash-active { background-color: #fff !important; border-color: #fff !important; transform: scale(1.02); }
+        
+        .result-description { 
+            font-size: 15px; font-weight: 400; color: var(--text-secondary); 
+            line-height: 1.4; max-width: 95%; margin: 0; display: none; text-align: center;
         }
-
-        /* Состояние "Увеличен" (Победитель) */
-        .slot-item.zoomed {
-            transform: scale(1.2);
-            color: var(--accent);
-            text-shadow: 0 0 20px rgba(255, 153, 0, 0.4);
-        }
-
-        /* Вспышка */
-        @keyframes flashEffect {
-            0% { background-color: transparent; }
-            50% { background-color: rgba(255, 255, 255, 0.8); }
-            100% { background-color: transparent; }
-        }
-        .card.flash-active::after {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            z-index: 100;
-            pointer-events: none;
-            animation: flashEffect 0.4s ease-out;
-            border-radius: 22px;
-        }
-
-        .result-description { font-size: 15px; font-weight: 400; color: var(--text-secondary); line-height: 1.4; max-width: 95%; margin: 0; display: none; }
         .result-description.fade-visible:not(:empty) { display: block; }
 
-        /* === SLOT ANIMATIONS === */
+        /* Idle Animation */
+        @keyframes scrollIdle { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
+        .slot-reel.idle { animation: scrollIdle 60s linear infinite; filter: blur(5px); opacity: 0.6; }
+        .slot-reel.spinning { filter: blur(0); opacity: 1; }
 
-        /* Бесконечная прокрутка (режим ожидания) */
-        @keyframes scrollIdle {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-50%); } /* Двигаем на половину, где список повторяется */
-        }
-
-        /* Класс для режима ожидания */
-        .slot-reel.idle {
-            animation: scrollIdle 60s linear infinite; 
-            filter: blur(5px); 
-            opacity: 0.6;      
-        }
-
-        /* Размытие при быстром вращении */
-        .slot-reel.spinning {
-            filter: blur(0);
-            opacity: 1;
-        }
-
-        /* Buttons & Controls */
+        /* =========================================
+        5. BUTTONS & CONTROLS
+        ========================================= */
         .btn-gen, .btn-watch, .related-item-btn, .btn-action { border-radius: 22px; outline: none; border: none; cursor: pointer; }
         
         .gen-controls { display: flex; gap: 10px; width: 100%; margin-bottom: 15px; transition: opacity 0.3s; }
@@ -333,224 +342,149 @@
         .btn-action.ban:hover, .btn-action.ban.active { border-color: var(--highlight-red); background: rgba(231, 76, 60, 0.15); color: var(--highlight-red); transform: scale(1.05); }
         .btn-action.fav:hover, .btn-action.fav.active { border-color: var(--highlight-green); background: rgba(46, 204, 113, 0.15); color: var(--highlight-green); transform: scale(1.05); }
 
-        /* Related */
-        .related-section { width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 10px; margin-bottom: 20px; text-align: center; }
-        .related-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 10px; opacity: 0.8; width: 100%; display: block; }
+        /* Related & Tags */
+        .related-section { width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 10px; margin-bottom: 20px; text-align: center; }
+        .related-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 10px; opacity: 0.8; }
         .related-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; width: 100%; }
-        .related-item-btn { background: var(--card-bg); border: 1px solid var(--border); padding: 8px 14px; border-radius: 12px; font-size: 13px; font-weight: 600; color: var(--text-main); transition: 0.2s; display: inline-block; }
+        .related-item-btn { background: var(--card-bg); border: 1px solid var(--border); padding: 8px 14px; border-radius: 12px; font-size: 13px; font-weight: 600; color: var(--text-main); transition: 0.2s; }
 
-        /* Utility Classes */
+        /* Utility */
         .hidden-initial { display: none !important; }
         .visually-hidden { opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .fade-hidden { opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease; display: none; }
         .fade-visible { opacity: 1; transform: translateY(0); display: flex; }
 
-        /* === 6. IOS SETTINGS & COMPONENTS === */
+        /* =========================================
+        6. IOS SETTINGS & COMPONENTS
+        ========================================= */
         .ios-group {
-            background: var(--ios-card);
-            border-radius: 22px;
-            overflow: hidden;
-            margin-bottom: 20px;
-            width: 100%;
+            background: var(--ios-card); border-radius: 22px; overflow: hidden; margin-bottom: 20px; width: 100%;
             box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
         .ios-header {
-            margin: 25px 0 8px 20px;
-            font-size: 13px;
-            color: var(--ios-header);
-            text-transform: uppercase;
-            display: flex; justify-content: space-between; align-items: center;
+            margin: 25px 0 8px 20px; font-size: 13px; color: var(--ios-header);
+            text-transform: uppercase; display: flex; justify-content: space-between;
         }
         .ios-row {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 12px 16px; background: var(--ios-card);
-            min-height: 48px; position: relative;
-            border: none; border-radius: 0; margin: 0; box-shadow: none;
+            padding: 12px 16px; background: var(--ios-card); min-height: 48px; position: relative;
         }
         .ios-row:not(:last-child)::after {
-            content: ""; position: absolute; bottom: 0;
-            left: 16px; right: 0; height: 1px;
+            content: ""; position: absolute; bottom: 0; left: 16px; right: 0; height: 1px;
             background-color: var(--ios-separator); transform: scaleY(0.5);
         }
         .ios-row.clickable { cursor: pointer; transition: background 0.2s; }
         .ios-row.clickable:active { background: var(--nav-bg); }
+        
+        .capsule-btn {
+            background: var(--ios-card); border-radius: 22px; padding: 5px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            width: 100%; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            min-height: 55px; cursor: pointer; transition: transform 0.2s, background 0.2s; border: none;
+        }
+        .capsule-btn:active { transform: scale(0.98); background: var(--nav-bg); }
+        .capsule-btn span { font-weight: 600; font-size: 16px; color: var(--text-main); }
+        .capsule-btn select { font-weight: 700; color: var(--accent) !important; font-size: 17px; background: transparent; border: none; text-align: right; appearance: none; -webkit-appearance: none; }
 
-        /* Селекты внутри обычных строк (Язык) */
-        .ios-row select {
+        .platform-select, .ios-row select {
             appearance: none;
             -webkit-appearance: none;
             background: transparent;
             border: none;
             font-size: 16px;
-            color: var(--text-secondary); /* Серый цвет, как в iOS */
+            color: var(--text-secondary);
             text-align: right;
             direction: rtl;
             padding-right: 0;
             font-weight: 400;
             cursor: pointer;
+            font-family: inherit;
         }
+
+        /* Account Elements */
+        .sync-date { font-size: 11px; color: var(--text-secondary); text-align: center; margin-top: 10px; margin-bottom: 20px; opacity: 0.6; }
         
-        .capsule-btn {
-            background: var(--ios-card);
-            border-radius: 22px;
-            padding: 5px 20px;
-            display: flex; justify-content: space-between; align-items: center;
-            width: 100%;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            min-height: 55px;
-            cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
-            border: none;
-        }
-        .capsule-btn:active { transform: scale(0.98); background: var(--nav-bg); }
-        .capsule-btn span { font-weight: 600; font-size: 16px; color: var(--text-main); }
-        .capsule-btn select {
-            font-weight: 700; color: var(--accent) !important; font-size: 17px;
-            background: transparent; border: none; text-align: right;
-            appearance: none; -webkit-appearance: none; cursor: pointer;
-        }
-
-        /* Дата синхронизации */
-        .sync-date {
-            font-size: 11px;
-            color: var(--text-secondary);
-            text-align: center;
-            margin-top: 10px;    /* Отступ от кнопки входа */
-            margin-bottom: 20px; /* Отступ до списка */
-            opacity: 0.6;
-        }
-        /* Капсула входа внутри блока не должна иметь большой отступ */
-        #block-account #login-capsule { margin-bottom: 0; }
-
-        /* Support Banner */
-        .support-banner {
-            background: linear-gradient(135deg, var(--accent-light), var(--accent));
-            border-radius: 22px; padding: 15px 20px;
-            display: flex; justify-content: center; align-items: center;
-            width: 100%; margin-bottom: 20px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-            cursor: pointer; transition: transform 0.2s; text-align: center;
-        }
-        .support-banner span { color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.3); font-weight: 700; }
-
-        /* Switch & Sliders */
+        /* Switches & Sliders */
         .switch { position: relative; display: inline-block; width: 44px; height: 24px; margin: 0 5px; flex-shrink: 0; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: var(--border); transition: .3s; border-radius: 34px;
-        }
-        .slider:before {
-            position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
-            background-color: white; transition: .3s; border-radius: 50%;
-        }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border); transition: .3s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--accent); }
         input:checked + .slider:before { transform: translateX(20px); }
-
+        
         .range-slider { width: 100%; cursor: pointer; }
         .intensity-labels { display: flex; justify-content: space-between; margin-top: 10px; padding: 0 5px; }
         .intensity-label { font-size: 12px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; }
-        .intensity-label.active[data-val="1"] { color: var(--highlight-green); font-weight: 700; }
-        .intensity-label.active[data-val="2"] { color: #ff9900; font-weight: 700; }
-        .intensity-label.active[data-val="3"] { color: var(--highlight-red); font-weight: 700; }
+        .intensity-label.active { color: var(--accent); font-weight: 700; }
 
         /* Accordion */
-        .accordion { background: transparent !important; border: none !important; margin: 0 !important; position: relative; }
-        .accordion-head { padding: 16px !important; font-size: 17px !important; color: var(--text-main) !important; display: flex; justify-content: space-between; align-items: center; }
+        .accordion { background: transparent !important; }
+        .accordion-head { padding: 16px !important; font-size: 17px !important; color: var(--text-main) !important; display: flex; justify-content: space-between; }
         .accordion-body { display: none; padding: 0 16px 16px; flex-wrap: wrap; gap: 8px; }
         .accordion-body.open { display: flex; }
-        .ios-group .accordion:not(:last-child)::after {
-            content: ""; position: absolute; bottom: 0; left: 16px; right: 0; height: 1px;
-            background-color: var(--ios-separator); transform: scaleY(0.5); z-index: 1;
-        }
-
-        /* Tags */
-        .tag {
-            padding: 6px 12px; background: var(--bg-color); border: 1px solid var(--border);
-            border-radius: 8px; font-size: 12px; color: var(--text-secondary); cursor: pointer;
-            font-weight: 600; opacity: 0.7; flex-grow: 1; text-align: center;
-        }
-        .tag.selected { background: var(--accent); color: #000; border-color: var(--accent); opacity: 1; }
         
-        .capsule-accordion-head {
-            background: var(--card-bg); border: 1px solid var(--border);
-            border-radius: 50px; padding: 10px 20px;
-            display: flex; justify-content: space-between; align-items: center;
-            width: auto; max-width: 200px; margin: 0 auto 15px auto;
-            cursor: pointer; font-size: 13px; font-weight: 700; color: var(--text-secondary);
-            text-transform: uppercase; transition: border 0.2s;
-        }
-        .capsule-accordion-head:hover { border-color: var(--accent); color: var(--accent); }
+        /* Tags */
+        .tag { padding: 6px 12px; background: var(--bg-color); border: 1px solid var(--border); border-radius: 8px; font-size: 12px; color: var(--text-secondary); cursor: pointer; font-weight: 600; opacity: 0.7; flex-grow: 1; text-align: center; }
+        .tag.selected { background: var(--accent); color: #000; border-color: var(--accent); opacity: 1; }
+        .capsule-accordion-head { background: var(--card-bg); border: 1px solid var(--border); border-radius: 50px; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; width: auto; max-width: 200px; margin: 0 auto 15px auto; cursor: pointer; font-size: 13px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; }
 
-        /* === 7. BOTTOM NAV (Mobile) === */
+        /* =========================================
+        7. MOBILE BOTTOM NAV
+        ========================================= */
         .bottom-nav {
-            display: none; position: fixed;
-            bottom: 20px; /* Отступ снизу */
-            left: 50%; transform: translateX(-50%);
+            display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             width: 85%; max-width: 350px; height: 65px;
-            background: rgba(20, 20, 20, 0.95); 
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-radius: 50px; /* Капсула */
-            z-index: 9999;
-            padding: 0 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 50px;
+            z-index: 9999; padding: 0 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.6);
             justify-content: space-between;
         }
-        body.light-theme .bottom-nav {
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-        }
-        .nav-item {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            font-size: 10px; font-weight: 600; color: var(--text-secondary);
-            flex: 1; height: 100%; cursor: pointer; transition: all 0.2s ease;
-        }
+        body.light-theme .bottom-nav { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(0, 0, 0, 0.1); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: var(--text-secondary); flex: 1; cursor: pointer; transition: all 0.2s; }
         .nav-item.active { color: var(--text-main); }
         .nav-item.active .nav-icon { transform: translateY(-2px); color: var(--accent); }
         .nav-icon { font-size: 22px; margin-bottom: 2px; transition: transform 0.2s; }
 
-        /* === 8. MODALS === */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-bg); z-index: 1000; display: none; justify-content: center; align-items: center; }
+        /* =========================================
+        8. MODALS (GENERAL)
+        ========================================= */
+        .modal-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: var(--modal-bg); z-index: 20000 !important; /* Above everything */
+            display: none; justify-content: center; align-items: center; 
+        }
         .modal-overlay.open { display: flex; }
-        .modal { background: var(--sidebar-bg); width: 90%; max-width: 500px; max-height: 80%; border-radius: 20px; border: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
-        .modal-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; font-weight: 800; font-size: 18px; }
-        .modal-body { padding: 10px; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start; }
-        
-        /* Catalog & Search */
+        .modal { 
+            background: var(--sidebar-bg); width: 90%; max-width: 500px; max-height: 80%; 
+            border-radius: 20px; border: 1px solid var(--border); 
+            display: flex; flex-direction: column; overflow: hidden; 
+        }
+        .modal-header { 
+            padding: 20px; border-bottom: 1px solid var(--border); 
+            display: flex; justify-content: space-between; font-weight: 800; font-size: 18px; 
+        }
+        .modal-body { 
+            padding: 10px; overflow-y: auto; 
+        }
+
+        /* Catalog Search */
         .modal-search-box { width: 100%; margin-bottom: 15px; position: relative; }
-        .modal-search-input {
-            width: 100%; background: var(--ios-card); border: 1px solid var(--border);
-            border-radius: 12px; padding: 12px; font-size: 16px; color: var(--text-main);
-        }
-        .modal-suggestions {
-            display: none; flex-direction: column; background: var(--card-bg);
-            border: 1px solid var(--border); border-radius: 12px; margin-top: 5px;
-            max-height: 200px; overflow-y: auto; position: absolute; width: 100%; z-index: 100;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-        .suggestion-row { padding: 10px 15px; border-bottom: 1px solid var(--border); font-size: 14px; color: var(--text-main); cursor: pointer; display: flex; justify-content: space-between; }
-        .suggestion-row:active { background: var(--nav-bg); }
-        .suggestion-row span { color: var(--accent); font-weight: 700; }
+        .modal-search-input { width: 100%; background: var(--ios-card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; font-size: 16px; color: var(--text-main); }
+        .modal-suggestions { display: none; flex-direction: column; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; margin-top: 5px; max-height: 200px; overflow-y: auto; position: absolute; width: 100%; z-index: 100; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .suggestion-row { padding: 10px 15px; border-bottom: 1px solid var(--border); font-size: 14px; cursor: pointer; display: flex; justify-content: space-between; }
         
-        .catalog-item {
-            padding: 8px 12px; border-radius: 20px; font-size: 13px; font-weight: 600;
-            cursor: default; display: flex; align-items: center; gap: 8px; transition: all 0.2s;
-            border: none; flex-grow: 0; width: auto;
-        }
+        .catalog-item { padding: 8px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: default; display: inline-flex; align-items: center; gap: 8px; margin: 3px; }
         .catalog-item.active { background: rgba(46, 204, 113, 0.2); color: #2ecc71; border: 1px solid #2ecc71; }
         .catalog-item.ban-active { background: rgba(231, 76, 60, 0.2); color: #e74c3c; border: 1px solid #e74c3c; }
-        .catalog-remove-btn { cursor: pointer; font-size: 16px; line-height: 1; opacity: 0.6; padding: 0 4px; }
-        .catalog-remove-btn:hover { opacity: 1; transform: scale(1.2); }
+        .catalog-remove-btn { cursor: pointer; opacity: 0.6; padding: 0 4px; }
 
-        /* Stats Chart & Badges */
+        /* =========================================
+        9. STATS & CHARTS
+        ========================================= */
         .chart-wrapper { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding-left: 20px; padding-bottom: 20px; }
-        .axis-label-y { position: absolute; left: -15px; top: 50%; transform: translateY(-50%) rotate(-90deg); font-size: 10px; color: var(--text-secondary); font-weight: 700; }
-        .axis-label-x-title { position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); font-size: 10px; color: var(--text-secondary); font-weight: 700; }
+        .axis-label-y { position: absolute; left: -15px; top: 50%; transform: translateY(-50%) rotate(-90deg); font-size: 10px; color: var(--text-secondary); }
+        .axis-label-x-title { position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); font-size: 10px; color: var(--text-secondary); }
         .chart-container { display: flex; align-items: flex-end; justify-content: space-between; height: 250px; width: 100%; border-bottom: 1px solid var(--border); border-left: 1px solid var(--border); position: relative; }
-        .bar-value-top { position: absolute; top: -18px; font-size: 9px; font-weight: 700; color: var(--text-main); width: 100%; text-align: center; }
         .chart-bar-group { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; flex: 1; height: 100%; position: relative; }
         .chart-bar { width: 12px; background: var(--accent); border-radius: 4px 4px 0 0; transition: height 0.5s ease; min-height: 4px; position: relative; }
         .chart-bar.secondary { background: var(--text-secondary); margin-right: 2px; }
@@ -558,134 +492,136 @@
         .chart-label-x { position: absolute; bottom: -25px; font-size: 10px; color: var(--text-secondary); text-align: center; width: 140%; left: -20%; white-space: nowrap; }
         .chart-value-y { position: absolute; top: -20px; font-size: 10px; font-weight: 700; color: var(--text-main); }
 
-        .stats-tf-capsule {
-            background: var(--ios-card); border: 1px solid var(--border); border-radius: 50px;
-            height: 36px; display: flex; padding: 3px; margin-bottom: 8px; width: 100%;
-        }
-        .stats-tf-item { flex: 1; display: flex; align-items: center; justify-content: center; border-radius: 40px; font-size: 11px; font-weight: 700; color: var(--text-secondary); cursor: pointer; text-transform: uppercase; }
-        .stats-tf-item.active { background: var(--nav-bg); color: var(--text-main); }
-        .stats-nav-capsule { background: var(--ios-card); border: 1px solid var(--border); border-radius: 50px; height: 50px; display: flex; padding: 4px; margin: 0; width: 100%; flex-shrink: 0; }
-        .stats-nav-item { flex: 1; display: flex; align-items: center; justify-content: center; border-radius: 40px; font-size: 13px; font-weight: 600; color: var(--text-secondary); cursor: pointer; }
-        .stats-nav-item.active { background: var(--nav-bg); color: var(--text-main); }
+        .stats-tf-capsule, .stats-nav-capsule { background: var(--ios-card); border: 1px solid var(--border); border-radius: 50px; display: flex; padding: 3px; width: 100%; }
+        .stats-tf-capsule { height: 36px; margin-bottom: 8px; }
+        .stats-nav-capsule { height: 50px; }
+        .stats-tf-item, .stats-nav-item { flex: 1; display: flex; align-items: center; justify-content: center; border-radius: 40px; font-size: 11px; font-weight: 700; color: var(--text-secondary); cursor: pointer; text-transform: uppercase; }
+        .stats-tf-item.active, .stats-nav-item.active { background: var(--nav-bg); color: var(--text-main); }
 
-        /* Badges */
-        .warning-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; color: #fff; cursor: default; }
+        /* =========================================
+        10. SUBSCRIPTION MODAL (RESPONSIVE)
+        ========================================= */
+        .plan-card {
+            background: var(--ios-card); border: 1px solid var(--border); border-radius: 20px;
+            padding: 20px; margin-bottom: 15px; position: relative; overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+        .plan-card.pro { border-color: #ff9900; box-shadow: 0 0 20px rgba(255, 153, 0, 0.1); }
+        .plan-card.beast { border-color: #9b59b6; background: linear-gradient(135deg, rgba(155, 89, 182, 0.1), transparent); box-shadow: 0 0 20px rgba(155, 89, 182, 0.15); }
+        
+        .plan-title { font-size: 22px; font-weight: 900; text-transform: uppercase; margin-bottom: 5px; }
+        .plan-card.pro .plan-title { color: #ff9900; }
+        .plan-card.beast .plan-title { color: #9b59b6; }
+        .plan-price { font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 15px; }
+        
+        .plan-features { list-style: none; padding: 0; margin: 0 0 20px 0; }
+        .plan-features li { font-size: 14px; color: var(--text-secondary); margin-bottom: 8px; padding-left: 20px; position: relative; }
+        .plan-features li::before { content: "•"; position: absolute; left: 0; color: var(--text-main); }
+        
+        .plan-btn { width: 100%; padding: 12px; border-radius: 12px; font-weight: 800; border: none; cursor: pointer; text-transform: uppercase; font-size: 14px; margin-top: auto; }
+        .plan-btn.current { background: var(--nav-bg); color: var(--text-secondary); opacity: 0.7; }
+        .plan-btn.pro-btn { background: #ff9900; color: #000; box-shadow: 0 4px 15px rgba(255, 153, 0, 0.3); }
+        .plan-btn.beast-btn { background: #9b59b6; color: #fff; box-shadow: 0 4px 15px rgba(155, 89, 182, 0.3); }
+
+        /* Mobile Default Layout for Plans */
+        .plans-container { display: flex; flex-direction: column; gap: 15px; }
+        #modal-sub-overlay .modal { width: 90%; max-width: 400px; max-height: 90vh; }
+
+        /* =========================================
+        11. OTHER COMPONENTS (Badges, History)
+        ========================================= */
+        .warning-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; color: #fff; cursor: help; }
         .badge-extreme { background: var(--highlight-red); }
         .badge-lgbt { background: #9b59b6; }
         .badge-niche { background: #34495e; }
-        .badge-wrapper { display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 2px; margin-top: 5px; width: 100%; position: relative; z-index: 5; min-height: 0; }
+        .badge-wrapper { display: flex; justify-content: center; gap: 6px; margin-bottom: 2px; margin-top: 5px; width: 100%; position: relative; z-index: 5; }
         
         .badge-tooltip {
             position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
             background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
             color: #fff; padding: 12px; border-radius: 14px; font-size: 13px; line-height: 1.4;
             width: 220px; text-align: left; pointer-events: none; opacity: 0; transition: opacity 0.2s;
-            margin-bottom: 10px; border: 1px solid var(--border); z-index: 100; font-weight: 400;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-bottom: 10px; border: 1px solid var(--border); z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        .warning-badge:hover .badge-tooltip, .warning-badge:active .badge-tooltip { opacity: 1; pointer-events: auto; }
+        .warning-badge:hover .badge-tooltip { opacity: 1; pointer-events: auto; }
 
-        /* Mobile Header */
-        .mobile-header {
-            display: none;
-            position: fixed;
-            top: calc(10px + env(safe-area-inset-top)); 
-            left: 50%; transform: translateX(-50%);
-            width: auto; min-width: 260px; max-width: 90%;
-            background: rgba(20, 20, 20, 0.9);
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 35px; z-index: 9999;
-            padding: 12px 20px; /* Больше отступа сверху */
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            flex-direction: column; align-items: center; justify-content: center;
+        .history-item-ios {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px; background: var(--ios-card); font-size: 16px; color: var(--text-main);
+            position: relative; cursor: pointer; transition: background 0.2s;
         }
-        body.light-theme .mobile-header { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(0, 0, 0, 0.1); }
-        .mobile-header .logo { margin-bottom: 0; display: flex; align-items: center; height: 100%; font-size: 20px; }
-        .mobile-header .logo-img { height: 34px; margin-right: 5px; }
-        .mobile-header .subtitle { display: none !important; }
+        .history-item-ios:active { background: var(--nav-bg); }
+        .history-item-ios:not(:last-child)::after {
+            content: ""; position: absolute; bottom: 0; left: 16px; right: 0; height: 1px;
+            background-color: var(--ios-separator); transform: scaleY(0.5);
+        }
 
-        /* Onboarding & Age Gate (Modals) */
+        /* Onboarding & Age Gate */
         .onb-tag { background: var(--accent); color: #000; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 8px; animation: popIn 0.3s ease; }
-        .onb-tag-remove { cursor: pointer; font-size: 16px; line-height: 1; opacity: 0.6; }
         @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         
         #age-gate .logo { font-size: 40px; margin-bottom: 20px; }
         #age-gate .logo-img { height: 70px; margin-right: 10px; }
 
-        /* Стили элементов истории */
-        .history-item-ios {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px; /* Большие отступы для пальца */
-            background: var(--ios-card);
-            font-size: 16px;
-            color: var(--text-main);
-            position: relative;
-            cursor: pointer;
-            transition: background 0.2s;
+        .mobile-header {
+            display: none; position: fixed; top: calc(10px + env(safe-area-inset-top)); 
+            left: 50%; transform: translateX(-50%); width: auto; min-width: 260px; max-width: 90%;
+            background: rgba(20, 20, 20, 0.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 35px; z-index: 9999;
+            padding: 12px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            flex-direction: column; align-items: center; justify-content: center;
         }
+        body.light-theme .mobile-header { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(0, 0, 0, 0.1); }
+        .mobile-header .logo { font-size: 20px; margin-bottom: 0; }
+        .mobile-header .logo-img { height: 34px; margin-right: 5px; }
 
-        .history-item-ios:active {
-            background: var(--nav-bg);
-        }
-
-        /* Разделительная линия */
-        .history-item-ios:not(:last-child)::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 16px;
-            right: 0;
-            height: 1px;
-            background-color: var(--ios-separator);
-            transform: scaleY(0.5);
-        }
-
-        /* Кнопка повтора в истории */
-        .history-item-ios span:last-child {
-            font-size: 18px;
-            color: var(--accent);
-            font-weight: 700;
-        }
-
-        /* === 9. MEDIA QUERIES (MOBILE) === */
+        /* =========================================
+        12. MEDIA QUERIES (ADAPTATION)
+        ========================================= */
+        
+        /* MOBILE DEVICES (< 768px) */
         @media (max-width: 768px) {
             .sidebar { display: none; }
             .mobile-header { display: flex; }
             .bottom-nav { display: flex; }
-            .top-gradient-mask { display: block; }
-            .bottom-gradient-mask { display: block; }
-            
+            .top-gradient-mask, .bottom-gradient-mask { display: block; }
             .main-content { padding: 0; }
             
-            /* Боковые отступы */
             .center-wrapper { padding-left: 10px; padding-right: 10px; width: 100%; }
-            
-            /* Убираем отступы контейнера для настроек/аккаунта, но добавляем внутрь */
             #tab-settings .center-wrapper, #tab-account .center-wrapper { padding: 0 !important; padding-top: 40px !important; }
             #mount-prefs, #mount-filters, #mount-account, #mount-extras { padding: 0 15px; width: 100%; }
 
-            /* Compact Card */
-            .card { padding: 10px 10px 15px 10px; min-height: 140px; }
+            /* Compact elements */
+            .card { padding: 10px; min-height: 140px; }
             .slot-item { font-size: clamp(28px, 8vw, 42px); }
-            .result-description { font-size: 13px; line-height: 1.3; }
-            
-            /* Buttons */
             .card-actions { margin-top: 10px; gap: 10px; }
             .btn-action { padding: 8px; height: 45px; font-size: 20px; }
             .btn-watch { padding: 12px; font-size: 14px; }
             .btn-gen { padding: 16px; font-size: 16px; }
             
-            /* Horizontal Scroll for Related */
-            .related-tags { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; padding-bottom: 10px; padding-left: 5px; padding-right: 5px; -webkit-overflow-scrolling: touch; mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%); -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%); }
+            .related-tags { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; padding-bottom: 10px; padding-left: 5px; padding-right: 5px; mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%); -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%); }
             .related-item-btn { flex-shrink: 0; white-space: nowrap; }
 
-            /* Floating Generate Button (Initial State) */
+            /* Floating Button Logic */
             #tab-home:not(.generated) { justify-content: center; height: 100vh; padding-bottom: 100px; }
             #tab-home:not(.generated) .gen-controls { position: fixed; bottom: 95px; left: 0; width: 100%; padding: 0 20px; z-index: 100; margin-bottom: 0; }
-            #tab-home:not(.generated) .btn-gen { box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid var(--accent); }
+        }
+
+        /* DESKTOP / TABLET (> 768px) */
+        @media (min-width: 769px) {
+            /* Wide Subscription Modal */
+            #modal-sub-overlay .modal {
+                max-width: 900px !important; 
+                width: 95%;
+            }
+            .plans-container {
+                flex-direction: row; 
+                align-items: stretch;
+                justify-content: center;
+            }
+            .plan-card {
+                flex: 1;
+            }
         }
     </style>
 </head>
@@ -873,24 +809,6 @@
     </div>
 </div>
 
-<!-- Modal Support -->
-<div class="modal-overlay" id="modal-support-overlay" onclick="closeSupport(event)">
-    <div class="modal" style="height: auto; max-height: 90%;">
-        <div class="modal-header">
-            <span data-key="support_banner">Support</span>
-            <span style="cursor:pointer" onclick="closeSupport(null, true)">✕</span>
-        </div>
-        <div class="modal-body" style="padding:20px; font-size:15px; line-height:1.5; color:var(--text-secondary); display:flex; flex-direction:column; height:100%;">
-            <!-- Контент теперь генерируется JS для локализации -->
-            <div id="support-content"></div>
-            
-            <button class="boosty-btn" onclick="window.open('https://boosty.to/xfetishhub', '_blank')">
-                Boosty
-            </button>
-        </div>
-    </div>
-</div>
-
 <!-- AGE GATE OVERLAY -->
 <div id="age-gate" class="modal-overlay" style="z-index: 20000; background: var(--bg-color);">
     <div class="center-wrapper" style="text-align:center; padding:20px;">
@@ -998,12 +916,12 @@
                     <span class="slider"></span>
                 </label>
             </div>
-            <div class="ios-row">
-                <span class="toggle-text" data-key="dark_mode">Dark Mode</span>
-                <label class="switch">
-                    <input type="checkbox" id="theme-toggle" onchange="toggleTheme()">
-                    <span class="slider"></span>
-                </label>
+            <div class="ios-row clickable" onclick="openThemeModal()">
+                <span class="toggle-text" data-key="theme_label">Appearance</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span id="current-theme-name" style="color:var(--text-secondary); font-size:15px;">Dark</span>
+                    <span style="color:var(--text-secondary)">›</span>
+                </div>
             </div>
         </div>
     </div>
@@ -1029,7 +947,7 @@
 
     <!-- BLOCK: ACCOUNT-->
     <div id="block-account">
-        <div class="ios-header">Account</div> <!-- Локализуем -->
+        <div class="ios-header" data-key="nav_account">Account</div>
         
         <!-- Кнопка входа теперь внутри группы -->
         <div class="capsule-btn" id="login-capsule" onclick="window.handleLoginClick()" style="margin-bottom:5px;">
@@ -1039,6 +957,16 @@
         
         <!-- Дата последней синхронизации -->
         <div class="sync-date" id="last-sync-date">Not synced yet</div>
+
+        <!-- Кнопка статуса подписки -->
+        <div class="capsule-btn" id="sub-status-btn" onclick="openSubModal()" style="background: linear-gradient(135deg, #1f1f1f, #141414); border: 1px solid var(--border); margin-bottom: 25px;">
+            <div style="display:flex; flex-direction:column; justify-content:center;">
+                <span style="font-size:11px; color:var(--text-secondary); line-height:1; margin-bottom:2px;">Current Plan</span>
+                <span id="current-plan-name" style="color:var(--text-main); font-weight:800; font-size:17px; letter-spacing:0.5px;">FREE</span>
+            </div>
+
+            <span id="upgrade-badge" style="color:var(--accent); font-weight:700; font-size:13px; text-transform:uppercase; background:rgba(255,153,0,0.1); padding:5px 10px; border-radius:10px;">Upgrade ⇧</span>
+        </div>
 
         <div class="ios-group">
             <div class="ios-row">
@@ -1057,14 +985,6 @@
                 <span data-key="btn_stats">Statistics</span>
                 <span style="color:var(--text-secondary)">›</span>
             </div>
-            <div class="ios-row clickable" onclick="exportData()">
-                <span data-key="btn_export">Export</span>
-                <span style="color:var(--text-secondary)">↓</span>
-            </div>
-            <div class="ios-row clickable" onclick="importData()">
-                <span data-key="btn_import">Import</span>
-                <span style="color:var(--text-secondary)">↑</span>
-            </div>
             <div class="ios-row clickable" onclick="resetAppHistory()" style="color: var(--highlight-red);">
                 <span data-key="btn_reset">Reset Data</span>
                 <span>✕</span>
@@ -1074,11 +994,6 @@
 
     <!-- BLOCK: EXTRAS & HISTORY -->
     <div id="block-extras">
-        <!-- Support Banner -->
-        <div class="support-banner" onclick="openSupportModal()">
-            <span data-key="support_banner">✨ Support the Project</span>
-        </div>
-
         <div class="ios-header" data-key="header_extras">Extras</div>
         <div class="ios-group">
             <div class="ios-row clickable" onclick="window.open('https://reddit.com/r/xfetishhub', '_blank')">
@@ -1099,11 +1014,93 @@
 
 </div>
 
+<!-- SUBSCRIPTION MODAL -->
+<div class="modal-overlay" id="modal-sub-overlay" onclick="closeSubModal(event)">
+    <div class="modal" style="background:var(--bg-color); max-height:95vh;">
+        <div class="modal-header" style="border:none; padding-bottom:0;">
+            <span data-key="sub_title">Premium Access</span>
+            <span style="cursor:pointer" onclick="closeSubModal(null, true)">✕</span>
+        </div>
+        
+        <div class="modal-body" style="padding:0 20px 30px 20px; display:block; overflow-y:auto;">
+            
+            <!-- Intro Text -->
+            <div style="text-align:center; margin-bottom:25px; margin-top:10px;">
+                <p style="font-size:14px; color:var(--text-secondary); line-height:1.5;" data-key="sub_intro">
+                    xFetishHub is an ad-free project developed by one enthusiast. It gives a unique experience for free, but your support helps it grow.
+                </p>
+            </div>
+
+            <!-- PLANS CONTAINER (Flex on PC) -->
+            <div class="plans-container">
+                
+                <!-- FREE CARD -->
+                <div class="plan-card">
+                    <div class="plan-title">Free</div>
+                    <div class="plan-price">$0</div>
+                    <ul class="plan-features">
+                        <li data-key="feat_limit">🎲 10 Generations / day</li>
+                        <li data-key="feat_stats_basic">📊 Basic Statistics</li>
+                        <li data-key="feat_filters">✔️ Standard Filters</li>
+                    </ul>
+                    <button class="plan-btn current" disabled data-key="btn_current">Current Plan</button>
+                </div>
+
+                <!-- PRO CARD -->
+                <div class="plan-card pro">
+                    <div class="plan-title">Pro <span style="font-size:12px; opacity:0.7">Fan</span></div>
+                    <div class="plan-price">$1.99 <span style="font-size:12px">/ mo</span></div>
+                    <ul class="plan-features">
+                        <li style="color:var(--text-main)" data-key="feat_unlim">🔥 <b>Unlimited</b> Generations</li>
+                        <li data-key="feat_stats_adv">📈 Advanced Stats & History</li>
+                        <li data-key="feat_custom">🎨 Deep Customization</li>
+                        <li data-key="feat_early">🚀 Early Access</li>
+                    </ul>
+                    <button class="plan-btn pro-btn" onclick="openBoosty('https://boosty.to/xfetishhub')" data-key="btn_get_pro">Get Pro</button>
+                </div>
+
+                <!-- BEAST CARD -->
+                <div class="plan-card beast">
+                    <div class="plan-title">Beast <span style="font-size:12px; opacity:0.7">Sponsor</span></div>
+                    <div class="plan-price">$4.99 <span style="font-size:12px">/ mo</span></div>
+                    <ul class="plan-features">
+                        <li style="color:var(--text-main)" data-key="feat_all_pro">👑 <b>All Pro Features</b></li>
+                        <li data-key="feat_sponsors">💎 Listed in "Sponsors"</li>
+                        <li data-key="feat_discord">💬 <b>Discord</b> (Dev Chat)</li>
+                        <li data-key="feat_vote">🗳️ Vote on Roadmap</li>
+                    </ul>
+                    <button class="plan-btn beast-btn" onclick="openBoosty('https://boosty.to/xfetishhub')" data-key="btn_get_beast">Unleash Beast</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- THEME MODAL -->
+<div class="modal-overlay" id="modal-theme-overlay" onclick="closeThemeModal(event)">
+    <div class="modal">
+        <div class="modal-header">
+            <span data-key="theme_title">Choose Theme</span>
+            <span style="cursor:pointer" onclick="closeThemeModal(null, true)">✕</span>
+        </div>
+        <div class="modal-body" style="padding: 20px;">
+            
+            <div class="ios-header" style="margin-left:0; margin-top:0;" data-key="theme_basic">Basic</div>
+            <div class="theme-grid" id="theme-list-basic"></div>
+
+            <div class="ios-header" style="margin-left:0;" data-key="theme_premium">Premium (Pro)</div>
+            <div class="theme-grid" id="theme-list-premium"></div>
+
+        </div>
+    </div>
+</div>
+
 <!-- FIREBASE INTEGRATION -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
 
     const firebaseConfig = {
         apiKey: "AIzaSyC94QWRaFu0o60kDSU8Uz0VJAcXwaDWjlI",
@@ -1140,6 +1137,54 @@
             location.reload(); // Перезагружаем для чистого старта
         } catch (error) {
             console.error("Logout failed:", error);
+        }
+    };
+
+    // === АКТИВАЦИЯ ПРОМОКОДА ===
+    window.activatePromoCode = async function(code) {
+        const user = auth.currentUser;
+        if (!user) {
+            alert("Please login (Sync Data) first to activate code!");
+            return;
+        }
+
+        const codeRef = doc(db, "promocodes", code);
+        const userRef = doc(db, "users", user.uid);
+
+        try {
+            const codeSnap = await getDoc(codeRef);
+
+            if (codeSnap.exists() && codeSnap.data().active === true) {
+                const promoData = codeSnap.data();
+                
+                // 1. Вычисляем дату истечения
+                const days = promoData.days || 30;
+                const expiresAt = new Date();
+                expiresAt.setDate(expiresAt.getDate() + days); // Текущая дата + дни
+
+                // 2. Обновляем пользователя
+                await setDoc(userRef, {
+                    subscription: promoData.type,
+                    expiresAt: expiresAt // Firebase сам превратит это в Timestamp
+                }, { merge: true });
+
+                // 3. "Сжигаем" код (делаем неактивным)
+                await updateDoc(codeRef, {
+                    active: false,
+                    usedBy: user.uid,
+                    usedAt: serverTimestamp()
+                });
+
+                alert(`Success! ${promoData.type.toUpperCase()} subscription activated for ${days} days.`);
+                
+                // Перезагружаем данные пользователя чтобы обновить интерфейс
+                window.location.href = window.location.pathname; // Очищаем URL от кода
+            } else {
+                alert("This code is invalid or already used.");
+            }
+        } catch (error) {
+            console.error("Promo error:", error);
+            alert("Error activating code.");
         }
     };
 
@@ -1203,6 +1248,14 @@
             // 2. Показываем статус и грузим данные
             window.updateLastSyncUI();
             await loadUserData(user); 
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            
+            if (code) {
+                // Если в ссылке есть ?code=..., пробуем его активировать
+                await window.activatePromoCode(code);
+            }
         } else {
             // ПОЛЬЗОВАТЕЛЬ ВЫШЕЛ
             window.isUserLoggedIn = false;
@@ -1272,6 +1325,14 @@
                 // Приоритет локальной настройке, если она менялась недавно, но тут берем облако если есть
                 let mergedPlatform = localStorage.getItem('xch_platform') || 'ph';
                 if (cloudData.platform) mergedPlatform = cloudData.platform;
+
+                // Проверяем подписку из облака
+                if (cloudData.subscription) {
+                    // Сохраняем в браузер
+                    localStorage.setItem('xch_sub_level', cloudData.subscription);
+                    // Обновляем глобальную переменную (через window, т.к. мы в модуле)
+                    if (window.updateSubscriptionUI) window.updateSubscriptionUI();
+                }
 
                 // === ПРИМЕНЕНИЕ ДАННЫХ ===
                 
@@ -1350,6 +1411,7 @@
             history: JSON.parse(localStorage.getItem('xch_history')) || [],
             activityLog: JSON.parse(localStorage.getItem('xch_activity_log')) || [],
             platform: currentPlatform,
+            subscription: localStorage.getItem('xch_sub_level') || 'free',
             lastUpdated: serverTimestamp()
         };
 
@@ -1371,6 +1433,18 @@
 <script>
     // === STATE ===
     let currentLang = 'en';
+    let subscriptionLevel = localStorage.getItem('xch_sub_level') || 'free'; // 'free', 'pro', 'beast'
+
+    /* ===========================================================
+       🛠 DEBUG MODE
+       =========================================================== */
+    
+    subscriptionLevel = 'pro'; 
+    // subscriptionLevel = 'beast';
+
+    /* =========================================================== */
+
+    const DAILY_LIMIT = 10;
     let currentItem = null;
     let lastGeneratedItem = null; 
     let hasInteractedWithCurrent = false;
@@ -1397,6 +1471,60 @@
         HISTORY: 'xch_history',
         ACTIVITY_LOG: 'xch_activity_log'
     };
+
+    // Конфигурация тем
+    // bg: цвет фона превью, accent: цвет кружочка
+    const APP_THEMES = [
+        // === FREE (Дефолтные из CSS) ===
+        { id: 'dark', name: 'Dark', type: 'free', isLight: false, preview: '#141414' },
+        { id: 'light', name: 'Light', type: 'free', isLight: true, preview: '#ffffff' },
+        
+        // === PRO DARK (Темный фон, чуть светлее блоки) ===
+        { 
+            id: 'blue-dark', name: 'Midnight', type: 'pro', isLight: false, preview: '#0a192f',
+            colors: { bg: '#020c1b', sidebar: '#0a192f', card: '#112240', nav: '#112240', border: '#233554' }
+        },
+        { 
+            id: 'green-dark', name: 'Forest', type: 'pro', isLight: false, preview: '#051405',
+            colors: { bg: '#020a02', sidebar: '#051405', card: '#0f290f', nav: '#0f290f', border: '#1a401a' }
+        },
+        { 
+            id: 'red-dark', name: 'Vampire', type: 'pro', isLight: false, preview: '#1a0000',
+            colors: { bg: '#0d0000', sidebar: '#1a0000', card: '#330000', nav: '#330000', border: '#4d0000' }
+        },
+        { 
+            id: 'gold-dark', name: 'Luxury', type: 'pro', isLight: false, preview: '#141100',
+            colors: { bg: '#0a0900', sidebar: '#141100', card: '#292200', nav: '#292200', border: '#4d4000' }
+        },
+        { 
+            id: 'noir', name: 'Noir', type: 'pro', isLight: false, preview: '#000000',
+            colors: { bg: '#000000', sidebar: '#0a0a0a', card: '#141414', nav: '#141414', border: '#333333' }
+        },
+
+        // === PRO LIGHT (Тонированный фон, БЕЛЫЕ блоки для контраста) ===
+        { 
+            id: 'blue-light', name: 'Sky', type: 'pro', isLight: true, preview: '#e6f2ff',
+            colors: { bg: '#e6f2ff', sidebar: '#ffffff', card: '#ffffff', nav: '#ffffff', border: '#cce4ff' }
+        },
+        { 
+            id: 'green-light', name: 'Mint', type: 'pro', isLight: true, preview: '#e6ffea',
+            colors: { bg: '#d9fce0', sidebar: '#ffffff', card: '#ffffff', nav: '#ffffff', border: '#b3fcc2' }
+        },
+        { 
+            id: 'red-light', name: 'Rose', type: 'pro', isLight: true, preview: '#ffe6e6',
+            colors: { bg: '#ffe6e6', sidebar: '#ffffff', card: '#ffffff', nav: '#ffffff', border: '#ffcccc' }
+        },
+        { 
+            id: 'gold-light', name: 'Sand', type: 'pro', isLight: true, preview: '#fff8e1',
+            colors: { bg: '#fff8e1', sidebar: '#ffffff', card: '#ffffff', nav: '#ffffff', border: '#ffe082' }
+        },
+        
+        // === SPECIAL ===
+        { 
+            id: 'rainbow', name: 'Rainbow', type: 'pro', isLight: false, preview: 'linear-gradient(45deg, red, orange, yellow, green, blue)',
+            isRainbow: true 
+        }
+    ];
 
     let blacklist = JSON.parse(localStorage.getItem(STORAGE.BLACKLIST)) || [];
     let favorites = JSON.parse(localStorage.getItem(STORAGE.FAVORITES)) || [];
@@ -12199,48 +12327,114 @@
 
     const langData = {
         en: {
+            // --- 1. General & Navigation ---
             subtitle: "Your home for adult preferences",
             lang_label: "Language",
-            header_prefs: "Preferences",
+            nav_home: "Home",
+            nav_settings: "Settings",
             nav_account: "Account",
-            header_data: "Data",
+            header_prefs: "Preferences",
             header_filters: "Filters",
             header_extras: "Extras",
+            theme_label: "Appearance",
+            theme_title: "Choose Theme",
+            theme_basic: "Basic",
+            theme_premium: "Premium Colors",
+            
+            // --- 2. Generator (Main Tab) ---
             generate: "Random Genre",
             generate_again: "Different Genre",
             btn_similar: "Similar",
-            related_header: "You may also like:",
             watch: "Watch",
-            search: "Search",
+            search: "Search", // For Google mode
+            related_header: "You may also like:",
             add_genre: "Add to genre:",
-            empty: "List is empty (Check filters)!",
             search_en_label: "Search EN",
             site_label: "Site",
+            exploration_mode: "Safety Level",
+            
+            // --- 3. Subscription (Premium) ---
+            sub_title: "Premium Access",
+            sub_intro: "xFetishHub is a one-of-a-kind project that helps you discover and analyze your adult preferences in one cozy, ad-free place. By subscribing, you ensure the project's survival, and in return, I'll give you significantly more features:",
+            
+            // Plans Features
+            feat_limit: "🎲 10 Generations / day",
+            feat_stats_basic: "📊 Basic Statistics",
+            feat_filters: "✔️ Standard Filters",
+            btn_current: "Current Plan",
+
+            feat_unlim: "🔥 Unlimited Generations",
+            feat_stats_adv: "📈 Advanced Stats & History",
+            feat_custom: "🎨 Deep Customization",
+            feat_early: "🚀 Early Access features",
+            btn_get_pro: "Get Pro",
+
+            feat_all_pro: "👑 All Pro Features",
+            feat_sponsors: "💎 Listed in Sponsors",
+            feat_discord: "💬 Discord (Dev Chat)",
+            feat_vote: "🗳️ Vote on Roadmap",
+            btn_get_beast: "Unleash Beast",
+
+            btn_lower_tier: "You deserve better",
+
+            // --- 4. Account & Data ---
+            login_text: "Log in", // Changed from "Sync Data"
+            logout_text: "Logout",
+            login_required: "Please log in (Sync Data) first so we can identify you!",
+            sync_success: "Data synced successfully!",
+            
+            btn_reset: "Reset Data",
+            confirm_reset: "Are you sure? This will delete your history, statistics, and preferences learning. This cannot be undone.",
+            reset_done: "Data has been reset.",
+            
+            explored_label: "Explored",
+            explored_txt: "{n} / {t} categories",
+            report_issue: "Report Issue",
+            
+            // --- 5. Lists (Favorites/Blacklist) ---
             favorites_catalog: "Liked",
             blacklist_catalog: "Disliked",
+            btn_fav_add: "Favorite",
+            btn_fav_remove: "In Favorites",
+            btn_ban_add: "Block",
+            btn_ban_remove: "Unblock",
+            empty: "List is empty (Check filters)!",
+            
+            // --- 6. Filters ---
             filter_include: "Include",
             filter_exclude: "Exclude",
             tag_fav: "Favorites",
-            nav_home: "Home",
-            nav_settings: "Settings",
-            btn_ban_add: "Block",
-            btn_ban_remove: "Unblock",
-            btn_fav_add: "Favorite",
-            btn_fav_remove: "In Favorites",
-            exploration_mode: "Safety Level",
-            btn_export: "Export",
-            btn_import: "Import",
+            tag_straight: "Straight", 
+            tag_gay: "Gay", 
+            tag_lesbian: "Lesbian", 
+            tag_trans: "Trans",
+
+            // --- 7. Statistics ---
+            btn_stats: "Statistics",
+            stats_header: "Your Favorite Categories",
+            stats_prefs: "Preferences",
+            stats_activity: "Activity",
+            
+            tf_week: "Week", 
+            tf_month: "Month", 
+            tf_year: "Year", 
+            tf_all: "All",
+            
+            act_gen: "Generations", 
+            act_watch: "Watched",
+            chart_prefs_x: "Preferences",
+            chart_points_y: "Points",
+            chart_count_y: "Count",
+            share_btn: "Share",
+
+            // --- 8. Explanations (Why did I get this?) ---
             expl_fav: "Because you like ",
             expl_sim: "Related to previous",
             expl_rand: "Fate",
-            history_title: "History",
-            btn_stats: "Statistics",
-            stats_header: "Your Favorite Categories",
             expl_score: "Because you liked ",
             expl_tag_click: "You chose tag: ",
-            tag_straight: "Straight", tag_gay: "Gay", tag_lesbian: "Lesbian", tag_trans: "Trans",
-            dark_mode: "Dark Mode",
-            share_btn: "Share",
+
+            // --- 9. Badges & Tooltips ---
             badge_extreme: "Extreme",
             badge_desc_extreme: "⚠️ <b>High Intensity</b><br>This category contains rough, intense, or hardcore elements. Not suitable for vanilla preferences.",
             
@@ -12252,91 +12446,131 @@
             
             badge_bdsm: "BDSM",
             badge_desc_bdsm: "⛓️ <b>BDSM & Kink</b><br>Involves bondage, dominance, submission, or sensation play.",
-            
-            explored_label: "Explored",
-            explored_txt: "{n} / {t} categories",
-            support_banner: "✨ Support Project",
-            sponsors: "Sponsors",
-            report_issue: "Report Issue",
-            
-            stats_prefs: "Preferences",
-            stats_activity: "Activity",
-            tf_week: "Week", tf_month: "Month", tf_year: "Year", tf_all: "All",
-            act_gen: "Generations", act_watch: "Watched",
 
-            chart_prefs_x: "Preferences",
-            chart_points_y: "Points",
-            chart_count_y: "Count",
-
+            // --- 10. Modals (Age Gate, Onboarding) ---
             age_title: "Age Verification",
             age_desc: "This website contains age-restricted materials. Are you 18 years or older?",
             age_yes: "Yes, I am 18+",
             age_no: "No, Exit",
             age_block_msg: "This website is only for users over 18 years of age.",
-            
+
             onb_title: "Quick Setup",
             onb_desc: "Describe your tastes in one sentence (e.g. 'I love milf, anal and stockings'). We will auto-detect categories.",
             onb_btn_check: "Find Categories",
             onb_found: "We found:",
             onb_btn_confirm: "Add to Favorites",
-            onb_skip: "Skip setup",
-
-            btn_reset: "Reset Data",
-            confirm_reset: "Are you sure? This will delete your history, statistics, and preferences learning. This cannot be undone.",
-            reset_done: "Data has been reset.",
-
-            login_text: "Sync Data (Login)",
-            logout_text: "Logout",
-            sync_success: "Data synced successfully!",
-
-            support_intro: "👋 <b>Hi there!</b><br><br>This project is completely <b>free</b>, ad-free, and I develop it in my spare time out of pure enthusiasm.",
-            support_why: "💡 <b>Why support?</b><br>Your support helps keep the motivation high to add cool new features and keep the app updated.",
-            support_roadmap_title: "🚀 <b>Roadmap:</b>",
-            support_roadmap_list: "<li>☁️ Cloud Sync & Backup</li><li>📊 Global Statistics</li><li>🎨 Deep Customization</li><li>📱 PWA Improvements</li>"
+            onb_skip: "Skip setup"
         },
+
         ru: {
+            // --- 1. Общее и Навигация ---
             subtitle: "Твой дом для взрослых предпочтений",
             lang_label: "Язык",
+            nav_home: "Главная",
+            nav_settings: "Настройки",
+            nav_account: "Аккаунт", // Исправлено (было Account на ПК)
             header_prefs: "Настройки",
-            nav_account: "Аккаунт",
-            header_data: "Данные",
             header_filters: "Фильтры",
             header_extras: "Дополнительно",
+            theme_label: "Оформление",
+            theme_title: "Выбор темы",
+            theme_basic: "Базовые",
+            theme_premium: "Премиум цвета",
+
+            // --- 2. Генератор ---
             generate: "Случайный жанр",
             generate_again: "Другой жанр",
             btn_similar: "Похожий",
-            related_header: "Вам также может понравиться:",
             watch: "Смотреть",
             search: "Найти",
+            related_header: "Вам также может понравиться:",
             add_genre: "Добавить к жанру:",
-            empty: "Пусто (Проверь фильтры)!",
             search_en_label: "Искать на EN",
             site_label: "Сайт",
+            exploration_mode: "Откровенность",
+
+            // --- 3. Подписка (Premium) ---
+            sub_title: "Премиум доступ",
+            sub_intro: "xFetishHub — это единственный в своём роде проект, который помогает тебе узнать и проанализировать твои взрослые предпочтения в одном уютном месте без рекламы. Если оплатишь подписку, то проект и дальше сможет существовать, а взамен я тебе дам ощутимо больше возможностей:",
+            
+            // Планы
+            feat_limit: "🎲 10 Генераций / день",
+            feat_stats_basic: "📊 Базовая статистика",
+            feat_filters: "✔️ Стандартные фильтры",
+            btn_current: "Текущий план",
+
+            feat_unlim: "🔥 Безлимитные генерации",
+            feat_stats_adv: "📈 Расширенные сводки",
+            feat_custom: "🎨 Кастомизация",
+            feat_early: "🚀 Ранний доступ к функциям",
+            btn_get_pro: "Купить Pro",
+
+            feat_all_pro: "👑 Всё, что есть в Pro",
+            feat_sponsors: "💎 Имя во вкладке Спонсоры",
+            feat_discord: "💬 Доступ в Discord чат",
+            feat_vote: "🗳️ Влияние на развитие",
+            btn_get_beast: "Стать Зверем",
+
+            btn_lower_tier: "Ты достоен большего",
+
+            // --- 4. Аккаунт и Данные ---
+            login_text: "Войти",
+            logout_text: "Выйти",
+            login_required: "Пожалуйста, войдите в аккаунт, чтобы мы могли активировать подписку!",
+            sync_success: "Данные синхронизированы!",
+
+            btn_reset: "Сброс данных",
+            confirm_reset: "Вы уверены? Это удалит историю, статистику и обучение алгоритма. Это действие нельзя отменить.",
+            reset_done: "Данные сброшены.",
+
+            explored_label: "Открыто",
+            explored_txt: "{n} из {t} категорий",
+            report_issue: "Сообщить о проблеме",
+
+            // --- 5. Списки ---
             favorites_catalog: "Понравившиеся",
             blacklist_catalog: "Не понравившиеся",
+            btn_fav_add: "В Избранное",
+            btn_fav_remove: "В Избранном",
+            btn_ban_add: "В ЧС",
+            btn_ban_remove: "Убрать из ЧС",
+            empty: "Пусто (Проверь фильтры)!",
+
+            // --- 6. Фильтры ---
             filter_include: "Включить",
             filter_exclude: "Исключить",
             tag_fav: "Избранное",
-            nav_home: "Главная",
-            nav_settings: "Настройки",
-            btn_ban_add: "В ЧС",
-            btn_ban_remove: "Убрать из ЧС",
-            btn_fav_add: "В Избранное",
-            btn_fav_remove: "В Избранном",
-            exploration_mode: "Откровенность",
-            btn_export: "Экспорт",
-            btn_import: "Импорт",
+            tag_straight: "Гетеро", 
+            tag_gay: "Гей", 
+            tag_lesbian: "Лесби", 
+            tag_trans: "Транс",
+
+            // --- 7. Статистика ---
+            btn_stats: "Статистика",
+            stats_header: "Ваши любимые категории",
+            stats_prefs: "Предпочтения",
+            stats_activity: "Активность",
+            
+            tf_week: "Неделя", 
+            tf_month: "Месяц", 
+            tf_year: "Год", 
+            tf_all: "Всё",
+            
+            act_gen: "Генераций", 
+            act_watch: "Просмотров",
+            chart_prefs_x: "Предпочтения",
+            chart_points_y: "Очки",
+            chart_count_y: "Кол-во",
+            share_btn: "Поделиться",
+
+            // --- 8. Объяснения ---
             expl_fav: "Потому что ты любишь: ",
             expl_sim: "Похоже на прошлое",
             expl_rand: "Судьба",
-            history_title: "История",
-            btn_stats: "Статистика",
-            stats_header: "Ваши любимые категории",
             expl_score: "Потому что тебе зашло: ",
             expl_tag_click: "Выбрана категория: ",
-            tag_straight: "Гетеро", tag_gay: "Гей", tag_lesbian: "Лесби", tag_trans: "Транс",
-            dark_mode: "Темная тема",
-            share_btn: "Поделиться",
+
+            // --- 9. Бейджи ---
             badge_extreme: "Экстрим",
             badge_desc_extreme: "⚠️ <b>Высокая интенсивность</b><br>Категория содержит жесткие или специфические практики. Не для любителей 'ванильного' контента.",
             
@@ -12348,91 +12582,121 @@
             
             badge_bdsm: "БДСМ",
             badge_desc_bdsm: "⛓️ <b>БДСМ и Кинк</b><br>Связывание, доминирование, подчинение и игры с ощущениями.",
-            
-            explored_label: "Открыто",
-            explored_txt: "{n} из {t} категорий",
-            support_banner: "✨ Поддержи проект",
-            sponsors: "Спонсоры",
-            report_issue: "Сообщить о проблеме",
 
-            stats_prefs: "Предпочтения",
-            stats_activity: "Активность",
-            tf_week: "Неделя", tf_month: "Месяц", tf_year: "Год", tf_all: "Всё",
-            act_gen: "Генераций", act_watch: "Просмотров",
-
-            chart_prefs_x: "Предпочтения",
-            chart_points_y: "Очки",
-            chart_count_y: "Кол-во",
-
+            // --- 10. Модальные окна ---
             age_title: "Проверка возраста",
             age_desc: "Этот сайт содержит материалы для взрослых. Вам уже исполнилось 18 лет?",
             age_yes: "Да, мне 18+",
             age_no: "Нет, выйти",
             age_block_msg: "Этот сайт предназначен только для пользователей старше 18 лет.",
-            
+
             onb_title: "Быстрая настройка",
             onb_desc: "Опишите свои вкусы одним предложением (напр. 'Люблю милф, анал и чулки'). Мы автоматически подберем категории.",
             onb_btn_check: "Найти категории",
             onb_found: "Мы нашли:",
             onb_btn_confirm: "Добавить в избранное",
-            onb_skip: "Пропустить", 
-
-            btn_reset: "Сброс данных",
-            confirm_reset: "Вы уверены? Это удалит историю, статистику и обучение алгоритма. Это действие нельзя отменить.",
-            reset_done: "Данные сброшены.",
-
-            login_text: "Синхронизация (Вход)",
-            logout_text: "Выйти",
-            sync_success: "Данные синхронизированы!",
-
-            support_intro: "👋 <b>Привет!</b><br><br>Этот проект полностью <b>бесплатный</b>, без рекламы, и я разрабатываю его в свободное время на чистом энтузиазме.",
-            support_why: "💡 <b>Зачем поддерживать?</b><br>Твоя поддержка мотивирует меня пилить новые фичи и не забрасывать проект.",
-            support_roadmap_title: "🚀 <b>Планы:</b>",
-            support_roadmap_list: "<li>☁️ Облачная синхронизация</li><li>📊 Глобальная статистика</li><li>🎨 Глубокая кастомизация</li><li>📱 Улучшение PWA</li>"
+            onb_skip: "Пропустить"
         },
+
         es: {
+            // --- General ---
             subtitle: "Tu hogar para preferencias adultas",
             lang_label: "Idioma",
-            header_prefs: "Preferencias",
+            nav_home: "Inicio",
+            nav_settings: "Ajustes",
             nav_account: "Cuenta",
-            header_data: "Datos",
+            header_prefs: "Preferencias",
             header_filters: "Filtros",
             header_extras: "Extras",
+            theme_label: "Apariencia",
+            theme_title: "Elegir Tema",
+            theme_basic: "Básico",
+            theme_premium: "Colores Premium",
+
+            // --- Generator ---
             generate: "Género Aleatorio",
             generate_again: "Otro Género",
             btn_similar: "Similar",
-            related_header: "También te puede interesar:",
             watch: "Ver",
             search: "Buscar",
+            related_header: "También te puede interesar:",
             add_genre: "Añadir al género:",
-            empty: "¡Lista vacía (Filtros)!",
             search_en_label: "Buscar en EN",
             site_label: "Sitio",
+            exploration_mode: "Intensidad",
+
+            // --- Subscription ---
+            sub_title: "Acceso Premium",
+            sub_intro: "xFetishHub es un proyecto único en su tipo que te ayuda a descubrir y analizar tus preferencias adultas en un lugar acogedor y sin publicidad. Al suscribirte aseguras la supervivencia del proyecto, y a cambio te daré muchas más funciones:",
+            
+            feat_limit: "🎲 10 Generaciones / día",
+            feat_stats_basic: "📊 Estadísticas Básicas",
+            feat_filters: "✔️ Filtros Estándar",
+            btn_current: "Plan Actual",
+
+            feat_unlim: "🔥 Generaciones Ilimitadas",
+            feat_stats_adv: "📈 Estadísticas Avanzadas",
+            feat_custom: "🎨 Personalización",
+            feat_early: "🚀 Acceso Anticipado",
+            btn_get_pro: "Obtener Pro",
+
+            feat_all_pro: "👑 Todo lo de Pro",
+            feat_sponsors: "💎 En Patrocinadores",
+            feat_discord: "💬 Acceso a Discord",
+            feat_vote: "🗳️ Votar Futuro",
+            btn_get_beast: "Modo Bestia",
+
+            btn_lower_tier: "Mereces algo mejor",
+
+            // --- Account ---
+            login_text: "Iniciar sesión",
+            logout_text: "Cerrar sesión",
+            login_required: "¡Por favor inicia sesión para activar tu suscripción!",
+            sync_success: "¡Datos sincronizados!",
+            
+            btn_reset: "Restablecer datos",
+            confirm_reset: "¿Estás seguro? Esto borrará tu historial y estadísticas. No se puede deshacer.",
+            reset_done: "Datos restablecidos.",
+            
+            explored_label: "Explorado",
+            explored_txt: "{n} / {t} categorías",
+            report_issue: "Reportar Problema",
+
+            // --- Lists ---
             favorites_catalog: "Me Gusta",
             blacklist_catalog: "No Me Gusta",
+            btn_fav_add: "A Favoritos",
+            btn_fav_remove: "En Favoritos",
+            btn_ban_add: "Bloquear",
+            btn_ban_remove: "Desbloquear",
+            empty: "¡Lista vacía (Filtros)!",
+
+            // --- Filters ---
             filter_include: "Incluir",
             filter_exclude: "Excluir",
             tag_fav: "Favoritos",
-            nav_home: "Inicio",
-            nav_settings: "Ajustes",
-            btn_ban_add: "Bloquear",
-            btn_ban_remove: "Desbloquear",
-            btn_fav_add: "A Favoritos",
-            btn_fav_remove: "En Favoritos",
-            exploration_mode: "Intensidad",
-            btn_export: "Exportar",
-            btn_import: "Importar",
+            tag_straight: "Hetero", tag_gay: "Gay", tag_lesbian: "Lesbiana", tag_trans: "Trans",
+
+            // --- Stats ---
+            btn_stats: "Estadísticas",
+            stats_header: "Tus Categorías",
+            stats_prefs: "Preferencias",
+            stats_activity: "Actividad",
+            tf_week: "Semana", tf_month: "Mes", tf_year: "Año", tf_all: "Todo",
+            act_gen: "Generaciones", act_watch: "Vistas",
+            chart_prefs_x: "Preferencias",
+            chart_points_y: "Puntos",
+            chart_count_y: "Cantidad",
+            share_btn: "Compartir",
+
+            // --- Explain ---
             expl_fav: "Porque te gusta ",
             expl_sim: "Relacionado",
             expl_rand: "Destino",
-            history_title: "Historial",
-            btn_stats: "Estadísticas",
-            stats_header: "Tus Categorías",
             expl_score: "Porque te gustó ",
             expl_tag_click: "Elegiste etiqueta: ",
-            tag_straight: "Hetero", tag_gay: "Gay", tag_lesbian: "Lesbiana", tag_trans: "Trans",
-            dark_mode: "Modo Oscuro",
-            share_btn: "Compartir",
+
+            // --- Badges ---
             badge_extreme: "Extremo",
             badge_desc_extreme: "⚠️ <b>Alta Intensidad</b><br>Contenido rudo o intenso.",
             badge_lgbt: "LGBT",
@@ -12441,92 +12705,121 @@
             badge_desc_niche: "🔍 <b>Fetiche Específico</b><br>Interés particular no convencional.",
             badge_bdsm: "BDSM",
             badge_desc_bdsm: "⛓️ <b>BDSM</b><br>Bondage, dominación y sumisión.",
-            
-            explored_label: "Explorado",
-            explored_txt: "{n} / {t} categorías",
-            support_banner: "✨ Apoyar Proyecto",
-            sponsors: "Patrocinadores",
-            report_issue: "Reportar Problema",
 
-            stats_prefs: "Preferencias",
-            stats_activity: "Actividad",
-            tf_week: "Semana", tf_month: "Mes", tf_year: "Año", tf_all: "Todo",
-            act_gen: "Generaciones", act_watch: "Vistas",
-
-            chart_prefs_x: "Preferencias",
-            chart_points_y: "Puntos",
-            chart_count_y: "Cantidad",
-
+            // --- Modals ---
             age_title: "Verificación de edad",
             age_desc: "Este sitio web contiene material para adultos. ¿Tienes 18 años o más?",
             age_yes: "Sí, tengo 18+",
             age_no: "No, Salir",
             age_block_msg: "Este sitio web es solo para usuarios mayores de 18 años.",
-            
-            // Onboarding
+
             onb_title: "Configuración rápida",
-            onb_desc: "Describe tus gustos en una frase (ej. 'Me gusta milf, anal y medias'). Detectaremos las categorías automáticamente.",
+            onb_desc: "Describe tus gustos en una frase. Detectaremos las categorías automáticamente.",
             onb_btn_check: "Buscar Categorías",
             onb_found: "Encontramos:",
             onb_btn_confirm: "Añadir a Favoritos",
-            onb_skip: "Saltar configuración",
-
-            btn_reset: "Restablecer datos",
-            confirm_reset: "¿Estás seguro? Esto borrará tu historial y estadísticas. No se puede deshacer.",
-            reset_done: "Datos restablecidos.",
-
-            login_text: "Sincronizar (Entrar)",
-            logout_text: "Salir",
-            sync_success: "¡Datos sincronizados!",
-
-            support_intro: "👋 <b>¡Hola!</b><br><br>Este proyecto es completamente <b>gratuito</b>, sin anuncios, y lo desarrollo en mi tiempo libre por puro entusiasmo.",
-            support_why: "💡 <b>¿Por qué apoyar?</b><br>Tu apoyo mantiene alta la motivación para añadir nuevas funciones y mantener la app actualizada.",
-            support_roadmap_title: "🚀 <b>Hoja de ruta:</b>",
-            support_roadmap_list: "<li>☁️ Sincronización en la nube</li><li>📊 Estadísticas globales</li><li>🎨 Personalización profunda</li><li>📱 Mejoras PWA</li>"
+            onb_skip: "Saltar configuración"
         },
+
         de: {
+            // --- General ---
             subtitle: "Dein Zuhause für Erwachsenen-Vorlieben",
             lang_label: "Sprache",
-            header_prefs: "Einstellungen",
+            nav_home: "Start",
+            nav_settings: "Einstell.",
             nav_account: "Konto",
-            header_data: "Daten",
+            header_prefs: "Einstellungen",
             header_filters: "Filter",
             header_extras: "Extras",
+            theme_label: "Aussehen",
+            theme_title: "Thema wählen",
+            theme_basic: "Basis",
+            theme_premium: "Premium Farben",
+
+            // --- Generator ---
             generate: "Zufallsgenre",
             generate_again: "Anderes Genre",
             btn_similar: "Ähnlich",
-            related_header: "Das könnte Ihnen auch gefallen:",
             watch: "Ansehen",
             search: "Suchen",
+            related_header: "Das könnte Ihnen auch gefallen:",
             add_genre: "Zum Genre:",
-            empty: "Liste leer (Filter)!",
             search_en_label: "Suche auf EN",
             site_label: "Webseite",
+            exploration_mode: "Intensität",
+
+            // --- Subscription ---
+            sub_title: "Premium Zugang",
+            sub_intro: "xFetishHub ist ein einzigartiges Projekt, das dir hilft, deine Vorlieben an einem gemütlichen, werbefreien Ort zu entdecken und zu analysieren. Mit einem Abo sicherst du den Fortbestand des Projekts, und im Gegenzug biete ich dir deutlich mehr Funktionen:",
+            
+            feat_limit: "🎲 10 Generationen / Tag",
+            feat_stats_basic: "📊 Basis-Statistik",
+            feat_filters: "✔️ Standardfilter",
+            btn_current: "Aktueller Plan",
+
+            feat_unlim: "🔥 Unbegrenzte Generationen",
+            feat_stats_adv: "📈 Erweiterte Statistik",
+            feat_custom: "🎨 Tiefe Anpassung",
+            feat_early: "🚀 Frühzugang",
+            btn_get_pro: "Pro holen",
+
+            feat_all_pro: "👑 Alle Pro-Funktionen",
+            feat_sponsors: "💎 In Sponsorenliste",
+            feat_discord: "💬 Discord Zugang",
+            feat_vote: "🗳️ Abstimmung",
+            btn_get_beast: "Beast werden",
+
+            btn_lower_tier: "Du verdienst Besseres",
+
+            // --- Account ---
+            login_text: "Anmelden",
+            logout_text: "Abmelden",
+            login_required: "Bitte melde dich an, um das Abo zu aktivieren!",
+            sync_success: "Daten synchronisiert!",
+            
+            btn_reset: "Daten zurücksetzen",
+            confirm_reset: "Bist du sicher? Dies löscht Verlauf und Statistiken. Kann nicht rückgängig gemacht werden.",
+            reset_done: "Daten zurückgesetzt.",
+            
+            explored_label: "Erforscht",
+            explored_txt: "{n} / {t} Kategorien",
+            report_issue: "Problem melden",
+
+            // --- Lists ---
             favorites_catalog: "Gefällt mir",
             blacklist_catalog: "Gefällt mir nicht",
+            btn_fav_add: "Favorit",
+            btn_fav_remove: "In Favoriten",
+            btn_ban_add: "Blockieren",
+            btn_ban_remove: "Entblocken",
+            empty: "Liste leer (Filter)!",
+
+            // --- Filters ---
             filter_include: "Einschließen",
             filter_exclude: "Ausschließen",
             tag_fav: "Favoriten",
-            nav_home: "Start",
-            nav_settings: "Einstell.",
-            btn_ban_add: "Blockieren",
-            btn_ban_remove: "Entblocken",
-            btn_fav_add: "Favorit",
-            btn_fav_remove: "In Favoriten",
-            exploration_mode: "Intensität",
-            btn_export: "Exportieren",
-            btn_import: "Importieren",
+            tag_straight: "Hetero", tag_gay: "Schwul", tag_lesbian: "Lesbisch", tag_trans: "Trans",
+
+            // --- Stats ---
+            btn_stats: "Statistik",
+            stats_header: "Deine Favoriten",
+            stats_prefs: "Vorlieben",
+            stats_activity: "Aktivität",
+            tf_week: "Woche", tf_month: "Monat", tf_year: "Jahr", tf_all: "Gesamt",
+            act_gen: "Generationen", act_watch: "Angeschaut",
+            chart_prefs_x: "Vorlieben",
+            chart_points_y: "Punkte",
+            chart_count_y: "Anzahl",
+            share_btn: "Teilen",
+
+            // --- Explain ---
             expl_fav: "Weil du magst: ",
             expl_sim: "Ähnlich wie voriges",
             expl_rand: "Schicksal",
-            history_title: "Verlauf",
-            btn_stats: "Statistik",
-            stats_header: "Deine Favoriten",
             expl_score: "Weil du mochtest: ",
             expl_tag_click: "Tag gewählt: ",
-            tag_straight: "Hetero", tag_gay: "Schwul", tag_lesbian: "Lesbisch", tag_trans: "Trans",
-            dark_mode: "Dunkelmodus",
-            share_btn: "Teilen",
+
+            // --- Badges ---
             badge_extreme: "Extrem",
             badge_desc_extreme: "⚠️ <b>Hohe Intensität</b><br>Raue oder intensive Inhalte.",
             badge_lgbt: "LGBT",
@@ -12535,51 +12828,23 @@
             badge_desc_niche: "🔍 <b>Spezifischer Fetisch</b><br>Besondere Interessen, kein Mainstream.",
             badge_bdsm: "BDSM",
             badge_desc_bdsm: "⛓️ <b>BDSM</b><br>Fesselspiele, Dominanz und Unterwerfung.",
-            
-            explored_label: "Erforscht",
-            explored_txt: "{n} / {t} Kategorien",
-            support_banner: "✨ Unterstützen",
-            sponsors: "Sponsoren",
-            report_issue: "Problem melden",
 
-            stats_prefs: "Vorlieben",
-            stats_activity: "Aktivität",
-            tf_week: "Woche", tf_month: "Monat", tf_year: "Jahr", tf_all: "Gesamt",
-            act_gen: "Generationen", act_watch: "Angeschaut",
-
-            chart_prefs_x: "Vorlieben",
-            chart_points_y: "Punkte",
-            chart_count_y: "Anzahl",
-
+            // --- Modals ---
             age_title: "Altersprüfung",
             age_desc: "Diese Website enthält Material für Erwachsene. Sind Sie 18 Jahre oder älter?",
             age_yes: "Ja, ich bin 18+",
             age_no: "Nein, Verlassen",
             age_block_msg: "Diese Website ist nur für Nutzer über 18 Jahre bestimmt.",
-            
-            // Onboarding
+
             onb_title: "Schnelleinrichtung",
-            onb_desc: "Beschreibe deine Vorlieben in einem Satz (z.B. 'Ich mag Milf, Anal und Strümpfe'). Wir finden die Kategorien automatisch.",
+            onb_desc: "Beschreibe deine Vorlieben in einem Satz. Wir finden die Kategorien automatisch.",
             onb_btn_check: "Kategorien suchen",
             onb_found: "Wir haben gefunden:",
-            onb_btn_confirm: "Zu Favoriten hinzufügen",
-            onb_skip: "Überspringen",
-
-            btn_reset: "Daten zurücksetzen",
-            confirm_reset: "Bist du sicher? Dies löscht Verlauf und Statistiken. Kann nicht rückgängig gemacht werden.",
-            reset_done: "Daten zurückgesetzt.",
-
-            login_text: "Synchronisieren (Login)",
-            logout_text: "Abmelden",
-            sync_success: "Daten synchronisiert!",
-
-            support_intro: "👋 <b>Hallo!</b><br><br>Dieses Projekt ist komplett <b>kostenlos</b>, werbefrei und ich entwickle es in meiner Freizeit aus reinem Enthusiasmus.",
-            support_why: "💡 <b>Warum unterstützen?</b><br>Deine Unterstützung hält die Motivation hoch, coole neue Funktionen hinzuzufügen.",
-            support_roadmap_title: "🚀 <b>Roadmap:</b>",
-            support_roadmap_list: "<li>☁️ Cloud-Synchronisierung</li><li>📊 Globale Statistiken</li><li>🎨 Tiefe Anpassung</li><li>📱 PWA-Verbesserungen</li>"
+            onb_btn_confirm: "Zu Favoriten",
+            onb_skip: "Überspringen"
         }
     };
-    
+
     const EXTREME_TAGS = ['extreme', 'blood', 'scat', 'piss', 'pain', 'torture', 'vomit', 'enema', 'fisting', 'needle-play'];
     const SPICY_TAGS = ['bdsm', 'kinky', 'fetish', 'bondage', 'domination', 'submission', 'spanking'];
     const LGBT_TAGS = ['gay', 'trans', 'shemale', 'lesbian', 'bi', 'crossdresser'];
@@ -12612,6 +12877,8 @@
 
         setWelcomeMessage(); 
         initIdleSlot(); 
+
+        updateSubscriptionUI();
         
         window.addEventListener('resize', checkLayout);
     };
@@ -12687,6 +12954,7 @@
 
     // === GENERATION LOGIC ===
     function startGeneration(mode) {
+        if (!checkGenerationLimit()) return; 
         if (isGenerating) return;
 
         // 1. Очистка интерфейса
@@ -13251,29 +13519,33 @@
     }
 
     function updateLink() {
-        // 1. ЛОГИКА ЦВЕТОВ (Выполняется всегда)
+        // 1. ЛОГИКА ЦВЕТОВ (АКЦЕНТ)
         const platform = document.getElementById('platform').value;
         const root = document.documentElement;
-        
-        // Цвета: Основной / Светлый (для градиента)
+        const currentThemeId = localStorage.getItem('xch_theme_id') || 'dark';
+
+        // Стандартные цвета сайтов
         const colors = {
-            'ph': ['#ff9900', '#ffbd55'], // Pornhub
-            'xv': ['#de2828', '#ff6b6b'], // xVideos
-            'xh': ['#5aaaff', '#8bc1ff'], // xHamster
-            'sb': ['#ffd700', '#ffe666'], // SpankBang
-            'yp': ['#ff3366', '#ff668a'], // YouPorn
-            'rt': ['#ff0000', '#ff4d4d'], // RedTube
-            'google': ['#4285F4', '#7aaafc'] // Google
+            'ph': ['#ff9900', '#ffbd55'],
+            'xv': ['#de2828', '#ff6b6b'],
+            'xh': ['#5aaaff', '#8bc1ff'],
+            'sb': ['#ffd700', '#ffe666'],
+            'yp': ['#ff3366', '#ff668a'],
+            'rt': ['#ff0000', '#ff4d4d'],
+            'google': ['#4285F4', '#7aaafc']
         };
+        const [platMain, platLight] = colors[platform] || colors['ph'];
 
-        const [mainColor, lightColor] = colors[platform] || colors['ph'];
-        
-        root.style.setProperty('--accent', mainColor);
-        root.style.setProperty('--accent-light', lightColor);
+        if (currentThemeId === 'rainbow') {
+            root.style.setProperty('--accent', '#ff00ff'); 
+            root.style.setProperty('--accent-light', '#ffccff');
+        } else {
+            root.style.setProperty('--accent', platMain);
+            root.style.setProperty('--accent-light', platLight);
+        }
 
-        // 2. ЛОГИКА ССЫЛКИ (Только если есть результат)
+        // 2. ЛОГИКА ССЫЛКИ 
         if(!currentItem) return;
-
         const btnWatch = document.getElementById('watch-link');
         const forceEn = document.getElementById('force-en').checked;
         const useRu = (currentLang === 'ru' && !forceEn);
@@ -13362,7 +13634,8 @@
                 lang: currentLang, 
                 theme: localStorage.getItem(STORAGE.THEME), 
                 intensity: currentIntensity,
-                platform: localStorage.getItem('xch_platform') || 'ph'
+                platform: localStorage.getItem('xch_platform') || 'ph',
+            sub: subscriptionLevel
             }
         };
         // Используем clipboard API для удобства, если поддерживается, или prompt
@@ -13397,6 +13670,11 @@
                 if (obj.settings.intensity) currentIntensity = obj.settings.intensity;
                 if (obj.settings.platform) localStorage.setItem('xch_platform', obj.settings.platform);
                 if (obj.settings.lang) localStorage.setItem(STORAGE.LANG, obj.settings.lang);
+            }
+
+            if (obj.settings && obj.settings.sub) {
+                localStorage.setItem('xch_sub_level', obj.settings.sub);
+                subscriptionLevel = obj.settings.sub;
             }
             
             // Сохраняем в память браузера
@@ -13556,21 +13834,10 @@
     }
     
     function initTheme() {
-        const savedTheme = localStorage.getItem(STORAGE.THEME) || 'dark'; 
-        const isDark = savedTheme === 'dark';
-        document.body.classList.toggle('light-theme', !isDark);
-        document.getElementById('theme-toggle').checked = isDark;
-        updateToggleLabels();
+        const savedId = localStorage.getItem('xch_theme_id') || 'dark';
+        applyTheme(savedId);
     }
     
-    function toggleTheme() {
-        const cb = document.getElementById('theme-toggle');
-        const isDark = cb.checked;
-        document.body.classList.toggle('light-theme', !isDark);
-        localStorage.setItem(STORAGE.THEME, isDark ? 'dark' : 'light');
-        updateToggleLabels();
-    }
-
     function initLanguage() {
         const saved = localStorage.getItem(STORAGE.LANG);
         currentLang = saved || 'en';
@@ -14261,6 +14528,251 @@
 
             alert(t.reset_done);
         }
+    }
+
+    function openSubModal() {
+        // Кнопки
+        const btnFree = document.querySelector('.plan-card:nth-child(1) .plan-btn');
+        const btnPro = document.querySelector('.plan-card.pro .plan-btn');
+        const btnBeast = document.querySelector('.plan-card.beast .plan-btn');
+
+        // Тексты
+        const tCurrent = langData[currentLang].btn_current || "Current Plan";
+        const tLower = langData[currentLang].btn_lower_tier || "You deserve better";
+        const tPro = langData[currentLang].btn_get_pro;
+        const tBeast = langData[currentLang].btn_get_beast;
+
+        // Helper: Настройка кнопки
+        // state: 'current' (активная, серая), 'lower' (пасхалка, серая), 'buy' (купить, цветная)
+        const configureBtn = (btn, state, buyText, link) => {
+            btn.onclick = null;
+            btn.classList.remove('current', 'pro-btn', 'beast-btn');
+            
+            if (state === 'current') {
+                btn.disabled = true;
+                btn.classList.add('current');
+                btn.innerText = tCurrent;
+            } 
+            else if (state === 'lower') {
+                btn.disabled = true;
+                btn.classList.add('current'); // Используем тот же серый стиль
+                btn.innerText = tLower;       // Пасхалка!
+            } 
+            else { // 'buy'
+                btn.disabled = false;
+                // Восстанавливаем класс цвета (костыль определения класса по родителю)
+                if (btn.closest('.pro')) btn.classList.add('pro-btn');
+                if (btn.closest('.beast')) btn.classList.add('beast-btn');
+                
+                btn.innerText = buyText;
+                btn.onclick = () => openBoosty(link);
+            }
+        };
+
+        // ЛОГИКА ОТОБРАЖЕНИЯ
+        if (subscriptionLevel === 'beast') {
+            // Если BEAST: Free и Pro — "Достойны большего", Beast — Текущий
+            configureBtn(btnFree, 'lower', null, null);
+            configureBtn(btnPro, 'lower', null, null);
+            configureBtn(btnBeast, 'current', null, null);
+        } 
+        else if (subscriptionLevel === 'pro') {
+            // Если PRO: Free — "Достойны большего", Pro — Текущий, Beast — Купить
+            configureBtn(btnFree, 'lower', null, null);
+            configureBtn(btnPro, 'current', null, null);
+            configureBtn(btnBeast, 'buy', tBeast, 'https://boosty.to/xfetishhub');
+        } 
+        else {
+            // Если FREE: Free — Текущий, остальные — Купить
+            configureBtn(btnFree, 'current', null, null);
+            configureBtn(btnPro, 'buy', tPro, 'https://boosty.to/xfetishhub');
+            configureBtn(btnBeast, 'buy', tBeast, 'https://boosty.to/xfetishhub');
+        }
+
+        document.getElementById('modal-sub-overlay').classList.add('open');
+    }
+
+    function closeSubModal(e, force) {
+        if (force || e.target.id === 'modal-sub-overlay') {
+            document.getElementById('modal-sub-overlay').classList.remove('open');
+        }
+    }
+
+    function checkGenerationLimit() {
+        if (subscriptionLevel !== 'free') return true; // Pro/Beast - безлимит
+
+        const today = new Date().toDateString();
+        const lastDate = localStorage.getItem('xch_limit_date');
+        let count = parseInt(localStorage.getItem('xch_limit_count') || '0');
+
+        // Если новый день - сбрасываем
+        if (lastDate !== today) {
+            count = 0;
+            localStorage.setItem('xch_limit_date', today);
+        }
+
+        if (count >= DAILY_LIMIT) {
+            // Лимит исчерпан
+            openSubModal();
+            alert(`Daily limit reached (${DAILY_LIMIT}). Upgrade to Pro for unlimited access!`);
+            return false;
+        }
+
+        // Увеличиваем счетчик
+        count++;
+        localStorage.setItem('xch_limit_count', count);
+        localStorage.setItem('xch_limit_date', today);
+        return true;
+    }
+
+    function updateSubscriptionUI() {
+        const nameEl = document.getElementById('current-plan-name');
+        const badgeEl = document.getElementById('upgrade-badge'); // Получаем бейдж
+        
+        if (!nameEl) return;
+
+        if (subscriptionLevel === 'pro') {
+            nameEl.innerText = "PRO";
+            nameEl.style.color = "#ff9900";
+            if(badgeEl) badgeEl.style.display = 'none'; // Скрываем
+        } else if (subscriptionLevel === 'beast') {
+            nameEl.innerText = "BEAST";
+            nameEl.style.color = "#9b59b6";
+            if(badgeEl) badgeEl.style.display = 'none'; // Скрываем
+        } else {
+            nameEl.innerText = "FREE";
+            nameEl.style.color = "var(--text-main)";
+            if(badgeEl) badgeEl.style.display = 'inline-block'; // Показываем
+        }
+    }
+
+    function openBoosty(url) {
+        if (!window.isUserLoggedIn) {
+            // Если не залогинен - требуем вход
+            alert(langData[currentLang].login_required || "Please log in (Sync Data) first so we can activate your subscription!");
+            
+            // Скроллим к кнопке входа и подсвечиваем её (опционально)
+            switchTab('account');
+            const loginBtn = document.getElementById('login-capsule');
+            if(loginBtn) {
+                loginBtn.style.border = "1px solid var(--accent)";
+                setTimeout(() => loginBtn.style.border = "none", 1000);
+            }
+            return;
+        }
+        // Если залогинен - открываем
+        window.open(url, '_blank');
+    }
+
+    // === THEME SYSTEM ===
+    
+    function openThemeModal() {
+        renderThemes();
+        document.getElementById('modal-theme-overlay').classList.add('open');
+    }
+
+    function closeThemeModal(e, force) {
+        if (force || e.target.id === 'modal-theme-overlay') {
+            document.getElementById('modal-theme-overlay').classList.remove('open');
+        }
+    }
+
+    function renderThemes() {
+        const basicCont = document.getElementById('theme-list-basic');
+        const premCont = document.getElementById('theme-list-premium');
+        const currentTheme = localStorage.getItem('xch_theme_id') || 'dark';
+        
+        basicCont.innerHTML = '';
+        premCont.innerHTML = '';
+
+        APP_THEMES.forEach(theme => {
+            const isLocked = (theme.type === 'pro' && subscriptionLevel === 'free');
+            const isActive = (currentTheme === theme.id);
+            
+            const div = document.createElement('div');
+            div.className = `theme-item ${isActive ? 'active' : ''} ${isLocked ? 'locked' : ''}`;
+            
+            // Превью теперь показывает ФОН темы
+            div.innerHTML = `
+                <div class="theme-preview-box" style="background: ${theme.preview}; border: 1px solid var(--border);">
+                    <!-- Можно добавить иконку "A" для демонстрации цвета текста, если хотите -->
+                    <span style="font-size:10px; font-weight:700; color:${theme.isLight ? '#000' : '#fff'}">Aa</span>
+                </div>
+                <div class="theme-info">
+                    <span class="theme-name">${theme.name}</span>
+                    <span class="theme-type" style="color: ${theme.type==='pro' ? 'var(--accent)' : 'var(--text-secondary)'}">
+                        ${theme.isLight ? 'Light' : 'Dark'}
+                    </span>
+                </div>
+                ${isLocked ? '<span class="lock-icon">🔒</span>' : ''}
+                ${isActive ? '<span class="lock-icon" style="color:var(--accent)">✓</span>' : ''}
+            `;
+
+            div.onclick = () => selectTheme(theme);
+            
+            if (theme.type === 'free') basicCont.appendChild(div);
+            else premCont.appendChild(div);
+        });
+    }
+
+    function selectTheme(theme) {
+        if (theme.type === 'pro' && subscriptionLevel === 'free') {
+            closeThemeModal(null, true);
+            openSubModal(); // Открываем окно покупки
+            return;
+        }
+        
+        applyTheme(theme.id);
+        renderThemes(); // Обновить галочки
+        
+        // Обновляем текст в меню настроек
+        const label = document.getElementById('current-theme-name');
+        if(label) label.innerText = theme.name;
+    }
+
+    function applyTheme(themeId) {
+        localStorage.setItem('xch_theme_id', themeId);
+        const root = document.documentElement;
+        
+        const theme = APP_THEMES.find(t => t.id === themeId);
+        if (!theme) return;
+
+        // 1. Text color logic
+        document.body.classList.toggle('light-theme', theme.isLight);
+        
+        // 2. Reset styles
+        const props = ['--bg-color', '--sidebar-bg', '--card-bg', '--nav-bg', '--border', '--ios-card', '--ios-bg'];
+        props.forEach(p => root.style.removeProperty(p));
+        
+        // 3. Apply Custom Colors
+        if (theme.colors) {
+            if (theme.colors.bg) {
+                root.style.setProperty('--bg-color', theme.colors.bg);
+                root.style.setProperty('--ios-bg', theme.colors.bg); // iOS фон тоже меняем
+            }
+            if (theme.colors.sidebar) root.style.setProperty('--sidebar-bg', theme.colors.sidebar);
+            
+            // Карточки и блоки
+            if (theme.colors.card) {
+                root.style.setProperty('--card-bg', theme.colors.card);
+                root.style.setProperty('--ios-card', theme.colors.card); // ВАЖНО для списков
+            }
+            
+            if (theme.colors.nav) root.style.setProperty('--nav-bg', theme.colors.nav);
+            if (theme.colors.border) root.style.setProperty('--border', theme.colors.border);
+        }
+
+        if (theme.isRainbow) {
+            root.style.setProperty('--bg-color', '#050505');
+            root.style.setProperty('--ios-bg', '#000000');
+            root.style.setProperty('--ios-card', '#111111');
+            root.style.setProperty('--card-bg', '#141414');
+        }
+
+        const label = document.getElementById('current-theme-name');
+        if(label) label.innerText = theme.name;
+        
+        updateLink(); 
     }
 
 </script>
