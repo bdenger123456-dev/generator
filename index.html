@@ -1100,17 +1100,20 @@
         </div>
 
         <!-- SITE CAPSULE -->
-        <div class="site-capsule">
-            <span data-key="site_label">Site</span>
-            <select id="platform" onchange="updateLink()">
-                <option value="ph">Pornhub</option>
-                <option value="xv">xVideos</option>
-                <option value="xh">xHamster</option>
-                <option value="sb">SpankBang</option>
-                <option value="yp">YouPorn</option>
-                <option value="rt">RedTube</option>
-                <option value="google">Google Images</option>
-            </select>
+        <select id="platform" onchange="savePlatform(this.value)">
+            <option value="ph">Pornhub</option>
+            <option value="xv">xVideos</option>
+            <option value="xh">xHamster</option>
+            <option value="sb">SpankBang</option>
+            <option value="yp">YouPorn</option>
+            <option value="rt">RedTube</option>
+            <option value="google">Google Images</option>
+        </select>
+
+        <!-- Кнопка входа -->
+        <div class="ios-row clickable" id="login-btn-row" onclick="window.loginWithGoogle()">
+            <span id="login-btn-text">Sync Data (Login)</span>
+            <span style="color:var(--text-secondary)">G</span>
         </div>
 
         <!-- GROUP 1: PREFERENCES -->
@@ -1378,6 +1381,147 @@
         </div>
     </div>
 </div>
+
+<!-- FIREBASE INTEGRATION -->
+<script type="module">
+    // 1. Импортируем Firebase через URL (для работы прямо в браузере)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // 2.  ключи
+    const firebaseConfig = {
+        apiKey: "AIzaSyC94QWRaFu0o60kDSU8Uz0VJAcXwaDWjlI",
+        authDomain: "xfetishhub.firebaseapp.com",
+        projectId: "xfetishhub",
+        storageBucket: "xfetishhub.firebasestorage.app",
+        messagingSenderId: "617015941952",
+        appId: "1:617015941952:web:4f75df1239b0c114d8f8a5"
+    };
+
+    // 3. Инициализация
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    console.log("Firebase initialized correctly!");
+
+    // --- ЛОГИКА ВХОДА И СИНХРОНИЗАЦИИ ---
+
+    // Функция входа (делаем её глобальной, чтобы вызывать из HTML onclick)
+    window.loginWithGoogle = async function() {
+        try {
+            await signInWithPopup(auth, provider);
+            // Страница не перезагружается, состояние обновится в onAuthStateChanged
+        } catch (error) {
+            console.error("Login failed:", error);
+            alert("Login error: " + error.message);
+        }
+    };
+
+    // Функция выхода
+    window.logout = async function() {
+        try {
+            await signOut(auth);
+            alert("Logged out");
+            location.reload(); // Перезагружаем, чтобы очистить данные сессии
+        } catch (error) {
+            console.error("Logout failed:", error);
+        }
+    };
+
+    // Слушатель состояния (Вошел / Не вошел)
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            console.log("User logged in:", user.email);
+            
+            // Меняем кнопку в настройках, если она есть
+            const loginBtn = document.getElementById('login-btn-text');
+            if(loginBtn) loginBtn.innerText = "Logout (" + user.email.split('@')[0] + ")";
+            
+            // Назначаем кнопку на Выход
+            const btnRow = document.getElementById('login-btn-row');
+            if(btnRow) btnRow.onclick = window.logout;
+
+            // ЗАГРУЗКА ДАННЫХ ИЗ ОБЛАКА
+            await loadUserData(user);
+        } else {
+            console.log("No user logged in");
+        }
+    });
+
+    // Функция загрузки данных
+    async function loadUserData(user) {
+        const userRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(userRef);
+
+        if (docSnap.exists()) {
+            const cloudData = docSnap.data();
+            console.log("Found cloud data:", cloudData);
+
+            // ВНЕДРЕНИЕ ДАННЫХ В  ПРИЛОЖЕНИЕ
+            if (cloudData.favorites) window.favorites = cloudData.favorites;
+            if (cloudData.blacklist) window.blacklist = cloudData.blacklist;
+            if (cloudData.tagScores) window.tagScores = cloudData.tagScores;
+            if (cloudData.history) window.historyData = cloudData.history;
+            
+            // Проверка премиума (для будущего)
+            if (cloudData.isPremium) {
+                console.log("PREMIUM USER!");
+                localStorage.setItem('xch_is_premium', 'true');
+            }
+
+            if (cloudData.platform) {
+                localStorage.setItem('xch_platform', cloudData.platform);
+                const el = document.getElementById('platform');
+                if (el) {
+                    el.value = cloudData.platform;
+                    // Обновляем цвета интерфейса под сайт
+                    if (typeof updateLink === 'function') updateLink(); 
+                }
+            }
+
+            // Обновляем интерфейс
+            if (typeof updateCounts === 'function') updateCounts();
+            if (typeof updateActionButtons === 'function') updateActionButtons();
+            if (typeof renderHistory === 'function') renderHistory();
+            
+            alert("Data synced from cloud! ✅");
+        } else {
+            console.log("No cloud data yet. Creating...");
+            saveUserData(user); // Создаем первую запись
+        }
+    }
+
+    // Функция сохранения (нужно вызывать её при каждом изменении данных)
+    // Делаем глобальной, чтобы вызвать её из toggleFavorite()
+    window.syncToCloud = async function() {
+        const user = auth.currentUser;
+        if (!user) return;
+
+        const userRef = doc(db, "users", user.uid);
+        
+        // Получаем текущий выбор сайта
+        const currentPlatform = document.getElementById('platform') ? document.getElementById('platform').value : 'ph';
+
+        try {
+            await setDoc(userRef, {
+                favorites: window.favorites || [],
+                blacklist: window.blacklist || [],
+                tagScores: window.tagScores || {},
+                history: window.historyData || [],
+                
+                platform: currentPlatform, 
+                
+                lastUpdated: serverTimestamp()
+            }, { merge: true });
+            console.log("Synced to cloud (with platform) ✅");
+        } catch (e) {
+            console.error("Sync error:", e);
+        }
+    };
+</script>
 
 <script>
     // === STATE ===
@@ -12592,8 +12736,18 @@
         renderHistory();
         updateCounts();
         checkLayout();
-        updateLink(); 
         initAgeGate();
+
+        const savedPlatform = localStorage.getItem('xch_platform'); // Проверяем, есть ли сохраненный сайт
+        if (savedPlatform) {
+            const platformSelect = document.getElementById('platform');
+            if (platformSelect) {
+                // Если есть, выставляем его в выпадающем списке
+                platformSelect.value = savedPlatform;
+            }
+        }
+        updateLink();
+
         window.addEventListener('resize', checkLayout);
     };
 
@@ -12965,6 +13119,17 @@
         }
     }
 
+    function savePlatform(val) {
+        // Сохраняем локально
+        localStorage.setItem('xch_platform', val);
+        
+        // Обновляем цвета и ссылку (твоя старая функция)
+        updateLink(); 
+        
+        // Отправляем в облако
+        if (window.syncToCloud) window.syncToCloud();
+    }
+
     function toggleFavorite() {
         if(!currentItem) return;
         const id = currentItem.id;
@@ -12978,6 +13143,7 @@
             logActivity('like', id, currentItem.tags);
         }
         saveLists(); updateActionButtons(); updateCounts();
+        if (window.syncToCloud) window.syncToCloud(); 
     }
 
     function handleOutboundClick() {
@@ -12997,6 +13163,7 @@
         localStorage.setItem(STORAGE.HISTORY, JSON.stringify(historyData));
         renderHistory();
         updateExploredCount();
+        if (window.syncToCloud) window.syncToCloud(); 
     }
 
     // Универсальная функция для получения названия на нужном языке
@@ -13172,6 +13339,7 @@
             logActivity('dislike', id, currentItem.tags);
         }
         saveLists(); updateActionButtons();
+        if (window.syncToCloud) window.syncToCloud(); 
     }
 
     function saveLists() {
@@ -13218,6 +13386,7 @@
             localStorage.setItem(STORAGE.TAG_SCORES, JSON.stringify(tagScores));
             localStorage.setItem(STORAGE.HISTORY, JSON.stringify(historyData));
             localStorage.setItem(STORAGE.INTENSITY, currentIntensity);
+            if (window.syncToCloud) window.syncToCloud();
             
             alert("Done! Reloading..."); location.reload();
         } catch(e) { alert("Error!"); }
@@ -13483,6 +13652,7 @@
                         
                         saveLists();
                         updateCounts();
+                        if (window.syncToCloud) window.syncToCloud();
                         input.value = ''; 
                         suggestBox.style.display = 'none';
                         renderListModal(type);
@@ -13540,6 +13710,7 @@
                 
                 saveLists();
                 updateCounts();
+                if (window.syncToCloud) window.syncToCloud();
                 
                 // Анимация удаления
                 div.style.opacity = '0';
@@ -13976,6 +14147,7 @@
             });
             saveLists();
             updateCounts();
+            if (window.syncToCloud) window.syncToCloud();
         }
         
         localStorage.setItem('xch_onboarding_done', 'true');
@@ -14014,6 +14186,7 @@
             updateCounts();
             updateExploredCount();
             renderHistory();
+            if (window.syncToCloud) window.syncToCloud();
             
             // Сбрасываем график статистики, если он открыт
             const modalBody = document.getElementById('modal-stats-body');
