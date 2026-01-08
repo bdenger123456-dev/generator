@@ -217,13 +217,25 @@
 
         .mobile-header .subtitle { font-size: 9px; margin: 2px 0 0 0; opacity: 0.6; padding: 0; white-space: nowrap; }
 
-        /* === GRADIENTS === */
+        /* === GRADIENTS  === */
         .top-gradient-mask {
             display: none;
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 120px;
+            top: -50px; /* Залезаем наверх за пределы экрана */
+            left: 0; width: 100%; 
+            height: 160px; /* Увеличиваем высоту */
             z-index: 9000; pointer-events: none;
-            background: linear-gradient(to bottom, var(--bg-color) 20%, transparent 100%);
+            /* Градиент начинается не с самого верха, а чуть ниже, чтобы перекрыть safe area */
+            background: linear-gradient(to bottom, var(--bg-color) 40%, transparent 100%);
+        }
+
+        .bottom-gradient-mask {
+            display: none; position: fixed; 
+            bottom: -50px; /* Залезаем вниз */
+            left: 0; width: 100%; 
+            height: 160px; 
+            z-index: 9000; pointer-events: none;
+            background: linear-gradient(to top, var(--bg-color) 40%, transparent 100%);
         }
 
         .card, .btn-gen, .btn-watch, .related-item-btn, .btn-action {
@@ -801,6 +813,68 @@
                 white-space: nowrap;
             }
         }
+        @media (max-width: 768px) {
+            /* 1. Уменьшаем боковые отступы */
+            .center-wrapper { 
+                padding-left: 10px; 
+                padding-right: 10px; 
+                width: 100%; 
+            }
+
+            /* 2. Логотип скрывает кнопку поддержки (добавляем отступ сверху для контента настроек) */
+            #tab-settings .center-wrapper {
+                padding-top: 40px; /* Дополнительный отступ, чтобы хедер не перекрывал первую кнопку */
+            }
+
+            /* 3. Убираем подзаголовок из мобильного хедера */
+            .mobile-header .subtitle { 
+                display: none !important; 
+            }
+            /* Делаем сам хедер компактнее */
+            .mobile-header {
+                padding: 8px 15px;
+                min-width: auto;
+            }
+            
+            /* 4. Компактная карточка результатов */
+            .card {
+                padding: 10px 10px 15px 10px; /* Меньше воздуха внутри */
+                min-height: 140px; /* Уменьшаем минимальную высоту */
+            }
+            
+            /* Слот-машина меньше по высоте */
+            .slot-window { height: 110px; }
+            .slot-item { font-size: clamp(28px, 8vw, 42px); } /* Шрифт чуть меньше */
+            
+            /* Описание результата компактнее */
+            .result-description { font-size: 13px; line-height: 1.3; }
+
+            /* 5. Кнопки лайк/дизлайк меньше */
+            .card-actions { margin-top: 10px; gap: 10px; }
+            .btn-action { 
+                padding: 8px; 
+                height: 45px; /* Фиксированная небольшая высота */
+                font-size: 20px; 
+            }
+            
+            /* Кнопки Watch/Generate тоже чуть компактнее */
+            .btn-watch { padding: 12px; font-size: 14px; }
+            .btn-gen { padding: 16px; font-size: 16px; }
+        }
+        /* Единый стиль для текста над карточкой */
+        .status-text-combined {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            min-height: 16px;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
         .related-item-btn { background: var(--card-bg); border: 1px solid var(--border); padding: 8px 14px; border-radius: 12px; font-size: 13px; font-weight: 600; color: var(--text-main); cursor: pointer; transition: 0.2s; display: inline-block; }
         .related-item-btn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
 
@@ -959,11 +1033,6 @@
         .bar-gen { height: 100%; background: var(--text-secondary); }
         .bar-watch { height: 100%; background: var(--accent); }
 
-        .bottom-gradient-mask {
-            display: none; position: fixed; bottom: 0; left: 0; width: 100%; height: 120px; z-index: 9000; pointer-events: none;
-            background: linear-gradient(to top, var(--bg-color) 20%, transparent 100%);
-        }
-
         #mobile-settings-mount, #settings-bundle { width: 100%; display: flex; flex-direction: column; gap: 10px; }
         .ios-group .platform-box, .ios-group .toggle-wrapper, .ios-group .sidebar-btn { width: 100%; border: none; background: transparent; padding: 0; margin: 0; }
 
@@ -972,7 +1041,6 @@
             .bottom-nav { display: flex !important; }
             .bottom-gradient-mask { display: block; }
             .main-content { padding: 0; }
-            .center-wrapper { padding-left: 20px; padding-right: 20px; width: 100%; }
         }
 
         /* Тег в онбординге с кнопкой удаления */
@@ -1050,28 +1118,24 @@
                     <div id="anim-text" class="animation-text"></div>
                 </div>
 
-                <div class="result-comment" id="result-comment"></div>
+                <!-- Единый текст статуса НАД карточкой -->
+                <div class="status-text-combined" id="status-text"></div>
 
-                <!-- CARD -->
                 <div class="card" id="card-block">
-                    
-                    <!-- 2. Объяснение (внутри карточки первым) -->
-                    <div class="explanation-text" id="explanation-text" style="margin-top: 5px;"></div>
-
-                    <!-- 3. Бейджи (над слотом) -->
+                    <!-- Внутри карточки сразу идут Бейджи -->
                     <div class="badge-wrapper" id="badge-wrapper"></div>
                     
-                    <!-- 4. Слот-машина -->
+                    <!-- Слот-машина -->
                     <div class="slot-window">
                         <div id="slot-reel" class="slot-reel">
                             <div class="slot-item" id="result-text">Press Generate</div>
                         </div>
                     </div>
                     
-                    <!-- 5. Описание -->
+                    <!-- Описание -->
                     <div id="result-desc" class="result-description"></div>
 
-                    <!-- 6. Действия -->
+                    <!-- Действия (Лайк/Дизлайк) -->
                     <div class="card-actions hidden-initial">
                         <button class="btn-action ban" id="btn-ban" onclick="toggleBlacklist()">👎</button>
                         <button class="btn-action fav" id="btn-fav" onclick="toggleFavorite()">👍</button>
@@ -13037,17 +13101,41 @@
         }, animationTime * 1000 + 100);
     }
 
-    function prepareElementsForFadeIn() {
-        const ids = ['result-desc', 'explanation-text', 'result-comment', 'related-block'];
-        ids.forEach(id => {
-            const el = document.getElementById(id);
-            if(el) {
-                el.classList.remove('fade-visible');
-                el.classList.add('fade-hidden');
+    // 1. Просто возвращаем текст объяснения, но не вставляем его в HTML
+    function getExplanationText(mode) {
+        const t = langData[currentLang];
+        let reason = null; // По умолчанию null
+
+        if (mode === 'similar') {
+            reason = t.expl_sim;
+        } else if (mode === 'tag_click') {
+            reason = t.expl_tag_click; 
+        } else {
+            // Проверяем веса тегов
+            let bestTag = null;
+            let maxScore = 0;
+            currentItem.tags.forEach(tag => {
+                if (tagScores[tag] && tagScores[tag] > 5) {
+                    if (tagScores[tag] > maxScore) {
+                        maxScore = tagScores[tag];
+                        bestTag = tag;
+                    }
+                }
+            });
+            
+            if (bestTag) {
+                // Красивое форматирование тега
+                let displayTag = bestTag.charAt(0).toUpperCase() + bestTag.slice(1);
+                reason = t.expl_score + displayTag;
             }
-        });
+            else if (favorites.includes(currentItem.id)) {
+                reason = t.expl_fav;
+            }
+        }
+        return reason;
     }
 
+    // 2. Обновленная функция рендера интерфейса
     function renderResultUI(item, mode) {
         currentItem = item;
         lastGeneratedItem = item;
@@ -13077,15 +13165,27 @@
         updateLink();
         renderResultName();
         renderBadges();
-        renderExplanation(mode);
         renderRelatedItems();
         updateActionButtons();
 
-        const comments = resultComments[currentLang];
-        document.getElementById('result-comment').innerText = comments[Math.floor(Math.random() * comments.length)];
+        // === ЛОГИКА ТЕКСТА СТАТУСА ===
+        const statusEl = document.getElementById('status-text');
+        const explanation = getExplanationText(mode); // Получаем объяснение
+        
+        if (explanation) {
+            // Если есть объяснение (умный подбор) - показываем его
+            statusEl.innerText = explanation;
+            statusEl.style.color = "var(--accent)"; // Выделяем цветом
+        } else {
+            // Если нет - показываем случайный комментарий
+            const comments = resultComments[currentLang];
+            statusEl.innerText = comments[Math.floor(Math.random() * comments.length)];
+            statusEl.style.color = "var(--text-secondary)"; // Обычный цвет
+        }
+        // ===================================
 
         setTimeout(() => {
-            const idsToShow = ['result-desc', 'explanation-text', 'result-comment', 'related-block'];
+            const idsToShow = ['result-desc', 'status-text', 'related-block'];
             idsToShow.forEach(id => {
                 const el = document.getElementById(id);
                 if(el) {
@@ -13095,6 +13195,19 @@
                 }
             });
         }, 50);
+    }
+
+    // 3. Обновленная функция подготовки анимации (скрываем новый элемент)
+    function prepareElementsForFadeIn() {
+        // Убрали старые ID, добавили status-text
+        const ids = ['result-desc', 'status-text', 'related-block']; 
+        ids.forEach(id => {
+            const el = document.getElementById(id);
+            if(el) {
+                el.classList.remove('fade-visible');
+                el.classList.add('fade-hidden');
+            }
+        });
     }
 
     function finishGeneration(item, mode) {
@@ -13539,14 +13652,17 @@
         });
         applyLanguage();
     }
+    
     function createFilterBtn(id, key, isActive) {
         const div = document.createElement('div'); div.className = 'tag';
         if(isActive) div.classList.add('selected'); div.setAttribute('data-key', key); return div;
     }
+    
     function toggleInclude(id) {
         if(includeTags.has(id)) includeTags.delete(id); else includeTags.add(id);
         renderFilters();
     }
+    
     function toggleExclude(id) {
         if(excludeTags.has(id)) excludeTags.delete(id); else excludeTags.add(id);
         renderFilters();
@@ -13589,6 +13705,7 @@
         document.getElementById('intensity-slider').value = currentIntensity;
         updateIntensity(currentIntensity);
     }
+    
     function updateIntensity(val) {
         currentIntensity = parseInt(val);
         localStorage.setItem(STORAGE.INTENSITY, currentIntensity);
@@ -13620,6 +13737,7 @@
     }
     
     function toggleAccordion(id) { document.getElementById(id).classList.toggle('open'); }
+    
     function switchTab(tab) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -13634,6 +13752,7 @@
         document.getElementById('theme-toggle').checked = isDark;
         updateToggleLabels();
     }
+    
     function toggleTheme() {
         const cb = document.getElementById('theme-toggle');
         const isDark = cb.checked;
@@ -13649,6 +13768,7 @@
         applyLanguage();
         updateToggleLabels();
     }
+    
     function changeLanguage(val) {
         currentLang = val;
         localStorage.setItem(STORAGE.LANG, currentLang);
@@ -13660,10 +13780,12 @@
         updateToggleLabels();
         updateExploredCount();
     }
+    
     function updateToggleLabels() {
         const isRu = (currentLang === 'ru');
         document.getElementById('comp-search').style.display = isRu ? 'flex' : 'none';
     }
+   
     function applyLanguage() {
         const t = langData[currentLang];
         document.querySelectorAll('[data-key]').forEach(el => {
@@ -13878,6 +14000,7 @@
     }
 
     // === STATS SYSTEM ===
+    
     function openStatistics() {
         // Устанавливаем тексты на кнопках дат при открытии
         const t = langData[currentLang];
@@ -14133,6 +14256,7 @@
         
         document.getElementById('modal-support-overlay').classList.add('open');
     }
+    
     function closeSupport(e, force) {
         if (force || e.target.id === 'modal-support-overlay') {
             document.getElementById('modal-support-overlay').classList.remove('open');
