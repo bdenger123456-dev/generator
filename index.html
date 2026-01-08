@@ -633,13 +633,18 @@
         /* Bottom Nav - Fix 1 */
         .bottom-nav {
             display: none; position: fixed;
-            /* Ignore safe area, set explicit bottom margin */
-            bottom: 15px; 
+            bottom: 20px; /* Чуть выше от края */
             left: 50%; transform: translateX(-50%);
-            width: 60%; min-width: 240px; max-width: 320px; height: 65px;
-            background: rgba(20, 20, 20, 0.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 50px; z-index: 9999;
-            padding: 5px; gap: 5px; box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            width: 85%; /* Шире для 3 кнопок */
+            max-width: 380px; height: 65px;
+            background: rgba(20, 20, 20, 0.95); 
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 20px; /* Менее овальный, более прямоугольный */
+            z-index: 9999;
+            padding: 0 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            justify-content: space-between; /* Равномерное распределение */
         }
         body.light-theme .bottom-nav {
             background: rgba(255, 255, 255, 0.9);
@@ -649,12 +654,23 @@
         .nav-item {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             font-size: 10px; font-weight: 600; color: var(--text-secondary);
-            flex: 1; height: 100%; cursor: pointer; border-radius: 40px; transition: all 0.2s ease;
+            flex: 1; height: 100%; cursor: pointer; 
+            transition: all 0.2s ease;
+            border-radius: 12px; /* Мягкие квадраты при нажатии */
         }
-        .nav-item.active { color: var(--text-main); background: rgba(255,255,255,0.05); }
+        .nav-item.active { color: var(--text-main); }
         body.light-theme .nav-item.active { background: rgba(0,0,0,0.05); }
-        .nav-item.active .nav-icon { transform: scale(1.1); color: var(--accent); }
+        .nav-item.active .nav-icon { transform: translateY(-2px); color: var(--accent); }
         .nav-icon { font-size: 22px; margin-bottom: 2px; transition: transform 0.2s; }
+
+        .sync-date {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-top: -10px;
+            margin-bottom: 15px;
+            opacity: 0.6;
+        }
 
         .subtitle {
             font-size: 11px; color: var(--text-secondary); text-transform: uppercase;
@@ -1166,15 +1182,24 @@
             </div>
         </div>
 
-        <!-- TAB 2: SETTINGS (Mobile) -->
+        <!-- TAB 2: SETTINGS (Preferences & Filters) -->
         <div id="tab-settings" class="tab-content">
             <div class="center-wrapper">
-                <div id="mobile-settings-mount"></div>
+                <div id="mount-prefs"></div>
+                <div id="mount-filters"></div>
             </div>
         </div>
-    </div> 
 
-</div>
+        <!-- TAB 3: ACCOUNT (Data & Login) -->
+        <div id="tab-account" class="tab-content">
+            <div class="center-wrapper">
+                <div id="mount-account"></div>
+                <div id="mount-extras"></div>
+            </div>
+        </div>
+            </div> 
+
+        </div>
 
 <div class="bottom-gradient-mask"></div>
 
@@ -1185,158 +1210,8 @@
     <div class="nav-item" onclick="switchTab('settings')" id="nav-settings">
         <span class="nav-icon">⚙️</span> <span data-key="nav_settings">Settings</span>
     </div>
-</div>
-
-<!-- SETTINGS BUNDLE -->
-<div style="display:none;">
-    <div id="settings-bundle">
-        
-        <!-- SUPPORT BANNER -->
-        <div class="support-banner" onclick="openSupportModal()">
-            <span data-key="support_banner">✨ Support the Project</span>
-        </div>
-
-       <!-- 1. КАПСУЛА ВХОДА/СИНХРОНИЗАЦИИ -->
-        <div class="capsule-btn" id="login-capsule" onclick="window.handleLoginClick()">
-            <!-- Текст меняется через JS -->
-            <span id="login-btn-text" data-key="login_text">Sync Data</span>
-            <!-- Иконка статуса -->
-            <span id="login-status-icon" class="capsule-icon" style="color: var(--accent);">G</span>
-        </div>
-
-        <!-- 2. КАПСУЛА ВЫБОРА САЙТА -->
-        <div class="capsule-btn">
-            <span data-key="site_label">Site</span>
-            <!-- Трюк: текст селекта будет справа, как в iOS -->
-            <select id="platform" onchange="savePlatform(this.value)" dir="rtl">
-                <option value="ph">Pornhub</option>
-                <option value="xv">xVideos</option>
-                <option value="xh">xHamster</option>
-                <option value="sb">SpankBang</option>
-                <option value="yp">YouPorn</option>
-                <option value="rt">RedTube</option>
-                <option value="google">Google Images</option>
-            </select>
-        </div>
-
-        <!-- GROUP 1: PREFERENCES -->
-        <div class="ios-header" style="display:flex; justify-content:space-between;">
-            <span data-key="header_prefs">Preferences</span>
-        </div>
-        <div class="ios-group">
-            
-            <div class="ios-row" style="display:block; padding-bottom: 15px; padding-top:15px;">
-                <div style="font-size:17px; margin-bottom:15px;" data-key="exploration_mode">Exploration Mode</div>
-                <input type="range" min="1" max="3" value="1" class="range-slider" id="intensity-slider" oninput="updateIntensity(this.value)">
-                <div class="intensity-labels">
-                    <span class="intensity-label active" id="lbl-1" data-val="1">Safe</span>
-                    <span class="intensity-label" id="lbl-2" data-val="2">Spicy</span>
-                    <span class="intensity-label" id="lbl-3" data-val="3">Extreme</span>
-                </div>
-            </div>
-
-            <div class="ios-row">
-                <span class="platform-label" data-key="lang_label">Language</span>
-                <select id="lang-select" class="platform-select" onchange="changeLanguage(this.value)">
-                    <option value="en">English</option>
-                    <option value="ru">Русский</option>
-                    <option value="es">Español</option>
-                    <option value="de">Deutsch</option>
-                </select>
-            </div>
-
-            <div id="comp-search" class="ios-row" style="display:none;">
-                <span class="toggle-text" data-key="search_en_label">Search EN</span>
-                <label class="switch">
-                    <input type="checkbox" id="force-en" checked onchange="updateLink()">
-                    <span class="slider"></span>
-                </label>
-            </div>
-
-            <div class="ios-row">
-                <span class="toggle-text" data-key="dark_mode">Dark Mode</span>
-                <label class="switch">
-                    <input type="checkbox" id="theme-toggle" onchange="toggleTheme()">
-                    <span class="slider"></span>
-                </label>
-            </div>
-
-        </div>
-
-        <!-- GROUP 2: FILTERS -->
-        <div class="ios-header" data-key="header_filters">Filters</div>
-        <div class="ios-group">
-            <div class="accordion">
-                <div class="accordion-head" onclick="toggleAccordion('filter-include')">
-                    <span data-key="filter_include">Include</span> <span style="color:var(--text-secondary)">▼</span>
-                </div>
-                <div class="accordion-body" id="filter-include"></div>
-            </div>
-            <!-- SEPARATOR -->
-            <div class="accordion">
-                <div class="accordion-head" onclick="toggleAccordion('filter-exclude')">
-                    <span data-key="filter_exclude">Exclude</span> <span style="color:var(--text-secondary)">▼</span>
-                </div>
-                <div class="accordion-body" id="filter-exclude"></div>
-            </div>
-        </div>
-
-        <!-- GROUP 3: DATA -->
-        <div class="ios-header" data-key="header_data">Data</div>
-        <div class="ios-group">
-            <div class="ios-row">
-                <span data-key="explored_label">Explored</span>
-                <span style="color:var(--text-secondary); font-size:16px;" id="explored-count">0 / 0</span>
-            </div>
-            <div class="ios-row clickable" onclick="openFavoritesCatalog()">
-                <span data-key="favorites_catalog">Liked</span>
-                <span class="badge" id="count-fav" style="color:var(--text-secondary); font-size:17px;">0</span>
-            </div>
-            <div class="ios-row clickable" onclick="openBlacklistCatalog()">
-                <span data-key="blacklist_catalog">Disliked</span>
-                <span style="color:var(--text-secondary)">›</span>
-            </div>
-            <div class="ios-row clickable" onclick="openStatistics()">
-                <span data-key="btn_stats">Statistics</span>
-                <span style="color:var(--text-secondary)">›</span>
-            </div>
-            <div class="ios-row clickable" onclick="exportData()">
-                <span data-key="btn_export">Export</span>
-                <span style="color:var(--text-secondary)">↓</span>
-            </div>
-            <div class="ios-row clickable" onclick="importData()">
-                <span data-key="btn_import">Import</span>
-                <span style="color:var(--text-secondary)">↑</span>
-            </div>
-            <div class="ios-row clickable" onclick="resetAppHistory()" style="color: var(--highlight-red);">
-                <span data-key="btn_reset">Reset Data</span>
-                <span>✕</span>
-            </div>
-        </div>
-
-        <!-- GROUP 4: EXTRAS -->
-        <div class="ios-header" data-key="header_extras">Extras</div>
-        <div class="ios-group">
-            <div class="ios-row clickable" onclick="window.open('https://reddit.com', '_blank')">
-                <span>Reddit</span>
-                <span style="color:var(--text-secondary)">↗</span>
-            </div>
-            <div class="ios-row clickable">
-                <span data-key="sponsors">Sponsors</span>
-                <span style="color:var(--text-secondary)">❤</span>
-            </div>
-            <div class="ios-row clickable" onclick="window.open('mailto:support@xfetishhub.com')">
-                <span data-key="report_issue">Report Issue</span>
-                <span style="color:var(--text-secondary)">✉</span>
-            </div>
-        </div>
-
-        <!-- HISTORY -->
-        <div class="history-section" style="border:none; margin-top:0;">
-            <div class="ios-header" data-key="history_title">History</div>
-            <div class="ios-group" id="history-list"></div>
-        </div>
-
+    <div class="nav-item" onclick="switchTab('account')" id="nav-account">
+        <span class="nav-icon">👤</span> <span>Account</span>
     </div>
 </div>
 
@@ -1485,6 +1360,152 @@
     </div>
 </div>
 
+<div id="ui-blocks-source" style="display:none;">
+    
+    <!-- BLOCK: PREFERENCES -->
+    <div id="block-prefs">
+        <!-- Site Select -->
+        <div class="capsule-btn">
+            <span data-key="site_label">Site</span>
+            <select id="platform" onchange="savePlatform(this.value)" dir="rtl">
+                <option value="ph">Pornhub</option>
+                <option value="xv">xVideos</option>
+                <option value="xh">xHamster</option>
+                <option value="sb">SpankBang</option>
+                <option value="yp">YouPorn</option>
+                <option value="rt">RedTube</option>
+                <option value="google">Google</option>
+            </select>
+        </div>
+
+        <div class="ios-header" data-key="header_prefs">Preferences</div>
+        <div class="ios-group">
+            <div class="ios-row" style="display:block; padding: 15px 16px;">
+                <div style="font-size:16px; margin-bottom:15px;" data-key="exploration_mode">Exploration Mode</div>
+                <input type="range" min="1" max="3" value="1" class="range-slider" id="intensity-slider" oninput="updateIntensity(this.value)">
+                <div class="intensity-labels">
+                    <span class="intensity-label active" id="lbl-1" data-val="1">Safe</span>
+                    <span class="intensity-label" id="lbl-2" data-val="2">Spicy</span>
+                    <span class="intensity-label" id="lbl-3" data-val="3">Extreme</span>
+                </div>
+            </div>
+            <div class="ios-row">
+                <span class="platform-label" data-key="lang_label">Language</span>
+                <select id="lang-select" class="platform-select" onchange="changeLanguage(this.value)">
+                    <option value="en">English</option>
+                    <option value="ru">Русский</option>
+                    <option value="es">Español</option>
+                    <option value="de">Deutsch</option>
+                </select>
+            </div>
+            <div id="comp-search" class="ios-row" style="display:none;">
+                <span class="toggle-text" data-key="search_en_label">Search EN</span>
+                <label class="switch">
+                    <input type="checkbox" id="force-en" checked onchange="updateLink()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="ios-row">
+                <span class="toggle-text" data-key="dark_mode">Dark Mode</span>
+                <label class="switch">
+                    <input type="checkbox" id="theme-toggle" onchange="toggleTheme()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- BLOCK: FILTERS -->
+    <div id="block-filters">
+        <div class="ios-header" data-key="header_filters">Filters</div>
+        <div class="ios-group">
+            <div class="accordion">
+                <div class="accordion-head" onclick="toggleAccordion('filter-include')">
+                    <span data-key="filter_include">Include</span> <span style="color:var(--text-secondary)">▼</span>
+                </div>
+                <div class="accordion-body" id="filter-include"></div>
+            </div>
+            <div class="accordion">
+                <div class="accordion-head" onclick="toggleAccordion('filter-exclude')">
+                    <span data-key="filter_exclude">Exclude</span> <span style="color:var(--text-secondary)">▼</span>
+                </div>
+                <div class="accordion-body" id="filter-exclude"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BLOCK: ACCOUNT-->
+    <div id="block-account">
+        <div class="ios-header">Account</div> <!-- Локализуем -->
+        
+        <!-- Кнопка входа теперь внутри группы -->
+        <div class="capsule-btn" id="login-capsule" onclick="window.handleLoginClick()" style="margin-bottom:5px;">
+            <span id="login-btn-text" data-key="login_text">Sync Data</span>
+            <span id="login-status-icon" class="capsule-icon" style="color: var(--accent);">G</span>
+        </div>
+        
+        <!-- Дата последней синхронизации -->
+        <div class="sync-date" id="last-sync-date">Not synced yet</div>
+
+        <div class="ios-group">
+            <div class="ios-row">
+                <span data-key="explored_label">Explored</span>
+                <span style="color:var(--text-secondary); font-size:16px;" id="explored-count">0 / 0</span>
+            </div>
+            <div class="ios-row clickable" onclick="openFavoritesCatalog()">
+                <span data-key="favorites_catalog">Liked</span>
+                <span class="badge" id="count-fav" style="color:var(--text-secondary); font-size:17px;">0</span>
+            </div>
+            <div class="ios-row clickable" onclick="openBlacklistCatalog()">
+                <span data-key="blacklist_catalog">Disliked</span>
+                <span style="color:var(--text-secondary)">›</span>
+            </div>
+            <div class="ios-row clickable" onclick="openStatistics()">
+                <span data-key="btn_stats">Statistics</span>
+                <span style="color:var(--text-secondary)">›</span>
+            </div>
+            <div class="ios-row clickable" onclick="exportData()">
+                <span data-key="btn_export">Export</span>
+                <span style="color:var(--text-secondary)">↓</span>
+            </div>
+            <div class="ios-row clickable" onclick="importData()">
+                <span data-key="btn_import">Import</span>
+                <span style="color:var(--text-secondary)">↑</span>
+            </div>
+            <div class="ios-row clickable" onclick="resetAppHistory()" style="color: var(--highlight-red);">
+                <span data-key="btn_reset">Reset Data</span>
+                <span>✕</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- BLOCK: EXTRAS & HISTORY -->
+    <div id="block-extras">
+        <!-- Support Banner -->
+        <div class="support-banner" onclick="openSupportModal()">
+            <span data-key="support_banner">✨ Support the Project</span>
+        </div>
+
+        <div class="ios-header" data-key="header_extras">Extras</div>
+        <div class="ios-group">
+            <div class="ios-row clickable" onclick="window.open('https://reddit.com/r/xfetishhub', '_blank')">
+                <span>Reddit</span>
+                <span style="color:var(--text-secondary)">↗</span>
+            </div>
+            <div class="ios-row clickable" onclick="window.open('mailto:support@xfetishhub.com')">
+                <span data-key="report_issue">Report Issue</span>
+                <span style="color:var(--text-secondary)">✉</span>
+            </div>
+        </div>
+
+        <div class="history-section" style="border:none; margin-top:20px;">
+            <div class="ios-header" data-key="history_title">History</div>
+            <div class="ios-group" id="history-list"></div>
+        </div>
+    </div>
+
+</div>
+
 <!-- FIREBASE INTEGRATION -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -1505,69 +1526,108 @@
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    // === ВХОД ===
+    // Глобальная переменная состояния
+    window.isUserLoggedIn = false;
+
+    // === ЛОГИКА ВХОДА ===
     window.loginWithGoogle = async function() {
         try {
             await signInWithPopup(auth, provider);
-            // Никаких алертов, состояние обновится само
+            // Состояние обновится автоматически в onAuthStateChanged
         } catch (error) {
             console.error("Login failed:", error);
         }
     };
 
-    // === ВЫХОД ===
+    // === ЛОГИКА ВЫХОДА ===
     window.logout = async function() {
         try {
             await signOut(auth);
-            location.reload(); // Перезагрузка для очистки сессии
+            localStorage.removeItem('xch_last_sync_ts'); // Сбрасываем дату при выходе
+            location.reload(); // Перезагружаем страницу для очистки кэша сессии
         } catch (error) {
             console.error("Logout failed:", error);
         }
     };
 
-    window.isUserLoggedIn = false;
-
-    // Обработчик клика по кнопке
+    // === ОБРАБОТЧИК КНОПКИ "SYNC DATA / LOGOUT" ===
     window.handleLoginClick = function() {
         if (window.isUserLoggedIn) {
-            const t = typeof langData !== 'undefined' ? (langData[localStorage.getItem('xch_lang') || 'en']) : { logout_text: "Logout" };
+            // Если уже вошел -> спрашиваем про выход
+            const t = (typeof langData !== 'undefined' && langData[localStorage.getItem('xch_lang') || 'en']) 
+                      ? langData[localStorage.getItem('xch_lang') || 'en'] 
+                      : { logout_text: "Logout" };
+                      
             if(confirm((t.logout_text || "Logout") + "?")) {
                 window.logout();
             }
         } else {
+            // Если не вошел -> запускаем вход
             window.loginWithGoogle();
         }
     };
 
-    // Слушатель состояния
+    // === UI: ОБНОВЛЕНИЕ ДАТЫ СИНХРОНИЗАЦИИ ===
+    window.updateLastSyncUI = function() {
+        const el = document.getElementById('last-sync-date');
+        const ts = localStorage.getItem('xch_last_sync_ts');
+        
+        if (!el) return;
+
+        if (!window.isUserLoggedIn) {
+            el.style.display = 'none';
+            return;
+        }
+        
+        el.style.display = 'block';
+        if (ts) {
+            const date = new Date(parseInt(ts));
+            // Форматируем дату красиво
+            const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const dateStr = date.toLocaleDateString();
+            el.innerText = `Synced: ${dateStr} at ${timeStr}`;
+        } else {
+            el.innerText = "Syncing...";
+        }
+    };
+
+    // === СЛУШАТЕЛЬ СОСТОЯНИЯ (ГЛАВНЫЙ КОНТРОЛЛЕР) ===
     onAuthStateChanged(auth, async (user) => {
         const btnText = document.getElementById('login-btn-text');
         const btnIcon = document.getElementById('login-status-icon');
-        const savedLang = localStorage.getItem('xch_lang') || 'en';
-        // Безопасное получение переводов
-        const t = (typeof langData !== 'undefined' && langData[savedLang]) ? langData[savedLang] : { login_text: "Sync Data", logout_text: "Logout" };
+        const currentLang = localStorage.getItem('xch_lang') || 'en';
+        const t = (typeof langData !== 'undefined' && langData[currentLang]) ? langData[currentLang] : { login_text: "Sync Data", logout_text: "Logout" };
 
         if (user) {
+            // ПОЛЬЗОВАТЕЛЬ ВОШЕЛ
             window.isUserLoggedIn = true;
+            console.log("Logged in as:", user.email);
             
-            // UI: Активное состояние
+            // 1. Меняем вид кнопки
             if(btnText) btnText.innerText = `${t.logout_text} (${user.email.split('@')[0]})`;
             if(btnIcon) {
                 btnIcon.innerText = "✓";
-                btnIcon.style.color = "#2ecc71";
+                btnIcon.style.color = "#2ecc71"; // Зеленый
             }
+
+            // 2. Показываем дату (если была сохранена ранее)
+            window.updateLastSyncUI();
             
-            // Загружаем данные
+            // 3. Запускаем загрузку данных
             await loadUserData(user); 
         } else {
+            // ПОЛЬЗОВАТЕЛЬ НЕ ВОШЕЛ
             window.isUserLoggedIn = false;
             
-            // UI: Состояние входа
+            // 1. Возвращаем вид кнопки "Вход"
             if(btnText) btnText.innerText = t.login_text;
             if(btnIcon) {
                 btnIcon.innerText = "G";
                 btnIcon.style.color = "var(--accent)";
             }
+            
+            // 2. Скрываем дату
+            window.updateLastSyncUI();
         }
     });
 
@@ -1580,102 +1640,110 @@
 
             if (docSnap.exists()) {
                 const cloudData = docSnap.data();
-                console.log("Downloading cloud data...");
+                console.log("Cloud data found, merging...");
 
-                // 1. ЛАЙКИ (Объединяем уникальные)
+                // --- 1. СЛИЯНИЕ ЛАЙКОВ И ЧС (Set убирает дубликаты) ---
                 const localFav = window.favorites || [];
                 const cloudFav = cloudData.favorites || [];
                 const mergedFav = [...new Set([...localFav, ...cloudFav])];
 
-                // 2. ЧЕРНЫЙ СПИСОК (Объединяем уникальные)
                 const localBan = window.blacklist || [];
                 const cloudBan = cloudData.blacklist || [];
                 const mergedBan = [...new Set([...localBan, ...cloudBan])];
 
-                // 3. ИСТОРИЯ (Короткая, объединяем по ID)
+                // --- 2. СЛИЯНИЕ ИСТОРИИ (По ID) ---
                 const localHist = window.historyData || [];
                 const cloudHist = cloudData.history || [];
                 const combinedHistMap = new Map();
-                // Сначала облачные, потом локальные (локальные свежее перезапишут)
+                // Сначала берем облако, потом локальные (чтобы локальные были приоритетнее по времени, если совпадают)
                 [...cloudHist, ...localHist].forEach(item => combinedHistMap.set(item.id, item));
+                // Сортируем: новые сверху, берем последние 50
                 const mergedHistory = Array.from(combinedHistMap.values())
                     .sort((a, b) => b.timestamp - a.timestamp)
                     .slice(0, 50);
 
-                // 4. ЛОГ АКТИВНОСТИ (ДЛЯ СТАТИСТИКИ И СЧЕТЧИКА) - ЭТО ВАЖНО
+                // --- 3. СЛИЯНИЕ ЛОГА АКТИВНОСТИ (Для счетчика Explored) ---
                 const localLog = window.activityLog || [];
                 const cloudLog = cloudData.activityLog || [];
-                // Объединяем, фильтруем дубликаты (грубо по timestamp + id) и сортируем
-                // Чтобы не раздувать, берем последние 5000
-                const combinedLog = [...cloudLog, ...localLog];
-                const uniqueLogMap = new Map();
-                combinedLog.forEach(item => uniqueLogMap.set(item.ts + "_" + item.id, item));
-                const mergedActivityLog = Array.from(uniqueLogMap.values())
-                    .sort((a, b) => a.ts - b.ts) // Хронологический порядок
-                    .slice(-5000); // Храним последние 5000 действий
+                // Ключ уникальности: timestamp + id
+                const combinedLogMap = new Map();
+                [...cloudLog, ...localLog].forEach(item => combinedLogMap.set(item.ts + "_" + item.id, item));
+                // Сортируем и обрезаем (храним последние 5000)
+                const mergedActivityLog = Array.from(combinedLogMap.values())
+                    .sort((a, b) => a.ts - b.ts)
+                    .slice(-5000);
 
-                // 5. ВЕСА ТЕГОВ
+                // --- 4. СЛИЯНИЕ ВЕСОВ ТЕГОВ (Обучение) ---
                 const localScores = window.tagScores || {};
                 const cloudScores = cloudData.tagScores || {};
                 const mergedScores = { ...cloudScores };
                 for (const [tag, score] of Object.entries(localScores)) {
-                    // Берем максимум, если тег уже есть
+                    // Берем максимальное значение интереса
                     if (mergedScores[tag]) mergedScores[tag] = Math.max(mergedScores[tag], score);
                     else mergedScores[tag] = score;
                 }
 
-                // 6. ПЛАТФОРМА
+                // --- 5. ПЛАТФОРМА ---
                 let mergedPlatform = localStorage.getItem('xch_platform') || 'ph';
                 if (cloudData.platform) mergedPlatform = cloudData.platform;
 
-                // === ПРИМЕНЕНИЕ В ПАМЯТЬ И LOCALSTORAGE ===
+                // --- ПРИМЕНЕНИЕ (ОБНОВЛЕНИЕ ПЕРЕМЕННЫХ) ---
                 window.favorites = mergedFav;
                 window.blacklist = mergedBan;
                 window.historyData = mergedHistory;
                 window.tagScores = mergedScores;
-                window.activityLog = mergedActivityLog; // Обновляем лог в памяти
+                window.activityLog = mergedActivityLog;
 
+                // --- СОХРАНЕНИЕ ЛОКАЛЬНО ---
                 localStorage.setItem('xch_favorites', JSON.stringify(mergedFav));
                 localStorage.setItem('xch_blacklist', JSON.stringify(mergedBan));
                 localStorage.setItem('xch_history', JSON.stringify(mergedHistory));
                 localStorage.setItem('xch_tag_scores', JSON.stringify(mergedScores));
-                localStorage.setItem('xch_activity_log', JSON.stringify(mergedActivityLog)); // Сохраняем лог
+                localStorage.setItem('xch_activity_log', JSON.stringify(mergedActivityLog));
                 localStorage.setItem('xch_platform', mergedPlatform);
 
-                // === ОТПРАВКА ОБРАТНО В ОБЛАКО (СИНХРОНИЗАЦИЯ) ===
+                // --- СОХРАНЕНИЕ ОБРАТНО В ОБЛАКО (Чтобы синхронизировать второе устройство) ---
                 await setDoc(userRef, {
                     favorites: mergedFav,
                     blacklist: mergedBan,
                     history: mergedHistory,
-                    activityLog: mergedActivityLog, // Отправляем лог в облако
+                    activityLog: mergedActivityLog,
                     tagScores: mergedScores,
                     platform: mergedPlatform,
                     lastSynced: serverTimestamp()
                 }, { merge: true });
 
-                // === ОБНОВЛЕНИЕ UI ===
+                // --- ОБНОВЛЕНИЕ ИНТЕРФЕЙСА ---
+                // 1. Дата
+                const now = Date.now();
+                localStorage.setItem('xch_last_sync_ts', now);
+                window.updateLastSyncUI();
+
+                // 2. Селектор сайта
                 const platEl = document.getElementById('platform');
                 if (platEl) {
                     platEl.value = mergedPlatform;
                     if (typeof updateLink === 'function') updateLink();
                 }
-                if (typeof updateCounts === 'function') updateCounts();
-                if (typeof updateActionButtons === 'function') updateActionButtons();
-                if (typeof renderHistory === 'function') renderHistory();
-                if (typeof updateExploredCount === 'function') updateExploredCount(); // Теперь счетчик обновится!
 
-                console.log("Sync complete (Silent)");
+                // 3. Счетчики и списки (ПРИНУДИТЕЛЬНАЯ ПЕРЕРИСОВКА)
+                if (typeof updateCounts === 'function') updateCounts();
+                if (typeof updateExploredCount === 'function') updateExploredCount();
+                if (typeof renderHistory === 'function') renderHistory();
+                if (typeof updateActionButtons === 'function') updateActionButtons();
+
+                console.log("Data merged and UI updated.");
                 
             } else {
-                console.log("New user, creating cloud data...");
+                console.log("No cloud data. Creating from local...");
                 if (window.syncToCloud) window.syncToCloud();
             }
         } catch (error) {
-            console.error("Error loading user data:", error);
+            console.error("Error loading/merging data:", error);
         }
     }
 
-    // === ОТПРАВКА В ОБЛАКО ===
+    // === АВТОСОХРАНЕНИЕ В ОБЛАКО (При каждом действии) ===
     window.syncToCloud = async function() {
         const user = auth.currentUser;
         if (!user) return;
@@ -1684,22 +1752,27 @@
         const currentPlatform = document.getElementById('platform') ? document.getElementById('platform').value : 'ph';
 
         try {
-            // Включаем activityLog в сохранение
             await setDoc(userRef, {
                 favorites: window.favorites || [],
                 blacklist: window.blacklist || [],
                 tagScores: window.tagScores || {},
                 history: window.historyData || [],
-                activityLog: window.activityLog || [], // Важно!
+                activityLog: window.activityLog || [], // Важно для счетчика
                 platform: currentPlatform, 
                 lastUpdated: serverTimestamp()
             }, { merge: true });
             
-            console.log("Auto-saved to cloud");
+            // Обновляем метку времени
+            const now = Date.now();
+            localStorage.setItem('xch_last_sync_ts', now);
+            window.updateLastSyncUI();
+            
+            console.log("Background sync successful");
         } catch (e) {
             console.error("Sync error:", e);
         }
     };
+
 </script>
 
 <script>
@@ -13723,19 +13796,34 @@
     
     function checkLayout() {
         const isPC = window.innerWidth > 768;
-        const bundle = document.getElementById('settings-bundle');
-        const pcMount = document.getElementById('pc-settings-mount');
-        const mobileMount = document.getElementById('mobile-settings-mount');
+        
+        // Получаем "кирпичики"
+        const bPrefs = document.getElementById('block-prefs');
+        const bFilters = document.getElementById('block-filters');
+        const bAccount = document.getElementById('block-account');
+        const bExtras = document.getElementById('block-extras');
+
         if (isPC) {
-            pcMount.appendChild(bundle);
-            // Fix 1: Force main tab on desktop layout
+            // === РЕЖИМ ПК: ВСЁ В БОКОВУЮ ПАНЕЛЬ ===
+            const sidebar = document.getElementById('pc-settings-mount');
+            // Очищаем мобильные контейнеры
+            sidebar.appendChild(bPrefs);
+            sidebar.appendChild(bFilters);
+            sidebar.appendChild(bAccount); // Аккаунт ПОД фильтрами
+            sidebar.appendChild(bExtras);
+            
+            // Показываем главную вкладку
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.getElementById('tab-home').classList.add('active');
         } else {
-            mobileMount.appendChild(bundle);
+            // === МОБИЛЬНЫЙ РЕЖИМ: РАСКИДЫВАЕМ ПО ВКЛАДКАМ ===
+            document.getElementById('mount-prefs').appendChild(bPrefs);
+            document.getElementById('mount-filters').appendChild(bFilters);
+            document.getElementById('mount-account').appendChild(bAccount);
+            document.getElementById('mount-extras').appendChild(bExtras);
         }
     }
-    
+
     function toggleAccordion(id) { document.getElementById(id).classList.toggle('open'); }
     
     function switchTab(tab) {
@@ -14000,7 +14088,7 @@
     }
 
     // === STATS SYSTEM ===
-    
+
     function openStatistics() {
         // Устанавливаем тексты на кнопках дат при открытии
         const t = langData[currentLang];
