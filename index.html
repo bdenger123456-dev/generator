@@ -18,6 +18,7 @@
             --text-main: #ffffff;
             --text-secondary: #888888;
             --accent: #ff9900;
+            --accent-light: #ffbd55;
             --border: #2a2a2a;
             --highlight-green: #2ecc71;
             --highlight-red: #e74c3c;
@@ -40,8 +41,6 @@
             --text-secondary: #666666;
             --border: #d1d1d6;
             --modal-bg: rgba(255, 255, 255, 0.95);
-
-            /* iOS Colors Light */
             --ios-bg: #F2F2F7;
             --ios-card: #FFFFFF;
             --ios-separator: #C6C6C8;
@@ -54,79 +53,14 @@
             color: var(--text-main);
             margin: 0;
             height: 100vh;
-            overflow: hidden;
+            overflow: hidden; /* Скролл только внутри контейнеров */
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         button, select, input { font-family: inherit; outline: none; }
         a { text-decoration: none; color: inherit; }
 
-        /* === LOGO STYLES === */
-        .logo {
-            display: flex;
-            align-items: center; /* Выравнивание по центру по вертикали */
-            justify-content: center; /* Центрирование */
-            font-size: 28px;
-            font-weight: 900;
-            margin-bottom: 5px; 
-            letter-spacing: -1px;
-            cursor: pointer;
-            line-height: 1;
-        }
-
-        .logo-img {
-            height: 48px;
-            width: auto;
-            margin-right: 0px;
-            display: block;
-            object-fit: contain;
-            transform: translateY(-8px);
-        }
-
-        /* Стили для подзаголовка */
-        .subtitle {
-            font-size: 11px; 
-            color: var(--text-secondary); 
-            text-transform: uppercase;
-            letter-spacing: 1px; 
-            text-align: center; 
-            margin-top: 0; 
-            margin-bottom: 25px;
-            font-weight: 600; 
-            opacity: 0.7; 
-            max-width: 240px; 
-            margin-left: auto; 
-            margin-right: auto; 
-            line-height: 1.4;
-        }
-
-        /* === МОБИЛЬНЫЙ ХЕДЕР === */
-        .mobile-header .logo {
-            font-size: 20px;
-            margin-bottom: 2px;
-        }
-        /* Увеличиваем лого на мобильных */
-        .mobile-header .logo-img {
-            height: 34px; /* Значительно больше текста (20px) */
-            margin-right: 5px;
-        }
-        .mobile-header .subtitle {
-            margin-bottom: 0;
-            font-size: 9px;
-        }
-
-        /* === AGE GATE (ПРОВЕРКА ВОЗРАСТА) === */
-        #age-gate .logo {
-            font-size: 40px;
-            margin-bottom: 20px;
-        }
-        /* Делаем логотип огромным на экране входа */
-        #age-gate .logo-img {
-            height: 70px; /* Намного больше текста (40px) */
-            margin-right: 10px;
-        }
-
-        /* === 2. LAYOUT === */
+        /* === 2. LAYOUT & SIDEBAR === */
         .app-layout { display: flex; height: 100%; width: 100%; }
 
         .sidebar {
@@ -141,8 +75,6 @@
             z-index: 10;
         }
 
-        .logo span { color: var(--accent); }
-
         .main-content {
             flex: 1;
             position: relative;
@@ -155,7 +87,7 @@
 
         .tab-content {
             flex: 1;
-            display: none;
+            display: none; /* Скрыты по умолчанию */
             flex-direction: column;
             align-items: center;
             overflow-y: auto;
@@ -163,13 +95,12 @@
             -webkit-overflow-scrolling: touch; 
             padding: 20px 15px;
             padding-bottom: 120px;
+            padding-top: 110px; /* Место под градиент/хедер */
             width: 100%;
             box-sizing: border-box;
         }
 
-        .tab-content.active {
-            display: flex;
-        }
+        .tab-content.active { display: flex; }
 
         .center-wrapper {
             width: 100%;
@@ -178,79 +109,243 @@
             flex-direction: column;
             align-items: center;
             margin: 0 auto;
-            box-sizing: border-box;
         }
 
-        @media (min-width: 769px) {
-            .center-wrapper { max-width: 900px; }
-            .slot-item { font-size: clamp(32px, 4vw, 72px) !important; }
-        }
-
-        /* === MOBILE HEADER === */
-        .mobile-header {
-            display: none;
-            position: fixed;
-            top: calc(10px + env(safe-area-inset-top)); 
-            left: 50%;
-            transform: translateX(-50%);
-            width: auto;
-            min-width: 260px;
-            max-width: 90%;
-            background: rgba(20, 20, 20, 0.9);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 35px;
-            z-index: 9999;
-            padding: 10px 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            flex-direction: column;
+        /* === 3. LOGO === */
+        .logo {
+            display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 28px;
+            font-weight: 900;
+            margin-bottom: 0;
+            letter-spacing: -1px;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .logo span { color: var(--accent); }
+        .logo-img {
+            height: 48px;
+            width: auto;
+            display: block;
+            object-fit: contain;
+            transform: translateY(-8px);
+        }
+        .subtitle {
+            font-size: 11px; 
+            color: var(--text-secondary); 
+            text-transform: uppercase;
+            letter-spacing: 1px; 
+            text-align: center; 
+            margin-top: 2px; 
+            margin-bottom: 35px;
+            font-weight: 600; 
+            opacity: 0.7; 
+            max-width: 240px; 
+            margin: 0 auto; 
+            line-height: 1.4;
         }
 
-        body.light-theme .mobile-header {
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-
-        .mobile-header .subtitle { font-size: 9px; margin: 2px 0 0 0; opacity: 0.6; padding: 0; white-space: nowrap; }
-
-        /* === GRADIENTS  === */
+        /* === 4. GRADIENTS & MASKS === */
         .top-gradient-mask {
-            display: none;
+            display: none; /* Показываем только на мобильных */
             position: fixed;
-            top: -50px; /* Залезаем наверх за пределы экрана */
-            left: 0; width: 100%; 
-            height: 160px; /* Увеличиваем высоту */
+            top: -50px; /* Перекрываем safe-area */
+            left: 0; width: 100%; height: 160px;
             z-index: 9000; pointer-events: none;
-            /* Градиент начинается не с самого верха, а чуть ниже, чтобы перекрыть safe area */
             background: linear-gradient(to bottom, var(--bg-color) 40%, transparent 100%);
         }
-
         .bottom-gradient-mask {
-            display: none; position: fixed; 
-            bottom: -50px; /* Залезаем вниз */
-            left: 0; width: 100%; 
-            height: 160px; 
+            display: none; 
+            position: fixed; 
+            bottom: -50px; 
+            left: 0; width: 100%; height: 160px;
             z-index: 9000; pointer-events: none;
             background: linear-gradient(to top, var(--bg-color) 40%, transparent 100%);
         }
 
-        .card, .btn-gen, .btn-watch, .related-item-btn, .btn-action {
-            border-radius: 22px !important;
+        /* === 5. CARD & GENERATION === */
+        .animation-text-box { text-align: center; min-height: 20px; margin-bottom: 5px; width: 100%; }
+        .animation-text { font-size: 14px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; opacity: 0; transition: opacity 0.2s; }
+        .animation-text.visible { opacity: 1; }
+
+        /* Единый статус над карточкой */
+        .status-text-combined {
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            
+            /* Увеличиваем шрифт */
+            font-size: 18px; 
+            font-weight: 800; 
+            color: var(--text-main); /* Белый цвет для важности */
+            
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px; /* Отступ до окна результатов */
+            min-height: 24px;
+            width: 100%;
+            white-space: normal;
+            line-height: 1.3;
+            opacity: 1; /* Полная видимость */
+            padding: 0 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5); /* Тень для объема */
         }
-        .btn-action { border-radius: 18px !important; }
 
-        .tab-content { padding-top: 110px !important; padding-bottom: 120px; }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 15px 20px 25px 20px; 
+            text-align: center;
+            position: relative;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            border-radius: 22px;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease-out;
+            width: 100%;
+        }
+        .card.has-results { min-height: 0; height: auto; justify-content: flex-start; gap: 15px; padding-bottom: 30px; }
+        .card.flash-active { background-color: #fff !important; border-color: #fff !important; transform: scale(1.02); }
 
-        @media (max-width: 768px) {
-            .mobile-header { display: flex; }
-            .top-gradient-mask { display: block; }
+        /* Slot Machine */
+        .slot-window {
+            height: 140px; /* Фиксированная высота для одного элемента */
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            /* Маска, чтобы было видно появление сверху/снизу */
+            mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
+        }
+        .card.has-results .slot-window { height: auto !important; margin-bottom: 5px; mask-image: none; -webkit-mask-image: none; overflow: visible; }
+        .slot-reel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform: translateY(0);
+            width: 100%;
+            will-change: transform;
+            filter: blur(0);       
+            opacity: 1;
         }
 
-        /* === IOS SETTINGS STYLE === */
+        /* Элементы слота */
+        .slot-item {
+            height: 140px; /* Должно совпадать с окном */
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            line-height: 1.1;
+            padding: 0 5px;
+            /* Шрифт адаптивный, но крупный */
+            font-size: clamp(32px, 6vw, 52px); 
+            font-weight: 800;
+            color: var(--text-main);
+            flex-shrink: 0;
+            box-sizing: border-box;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Пружинистый зум */
+        }
+        .card.has-results .slot-item { height: auto !important; padding: 10px 0; }
+        #result-text { color: var(--accent); }
+
+        /* Состояние "Уменьшен" перед стартом */
+        .slot-item.shrunk {
+            transform: scale(0.8);
+            opacity: 0.7;
+        }
+
+        /* Состояние "Увеличен" (Победитель) */
+        .slot-item.zoomed {
+            transform: scale(1.2);
+            color: var(--accent);
+            text-shadow: 0 0 20px rgba(255, 153, 0, 0.4);
+        }
+
+        /* Вспышка */
+        @keyframes flashEffect {
+            0% { background-color: transparent; }
+            50% { background-color: rgba(255, 255, 255, 0.8); }
+            100% { background-color: transparent; }
+        }
+        .card.flash-active::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 100;
+            pointer-events: none;
+            animation: flashEffect 0.4s ease-out;
+            border-radius: 22px;
+        }
+
+        .result-description { font-size: 15px; font-weight: 400; color: var(--text-secondary); line-height: 1.4; max-width: 95%; margin: 0; display: none; }
+        .result-description.fade-visible:not(:empty) { display: block; }
+
+        /* === SLOT ANIMATIONS === */
+
+        /* Бесконечная прокрутка (режим ожидания) */
+        @keyframes scrollIdle {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-50%); } /* Двигаем на половину, где список повторяется */
+        }
+
+        /* Класс для режима ожидания */
+        .slot-reel.idle {
+            animation: scrollIdle 60s linear infinite; 
+            filter: blur(5px); 
+            opacity: 0.6;      
+        }
+
+        /* Размытие при быстром вращении */
+        .slot-reel.spinning {
+            filter: blur(0);
+            opacity: 1;
+        }
+
+        /* Buttons & Controls */
+        .btn-gen, .btn-watch, .related-item-btn, .btn-action { border-radius: 22px; outline: none; border: none; cursor: pointer; }
+        
+        .gen-controls { display: flex; gap: 10px; width: 100%; margin-bottom: 15px; transition: opacity 0.3s; }
+        .btn-gen { flex: 1; padding: 22px; background: var(--text-main); color: var(--bg-color); font-size: 18px; font-weight: 900; text-transform: uppercase; box-shadow: 0 4px 15px rgba(255,255,255,0.1); }
+        .btn-gen.secondary { background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border); font-size: 16px; flex: 0.8; }
+
+        .btn-group { display: flex; gap: 10px; margin-bottom: 15px; width: 100%; }
+        .btn-watch { flex: 1; display: flex; align-items: center; justify-content: center; text-decoration: none; padding: 16px; border-radius: 16px; font-weight: 800; font-size: 15px; text-transform: uppercase; background: var(--accent); color: #000; }
+
+        .card-actions { display: flex; gap: 15px; width: 100%; justify-content: center; margin-top: 20px; }
+        .btn-action { 
+            flex: 1; padding: 15px; border-radius: 18px; border: 1px solid var(--border); 
+            background: transparent; color: var(--text-secondary); font-size: 24px;
+            font-weight: 700; transition: all 0.2s; max-width: 80px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .btn-action.ban:hover, .btn-action.ban.active { border-color: var(--highlight-red); background: rgba(231, 76, 60, 0.15); color: var(--highlight-red); transform: scale(1.05); }
+        .btn-action.fav:hover, .btn-action.fav.active { border-color: var(--highlight-green); background: rgba(46, 204, 113, 0.15); color: var(--highlight-green); transform: scale(1.05); }
+
+        /* Related */
+        .related-section { width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 10px; margin-bottom: 20px; text-align: center; }
+        .related-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 10px; opacity: 0.8; width: 100%; display: block; }
+        .related-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; width: 100%; }
+        .related-item-btn { background: var(--card-bg); border: 1px solid var(--border); padding: 8px 14px; border-radius: 12px; font-size: 13px; font-weight: 600; color: var(--text-main); transition: 0.2s; display: inline-block; }
+
+        /* Utility Classes */
+        .hidden-initial { display: none !important; }
+        .visually-hidden { opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .fade-hidden { opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease; display: none; }
+        .fade-visible { opacity: 1; transform: translateY(0); display: flex; }
+
+        /* === 6. IOS SETTINGS & COMPONENTS === */
         .ios-group {
             background: var(--ios-card);
             border-radius: 22px;
@@ -259,7 +354,6 @@
             width: 100%;
             box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
-
         .ios-header {
             margin: 25px 0 8px 20px;
             font-size: 13px;
@@ -267,327 +361,80 @@
             text-transform: uppercase;
             display: flex; justify-content: space-between; align-items: center;
         }
-        .ios-header-info { font-size: 11px; opacity: 0.7; text-transform: none; margin-right: 20px; }
-
         .ios-row {
             display: flex; align-items: center; justify-content: space-between;
             padding: 12px 16px; background: var(--ios-card);
             min-height: 48px; position: relative;
-            border: none !important; border-radius: 0 !important;
-            margin: 0 !important; box-shadow: none !important;
+            border: none; border-radius: 0; margin: 0; box-shadow: none;
         }
-
         .ios-row:not(:last-child)::after {
             content: ""; position: absolute; bottom: 0;
             left: 16px; right: 0; height: 1px;
             background-color: var(--ios-separator); transform: scaleY(0.5);
         }
-
-        .ios-row .platform-label, .ios-row .toggle-text {
-            font-size: 16px; color: var(--text-main); font-weight: 400;
-        }
-
-        .ios-row select {
-            color: var(--text-secondary); font-size: 16px; margin-right: -5px;
-            background: transparent; border: none; text-align: right;
-        }
-
         .ios-row.clickable { cursor: pointer; transition: background 0.2s; }
         .ios-row.clickable:active { background: var(--nav-bg); }
 
-        /* Общий стиль для капсул (Сайт и Логин) */
+        /* Селекты внутри обычных строк (Язык) */
+        .ios-row select {
+            appearance: none;
+            -webkit-appearance: none;
+            background: transparent;
+            border: none;
+            font-size: 16px;
+            color: var(--text-secondary); /* Серый цвет, как в iOS */
+            text-align: right;
+            direction: rtl;
+            padding-right: 0;
+            font-weight: 400;
+            cursor: pointer;
+        }
+        
         .capsule-btn {
             background: var(--ios-card);
-            border-radius: 22px; /* Сильное скругление */
+            border-radius: 22px;
             padding: 5px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            display: flex; justify-content: space-between; align-items: center;
             width: 100%;
-            margin-bottom: 15px; /* Отступ снизу */
+            margin-bottom: 15px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.03);
             min-height: 55px;
             cursor: pointer;
             transition: transform 0.2s, background 0.2s;
-            border: none; /* Убираем рамки */
-        }
-
-        .capsule-btn:active {
-            transform: scale(0.98);
-            background: var(--nav-bg);
-        }
-
-        .capsule-btn span {
-            font-weight: 600;
-            font-size: 16px;
-            color: var(--text-main);
-        }
-
-        /* Стили для селекта внутри капсулы */
-        .capsule-btn select {
-            font-weight: 700;
-            color: var(--accent) !important;
-            font-size: 17px;
-            background: transparent;
             border: none;
-            text-align: right;
-            appearance: none; /* Убираем стандартную стрелку браузера */
-            -webkit-appearance: none;
-            padding-right: 0;
-            cursor: pointer;
+        }
+        .capsule-btn:active { transform: scale(0.98); background: var(--nav-bg); }
+        .capsule-btn span { font-weight: 600; font-size: 16px; color: var(--text-main); }
+        .capsule-btn select {
+            font-weight: 700; color: var(--accent) !important; font-size: 17px;
+            background: transparent; border: none; text-align: right;
+            appearance: none; -webkit-appearance: none; cursor: pointer;
         }
 
-        /* Иконка Google или стрелочка */
-        .capsule-icon {
-            font-size: 18px;
+        /* Дата синхронизации */
+        .sync-date {
+            font-size: 11px;
             color: var(--text-secondary);
-            font-weight: 400;
+            text-align: center;
+            margin-top: 10px;    /* Отступ от кнопки входа */
+            margin-bottom: 20px; /* Отступ до списка */
+            opacity: 0.6;
         }
+        /* Капсула входа внутри блока не должна иметь большой отступ */
+        #block-account #login-capsule { margin-bottom: 0; }
 
         /* Support Banner */
-        /*  Динамический баннер поддержки */
-        :root {
-            /* Добавляем переменную для светлого оттенка акцента */
-            --accent-light: #ffbd55; 
-        }
-
         .support-banner {
-            /* Градиент теперь использует переменные */
             background: linear-gradient(135deg, var(--accent-light), var(--accent));
-            border-radius: 22px;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Тень сделаем нейтральной */
-            cursor: pointer;
-            transition: transform 0.2s;
-            text-align: center;
+            border-radius: 22px; padding: 15px 20px;
+            display: flex; justify-content: center; align-items: center;
+            width: 100%; margin-bottom: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            cursor: pointer; transition: transform 0.2s; text-align: center;
         }
-        .support-banner span {
-            color: #fff; /* Текст всегда белый для контраста */
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-        }
+        .support-banner span { color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.3); font-weight: 700; }
 
-        /* Кнопка Boosty (стиль как у баннера) */
-        .boosty-btn {
-            width: 100%;
-            margin-top: auto; /* Прижать к низу */
-            padding: 15px;
-            border-radius: 16px;
-            font-weight: 800;
-            font-size: 16px;
-            text-transform: uppercase;
-            color: #fff;
-            border: none;
-            background: linear-gradient(135deg, var(--accent-light), var(--accent));
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            cursor: pointer;
-        }
-
-        /* Новая статистика (Графики и Капсула) */
-        /* Контейнер графика с отступами для осей */
-        .chart-wrapper {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding-left: 20px; /* Место для оси Y */
-            padding-bottom: 20px; /* Место для оси X */
-        }
-
-        /* Ось Y (Текст вертикально) */
-        .axis-label-y {
-            position: absolute;
-            left: -15px;
-            top: 50%;
-            transform: translateY(-50%) rotate(-90deg);
-            font-size: 10px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 700;
-        }
-
-        /* Ось X (Текст снизу) */
-        .axis-label-x-title {
-            position: absolute;
-            bottom: -5px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 10px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 700;
-        }
-
-        /* Контейнер баров */
-        .chart-container {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            height: 250px;
-            width: 100%;
-            border-bottom: 1px solid var(--border);
-            border-left: 1px solid var(--border);
-            position: relative;
-        }
-
-        /* Значения над колонками */
-        .bar-value-top {
-            position: absolute;
-            top: -18px;
-            font-size: 9px;
-            font-weight: 700;
-            color: var(--text-main);
-            width: 100%;
-            text-align: center;
-        }
-
-        /* Капсула ДАТ (Timeframe) - стиль как у нижней, но компактнее */
-        .stats-tf-capsule {
-            background: var(--ios-card);
-            border: 1px solid var(--border);
-            border-radius: 50px; /* Полное скругление как у нижней */
-            height: 36px; /* Чуть ниже основной */
-            display: flex;
-            padding: 3px;
-            margin-bottom: 8px; /* Прижат к нижней капсуле */
-            width: 100%;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-
-        .stats-tf-item {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 40px;
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.2s;
-            text-transform: uppercase;
-        }
-
-        .stats-tf-item.active {
-            background: var(--nav-bg); /* Как у нижней */
-            color: var(--text-main);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        /* Обновляем нижнюю капсулу для единообразия */
-        .stats-nav-capsule {
-            margin: 0 !important; /* Убираем лишние отступы */
-            width: 100%;
-        }
-
-        .stats-modal-body {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 15px;
-            overflow-y: auto;
-        }
-
-        .chart-bar-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-end;
-            flex: 1;
-            height: 100%;
-            position: relative;
-        }
-
-        .chart-bar {
-            width: 12px; /* Тонкие столбики */
-            background: var(--accent);
-            border-radius: 4px 4px 0 0;
-            transition: height 0.5s ease;
-            min-height: 4px;
-            position: relative;
-        }
-        /* Двойные бары для активности */
-        .chart-bar.secondary {
-            background: var(--text-secondary);
-            margin-right: 2px;
-        }
-        .bar-wrapper {
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            gap: 2px;
-            height: 100%;
-        }
-
-        .chart-label-x {
-            position: absolute;
-            bottom: -25px;
-            font-size: 10px; /* Чуть крупнее */
-            color: var(--text-secondary);
-            text-align: center;
-            width: 140%; /* Шире, чтобы текст влезал */
-            left: -20%;
-            white-space: nowrap;
-        }
-        
-
-        .chart-value-y {
-            position: absolute;
-            top: -20px;
-            font-size: 10px;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        /* Капсула навигации в статистике */
-        .stats-nav-capsule {
-            background: var(--ios-card);
-            border: 1px solid var(--border);
-            border-radius: 50px;
-            height: 50px;
-            display: flex;
-            padding: 4px;
-            margin: 0px 20px 20px 20px; /* Отступы снизу */
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            flex-shrink: 0;
-        }
-
-        .stats-nav-item {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 40px;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .stats-nav-item.active {
-            background: var(--nav-bg);
-            color: var(--text-main);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        /* Иконка поделиться в шапке */
-        .header-icon-btn {
-            cursor: pointer;
-            font-size: 20px;
-            margin-right: 15px;
-            color: var(--accent);
-        }
-
-        /* Switch */
+        /* Switch & Sliders */
         .switch { position: relative; display: inline-block; width: 44px; height: 24px; margin: 0 5px; flex-shrink: 0; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider {
@@ -601,7 +448,6 @@
         input:checked + .slider { background-color: var(--accent); }
         input:checked + .slider:before { transform: translateX(20px); }
 
-        /* Slider Intensity */
         .range-slider { width: 100%; cursor: pointer; }
         .intensity-labels { display: flex; justify-content: space-between; margin-top: 10px; padding: 0 5px; }
         .intensity-label { font-size: 12px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; }
@@ -609,309 +455,24 @@
         .intensity-label.active[data-val="2"] { color: #ff9900; font-weight: 700; }
         .intensity-label.active[data-val="3"] { color: var(--highlight-red); font-weight: 700; }
 
-        /* Accordions & Separators */
+        /* Accordion */
         .accordion { background: transparent !important; border: none !important; margin: 0 !important; position: relative; }
-        .accordion-head {
-            padding: 16px !important; font-size: 17px !important; font-weight: 400 !important;
-            color: var(--text-main) !important; display: flex; justify-content: space-between; align-items: center;
-        }
+        .accordion-head { padding: 16px !important; font-size: 17px !important; color: var(--text-main) !important; display: flex; justify-content: space-between; align-items: center; }
         .accordion-body { display: none; padding: 0 16px 16px; flex-wrap: wrap; gap: 8px; }
         .accordion-body.open { display: flex; }
-        /* Разделитель между аккордеонами */
         .ios-group .accordion:not(:last-child)::after {
             content: ""; position: absolute; bottom: 0; left: 16px; right: 0; height: 1px;
             background-color: var(--ios-separator); transform: scaleY(0.5); z-index: 1;
         }
 
+        /* Tags */
         .tag {
             padding: 6px 12px; background: var(--bg-color); border: 1px solid var(--border);
             border-radius: 8px; font-size: 12px; color: var(--text-secondary); cursor: pointer;
             font-weight: 600; opacity: 0.7; flex-grow: 1; text-align: center;
         }
         .tag.selected { background: var(--accent); color: #000; border-color: var(--accent); opacity: 1; }
-
-        /* Bottom Nav - Fix 1 */
-        .bottom-nav {
-            display: none; position: fixed;
-            bottom: 20px; /* Чуть выше от края */
-            left: 50%; transform: translateX(-50%);
-            width: 85%; /* Шире для 3 кнопок */
-            max-width: 380px; height: 65px;
-            background: rgba(20, 20, 20, 0.95); 
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-radius: 20px; /* Менее овальный, более прямоугольный */
-            z-index: 9999;
-            padding: 0 10px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-            justify-content: space-between; /* Равномерное распределение */
-        }
-        body.light-theme .bottom-nav {
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-        }
-        .nav-item {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            font-size: 10px; font-weight: 600; color: var(--text-secondary);
-            flex: 1; height: 100%; cursor: pointer; 
-            transition: all 0.2s ease;
-            border-radius: 12px; /* Мягкие квадраты при нажатии */
-        }
-        .nav-item.active { color: var(--text-main); }
-        body.light-theme .nav-item.active { background: rgba(0,0,0,0.05); }
-        .nav-item.active .nav-icon { transform: translateY(-2px); color: var(--accent); }
-        .nav-icon { font-size: 22px; margin-bottom: 2px; transition: transform 0.2s; }
-
-        .sync-date {
-            font-size: 11px;
-            color: var(--text-secondary);
-            text-align: center;
-            margin-top: -10px;
-            margin-bottom: 15px;
-            opacity: 0.6;
-        }
-
-        .subtitle {
-            font-size: 11px; color: var(--text-secondary); text-transform: uppercase;
-            letter-spacing: 1px; text-align: center; margin-top: -15px; margin-bottom: 25px;
-            font-weight: 600; opacity: 0.7; max-width: 240px; margin-left: auto; margin-right: auto; line-height: 1.4;
-        }
-
-        /* === CARD & GENERATION === */
-        .animation-text-box { text-align: center; min-height: 20px; margin-bottom: 5px; width: 100%; }
-        .animation-text { font-size: 14px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; opacity: 0; transition: opacity 0.2s; }
-        .animation-text.visible { opacity: 1; }
-
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            padding: 15px 20px 25px 20px; 
-            text-align: center;
-            position: relative;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            min-height: 180px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.3s ease-out;
-            width: 100%;
-            overflow: visible;
-        }
-        .card.has-results { min-height: 0; height: auto; justify-content: flex-start; gap: 15px; padding-bottom: 30px; }
-        .card.flash-active { background-color: #fff !important; border-color: #fff !important; transform: scale(1.02); }
-
-        .hidden-initial { display: none !important; }
-        .visually-hidden { opacity: 0; pointer-events: none; transition: opacity 0.3s; }
-        .fade-hidden { opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease; display: none; }
-        .fade-visible { opacity: 1; transform: translateY(0); display: flex; }
         
-        .warning-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; color: #fff; cursor: default; }
-        .badge-extreme { background: var(--highlight-red); }
-        .badge-lgbt { background: #9b59b6; }
-        .badge-niche { background: #34495e; }
-        /* Показываем тултип при наведении на сам бейдж */
-        .warning-badge:hover .badge-tooltip,
-        .warning-badge:active .badge-tooltip {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        
-        .badge-help {
-            width: 16px; height: 16px; border-radius: 50%;
-            background: rgba(255,255,255,0.1); color: var(--text-secondary);
-            font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; position: relative;
-        }
-        .badge-help:hover .badge-tooltip, .badge-help.active .badge-tooltip { opacity: 1; }
-
-        /* Slot Machine */
-        .slot-window { height: 150px; width: 100%; overflow: hidden; position: relative; display: flex; justify-content: center; align-items: center; flex-shrink: 0; mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent); -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent); }
-        .card.has-results .slot-window { height: auto !important; margin-bottom: 5px; mask-image: none; -webkit-mask-image: none; overflow: visible; }
-        .slot-reel { display: flex; flex-direction: column; align-items: center; transform: translateY(0); will-change: transform; width: 100%; }
-        .slot-item { height: 150px; width: 100%; display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1.1; padding: 0 5px; box-sizing: border-box; font-size: clamp(28px, 6vw, 64px); font-weight: 800; color: var(--text-main); flex-shrink: 0; word-break: break-word; hyphens: auto; }
-        .card.has-results .slot-item { height: auto !important; padding: 10px 0; }
-        #result-text { color: var(--accent); }
-
-        .result-description { font-size: 15px; font-weight: 400; color: var(--text-secondary); line-height: 1.4; max-width: 95%; margin: 0; display: none; }
-        .result-description.fade-visible:not(:empty) { display: block; }
-        
-        .result-comment {
-            text-align: center;
-            font-size: 14px;
-            color: var(--text-secondary);
-            font-style: italic;
-            margin-bottom: 12px;
-            min-height: 20px;
-            width: 100%;
-            display: block;
-        }
-
-        /* Бейджи привязаны к названию (над слотом) */
-        .badge-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            margin-bottom: 2px;
-            margin-top: 5px;    
-            width: 100%;
-            position: relative;
-            z-index: 5;
-            min-height: 0; 
-        }
-
-        /* Обновленный тултип для длинных описаний */
-        .badge-tooltip {
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(20, 20, 20, 0.95);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            color: #fff;
-            padding: 12px;
-            border-radius: 14px;
-            font-size: 13px;
-            line-height: 1.4;
-            width: 220px; /* Делаем шире для текста */
-            text-align: left; /* Текст слева для читаемости */
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.2s;
-            margin-bottom: 10px;
-            border: 1px solid var(--border);
-            z-index: 100;
-            font-weight: 400;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        /* Action Buttons (Thumbs) */
-        .card-actions { display: flex; gap: 15px; width: 100%; justify-content: center; margin-top: 20px; }
-        .btn-action { 
-            flex: 1; padding: 15px; border-radius: 18px; border: 1px solid var(--border); 
-            background: transparent; color: var(--text-secondary); font-size: 24px;
-            font-weight: 700; cursor: pointer; transition: all 0.2s; max-width: 80px;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .btn-action.ban:hover, .btn-action.ban.active { border-color: var(--highlight-red); background: rgba(231, 76, 60, 0.15); color: var(--highlight-red); transform: scale(1.05); }
-        .btn-action.fav:hover, .btn-action.fav.active { border-color: var(--highlight-green); background: rgba(46, 204, 113, 0.15); color: var(--highlight-green); transform: scale(1.05); }
-
-        .related-section { width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 10px; margin-bottom: 20px; text-align: center; }
-        .related-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 10px; opacity: 0.8; width: 100%; display: block; }
-        .related-tags {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-        }
-
-        @media (max-width: 768px) {
-            .related-tags {
-                flex-wrap: nowrap; /* Запрет переноса */
-                overflow-x: auto; /* Горизонтальный скролл */
-                justify-content: flex-start; /* Выравнивание по левому краю */
-                padding-bottom: 10px; /* Место под скроллбар */
-                padding-left: 5px; 
-                padding-right: 5px;
-                -webkit-overflow-scrolling: touch; /* Плавность на iOS */
-                /* Маска для красивого исчезновения краев */
-                mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
-                -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
-            }
-            
-            .related-item-btn {
-                flex-shrink: 0; /* Чтобы кнопки не сжимались */
-                white-space: nowrap;
-            }
-        }
-        @media (max-width: 768px) {
-            /* 1. Уменьшаем боковые отступы */
-            .center-wrapper { 
-                padding-left: 10px; 
-                padding-right: 10px; 
-                width: 100%; 
-            }
-
-            /* 2. Логотип скрывает кнопку поддержки (добавляем отступ сверху для контента настроек) */
-            #tab-settings .center-wrapper {
-                padding-top: 40px; /* Дополнительный отступ, чтобы хедер не перекрывал первую кнопку */
-            }
-
-            /* 3. Убираем подзаголовок из мобильного хедера */
-            .mobile-header .subtitle { 
-                display: none !important; 
-            }
-            /* Делаем сам хедер компактнее */
-            .mobile-header {
-                padding: 8px 15px;
-                min-width: auto;
-            }
-            
-            /* 4. Компактная карточка результатов */
-            .card {
-                padding: 10px 10px 15px 10px; /* Меньше воздуха внутри */
-                min-height: 140px; /* Уменьшаем минимальную высоту */
-            }
-            
-            /* Слот-машина меньше по высоте */
-            .slot-window { height: 110px; }
-            .slot-item { font-size: clamp(28px, 8vw, 42px); } /* Шрифт чуть меньше */
-            
-            /* Описание результата компактнее */
-            .result-description { font-size: 13px; line-height: 1.3; }
-
-            /* 5. Кнопки лайк/дизлайк меньше */
-            .card-actions { margin-top: 10px; gap: 10px; }
-            .btn-action { 
-                padding: 8px; 
-                height: 45px; /* Фиксированная небольшая высота */
-                font-size: 20px; 
-            }
-            
-            /* Кнопки Watch/Generate тоже чуть компактнее */
-            .btn-watch { padding: 12px; font-size: 14px; }
-            .btn-gen { padding: 16px; font-size: 16px; }
-        }
-        /* Единый стиль для текста над карточкой */
-        .status-text-combined {
-            text-align: center;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-            min-height: 16px;
-            opacity: 0.8;
-            transition: opacity 0.3s;
-        }
-
-        .related-item-btn { background: var(--card-bg); border: 1px solid var(--border); padding: 8px 14px; border-radius: 12px; font-size: 13px; font-weight: 600; color: var(--text-main); cursor: pointer; transition: 0.2s; display: inline-block; }
-        .related-item-btn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
-
-        .btn-group { display: flex; gap: 10px; margin-bottom: 15px; width: 100%; }
-        .btn-watch { flex: 1; display: flex; align-items: center; justify-content: center; text-decoration: none; padding: 16px; border-radius: 16px; font-weight: 800; font-size: 15px; text-transform: uppercase; background: var(--accent); color: #000; }
-
-        .gen-controls { display: flex; gap: 10px; width: 100%; margin-bottom: 15px; transition: opacity 0.3s; }
-        .btn-gen { flex: 1; padding: 22px; background: var(--text-main); color: var(--bg-color); border: none; border-radius: 16px; font-size: 18px; font-weight: 900; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 15px rgba(255,255,255,0.1); }
-        .btn-gen.secondary { background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border); font-size: 16px; flex: 0.8; }
-
-        .explanation-text {
-            font-size: 11px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 0; /* Убираем лишний отступ снизу */
-            text-align: center;
-            min-height: 14px;
-        }
-
-        /* Add Genre Capsule Button Style */
         .capsule-accordion-head {
             background: var(--card-bg); border: 1px solid var(--border);
             border-radius: 50px; padding: 10px 20px;
@@ -921,179 +482,211 @@
             text-transform: uppercase; transition: border 0.2s;
         }
         .capsule-accordion-head:hover { border-color: var(--accent); color: var(--accent); }
-        #mods-block.visually-hidden { opacity: 0; pointer-events: none; }
 
-        /* History */
-        .history-list { display: flex; flex-direction: column; width: 100%; }
-        .history-item-ios { padding: 16px; background: var(--ios-card); font-size: 16px; display: flex; justify-content: space-between; align-items: center; position: relative; cursor: pointer; color: var(--text-main); }
-        .history-item-ios:active { background: var(--nav-bg); }
-        .history-item-ios:not(:last-child)::after { content: ""; position: absolute; bottom: 0; left: 16px; right: 0; height: 1px; background-color: var(--ios-separator); transform: scaleY(0.5); }
+        /* === 7. BOTTOM NAV (Mobile) === */
+        .bottom-nav {
+            display: none; position: fixed;
+            bottom: 20px; /* Отступ снизу */
+            left: 50%; transform: translateX(-50%);
+            width: 85%; max-width: 350px; height: 65px;
+            background: rgba(20, 20, 20, 0.95); 
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 50px; /* Капсула */
+            z-index: 9999;
+            padding: 0 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            justify-content: space-between;
+        }
+        body.light-theme .bottom-nav {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-size: 10px; font-weight: 600; color: var(--text-secondary);
+            flex: 1; height: 100%; cursor: pointer; transition: all 0.2s ease;
+        }
+        .nav-item.active { color: var(--text-main); }
+        .nav-item.active .nav-icon { transform: translateY(-2px); color: var(--accent); }
+        .nav-icon { font-size: 22px; margin-bottom: 2px; transition: transform 0.2s; }
 
-        /* Modals */
+        /* === 8. MODALS === */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-bg); z-index: 1000; display: none; justify-content: center; align-items: center; }
         .modal-overlay.open { display: flex; }
         .modal { background: var(--sidebar-bg); width: 90%; max-width: 500px; max-height: 80%; border-radius: 20px; border: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
         .modal-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; font-weight: 800; font-size: 18px; }
         .modal-body { padding: 10px; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start; }
-
-
-        /* === СТИЛИ ДЛЯ КАТАЛОГОВ (Like/Dislike) === */
-
-        /* Поле поиска в модалке */
-        .modal-search-box {
-            width: 100%;
-            margin-bottom: 15px;
-            position: relative;
-        }
-
+        
+        /* Catalog & Search */
+        .modal-search-box { width: 100%; margin-bottom: 15px; position: relative; }
         .modal-search-input {
-            width: 100%;
-            background: var(--ios-card); /* Контрастный фон */
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 12px;
-            font-size: 16px;
-            color: var(--text-main);
-            outline: none;
+            width: 100%; background: var(--ios-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 12px; font-size: 16px; color: var(--text-main);
         }
-
-        /* Список подсказок при поиске */
         .modal-suggestions {
-            display: none; /* Скрыт по умолчанию */
-            flex-direction: column;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            margin-top: 5px;
-            max-height: 200px;
-            overflow-y: auto;
-            position: absolute;
-            width: 100%;
-            z-index: 100;
+            display: none; flex-direction: column; background: var(--card-bg);
+            border: 1px solid var(--border); border-radius: 12px; margin-top: 5px;
+            max-height: 200px; overflow-y: auto; position: absolute; width: 100%; z-index: 100;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
-
-        .suggestion-row {
-            padding: 10px 15px;
-            border-bottom: 1px solid var(--border);
-            font-size: 14px;
-            color: var(--text-main);
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-        }
+        .suggestion-row { padding: 10px 15px; border-bottom: 1px solid var(--border); font-size: 14px; color: var(--text-main); cursor: pointer; display: flex; justify-content: space-between; }
         .suggestion-row:active { background: var(--nav-bg); }
         .suggestion-row span { color: var(--accent); font-weight: 700; }
-
-        /* Обновленный стиль тега (как в онбординге) */
+        
         .catalog-item {
-            padding: 8px 12px;
-            border-radius: 20px; /* Более круглые */
-            font-size: 13px;
-            font-weight: 600;
-            cursor: default; /* Сам тег не кликабелен, только крестик */
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s;
-            border: none; /* Убираем бордер для чистоты */
-            flex-grow: 0; /* Не растягиваем */
-            width: auto;
+            padding: 8px 12px; border-radius: 20px; font-size: 13px; font-weight: 600;
+            cursor: default; display: flex; align-items: center; gap: 8px; transition: all 0.2s;
+            border: none; flex-grow: 0; width: auto;
         }
-
-        /* Цвета для лайков */
-        .catalog-item.active {
-            background: rgba(46, 204, 113, 0.2); 
-            color: #2ecc71; 
-            border: 1px solid #2ecc71;
-        }
-
-        /* Цвета для дизлайков */
-        .catalog-item.ban-active {
-            background: rgba(231, 76, 60, 0.2);
-            color: #e74c3c;
-            border: 1px solid #e74c3c;
-        }
-
-        /* Крестик удаления */
-        .catalog-remove-btn {
-            cursor: pointer;
-            font-size: 16px;
-            line-height: 1;
-            opacity: 0.6;
-            padding: 0 4px;
-        }
+        .catalog-item.active { background: rgba(46, 204, 113, 0.2); color: #2ecc71; border: 1px solid #2ecc71; }
+        .catalog-item.ban-active { background: rgba(231, 76, 60, 0.2); color: #e74c3c; border: 1px solid #e74c3c; }
+        .catalog-remove-btn { cursor: pointer; font-size: 16px; line-height: 1; opacity: 0.6; padding: 0 4px; }
         .catalog-remove-btn:hover { opacity: 1; transform: scale(1.2); }
 
-        /* Stats Controls */
-        .stats-controls { display: flex; gap: 5px; padding: 10px 15px; border-bottom: 1px solid var(--border); overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        .stats-tab { padding: 6px 12px; border-radius: 15px; font-size: 12px; font-weight: 700; color: var(--text-secondary); background: var(--bg-color); border: 1px solid var(--border); cursor: pointer; white-space: nowrap; }
-        .stats-tab.active { background: var(--accent); color: #000; border-color: var(--accent); }
-        
-        .timeframe-selector { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; padding: 0 15px; }
-        .tf-opt { font-size: 11px; font-weight: 600; color: var(--text-secondary); cursor: pointer; text-transform: uppercase; }
-        .tf-opt.active { color: var(--text-main); text-decoration: underline; }
+        /* Stats Chart & Badges */
+        .chart-wrapper { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding-left: 20px; padding-bottom: 20px; }
+        .axis-label-y { position: absolute; left: -15px; top: 50%; transform: translateY(-50%) rotate(-90deg); font-size: 10px; color: var(--text-secondary); font-weight: 700; }
+        .axis-label-x-title { position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); font-size: 10px; color: var(--text-secondary); font-weight: 700; }
+        .chart-container { display: flex; align-items: flex-end; justify-content: space-between; height: 250px; width: 100%; border-bottom: 1px solid var(--border); border-left: 1px solid var(--border); position: relative; }
+        .bar-value-top { position: absolute; top: -18px; font-size: 9px; font-weight: 700; color: var(--text-main); width: 100%; text-align: center; }
+        .chart-bar-group { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; flex: 1; height: 100%; position: relative; }
+        .chart-bar { width: 12px; background: var(--accent); border-radius: 4px 4px 0 0; transition: height 0.5s ease; min-height: 4px; position: relative; }
+        .chart-bar.secondary { background: var(--text-secondary); margin-right: 2px; }
+        .bar-wrapper { display: flex; align-items: flex-end; justify-content: center; gap: 2px; height: 100%; }
+        .chart-label-x { position: absolute; bottom: -25px; font-size: 10px; color: var(--text-secondary); text-align: center; width: 140%; left: -20%; white-space: nowrap; }
+        .chart-value-y { position: absolute; top: -20px; font-size: 10px; font-weight: 700; color: var(--text-main); }
 
-        .stat-card {
-            width: 100%; background: var(--card-bg); border-radius: 12px; padding: 10px 15px;
-            display: flex; align-items: center; justify-content: space-between;
-            border: 1px solid var(--border); margin-bottom: 8px;
+        .stats-tf-capsule {
+            background: var(--ios-card); border: 1px solid var(--border); border-radius: 50px;
+            height: 36px; display: flex; padding: 3px; margin-bottom: 8px; width: 100%;
         }
-        .stat-rank { font-size: 20px; margin-right: 10px; width: 30px; text-align: center; }
-        .stat-name { font-weight: 700; font-size: 15px; color: var(--text-main); text-transform: uppercase; }
-        .stat-card.rank-1 { border: 2px solid #FFD700; background: linear-gradient(90deg, rgba(255, 215, 0, 0.1), transparent); }
-        .stat-card.rank-2 { border: 2px solid #C0C0C0; background: linear-gradient(90deg, rgba(192, 192, 192, 0.1), transparent); }
-        .stat-card.rank-3 { border: 2px solid #CD7F32; background: linear-gradient(90deg, rgba(205, 127, 50, 0.1), transparent); }
+        .stats-tf-item { flex: 1; display: flex; align-items: center; justify-content: center; border-radius: 40px; font-size: 11px; font-weight: 700; color: var(--text-secondary); cursor: pointer; text-transform: uppercase; }
+        .stats-tf-item.active { background: var(--nav-bg); color: var(--text-main); }
+        .stats-nav-capsule { background: var(--ios-card); border: 1px solid var(--border); border-radius: 50px; height: 50px; display: flex; padding: 4px; margin: 0; width: 100%; flex-shrink: 0; }
+        .stats-nav-item { flex: 1; display: flex; align-items: center; justify-content: center; border-radius: 40px; font-size: 13px; font-weight: 600; color: var(--text-secondary); cursor: pointer; }
+        .stats-nav-item.active { background: var(--nav-bg); color: var(--text-main); }
 
-        .activity-bar { width: 100%; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; margin-top: 5px; display: flex; }
-        .bar-gen { height: 100%; background: var(--text-secondary); }
-        .bar-watch { height: 100%; background: var(--accent); }
+        /* Badges */
+        .warning-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; color: #fff; cursor: default; }
+        .badge-extreme { background: var(--highlight-red); }
+        .badge-lgbt { background: #9b59b6; }
+        .badge-niche { background: #34495e; }
+        .badge-wrapper { display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 2px; margin-top: 5px; width: 100%; position: relative; z-index: 5; min-height: 0; }
+        
+        .badge-tooltip {
+            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+            background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            color: #fff; padding: 12px; border-radius: 14px; font-size: 13px; line-height: 1.4;
+            width: 220px; text-align: left; pointer-events: none; opacity: 0; transition: opacity 0.2s;
+            margin-bottom: 10px; border: 1px solid var(--border); z-index: 100; font-weight: 400;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .warning-badge:hover .badge-tooltip, .warning-badge:active .badge-tooltip { opacity: 1; pointer-events: auto; }
 
-        #mobile-settings-mount, #settings-bundle { width: 100%; display: flex; flex-direction: column; gap: 10px; }
-        .ios-group .platform-box, .ios-group .toggle-wrapper, .ios-group .sidebar-btn { width: 100%; border: none; background: transparent; padding: 0; margin: 0; }
+        /* Mobile Header */
+        .mobile-header {
+            display: none;
+            position: fixed;
+            top: calc(10px + env(safe-area-inset-top)); 
+            left: 50%; transform: translateX(-50%);
+            width: auto; min-width: 260px; max-width: 90%;
+            background: rgba(20, 20, 20, 0.9);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 35px; z-index: 9999;
+            padding: 12px 20px; /* Больше отступа сверху */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            flex-direction: column; align-items: center; justify-content: center;
+        }
+        body.light-theme .mobile-header { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(0, 0, 0, 0.1); }
+        .mobile-header .logo { margin-bottom: 0; display: flex; align-items: center; height: 100%; font-size: 20px; }
+        .mobile-header .logo-img { height: 34px; margin-right: 5px; }
+        .mobile-header .subtitle { display: none !important; }
 
+        /* Onboarding & Age Gate (Modals) */
+        .onb-tag { background: var(--accent); color: #000; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 8px; animation: popIn 0.3s ease; }
+        .onb-tag-remove { cursor: pointer; font-size: 16px; line-height: 1; opacity: 0.6; }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        #age-gate .logo { font-size: 40px; margin-bottom: 20px; }
+        #age-gate .logo-img { height: 70px; margin-right: 10px; }
+
+        /* Стили элементов истории */
+        .history-item-ios {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px; /* Большие отступы для пальца */
+            background: var(--ios-card);
+            font-size: 16px;
+            color: var(--text-main);
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .history-item-ios:active {
+            background: var(--nav-bg);
+        }
+
+        /* Разделительная линия */
+        .history-item-ios:not(:last-child)::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 16px;
+            right: 0;
+            height: 1px;
+            background-color: var(--ios-separator);
+            transform: scaleY(0.5);
+        }
+
+        /* Кнопка повтора в истории */
+        .history-item-ios span:last-child {
+            font-size: 18px;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        /* === 9. MEDIA QUERIES (MOBILE) === */
         @media (max-width: 768px) {
             .sidebar { display: none; }
-            .bottom-nav { display: flex !important; }
+            .mobile-header { display: flex; }
+            .bottom-nav { display: flex; }
+            .top-gradient-mask { display: block; }
             .bottom-gradient-mask { display: block; }
+            
             .main-content { padding: 0; }
-        }
+            
+            /* Боковые отступы */
+            .center-wrapper { padding-left: 10px; padding-right: 10px; width: 100%; }
+            
+            /* Убираем отступы контейнера для настроек/аккаунта, но добавляем внутрь */
+            #tab-settings .center-wrapper, #tab-account .center-wrapper { padding: 0 !important; padding-top: 40px !important; }
+            #mount-prefs, #mount-filters, #mount-account, #mount-extras { padding: 0 15px; width: 100%; }
 
-        /* Тег в онбординге с кнопкой удаления */
-        .onb-tag {
-            background: var(--accent);
-            color: #000;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            animation: popIn 0.3s ease;
-        }
+            /* Compact Card */
+            .card { padding: 10px 10px 15px 10px; min-height: 140px; }
+            .slot-item { font-size: clamp(28px, 8vw, 42px); }
+            .result-description { font-size: 13px; line-height: 1.3; }
+            
+            /* Buttons */
+            .card-actions { margin-top: 10px; gap: 10px; }
+            .btn-action { padding: 8px; height: 45px; font-size: 20px; }
+            .btn-watch { padding: 12px; font-size: 14px; }
+            .btn-gen { padding: 16px; font-size: 16px; }
+            
+            /* Horizontal Scroll for Related */
+            .related-tags { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; padding-bottom: 10px; padding-left: 5px; padding-right: 5px; -webkit-overflow-scrolling: touch; mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%); -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%); }
+            .related-item-btn { flex-shrink: 0; white-space: nowrap; }
 
-        .onb-tag-remove {
-            cursor: pointer;
-            font-size: 16px;
-            line-height: 1;
-            opacity: 0.6;
+            /* Floating Generate Button (Initial State) */
+            #tab-home:not(.generated) { justify-content: center; height: 100vh; padding-bottom: 100px; }
+            #tab-home:not(.generated) .gen-controls { position: fixed; bottom: 95px; left: 0; width: 100%; padding: 0 20px; z-index: 100; margin-bottom: 0; }
+            #tab-home:not(.generated) .btn-gen { box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid var(--accent); }
         }
-        .onb-tag-remove:hover { opacity: 1; }
-
-        @keyframes popIn {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
-        .onb-error {
-            animation: fadeIn 0.3s ease;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
     </style>
 </head>
 <body>
@@ -1211,7 +804,7 @@
         <span class="nav-icon">⚙️</span> <span data-key="nav_settings">Settings</span>
     </div>
     <div class="nav-item" onclick="switchTab('account')" id="nav-account">
-        <span class="nav-icon">👤</span> <span>Account</span>
+        <span class="nav-icon">👤</span> <span data-key="nav_account">Account</span>
     </div>
 </div>
 
@@ -1526,43 +1119,41 @@
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    // Глобальная переменная состояния
+    // Глобальное состояние входа
     window.isUserLoggedIn = false;
 
-    // === ЛОГИКА ВХОДА ===
+    // === ФУНКЦИИ ВХОДА/ВЫХОДА (Доступны глобально) ===
+    
     window.loginWithGoogle = async function() {
         try {
             await signInWithPopup(auth, provider);
-            // Состояние обновится автоматически в onAuthStateChanged
+            // Состояние обновится в onAuthStateChanged
         } catch (error) {
             console.error("Login failed:", error);
         }
     };
 
-    // === ЛОГИКА ВЫХОДА ===
     window.logout = async function() {
         try {
             await signOut(auth);
-            localStorage.removeItem('xch_last_sync_ts'); // Сбрасываем дату при выходе
-            location.reload(); // Перезагружаем страницу для очистки кэша сессии
+            localStorage.removeItem('xch_last_sync_ts'); // Очищаем дату синхронизации
+            location.reload(); // Перезагружаем для чистого старта
         } catch (error) {
             console.error("Logout failed:", error);
         }
     };
 
-    // === ОБРАБОТЧИК КНОПКИ "SYNC DATA / LOGOUT" ===
     window.handleLoginClick = function() {
         if (window.isUserLoggedIn) {
-            // Если уже вошел -> спрашиваем про выход
+            // Берем перевод кнопки выхода или дефолтный
             const t = (typeof langData !== 'undefined' && langData[localStorage.getItem('xch_lang') || 'en']) 
                       ? langData[localStorage.getItem('xch_lang') || 'en'] 
                       : { logout_text: "Logout" };
-                      
+            
             if(confirm((t.logout_text || "Logout") + "?")) {
                 window.logout();
             }
         } else {
-            // Если не вошел -> запускаем вход
             window.loginWithGoogle();
         }
     };
@@ -1570,8 +1161,6 @@
     // === UI: ОБНОВЛЕНИЕ ДАТЫ СИНХРОНИЗАЦИИ ===
     window.updateLastSyncUI = function() {
         const el = document.getElementById('last-sync-date');
-        const ts = localStorage.getItem('xch_last_sync_ts');
-        
         if (!el) return;
 
         if (!window.isUserLoggedIn) {
@@ -1579,10 +1168,11 @@
             return;
         }
         
+        const ts = localStorage.getItem('xch_last_sync_ts');
         el.style.display = 'block';
+        
         if (ts) {
             const date = new Date(parseInt(ts));
-            // Форматируем дату красиво
             const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             const dateStr = date.toLocaleDateString();
             el.innerText = `Synced: ${dateStr} at ${timeStr}`;
@@ -1591,7 +1181,7 @@
         }
     };
 
-    // === СЛУШАТЕЛЬ СОСТОЯНИЯ (ГЛАВНЫЙ КОНТРОЛЛЕР) ===
+    // === СЛУШАТЕЛЬ АВТОРИЗАЦИИ (Главная точка входа) ===
     onAuthStateChanged(auth, async (user) => {
         const btnText = document.getElementById('login-btn-text');
         const btnIcon = document.getElementById('login-status-icon');
@@ -1601,37 +1191,32 @@
         if (user) {
             // ПОЛЬЗОВАТЕЛЬ ВОШЕЛ
             window.isUserLoggedIn = true;
-            console.log("Logged in as:", user.email);
+            console.log("Authorized:", user.email);
             
-            // 1. Меняем вид кнопки
+            // 1. Обновляем кнопку
             if(btnText) btnText.innerText = `${t.logout_text} (${user.email.split('@')[0]})`;
             if(btnIcon) {
                 btnIcon.innerText = "✓";
                 btnIcon.style.color = "#2ecc71"; // Зеленый
             }
 
-            // 2. Показываем дату (если была сохранена ранее)
+            // 2. Показываем статус и грузим данные
             window.updateLastSyncUI();
-            
-            // 3. Запускаем загрузку данных
             await loadUserData(user); 
         } else {
-            // ПОЛЬЗОВАТЕЛЬ НЕ ВОШЕЛ
+            // ПОЛЬЗОВАТЕЛЬ ВЫШЕЛ
             window.isUserLoggedIn = false;
             
-            // 1. Возвращаем вид кнопки "Вход"
             if(btnText) btnText.innerText = t.login_text;
             if(btnIcon) {
                 btnIcon.innerText = "G";
                 btnIcon.style.color = "var(--accent)";
             }
-            
-            // 2. Скрываем дату
             window.updateLastSyncUI();
         }
     });
 
-    // === ЗАГРУЗКА И СЛИЯНИЕ ДАННЫХ ===
+    // === ЗАГРУЗКА И СЛИЯНИЕ ДАННЫХ (СЕРДЦЕ СИНХРОНИЗАЦИИ) ===
     async function loadUserData(user) {
         const userRef = doc(db, "users", user.uid);
         
@@ -1640,61 +1225,64 @@
 
             if (docSnap.exists()) {
                 const cloudData = docSnap.data();
-                console.log("Cloud data found, merging...");
+                console.log("Cloud data received. Merging...");
 
-                // --- 1. СЛИЯНИЕ ЛАЙКОВ И ЧС (Set убирает дубликаты) ---
-                const localFav = window.favorites || [];
+                // 1. ЛАЙКИ (Объединение уникальных ID)
+                const localFav = window.favorites || []; // Берем из глобальной window
                 const cloudFav = cloudData.favorites || [];
                 const mergedFav = [...new Set([...localFav, ...cloudFav])];
 
+                // 2. ЧЕРНЫЙ СПИСОК
                 const localBan = window.blacklist || [];
                 const cloudBan = cloudData.blacklist || [];
                 const mergedBan = [...new Set([...localBan, ...cloudBan])];
 
-                // --- 2. СЛИЯНИЕ ИСТОРИИ (По ID) ---
+                // 3. ИСТОРИЯ (По ID, приоритет более новым)
                 const localHist = window.historyData || [];
                 const cloudHist = cloudData.history || [];
                 const combinedHistMap = new Map();
-                // Сначала берем облако, потом локальные (чтобы локальные были приоритетнее по времени, если совпадают)
+                // Добавляем облачные, потом локальные (локальные перезапишут облачные, если ID совпадает)
                 [...cloudHist, ...localHist].forEach(item => combinedHistMap.set(item.id, item));
-                // Сортируем: новые сверху, берем последние 50
+                // Сортируем: новые в начале
                 const mergedHistory = Array.from(combinedHistMap.values())
                     .sort((a, b) => b.timestamp - a.timestamp)
-                    .slice(0, 50);
+                    .slice(0, 50); // Храним только последние 50
 
-                // --- 3. СЛИЯНИЕ ЛОГА АКТИВНОСТИ (Для счетчика Explored) ---
+                // 4. ЛОГ АКТИВНОСТИ (Для счетчика "Открыто")
                 const localLog = window.activityLog || [];
                 const cloudLog = cloudData.activityLog || [];
-                // Ключ уникальности: timestamp + id
                 const combinedLogMap = new Map();
-                [...cloudLog, ...localLog].forEach(item => combinedLogMap.set(item.ts + "_" + item.id, item));
-                // Сортируем и обрезаем (храним последние 5000)
+                // Уникальный ключ: timestamp + id (чтобы не дублировать записи)
+                [...cloudLog, ...localLog].forEach(item => combinedLogMap.set((item.ts || 0) + "_" + item.id, item));
                 const mergedActivityLog = Array.from(combinedLogMap.values())
-                    .sort((a, b) => a.ts - b.ts)
-                    .slice(-5000);
+                    .sort((a, b) => a.ts - b.ts) // Хронологически
+                    .slice(-5000); // Ограничиваем размер
 
-                // --- 4. СЛИЯНИЕ ВЕСОВ ТЕГОВ (Обучение) ---
+                // 5. ВЕСА ТЕГОВ (Обучение)
                 const localScores = window.tagScores || {};
                 const cloudScores = cloudData.tagScores || {};
                 const mergedScores = { ...cloudScores };
                 for (const [tag, score] of Object.entries(localScores)) {
-                    // Берем максимальное значение интереса
+                    // Берем максимальное значение (чтобы не терять прогресс обучения)
                     if (mergedScores[tag]) mergedScores[tag] = Math.max(mergedScores[tag], score);
                     else mergedScores[tag] = score;
                 }
 
-                // --- 5. ПЛАТФОРМА ---
+                // 6. ПЛАТФОРМА
+                // Приоритет локальной настройке, если она менялась недавно, но тут берем облако если есть
                 let mergedPlatform = localStorage.getItem('xch_platform') || 'ph';
                 if (cloudData.platform) mergedPlatform = cloudData.platform;
 
-                // --- ПРИМЕНЕНИЕ (ОБНОВЛЕНИЕ ПЕРЕМЕННЫХ) ---
+                // === ПРИМЕНЕНИЕ ДАННЫХ ===
+                
+                // А. Обновляем память (window)
                 window.favorites = mergedFav;
                 window.blacklist = mergedBan;
                 window.historyData = mergedHistory;
                 window.tagScores = mergedScores;
                 window.activityLog = mergedActivityLog;
 
-                // --- СОХРАНЕНИЕ ЛОКАЛЬНО ---
+                // Б. Обновляем LocalStorage
                 localStorage.setItem('xch_favorites', JSON.stringify(mergedFav));
                 localStorage.setItem('xch_blacklist', JSON.stringify(mergedBan));
                 localStorage.setItem('xch_history', JSON.stringify(mergedHistory));
@@ -1702,7 +1290,8 @@
                 localStorage.setItem('xch_activity_log', JSON.stringify(mergedActivityLog));
                 localStorage.setItem('xch_platform', mergedPlatform);
 
-                // --- СОХРАНЕНИЕ ОБРАТНО В ОБЛАКО (Чтобы синхронизировать второе устройство) ---
+                // В. Отправляем ОБЪЕДИНЕННЫЙ результат обратно в облако
+                // Это важно: если на телефоне было 5, а на ПК 0, теперь в облаке будет 5
                 await setDoc(userRef, {
                     favorites: mergedFav,
                     blacklist: mergedBan,
@@ -1713,66 +1302,68 @@
                     lastSynced: serverTimestamp()
                 }, { merge: true });
 
-                // --- ОБНОВЛЕНИЕ ИНТЕРФЕЙСА ---
-                // 1. Дата
+                // Г. Обновляем UI
                 const now = Date.now();
                 localStorage.setItem('xch_last_sync_ts', now);
                 window.updateLastSyncUI();
 
-                // 2. Селектор сайта
-                const platEl = document.getElementById('platform');
-                if (platEl) {
-                    platEl.value = mergedPlatform;
-                    if (typeof updateLink === 'function') updateLink();
-                }
-
-                // 3. Счетчики и списки (ПРИНУДИТЕЛЬНАЯ ПЕРЕРИСОВКА)
+                // Принудительно перерисовываем все списки
                 if (typeof updateCounts === 'function') updateCounts();
                 if (typeof updateExploredCount === 'function') updateExploredCount();
                 if (typeof renderHistory === 'function') renderHistory();
                 if (typeof updateActionButtons === 'function') updateActionButtons();
+                
+                // Обновляем селектор сайта
+                const platEl = document.getElementById('platform');
+                if (platEl) { 
+                    platEl.value = mergedPlatform; 
+                    if (typeof updateLink === 'function') updateLink(); 
+                }
 
-                console.log("Data merged and UI updated.");
+                console.log("Data sync complete. Favorites:", mergedFav.length);
                 
             } else {
-                console.log("No cloud data. Creating from local...");
+                console.log("No cloud data. Creating initial backup...");
+                // Если данных в облаке нет, просто заливаем текущие
                 if (window.syncToCloud) window.syncToCloud();
             }
         } catch (error) {
-            console.error("Error loading/merging data:", error);
+            console.error("Error loading data:", error);
         }
     }
 
-    // === АВТОСОХРАНЕНИЕ В ОБЛАКО (При каждом действии) ===
+    // === АВТО-СОХРАНЕНИЕ В ОБЛАКО (Вызывается при лайках/дизлайках) ===
     window.syncToCloud = async function() {
         const user = auth.currentUser;
-        if (!user) return;
+        if (!user) return; // Не вошел - не сохраняем
 
         const userRef = doc(db, "users", user.uid);
         const currentPlatform = document.getElementById('platform') ? document.getElementById('platform').value : 'ph';
 
+        // Собираем данные прямо из window, чтобы они были свежими
+        const dataToSave = {
+            favorites: window.favorites || [],
+            blacklist: window.blacklist || [],
+            tagScores: window.tagScores || {},
+            history: window.historyData || [],
+            activityLog: window.activityLog || [], 
+            platform: currentPlatform,
+            lastUpdated: serverTimestamp()
+        };
+
         try {
-            await setDoc(userRef, {
-                favorites: window.favorites || [],
-                blacklist: window.blacklist || [],
-                tagScores: window.tagScores || {},
-                history: window.historyData || [],
-                activityLog: window.activityLog || [], // Важно для счетчика
-                platform: currentPlatform, 
-                lastUpdated: serverTimestamp()
-            }, { merge: true });
+            await setDoc(userRef, dataToSave, { merge: true });
             
-            // Обновляем метку времени
+            // Обновляем дату
             const now = Date.now();
             localStorage.setItem('xch_last_sync_ts', now);
             window.updateLastSyncUI();
             
-            console.log("Background sync successful");
+            console.log("Auto-save success.");
         } catch (e) {
-            console.error("Sync error:", e);
+            console.error("Auto-save error:", e);
         }
     };
-
 </script>
 
 <script>
@@ -1802,7 +1393,7 @@
         INTENSITY: 'xch_intensity',
         TAG_SCORES: 'xch_tag_scores',
         HISTORY: 'xch_history',
-        ACTIVITY_LOG: 'xch_activity_log' // New log
+        ACTIVITY_LOG: 'xch_activity_log'
     };
 
     let blacklist = JSON.parse(localStorage.getItem(STORAGE.BLACKLIST)) || [];
@@ -12609,6 +12200,7 @@
             subtitle: "Your home for adult preferences",
             lang_label: "Language",
             header_prefs: "Preferences",
+            nav_account: "Account",
             header_data: "Data",
             header_filters: "Filters",
             header_extras: "Extras",
@@ -12704,6 +12296,7 @@
             subtitle: "Твой дом для взрослых предпочтений",
             lang_label: "Язык",
             header_prefs: "Настройки",
+            nav_account: "Аккаунт",
             header_data: "Данные",
             header_filters: "Фильтры",
             header_extras: "Дополнительно",
@@ -12731,7 +12324,7 @@
             exploration_mode: "Откровенность",
             btn_export: "Экспорт",
             btn_import: "Импорт",
-            expl_fav: "Потому что ты любишь ",
+            expl_fav: "Потому что ты любишь: ",
             expl_sim: "Похоже на прошлое",
             expl_rand: "Судьба",
             history_title: "История",
@@ -12799,6 +12392,7 @@
             subtitle: "Tu hogar para preferencias adultas",
             lang_label: "Idioma",
             header_prefs: "Preferencias",
+            nav_account: "Cuenta",
             header_data: "Datos",
             header_filters: "Filtros",
             header_extras: "Extras",
@@ -12892,6 +12486,7 @@
             subtitle: "Dein Zuhause für Erwachsenen-Vorlieben",
             lang_label: "Sprache",
             header_prefs: "Einstellungen",
+            nav_account: "Konto",
             header_data: "Daten",
             header_filters: "Filter",
             header_extras: "Extras",
@@ -12998,26 +12593,36 @@
         initLanguage();
         initTheme();
         initIntensity();
-        setInitialText();
         renderModifiers();
         renderFilters();
         renderHistory();
         updateCounts();
         checkLayout();
         initAgeGate();
-
-        const savedPlatform = localStorage.getItem('xch_platform'); // Проверяем, есть ли сохраненный сайт
+        
+        // Платформа
+        const savedPlatform = localStorage.getItem('xch_platform');
         if (savedPlatform) {
             const platformSelect = document.getElementById('platform');
-            if (platformSelect) {
-                // Если есть, выставляем его в выпадающем списке
-                platformSelect.value = savedPlatform;
-            }
+            if (platformSelect) platformSelect.value = savedPlatform;
         }
         updateLink();
 
+        setWelcomeMessage(); 
+        initIdleSlot(); 
+        
         window.addEventListener('resize', checkLayout);
     };
+
+    function setWelcomeMessage() {
+        const statusEl = document.getElementById('status-text');
+        if(!statusEl) return;
+        
+        const phrases = welcomePhrases[currentLang];
+        // Ставим случайную фразу и делаем цвет акцентным
+        statusEl.innerText = phrases[Math.floor(Math.random() * phrases.length)];
+        statusEl.style.color = "var(--accent)"; 
+    }
 
     function logActivity(type, itemId, tags) {
         const logEntry = {
@@ -13080,115 +12685,150 @@
 
     // === GENERATION LOGIC ===
     function startGeneration(mode) {
-        if(isGenerating) return;
+        if (isGenerating) return;
 
-        // Hide UI during spin
-        document.getElementById('card-block').classList.remove('has-results');
+        // 1. Очистка интерфейса
+        const descEl = document.getElementById('result-desc');
+        descEl.style.display = 'none';
+        document.getElementById('status-text').innerText = ''; 
+        
+        document.getElementById('badge-wrapper').innerHTML = '';
         document.querySelector('.card-actions').classList.add('hidden-initial');
         document.querySelector('.btn-group').classList.add('hidden-initial');
         document.getElementById('related-block').classList.add('hidden-initial');
-        document.getElementById('badge-wrapper').innerHTML = '';
-        
-        // Hide controls to prevent clicking
         document.querySelector('.gen-controls').classList.add('visually-hidden');
         document.getElementById('mods-block').classList.add('visually-hidden');
-        
+        document.getElementById('tab-home').classList.add('generated');
+
         const card = document.getElementById('card-block');
-        card.classList.add('is-spinning');
         card.classList.remove('has-results');
-
-        if (mode === 'random' && currentItem && !hasInteractedWithCurrent) {
-            adjustTagScores(currentItem, -1);
-        }
-        if (mode === 'similar' && currentItem) {
-            adjustTagScores(currentItem, 1);
-        }
-
-        let filtered = filterData();
         
+        // Логика обучения
+        if (mode === 'random' && currentItem && !hasInteractedWithCurrent) adjustTagScores(currentItem, -1);
+        if (mode === 'similar' && currentItem) adjustTagScores(currentItem, 1);
+
+        // Подбор кандидатов
+        let filtered = filterData();
         if (mode === 'similar' && lastGeneratedItem) {
             const subset = filtered.filter(item => {
-                if(item.id === lastGeneratedItem.id) return false;
+                if (item.id === lastGeneratedItem.id) return false;
                 const intersection = item.tags.filter(t => lastGeneratedItem.tags.includes(t));
                 return intersection.length >= 2;
             });
-            if(subset.length > 0) filtered = subset;
+            if (subset.length > 0) filtered = subset;
         }
 
         const reel = document.getElementById('slot-reel');
-        if(filtered.length === 0) {
-            reel.innerHTML = `<div class="slot-item" style="color:var(--highlight-red); height:150px;">${langData[currentLang].empty}</div>`;
-            document.querySelector('.gen-controls').classList.remove('visually-hidden');
-            document.getElementById('mods-block').classList.remove('visually-hidden');
-            document.getElementById('card-block').classList.remove('is-spinning');
+        if (filtered.length === 0) {
+            reel.innerHTML = `<div class="slot-item" style="color:var(--highlight-red);">List Empty</div>`;
+            reel.className = 'slot-reel';
+            resetControls();
             return;
         }
 
         isGenerating = true;
         hasInteractedWithCurrent = false;
-
         const finalItem = getWeightedRandom(filtered);
-        const animText = document.getElementById('anim-text');
-        
-        prepareElementsForFadeIn();
 
-        const anims = animationPhrases[currentLang];
-        animText.innerText = anims[Math.floor(Math.random() * anims.length)];
-        animText.classList.add('visible');
+        // === СЦЕНАРИЙ АНИМАЦИИ (УЛУЧШЕННЫЙ) ===
 
-        let reelHTML = '';
-        const spinLength = 30; // Increased length
-        const itemHeight = 150;
-        const animationTime = 1.8; // Duration in seconds
-        
-        for (let i = 0; i < spinLength; i++) {
+        // Увеличиваем кол-во элементов для эффекта "размытия" при вращении
+        const spinCount = 10;
+        const itemHeight = 140; 
+        let html = '';
+
+        // Генерируем "пустышки"
+        for (let i = 0; i < spinCount - 1; i++) {
             const randomItem = filtered[Math.floor(Math.random() * filtered.length)];
-            const name = getLocalizedName(randomItem); 
-            reelHTML += `<div class="slot-item" style="height:${itemHeight}px">${name}</div>`;
+            html += `<div class="slot-item">${getLocalizedName(randomItem)}</div>`;
         }
-        
-        // И для победителя внизу барабана:
-        let winnerName = getLocalizedName(finalItem);
-        if (currentLang === 'ru' && finalItem.name_ru) winnerName = finalItem.name_ru;
-        else if (currentLang === 'es' && finalItem.name_es) winnerName = finalItem.name_es;
-        else if (currentLang === 'de' && finalItem.name_de) winnerName = finalItem.name_de;
+        // Последний элемент - Победитель
+        const winnerName = getLocalizedName(finalItem);
+        html += `<div class="slot-item" id="result-text">${winnerName}</div>`;
 
-        reelHTML += `<div class="slot-item" id="result-text" style="height:${itemHeight}px">${winnerName}</div>`;
-        
-        reel.innerHTML = reelHTML;
-        
-        // Reset transform
-        reel.style.transition = 'none';
+        // ШАГ 2: Сброс ленты в начало
+        reel.className = 'slot-reel spinning'; 
+        reel.innerHTML = html;
+        reel.style.transition = 'none'; 
         reel.style.transform = 'translateY(0)';
+        
+        // Уменьшаем элементы для эффекта глубины
+        const items = reel.querySelectorAll('.slot-item');
+        items.forEach(el => el.classList.add('shrunk'));
 
-        // Trigger animation
-        setTimeout(() => {
-            reel.style.transition = `transform ${animationTime}s cubic-bezier(0.15, 0.9, 0.3, 1)`;
-            const distance = spinLength * itemHeight;
-            reel.style.transform = `translateY(-${distance}px)`;
-        }, 50);
+        // Force Reflow (Перерисовка браузера)
+        void reel.offsetWidth;
 
-        // Sync with animation time
+        // ШАГ 3: Запуск вращения
+        // Цель - нижний элемент. Сдвиг = -(индекс * высота)
+        const targetIndex = spinCount - 1; 
+        const targetY = -(targetIndex * itemHeight);
+
+        requestAnimationFrame(() => {
+            // cubic-bezier(0.25, 1, 0.5, 1) дает резкий старт и плавную остановку
+            reel.style.transition = 'transform 1.2s cubic-bezier(0.25, 1, 0.5, 1)';
+            reel.style.transform = `translateY(${targetY}px)`;
+        });
+
+        // ШАГ 4: Финал (через 1.2 сек)
         setTimeout(() => {
+            reel.className = 'slot-reel'; 
+            
+            // Находим победителя (последний элемент в списке)
+            const winnerEl = reel.lastElementChild;
+            
+            // Убираем уменьшение
+            items.forEach(el => el.classList.remove('shrunk'));
+            
+            // Зум победителя (Вот здесь была ошибка wrapperEl -> winnerEl)
+            if (winnerEl) winnerEl.classList.add('zoomed');
+            
+            // Вспышка карточки
+            card.classList.add('flash-active');
+            setTimeout(() => card.classList.remove('flash-active'), 400);
+
+            // Рендер UI результата
             finishGeneration(finalItem, mode);
-        }, animationTime * 1000 + 100);
+            
+            // Убираем зум через паузу
+            setTimeout(() => {
+                if (winnerEl) winnerEl.classList.remove('zoomed');
+            }, 600);
+
+        }, 1200); // Тайминг должен совпадать с длительностью transition
+    }
+
+    function resetControls() {
+        document.querySelector('.gen-controls').classList.remove('visually-hidden');
+        document.getElementById('mods-block').classList.remove('visually-hidden');
+        document.getElementById('card-block').classList.remove('is-spinning');
     }
 
     // 1. Просто возвращаем текст объяснения, но не вставляем его в HTML
     function getExplanationText(mode) {
         const t = langData[currentLang];
-        let reason = null; // По умолчанию null
+        let reason = null;
 
         if (mode === 'similar') {
+            // Если нажали "Похожие"
             reason = t.expl_sim;
-        } else if (mode === 'tag_click') {
+        } 
+        else if (mode === 'tag_click') {
+            // Если кликнули по тегу в каталоге
             reason = t.expl_tag_click; 
-        } else {
-            // Проверяем веса тегов
+        } 
+        else {
+            // === УМНЫЙ ПОИСК ПРИЧИНЫ ===
+            
+            // 1. Ищем самый весомый тег текущего предмета
             let bestTag = null;
             let maxScore = 0;
+            
+            // Исключаем общие теги, они не дают хорошего объяснения
+            const ignoreTags = ['universal', 'straight', 'gay', 'lesbian', 'trans', 'bi', 'male', 'female'];
+            
             currentItem.tags.forEach(tag => {
-                if (tagScores[tag] && tagScores[tag] > 5) {
+                if (!ignoreTags.includes(tag) && tagScores[tag] && tagScores[tag] > 5) {
                     if (tagScores[tag] > maxScore) {
                         maxScore = tagScores[tag];
                         bestTag = tag;
@@ -13197,12 +12837,35 @@
             });
             
             if (bestTag) {
-                // Красивое форматирование тега
-                let displayTag = bestTag.charAt(0).toUpperCase() + bestTag.slice(1);
-                reason = t.expl_score + displayTag;
+                // 2. Ищем В ИСТОРИИ или ЛАЙКАХ предмет с этим тегом
+                // Чтобы сказать "Потому что тебе зашло: [Название]"
+                
+                // Сначала ищем в лайках (это сильнее)
+                let sourceItem = null;
+                if (favorites.length > 0) {
+                    const favItem = favorites.map(id => data.find(x => x.id === id)).find(item => item && item.tags.includes(bestTag));
+                    if (favItem) sourceItem = favItem;
+                }
+                
+                // Если в лайках нет, ищем в недавней истории
+                if (!sourceItem && historyData.length > 0) {
+                    const histItem = historyData.map(h => data.find(x => x.id === h.id)).find(item => item && item.id !== currentItem.id && item.tags.includes(bestTag));
+                    if (histItem) sourceItem = histItem;
+                }
+
+                if (sourceItem) {
+                    // Если нашли конкретный пример
+                    const reasonName = getLocalizedName(sourceItem);
+                    reason = t.expl_score + reasonName; // "Потому что тебе зашло: Порка"
+                } else {
+                    // Если не нашли конкретный пример, но тег имеет высокий вес (накопленный)
+                    // Выводим название тега с большой буквы
+                    let displayTag = bestTag.charAt(0).toUpperCase() + bestTag.slice(1);
+                    reason = t.expl_score + displayTag; 
+                }
             }
             else if (favorites.includes(currentItem.id)) {
-                reason = t.expl_fav;
+                reason = t.expl_fav; // "Потому что ты любишь это"
             }
         }
         return reason;
@@ -13215,6 +12878,7 @@
         
         const reel = document.getElementById('slot-reel');
         const winnerName = getLocalizedName(item);
+        reel.removeAttribute('style');
 
         reel.innerHTML = `<div class="slot-item" id="result-text" style="color:var(--accent);">${winnerName}</div>`;
         reel.style.transition = 'none';
@@ -13234,6 +12898,7 @@
         document.getElementById('mods-block').classList.remove('visually-hidden');
         document.querySelector('.card-actions').classList.remove('hidden-initial');
         document.querySelector('.btn-group').classList.remove('hidden-initial');
+        document.getElementById('tab-home').classList.add('generated'); 
 
         updateLink();
         renderResultName();
@@ -13258,6 +12923,9 @@
         // ===================================
 
         setTimeout(() => {
+            const descEl = document.getElementById('result-desc');
+            descEl.style.display = 'block'; 
+            
             const idsToShow = ['result-desc', 'status-text', 'related-block'];
             idsToShow.forEach(id => {
                 const el = document.getElementById(id);
@@ -13787,13 +13455,27 @@
         if(activeLabel) activeLabel.classList.add('active');
     }
 
-    function setInitialText() {
-        const phrases = welcomePhrases[currentLang];
-        const text = phrases[Math.floor(Math.random() * phrases.length)];
+    // Запуск медленной анимации (Attract mode)
+    function initIdleSlot() {
         const reel = document.getElementById('slot-reel');
-        reel.innerHTML = `<div class="slot-item" id="result-text">${text}</div>`;
+        if (!reel) return;
+
+        // Берем 30 случайных элементов
+        const sample = [...data].sort(() => 0.5 - Math.random()).slice(0, 30);
+        
+        // Дублируем список 4 раза для бесшовности
+        let html = '';
+        // Генерируем HTML один раз
+        const itemsHtml = sample.map(item => `<div class="slot-item">${getLocalizedName(item)}</div>`).join('');
+        
+        // Вставляем 4 копии
+        reel.innerHTML = itemsHtml + itemsHtml + itemsHtml + itemsHtml;
+
+        reel.className = 'slot-reel idle'; 
+        reel.style.transform = ''; 
+        reel.style.transition = ''; 
     }
-    
+
     function checkLayout() {
         const isPC = window.innerWidth > 768;
         
