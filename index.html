@@ -1332,21 +1332,23 @@
         }
     }
 
-    // === АВТО-СОХРАНЕНИЕ В ОБЛАКО (Вызывается при лайках/дизлайках) ===
+    // === АВТО-СОХРАНЕНИЕ В ОБЛАКО ===
     window.syncToCloud = async function() {
         const user = auth.currentUser;
         if (!user) return; // Не вошел - не сохраняем
 
         const userRef = doc(db, "users", user.uid);
+        
+        // Читаем настройки интерфейса, если элемент существует
         const currentPlatform = document.getElementById('platform') ? document.getElementById('platform').value : 'ph';
 
-        // Собираем данные прямо из window, чтобы они были свежими
+        // ИСПРАВЛЕНИЕ: Читаем данные напрямую из LocalStorage, так как переменные JS могут быть недоступны в модуле
         const dataToSave = {
-            favorites: window.favorites || [],
-            blacklist: window.blacklist || [],
-            tagScores: window.tagScores || {},
-            history: window.historyData || [],
-            activityLog: window.activityLog || [], 
+            favorites: JSON.parse(localStorage.getItem('xch_favorites')) || [],
+            blacklist: JSON.parse(localStorage.getItem('xch_blacklist')) || [],
+            tagScores: JSON.parse(localStorage.getItem('xch_tag_scores')) || {},
+            history: JSON.parse(localStorage.getItem('xch_history')) || [],
+            activityLog: JSON.parse(localStorage.getItem('xch_activity_log')) || [],
             platform: currentPlatform,
             lastUpdated: serverTimestamp()
         };
@@ -1359,7 +1361,7 @@
             localStorage.setItem('xch_last_sync_ts', now);
             window.updateLastSyncUI();
             
-            console.log("Auto-save success.");
+            console.log("Auto-save success. Items saved:", dataToSave.favorites.length);
         } catch (e) {
             console.error("Auto-save error:", e);
         }
@@ -13350,31 +13352,69 @@
 
     function exportData() {
         const exportObj = {
-            blacklist, favorites, tagScores, history: historyData,
-            settings: { lang: currentLang, theme: localStorage.getItem(STORAGE.THEME), intensity: currentIntensity }
+            // Добавляем activityLog в экспорт
+            activityLog: activityLog, 
+            blacklist, 
+            favorites, 
+            tagScores, 
+            history: historyData,
+            settings: { 
+                lang: currentLang, 
+                theme: localStorage.getItem(STORAGE.THEME), 
+                intensity: currentIntensity,
+                platform: localStorage.getItem('xch_platform') || 'ph'
+            }
         };
-        prompt("Copy:", JSON.stringify(exportObj));
+        // Используем clipboard API для удобства, если поддерживается, или prompt
+        const dataStr = JSON.stringify(exportObj);
+        
+        try {
+            navigator.clipboard.writeText(dataStr).then(() => {
+                alert("Data copied to clipboard!");
+            }).catch(() => {
+                prompt("Copy this data:", dataStr);
+            });
+        } catch (e) {
+            prompt("Copy this data:", dataStr);
+        }
     }
 
     function importData() {
-        const str = prompt("Paste data:");
+        const str = prompt("Paste data here:");
         if(!str) return;
         try {
             const obj = JSON.parse(str);
+            
+            // Восстанавливаем все поля
             if(obj.blacklist) blacklist = obj.blacklist;
             if(obj.favorites) favorites = obj.favorites;
             if(obj.tagScores) tagScores = obj.tagScores;
             if(obj.history) historyData = obj.history;
-            if(obj.settings) currentIntensity = obj.settings.intensity || 1;
+            if(obj.activityLog) activityLog = obj.activityLog; // Восстанавливаем лог
             
+            // Настройки
+            if(obj.settings) {
+                if (obj.settings.intensity) currentIntensity = obj.settings.intensity;
+                if (obj.settings.platform) localStorage.setItem('xch_platform', obj.settings.platform);
+                if (obj.settings.lang) localStorage.setItem(STORAGE.LANG, obj.settings.lang);
+            }
+            
+            // Сохраняем в память браузера
             saveLists();
             localStorage.setItem(STORAGE.TAG_SCORES, JSON.stringify(tagScores));
             localStorage.setItem(STORAGE.HISTORY, JSON.stringify(historyData));
+            localStorage.setItem(STORAGE.ACTIVITY_LOG, JSON.stringify(activityLog)); // Сохраняем лог
             localStorage.setItem(STORAGE.INTENSITY, currentIntensity);
+            
+            // Синхронизируем с облаком сразу после импорта
             if (window.syncToCloud) window.syncToCloud();
             
-            alert("Done! Reloading..."); location.reload();
-        } catch(e) { alert("Error!"); }
+            alert("Import successful! Reloading page..."); 
+            location.reload();
+        } catch(e) { 
+            console.error(e);
+            alert("Error parsing data! Check format."); 
+        }
     }
 
     function renderFilters() {
