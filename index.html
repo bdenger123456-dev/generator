@@ -1151,7 +1151,7 @@
                 <option value="sb">SpankBang</option>
                 <option value="yp">YouPorn</option>
                 <option value="rt">RedTube</option>
-                <option value="google">Google</option>
+                <option value="google">Google Images</option>
             </select>
         </div>
 
@@ -1423,12 +1423,10 @@
 
 <!-- FIREBASE INTEGRATION -->
 <script type="module">
-    // 1. Импортируем Firebase через URL (для работы прямо в браузере)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // 2.  ключи
     const firebaseConfig = {
         apiKey: "AIzaSyC94QWRaFu0o60kDSU8Uz0VJAcXwaDWjlI",
         authDomain: "xfetishhub.firebaseapp.com",
@@ -1438,80 +1436,69 @@
         appId: "1:617015941952:web:4f75df1239b0c114d8f8a5"
     };
 
-    // 3. Инициализация
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    console.log("Firebase initialized correctly!");
-
-    // --- ЛОГИКА ВХОДА И СИНХРОНИЗАЦИИ ---
-
-    // Функция входа (делаем её глобальной, чтобы вызывать из HTML onclick)
+    // === ВХОД ===
     window.loginWithGoogle = async function() {
         try {
             await signInWithPopup(auth, provider);
-            // Страница не перезагружается, состояние обновится в onAuthStateChanged
+            // Никаких алертов, состояние обновится само
         } catch (error) {
             console.error("Login failed:", error);
-            alert("Login error: " + error.message);
         }
     };
 
-    // Функция выхода
+    // === ВЫХОД ===
     window.logout = async function() {
         try {
             await signOut(auth);
-            alert("Logged out");
-            location.reload(); // Перезагружаем, чтобы очистить данные сессии
+            location.reload(); // Перезагрузка для очистки сессии
         } catch (error) {
             console.error("Logout failed:", error);
         }
     };
 
-    // Глобальная переменная для состояния
     window.isUserLoggedIn = false;
 
-    // 1. Умный обработчик клика по капсуле
+    // Обработчик клика по кнопке
     window.handleLoginClick = function() {
         if (window.isUserLoggedIn) {
-            // Если уже вошел -> Выходим
-            const t = langData[currentLang]; // Берем переводы
-            if(confirm(t.logout_text + "?")) {
+            const t = typeof langData !== 'undefined' ? (langData[localStorage.getItem('xch_lang') || 'en']) : { logout_text: "Logout" };
+            if(confirm((t.logout_text || "Logout") + "?")) {
                 window.logout();
             }
         } else {
-            // Если не вошел -> Входим
             window.loginWithGoogle();
         }
     };
 
-    // 2. Слушатель изменения состояния (обновляет текст и иконку)
+    // Слушатель состояния
     onAuthStateChanged(auth, async (user) => {
         const btnText = document.getElementById('login-btn-text');
         const btnIcon = document.getElementById('login-status-icon');
-        
-        // Получаем текущий словарь
         const savedLang = localStorage.getItem('xch_lang') || 'en';
-        const t = langData[savedLang] || langData['en'];
+        // Безопасное получение переводов
+        const t = (typeof langData !== 'undefined' && langData[savedLang]) ? langData[savedLang] : { login_text: "Sync Data", logout_text: "Logout" };
 
         if (user) {
             window.isUserLoggedIn = true;
-            console.log("User:", user.email);
             
-            // Меняем вид капсулы на "Активный"
+            // UI: Активное состояние
             if(btnText) btnText.innerText = `${t.logout_text} (${user.email.split('@')[0]})`;
             if(btnIcon) {
-                btnIcon.innerText = "✓"; // Галочка
-                btnIcon.style.color = "#2ecc71"; // Зеленый цвет
+                btnIcon.innerText = "✓";
+                btnIcon.style.color = "#2ecc71";
             }
             
-            await loadUserData(user); //  функция загрузки
+            // Загружаем данные
+            await loadUserData(user); 
         } else {
             window.isUserLoggedIn = false;
             
-            // Возвращаем вид "Вход"
+            // UI: Состояние входа
             if(btnText) btnText.innerText = t.login_text;
             if(btnIcon) {
                 btnIcon.innerText = "G";
@@ -1520,8 +1507,7 @@
         }
     });
 
-    // Функция загрузки данных
-    // Функция загрузки и ОБЪЕДИНЕНИЯ данных
+    // === ЗАГРУЗКА И СЛИЯНИЕ ДАННЫХ ===
     async function loadUserData(user) {
         const userRef = doc(db, "users", user.uid);
         
@@ -1530,135 +1516,122 @@
 
             if (docSnap.exists()) {
                 const cloudData = docSnap.data();
-                console.log("Cloud data found:", cloudData);
+                console.log("Downloading cloud data...");
 
-                // --- 1. ЛОГИКА ОБЪЕДИНЕНИЯ (MERGE) ---
-                
-                // Лайки: Берем локальные + облачные, убираем дубликаты через Set
+                // 1. ЛАЙКИ (Объединяем уникальные)
                 const localFav = window.favorites || [];
                 const cloudFav = cloudData.favorites || [];
-                // Set автоматически удаляет повторы
                 const mergedFav = [...new Set([...localFav, ...cloudFav])];
 
-                // Черный список: аналогично
+                // 2. ЧЕРНЫЙ СПИСОК (Объединяем уникальные)
                 const localBan = window.blacklist || [];
                 const cloudBan = cloudData.blacklist || [];
                 const mergedBan = [...new Set([...localBan, ...cloudBan])];
 
-                // История: Объединяем, сортируем по времени (новые сверху), обрезаем до 50
+                // 3. ИСТОРИЯ (Короткая, объединяем по ID)
                 const localHist = window.historyData || [];
                 const cloudHist = cloudData.history || [];
-                // Уникальность истории проверяем по ID элемента
                 const combinedHistMap = new Map();
-                [...cloudHist, ...localHist].forEach(item => {
-                    // Если запись уже есть, оставляем ту, что новее (или просто перезаписываем)
-                    combinedHistMap.set(item.id, item);
-                });
+                // Сначала облачные, потом локальные (локальные свежее перезапишут)
+                [...cloudHist, ...localHist].forEach(item => combinedHistMap.set(item.id, item));
                 const mergedHistory = Array.from(combinedHistMap.values())
-                    .sort((a, b) => b.timestamp - a.timestamp) // Сортировка по убыванию времени
-                    .slice(0, 50); // Оставляем только последние 50
+                    .sort((a, b) => b.timestamp - a.timestamp)
+                    .slice(0, 50);
 
-                // Веса тегов (Tag Scores): Складываем значения или берем максимальное
+                // 4. ЛОГ АКТИВНОСТИ (ДЛЯ СТАТИСТИКИ И СЧЕТЧИКА) - ЭТО ВАЖНО
+                const localLog = window.activityLog || [];
+                const cloudLog = cloudData.activityLog || [];
+                // Объединяем, фильтруем дубликаты (грубо по timestamp + id) и сортируем
+                // Чтобы не раздувать, берем последние 5000
+                const combinedLog = [...cloudLog, ...localLog];
+                const uniqueLogMap = new Map();
+                combinedLog.forEach(item => uniqueLogMap.set(item.ts + "_" + item.id, item));
+                const mergedActivityLog = Array.from(uniqueLogMap.values())
+                    .sort((a, b) => a.ts - b.ts) // Хронологический порядок
+                    .slice(-5000); // Храним последние 5000 действий
+
+                // 5. ВЕСА ТЕГОВ
                 const localScores = window.tagScores || {};
                 const cloudScores = cloudData.tagScores || {};
-                const mergedScores = { ...cloudScores }; // Начинаем с облачных
-                
-                // Добавляем/обновляем локальными данными (можно сделать сложнее, но пока так надежнее)
+                const mergedScores = { ...cloudScores };
                 for (const [tag, score] of Object.entries(localScores)) {
-                    if (mergedScores[tag]) {
-                        // Если тег есть и там и там, берем максимальный интерес
-                        mergedScores[tag] = Math.max(mergedScores[tag], score);
-                    } else {
-                        mergedScores[tag] = score;
-                    }
+                    // Берем максимум, если тег уже есть
+                    if (mergedScores[tag]) mergedScores[tag] = Math.max(mergedScores[tag], score);
+                    else mergedScores[tag] = score;
                 }
 
-                // Платформа (сайт): Если в облаке есть свежая запись, берем её, иначе оставляем локальную
+                // 6. ПЛАТФОРМА
                 let mergedPlatform = localStorage.getItem('xch_platform') || 'ph';
-                if (cloudData.platform) {
-                    mergedPlatform = cloudData.platform;
-                }
+                if (cloudData.platform) mergedPlatform = cloudData.platform;
 
-                // --- 2. ПРИМЕНЕНИЕ ДАННЫХ ---
-                
-                // Обновляем глобальные переменные
+                // === ПРИМЕНЕНИЕ В ПАМЯТЬ И LOCALSTORAGE ===
                 window.favorites = mergedFav;
                 window.blacklist = mergedBan;
                 window.historyData = mergedHistory;
                 window.tagScores = mergedScores;
+                window.activityLog = mergedActivityLog; // Обновляем лог в памяти
 
-                // Сохраняем объединенный результат обратно в LocalStorage
                 localStorage.setItem('xch_favorites', JSON.stringify(mergedFav));
                 localStorage.setItem('xch_blacklist', JSON.stringify(mergedBan));
                 localStorage.setItem('xch_history', JSON.stringify(mergedHistory));
                 localStorage.setItem('xch_tag_scores', JSON.stringify(mergedScores));
+                localStorage.setItem('xch_activity_log', JSON.stringify(mergedActivityLog)); // Сохраняем лог
                 localStorage.setItem('xch_platform', mergedPlatform);
 
-                // --- 3. СОХРАНЯЕМ ОБРАТНО В ОБЛАКО ---
-                // Это важно: теперь в облаке лежит полная сумма данных с обоих устройств
+                // === ОТПРАВКА ОБРАТНО В ОБЛАКО (СИНХРОНИЗАЦИЯ) ===
                 await setDoc(userRef, {
                     favorites: mergedFav,
                     blacklist: mergedBan,
                     history: mergedHistory,
+                    activityLog: mergedActivityLog, // Отправляем лог в облако
                     tagScores: mergedScores,
                     platform: mergedPlatform,
                     lastSynced: serverTimestamp()
                 }, { merge: true });
 
-                // --- 4. ОБНОВЛЕНИЕ ИНТЕРФЕЙСА ---
-                
-                // Проверка премиума
-                if (cloudData.isPremium) {
-                    localStorage.setItem('xch_is_premium', 'true');
-                }
-
-                // Обновляем UI (селектор сайта)
+                // === ОБНОВЛЕНИЕ UI ===
                 const platEl = document.getElementById('platform');
                 if (platEl) {
                     platEl.value = mergedPlatform;
                     if (typeof updateLink === 'function') updateLink();
                 }
-
-                // Обновляем счетчики и списки
                 if (typeof updateCounts === 'function') updateCounts();
                 if (typeof updateActionButtons === 'function') updateActionButtons();
                 if (typeof renderHistory === 'function') renderHistory();
-                if (typeof updateExploredCount === 'function') updateExploredCount();
+                if (typeof updateExploredCount === 'function') updateExploredCount(); // Теперь счетчик обновится!
 
-                alert(langData[localStorage.getItem('xch_lang') || 'en'].sync_success || "Data synced!");
+                console.log("Sync complete (Silent)");
                 
             } else {
-                console.log("No cloud data. Creating from local...");
-                // Если в облаке пусто, просто загружаем туда текущие локальные данные
+                console.log("New user, creating cloud data...");
                 if (window.syncToCloud) window.syncToCloud();
             }
         } catch (error) {
             console.error("Error loading user data:", error);
-            alert("Sync error: " + error.message);
         }
     }
 
+    // === ОТПРАВКА В ОБЛАКО ===
     window.syncToCloud = async function() {
         const user = auth.currentUser;
         if (!user) return;
 
         const userRef = doc(db, "users", user.uid);
-        
-        // Получаем текущий выбор сайта
         const currentPlatform = document.getElementById('platform') ? document.getElementById('platform').value : 'ph';
 
         try {
+            // Включаем activityLog в сохранение
             await setDoc(userRef, {
                 favorites: window.favorites || [],
                 blacklist: window.blacklist || [],
                 tagScores: window.tagScores || {},
                 history: window.historyData || [],
-                
+                activityLog: window.activityLog || [], // Важно!
                 platform: currentPlatform, 
-                
                 lastUpdated: serverTimestamp()
             }, { merge: true });
-            console.log("Synced to cloud (with platform) ✅");
+            
+            console.log("Auto-saved to cloud");
         } catch (e) {
             console.error("Sync error:", e);
         }
