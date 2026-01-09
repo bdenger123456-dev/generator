@@ -253,9 +253,9 @@
 
         .status-text-combined {
             text-align: center; display: flex; justify-content: center; align-items: center;
-            font-size: 18px; font-weight: 600; color: var(--text-main);
-            text-transform: none; letter-spacing: 1px;
-            margin-bottom: 10px; min-height: auto; width: 100%;
+            font-size: 16px; font-weight: 700; color: var(--text-main);
+            text-transform: uppercase; letter-spacing: 1px;
+            margin-bottom: 15px; min-height: auto; width: 100%;
             line-height: 1.3; text-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
 
@@ -271,7 +271,7 @@
             align-items: center;
             transition: all 0.3s ease-out;
         }
-        .card.has-results { min-height: 0; height: auto; justify-content: flex-start; gap: 15px; padding-bottom: 30px; }
+        .card.has-results { padding-top: 15px; height: auto; justify-content: flex-start; gap: 10px; padding-bottom: 15px; }
         
         /* Slot Window */
         .slot-window {
@@ -284,7 +284,12 @@
             border-top: 1px solid transparent; 
             border-bottom: 1px solid transparent;
         }
-        .card.has-results .slot-window { height: auto !important; margin-bottom: 5px; overflow: visible; }
+
+        .card.has-results .slot-window {
+            height: auto !important;
+            margin: 0;
+            overflow: visible;
+        }
 
         .slot-reel {
             display: flex; flex-direction: column; align-items: center;
@@ -300,7 +305,10 @@
             flex-shrink: 0; box-sizing: border-box;
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .card.has-results .slot-item { height: auto !important; padding: 10px 0; }
+        .card.has-results .slot-item {
+            padding: 0;
+            margin-bottom: 5px;
+        }
         
         /* Animations & Effects */
         .slot-item.shrunk { transform: scale(0.8); opacity: 0.7; }
@@ -535,13 +543,12 @@
         11. Tinder Logic
         ========================================= */
         .tinder-actions {
-            display: flex;
-            gap: 15px;
+            margin-top: auto; 
+            padding-top: 10px;
+            border-top: none;
             width: 100%;
-            margin-bottom: 10px;
-            margin-top: auto;
-            padding-top: 15px;
-            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
         }
 
         .result-description {
@@ -553,10 +560,8 @@
         }
 
         .related-section {
+            margin-top: 15px;
             margin-bottom: 15px;
-            background: var(--bg-color); /* Слегка выделить фон */
-            padding: 10px;
-            border-radius: 12px;
             width: 100%;
         }
 
@@ -580,15 +585,20 @@
         .btn-tinder:active { transform: scale(0.95); }
 
         .btn-pass {
-            background: var(--card-bg);
+            background:transparent;
             border: 2px solid var(--highlight-red);
             color: var(--highlight-red);
         }
         
         .btn-like {
-            background: var(--accent);
-            color: #000; /* Контраст на акцентном цвете */
-            border: 2px solid var(--accent);
+            background: var(--highlight-green) !important;
+            color: #fff !important; /* Белый текст для контраста */
+            border: 2px solid var(--highlight-green) !important;
+        }
+
+        .btn-like:active, .btn-like.active-state {
+            background: rgba(46, 204, 113, 0.2) !important;
+            color: var(--highlight-green) !important;
         }
 
         /* === 3. КНОПКА НАЗАД (UNDO) === */
@@ -624,8 +634,8 @@
             transform-origin: 50% 100%;
             will-change: transform, opacity;
             height: auto;
-            min-height: 300px;
-            justify-content: flex-start;
+            min-height: 280px;
+            justify-content: space-between;
             padding-bottom: 20px;
         }
 
@@ -836,57 +846,57 @@
         <div id="tab-home" class="tab-content active">
             <div class="center-wrapper">
                 
-                <!-- КНОПКА СТАРТА (Вне карточки, исчезает после первого раза) -->
-                <div class="gen-controls" id="start-btn-container">
-                    <button class="btn-gen" onclick="startGeneration('random')">Start Exploring</button>
-                </div>
+                <!-- ФРАЗА (Сверху) -->
+                <div class="status-text-combined" id="status-text" style="min-height: 24px; margin-bottom: 5px; display:flex; align-items:center; justify-content:center;"></div>
 
                 <!-- КАРТОЧКА -->
                 <div class="card" id="card-block">
-                    <!-- Оверлеи для свайпов -->
+                    <!-- Оверлеи -->
                     <div class="swipe-overlay overlay-like">LIKE</div>
                     <div class="swipe-overlay overlay-nope">NOPE</div>
 
-                    <!-- Бейджи (Экстрим и т.д.) -->
+                    <!-- Бейджи -->
                     <div class="badge-wrapper" id="badge-wrapper"></div>
                     
-                    <!-- Окно с названием (Слот) -->
+                    <!-- Название -->
                     <div class="slot-window">
                         <div id="slot-reel" class="slot-reel">
                             <div class="slot-item" id="result-text">Press Start</div>
                         </div>
                     </div>
                     
-                    <!-- Описание фетиша -->
+                    <!-- Описание -->
                     <div id="result-desc" class="result-description"></div>
 
-                    <!-- Фраза-объяснение (Судьба / Потому что лайкнул...) -->
-                    <div class="status-text-combined" id="status-text" style="display:none; font-size: 14px; margin: 10px 0; color: var(--accent);"></div>
-
-                    <!-- Похожие (Внутри карточки) -->
-                    <div class="related-section hidden-initial" id="related-block">
-                        <div class="related-title" data-key="related_header">You might also like:</div>
-                        <div class="related-tags" id="related-tags"></div>
-                    </div>
-
-                    <!-- ЛАЙК/ДИЗЛАЙК (Внутри карточки, внизу) -->
+                    <!-- КНОПКИ ЛАЙК/ДИЗЛАЙК (Внизу карточки) -->
                     <div class="tinder-actions hidden-initial" id="main-actions">
                         <button class="btn-tinder btn-pass" id="btn-tinder-pass" onclick="handleSwipeAction('left')">
-                            👎 Other
+                            👎 <span data-key="btn_pass">Other</span>
                         </button>
                         <button class="btn-tinder btn-like" id="btn-tinder-like" onclick="handleSwipeAction('right')">
-                            👍 Similar
+                            👍 <span data-key="btn_like">Similar</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Дополнительные кнопки (Снаружи карточки) -->
-                <div class="btn-group hidden-initial" style="margin-top: 15px;">
+                <!-- 1. Кнопка СТАРТА -->
+                <div class="gen-controls" id="start-btn-container">
+                    <button class="btn-gen" onclick="startGeneration('random')" data-key="btn_start">Start Exploring</button>
+                </div>
+
+                <!-- 2. Блок "ВАМ ТАКЖЕ МОЖЕТ ПОНРАВИТЬСЯ" -->
+                <div class="related-section hidden-initial" id="related-block">
+                    <div class="related-title" data-key="related_header">You might also like:</div>
+                    <div class="related-tags" id="related-tags"></div>
+                </div>
+
+                <!-- 3. Кнопка WATCH -->
+                <div class="btn-group hidden-initial" style="width:100%">
                     <a href="#" target="_blank" class="btn-watch" id="watch-link" onclick="handleOutboundClick()">Watch</a>
                 </div>
 
                 <!-- Модификаторы -->
-                <div id="mods-block" class="hidden-initial" style="width:100%">
+                <div id="mods-block" class="hidden-initial" style="width:100%; margin-top: 15px;">
                     <div class="capsule-accordion-head" onclick="toggleAccordion('mod-container')">
                         <span data-key="add_genre">Add Genre</span> <span>▼</span>
                     </div>
@@ -1075,7 +1085,7 @@
                 <option value="sb">SpankBang</option>
                 <option value="yp">YouPorn</option>
                 <option value="rt">RedTube</option>
-                <option value="google">Google</option>
+                <option value="google">Google Images</option>
             </select>
         </div>
 
@@ -1704,7 +1714,7 @@
 
     /* =================== ⚒️ DEBUG MODE =========================== */
     
-    subscriptionLevel = 'pro'; 
+    // subscriptionLevel = 'pro'; 
     // subscriptionLevel = 'beast';
 
     /* =========================================================== */
@@ -12573,7 +12583,7 @@
         { key: 'Trans', en: 'Trans', ru: 'Транс', es: 'Trans', de: 'Trans' },
         { key: 'Orgy', en: 'Orgy', ru: 'Оргия', es: 'Orgía', de: 'Orgie' },
         { key: 'VR', en: 'VR', ru: 'VR', es: 'RV (VR)', de: 'VR' },
-        { key: 'Cosplay', en: 'Cosplay', ru: 'Косплей', es: 'Cosplay', de: 'Cosplay' },
+        { key: 'Compilation', en: 'Compilation', ru: 'Сборник', es: 'Compilación', de: 'Kompilation' },
         { key: 'Vintage', en: 'Vintage', ru: 'Ретро', es: 'Vintage', de: 'Vintage' },
         { key: 'Solo', en: 'Solo', ru: 'Соло', es: 'Solo', de: 'Solo' },
         { key: 'AI', en: 'AI', ru: 'ИИ', es: 'IA', de: 'KI' },
@@ -12615,6 +12625,10 @@
             theme_title: "Choose Theme",
             theme_basic: "Basic",
             theme_premium: "Premium Colors",
+            btn_start: "Start Exploring",
+            btn_pass: "Other",
+            btn_like: "Similar",
+            btn_upgrade_short: "Upgrade ⇧",
             
             // --- 2. Generator (Main Tab) ---
             generate: "Random Genre",
@@ -12751,6 +12765,10 @@
             theme_title: "Выбор темы",
             theme_basic: "Базовые",
             theme_premium: "Премиум цвета",
+            btn_start: "Начать поиск",
+            btn_pass: "Другое",
+            btn_like: "Похожее",
+            btn_upgrade_short: "Улучш... ⇧",
 
             // --- 2. Генератор ---
             generate: "Случайный жанр",
@@ -12900,6 +12918,11 @@
             site_label: "Sitio",
             exploration_mode: "Intensidad",
 
+            btn_start: "Empezar",
+            btn_pass: "Otro",
+            btn_like: "Similar",
+            btn_upgrade_short: "Mejorar ⇧",
+
             // --- Subscription ---
             sub_title: "Acceso Premium",
             sub_intro: "xFetishHub es un proyecto único en su tipo que te ayuda a descubrir y analizar tus preferencias adultas en un lugar acogedor y sin publicidad. Al suscribirte aseguras la supervivencia del proyecto, y a cambio te daré muchas más funciones:",
@@ -13010,6 +13033,11 @@
             theme_title: "Thema wählen",
             theme_basic: "Basis",
             theme_premium: "Premium Farben",
+
+            btn_start: "Starten",
+            btn_pass: "Andere",
+            btn_like: "Ähnlich",
+            btn_upgrade_short: "Upgrade ⇧",
 
             // --- Generator ---
             generate: "Zufallsgenre",
@@ -13908,7 +13936,9 @@
             const key = el.getAttribute('data-key');
             if(t[key]) el.innerText = t[key];
         });
+        
         updateExploredCount();
+        updateSubscriptionUI(); // Обновляем UI подписки при смене языка
     }
 
     // === ЛОГИКА КАТАЛОГОВ (LIKE / DISLIKE) ===
@@ -14702,50 +14732,66 @@
     }
 
     function checkGenerationLimit() {
-        if (subscriptionLevel !== 'free') return true; // Pro/Beast - безлимит
+        if (subscriptionLevel !== 'free') return true; 
 
         const today = new Date().toDateString();
         const lastDate = localStorage.getItem('xch_limit_date');
         let count = parseInt(localStorage.getItem('xch_limit_count') || '0');
 
-        // Если новый день - сбрасываем
         if (lastDate !== today) {
             count = 0;
             localStorage.setItem('xch_limit_date', today);
         }
 
         if (count >= DAILY_LIMIT) {
-            // Лимит исчерпан
             openSubModal();
-            alert(`Daily limit reached (${DAILY_LIMIT}). Upgrade to Pro for unlimited access!`);
+            alert(`Daily limit reached (${DAILY_LIMIT}). Upgrade to Pro!`);
             return false;
         }
 
-        // Увеличиваем счетчик
         count++;
         localStorage.setItem('xch_limit_count', count);
         localStorage.setItem('xch_limit_date', today);
+        
+        // Обновляем интерфейс счетчика сразу
+        updateSubscriptionUI(); 
+        
         return true;
     }
 
     function updateSubscriptionUI() {
         const nameEl = document.getElementById('current-plan-name');
-        const badgeEl = document.getElementById('upgrade-badge'); // Получаем бейдж
+        const badgeEl = document.getElementById('upgrade-badge'); 
         
         if (!nameEl) return;
+
+        // Получаем переводы
+        const t = langData[currentLang] || langData['en'];
 
         if (subscriptionLevel === 'pro') {
             nameEl.innerText = "PRO";
             nameEl.style.color = "#ff9900";
-            if(badgeEl) badgeEl.style.display = 'none'; // Скрываем
+            if(badgeEl) badgeEl.style.display = 'none';
         } else if (subscriptionLevel === 'beast') {
             nameEl.innerText = "BEAST";
             nameEl.style.color = "#9b59b6";
-            if(badgeEl) badgeEl.style.display = 'none'; // Скрываем
+            if(badgeEl) badgeEl.style.display = 'none';
         } else {
-            nameEl.innerText = "FREE";
+            // FREE PLAN
+            const count = parseInt(localStorage.getItem('xch_limit_count') || '0');
+            const today = new Date().toDateString();
+            const lastDate = localStorage.getItem('xch_limit_date');
+            
+            // Если день сменился, счетчик визуально 0 (логика сброса в checkGenerationLimit)
+            const displayCount = (lastDate === today) ? count : 0;
+
+            nameEl.innerHTML = `FREE <span style="font-size:12px; opacity:0.6; font-weight:400;">(${displayCount}/10)</span>`;
             nameEl.style.color = "var(--text-main)";
-            if(badgeEl) badgeEl.style.display = 'inline-block'; // Показываем
+            
+            if(badgeEl) {
+                badgeEl.style.display = 'inline-block';
+                badgeEl.innerText = t.btn_upgrade_short || "Upgrade ⇧"; // Используем короткий текст
+            }
         }
     }
 
@@ -15108,64 +15154,61 @@
         currentItem = item;
         lastGeneratedItem = item;
         
-        // 1. Показываем результат в слоте
+        // 1. Слот
         const reel = document.getElementById('slot-reel');
         const winnerName = getLocalizedName(item);
-        
         reel.removeAttribute('style');
         reel.className = 'slot-reel';
         reel.innerHTML = `<div class="slot-item" id="result-text" style="color:var(--text-main); font-weight:900;">${winnerName}</div>`;
         
-        // 2. Показываем описание (ОБЯЗАТЕЛЬНО)
+        // 2. Описание
         const descEl = document.getElementById('result-desc');
-        let desc = item.desc_en; // Логика выбора языка
+        let desc = item.desc_en; 
         if (currentLang === 'ru' && item.desc_ru) desc = item.desc_ru;
         else if (currentLang === 'es' && item.desc_es) desc = item.desc_es;
         else if (currentLang === 'de' && item.desc_de) desc = item.desc_de;
         
         if(descEl) {
             descEl.innerText = desc || "";
-            descEl.style.display = 'block'; // Принудительно показываем
+            descEl.style.display = 'block'; 
             descEl.classList.remove('hidden-initial', 'fade-hidden');
             descEl.classList.add('fade-visible');
         }
 
-        // 3. Логика фразы-объяснения
+        // 3. Фраза-объяснение (Над карточкой)
         const statusEl = document.getElementById('status-text');
         if(statusEl) {
             const explanation = getExplanationText(mode);
-            statusEl.style.display = 'block'; // Показываем блок
+            statusEl.style.display = 'flex'; // Flex для центрирования
             statusEl.classList.remove('hidden-initial');
             
             if (explanation) {
-                // Если есть причина (лайк/тег)
                 statusEl.innerText = explanation;
                 statusEl.style.color = "var(--accent)";
             } else {
-                // Если причины нет — случайная фраза
                 const comments = resultComments[currentLang];
                 statusEl.innerText = comments[Math.floor(Math.random() * comments.length)];
-                statusEl.style.color = "var(--text-secondary)";
+                statusEl.style.color = "var(--text-secondary)"; // Серый цвет для рандома
             }
         }
 
-        // 4. Убираем спиннер с карточки
+        // 4. Снимаем спиннер с карточки
         const card = document.getElementById('card-block');
         if(card) {
             card.classList.remove('is-spinning');
             card.classList.add('has-results');
-            // Сброс трансформации свайпа (важно для мобильных!)
+            // Сброс позиций после свайпа
             card.style.transform = 'translate(0, 0) rotate(0)';
             card.style.transition = 'none';
-            // Убираем оверлеи
             document.querySelector('.overlay-like').style.opacity = 0;
             document.querySelector('.overlay-nope').style.opacity = 0;
         }
 
-        // 5. Скрываем кнопку старта, показываем интерфейс
+        // 5. Показываем/Скрываем блоки
         const startBtn = document.getElementById('start-btn-container');
         if (startBtn) startBtn.classList.add('hidden-initial'); 
 
+        // Показываем кнопки, моды и похожие
         const idsToShow = ['main-actions', 'mods-block', 'related-block'];
         idsToShow.forEach(id => {
             const el = document.getElementById(id);
@@ -15175,7 +15218,7 @@
         document.querySelector('.undo-container').classList.remove('hidden-initial');
         document.querySelector('.btn-group').classList.remove('hidden-initial');
 
-        // 6. Обновляем ссылки и бейджи
+        // 6. Обновления
         updateLink();
         renderBadges();
         renderRelatedItems();
