@@ -620,15 +620,12 @@
         /* =========================================
         9. STATS & CHARTS
         ========================================= */
-        .chart-wrapper { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding-left: 20px; padding-bottom: 20px; }
         .axis-label-y { position: absolute; left: -15px; top: 50%; transform: translateY(-50%) rotate(-90deg); font-size: 10px; color: var(--text-secondary); }
         .axis-label-x-title { position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); font-size: 10px; color: var(--text-secondary); }
         .chart-container { display: flex; align-items: flex-end; justify-content: space-between; height: 250px; width: 100%; border-bottom: 1px solid var(--border); border-left: 1px solid var(--border); position: relative; }
         .chart-bar-group { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; flex: 1; height: 100%; position: relative; }
-        .chart-bar { width: 12px; background: var(--accent); border-radius: 4px 4px 0 0; transition: height 0.5s ease; min-height: 4px; position: relative; }
         .chart-bar.secondary { background: var(--text-secondary); margin-right: 2px; }
         .bar-wrapper { display: flex; align-items: flex-end; justify-content: center; gap: 2px; height: 100%; }
-        .chart-label-x { position: absolute; bottom: -25px; font-size: 10px; color: var(--text-secondary); text-align: center; width: 140%; left: -20%; white-space: nowrap; }
         .chart-value-y { position: absolute; top: -20px; font-size: 10px; font-weight: 700; color: var(--text-main); }
 
         .stats-tf-capsule, .stats-nav-capsule { background: var(--ios-card); border: 1px solid var(--border); border-radius: 50px; display: flex; padding: 3px; width: 100%; }
@@ -981,6 +978,96 @@
             font-size: 24px; color: rgba(255,255,255,0.5); z-index: 30; cursor: pointer;
         }
 
+        /* === STATS UPDATE === */
+        /* Контейнер графика */
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            height: 180px; 
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        }
+
+        /* Скролл-контейнер для предпочтений */
+        .chart-scroll-view {
+            display: flex;
+            overflow-x: auto;
+            overflow-y: hidden;
+            height: 100%;
+            align-items: flex-end;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; 
+            padding-bottom: 5px; /* Отступ для скролла */
+        }
+        .chart-scroll-view::-webkit-scrollbar { display: none; }
+
+        /* Колонка предпочтений (5 + немного 6-ая колонка) */
+        .pref-col {
+            min-width: 17%; 
+            max-width: 17%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 0 4px; /* Чуть больше отступ между ними */
+        }
+
+        /* Колонка активности */
+        .act-col {
+            flex: 1; 
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            min-width: 30px; 
+        }
+
+        .act-bar-group {
+            width: 100%;
+            max-width: 50px; /* Максимальная ширина "толстых" столбиков */
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            height: 100%;
+            gap: 4px; /* Зазор между серым и цветным столбиком */
+        }
+
+        /* Сами бары */
+        .chart-bar {
+            width: 100%; 
+            background: var(--accent);
+            border-radius: 4px 4px 0 0;
+            transition: height 0.5s ease;
+            min-height: 4px;
+            position: relative;
+        }
+
+        /* Подписи под графиком */
+        .chart-label-x {
+            margin-top: 5px;
+            font-size: 10px;
+            color: var(--text-secondary);
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+        }
+
+        /* Цифры для активности (ПОД графиком) */
+        .act-values {
+            display: flex;
+            gap: 5px;
+            font-size: 9px;
+            font-weight: 700;
+            margin-top: 2px;
+            color: var(--text-main);
+        }
+
         /* =========================================
         13. MEDIA QUERIES (ADAPTATION)
         ========================================= */
@@ -1200,20 +1287,53 @@
 </div>
 
 <!-- Modal Stats -->
-<div class="modal-header" style="flex-direction:column; gap:10px; align-items:flex-start;">
-    <div style="display:flex; justify-content:space-between; width:100%;">
-        <span data-key="btn_stats">Statistics</span>
-        <div style="display:flex; align-items:center;">
-            <span class="header-icon-btn" onclick="shareStats()">⤤</span>
-            <span style="cursor:pointer" onclick="closeStats(null, true)">✕</span>
+<div class="modal-overlay" id="modal-stats-overlay" onclick="closeStats(event)">
+    <div class="modal" style="background:var(--sidebar-bg); max-height:85vh; display:flex; flex-direction:column;">
+        
+        <!-- HEADER: Заголовок + Закрытие + Кнопка Wrapped -->
+        <div class="modal-header" style="flex-direction:column; gap:10px; align-items:flex-start; padding-bottom: 10px; border-bottom:none; flex-shrink: 0;">
+            <div style="display:flex; justify-content:space-between; width:100%;">
+                <span data-key="btn_stats">Statistics</span>
+                <div style="display:flex; align-items:center;">
+                    <span class="header-icon-btn" onclick="shareStats()" style="cursor:pointer; font-size: 20px; margin-right: 15px;">⤤</span>
+                    <span style="cursor:pointer" onclick="closeStats(null, true)">✕</span>
+                </div>
+            </div>
+            
+            <!-- Кнопка WRAPPED (Изначально скрыта style="display:none", JS покажет её при наличии данных) -->
+            <button id="btn-wrapped-trigger" onclick="openWrapped()" 
+                style="display:none; width:100%; background: linear-gradient(45deg, #FF9900, #9B59B6); border:none; padding:10px; border-radius:12px; color:#fff; font-weight:800; font-size:14px; text-transform:uppercase; cursor:pointer; justify-content:space-between; align-items:center;">
+                <span data-key="wrapped_btn">Daily Recap ✨</span>
+                <span style="background:rgba(0,0,0,0.2); padding:2px 6px; border-radius:6px; font-size:10px;">PRO</span>
+            </button>
+        </div>
+
+        <!-- BODY: График (Скроллится если нужно) -->
+        <div class="modal-body" id="modal-stats-body" style="padding: 0 20px; flex: 1; overflow-y: auto; min-height: 280px; display:flex; flex-direction:column; justify-content:center;">
+            <!-- Сюда JS рисует график -->
+        </div>
+
+        <!-- FOOTER: Элементы управления (Прижаты к низу) -->
+        <div style="padding: 15px 20px 20px 20px; flex-shrink: 0;">
+            <!-- Переключатель Периода (Week/Month/Year) -->
+            <div class="stats-tf-capsule" style="margin-bottom: 10px;">
+                <div class="stats-tf-item active" id="tf-week" onclick="switchTimeframe('week')">Week</div>
+                <div class="stats-tf-item" id="tf-month" onclick="switchTimeframe('month')">Month</div>
+                <div class="stats-tf-item" id="tf-year" onclick="switchTimeframe('year')">Year</div>
+                <div class="stats-tf-item" id="tf-all" onclick="switchTimeframe('all')">All</div>
+            </div>
+
+            <!-- Переключатель Типа (Preferences/Activity) -->
+            <div class="stats-nav-capsule" style="height: 45px; margin-bottom: 0;">
+                <div class="stats-nav-item active" id="stat-nav-tags" onclick="switchStatsTab('tags')">
+                    <span data-key="stats_prefs">Preferences</span>
+                </div>
+                <div class="stats-nav-item" id="stat-nav-activity" onclick="switchStatsTab('activity')">
+                    <span data-key="stats_activity">Activity</span>
+                </div>
+            </div>
         </div>
     </div>
-    <!-- Кнопка WRAPPED -->
-    <button onclick="openWrapped()" 
-        style="width:100%; background: linear-gradient(45deg, #FF9900, #9B59B6); border:none; padding:10px; border-radius:12px; color:#fff; font-weight:800; font-size:14px; text-transform:uppercase; cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
-        <span data-key="wrapped_btn">Daily Recap ✨</span>
-        <span style="background:rgba(0,0,0,0.2); padding:2px 6px; border-radius:6px; font-size:10px;">PRO</span>
-    </button>
 </div>
 
 <!-- AGE GATE OVERLAY -->
@@ -1355,28 +1475,27 @@
     <!-- BLOCK: ACCOUNT-->
 
     <div id="block-account">
-        <div class="ios-header" data-key="nav_account">Account</div>
+        <!-- ЗАГОЛОВОК С ДАТОЙ (Flexbox) -->
+        <div class="ios-header" style="display:flex; justify-content:space-between; align-items:baseline; padding-right: 16px;">
+            <span data-key="nav_account">Account</span>
+            <span id="last-sync-date" style="font-size:11px; color:var(--text-secondary); text-transform:none; font-weight:400; opacity:0.8; display:none;"></span>
+        </div>
         
         <!-- Кнопка входа -->
-        <div class="capsule-btn" id="login-capsule" onclick="window.handleLoginClick()" style="margin-bottom:5px;">
+        <div class="capsule-btn" id="login-capsule" onclick="window.handleLoginClick()" style="margin-bottom:20px;">
             <span id="login-btn-text" data-key="login_text">Sync Data</span>
             <span id="login-status-icon" class="capsule-icon" style="color: var(--accent);">G</span>
         </div>
-        
-        <!-- Дата синхронизации -->
-        <div class="sync-date" id="last-sync-date">Not synced yet</div>
 
         <!-- Кнопка статуса подписки -->
         <div class="capsule-btn" id="sub-status-btn" onclick="openSubModal()" 
             style="margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; height: auto; min-height: 55px; padding: 10px 20px;">
             
-            <!-- Левая часть: Тексты (в столбик) -->
             <div style="display:flex; flex-direction:column; align-items: flex-start; justify-content: center; line-height: 1.2;">
                 <span style="font-size:11px; color:var(--text-secondary); margin-bottom:2px; font-weight: 500;">Current Plan</span>
                 <span id="current-plan-name" style="color:var(--text-main); font-weight:800; font-size:17px; letter-spacing:0.5px;">FREE</span>
             </div>
 
-            <!-- Правая часть: Бейдж -->
             <span id="upgrade-badge" style="color:var(--accent); font-weight:700; font-size:13px; text-transform:uppercase; background:rgba(255,153,0,0.1); padding:5px 10px; border-radius:10px; white-space: nowrap;">Upgrade ⇧</span>
         </div>
 
@@ -1583,6 +1702,56 @@
     </div>
 </div>
 
+<!-- INSTALL APP MODAL -->
+<div id="modal-install-overlay" class="modal-overlay" style="z-index: 19500;">
+    <div class="modal" style="max-width: 400px; padding: 20px;">
+        <div style="text-align:center; margin-bottom:20px;">
+            <!-- Иконка приложения -->
+            <img src="logo.png" style="width:60px; height:60px; border-radius:15px; margin-bottom:15px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            <h2 style="margin:0 0 10px 0; font-size:20px;" data-key="install_title">Install App</h2>
+            <p style="font-size:14px; color:var(--text-secondary); line-height:1.5;" data-key="install_desc">
+                Install our app for a full-screen experience and better performance. It takes less than 5 seconds!
+            </p>
+        </div>
+
+        <!-- Кнопки выбора платформы -->
+        <div class="ios-group" style="margin-bottom:15px;">
+            <!-- iOS -->
+            <div class="ios-row clickable" onclick="toggleInstallInstruct('ios')">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:20px;">🍎</span>
+                    <span style="font-weight:600;">iPhone (Safari)</span>
+                </div>
+                <span>▼</span>
+            </div>
+            <!-- Инструкция iOS (Скрыта) -->
+            <div id="instruct-ios" style="display:none; padding:15px; background:var(--bg-color); font-size:13px; color:var(--text-secondary); line-height:1.6;">
+                1. <span data-key="inst_ios_1">Tap the <b>Share</b> button</span> <span style="font-size:16px">⎋</span><br>
+                2. <span data-key="inst_ios_2">Scroll down and tap</span> <br>
+                <span style="display:inline-block; background:var(--ios-separator); padding:4px 8px; border-radius:6px; margin:4px 0; color:var(--text-main); font-weight:600;">➕ <span data-key="inst_ios_btn">Add to Home Screen</span></span><br>
+                3. <span data-key="inst_ios_3">Tap <b>Add</b> in the top right.</span>
+            </div>
+
+            <!-- Android -->
+            <div class="ios-row clickable" onclick="toggleInstallInstruct('android')">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:20px;">🤖</span>
+                    <span style="font-weight:600;">Android (Chrome)</span>
+                </div>
+                <span>▼</span>
+            </div>
+            <!-- Инструкция Android (Скрыта) -->
+            <div id="instruct-android" style="display:none; padding:15px; background:var(--bg-color); font-size:13px; color:var(--text-secondary); line-height:1.6;">
+                1. <span data-key="inst_and_1">Tap the <b>Menu</b> button (3 dots)</span> <span style="font-size:16px">⋮</span><br>
+                2. <span data-key="inst_and_2">Select</span> <br>
+                <span style="display:inline-block; background:var(--ios-separator); padding:4px 8px; border-radius:6px; margin:4px 0; color:var(--text-main); font-weight:600;">⬇ <span data-key="inst_and_btn">Install App</span></span>
+            </div>
+        </div>
+
+        <button class="btn-gen" onclick="skipInstall()" data-key="install_continue" style="padding:15px; font-size:14px; background:transparent; border:1px solid var(--border); color:var(--text-secondary);">Continue in Browser</button>
+    </div>
+</div>
+
 <div id="wrapped-mount" class="wrapped-overlay"></div>
 
 <!-- FIREBASE INTEGRATION -->
@@ -1704,15 +1873,26 @@
         }
         
         const ts = localStorage.getItem('xch_last_sync_ts');
-        el.style.display = 'block';
         
+        const currentLang = localStorage.getItem('xch_lang') || 'en';
+        
+        // Безопасное получение перевода
+        let prefix = "Synced: ";
+        if (typeof langData !== 'undefined' && langData[currentLang]) {
+            prefix = langData[currentLang].sync_label || "Synced: ";
+        }
+
         if (ts) {
             const date = new Date(parseInt(ts));
             const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const dateStr = date.toLocaleDateString();
-            el.innerText = `Synced: ${dateStr} at ${timeStr}`;
+            
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            
+            el.innerText = `${prefix}${day}.${month} ${timeStr}`;
+            el.style.display = 'block';
         } else {
-            el.innerText = "Syncing...";
+            el.style.display = 'none';
         }
     };
 
@@ -2706,7 +2886,7 @@
             {
                 id: 75, 
                 name: "Hooker", name_ru: "Проститутка", name_es: "Prostituta", name_de: "Prostituierte",
-                slug: "hooker", tags: ["straight", "trans"],
+                slug: "hooker", tags: ["straight"],
                 desc_en: "Roleplay involving paid sex workers.",
                 desc_ru: "Ролевая игра с участием секс-работниц.",
                 desc_es: "Juego de rol involucrando trabajadoras sexuales pagadas.",
@@ -11181,7 +11361,7 @@
                 name: "Spiritual BDSM", name_ru: "Духовный БДСМ", name_es: "BDSM Espiritual", name_de: "Spiritueller BDSM",
                 slug: "spiritual-bdsm", tags: ["tantra", "ritual"],
                 desc_en: "Kink as a spiritual journey.",
-                desc_ru: "Кинк как духовное путешествие.",
+                desc_ru: "Фетиш как духовное путешествие.",
                 desc_es: "Kink como viaje espiritual.",
                 desc_de: "Kink als spirituelle Reise."
             },
@@ -12205,7 +12385,7 @@
             },
             {
                 id: 1171, 
-                name: "Praise Kink", name_ru: "Кинк на похвалу", name_es: "Kink de Elogios", name_de: "Lob-Kink",
+                name: "Praise Kink", name_ru: "Фетиш на похвалу", name_es: "Kink de Elogios", name_de: "Lob-Kink",
                 slug: "praise-kink", tags: ["attention", "verbal", "soft"],
                 desc_en: "Getting aroused by being told 'Good girl/boy'.",
                 desc_ru: "Возбуждение от слов 'Хорошая девочка/мальчик'.",
@@ -12631,7 +12811,7 @@
                 name: "First Time Seeing This", name_ru: "Вижу это впервые", name_es: "Primera Vez Viendo Esto", name_de: "Erstes Mal gesehen",
                 slug: "first-time-seeing-this", tags: ["meta", "curiosity", "discovery"],
                 desc_en: "Discovering a new kink.",
-                desc_ru: "Открытие нового кинка.",
+                desc_ru: "Открытие нового фетиша.",
                 desc_es: "Descubriendo un nuevo kink.",
                 desc_de: "Entdeckung eines neuen Kinks."
             },
@@ -12655,7 +12835,7 @@
             },
             {
                 id: 1222, 
-                name: "Awakening Kink", name_ru: "Кинк пробуждения", name_es: "Kink de Despertar", name_de: "Erwachens-Kink",
+                name: "Awakening Kink", name_ru: "Фетиш пробуждения", name_es: "Kink de Despertar", name_de: "Erwachens-Kink",
                 slug: "awakening-kink", tags: ["meta", "discovery", "new"],
                 desc_en: "Realizing a lifelong fetish.",
                 desc_ru: "Осознание фетиша всей жизни.",
@@ -12851,6 +13031,7 @@
             btn_return: "Return",
             watch_later: "Watch Later",
             empty_wl: "No saved items yet",
+            sync_label: "Synced: ",
             
             // --- 2. Generator (Main Tab) ---
             generate: "Random Genre",
@@ -12925,6 +13106,7 @@
             stats_header: "Your Favorite Categories",
             stats_prefs: "Preferences",
             stats_activity: "Activity",
+            wrapped_btn: "Daily Recap ✨",
             
             tf_week: "Week", 
             tf_month: "Month", 
@@ -12937,6 +13119,12 @@
             chart_points_y: "Points",
             chart_count_y: "Count",
             share_btn: "Share",
+
+            legend_watch: "Watch (+10)",
+            legend_like: "Like / Similar (+5)",
+            legend_dislike: "Other / Dislike (-10)",
+            act_actions: "Actions",
+            act_watches: "Watches",
 
             // --- 8. Explanations (Why did I get this?) ---
             expl_fav: "Because you like ",
@@ -12964,6 +13152,21 @@
             age_yes: "Yes, I am 18+",
             age_no: "No, Exit",
             age_block_msg: "This website is only for users over 18 years of age.",
+            onb_placeholder: "e.g. I like milf, anal and big tits...",
+
+            // Окно установки
+            install_title: "Install App",
+            install_desc: "Add to Home Screen for the best experience. No download required!",
+            install_continue: "Continue in Browser",
+            
+            inst_ios_1: "Tap the <b>Share</b> button",
+            inst_ios_2: "Scroll down and tap",
+            inst_ios_btn: "Add to Home Screen",
+            inst_ios_3: "Tap <b>Add</b>.",
+            
+            inst_and_1: "Tap the <b>Menu</b> (3 dots)",
+            inst_and_2: "Select",
+            inst_and_btn: "Install App / Add to Home",
 
             onb_title: "Quick Setup",
             onb_desc: "Describe your tastes in one sentence (e.g. 'I love milf, anal and stockings'). We will auto-detect categories.",
@@ -12994,6 +13197,7 @@
             btn_return: "Вернуться",
             watch_later: "Смотреть позже",
             empty_wl: "Список пуст",
+            sync_label: "Синхр: ",
 
 
             // --- 2. Генератор ---
@@ -13081,6 +13285,13 @@
             chart_points_y: "Очки",
             chart_count_y: "Кол-во",
             share_btn: "Поделиться",
+            wrapped_btn: "Итоги дня ✨",
+
+            legend_watch: "Просмотр (+10)",
+            legend_like: "Лайк / Похожее (+5)",
+            legend_dislike: "Другое / Дизлайк (-10)",
+            act_actions: "Действия",
+            act_watches: "Просмотры",
 
             // --- 8. Объяснения ---
             expl_fav: "Потому что ты любишь: ",
@@ -13100,7 +13311,7 @@
             badge_desc_niche: "🔍 <b>Специфичный фетиш</b><br>Узконаправленный интерес, фокусирующийся на определенных частях тела, предметах или сценариях.",
             
             badge_bdsm: "БДСМ",
-            badge_desc_bdsm: "⛓️ <b>БДСМ и Кинк</b><br>Связывание, доминирование, подчинение и игры с ощущениями.",
+            badge_desc_bdsm: "⛓️ <b>БДСМ и Фетиш</b><br>Связывание, доминирование, подчинение и игры с ощущениями.",
 
             // --- 10. Модальные окна ---
             age_title: "Проверка возраста",
@@ -13108,6 +13319,22 @@
             age_yes: "Да, мне 18+",
             age_no: "Нет, выйти",
             age_block_msg: "Этот сайт предназначен только для пользователей старше 18 лет.",
+
+            onb_placeholder: "например: люблю милф, анал и большую грудь...",
+        
+            install_title: "Установить приложение",
+            install_desc: "Добавьте на главный экран для полноэкранного режима. Это займет 5 секунд!",
+            install_continue: "Продолжить в браузере",
+            
+            inst_ios_1: "Нажмите кнопку <b>Поделиться</b>",
+            inst_ios_2: "Пролистайте вниз и выберите",
+            inst_ios_btn: "На экран «Домой»",
+            inst_ios_3: "Нажмите <b>Добавить</b>.",
+            
+            inst_and_1: "Нажмите <b>Меню</b> (3 точки)",
+            inst_and_2: "Выберите",
+            inst_and_btn: "Установить / Добавить на экран",
+
 
             onb_title: "Быстрая настройка",
             onb_desc: "Опишите свои вкусы одним предложением (напр. 'Люблю милф, анал и чулки'). Мы автоматически подберем категории.",
@@ -13134,6 +13361,7 @@
             btn_return: "Volver",
             watch_later: "Ver más tarde",
             empty_wl: "Lista vacía",
+            sync_label: "Sinc: ",
 
             // --- Generator ---
             generate: "Género Aleatorio",
@@ -13216,6 +13444,13 @@
             chart_points_y: "Puntos",
             chart_count_y: "Cantidad",
             share_btn: "Compartir",
+            wrapped_btn: "Resumen Diario ✨",
+
+            legend_watch: "Ver (+10)",
+            legend_like: "Me gusta (+5)",
+            legend_dislike: "Otro / No me gusta (-10)",
+            act_actions: "Acciones",
+            act_watches: "Vistas", 
 
             // --- Explain ---
             expl_fav: "Porque te gusta ",
@@ -13240,6 +13475,20 @@
             age_yes: "Sí, tengo 18+",
             age_no: "No, Salir",
             age_block_msg: "Este sitio web es solo para usuarios mayores de 18 años.",
+            onb_placeholder: "ej. me gustan maduras, anal y pechos grandes...",
+        
+            install_title: "Instalar App",
+            install_desc: "Añadir a pantalla de inicio para mejor experiencia.",
+            install_continue: "Continuar en navegador",
+            
+            inst_ios_1: "Toca el botón <b>Compartir</b>",
+            inst_ios_2: "Baja y selecciona",
+            inst_ios_btn: "Añadir a Inicio",
+            inst_ios_3: "Toca <b>Añadir</b>.",
+            
+            inst_and_1: "Toca el <b>Menú</b> (3 puntos)",
+            inst_and_2: "Selecciona",
+            inst_and_btn: "Instalar Aplicación",
 
             onb_title: "Configuración rápida",
             onb_desc: "Describe tus gustos en una frase. Detectaremos las categorías automáticamente.",
@@ -13266,6 +13515,7 @@
             btn_return: "Zurück",
              watch_later: "Später ansehen",
             empty_wl: "Liste leer",
+            sync_label: "Sync: ",
 
             btn_start: "Starten",
             btn_pass: "Andere",
@@ -13347,6 +13597,13 @@
             chart_points_y: "Punkte",
             chart_count_y: "Anzahl",
             share_btn: "Teilen",
+            wrapped_btn: "Tagesrückblick ✨",
+
+            legend_watch: "Ansehen (+10)",
+            legend_like: "Like (+5)",
+            legend_dislike: "Andere / Dislike (-10)",
+            act_actions: "Aktionen",
+            act_watches: "Angeschaut",
 
             // --- Explain ---
             expl_fav: "Weil du magst: ",
@@ -13371,6 +13628,20 @@
             age_yes: "Ja, ich bin 18+",
             age_no: "Nein, Verlassen",
             age_block_msg: "Diese Website ist nur für Nutzer über 18 Jahre bestimmt.",
+            onb_placeholder: "z.B. ich mag Milf, Anal und große Brüste...",
+        
+            install_title: "App installieren",
+            install_desc: "Zum Home-Bildschirm hinzufügen für das beste Erlebnis.",
+            install_continue: "Im Browser fortfahren",
+            
+            inst_ios_1: "Tippe auf <b>Teilen</b>",
+            inst_ios_2: "Scrolle runter und wähle",
+            inst_ios_btn: "Zum Home-Bildschirm",
+            inst_ios_3: "Tippe auf <b>Hinzufügen</b>.",
+            
+            inst_and_1: "Tippe auf <b>Menü</b> (3 Punkte)",
+            inst_and_2: "Wähle",
+            inst_and_btn: "App installieren",
 
             onb_title: "Schnelleinrichtung",
             onb_desc: "Beschreibe deine Vorlieben in einem Satz. Wir finden die Kategorien automatisch.",
@@ -13808,16 +14079,24 @@
         }
     }
 
-    function adjustTagScores(item, delta) {
-        if(!item || !item.tags) return;
+    function adjustTagScoresByTags(tags, delta) {
+        if(!tags) return;
         let changed = false;
-        item.tags.forEach(tag => {
+        tags.forEach(tag => {
+            // Игнорируем только самые технические теги
             if(['universal', 'straight'].includes(tag)) return;
+            
             if(!tagScores[tag]) tagScores[tag] = 0;
             tagScores[tag] += delta;
             changed = true;
         });
         if(changed) localStorage.setItem(STORAGE.TAG_SCORES, JSON.stringify(tagScores));
+    }
+
+    function adjustTagScores(item, delta) {
+        if (!item) return;
+        const tags = getCombinedTags(item);
+        adjustTagScoresByTags(tags, delta);
     }
 
     function getWeightedRandom(items) {
@@ -14090,12 +14369,37 @@
         if (window.syncToCloud) window.syncToCloud();
     }
 
+    function getCombinedTags(item) {
+        if (!item || !item.tags) return [];
+        
+        // Берем теги жанра
+        const combined = [...item.tags];
+        
+        // Добавляем активные модификаторы (приводим к нижнему регистру)
+        activeMods.forEach(modKey => {
+            const tag = modKey.toLowerCase();
+            if (!combined.includes(tag)) {
+                combined.push(tag);
+            }
+        });
+        
+        return combined;
+    }
+
     function handleOutboundClick() {
         if(!currentItem) return;
         if(!hasInteractedWithCurrent) {
-            adjustTagScores(currentItem, 3);
+            // Получаем полный список тегов (Жанр + Моды)
+            const fullTags = getCombinedTags(currentItem);
+            
+            // Начисляем очки всем этим тегам (+3 за клик, но в статистике мы будем считать это как WATCH = 10)
+            // adjustTagScores меняет веса для будущих генераций
+            adjustTagScoresByTags(fullTags, 3); 
+            
             hasInteractedWithCurrent = true;
-            logActivity('watch', currentItem.id, currentItem.tags);
+            
+            // Логируем событие с ПОЛНЫМ списком тегов
+            logActivity('watch', currentItem.id, fullTags);
         }
     }
 
@@ -14513,6 +14817,7 @@
         currentLang = val;
         localStorage.setItem(STORAGE.LANG, currentLang);
         applyLanguage();
+        if (window.updateLastSyncUI) window.updateLastSyncUI(); 
         renderHistory();
         renderModifiers();
         if(currentItem) { renderResultUI(currentItem, null); updateLink(); } 
@@ -14528,13 +14833,28 @@
    
     function applyLanguage() {
         const t = langData[currentLang];
+        
+        // Текстовые элементы
         document.querySelectorAll('[data-key]').forEach(el => {
             const key = el.getAttribute('data-key');
-            if(t[key]) el.innerText = t[key];
+            if(t[key]) {
+                // Если внутри есть HTML теги (как в инструкциях), используем innerHTML
+                if (key.startsWith('inst_') || key.startsWith('badge_')) {
+                    el.innerHTML = t[key];
+                } else {
+                    el.innerText = t[key];
+                }
+            }
         });
+
+        // --- ЛОКАЛИЗАЦИЯ ПЛЕЙСХОЛДЕРА ---
+        const onbInput = document.getElementById('onb-input');
+        if(onbInput && t.onb_placeholder) {
+            onbInput.placeholder = t.onb_placeholder;
+        }
         
         updateExploredCount();
-        updateSubscriptionUI(); // Обновляем UI подписки при смене языка
+        updateSubscriptionUI(); 
     }
 
     // === ЛОГИКА КАТАЛОГОВ (LIKE / DISLIKE) ===
@@ -14751,30 +15071,49 @@
     // === STATS SYSTEM ===
 
     function openStatistics() {
-        // Устанавливаем переводы на кнопки
+        // 1. Устанавливаем переводы на кнопки периодов
         const t = langData[currentLang];
         if (document.getElementById('tf-week')) document.getElementById('tf-week').innerText = t.tf_week;
         if (document.getElementById('tf-month')) document.getElementById('tf-month').innerText = t.tf_month;
         if (document.getElementById('tf-year')) document.getElementById('tf-year').innerText = t.tf_year;
         if (document.getElementById('tf-all')) document.getElementById('tf-all').innerText = t.tf_all;
 
-        // Обновляем замки (показываем, что доступно, а что нет)
+        // 2. Обновляем замки (Pro функции)
         updateStatsLocks();
 
-        // Открываем само окно
+        // 3. ЛОГИКА WRAPPED BUTTON
+        // Проверяем, есть ли данные
+        const wData = getWrappedData();
+        const wBtn = document.getElementById('btn-wrapped-trigger');
+        
+        if (wBtn) {
+            // Показываем кнопку ТОЛЬКО если генераций сегодня >= 3
+            // (Можете изменить число 3 на любое другое)
+            if (wData.countToday >= 3) {
+                wBtn.style.display = 'flex';
+            } else {
+                wBtn.style.display = 'none';
+            }
+        }
+
+        // 4. Открываем окно
         const modal = document.getElementById('modal-stats-overlay');
         if (modal) {
             modal.classList.add('open');
-            // Рендерим контент (по умолчанию вкладка 'tags')
-            // Важно: сбрасываем фильтр времени на 'week', так как он доступен всем
-            currentStatsTimeframe = 'week'; 
-            switchStatsTab('tags'); 
             
-            // Визуально активируем кнопку Week
+            // Сброс к дефолтным значениям при открытии
+            currentStatsTimeframe = 'week'; 
+            currentStatsTab = 'tags';
+            
+            // Визуальный сброс активных классов
             document.querySelectorAll('.stats-tf-item').forEach(el => el.classList.remove('active'));
             document.getElementById('tf-week').classList.add('active');
-        } else {
-            console.error("Error: Modal 'modal-stats-overlay' not found in HTML");
+            
+            document.getElementById('stat-nav-tags').classList.add('active');
+            document.getElementById('stat-nav-activity').classList.remove('active');
+
+            // Рендер
+            renderStatsContent();
         }
     }
 
@@ -14838,78 +15177,18 @@
         body.innerHTML = '';
         const t = langData[currentLang];
 
-        const now = Date.now();
-        const oneDay = 24 * 60 * 60 * 1000;
-        let xLabels = [];
-        let aggregated = {};
-
-        // 1. Подготовка дат (Ось X)
-        if (currentStatsTimeframe === 'week') {
-            for (let i = 6; i >= 0; i--) {
-                const d = new Date(now - i * oneDay);
-                const key = d.toISOString().split('T')[0];
-                const label = d.toLocaleDateString(currentLang, { weekday: 'short' });
-                xLabels.push({ key, label, showLabel: true });
-                aggregated[key] = (currentStatsTab === 'tags') ? {} : { gen: 0, watch: 0 };
-            }
-        } 
-        else if (currentStatsTimeframe === 'month') {
-            for (let i = 29; i >= 0; i--) {
-                const d = new Date(now - i * oneDay);
-                const key = d.toISOString().split('T')[0];
-                const day = String(d.getDate()).padStart(2, '0');
-                const month = String(d.getMonth() + 1).padStart(2, '0');
-                const label = `${day}.${month}`;
-                // Показываем каждую 3-ю дату
-                xLabels.push({ key, label, showLabel: (i % 3 === 0) });
-                aggregated[key] = (currentStatsTab === 'tags') ? {} : { gen: 0, watch: 0 };
-            }
-        } 
-        else if (currentStatsTimeframe === 'year') {
-            const currDate = new Date();
-            for (let i = 11; i >= 0; i--) {
-                const d = new Date(currDate.getFullYear(), currDate.getMonth() - i, 1);
-                const key = `${d.getFullYear()}-${d.getMonth()}`;
-                let label = d.toLocaleDateString(currentLang, { month: 'short' });
-                label = label.replace('.', ''); // Убираем точку для красоты
-                xLabels.push({ key, label, showLabel: true });
-                aggregated[key] = (currentStatsTab === 'tags') ? {} : { gen: 0, watch: 0 };
-            }
-        }
-
-        // Фильтр логов
-        const cutoff = (currentStatsTimeframe === 'week') ? now - 7*oneDay : 
-                       (currentStatsTimeframe === 'month') ? now - 30*oneDay : 
-                       now - 365*oneDay;
-        
-        const filteredLog = activityLog.filter(log => log.ts >= cutoff);
-
-        // --- РЕНДЕРИНГ ГРАФИКА ---
-        
-        // Лейблы осей
-        const yAxisTitle = (currentStatsTab === 'tags') ? t.chart_points_y : t.chart_count_y;
-        const xAxisTitle = (currentStatsTab === 'tags') ? t.chart_prefs_x : ""; // Для активности дата понятна сама по себе
-
-        let html = `
-            <div class="chart-wrapper">
-                <div class="axis-label-y">${yAxisTitle}</div>
-                <div class="chart-container">
-        `;
-
+        // --- ЛОГИКА 1: ПРЕДПОЧТЕНИЯ (TAGS) ---
         if (currentStatsTab === 'tags') {
-            // === ГРАФИК ПРЕДПОЧТЕНИЙ (ТЕГИ) ===
             const tempScores = {};
-            // Игнорируем технические или слишком общие теги
-            const ignoreStats = ['universal', 'straight', 'gay', 'lesbian', 'trans', 'bi'];
+            const ignoreStats = ['universal', 'straight', 'male', 'female']; 
             
-            filteredLog.forEach(log => {
+            activityLog.forEach(log => {
                 if (log.tags) {
                     let weight = 0;
-                    // Система очков
-                    if (log.type === 'like') weight = 5;
-                    else if (log.type === 'watch') weight = 3;
-                    else if (log.type === 'gen') weight = 1;
-                    else if (log.type === 'dislike') weight = -5; // Отнимаем очки
+                    if (log.type === 'watch') weight = 10;
+                    else if (log.type === 'like' || log.type === 'similar') weight = 5;
+                    else if (log.type === 'gen' || log.type === 'pass') weight = 0;
+                    else if (log.type === 'dislike') weight = -5; // Исключаем из топа, но не убиваем совсем
 
                     if (weight !== 0) {
                         log.tags.forEach(tag => {
@@ -14921,116 +15200,140 @@
                 }
             });
 
-            // Сортируем: от большего к меньшему
             const sortedTags = Object.entries(tempScores)
                 .sort((a, b) => b[1] - a[1])
-                .filter(x => x[1] > 0) // Показываем только положительные интересы
-                .slice(0, 8); // Топ 8
+                .filter(x => x[1] > 0)
+                .slice(0, 20); 
             
+            let html = `<div class="chart-wrapper"><div class="chart-scroll-view">`;
+
             if(sortedTags.length === 0) {
-                html += '<div style="width:100%; text-align:center; align-self:center; color:var(--text-secondary);">No data yet</div>';
+                html += '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-secondary);">No data yet</div>';
             } else {
                 const maxVal = Math.max(...sortedTags.map(x => x[1]));
                 
                 sortedTags.forEach(([tag, score]) => {
-                    // Нормализация высоты (минимум 5%)
                     const height = Math.max(5, (score / maxVal) * 100);
                     
-                    // Красивое форматирование тега (bdsm -> BDSM, roleplay -> Roleplay)
                     let displayTag = tag.charAt(0).toUpperCase() + tag.slice(1);
-                    if (tag === 'bdsm' || tag === 'pov' || tag === 'joi' || tag === 'bbw') displayTag = tag.toUpperCase();
-                    
-                    // Обрезка, если слишком длинный
-                    if(displayTag.length > 9) displayTag = displayTag.substring(0, 7) + '..';
+                    if (displayTag.length > 9) displayTag = displayTag.substring(0, 7) + '..';
 
                     html += `
-                        <div class="chart-bar-group">
-                            <div class="chart-value-y">${score}</div>
-                            <div class="chart-bar" style="height:${height}%; width:18px;"></div>
-                            <div class="chart-label-x" style="width:140%; left:-20%;">${displayTag}</div>
+                        <div class="pref-col">
+                            <div style="font-size:10px; color:var(--text-main); margin-bottom:2px; font-weight:700;">${score}</div>
+                            <div class="chart-bar" style="height:${height}%;"></div>
+                            <div class="chart-label-x" title="${tag}">${displayTag}</div>
                         </div>
                     `;
                 });
             }
             
-            html += `</div>`; // Закрываем chart-container
-            if(xAxisTitle) html += `<div class="axis-label-x-title">${xAxisTitle}</div>`;
-            
+            html += `</div></div>`;
+
             // Легенда
             html += `
-                <div style="margin-top:40px; display:flex; justify-content:center; gap:15px; font-size:11px; color:var(--text-secondary);">
-                    <div>Gen = 1</div>
-                    <div>Watch = 3</div>
-                    <div>Like = 5</div>
-                    <div>Ban = -5</div>
+                <div style="margin-top:15px; display:flex; flex-direction:column; gap:5px; align-items:center;">
+                    <div style="display:flex; gap:15px; font-size:10px; color:var(--text-secondary);">
+                        <div style="display:flex; align-items:center; gap:4px;"><span style="color:var(--accent)">●</span> ${t.legend_watch}</div>
+                        <div style="display:flex; align-items:center; gap:4px;"><span style="color:var(--text-main)">●</span> ${t.legend_like}</div>
+                    </div>
+                    <div style="display:flex; gap:15px; font-size:10px; color:var(--text-secondary);">
+                        <div style="display:flex; align-items:center; gap:4px;"><span style="color:var(--highlight-red)">●</span> ${t.legend_dislike}</div>
+                    </div>
                 </div>
             `;
-        } else {
-            // === ГРАФИК АКТИВНОСТИ ===
-            filteredLog.forEach(log => {
-                const d = new Date(log.ts);
-                let key;
-                if (currentStatsTimeframe === 'year') key = `${d.getFullYear()}-${d.getMonth()}`;
-                else key = d.toISOString().split('T')[0];
-
-                if (aggregated[key]) {
-                    if(log.type === 'gen') aggregated[key].gen++;
-                    if(log.type === 'watch') aggregated[key].watch++;
-                }
-            });
-
-            let maxVal = 0;
-            xLabels.forEach(x => {
-                const d = aggregated[x.key];
-                if(d.gen > maxVal) maxVal = d.gen;
-                if(d.watch > maxVal) maxVal = d.watch;
-            });
-            if(maxVal === 0) maxVal = 1;
-
-            xLabels.forEach(x => {
-                const d = aggregated[x.key];
-                const hGen = (d.gen / maxVal) * 80; // Максимум 80% высоты, чтобы цифры влезли
-                const hWatch = (d.watch / maxVal) * 80;
-                
-                const valGen = d.gen > 1 ? `<div class="bar-value-top" style="bottom:${hGen+2}%">${d.gen}</div>` : '';
-                const valWatch = d.watch > 1 ? `<div class="bar-value-top" style="bottom:${hWatch+2}%">${d.watch}</div>` : '';
-
-                // Минимальная высота для визуализации
-                const styleGen = d.gen > 0 ? `height:${hGen}%` : 'height:1px; opacity:0.1;';
-                const styleWatch = d.watch > 0 ? `height:${hWatch}%` : 'height:1px; opacity:0.1;';
-
-                html += `
-                    <div class="chart-bar-group" style="flex:1;">
-                        <div class="bar-wrapper" style="width:100%; gap:2px; position:relative; height:100%;">
-                            <div class="chart-bar secondary" style="${styleGen}; width:40%; position:relative;">${valGen}</div>
-                            <div class="chart-bar" style="${styleWatch}; width:40%; position:relative;">${valWatch}</div>
-                        </div>
-                        ${x.showLabel ? `<div class="chart-label-x">${x.label}</div>` : ''}
-                    </div>
-                `;
-            });
-
-            html += `</div>`; // Закрываем chart-container
+            body.innerHTML = html;
+        } 
+        
+        // --- ЛОГИКА 2: АКТИВНОСТЬ (ACTIVITY) ---
+        else {
+            const aggregated = {};
+            const now = Date.now();
+            const oneDay = 24 * 60 * 60 * 1000;
             
-            // Легенда для активности
+            let cutoffTime = 0;
+            if (currentStatsTimeframe === 'week') cutoffTime = now - 7 * oneDay;
+            else if (currentStatsTimeframe === 'month') cutoffTime = now - 30 * oneDay;
+            else if (currentStatsTimeframe === 'year') cutoffTime = now - 365 * oneDay;
+            
+            activityLog.forEach(log => {
+                if (log.ts < cutoffTime) return;
+
+                const d = new Date(log.ts);
+                let key, label;
+
+                if (currentStatsTimeframe === 'year' || currentStatsTimeframe === 'all') {
+                    key = `${d.getFullYear()}-${d.getMonth()}`;
+                    label = d.toLocaleDateString(currentLang, { month: 'short' }).replace('.', '');
+                } else {
+                    key = d.toISOString().split('T')[0];
+                    label = d.toLocaleDateString(currentLang, { day: 'numeric', month: 'numeric' });
+                }
+
+                if (!aggregated[key]) aggregated[key] = { gen: 0, watch: 0, label: label, sort: d.getTime() };
+                
+                if (log.type === 'watch') aggregated[key].watch++;
+                else if (['like', 'gen', 'pass', 'dislike'].includes(log.type)) aggregated[key].gen++;
+            });
+
+            const chartData = Object.values(aggregated).sort((a, b) => a.sort - b.sort);
+
+            let html = `<div class="chart-wrapper"><div class="chart-scroll-view" style="justify-content: flex-start;">`;
+
+            if (chartData.length === 0) {
+                html += '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-secondary);">No activity yet</div>';
+            } else {
+                let maxVal = 0;
+                chartData.forEach(d => {
+                    if (d.gen > maxVal) maxVal = d.gen;
+                    if (d.watch > maxVal) maxVal = d.watch;
+                });
+                if (maxVal === 0) maxVal = 1;
+
+                chartData.forEach(d => {
+                    const hGen = Math.max(2, (d.gen / maxVal) * 80);
+                    const hWatch = Math.max(2, (d.watch / maxVal) * 80);
+
+                    // Отрисовка с flex-grow (act-bar-group) для расширения
+                    html += `
+                        <div class="act-col">
+                            <div class="act-bar-group">
+                                <!-- Gen Bar (Серый) - 45% ширины группы -->
+                                <div style="width:45%; background:var(--text-secondary); height:${hGen}%; border-radius:3px 3px 0 0; opacity:0.3;"></div>
+                                <!-- Watch Bar (Акцент) - 45% ширины группы -->
+                                <div style="width:45%; background:var(--accent); height:${hWatch}%; border-radius:3px 3px 0 0;"></div>
+                            </div>
+                            
+                            <div class="act-values">
+                                <span style="color:var(--text-secondary); opacity:0.6;">${d.gen}</span>
+                                <span style="color:var(--accent);">${d.watch}</span>
+                            </div>
+                            
+                            <div class="chart-label-x" style="font-size:9px;">${d.label}</div>
+                        </div>
+                    `;
+                });
+            }
+
+            html += `</div></div>`; 
+
+            // Легенда активности (Локализованная)
             html += `
-                <div style="margin-top:40px; display:flex; justify-content:center; gap:20px; font-size:12px;">
+                <div style="margin-top:15px; display:flex; justify-content:center; gap:20px; font-size:11px;">
                     <div style="display:flex; align-items:center; gap:6px;">
-                        <div style="width:10px; height:10px; background:var(--text-secondary); border-radius:2px;"></div>
-                        <span>${t.act_gen}</span>
+                        <div style="width:10px; height:10px; background:var(--text-secondary); opacity:0.3; border-radius:2px;"></div>
+                        <span>${t.act_actions}</span>
                     </div>
                     <div style="display:flex; align-items:center; gap:6px;">
                         <div style="width:10px; height:10px; background:var(--accent); border-radius:2px;"></div>
-                        <span>${t.act_watch}</span>
+                        <span>${t.act_watches}</span>
                     </div>
                 </div>
             `;
+            body.innerHTML = html;
         }
-
-        html += `</div>`; // Закрываем chart-wrapper
-        body.innerHTML = html;
     }
-    
+
     function shareStats() {
         const modalBody = document.getElementById('modal-stats-body');
         if(!modalBody) return;
@@ -15079,21 +15382,36 @@
 
     function initAgeGate() {
         const isVerified = localStorage.getItem('xch_age_verified');
-        const isOnboarded = localStorage.getItem('xch_onboarding_done');
 
         if (!isVerified) {
+            // Если возраст не подтвержден - показываем Age Gate
             document.getElementById('age-gate').classList.add('open');
-        } else if (!isOnboarded) {
-            // Если возраст подтвержден, но онбординг не пройден -> показываем онбординг
-            document.getElementById('onboarding-overlay').classList.add('open');
+        } else {
+            // Если подтвержден - запускаем цепочку проверок
+            runStartupChecks();
         }
     }
 
     function passAgeGate() {
         localStorage.setItem('xch_age_verified', 'true');
         document.getElementById('age-gate').classList.remove('open');
-        // Сразу открываем онбординг
-        document.getElementById('onboarding-overlay').classList.add('open');
+        runStartupChecks();
+    }
+
+    function runStartupChecks() {
+        const isMobile = window.innerWidth < 768; // Проверка на мобильность
+        const isInstalled = isAppInstalled();
+        const isSkipped = sessionStorage.getItem('xch_install_skipped'); // Проверка, пропускали ли в этой сессии
+
+        // ЦЕПОЧКА:
+        // 1. Мобилка? НЕ установлено? НЕ пропускали? -> Показать Install Modal
+        // 2. Иначе -> Проверить Onboarding Preferences
+
+        if (isMobile && !isInstalled && !isSkipped) {
+            document.getElementById('modal-install-overlay').classList.add('open');
+        } else {
+            checkOnboarding();
+        }
     }
 
     function blockAccess() {
@@ -15980,9 +16298,12 @@
         } else {
             favorites.push(id); 
             blacklist = blacklist.filter(x => x !== id);
-            adjustTagScores(currentItem, 5); 
+            
+            const fullTags = getCombinedTags(currentItem);
+            adjustTagScoresByTags(fullTags, 5); // Лайк влияет на выдачу
+            
             hasInteractedWithCurrent = true;
-            logActivity('like', id, currentItem.tags);
+            logActivity('like', id, fullTags);
         }
         saveLists(); 
         updateActionButtons(); 
@@ -15990,14 +16311,13 @@
         if (window.syncToCloud) window.syncToCloud(); 
     }
 
+    // 3. DISLIKE (ДРУГОЕ / ДИЗЛАЙК)
     function toggleBlacklist(silent = false) {
         if(!currentItem) return;
         const id = currentItem.id;
         
-        // === Не добавлять в ЧС, если отложено в "Смотреть позже" ===
-        if (watchLater.includes(id)) {
-            return; // Просто выходим, ничего не делаем
-        }
+        // Если в Watch Later, не добавляем в ЧС
+        if (watchLater.includes(id)) return;
 
         if (blacklist.includes(id)) {
             if (!silent) blacklist = blacklist.filter(x => x !== id);
@@ -16005,9 +16325,10 @@
             blacklist.push(id); 
             favorites = favorites.filter(x => x !== id); 
             
-            // Уменьшаем баллы только если не было в Watch Later (двойная проверка не повредит)
-            adjustTagScores(currentItem, -5);
-            logActivity('dislike', id, currentItem.tags);
+            const fullTags = getCombinedTags(currentItem);
+            adjustTagScoresByTags(fullTags, -5); // Уменьшаем вес
+            
+            logActivity('dislike', id, fullTags);
         }
         
         saveLists(); 
@@ -16273,6 +16594,44 @@
     function closeWrapped() {
         clearInterval(slideInterval);
         document.getElementById('wrapped-mount').classList.remove('active');
+    }
+
+    function toggleInstallInstruct(platform) {
+        const el = document.getElementById('instruct-' + platform);
+        const isVisible = el.style.display === 'block';
+        
+        // Скрываем все
+        document.getElementById('instruct-ios').style.display = 'none';
+        document.getElementById('instruct-android').style.display = 'none';
+        
+        // Показываем нужный, если он был скрыт
+        if (!isVisible) {
+            el.style.display = 'block';
+        }
+    }
+
+    // 3. Проверка: установлено ли приложение?
+    function isAppInstalled() {
+        // iOS Standalone или стандартный display-mode
+        return (window.navigator.standalone === true) || (window.matchMedia('(display-mode: standalone)').matches);
+    }
+
+    // 4. Логика пропуска окна установки
+    function skipInstall() {
+        document.getElementById('modal-install-overlay').classList.remove('open');
+        // Помечаем, что видели (на эту сессию или навсегда - решать вам)
+        sessionStorage.setItem('xch_install_skipped', 'true'); 
+        
+        // Переходим к следующему шагу (Онбординг предпочтений)
+        checkOnboarding(); 
+    }
+
+    // 5. Проверка онбординга
+    function checkOnboarding() {
+        const isOnboarded = localStorage.getItem('xch_onboarding_done');
+        if (!isOnboarded) {
+            document.getElementById('onboarding-overlay').classList.add('open');
+        }
     }
 
 </script>
