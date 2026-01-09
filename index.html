@@ -886,8 +886,103 @@
         .mobile-header .logo { font-size: 20px; margin-bottom: 0; }
         .mobile-header .logo-img { height: 34px; margin-right: 5px; }
 
+        /* === 12. PREMIUM STATS === */
+        .locked-feature {
+            position: relative;
+            opacity: 0.5;
+            pointer-events: none;
+            filter: blur(2px);
+        }
+        .lock-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            z-index: 10;
+            background: rgba(0,0,0,0.3);
+            cursor: pointer;
+            pointer-events: auto; /* Чтобы клик проходил на оверлей */
+        }
+        .lock-badge {
+            background: var(--accent); color: #000;
+            padding: 5px 10px; border-radius: 12px;
+            font-weight: 800; font-size: 12px; text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        /* === WRAPPED / SUMMARY UI (Spotify Style) === */
+        .wrapped-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 25000; background: #000;
+            display: none; flex-direction: column;
+        }
+        .wrapped-overlay.active { display: flex; animation: fadeIn 0.3s ease; }
+
+        /* Динамические фоны для слайдов */
+        .wrapped-slide {
+            flex: 1; display: none; flex-direction: column;
+            justify-content: center; align-items: center;
+            padding: 40px; text-align: center;
+            background-size: 400% 400%;
+            animation: gradientBG 10s ease infinite;
+        }
+        .wrapped-slide.active-slide { display: flex; }
+
+        /* Градиенты для разных настроений */
+        .bg-fire { background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab); }
+        .bg-dark { background: linear-gradient(-45deg, #000000, #434343, #1a1a1a); }
+        .bg-toxic { background: linear-gradient(-45deg, #11998e, #38ef7d, #000000); }
+        .bg-passion { background: linear-gradient(-45deg, #8E2DE2, #4A00E0, #ff00cc); }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Элементы сводки */
+        .wrapped-progress-container {
+            position: absolute; top: 10px; left: 0; width: 100%;
+            padding: 0 10px; display: flex; gap: 5px; z-index: 20;
+        }
+        .wrapped-progress-bar {
+            height: 4px; flex: 1; background: rgba(255,255,255,0.3);
+            border-radius: 2px; overflow: hidden;
+        }
+        .wrapped-progress-fill {
+            height: 100%; background: #fff; width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .wrapped-big-text {
+            font-size: clamp(40px, 10vw, 80px);
+            font-weight: 900; line-height: 1; margin-bottom: 20px;
+            color: #fff; text-shadow: 0 4px 30px rgba(0,0,0,0.5);
+        }
+        .wrapped-sub-text {
+            font-size: 18px; font-weight: 600; color: rgba(255,255,255,0.9);
+            line-height: 1.5; max-width: 400px;
+        }
+        .wrapped-stat-box {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px;
+            margin: 20px 0; border: 1px solid rgba(255,255,255,0.3);
+        }
+        .wrapped-highlight { color: #ffe600; font-weight: 800; }
+
+        .wrapped-nav-area {
+            position: absolute; top: 0; height: 100%; width: 30%; z-index: 10;
+        }
+        .nav-left { left: 0; }
+        .nav-right { right: 0; }
+        .wrapped-close {
+            position: absolute; top: 20px; right: 20px;
+            font-size: 24px; color: rgba(255,255,255,0.5); z-index: 30; cursor: pointer;
+        }
+
         /* =========================================
-        12. MEDIA QUERIES (ADAPTATION)
+        13. MEDIA QUERIES (ADAPTATION)
         ========================================= */
         
         /* MOBILE DEVICES (< 768px) */
@@ -1082,7 +1177,7 @@
 
 <!-- Modal Favorites -->
 <div class="modal-overlay" id="modal-overlay" onclick="closeList(event)">
-    <div class="modal"> <!-- Уберите max-height, если он мешает поиску -->
+    <div class="modal"> 
         <div class="modal-header">
             <span data-key="favorites_catalog">Liked</span>
             <span style="cursor:pointer" onclick="closeList(null, true)">✕</span>
@@ -1105,44 +1200,20 @@
 </div>
 
 <!-- Modal Stats -->
-<div class="modal-overlay" id="modal-stats-overlay" onclick="closeStats(event)">
-    <div class="modal" style="height: 600px; max-height: 90vh; display:flex; flex-direction:column;">
-        <!-- Хедер -->
-        <div class="modal-header">
-            <span data-key="btn_stats">Statistics</span>
-            <div style="display:flex; align-items:center;">
-                <span class="header-icon-btn" onclick="shareStats()">⤤</span>
-                <span style="cursor:pointer" onclick="closeStats(null, true)">✕</span>
-            </div>
-        </div>
-        
-        <!-- Тело с графиком (скроллится) -->
-        <div class="stats-modal-body" id="modal-stats-body" style="flex:1; padding:20px; position:relative;">
-            <!-- График рендерится сюда -->
-        </div>
-
-        <!-- Футер с переключателями (фиксирован снизу) -->
-        <div class="stats-footer" style="padding: 10px 20px 20px 20px; background: var(--sidebar-bg); border-top: 1px solid var(--border);">
-            
-            <!-- Капсула ДАТ (сверху) -->
-            <div class="stats-tf-capsule">
-                <div class="stats-tf-item active" id="tf-week" onclick="switchTimeframe('week')"></div>
-                <div class="stats-tf-item" id="tf-month" onclick="switchTimeframe('month')"></div>
-                <div class="stats-tf-item" id="tf-year" onclick="switchTimeframe('year')"></div>
-            </div>
-
-            <!-- Капсула РАЗДЕЛОВ (снизу) -->
-            <div class="stats-nav-capsule">
-                <div class="stats-nav-item active" id="stat-nav-tags" onclick="switchStatsTab('tags')">
-                    <span data-key="stats_prefs">Preferences</span>
-                </div>
-                <div class="stats-nav-item" id="stat-nav-activity" onclick="switchStatsTab('activity')">
-                    <span data-key="stats_activity">Activity</span>
-                </div>
-            </div>
-
+<div class="modal-header" style="flex-direction:column; gap:10px; align-items:flex-start;">
+    <div style="display:flex; justify-content:space-between; width:100%;">
+        <span data-key="btn_stats">Statistics</span>
+        <div style="display:flex; align-items:center;">
+            <span class="header-icon-btn" onclick="shareStats()">⤤</span>
+            <span style="cursor:pointer" onclick="closeStats(null, true)">✕</span>
         </div>
     </div>
+    <!-- Кнопка WRAPPED -->
+    <button onclick="openWrapped()" 
+        style="width:100%; background: linear-gradient(45deg, #FF9900, #9B59B6); border:none; padding:10px; border-radius:12px; color:#fff; font-weight:800; font-size:14px; text-transform:uppercase; cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
+        <span data-key="wrapped_btn">Daily Recap ✨</span>
+        <span style="background:rgba(0,0,0,0.2); padding:2px 6px; border-radius:6px; font-size:10px;">PRO</span>
+    </button>
 </div>
 
 <!-- AGE GATE OVERLAY -->
@@ -1511,6 +1582,8 @@
         </div>
     </div>
 </div>
+
+<div id="wrapped-mount" class="wrapped-overlay"></div>
 
 <!-- FIREBASE INTEGRATION -->
 <script type="module">
@@ -1888,6 +1961,9 @@
     const overlayNope = document.querySelector('.overlay-nope');
 
     let sessionHistoryStack = []; // Стек для кнопки "Назад"
+
+    let currentSlideIndex = 0;
+    let slideInterval;
 
     const STORAGE = {
         THEME: 'xch_theme',
@@ -12894,7 +12970,7 @@
             onb_btn_check: "Find Categories",
             onb_found: "We found:",
             onb_btn_confirm: "Add to Favorites",
-            onb_skip: "Skip setup"
+            onb_skip: "Skip setup",
         },
 
         ru: {
@@ -13038,7 +13114,7 @@
             onb_btn_check: "Найти категории",
             onb_found: "Мы нашли:",
             onb_btn_confirm: "Добавить в избранное",
-            onb_skip: "Пропустить"
+            onb_skip: "Пропустить",
         },
 
         es: {
@@ -13302,6 +13378,353 @@
             onb_found: "Wir haben gefunden:",
             onb_btn_confirm: "Zu Favoriten",
             onb_skip: "Überspringen"
+        }
+    };
+
+    const wrappedPhrases = {
+        en: {
+            intro: [
+                "Ready for your spicy recap? ✨",
+                "Let's see what turned you on... 🔥",
+                "Your daily dose of pleasure stats. 📈",
+                "Here is your passion report. 💌",
+                "Let's review your highlights. 🌟"
+            ],
+            act_high: [ // Много генераций
+                "Wow! You generated {n} categories. Impressive stamina!",
+                "Curiosity level: Maximum. {n} searches!",
+                "Someone had a fun night... {n} spins. 😉",
+                "You are a true explorer! {n} discoveries.",
+                "{n} times? You know exactly what you want."
+            ],
+            act_low: [ // Мало генераций
+                "Quick and efficient. {n} categories.",
+                "Quality over quantity. Just {n} searches. ✨",
+                "Saving energy for later? {n} spins.",
+                "Short and sweet. {n} generations.",
+                "A focused session. {n} finds."
+            ],
+            act_comment_high: [
+                "I love your enthusiasm! 🔥",
+                "You certainly have a healthy appetite.",
+                "Exploring all the possibilities, aren't we?",
+                "Never a dull moment with you.",
+                "Keep that energy up!"
+            ],
+            act_comment_low: [
+                "Sometimes less is more. 👌",
+                "Found what you needed quickly?",
+                "A connoisseur picks carefully.",
+                "Brief, but hopefully intense.",
+                "Taking it easy today."
+            ],
+            trend_up: [
+                "That's {n} more than before. Heating up! 🔥",
+                "You are beating your own records (+{n}).",
+                "The passion is growing (+{n}). Nice.",
+                "On the rise! {n} more discoveries.",
+                "You are getting more curious (+{n})."
+            ],
+            trend_down: [
+                "That's {n} less than yesterday. Recharging? 🔋",
+                "Taking a little breather (-{n}).",
+                "Slowing down to enjoy the view?",
+                "A bit quieter today (-{n}). Relaxing.",
+                "Saving the best for later (-{n})."
+            ],
+            fav_tag: [
+                "Your absolute favorite is:",
+                "Your heart beats faster for:",
+                "You seem to really enjoy:",
+                "The winner of the day:",
+                "Your top pick:"
+            ],
+            fav_comment: [
+                "Excellent taste! 🥂",
+                "A classic choice. Never gets old.",
+                "I can see why you like it.",
+                "This one suits you.",
+                "Spicy! Good selection."
+            ],
+            change_tag: [
+                "Interesting! You switched from {old} to {new}.",
+                "New mood? Yesterday: {old}, Today: {new}.",
+                "Exploring new horizons: {new} (was {old}).",
+                "Variety is key! {old} -> {new}.",
+                "Fresh desires. Now loving: {new}."
+            ],
+            change_comment: [
+                "I love that you're exploring new things.",
+                "Versatility is sexy.",
+                "It's good to mix things up!",
+                "Follow your instincts.",
+                "A man of many talents."
+            ],
+            outro: [
+                "Come back soon for more fun 😘",
+                "Sweet dreams (or fantasies) 🌙",
+                "See you next time! Don't be a stranger.",
+                "Thanks for playing with me today.",
+                "Keep exploring your desires 😈"
+            ]
+        },
+        ru: {
+            intro: [
+                "Готов к горячей сводке? ✨",
+                "Давай посмотрим, что тебя зацепило... 🔥",
+                "Твоя ежедневная доза статистики. 📈",
+                "Отчет о твоих желаниях. 💌",
+                "Вспомним лучшие моменты. 🌟"
+            ],
+            act_high: [
+                "Воу! {n} категорий. Впечатляющая выносливость!",
+                "Уровень любопытства: Максимум. {n} поисков!",
+                "У кого-то был веселый вечер... {n} спинов. 😉",
+                "Ты настоящий исследователь! {n} открытий.",
+                "{n} раз? Ты точно знаешь, чего хочешь."
+            ],
+            act_low: [
+                "Быстро и эффективно. {n} категорий.",
+                "Качество важнее количества. Всего {n} поисков. ✨",
+                "Бережешь силы на потом? {n} спинов.",
+                "Краткость — сестра таланта. {n} генераций.",
+                "Точечный удар. {n} находок."
+            ],
+            act_comment_high: [
+                "Мне нравится твой энтузиазм! 🔥",
+                "У тебя отменный аппетит.",
+                "Исследуем все возможности?",
+                "С тобой не соскучишься.",
+                "Так держать!"
+            ],
+            act_comment_low: [
+                "Иногда меньше — значит лучше. 👌",
+                "Быстро нашел то, что искал?",
+                "Истинный ценитель выбирает тщательно.",
+                "Коротко, но, надеюсь, ярко.",
+                "Сегодня в расслабленном режиме."
+            ],
+            trend_up: [
+                "Это на {n} больше, чем вчера. Градус растет! 🔥",
+                "Ты бьешь свои рекорды (+{n}).",
+                "Страсть разгорается (+{n}). Мне нравится.",
+                "На взлете! На {n} открытий больше.",
+                "Твой интерес растет (+{n})."
+            ],
+            trend_down: [
+                "Это на {n} меньше, чем вчера. Перезарядка? 🔋",
+                "Небольшая передышка (-{n}).",
+                "Притормозил, чтобы насладиться моментом?",
+                "Сегодня поспокойнее (-{n}). Релакс.",
+                "Копишь силы на выходные? (-{n})."
+            ],
+            fav_tag: [
+                "Твой абсолютный фаворит:",
+                "Твое сердце бьется чаще от:",
+                "Кажется, тебе очень нравится:",
+                "Победитель этого дня:",
+                "Твой выбор номер один:"
+            ],
+            fav_comment: [
+                "Отличный вкус! 🥂",
+                "Классика. Никогда не надоедает.",
+                "Я понимаю, почему тебе это нравится.",
+                "Тебе это подходит.",
+                "Горячо! Хороший выбор."
+            ],
+            change_tag: [
+                "Интересно! Ты сменил {old} на {new}.",
+                "Новое настроение? Вчера: {old}, Сегодня: {new}.",
+                "Новые горизонты: {new} (было {old}).",
+                "Разнообразие — это круто! {old} -> {new}.",
+                "Свежие желания. Теперь любим: {new}."
+            ],
+            change_comment: [
+                "Люблю, когда ты пробуешь новое.",
+                "Разносторонность — это сексуально.",
+                "Полезно иногда менять обстановку!",
+                "Следуй за своими инстинктами.",
+                "Человек множества талантов."
+            ],
+            outro: [
+                "Возвращайся скорее 😘",
+                "Сладких снов (и фантазий) 🌙",
+                "До встречи! Не пропадай.",
+                "Спасибо, что провел время со мной.",
+                "Продолжай исследовать себя 😈"
+            ]
+        },
+        es: {
+            intro: [
+                "¿Listo para tu resumen picante? ✨",
+                "Veamos qué te encendió... 🔥",
+                "Tu dosis diaria de placer. 📈",
+                "Aquí está tu reporte de pasión. 💌",
+                "Repasemos tus mejores momentos. 🌟"
+            ],
+            act_high: [
+                "¡Wow! Generaste {n} categorías. ¡Qué energía!",
+                "Nivel de curiosidad: Máximo. ¡{n} búsquedas!",
+                "Alguien tuvo una noche divertida... {n} giros. 😉",
+                "¡Eres un verdadero explorador! {n} descubrimientos.",
+                "¿{n} veces? Sabes exactamente lo que quieres."
+            ],
+            act_low: [
+                "Rápido y eficiente. {n} categorías.",
+                "Calidad sobre cantidad. Solo {n} búsquedas. ✨",
+                "¿Guardando energía para luego? {n} giros.",
+                "Breve y dulce. {n} generaciones.",
+                "Una sesión enfocada. {n} hallazgos."
+            ],
+            act_comment_high: [
+                "¡Me encanta tu entusiasmo! 🔥",
+                "Tienes un apetito saludable.",
+                "Explorando todas las posibilidades, ¿eh?",
+                "Nunca hay un momento aburrido contigo.",
+                "¡Mantén esa energía!"
+            ],
+            act_comment_low: [
+                "A veces menos es más. 👌",
+                "¿Encontraste rápido lo que buscabas?",
+                "Un conocedor elige con cuidado.",
+                "Breve, pero espero que intenso.",
+                "Tomándolo con calma hoy."
+            ],
+            trend_up: [
+                "Son {n} más que antes. ¡Subiendo temperatura! 🔥",
+                "Estás rompiendo tus récords (+{n}).",
+                "La pasión crece (+{n}). Qué bien.",
+                "¡En alza! {n} descubrimientos más.",
+                "Te estás volviendo más curioso (+{n})."
+            ],
+            trend_down: [
+                "Son {n} menos que ayer. ¿Recargando? 🔋",
+                "Un pequeño respiro (-{n}).",
+                "¿Frenando para disfrutar la vista?",
+                "Un poco más tranquilo hoy (-{n}). Relax.",
+                "¿Guardando lo mejor para luego? (-{n})."
+            ],
+            fav_tag: [
+                "Tu favorito absoluto es:",
+                "Tu corazón late por:",
+                "Parece que realmente disfrutas:",
+                "El ganador del día:",
+                "Tu elección número uno:"
+            ],
+            fav_comment: [
+                "¡Excelente gusto! 🥂",
+                "Un clásico. Nunca pasa de moda.",
+                "Puedo ver por qué te gusta.",
+                "Esto te queda bien.",
+                "¡Picante! Buena elección."
+            ],
+            change_tag: [
+                "¡Interesante! Cambiaste {old} por {new}.",
+                "¿Nuevo humor? Ayer: {old}, Hoy: {new}.",
+                "Nuevos horizontes: {new} (era {old}).",
+                "¡La variedad es clave! {old} -> {new}.",
+                "Deseos frescos. Ahora amas: {new}."
+            ],
+            change_comment: [
+                "Me encanta que pruebes cosas nuevas.",
+                "La versatilidad es sexy.",
+                "¡Es bueno mezclar las cosas!",
+                "Sigue tus instintos.",
+                "Un hombre de muchos talentos."
+            ],
+            outro: [
+                "Vuelve pronto para más diversión 😘",
+                "Dulces sueños (o fantasías) 🌙",
+                "¡Hasta la próxima! No te pierdas.",
+                "Gracias por jugar conmigo hoy.",
+                "Sigue explorando tus deseos 😈"
+            ]
+        },
+        de: {
+            intro: [
+                "Bereit für deine heiße Zusammenfassung? ✨",
+                "Mal sehen, was dich angemacht hat... 🔥",
+                "Deine tägliche Dosis Vergnügen. 📈",
+                "Hier ist dein Leidenschaftsbericht. 💌",
+                "Lass uns deine Highlights ansehen. 🌟"
+            ],
+            act_high: [
+                "Wow! {n} Kategorien. Beeindruckende Ausdauer!",
+                "Neugier-Level: Maximum. {n} Suchen!",
+                "Jemand hatte Spaß... {n} Spins. 😉",
+                "Ein wahrer Entdecker! {n} Funde.",
+                "{n} Mal? Du weißt genau, was du willst."
+            ],
+            act_low: [
+                "Schnell und effizient. {n} Kategorien.",
+                "Qualität vor Quantität. Nur {n} Suchen. ✨",
+                "Energie sparen für später? {n} Spins.",
+                "Kurz und bündig. {n} Generationen.",
+                "Eine fokussierte Sitzung. {n} Funde."
+            ],
+            act_comment_high: [
+                "Ich liebe deinen Enthusiasmus! 🔥",
+                "Du hast einen gesunden Appetit.",
+                "Wir erkunden alle Möglichkeiten, was?",
+                "Mit dir wird es nie langweilig.",
+                "Behalt diese Energie bei!"
+            ],
+            act_comment_low: [
+                "Manchmal ist weniger mehr. 👌",
+                "Schnell gefunden, was du gesucht hast?",
+                "Ein Kenner wählt sorgfältig.",
+                "Kurz, aber hoffentlich intensiv.",
+                "Heute ganz entspannt."
+            ],
+            trend_up: [
+                "Das sind {n} mehr als vorher. Es wird heiß! 🔥",
+                "Du brichst deine Rekorde (+{n}).",
+                "Die Leidenschaft wächst (+{n}). Schön.",
+                "Im Aufwind! {n} mehr Entdeckungen.",
+                "Du wirst neugieriger (+{n})."
+            ],
+            trend_down: [
+                "Das sind {n} weniger als gestern. Aufladen? 🔋",
+                "Eine kleine Atempause (-{n}).",
+                "Langsamer, um die Aussicht zu genießen?",
+                "Heute etwas ruhiger (-{n}). Entspann dich.",
+                "Das Beste für später aufheben? (-{n})."
+            ],
+            fav_tag: [
+                "Dein absoluter Favorit ist:",
+                "Dein Herz schlägt für:",
+                "Du scheinst es echt zu mögen:",
+                "Der Gewinner des Tages:",
+                "Deine Nummer Eins:"
+            ],
+            fav_comment: [
+                "Exzellenter Geschmack! 🥂",
+                "Ein Klassiker. Wird nie alt.",
+                "Ich kann sehen, warum du es magst.",
+                "Das steht dir.",
+                "Scharf! Gute Wahl."
+            ],
+            change_tag: [
+                "Interessant! Wechsel von {old} zu {new}.",
+                "Neue Laune? Gestern: {old}, Heute: {new}.",
+                "Neue Horizonte: {new} (war {old}).",
+                "Abwechslung ist der Schlüssel! {old} -> {new}.",
+                "Frische Wünsche. Jetzt beliebt: {new}."
+            ],
+            change_comment: [
+                "Ich liebe es, wenn du Neues probierst.",
+                "Vielseitigkeit ist sexy.",
+                "Es ist gut, Dinge zu mischen!",
+                "Folge deinen Instinkten.",
+                "Ein Mann vieler Talente."
+            ],
+            outro: [
+                "Komm bald wieder für mehr Spaß 😘",
+                "Süße Träume (oder Fantasien) 🌙",
+                "Bis zum nächsten Mal! Bleib nicht fern.",
+                "Danke, dass du heute mit mir gespielt hast.",
+                "Erforsche weiter deine Wünsche 😈"
+            ]
         }
     };
 
@@ -14328,31 +14751,86 @@
     // === STATS SYSTEM ===
 
     function openStatistics() {
-        // Устанавливаем тексты на кнопках дат при открытии
+        // Устанавливаем переводы на кнопки
         const t = langData[currentLang];
-        document.getElementById('tf-week').innerText = t.tf_week;
-        document.getElementById('tf-month').innerText = t.tf_month;
-        document.getElementById('tf-year').innerText = t.tf_year;
+        if (document.getElementById('tf-week')) document.getElementById('tf-week').innerText = t.tf_week;
+        if (document.getElementById('tf-month')) document.getElementById('tf-month').innerText = t.tf_month;
+        if (document.getElementById('tf-year')) document.getElementById('tf-year').innerText = t.tf_year;
+        if (document.getElementById('tf-all')) document.getElementById('tf-all').innerText = t.tf_all;
 
-        document.getElementById('modal-stats-overlay').classList.add('open');
-        renderStatsContent();
+        // Обновляем замки (показываем, что доступно, а что нет)
+        updateStatsLocks();
+
+        // Открываем само окно
+        const modal = document.getElementById('modal-stats-overlay');
+        if (modal) {
+            modal.classList.add('open');
+            // Рендерим контент (по умолчанию вкладка 'tags')
+            // Важно: сбрасываем фильтр времени на 'week', так как он доступен всем
+            currentStatsTimeframe = 'week'; 
+            switchStatsTab('tags'); 
+            
+            // Визуально активируем кнопку Week
+            document.querySelectorAll('.stats-tf-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('tf-week').classList.add('active');
+        } else {
+            console.error("Error: Modal 'modal-stats-overlay' not found in HTML");
+        }
     }
 
     function switchStatsTab(tab) {
+        if (tab === 'activity' && subscriptionLevel === 'free') {
+            openSubModal();
+            return;
+        }
+        
         currentStatsTab = tab;
-        // Переключаем классы кнопок навигации
         document.getElementById('stat-nav-tags').classList.toggle('active', tab === 'tags');
         document.getElementById('stat-nav-activity').classList.toggle('active', tab === 'activity');
         renderStatsContent();
     }
 
     function switchTimeframe(tf) {
+        // NERF: Блокируем всё кроме "Week" для бесплатных
+        if (tf !== 'week' && subscriptionLevel === 'free') {
+            openSubModal();
+            return;
+        }
+
         currentStatsTimeframe = tf;
-        // Переключаем классы кнопок дат
-        document.getElementById('tf-week').classList.toggle('active', tf === 'week');
-        document.getElementById('tf-month').classList.toggle('active', tf === 'month');
-        document.getElementById('tf-year').classList.toggle('active', tf === 'year');
+        document.querySelectorAll('.stats-tf-item').forEach(el => el.classList.remove('active'));
+        document.getElementById('tf-' + tf).classList.add('active');
         renderStatsContent();
+    }
+
+    function updateStatsLocks() {
+        const isFree = subscriptionLevel === 'free';
+        
+        // Элементы, которые блокируем
+        const idsToLock = ['tf-month', 'tf-year', 'stat-nav-activity'];
+        
+        idsToLock.forEach(id => {
+            const el = document.getElementById(id);
+            if(!el) return;
+            
+            // Сначала чистим старые замки, чтобы не дублировались
+            const existingLock = el.querySelector('.lock-icon-small');
+            if (existingLock) existingLock.remove();
+            
+            // Сбрасываем прозрачность
+            el.style.opacity = '1';
+            
+            // Если тариф бесплатный — добавляем замок и прозрачность
+            if (isFree) {
+                el.style.opacity = '0.6';
+                // Добавляем иконку замка
+                const lockSpan = document.createElement('span');
+                lockSpan.className = 'lock-icon-small';
+                lockSpan.innerText = ' 🔒';
+                lockSpan.style.fontSize = '10px';
+                el.appendChild(lockSpan);
+            }
+        });
     }
 
     function renderStatsContent() {
@@ -15561,6 +16039,240 @@
 
     function openWatchLaterCatalog() {
         renderListModal('wl');
+    }
+
+    function getWrappedData() {
+        // 1. Определяем периоды (Сегодня/Вчера или Текущая неделя/Прошлая)
+        const now = new Date();
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+        const startOfYesterday = startOfToday - 86400000;
+        
+        // Фильтруем логи
+        const logsToday = activityLog.filter(l => l.ts >= startOfToday && l.type === 'gen');
+        const logsYesterday = activityLog.filter(l => l.ts >= startOfYesterday && l.ts < startOfToday && l.type === 'gen');
+        
+        // 2. Считаем лучший тег за сегодня
+        const tagCountsToday = {};
+        logsToday.forEach(l => {
+            l.tags.forEach(t => {
+                if(['universal','straight','gay','lesbian','trans'].includes(t)) return;
+                tagCountsToday[t] = (tagCountsToday[t] || 0) + 1;
+            });
+        });
+        const topTagToday = Object.keys(tagCountsToday).sort((a,b) => tagCountsToday[b] - tagCountsToday[a])[0];
+
+        // 3. Считаем лучший тег за вчера (для сравнения)
+        const tagCountsYesterday = {};
+        logsYesterday.forEach(l => {
+            l.tags.forEach(t => {
+                if(['universal','straight','gay','lesbian','trans'].includes(t)) return;
+                tagCountsYesterday[t] = (tagCountsYesterday[t] || 0) + 1;
+            });
+        });
+        const topTagYesterday = Object.keys(tagCountsYesterday).sort((a,b) => tagCountsYesterday[b] - tagCountsYesterday[a])[0];
+
+        return {
+            countToday: logsToday.length,
+            countYesterday: logsYesterday.length,
+            diff: logsToday.length - logsYesterday.length,
+            topTag: topTagToday,
+            prevTopTag: topTagYesterday
+        };
+    }
+
+    // Хелпер для получения случайной фразы на нужном языке
+    function getWrappedPhrase(category, replacements = {}) {
+        // 1. Определяем язык (если нет перевода, берем EN)
+        const lang = wrappedPhrases[currentLang] ? currentLang : 'en';
+        const phrases = wrappedPhrases[lang][category];
+        
+        // 2. Берем случайную фразу
+        let phrase = phrases[Math.floor(Math.random() * phrases.length)];
+        
+        // 3. Заменяем плейсхолдеры (например, {n} на число)
+        for (const [key, value] of Object.entries(replacements)) {
+            phrase = phrase.replace(`{${key}}`, value);
+        }
+        
+        return phrase;
+    }
+
+    function openWrapped() {
+        // Проверка подписки (Нерф)
+        if (subscriptionLevel === 'free') {
+            openSubModal();
+            return;
+        }
+
+        const data = getWrappedData();
+        
+        // Минимальный порог данных
+        if (data.countToday < 3) {
+            alert(currentLang === 'ru' ? "Слишком мало данных! Сгенерируй больше фетишей сегодня 😏" : "Not enough data yet! Generate more fetishes today. 😏");
+            return;
+        }
+
+        const overlay = document.getElementById('wrapped-mount');
+        overlay.innerHTML = '';
+        overlay.classList.add('active');
+        
+        const slides = [];
+
+        // --- SLIDE 1: INTRO ---
+        slides.push(`
+            <div class="wrapped-slide bg-dark active-slide">
+                <div class="wrapped-big-text">xFetish<br><span style="color:var(--accent)">Wrapped</span></div>
+                <div class="wrapped-sub-text">${getWrappedPhrase('intro')}</div>
+            </div>
+        `);
+
+        // --- SLIDE 2: COUNT (Количество) ---
+        const isBusy = data.countToday > 15;
+        const countPhrase = isBusy 
+            ? getWrappedPhrase('act_high', {n: data.countToday}) 
+            : getWrappedPhrase('act_low', {n: data.countToday});
+        
+        const countComment = isBusy
+            ? getWrappedPhrase('act_comment_high')
+            : getWrappedPhrase('act_comment_low');
+
+        slides.push(`
+            <div class="wrapped-slide bg-fire">
+                <div class="wrapped-big-text">${data.countToday}</div>
+                <div class="wrapped-sub-text">
+                    ${countPhrase}
+                    <br><br>
+                    <b>${countComment}</b>
+                </div>
+            </div>
+        `);
+
+        // --- SLIDE 3: TREND (Только если есть данные за вчера) ---
+        if (data.countYesterday > 0) {
+            const isUp = data.diff > 0;
+            const diffNum = Math.abs(data.diff);
+            const trendPhrase = isUp
+                ? getWrappedPhrase('trend_up', {n: diffNum})
+                : getWrappedPhrase('trend_down', {n: diffNum});
+
+            slides.push(`
+                <div class="wrapped-slide bg-toxic">
+                    <div class="wrapped-big-text">${data.diff > 0 ? '+' : ''}${data.diff}</div>
+                    <div class="wrapped-sub-text">${trendPhrase}</div>
+                </div>
+            `);
+        }
+
+        // --- SLIDE 4: TOP TAG ---
+        if (data.topTag) {
+            const tagName = data.topTag.charAt(0).toUpperCase() + data.topTag.slice(1);
+            
+            slides.push(`
+                <div class="wrapped-slide bg-passion">
+                    <div class="wrapped-sub-text">${getWrappedPhrase('fav_tag')}</div>
+                    <div class="wrapped-big-text wrapped-highlight">${tagName}</div>
+                    <div class="wrapped-sub-text">${getWrappedPhrase('fav_comment')}</div>
+                </div>
+            `);
+            
+            // --- SLIDE 5: CHANGE (Если вкус изменился) ---
+            if (data.prevTopTag && data.prevTopTag !== data.topTag) {
+                const oldName = data.prevTopTag.charAt(0).toUpperCase() + data.prevTopTag.slice(1);
+                
+                const changePhrase = getWrappedPhrase('change_tag', {old: oldName, new: tagName});
+
+                slides.push(`
+                    <div class="wrapped-slide bg-dark">
+                        <div class="wrapped-sub-text">
+                            ${changePhrase}
+                            <br><br>
+                            ${getWrappedPhrase('change_comment')}
+                        </div>
+                    </div>
+                `);
+            }
+        }
+
+        // --- SLIDE 6: OUTRO ---
+        slides.push(`
+            <div class="wrapped-slide bg-dark">
+                <div class="wrapped-big-text">👋</div>
+                <div class="wrapped-sub-text">${getWrappedPhrase('outro')}</div>
+                <button class="btn-gen" style="margin-top:30px; font-size:14px; background:#fff; color:#000;" onclick="closeWrapped()">Close</button>
+            </div>
+        `);
+
+        // Рендер баров и контейнера
+        let barsHtml = '';
+        slides.forEach((_, i) => {
+            barsHtml += `<div class="wrapped-progress-bar"><div class="wrapped-progress-fill" id="bar-${i}"></div></div>`;
+        });
+
+        overlay.innerHTML = `
+            <div class="wrapped-progress-container">${barsHtml}</div>
+            <div class="wrapped-close" onclick="closeWrapped()">✕</div>
+            <div class="wrapped-nav-area nav-left" onclick="prevSlide()"></div>
+            <div class="wrapped-nav-area nav-right" onclick="nextSlide()"></div>
+            ${slides.join('')}
+        `;
+
+        currentSlideIndex = 0;
+        startSlideTimer(slides.length);
+    }
+
+    function startSlideTimer(total) {
+        clearInterval(slideInterval);
+        
+        const show = (idx) => {
+            document.querySelectorAll('.wrapped-slide').forEach(el => el.classList.remove('active-slide'));
+            document.querySelectorAll('.wrapped-slide')[idx].classList.add('active-slide');
+            
+            // Обновляем бары
+            for(let i=0; i<total; i++) {
+                const bar = document.getElementById('bar-'+i);
+                if(i < idx) bar.style.width = '100%';
+                else if(i > idx) bar.style.width = '0%';
+                else {
+                    // Анимация текущего бара
+                    bar.style.width = '0%';
+                    setTimeout(() => bar.style.width = '100%', 10);
+                }
+            }
+        };
+
+        show(currentSlideIndex);
+
+        slideInterval = setInterval(() => {
+            if (currentSlideIndex < total - 1) {
+                currentSlideIndex++;
+                show(currentSlideIndex);
+            } else {
+                clearInterval(slideInterval); // Конец
+            }
+        }, 4000); // 4 секунды на слайд
+    }
+
+    function nextSlide() {
+        const total = document.querySelectorAll('.wrapped-slide').length;
+        if (currentSlideIndex < total - 1) {
+            currentSlideIndex++;
+            startSlideTimer(total);
+        } else {
+            closeWrapped();
+        }
+    }
+
+    function prevSlide() {
+        const total = document.querySelectorAll('.wrapped-slide').length;
+        if (currentSlideIndex > 0) {
+            currentSlideIndex--;
+            startSlideTimer(total);
+        }
+    }
+
+    function closeWrapped() {
+        clearInterval(slideInterval);
+        document.getElementById('wrapped-mount').classList.remove('active');
     }
 
 </script>
