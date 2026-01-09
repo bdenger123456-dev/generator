@@ -1095,6 +1095,78 @@
     </div>
 </div>
 
+<!-- PAYMENT SELECTION MODAL -->
+<div class="modal-overlay" id="modal-payment-overlay" onclick="closePaymentModal(event)" style="z-index: 22000;">
+    <div class="modal" style="max-width: 400px; background: var(--bg-color);">
+        <div class="modal-header">
+            <span id="payment-modal-title">Checkout</span>
+            <span style="cursor:pointer" onclick="closePaymentModal(null, true)">✕</span>
+        </div>
+        
+        <div class="modal-body" style="padding: 0;">
+            <div style="padding: 15px 20px; color: var(--text-secondary); font-size: 13px; text-align: center;">
+                Select a payment method to receive your activation code instantly.
+            </div>
+
+            <div class="ios-group" style="margin: 0 15px 20px 15px;">
+                
+                <!-- Telegram Stars -->
+                <div class="ios-row clickable" onclick="processPayment('telegram')" style="padding: 15px;">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <span style="font-size:24px;">⭐</span>
+                        <div style="display:flex; flex-direction:column;">
+                            <span style="font-weight:600; color:var(--text-main);">Telegram Stars</span>
+                            <span style="font-size:11px; color:#2ecc71;">Apple Pay / Google Pay available</span>
+                        </div>
+                    </div>
+                    <span style="color:var(--text-secondary)">›</span>
+                </div>
+
+                <!-- Lava.top -->
+                <div class="ios-row clickable" onclick="processPayment('lava')" style="padding: 15px;">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <span style="font-size:24px;">🌋</span>
+                        <div style="display:flex; flex-direction:column;">
+                            <span style="font-weight:600; color:var(--text-main);">Card (Lava.top)</span>
+                            <span style="font-size:11px; color:var(--text-secondary);">Visa / Mastercard (World)</span>
+                        </div>
+                    </div>
+                    <span style="color:var(--text-secondary)">›</span>
+                </div>
+
+                <!-- Cryptomus -->
+                <div class="ios-row clickable" onclick="processPayment('crypto')" style="padding: 15px;">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <span style="font-size:24px;">🛡️</span>
+                        <div style="display:flex; flex-direction:column;">
+                            <span style="font-weight:600; color:var(--text-main);">Crypto</span>
+                            <span style="font-size:11px; color:var(--text-secondary);">USDT, TON, BTC (Anonymous)</span>
+                        </div>
+                    </div>
+                    <span style="color:var(--text-secondary)">›</span>
+                </div>
+
+                <!-- Boosty -->
+                <div class="ios-row clickable" onclick="processPayment('boosty')" style="padding: 15px;">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <span style="font-size:24px;">🅱️</span>
+                        <div style="display:flex; flex-direction:column;">
+                            <span style="font-weight:600; color:var(--text-main);">Boosty</span>
+                            <span style="font-size:11px; color:var(--text-secondary);">Cards (RF), PayPal</span>
+                        </div>
+                    </div>
+                    <span style="color:var(--text-secondary)">›</span>
+                </div>
+
+            </div>
+            
+            <div style="text-align:center; padding-bottom:20px;">
+                <span style="font-size:12px; color:var(--text-secondary); text-decoration:underline; cursor:pointer;" onclick="promptPromoCode()">I already have a code</span>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- FIREBASE INTEGRATION -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -1435,9 +1507,7 @@
     let currentLang = 'en';
     let subscriptionLevel = localStorage.getItem('xch_sub_level') || 'free'; // 'free', 'pro', 'beast'
 
-    /* ===========================================================
-       🛠 DEBUG MODE
-       =========================================================== */
+    /* =================== ⚒️ DEBUG MODE =========================== */
     
     subscriptionLevel = 'pro'; 
     // subscriptionLevel = 'beast';
@@ -1448,6 +1518,8 @@
     let currentItem = null;
     let lastGeneratedItem = null; 
     let hasInteractedWithCurrent = false;
+
+    let pendingPlan = null;
 
     let activeMods = new Set();
     let isGenerating = false;
@@ -8316,12 +8388,12 @@
             },
             {
                 id: 768, 
-                name: "Eye Crossing", name_ru: "Скошенные глаза (Ahegao)", name_es: "Bizco (Ahegao)", name_de: "Schielen (Ahegao)",
+                name: "Ahegao", name_ru: "Ахегао", name_es: "Ahegao", name_de: "Ahegao",
                 slug: "eye-crossing", tags: ["face", "expression"],
-                desc_en: "Crossing eyes in pleasure (Ahegao).",
-                desc_ru: "Скашивание глаз от удовольствия (Ахегао).",
-                desc_es: "Cruzar los ojos de placer (Ahegao).",
-                desc_de: "Augen verdrehen vor Vergnügen (Ahegao)."
+                desc_en: "Crossing eyes in pleasure.",
+                desc_ru: "Скашивание глаз от удовольствия.",
+                desc_es: "Cruzar los ojos de placer.",
+                desc_de: "Augen verdrehen vor Vergnügen."
             },
             {
                 id: 769, 
@@ -14543,8 +14615,7 @@
         const tBeast = langData[currentLang].btn_get_beast;
 
         // Helper: Настройка кнопки
-        // state: 'current' (активная, серая), 'lower' (пасхалка, серая), 'buy' (купить, цветная)
-        const configureBtn = (btn, state, buyText, link) => {
+        const configureBtn = (btn, state, buyText, planType) => {
             btn.onclick = null;
             btn.classList.remove('current', 'pro-btn', 'beast-btn');
             
@@ -14555,41 +14626,106 @@
             } 
             else if (state === 'lower') {
                 btn.disabled = true;
-                btn.classList.add('current'); // Используем тот же серый стиль
-                btn.innerText = tLower;       // Пасхалка!
+                btn.classList.add('current'); 
+                btn.innerText = tLower;       
             } 
             else { // 'buy'
                 btn.disabled = false;
-                // Восстанавливаем класс цвета (костыль определения класса по родителю)
                 if (btn.closest('.pro')) btn.classList.add('pro-btn');
                 if (btn.closest('.beast')) btn.classList.add('beast-btn');
                 
                 btn.innerText = buyText;
-                btn.onclick = () => openBoosty(link);
+                // ВАЖНО: Теперь вызываем выбор оплаты
+                btn.onclick = () => openPaymentSelection(planType);
             }
         };
 
         // ЛОГИКА ОТОБРАЖЕНИЯ
         if (subscriptionLevel === 'beast') {
-            // Если BEAST: Free и Pro — "Достойны большего", Beast — Текущий
             configureBtn(btnFree, 'lower', null, null);
             configureBtn(btnPro, 'lower', null, null);
             configureBtn(btnBeast, 'current', null, null);
         } 
         else if (subscriptionLevel === 'pro') {
-            // Если PRO: Free — "Достойны большего", Pro — Текущий, Beast — Купить
             configureBtn(btnFree, 'lower', null, null);
             configureBtn(btnPro, 'current', null, null);
-            configureBtn(btnBeast, 'buy', tBeast, 'https://boosty.to/xfetishhub');
+            configureBtn(btnBeast, 'buy', tBeast, 'beast');
         } 
         else {
-            // Если FREE: Free — Текущий, остальные — Купить
             configureBtn(btnFree, 'current', null, null);
-            configureBtn(btnPro, 'buy', tPro, 'https://boosty.to/xfetishhub');
-            configureBtn(btnBeast, 'buy', tBeast, 'https://boosty.to/xfetishhub');
+            configureBtn(btnPro, 'buy', tPro, 'pro');
+            configureBtn(btnBeast, 'buy', tBeast, 'beast');
         }
 
         document.getElementById('modal-sub-overlay').classList.add('open');
+    }
+
+    // --- ФУНКЦИИ ДЛЯ ОПЛАТЫ ---
+
+    function openPaymentSelection(plan) {
+        if (!window.isUserLoggedIn) {
+            alert(langData[currentLang].login_required || "Please log in (Sync Data) first!");
+            closeSubModal(null, true);
+            switchTab('account');
+            const loginBtn = document.getElementById('login-capsule');
+            if(loginBtn) {
+                loginBtn.style.border = "1px solid var(--accent)";
+                setTimeout(() => loginBtn.style.border = "none", 1000);
+            }
+            return;
+        }
+
+        pendingPlan = plan;
+        // Меняем заголовок в зависимости от плана
+        const titleEl = document.getElementById('payment-modal-title');
+        const planName = plan === 'pro' ? 'Pro' : 'Beast';
+        const price = plan === 'pro' ? '$1.99' : '$4.99';
+        titleEl.innerText = `Get ${planName} (${price})`;
+
+        document.getElementById('modal-payment-overlay').classList.add('open');
+    }
+
+    function closePaymentModal(e, force) {
+        if (force || e.target.id === 'modal-payment-overlay') {
+            document.getElementById('modal-payment-overlay').classList.remove('open');
+        }
+    }
+
+    function processPayment(provider) {
+        // === ЗАГЛУШКИ ССЫЛОК ===
+        
+        let url = "";
+        
+        if (provider === 'telegram') {
+            // Ссылка на вашего бота
+            url = "https://t.me/YourBotName?start=" + pendingPlan; 
+        } 
+        else if (provider === 'lava') {
+            // Ссылка на товар Lava.top
+            url = pendingPlan === 'pro' ? "https://lava.top/product/pro-link" : "https://lava.top/product/beast-link";
+        }
+        else if (provider === 'crypto') {
+            // Ссылка на Cryptomus
+            url = "https://cryptomus.com/pay/your-link";
+        }
+        else if (provider === 'boosty') {
+            url = "https://boosty.to/xfetishhub";
+        }
+
+        window.open(url, '_blank');
+        
+        // После клика можно закрыть модалку или показать инструкцию
+        // closePaymentModal(null, true);
+    }
+
+    function promptPromoCode() {
+        const code = prompt("Enter your activation code (received after payment):");
+        if (code) {
+            // Вызываем существующую функцию активации
+            window.activatePromoCode(code.trim());
+            closePaymentModal(null, true);
+            closeSubModal(null, true);
+        }
     }
 
     function closeSubModal(e, force) {
