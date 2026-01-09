@@ -1199,8 +1199,45 @@
         }
         .btn-google:active { transform: scale(0.98); }
 
+        /* 15. SYNC MODAL STYLES */
+        .sync-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .sync-stat-item {
+            background: var(--ios-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sync-stat-val {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .sync-stat-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        /* Анимация вращения для кнопки синхронизации */
+        @keyframes spinIcon { 100% { transform: rotate(360deg); } }
+        .spinning-icon { animation: spinIcon 1s linear infinite; display: inline-block; }
+
         /* =========================================
-        15. MEDIA QUERIES (ADAPTATION)
+        16. MEDIA QUERIES (ADAPTATION)
         ========================================= */
         
         /* MOBILE DEVICES (< 768px) */
@@ -1928,6 +1965,77 @@
     </div>
 </div>
 
+<!-- SYNC INFO & LOGOUT MODAL -->
+<div class="modal-overlay" id="modal-sync-info-overlay" onclick="closeSyncInfoModal(event)" style="z-index: 23000;">
+    <div class="modal" style="max-width: 400px; padding: 0; background: var(--sidebar-bg); overflow: hidden;">
+        
+        <!-- Header -->
+        <div class="modal-header" style="border-bottom: 1px solid var(--border); padding: 15px 20px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-size:24px;">☁️</span>
+                <span data-key="sync_title">Cloud Storage</span>
+            </div>
+            <span style="cursor:pointer; opacity:0.6;" onclick="closeSyncInfoModal(null, true)">✕</span>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body" style="padding: 20px;">
+            
+            <div style="text-align:center; margin-bottom:20px; color:var(--text-secondary); font-size:13px;">
+                <span id="sync-email-display" style="color:var(--text-main); font-weight:700;">...</span>
+                
+                <!-- Блок подписки -->
+                <div id="sync-plan-box" style="margin-top: 8px; display: inline-flex; align-items: center; gap: 8px; background: var(--ios-card); border: 1px solid var(--border); padding: 4px 10px; border-radius: 20px;">
+                    <span id="sync-plan-badge" style="font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">FREE</span>
+                    <span id="sync-plan-expiry" style="font-size: 11px; color: var(--text-secondary); display: none;">...</span>
+                </div>
+
+                <br>
+                <!-- ДОБАВИЛ data-key -->
+                <span data-key="sync_desc">Data stored safely on Google servers</span>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="sync-stats-grid">
+                <div class="sync-stat-item">
+                    <span class="sync-stat-val" id="cloud-fav-count">...</span>
+                    <span class="sync-stat-label" data-key="favorites_catalog">Liked</span>
+                </div>
+                <div class="sync-stat-item">
+                    <span class="sync-stat-val" id="cloud-wl-count">...</span>
+                    <span class="sync-stat-label" data-key="watch_later">Watch Later</span>
+                </div>
+                <div class="sync-stat-item">
+                    <span class="sync-stat-val" id="cloud-hist-count">...</span>
+                    <span class="sync-stat-label" data-key="history_title">History</span>
+                </div>
+                <div class="sync-stat-item">
+                    <span class="sync-stat-val" id="cloud-ban-count">...</span>
+                    <span class="sync-stat-label" data-key="blacklist_catalog">Disliked</span>
+                </div>
+            </div>
+
+            <div style="background:rgba(255,153,0,0.1); border:1px solid rgba(255,153,0,0.3); padding:10px; border-radius:12px; margin-bottom:20px; font-size:12px; color:var(--text-secondary); text-align:center;">
+                <!-- ДОБАВИЛ data-key -->
+                <span data-key="sync_tip">Click "Synchronize" to merge Cloud data with this device.</span>
+            </div>
+
+            <!-- Actions -->
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <button class="btn-gen" onclick="performManualSync()" id="btn-manual-sync" style="padding:15px; font-size:15px; background:var(--accent); color:#000; border:none;">
+                    <!-- ДОБАВИЛ data-key -->
+                    <span id="sync-btn-text" data-key="btn_sync">🔄 Synchronize Device</span>
+                </button>
+
+                <button class="btn-gen" onclick="window.logout()" style="padding:15px; font-size:15px; background:transparent; border:1px solid var(--highlight-red); color:var(--highlight-red);">
+                    <span data-key="logout_text">Log Out</span>
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 <div id="wrapped-mount" class="wrapped-overlay"></div>
 
 <!-- FIREBASE INTEGRATION -->
@@ -2023,53 +2131,116 @@
         }
     };
 
+    // === 1. ФУНКЦИЯ КЛИКА ПО АККАУНТУ ===
     window.handleLoginClick = function() {
         if (window.isUserLoggedIn) {
-            // Если уже вошел - спрашиваем про выход
-            const t = (typeof langData !== 'undefined' && langData[currentLang]) 
-                    ? langData[currentLang] 
-                    : { logout_text: "Logout" };
-            
-            if(confirm((t.logout_text || "Logout") + "?")) {
-                window.logout();
-            }
+            openSyncInfoModal();
         } else {
-            // Если не вошел - показываем красивое окно
             openLoginModal();
         }
     };
 
-    // === UI: ОБНОВЛЕНИЕ ДАТЫ СИНХРОНИЗАЦИИ ===
-    window.updateLastSyncUI = function() {
-        const el = document.getElementById('last-sync-date');
-        if (!el) return;
+    // === 2. ОТКРЫТИЕ ОКНА И ПОДГРУЗКА СТАТИСТИКИ ===
+    window.openSyncInfoModal = async function() {
+        const user = auth.currentUser;
+        if (!user) return;
 
-        if (!window.isUserLoggedIn) {
-            el.style.display = 'none';
-            return;
-        }
-        
-        const ts = localStorage.getItem('xch_last_sync_ts');
-        
-        const currentLang = localStorage.getItem('xch_lang') || 'en';
-        
-        // Безопасное получение перевода
-        let prefix = "Synced: ";
-        if (typeof langData !== 'undefined' && langData[currentLang]) {
-            prefix = langData[currentLang].sync_label || "Synced: ";
-        }
+        document.getElementById('modal-sync-info-overlay').classList.add('open');
+        document.getElementById('sync-email-display').innerText = user.email;
 
-        if (ts) {
-            const date = new Date(parseInt(ts));
-            const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            
-            el.innerText = `${prefix}${day}.${month} ${timeStr}`;
-            el.style.display = 'block';
-        } else {
-            el.style.display = 'none';
+        const badge = document.getElementById('sync-plan-badge');
+        const expiryText = document.getElementById('sync-plan-expiry');
+        badge.innerText = "LOADING...";
+        badge.style.color = "var(--text-secondary)";
+        expiryText.style.display = "none";
+
+        // Получаем текущие переводы
+        const t = langData[currentLang] || langData['en'];
+
+        ['cloud-fav-count', 'cloud-wl-count', 'cloud-hist-count', 'cloud-ban-count'].forEach(id => {
+            document.getElementById(id).innerText = "...";
+        });
+
+        try {
+            const userRef = doc(db, "users", user.uid);
+            const docSnap = await getDoc(userRef);
+
+            if (docSnap.exists()) {
+                const d = docSnap.data();
+                
+                // === ПОДПИСКА ===
+                const plan = d.subscription || 'free';
+                badge.innerText = plan.toUpperCase();
+                
+                if (plan === 'pro') badge.style.color = '#ff9900';
+                else if (plan === 'beast') badge.style.color = '#9b59b6';
+                else badge.style.color = 'var(--text-main)';
+
+                if (plan !== 'free' && d.expiresAt) {
+                    const dateObj = d.expiresAt.toDate(); 
+                    const dateStr = dateObj.toLocaleDateString();
+                    const daysLeft = Math.ceil((dateObj - new Date()) / (1000 * 60 * 60 * 24));
+                    
+                    if (daysLeft > 0) {
+                        // ИСПОЛЬЗУЕМ ПЕРЕВОДЫ
+                        expiryText.innerText = `${t.sub_exp} ${dateStr} (${daysLeft}${t.time_d})`;
+                        expiryText.style.display = "inline";
+                    } else {
+                        expiryText.innerText = t.sub_expired; // "Истекла"
+                        expiryText.style.display = "inline";
+                        expiryText.style.color = "var(--highlight-red)";
+                    }
+                }
+                // ================
+
+                document.getElementById('cloud-fav-count').innerText = d.favorites ? d.favorites.length : 0;
+                document.getElementById('cloud-wl-count').innerText = d.watchLater ? d.watchLater.length : 0;
+                document.getElementById('cloud-hist-count').innerText = d.history ? d.history.length : 0;
+                document.getElementById('cloud-ban-count').innerText = d.blacklist ? d.blacklist.length : 0;
+            } else {
+                badge.innerText = "FREE";
+                ['cloud-fav-count', 'cloud-wl-count', 'cloud-hist-count', 'cloud-ban-count'].forEach(id => {
+                    document.getElementById(id).innerText = "0";
+                });
+            }
+        } catch (e) {
+            console.error("Error fetching sync stats:", e);
+            badge.innerText = "ERROR";
+        }
+    };
+    
+    window.closeSyncInfoModal = function(e, force) {
+        if (force || e.target.id === 'modal-sync-info-overlay') {
+            document.getElementById('modal-sync-info-overlay').classList.remove('open');
+        }
+    };
+
+    // === 3. РУЧНАЯ СИНХРОНИЗАЦИЯ (MERGE) ===
+    window.performManualSync = async function() {
+        const user = auth.currentUser;
+        if (!user) return;
+
+        const btnText = document.getElementById('sync-btn-text');
+        const originalText = btnText.innerText;
+        
+        // Включаем анимацию загрузки
+        btnText.innerHTML = `<span class="spinning-icon">↻</span> Syncing...`;
+        
+        try {
+            await loadUserData(user); // Эта функция уже у тебя есть в коде выше
+
+            // 2. Визуальный успех
+            btnText.innerHTML = "✅ Done!";
+            setTimeout(() => {
+                btnText.innerText = originalText;
+                // Обновляем цифры в самом модальном окне, так как они могли измениться после мержа
+                window.openSyncInfoModal(); 
+            }, 1500);
+
+        } catch (e) {
+            console.error("Manual sync failed:", e);
+            btnText.innerText = "❌ Error";
+            setTimeout(() => btnText.innerText = originalText, 2000);
         }
     };
 
@@ -3721,8 +3892,8 @@
                 id: 150, 
                 name: "Sandwich", name_ru: "Сэндвич", name_es: "Sándwich", name_de: "Sandwich",
                 slug: "sandwich", tags: ["straight", "gay", "bi"],
-                desc_en: "One person between two partners (DP/Spitroast).",
-                desc_ru: "Один человек между двумя партнерами (ДП/Вертел).",
+                desc_en: "One person between two partners.",
+                desc_ru: "Один человек между двумя партнерами.",
                 desc_es: "Una persona entre dos parejas.",
                 desc_de: "Eine Person zwischen zwei Partnern."
             },
@@ -13278,6 +13449,14 @@
             explored_label: "Explored",
             explored_txt: "{n} / {t} categories",
             report_issue: "Report Issue",
+
+            sync_title: "Cloud Storage",
+            sync_desc: "Data stored safely on Google servers",
+            sync_tip: "Click 'Synchronize' to merge Cloud data with this device.",
+            btn_sync: "🔄 Synchronize Device",
+            sub_exp: "exp:",
+            sub_expired: "Expired",
+            time_d: "d",
             
             // --- 5. Lists (Favorites/Blacklist) ---
             favorites_catalog: "Liked",
@@ -13463,6 +13642,14 @@
             explored_label: "Открыто",
             explored_txt: "{n} из {t} категорий",
             report_issue: "Сообщить о проблеме",
+
+            sync_title: "Облачное хранилище",
+            sync_desc: "Данные безопасно хранятся на серверах Google",
+            sync_tip: "Нажми «Синхронизировать», чтобы объединить данные.",
+            btn_sync: "🔄 Синхронизировать",
+            sub_exp: "ист:",
+            sub_expired: "Истекла",
+            time_d: "д",
 
             // --- 5. Списки ---
             favorites_catalog: "Понравившиеся",
@@ -13651,6 +13838,14 @@
             explored_txt: "{n} / {t} categorías",
             report_issue: "Reportar Problema",
 
+            sync_title: "Nube",
+            sync_desc: "Datos guardados seguros en Google",
+            sync_tip: "Haz clic en 'Sincronizar' para fusionar datos.",
+            btn_sync: "🔄 Sincronizar",
+            sub_exp: "exp:",
+            sub_expired: "Vencido",
+            time_d: "d",
+
             // --- Lists ---
             favorites_catalog: "Me Gusta",
             blacklist_catalog: "No Me Gusta",
@@ -13822,6 +14017,14 @@
             explored_label: "Erforscht",
             explored_txt: "{n} / {t} Kategorien",
             report_issue: "Problem melden",
+
+            sync_title: "Cloud-Speicher",
+            sync_desc: "Daten sicher auf Google-Servern gespeichert",
+            sync_tip: "Klicke auf 'Synchronisieren', um Daten zusammenzuführen.",
+            btn_sync: "🔄 Synchronisieren",
+            sub_exp: "abl:",
+            sub_expired: "Abgelaufen",
+            time_d: "t",
 
             // --- Lists ---
             favorites_catalog: "Gefällt mir",
