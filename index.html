@@ -1068,8 +1068,127 @@
             color: var(--text-main);
         }
 
+        /* === 13. PAYMENT MODAL STYLES === */
+        .pay-desc {
+            padding: 15px 20px 10px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        /* Секция промокода */
+        .promo-container {
+            margin: 10px 15px 20px 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+        }
+
+        .promo-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            margin-left: 5px;
+        }
+
+        .promo-input-group {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .promo-input {
+            flex: 1;
+            background: var(--ios-bg); /* Цвет фона как у страницы */
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 15px;
+            color: var(--text-main);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .promo-input:focus {
+            border-color: var(--accent);
+        }
+
+        .promo-btn {
+            width: 44px;
+            background: var(--accent);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s;
+        }
+
+        .promo-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* === 14. LOGIN MODAL === */
+        .auth-benefits {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .auth-benefits li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: var(--text-main);
+        }
+
+        .auth-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--nav-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .auth-note {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-top: 15px;
+            line-height: 1.4;
+            opacity: 0.7;
+        }
+
+        .btn-google {
+            width: 100%;
+            background: #FFFFFF;
+            color: #1f1f1f;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 14px;
+            font-weight: 600;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .btn-google:active { transform: scale(0.98); }
+
         /* =========================================
-        13. MEDIA QUERIES (ADAPTATION)
+        15. MEDIA QUERIES (ADAPTATION)
         ========================================= */
         
         /* MOBILE DEVICES (< 768px) */
@@ -1492,7 +1611,7 @@
             style="margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; height: auto; min-height: 55px; padding: 10px 20px;">
             
             <div style="display:flex; flex-direction:column; align-items: flex-start; justify-content: center; line-height: 1.2;">
-                <span style="font-size:11px; color:var(--text-secondary); margin-bottom:2px; font-weight: 500;">Current Plan</span>
+                <span style="font-size:11px; color:var(--text-secondary); margin-bottom:2px; font-weight: 500;" data-key="lbl_current_plan">Current Plan</span>
                 <span id="current-plan-name" style="color:var(--text-main); font-weight:800; font-size:17px; letter-spacing:0.5px;">FREE</span>
             </div>
 
@@ -1632,72 +1751,78 @@
 
 <!-- PAYMENT SELECTION MODAL -->
 <div class="modal-overlay" id="modal-payment-overlay" onclick="closePaymentModal(event)" style="z-index: 22000;">
-    <div class="modal" style="max-width: 400px; background: var(--bg-color);">
+    <div class="modal" style="max-width: 400px; background: var(--ios-card);">
         <div class="modal-header">
             <span id="payment-modal-title">Checkout</span>
             <span style="cursor:pointer" onclick="closePaymentModal(null, true)">✕</span>
         </div>
         
         <div class="modal-body" style="padding: 0;">
-            <div style="padding: 15px 20px; color: var(--text-secondary); font-size: 13px; text-align: center;">
+            <div class="pay-desc" data-key="pay_desc">
                 Select a payment method to receive your activation code instantly.
             </div>
 
-            <div class="ios-group" style="margin: 0 15px 20px 15px;">
+            <!-- Список методов (Вертикальный, без скролла) -->
+            <div class="ios-group" style="margin: 0 15px 15px 15px;">
                 
                 <!-- Telegram Stars -->
-                <div class="ios-row clickable" onclick="processPayment('telegram')" style="padding: 15px;">
+                <div class="ios-row clickable" onclick="processPayment('telegram')" style="padding: 12px 16px;">
                     <div style="display:flex; align-items:center; gap:12px;">
                         <span style="font-size:24px;">⭐</span>
                         <div style="display:flex; flex-direction:column;">
-                            <span style="font-weight:600; color:var(--text-main);">Telegram Stars</span>
-                            <span style="font-size:11px; color:#2ecc71;">Apple Pay / Google Pay available</span>
+                            <span style="font-weight:600; color:var(--text-main);" data-key="pay_stars">Telegram Stars</span>
+                            <span style="font-size:11px; color:#2ecc71;">Apple Pay / Google Pay</span>
                         </div>
                     </div>
                     <span style="color:var(--text-secondary)">›</span>
                 </div>
 
                 <!-- Lava.top -->
-                <div class="ios-row clickable" onclick="processPayment('lava')" style="padding: 15px;">
+                <div class="ios-row clickable" onclick="processPayment('lava')" style="padding: 12px 16px;">
                     <div style="display:flex; align-items:center; gap:12px;">
                         <span style="font-size:24px;">🌋</span>
                         <div style="display:flex; flex-direction:column;">
-                            <span style="font-weight:600; color:var(--text-main);">Card (Lava.top)</span>
-                            <span style="font-size:11px; color:var(--text-secondary);">Visa / Mastercard (World)</span>
+                            <span style="font-weight:600; color:var(--text-main);" data-key="pay_card">Card (Lava.top)</span>
+                            <span style="font-size:11px; color:var(--text-secondary);">Visa / Mastercard</span>
                         </div>
                     </div>
                     <span style="color:var(--text-secondary)">›</span>
                 </div>
 
                 <!-- Cryptomus -->
-                <div class="ios-row clickable" onclick="processPayment('crypto')" style="padding: 15px;">
+                <div class="ios-row clickable" onclick="processPayment('crypto')" style="padding: 12px 16px;">
                     <div style="display:flex; align-items:center; gap:12px;">
                         <span style="font-size:24px;">🛡️</span>
                         <div style="display:flex; flex-direction:column;">
-                            <span style="font-weight:600; color:var(--text-main);">Crypto</span>
-                            <span style="font-size:11px; color:var(--text-secondary);">USDT, TON, BTC (Anonymous)</span>
+                            <span style="font-weight:600; color:var(--text-main);" data-key="pay_crypto">Crypto</span>
+                            <span style="font-size:11px; color:var(--text-secondary);">USDT, TON, BTC</span>
                         </div>
                     </div>
                     <span style="color:var(--text-secondary)">›</span>
                 </div>
 
                 <!-- Boosty -->
-                <div class="ios-row clickable" onclick="processPayment('boosty')" style="padding: 15px;">
+                <div class="ios-row clickable" onclick="processPayment('boosty')" style="padding: 12px 16px;">
                     <div style="display:flex; align-items:center; gap:12px;">
                         <span style="font-size:24px;">🅱️</span>
                         <div style="display:flex; flex-direction:column;">
-                            <span style="font-weight:600; color:var(--text-main);">Boosty</span>
+                            <span style="font-weight:600; color:var(--text-main);" data-key="pay_boosty">Boosty</span>
                             <span style="font-size:11px; color:var(--text-secondary);">Cards (RF), PayPal</span>
                         </div>
                     </div>
                     <span style="color:var(--text-secondary)">›</span>
                 </div>
-
             </div>
             
-            <div style="text-align:center; padding-bottom:20px;">
-                <span style="font-size:12px; color:var(--text-secondary); text-decoration:underline; cursor:pointer;" onclick="promptPromoCode()">I already have a code</span>
+            <!-- Поле ввода кода -->
+            <div class="promo-container">
+                <div class="promo-label" data-key="pay_code_label">If you paid, enter code here:</div>
+                <div class="promo-input-group">
+                    <input type="text" id="promo-input-field" class="promo-input" placeholder="Activation code...">
+                    <button class="promo-btn" onclick="submitPromoFromInput()">→</button>
+                </div>
             </div>
+
         </div>
     </div>
 </div>
@@ -1749,6 +1874,45 @@
         </div>
 
         <button class="btn-gen" onclick="skipInstall()" data-key="install_continue" style="padding:15px; font-size:14px; background:transparent; border:1px solid var(--border); color:var(--text-secondary);">Continue in Browser</button>
+    </div>
+</div>
+
+<!-- LOGIN EXPLANATION MODAL -->
+<div class="modal-overlay" id="modal-login-overlay" onclick="closeLoginModal(event)" style="z-index: 23000;">
+    <div class="modal" style="max-width: 380px; padding: 25px;">
+        
+        <div style="text-align:center; margin-bottom: 20px;">
+            <div style="font-size:40px; margin-bottom:10px;">☁️</div>
+            <h2 style="margin:0; font-size:22px;" data-key="auth_title">Sync & Backup</h2>
+        </div>
+
+        <ul class="auth-benefits">
+            <li>
+                <div class="auth-icon">🔄</div>
+                <span data-key="auth_p1">Store history and preferences across all devices</span>
+            </li>
+            <li>
+                <div class="auth-icon">⭐</div>
+                <span data-key="auth_p2">Activate Pro / Beast status</span>
+            </li>
+            <li>
+                <div class="auth-icon">🔒</div>
+                <span data-key="auth_p3">Anonymous storage on Google servers</span>
+            </li>
+        </ul>
+
+        <button class="btn-google" onclick="performGoogleLogin()">
+            <img src="google_logo.svg.png" width="20" height="20" style="object-fit: contain;">
+            <span data-key="btn_google_signin">Continue with Google</span>
+        </button>
+
+        <div class="auth-note" data-key="auth_security_note">
+            Developer has no access to data. Don't worry about your history safety 😏
+        </div>
+        
+        <div style="text-align:center; margin-top:15px;">
+            <span style="color:var(--text-secondary); font-size:13px; cursor:pointer;" onclick="closeLoginModal(null, true)" data-key="btn_cancel">Cancel</span>
+        </div>
     </div>
 </div>
 
@@ -1849,16 +2013,17 @@
 
     window.handleLoginClick = function() {
         if (window.isUserLoggedIn) {
-            // Берем перевод кнопки выхода или дефолтный
-            const t = (typeof langData !== 'undefined' && langData[localStorage.getItem('xch_lang') || 'en']) 
-                      ? langData[localStorage.getItem('xch_lang') || 'en'] 
-                      : { logout_text: "Logout" };
+            // Если уже вошел - спрашиваем про выход
+            const t = (typeof langData !== 'undefined' && langData[currentLang]) 
+                    ? langData[currentLang] 
+                    : { logout_text: "Logout" };
             
             if(confirm((t.logout_text || "Logout") + "?")) {
                 window.logout();
             }
         } else {
-            window.loginWithGoogle();
+            // Если не вошел - показываем красивое окно
+            openLoginModal();
         }
     };
 
@@ -13032,6 +13197,14 @@
             watch_later: "Watch Later",
             empty_wl: "No saved items yet",
             sync_label: "Synced: ",
+
+            auth_title: "Sync & Backup",
+            auth_p1: "Store history and preferences on all devices",
+            auth_p2: "Activate Pro / Beast status",
+            auth_p3: "Anonymous storage on Google servers",
+            btn_google_signin: "Continue with Google",
+            auth_security_note: "Developer has no access to data. Don't worry about your history safety 😏",
+            btn_cancel: "Cancel",
             
             // --- 2. Generator (Main Tab) ---
             generate: "Random Genre",
@@ -13068,6 +13241,17 @@
             btn_get_beast: "Unleash Beast",
 
             btn_lower_tier: "You deserve better",
+
+            pay_desc: "Select a payment method. You will receive an activation code instantly.",
+            pay_stars: "Telegram Stars",
+            pay_card: "Card (World)",
+            pay_crypto: "Crypto (Anonymous)",
+            pay_boosty: "Boosty (RF Cards)",
+            pay_code_label: "If you paid, enter code here:",
+            pay_code_placeholder: "Activation code...",
+
+            lbl_current_plan: "Current Plan",
+            login_alert: "Please log in to manage subscriptions!",
 
             // --- 4. Account & Data ---
             login_text: "Log in", // Changed from "Sync Data"
@@ -13199,6 +13383,14 @@
             empty_wl: "Список пуст",
             sync_label: "Синхр: ",
 
+            auth_title: "Синхронизация",
+            auth_p1: "Хранение истории и предпочтений на всех устройствах",
+            auth_p2: "Активация Pro / Beast статуса",
+            auth_p3: "Анонимное хранение на серверах Google",
+            btn_google_signin: "Войти через Google",
+            auth_security_note: "Разработчик не имеет доступа к данным. Можешь не беспокоиться о сохранности своей истории 😏",
+            btn_cancel: "Отмена",
+
 
             // --- 2. Генератор ---
             generate: "Случайный жанр",
@@ -13235,6 +13427,16 @@
             btn_get_beast: "Стать Зверем",
 
             btn_lower_tier: "Ты достоен большего",
+            pay_desc: "Выберите способ оплаты. Вы получите код активации мгновенно после оплаты.",
+            pay_stars: "Telegram Stars",
+            pay_card: "Карта (Весь мир)",
+            pay_crypto: "Крипта (Анонимно)",
+            pay_boosty: "Boosty (Карты РФ)",
+            pay_code_label: "Если оплатили, введите код сюда:",
+            pay_code_placeholder: "Код активации...",
+
+            lbl_current_plan: "Текущий план",
+            login_alert: "Пожалуйста, войдите в аккаунт для управления подпиской!",
 
             // --- 4. Аккаунт и Данные ---
             login_text: "Войти",
@@ -13363,6 +13565,14 @@
             empty_wl: "Lista vacía",
             sync_label: "Sinc: ",
 
+            auth_title: "Sincronización",
+            auth_p1: "Historial y preferencias en todos los dispositivos",
+            auth_p2: "Activar estado Pro / Beast",
+            auth_p3: "Almacenamiento anónimo en servidores de Google",
+            btn_google_signin: "Continuar con Google",
+            auth_security_note: "El desarrollador no tiene acceso a los datos. No te preocupes por tu historial 😏",
+            btn_cancel: "Cancelar",
+
             // --- Generator ---
             generate: "Género Aleatorio",
             generate_again: "Otro Género",
@@ -13403,6 +13613,17 @@
             btn_get_beast: "Modo Bestia",
 
             btn_lower_tier: "Mereces algo mejor",
+
+            pay_desc: "Selecciona un método de pago. Recibirás un código de activación al instante.",
+            pay_stars: "Estrellas Telegram",
+            pay_card: "Tarjeta (Mundial)",
+            pay_crypto: "Cripto (Anónimo)",
+            pay_boosty: "Boosty (Tarjetas)",
+            pay_code_label: "Si ya pagaste, ingresa el código:",
+            pay_code_placeholder: "Código de activación...",
+
+            lbl_current_plan: "Plan Actual",
+            login_alert: "¡Inicia sesión para gestionar suscripciones!",
 
             // --- Account ---
             login_text: "Iniciar sesión",
@@ -13517,6 +13738,14 @@
             empty_wl: "Liste leer",
             sync_label: "Sync: ",
 
+            auth_title: "Synchronisierung",
+            auth_p1: "Verlauf und Vorlieben auf allen Geräten speichern",
+            auth_p2: "Pro / Beast Status aktivieren",
+            auth_p3: "Anonyme Speicherung auf Google-Servern",
+            btn_google_signin: "Weiter mit Google",
+            auth_security_note: "Entwickler hat keinen Zugriff auf Daten. Keine Sorge um deinen Verlauf 😏",
+            btn_cancel: "Abbrechen",
+
             btn_start: "Starten",
             btn_pass: "Andere",
             btn_like: "Ähnlich",
@@ -13556,6 +13785,17 @@
             btn_get_beast: "Beast werden",
 
             btn_lower_tier: "Du verdienst Besseres",
+
+            pay_desc: "Wähle eine Zahlungsmethode. Du erhältst sofort einen Aktivierungscode.",
+            pay_stars: "Telegram Stars",
+            pay_card: "Karte (Weltweit)",
+            pay_crypto: "Krypto (Anonym)",
+            pay_boosty: "Boosty (Karten)",
+            pay_code_label: "Wenn bezahlt, Code hier eingeben:",
+            pay_code_placeholder: "Aktivierungscode...",
+
+            lbl_current_plan: "Aktueller Plan",
+            login_alert: "Bitte anmelden, um Abos zu verwalten!",
 
             // --- Account ---
             login_text: "Anmelden",
@@ -14834,11 +15074,10 @@
     function applyLanguage() {
         const t = langData[currentLang];
         
-        // Текстовые элементы
+        // Перевод текстов
         document.querySelectorAll('[data-key]').forEach(el => {
             const key = el.getAttribute('data-key');
             if(t[key]) {
-                // Если внутри есть HTML теги (как в инструкциях), используем innerHTML
                 if (key.startsWith('inst_') || key.startsWith('badge_')) {
                     el.innerHTML = t[key];
                 } else {
@@ -14847,14 +15086,36 @@
             }
         });
 
-        // --- ЛОКАЛИЗАЦИЯ ПЛЕЙСХОЛДЕРА ---
+        // Перевод плейсхолдеров
         const onbInput = document.getElementById('onb-input');
-        if(onbInput && t.onb_placeholder) {
-            onbInput.placeholder = t.onb_placeholder;
-        }
+        if(onbInput && t.onb_placeholder) onbInput.placeholder = t.onb_placeholder;
+
+        const promoInput = document.getElementById('promo-input-field');
+        if(promoInput && t.pay_code_placeholder) promoInput.placeholder = t.pay_code_placeholder;
         
         updateExploredCount();
         updateSubscriptionUI(); 
+    }
+
+    function submitPromoFromInput() {
+        const input = document.getElementById('promo-input-field');
+        const code = input.value.trim();
+        
+        if (!code) {
+            // Визуальная тряска или красная рамка (опционально)
+            input.style.borderColor = "var(--highlight-red)";
+            setTimeout(() => input.style.borderColor = "var(--border)", 1000);
+            return;
+        }
+
+        // Вызываем существующую логику активации
+        window.activatePromoCode(code);
+        
+        // Очищаем поле
+        input.value = "";
+        
+        closePaymentModal(null, true);
+        closeSubModal(null, true);
     }
 
     // === ЛОГИКА КАТАЛОГОВ (LIKE / DISLIKE) ===
@@ -15636,24 +15897,19 @@
     // --- ФУНКЦИИ ДЛЯ ОПЛАТЫ ---
 
     function openPaymentSelection(plan) {
+        // 1. Проверка авторизации
         if (!window.isUserLoggedIn) {
-            alert(langData[currentLang].login_required || "Please log in (Sync Data) first!");
-            closeSubModal(null, true);
-            switchTab('account');
-            const loginBtn = document.getElementById('login-capsule');
-            if(loginBtn) {
-                loginBtn.style.border = "1px solid var(--accent)";
-                setTimeout(() => loginBtn.style.border = "none", 1000);
-            }
+            openLoginModal();
             return;
         }
 
+        // 2. Если авторизован - продолжаем логику оплаты
         pendingPlan = plan;
-        // Меняем заголовок в зависимости от плана
+        
         const titleEl = document.getElementById('payment-modal-title');
         const planName = plan === 'pro' ? 'Pro' : 'Beast';
         const price = plan === 'pro' ? '$1.99' : '$4.99';
-        titleEl.innerText = `Get ${planName} (${price})`;
+        if(titleEl) titleEl.innerText = `Get ${planName} (${price})`;
 
         document.getElementById('modal-payment-overlay').classList.add('open');
     }
@@ -15736,12 +15992,11 @@
     }
 
     function updateSubscriptionUI() {
-        const nameEl = document.getElementById('current-plan-name');
+        const nameEl = document.getElementById('current-plan-name'); // Целимся только в название плана, не в лейбл
         const badgeEl = document.getElementById('upgrade-badge'); 
         
         if (!nameEl) return;
 
-        // Получаем переводы
         const t = langData[currentLang] || langData['en'];
 
         if (subscriptionLevel === 'pro') {
@@ -15753,21 +16008,15 @@
             nameEl.style.color = "#9b59b6";
             if(badgeEl) badgeEl.style.display = 'none';
         } else {
-            // === БЕСПЛАТНЫЙ ПЛАН (Логика от 10 до 0) ===
-            
-            // 1. Берем сколько уже использовали
+            // FREE LOGIC
             const count = parseInt(localStorage.getItem('xch_limit_count') || '0');
             const today = new Date().toDateString();
             const lastDate = localStorage.getItem('xch_limit_date');
-            
-            // Если день сменился — использовали 0. Если тот же день — берем count.
             const usedToday = (lastDate === today) ? count : 0;
-            
-            // 2. Считаем ОСТАТОК (Максимум 10, минимум 0)
             const remaining = Math.max(0, DAILY_LIMIT - usedToday);
 
-            // 3. Выводим: "10/10", "9/10" и т.д.
-            nameEl.innerHTML = `FREE <span style="font-size:14px; opacity:0.6; font-weight:600; margin-left:5px;">${remaining}/10</span>`;
+            // Используем HTML для форматирования "10/10" поменьше
+            nameEl.innerHTML = `FREE <span style="font-size:14px; opacity:0.6; font-weight:600; margin-left:5px;">${remaining}/${DAILY_LIMIT}</span>`;
             nameEl.style.color = "var(--text-main)";
             
             if(badgeEl) {
@@ -16633,6 +16882,24 @@
             document.getElementById('onboarding-overlay').classList.add('open');
         }
     }
+
+    function openLoginModal() {
+        document.getElementById('modal-login-overlay').classList.add('open');
+    }
+
+    function closeLoginModal(e, force) {
+        if (force || e.target.id === 'modal-login-overlay') {
+            document.getElementById('modal-login-overlay').classList.remove('open');
+        }
+    }
+
+    function performGoogleLogin() {
+        // Закрываем модалку
+        document.getElementById('modal-login-overlay').classList.remove('open');
+        // Вызываем оригинальную функцию из модуля Firebase
+        window.loginWithGoogle();
+    }
+
 
 </script>
 </body>
