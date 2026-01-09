@@ -19,8 +19,8 @@
             --nav-bg: #1a1a1a;
             --text-main: #ffffff;
             --text-secondary: #888888;
-            --accent: #ff9900;
-            --accent-light: #ffbd55;
+            --accent: #9b59b6; 
+            --accent-light: #b07cc6;
             --border: #2a2a2a;
             --highlight-green: #2ecc71;
             --highlight-red: #e74c3c;
@@ -206,13 +206,41 @@
             cursor: pointer;
             line-height: 1;
         }
-        .logo span { color: var(--accent); }
+        .logo span { 
+            color: #9b59b6 !important;
+        }
         .logo-img {
             height: 48px;
             width: auto;
             display: block;
             object-fit: contain;
             transform: translateY(-8px);
+        }
+
+        body.tab-home-active .mobile-header .subtitle {
+            display: none !important; /* Скрываем подзаголовок */
+        }
+
+        body.tab-home-active .mobile-header {
+            min-width: auto;
+            width: auto;
+            padding: 8px 20px;
+            border-radius: 50px;
+            min-height: 50px; 
+        }
+
+        body.tab-home-active .mobile-header .logo {
+            font-size: 22px;
+            margin: 0;
+        }
+
+        body.tab-home-active .mobile-header .logo-img {
+            height: 28px;
+            transform: translateY(0);
+        }
+
+        body.tab-home-active #tab-home {
+            padding-top: 80px !important; 
         }
         
         .subtitle {
@@ -271,24 +299,40 @@
             align-items: center;
             transition: all 0.3s ease-out;
         }
-        .card.has-results { padding-top: 15px; height: auto; justify-content: flex-start; gap: 10px; padding-bottom: 15px; }
+        .card.has-results {
+            min-height: auto !important;
+            height: auto !important;
+            padding-top: 15px !important; 
+            padding-bottom: 15px !important;
+            justify-content: flex-start !important;
+            gap: 5px; 
+        }
         
         /* Slot Window */
         .slot-window {
-            height: 140px;
+            height: 140px; /* Фиксируем высоту, чтобы окно не было бесконечным */
             width: 100%;
-            overflow: hidden;
+            overflow: hidden; /* Обрезаем всё, что не влезает в 140px */
             position: relative;
-            display: flex; justify-content: center; align-items: center;
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
             flex-shrink: 0;
-            border-top: 1px solid transparent; 
-            border-bottom: 1px solid transparent;
+            
+            /* Убираем рамки */
+            border: none !important;
+            
+            /* Маска прозрачности: текст плавно исчезает сверху и снизу */
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
+            mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
         }
 
         .card.has-results .slot-window {
             height: auto !important;
-            margin: 0;
-            overflow: visible;
+            margin: 0 !important;
+            overflow: visible !important;
+            -webkit-mask-image: none !important;
+            mask-image: none !important;
         }
 
         .slot-reel {
@@ -306,8 +350,10 @@
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .card.has-results .slot-item {
-            padding: 0;
+            height: auto !important;
+            padding: 0 !important;
             margin-bottom: 5px;
+            font-size: clamp(28px, 6vw, 42px) !important; 
         }
         
         /* Animations & Effects */
@@ -348,6 +394,40 @@
         }
         .btn-action.ban:hover, .btn-action.ban.active { border-color: var(--highlight-red); background: rgba(231, 76, 60, 0.15); color: var(--highlight-red); transform: scale(1.05); }
         .btn-action.fav:hover, .btn-action.fav.active { border-color: var(--highlight-green); background: rgba(46, 204, 113, 0.15); color: var(--highlight-green); transform: scale(1.05); }
+
+        /* Кнопка "Смотреть позже" (Квадратная рядом с Watch) */
+        .btn-watch-later {
+            width: 54px; /* Фиксированная ширина = высоте */
+            flex-shrink: 0;
+            border-radius: 16px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-watch-later:active {
+            transform: scale(0.95);
+        }
+
+        /* Активное состояние кнопки (когда добавлено) - Синий цвет */
+        .btn-watch-later.active {
+            background: #3498db; /* Синий */
+            color: #ffffff;
+            border-color: #3498db;
+        }
+
+        /* Стиль тега в списке "Смотреть позже" (Синий) */
+        .catalog-item.wl-active { 
+            background: rgba(52, 152, 219, 0.2); 
+            color: #3498db; 
+            border: 1px solid #3498db; 
+        }
 
         /* Related & Tags */
         .related-section { width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 10px; margin-bottom: 20px; text-align: center; }
@@ -560,9 +640,8 @@
         }
 
         .related-section {
-            margin-top: 15px;
+            margin-top: 5px !important;
             margin-bottom: 15px;
-            width: 100%;
         }
 
         .btn-tinder {
@@ -603,28 +682,32 @@
 
         /* === 3. КНОПКА НАЗАД (UNDO) === */
         .undo-container {
+            margin-top: 5px;
             width: 100%;
             display: flex;
             justify-content: center;
-            margin-top: 10px;
         }
 
         .btn-undo {
+            width: auto !important;
+            height: auto !important;
+            border-radius: 50px !important;
+            padding: 8px 24px !important; 
             background: transparent;
-            border: none;
+            border: 1px solid var(--border);
             color: var(--text-secondary);
-            font-size: 24px;
-            padding: 10px;
-            cursor: pointer;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            font-size: 13px !important;
+            font-weight: 600;
+            text-transform: uppercase;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.2s, transform 0.2s;
+            transition: all 0.2s;
         }
-        .btn-undo:active { background: var(--nav-bg); transform: scale(0.9) rotate(-30deg); }
+        .btn-undo:active {
+            background: var(--nav-bg);
+            transform: scale(0.96);
+        }
 
         /* === 4. СВАЙПЫ (Карточка) === */
         .card {
@@ -634,9 +717,9 @@
             transform-origin: 50% 100%;
             will-change: transform, opacity;
             height: auto;
-            min-height: 280px;
+            min-height: 180px;
             justify-content: space-between;
-            padding-bottom: 20px;
+            margin-bottom: 10px !important; 
         }
 
         /* Оверлеи "LIKE" и "NOPE" при свайпе */
@@ -808,6 +891,10 @@
             .plan-card {
                 flex: 1;
             }
+            .subtitle {
+                margin-bottom: 15px !important; /* Уменьшили (было 35px) */
+                margin-top: 0 !important;
+            }
         }
     </style>
 </head>
@@ -881,7 +968,7 @@
 
                 <!-- 1. Кнопка СТАРТА -->
                 <div class="gen-controls" id="start-btn-container">
-                    <button class="btn-gen" onclick="startGeneration('random')" data-key="btn_start">Start Exploring</button>
+                    <button class="btn-gen" onclick="startNewSession()" data-key="btn_start">Start Exploring</button>
                 </div>
 
                 <!-- 2. Блок "ВАМ ТАКЖЕ МОЖЕТ ПОНРАВИТЬСЯ" -->
@@ -893,6 +980,9 @@
                 <!-- 3. Кнопка WATCH -->
                 <div class="btn-group hidden-initial" style="width:100%">
                     <a href="#" target="_blank" class="btn-watch" id="watch-link" onclick="handleOutboundClick()">Watch</a>
+                    <button class="btn-watch-later" id="btn-watch-later" onclick="toggleWatchLater()">
+                        🕒
+                    </button>
                 </div>
 
                 <!-- Модификаторы -->
@@ -905,7 +995,9 @@
 
                 <!-- Кнопка Назад -->
                 <div class="undo-container hidden-initial">
-                    <button class="btn-undo" onclick="undoLastAction()" title="Back">↺</button>
+                    <button class="btn-undo" onclick="undoLastAction()">
+                        <span data-key="btn_return">Return</span>
+                    </button>
                 </div>
 
             </div>
@@ -1079,9 +1171,9 @@
         <div class="capsule-btn">
             <span data-key="site_label">Site</span>
             <select id="platform" onchange="savePlatform(this.value)" dir="rtl">
+                <option value="xh">xHamster</option>
                 <option value="ph">Pornhub</option>
                 <option value="xv">xVideos</option>
-                <option value="xh">xHamster</option>
                 <option value="sb">SpankBang</option>
                 <option value="yp">YouPorn</option>
                 <option value="rt">RedTube</option>
@@ -1185,6 +1277,10 @@
             <div class="ios-row clickable" onclick="openBlacklistCatalog()">
                 <span data-key="blacklist_catalog">Disliked</span>
                 <span style="color:var(--text-secondary)">›</span>
+            </div>
+            <div class="ios-row clickable" onclick="openWatchLaterCatalog()">
+                <span data-key="watch_later">Watch Later</span>
+                <span class="badge" id="count-wl" style="color:var(--text-secondary); font-size:17px;">0</span>
             </div>
             <div class="ios-row clickable" onclick="openStatistics()">
                 <span data-key="btn_stats">Statistics</span>
@@ -1557,65 +1653,65 @@
                 const cloudData = docSnap.data();
                 console.log("Cloud data received. Merging...");
 
-                // 1. ЛАЙКИ (Объединение уникальных ID)
-                const localFav = window.favorites || []; // Берем из глобальной window
+                // 1. ЛАЙКИ (Favorites)
+                const localFav = window.favorites || [];
                 const cloudFav = cloudData.favorites || [];
                 const mergedFav = [...new Set([...localFav, ...cloudFav])];
 
-                // 2. ЧЕРНЫЙ СПИСОК
+                // 2. ЧЕРНЫЙ СПИСОК (Blacklist)
                 const localBan = window.blacklist || [];
                 const cloudBan = cloudData.blacklist || [];
                 const mergedBan = [...new Set([...localBan, ...cloudBan])];
 
-                // 3. ИСТОРИЯ (По ID, приоритет более новым)
+                // 3. СМОТРЕТЬ ПОЗЖЕ (Watch Later) — НОВОЕ
+                const localWL = window.watchLater || [];
+                const cloudWL = cloudData.watchLater || [];
+                const mergedWL = [...new Set([...localWL, ...cloudWL])];
+
+                // 4. ИСТОРИЯ (History)
                 const localHist = window.historyData || [];
                 const cloudHist = cloudData.history || [];
                 const combinedHistMap = new Map();
-                // Добавляем облачные, потом локальные (локальные перезапишут облачные, если ID совпадает)
                 [...cloudHist, ...localHist].forEach(item => combinedHistMap.set(item.id, item));
-                // Сортируем: новые в начале
                 const mergedHistory = Array.from(combinedHistMap.values())
                     .sort((a, b) => b.timestamp - a.timestamp)
-                    .slice(0, 50); // Храним только последние 50
+                    .slice(0, 50);
 
-                // 4. ЛОГ АКТИВНОСТИ (Для счетчика "Открыто")
+                // 5. ЛОГ АКТИВНОСТИ (Activity Log)
                 const localLog = window.activityLog || [];
                 const cloudLog = cloudData.activityLog || [];
                 const combinedLogMap = new Map();
-                // Уникальный ключ: timestamp + id (чтобы не дублировать записи)
                 [...cloudLog, ...localLog].forEach(item => combinedLogMap.set((item.ts || 0) + "_" + item.id, item));
                 const mergedActivityLog = Array.from(combinedLogMap.values())
-                    .sort((a, b) => a.ts - b.ts) // Хронологически
-                    .slice(-5000); // Ограничиваем размер
+                    .sort((a, b) => a.ts - b.ts)
+                    .slice(-5000);
 
-                // 5. ВЕСА ТЕГОВ (Обучение)
+                // 6. ВЕСА ТЕГОВ (Tag Scores)
                 const localScores = window.tagScores || {};
                 const cloudScores = cloudData.tagScores || {};
                 const mergedScores = { ...cloudScores };
                 for (const [tag, score] of Object.entries(localScores)) {
-                    // Берем максимальное значение (чтобы не терять прогресс обучения)
                     if (mergedScores[tag]) mergedScores[tag] = Math.max(mergedScores[tag], score);
                     else mergedScores[tag] = score;
                 }
 
-                // 6. ПЛАТФОРМА
-                // Приоритет локальной настройке, если она менялась недавно, но тут берем облако если есть
-                let mergedPlatform = localStorage.getItem('xch_platform') || 'ph';
+                // 7. ПЛАТФОРМА (По умолчанию xHamster 'xh')
+                let mergedPlatform = localStorage.getItem('xch_platform') || 'xh';
                 if (cloudData.platform) mergedPlatform = cloudData.platform;
 
-                // Проверяем подписку из облака
+                // 8. ПОДПИСКА
                 if (cloudData.subscription) {
-                    // Сохраняем в браузер
                     localStorage.setItem('xch_sub_level', cloudData.subscription);
-                    // Обновляем глобальную переменную (через window, т.к. мы в модуле)
+                    // Обновляем UI подписки через глобальную функцию
                     if (window.updateSubscriptionUI) window.updateSubscriptionUI();
                 }
 
-                // === ПРИМЕНЕНИЕ ДАННЫХ ===
+                // === ПРИМЕНЕНИЕ ДАННЫХ (APPLY) ===
                 
                 // А. Обновляем память (window)
                 window.favorites = mergedFav;
                 window.blacklist = mergedBan;
+                window.watchLater = mergedWL; // Сохраняем в память
                 window.historyData = mergedHistory;
                 window.tagScores = mergedScores;
                 window.activityLog = mergedActivityLog;
@@ -1623,16 +1719,17 @@
                 // Б. Обновляем LocalStorage
                 localStorage.setItem('xch_favorites', JSON.stringify(mergedFav));
                 localStorage.setItem('xch_blacklist', JSON.stringify(mergedBan));
+                localStorage.setItem('xch_watch_later', JSON.stringify(mergedWL)); // Сохраняем локально
                 localStorage.setItem('xch_history', JSON.stringify(mergedHistory));
                 localStorage.setItem('xch_tag_scores', JSON.stringify(mergedScores));
                 localStorage.setItem('xch_activity_log', JSON.stringify(mergedActivityLog));
                 localStorage.setItem('xch_platform', mergedPlatform);
 
                 // В. Отправляем ОБЪЕДИНЕННЫЙ результат обратно в облако
-                // Это важно: если на телефоне было 5, а на ПК 0, теперь в облаке будет 5
                 await setDoc(userRef, {
                     favorites: mergedFav,
                     blacklist: mergedBan,
+                    watchLater: mergedWL, // Отправляем в облако
                     history: mergedHistory,
                     activityLog: mergedActivityLog,
                     tagScores: mergedScores,
@@ -1645,24 +1742,23 @@
                 localStorage.setItem('xch_last_sync_ts', now);
                 window.updateLastSyncUI();
 
-                // Принудительно перерисовываем все списки
+                // Обновляем все счетчики и списки на странице
                 if (typeof updateCounts === 'function') updateCounts();
                 if (typeof updateExploredCount === 'function') updateExploredCount();
                 if (typeof renderHistory === 'function') renderHistory();
                 if (typeof updateActionButtons === 'function') updateActionButtons();
                 
-                // Обновляем селектор сайта
+                // Обновляем селектор сайта и ссылку
                 const platEl = document.getElementById('platform');
                 if (platEl) { 
                     platEl.value = mergedPlatform; 
                     if (typeof updateLink === 'function') updateLink(); 
                 }
 
-                console.log("Data sync complete. Favorites:", mergedFav.length);
+                console.log("Data sync complete. WatchLater:", mergedWL.length);
                 
             } else {
                 console.log("No cloud data. Creating initial backup...");
-                // Если данных в облаке нет, просто заливаем текущие
                 if (window.syncToCloud) window.syncToCloud();
             }
         } catch (error) {
@@ -1678,12 +1774,13 @@
         const userRef = doc(db, "users", user.uid);
         
         // Читаем настройки интерфейса, если элемент существует
-        const currentPlatform = document.getElementById('platform') ? document.getElementById('platform').value : 'ph';
+        const currentPlatform = document.getElementById('platform') ? document.getElementById('platform').value : 'xh';
 
         // ИСПРАВЛЕНИЕ: Читаем данные напрямую из LocalStorage, так как переменные JS могут быть недоступны в модуле
         const dataToSave = {
             favorites: JSON.parse(localStorage.getItem('xch_favorites')) || [],
             blacklist: JSON.parse(localStorage.getItem('xch_blacklist')) || [],
+            watchLater: JSON.parse(localStorage.getItem('xch_watch_later')) || [],
             tagScores: JSON.parse(localStorage.getItem('xch_tag_scores')) || {},
             history: JSON.parse(localStorage.getItem('xch_history')) || [],
             activityLog: JSON.parse(localStorage.getItem('xch_activity_log')) || [],
@@ -1753,6 +1850,7 @@
         LANG: 'xch_lang',
         BLACKLIST: 'xch_blacklist',
         FAVORITES: 'xch_favorites',
+        WATCH_LATER: 'xch_watch_later',
         INTENSITY: 'xch_intensity',
         TAG_SCORES: 'xch_tag_scores',
         HISTORY: 'xch_history',
@@ -1813,6 +1911,7 @@
 
     let blacklist = JSON.parse(localStorage.getItem(STORAGE.BLACKLIST)) || [];
     let favorites = JSON.parse(localStorage.getItem(STORAGE.FAVORITES)) || [];
+    let watchLater = JSON.parse(localStorage.getItem(STORAGE.WATCH_LATER)) || [];
     let tagScores = JSON.parse(localStorage.getItem(STORAGE.TAG_SCORES)) || {};
     let historyData = JSON.parse(localStorage.getItem(STORAGE.HISTORY)) || [];
     let activityLog = JSON.parse(localStorage.getItem(STORAGE.ACTIVITY_LOG)) || [];
@@ -11716,7 +11815,7 @@
             {
                 id: 1126, 
                 name: "Shemale Fucks Girl", name_ru: "Транс трахает девушку", name_es: "Trans folla a Chica", name_de: "Shemale fickt Mädchen",
-                slug: "shemale-fucks-girl", tags: ["trans", "straight"],
+                slug: "shemale-fucks-girl", tags: ["trans"],
                 desc_en: "Trans woman penetrating a bio female.",
                 desc_ru: "Транс-женщина проникает в био-женщину.",
                 desc_es: "Mujer trans penetrando a mujer biológica.",
@@ -11725,7 +11824,7 @@
             {
                 id: 1127, 
                 name: "Shemale Fucks Shemale", name_ru: "Транс трахает транса", name_es: "Trans folla a Trans", name_de: "Shemale fickt Shemale",
-                slug: "shemale-fucks-shemale", tags: ["trans", "lesbian"],
+                slug: "shemale-fucks-shemale", tags: ["trans"],
                 desc_en: "Sex between two trans women (T4T).",
                 desc_ru: "Секс между двумя транс-женщинами.",
                 desc_es: "Sexo entre dos mujeres trans.",
@@ -12629,6 +12728,9 @@
             btn_pass: "Other",
             btn_like: "Similar",
             btn_upgrade_short: "Upgrade ⇧",
+            btn_return: "Return",
+            watch_later: "Watch Later",
+            empty_wl: "No saved items yet",
             
             // --- 2. Generator (Main Tab) ---
             generate: "Random Genre",
@@ -12769,6 +12871,10 @@
             btn_pass: "Другое",
             btn_like: "Похожее",
             btn_upgrade_short: "Улучш... ⇧",
+            btn_return: "Вернуться",
+            watch_later: "Смотреть позже",
+            empty_wl: "Список пуст",
+
 
             // --- 2. Генератор ---
             generate: "Случайный жанр",
@@ -12905,6 +13011,9 @@
             theme_title: "Elegir Tema",
             theme_basic: "Básico",
             theme_premium: "Colores Premium",
+            btn_return: "Volver",
+            watch_later: "Ver más tarde",
+            empty_wl: "Lista vacía",
 
             // --- Generator ---
             generate: "Género Aleatorio",
@@ -12917,6 +13026,7 @@
             search_en_label: "Buscar en EN",
             site_label: "Sitio",
             exploration_mode: "Intensidad",
+
 
             btn_start: "Empezar",
             btn_pass: "Otro",
@@ -13033,6 +13143,9 @@
             theme_title: "Thema wählen",
             theme_basic: "Basis",
             theme_premium: "Premium Farben",
+            btn_return: "Zurück",
+             watch_later: "Später ansehen",
+            empty_wl: "Liste leer",
 
             btn_start: "Starten",
             btn_pass: "Andere",
@@ -13171,6 +13284,8 @@
         initAgeGate();
         initSwipeCards();
         
+        document.body.classList.add('tab-home-active'); 
+
         // Платформа
         const savedPlatform = localStorage.getItem('xch_platform');
         if (savedPlatform) {
@@ -13632,15 +13747,15 @@
 
         // Стандартные цвета сайтов
         const colors = {
+            'xh': ['#9b59b6', '#b07cc6'],
             'ph': ['#ff9900', '#ffbd55'],
             'xv': ['#de2828', '#ff6b6b'],
-            'xh': ['#5aaaff', '#8bc1ff'],
             'sb': ['#ffd700', '#ffe666'],
             'yp': ['#ff3366', '#ff668a'],
             'rt': ['#ff0000', '#ff4d4d'],
             'google': ['#4285F4', '#7aaafc']
         };
-        const [platMain, platLight] = colors[platform] || colors['ph'];
+        const [platMain, platLight] = colors[platform] || colors['xh'];
 
         if (currentThemeId === 'rainbow') {
             root.style.setProperty('--accent', '#ff00ff'); 
@@ -13672,9 +13787,9 @@
         } else {
             btnWatch.innerText = langData[currentLang].watch;
             switch(platform) {
+                case 'xh': url = `https://xhamster.com/search/${plusQuery}`; break;
                 case 'ph': url = `https://www.pornhub.com/video/search?search=${plusQuery}`; break;
                 case 'xv': url = `https://www.xvideos.com/?k=${plusQuery}`; break;
-                case 'xh': url = `https://xhamster.com/search/${plusQuery}`; break;
                 case 'sb': url = `https://spankbang.com/s/${plusQuery}/`; break;
                 case 'yp': url = `https://www.youporn.com/search/?query=${plusQuery}`; break;
                 case 'rt': url = `https://www.redtube.com/?search=${plusQuery}`; break;
@@ -13688,7 +13803,12 @@
         localStorage.setItem(STORAGE.FAVORITES, JSON.stringify(favorites));
     }
 
-    function updateCounts() { document.getElementById('count-fav').innerText = favorites.length; }
+    function updateCounts() { 
+        document.getElementById('count-fav').innerText = favorites.length; 
+        const wlBadge = document.getElementById('count-wl');
+        if(wlBadge) wlBadge.innerText = watchLater.length;
+        // updateExploredCount уже есть
+    }
 
     function exportData() {
         const exportObj = {
@@ -13702,7 +13822,7 @@
                 lang: currentLang, 
                 theme: localStorage.getItem(STORAGE.THEME), 
                 intensity: currentIntensity,
-                platform: localStorage.getItem('xch_platform') || 'ph',
+                platform: localStorage.getItem('xch_platform') || 'xh',
             sub: subscriptionLevel
             }
         };
@@ -13894,12 +14014,21 @@
     function toggleAccordion(id) { document.getElementById(id).classList.toggle('open'); }
     
     function switchTab(tab) {
+        // Скрываем все табы
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        
+        // Показываем нужный
         document.getElementById('tab-' + tab).classList.add('active');
         document.getElementById('nav-' + tab).classList.add('active');
+
+        // === Управление классами body для мобильной шапки ===
+        // Удаляем все классы активных табов
+        document.body.classList.remove('tab-home-active', 'tab-settings-active', 'tab-account-active');
+        // Добавляем текущий
+        document.body.classList.add('tab-' + tab + '-active');
     }
-    
+
     function initTheme() {
         const savedId = localStorage.getItem('xch_theme_id') || 'dark';
         applyTheme(savedId);
@@ -13953,129 +14082,129 @@
         renderListModal('ban');
     }
 
-    // Универсальная функция рендера
     function renderListModal(type) {
-        const isFav = (type === 'fav');
-        const modalId = isFav ? 'modal-overlay' : 'modal-blacklist-overlay';
-        const bodyId = isFav ? 'modal-catalog-body' : 'modal-blacklist-body';
-        const listData = isFav ? favorites : blacklist;
+        // Определяем параметры
+        let modalId, bodyId, listData, placeholder;
         const t = langData[currentLang];
+
+        if (type === 'fav') {
+            modalId = 'modal-overlay'; bodyId = 'modal-catalog-body'; listData = favorites;
+            placeholder = "Search liked...";
+        } else if (type === 'ban') {
+            modalId = 'modal-blacklist-overlay'; bodyId = 'modal-blacklist-body'; listData = blacklist;
+            placeholder = "Search disliked...";
+        } else if (type === 'wl') {
+            modalId = 'modal-overlay'; 
+            bodyId = 'modal-catalog-body'; 
+            listData = watchLater;
+            // Поиск не нужен, placeholder не важен
+            
+            // Меняем заголовок модалки
+            const header = document.querySelector(`#${modalId} .modal-header span`);
+            if(header) header.innerText = t.watch_later;
+        }
 
         const modal = document.getElementById(modalId);
         const body = document.getElementById(bodyId);
         
-        // Очищаем и строим структуру
         body.innerHTML = '';
-        body.style.display = 'block'; // Сбрасываем flex, если был
+        body.style.display = 'block';
         body.style.padding = '15px';
 
-        // 1. Поле поиска
-        const searchBox = document.createElement('div');
-        searchBox.className = 'modal-search-box';
-        const placeholder = isFav ? "Add to Favorites..." : "Block a genre..."; // Можно добавить в langData
-        
-        searchBox.innerHTML = `
-            <input type="text" class="modal-search-input" placeholder="${placeholder}" id="search-${type}">
-            <div class="modal-suggestions" id="suggest-${type}"></div>
-        `;
-        body.appendChild(searchBox);
+        // 1. ПОЛЕ ПОИСКА (Только если это НЕ Watch Later)
+        if (type !== 'wl') {
+            const searchBox = document.createElement('div');
+            searchBox.className = 'modal-search-box';
+            searchBox.innerHTML = `
+                <input type="text" class="modal-search-input" placeholder="${placeholder}" id="search-${type}">
+                <div class="modal-suggestions" id="suggest-${type}"></div>
+            `;
+            body.appendChild(searchBox);
+        }
 
-        // 2. Контейнер для тегов
+        // 2. Контейнер тегов
         const tagsContainer = document.createElement('div');
         tagsContainer.style.display = 'flex';
         tagsContainer.style.flexWrap = 'wrap';
         tagsContainer.style.gap = '8px';
-        tagsContainer.id = `tags-container-${type}`;
         body.appendChild(tagsContainer);
 
-        // 3. Рендер существующих тегов
+        // 3. Рендер тегов
         renderCurrentTags(type, listData, tagsContainer);
 
-        // 4. Логика поиска
-        const input = document.getElementById(`search-${type}`);
-        const suggestBox = document.getElementById(`suggest-${type}`);
+        // 4. Логика поиска (Только если поле создано)
+        if (type !== 'wl') {
+            const input = document.getElementById(`search-${type}`);
+            const suggestBox = document.getElementById(`suggest-${type}`);
 
-        input.oninput = (e) => {
-            const val = e.target.value.toLowerCase().trim();
-            if (val.length < 2) {
-                suggestBox.style.display = 'none';
-                return;
-            }
+            input.oninput = (e) => {
+                const val = e.target.value.toLowerCase().trim();
+                if (val.length < 2) { suggestBox.style.display = 'none'; return; }
 
-            // Фильтруем данные:
-            // 1. Не должно быть уже в списке
-            // 2. Должно совпадать по названию (EN, RU, ES, DE)
-            const matches = data.filter(item => {
-                if (listData.includes(item.id)) return false;
-                
-                const terms = [
-                    item.name, 
-                    item.name_ru || "", 
-                    item.name_es || "", 
-                    item.name_de || "",
-                    item.slug
-                ].map(x => x.toLowerCase());
+                const matches = data.filter(item => {
+                    if (listData.includes(item.id)) return false;
+                    const terms = [item.name, item.name_ru || "", item.name_es || "", item.name_de || "", item.slug].map(x => x.toLowerCase());
+                    return terms.some(term => term.includes(val));
+                }).slice(0, 10);
 
-                return terms.some(term => term.includes(val));
-            }).slice(0, 10); // Максимум 10 подсказок
-
-            // Рендер подсказок
-            suggestBox.innerHTML = '';
-            if (matches.length > 0) {
-                suggestBox.style.display = 'flex';
-                matches.forEach(item => {
-                    const row = document.createElement('div');
-                    row.className = 'suggestion-row';
-                    const localName = getLocalizedName(item);
-                    row.innerHTML = `${localName} <span>+</span>`;
-                    
-                    row.onclick = () => {
-                        // ДОБАВЛЕНИЕ
-                        if (isFav) {
-                            favorites.push(item.id);
-                            if (blacklist.includes(item.id)) blacklist = blacklist.filter(x => x !== item.id);
-                            adjustTagScores(item, 5);
-                            
-                            // ДОБАВЛЕНО: Лог лайка
-                            logActivity('like', item.id, item.tags);
-                            
-                        } else {
-                            // БЛОКИРОВКА
-                            blacklist.push(item.id);
-                            if (favorites.includes(item.id)) favorites = favorites.filter(x => x !== item.id);
-                            adjustTagScores(item, -5); // Уменьшаем вес для рандома
-                            
-                            // ДОБАВЛЕНО: Лог дизлайка
-                            logActivity('dislike', item.id, item.tags);
-                        }
+                suggestBox.innerHTML = '';
+                if (matches.length > 0) {
+                    suggestBox.style.display = 'flex';
+                    matches.forEach(item => {
+                        const row = document.createElement('div');
+                        row.className = 'suggestion-row';
+                        row.innerHTML = `${getLocalizedName(item)} <span>+</span>`;
                         
-                        saveLists();
-                        updateCounts();
-                        if (window.syncToCloud) window.syncToCloud();
-                        input.value = ''; 
-                        suggestBox.style.display = 'none';
-                        renderListModal(type);
-                        if(currentItem && currentItem.id === item.id) updateActionButtons();
-                    };
-                    suggestBox.appendChild(row);
-                });
-            } else {
-                suggestBox.style.display = 'none';
-            }
-        };
+                        row.onclick = () => {
+                            if (type === 'fav') {
+                                favorites.push(item.id);
+                                if (blacklist.includes(item.id)) blacklist = blacklist.filter(x => x !== item.id);
+                                adjustTagScores(item, 5);
+                                logActivity('like', item.id, item.tags);
+                            } else if (type === 'ban') {
+                                blacklist.push(item.id);
+                                if (favorites.includes(item.id)) favorites = favorites.filter(x => x !== item.id);
+                                adjustTagScores(item, -5);
+                                logActivity('dislike', item.id, item.tags);
+                            } 
+                            
+                            localStorage.setItem(STORAGE.FAVORITES, JSON.stringify(favorites));
+                            localStorage.setItem(STORAGE.BLACKLIST, JSON.stringify(blacklist));
+                            
+                            updateCounts();
+                            if (window.syncToCloud) window.syncToCloud();
+                            
+                            input.value = ''; 
+                            suggestBox.style.display = 'none';
+                            renderListModal(type);
+                            if(currentItem && currentItem.id === item.id) updateActionButtons();
+                        };
+                        suggestBox.appendChild(row);
+                    });
+                } else {
+                    suggestBox.style.display = 'none';
+                }
+            };
+        }
+
+        // Возврат заголовка для Fav при закрытии (или при следующем открытии Fav само исправится)
+        if (type === 'fav') {
+             const header = document.querySelector(`#${modalId} .modal-header span`);
+             if(header) header.innerText = t.favorites_catalog;
+        }
 
         modal.classList.add('open');
     }
 
     function renderCurrentTags(type, listIds, container) {
         container.innerHTML = '';
+        const t = langData[currentLang];
         
         if (listIds.length === 0) {
-            container.innerHTML = '<div style="width:100%; text-align:center; color:var(--text-secondary); margin-top:20px; font-size:14px;">List is empty</div>';
+            container.innerHTML = `<div style="width:100%; text-align:center; color:var(--text-secondary); margin-top:20px; font-size:14px;">${t.empty_wl || "List is empty"}</div>`;
             return;
         }
 
-        // Сортировка по имени
         const sortedIds = [...listIds].sort((a, b) => {
             const itemA = data.find(x => x.id === a);
             const itemB = data.find(x => x.id === b);
@@ -14088,44 +14217,51 @@
             if (!item) return;
 
             const div = document.createElement('div');
-            const isFav = (type === 'fav');
-            // Классы: ban-active или active
-            div.className = `catalog-item ${isFav ? 'active' : 'ban-active'}`;
+            // ОПРЕДЕЛЕНИЕ КЛАССА
+            let className = 'catalog-item';
+            if (type === 'fav') className += ' active';
+            else if (type === 'ban') className += ' ban-active';
+            else if (type === 'wl') className += ' wl-active'; // СИНИЙ
             
-            div.innerHTML = `
-                ${getLocalizedName(item)}
-                <span class="catalog-remove-btn">✕</span>
-            `;
+            div.className = className;
+            div.innerHTML = `${getLocalizedName(item)} <span class="catalog-remove-btn">✕</span>`;
 
-            // Удаление при клике на крестик
             div.querySelector('.catalog-remove-btn').onclick = (e) => {
-                e.stopPropagation(); // Чтобы не сработало что-то еще
+                e.stopPropagation();
                 
-                if (isFav) {
-                    favorites = favorites.filter(x => x !== id);
-                } else {
-                    blacklist = blacklist.filter(x => x !== id);
-                }
+                if (type === 'fav') favorites = favorites.filter(x => x !== id);
+                else if (type === 'ban') blacklist = blacklist.filter(x => x !== id);
+                else if (type === 'wl') watchLater = watchLater.filter(x => x !== id);
                 
-                saveLists();
+                localStorage.setItem(STORAGE.FAVORITES, JSON.stringify(favorites));
+                localStorage.setItem(STORAGE.BLACKLIST, JSON.stringify(blacklist));
+                localStorage.setItem(STORAGE.WATCH_LATER, JSON.stringify(watchLater));
+                
                 updateCounts();
                 if (window.syncToCloud) window.syncToCloud();
                 
-                // Анимация удаления
                 div.style.opacity = '0';
                 div.style.transform = 'scale(0.8)';
                 setTimeout(() => {
-                    renderCurrentTags(type, isFav ? favorites : blacklist, container);
+                    renderCurrentTags(type, type === 'fav' ? favorites : (type === 'ban' ? blacklist : watchLater), container);
                 }, 200);
 
                 if(currentItem && currentItem.id === id) updateActionButtons();
             };
+            
+            // Клик по самому тегу открывает его (как в истории)
+            div.onclick = (e) => {
+                if(e.target.classList.contains('catalog-remove-btn')) return;
+                closeList(null, true);
+                closeBlacklist(null, true);
+                switchTab('home');
+                forceShowResult(item, 'history');
+            }
 
             container.appendChild(div);
         });
     }
 
-    // Закрытие модалок
     function closeList(e, force) {
         if (force || e.target.id === 'modal-overlay') {
             document.getElementById('modal-overlay').classList.remove('open');
@@ -14777,20 +14913,26 @@
             nameEl.style.color = "#9b59b6";
             if(badgeEl) badgeEl.style.display = 'none';
         } else {
-            // FREE PLAN
+            // === БЕСПЛАТНЫЙ ПЛАН (Логика от 10 до 0) ===
+            
+            // 1. Берем сколько уже использовали
             const count = parseInt(localStorage.getItem('xch_limit_count') || '0');
             const today = new Date().toDateString();
             const lastDate = localStorage.getItem('xch_limit_date');
             
-            // Если день сменился, счетчик визуально 0 (логика сброса в checkGenerationLimit)
-            const displayCount = (lastDate === today) ? count : 0;
+            // Если день сменился — использовали 0. Если тот же день — берем count.
+            const usedToday = (lastDate === today) ? count : 0;
+            
+            // 2. Считаем ОСТАТОК (Максимум 10, минимум 0)
+            const remaining = Math.max(0, DAILY_LIMIT - usedToday);
 
-            nameEl.innerHTML = `FREE <span style="font-size:12px; opacity:0.6; font-weight:400;">(${displayCount}/10)</span>`;
+            // 3. Выводим: "10/10", "9/10" и т.д.
+            nameEl.innerHTML = `FREE <span style="font-size:14px; opacity:0.6; font-weight:600; margin-left:5px;">${remaining}/10</span>`;
             nameEl.style.color = "var(--text-main)";
             
             if(badgeEl) {
                 badgeEl.style.display = 'inline-block';
-                badgeEl.innerText = t.btn_upgrade_short || "Upgrade ⇧"; // Используем короткий текст
+                badgeEl.innerText = t.btn_upgrade_short || "Upgrade ⇧"; 
             }
         }
     }
@@ -14982,27 +15124,45 @@
     function handleSwipeAction(direction) {
         if (isGenerating) return;
 
-        // Сохраняем в историю (Undo)
+        // Сохраняем в историю для кнопки "Вернуться"
         if (currentItem) {
             sessionHistoryStack.push(currentItem);
         }
 
-        // Сброс карточки в центр ПЕРЕД генерацией
         const card = document.getElementById('card-block');
         card.style.transition = 'none';
         card.style.transform = 'translate(0,0) rotate(0)';
-        // Скрываем оверлеи
+        
         document.querySelector('.overlay-like').style.opacity = 0;
         document.querySelector('.overlay-nope').style.opacity = 0;
 
-        // Небольшая задержка, чтобы браузер отрисовал сброс позиции
+        // 1. ЗАПУСК БЕСКОНЕЧНОЙ ПРОКРУТКИ (IDLE)
+        // Это создаст эффект "думающего" слота на фоне
+        initIdleSlot(); 
+        
+        // 2. УБИРАЕМ РЕЗУЛЬТАТЫ С КАРТОЧКИ
+        card.classList.remove('has-results'); // Возвращаем высоту слота
+        document.getElementById('result-desc').style.display = 'none';
+        document.getElementById('badge-wrapper').innerHTML = '';
+        
+        // 3. СКРЫВАЕМ ВСЕ КНОПКИ
+        document.getElementById('main-actions').classList.add('hidden-initial');
+        document.querySelector('.btn-group').classList.add('hidden-initial');
+        document.getElementById('mods-block').classList.add('hidden-initial');
+        document.getElementById('related-block').classList.add('hidden-initial');
+        
+        const undoBtn = document.querySelector('.undo-container');
+        if(undoBtn) {
+            undoBtn.classList.add('hidden-initial');
+            undoBtn.style.display = 'none';
+        }
+
+        // Запуск генерации
         requestAnimationFrame(() => {
             if (direction === 'right') {
-                // ЛАЙК -> Ищем ПОХОЖЕЕ
-                toggleFavorite(true); // silent mode
+                toggleFavorite(true); 
                 startGeneration('similar');
             } else {
-                // ДИЗЛАЙК -> Ищем ДРУГОЕ
                 toggleBlacklist(true);
                 startGeneration('random');
             }
@@ -15037,6 +15197,10 @@
 
         // Показываем результат (без запуска рулетки)
         forceShowResult(prevItem, 'history');
+
+        if (sessionHistoryStack.length === 0) {
+            document.querySelector('.undo-container').classList.add('hidden-initial');
+        }
         
     }
 
@@ -15046,7 +15210,7 @@
         if (!checkGenerationLimit()) return; 
         if (isGenerating) return;
 
-        // 1. Скрываем кнопки и очищаем UI
+        // 1. Очистка UI
         const descEl = document.getElementById('result-desc');
         if(descEl) descEl.style.display = 'none';
         
@@ -15055,28 +15219,36 @@
         
         document.getElementById('badge-wrapper').innerHTML = '';
         
-        // Скрываем Tinder-кнопки во время вращения, чтобы не нажать дважды
-        const mainActions = document.getElementById('main-actions');
-        if(mainActions) mainActions.classList.add('hidden-initial');
+        // 2. Скрытие кнопок
+        document.getElementById('main-actions').classList.add('hidden-initial');
+        document.querySelector('.btn-group').classList.add('hidden-initial');
+        document.getElementById('mods-block').classList.add('hidden-initial');
+        document.getElementById('related-block').classList.add('hidden-initial');
         
-        // Скрываем кнопку "Назад" и "Похожие"
         const undoBtn = document.querySelector('.undo-container');
-        if(undoBtn) undoBtn.classList.add('hidden-initial');
-        
-        const relatedBlock = document.getElementById('related-block');
-        if(relatedBlock) relatedBlock.classList.add('hidden-initial');
+        if (undoBtn) {
+            undoBtn.classList.add('hidden-initial');
+            undoBtn.style.display = 'none';
+        }
 
         const card = document.getElementById('card-block');
         if(card) {
             card.classList.remove('has-results');
-            card.classList.remove('restore-anim'); // убираем анимацию возврата, если была
+            card.classList.remove('restore-anim');
+        }
+
+        // Логика обучения (+1 если Watch Later, -1 если просто пропуск)
+        if (mode === 'random' && currentItem && !hasInteractedWithCurrent) {
+            if (watchLater.includes(currentItem.id)) {
+                adjustTagScores(currentItem, 1);
+            } else {
+                adjustTagScores(currentItem, -1);
+            }
         }
         
-        // Логика обучения (веса)
-        if (mode === 'random' && currentItem && !hasInteractedWithCurrent) adjustTagScores(currentItem, -1);
         if (mode === 'similar' && currentItem) adjustTagScores(currentItem, 1);
 
-        // Подбор кандидатов
+        // Генерация
         let filtered = filterData();
         if (mode === 'similar' && lastGeneratedItem) {
             const subset = filtered.filter(item => {
@@ -15090,9 +15262,7 @@
         const reel = document.getElementById('slot-reel');
         if (filtered.length === 0) {
             reel.innerHTML = `<div class="slot-item" style="color:var(--highlight-red);">List Empty</div>`;
-            reel.className = 'slot-reel';
-            // Возвращаем кнопки, если список пуст
-            if(mainActions) mainActions.classList.remove('hidden-initial');
+            document.getElementById('main-actions').classList.remove('hidden-initial');
             return;
         }
 
@@ -15100,7 +15270,7 @@
         hasInteractedWithCurrent = false;
         const finalItem = getWeightedRandom(filtered);
 
-        // === АНИМАЦИЯ ===
+        // Анимация
         const spinCount = 10;
         const itemHeight = 140; 
         let html = '';
@@ -15117,10 +15287,13 @@
         reel.style.transition = 'none'; 
         reel.style.transform = 'translateY(0)';
         
+        document.querySelector('.slot-window').style.maskImage = "linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%)";
+        document.querySelector('.slot-window').style.webkitMaskImage = "linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%)";
+
         const items = reel.querySelectorAll('.slot-item');
         items.forEach(el => el.classList.add('shrunk'));
 
-        void reel.offsetWidth; // Force Reflow
+        void reel.offsetWidth; 
 
         const targetIndex = spinCount - 1; 
         const targetY = -(targetIndex * itemHeight);
@@ -15131,34 +15304,25 @@
         });
 
         setTimeout(() => {
-            reel.className = 'slot-reel'; 
-            const winnerEl = reel.lastElementChild;
-            items.forEach(el => el.classList.remove('shrunk'));
-            if (winnerEl) winnerEl.classList.add('zoomed');
-            
-            if(card) {
-                card.classList.add('flash-active');
-                setTimeout(() => card.classList.remove('flash-active'), 400);
-            }
-
             finishGeneration(finalItem, mode);
-            
-            setTimeout(() => {
-                if (winnerEl) winnerEl.classList.remove('zoomed');
-            }, 600);
-
         }, 1200);
+    }
+
+    function startNewSession() {
+        sessionHistoryStack = []; // Очищаем историю только при полном перезапуске
+        startGeneration('random');
     }
 
     function renderResultUI(item, mode) {
         currentItem = item;
         lastGeneratedItem = item;
         
-        // 1. Слот
+        // 1. Слот (Результат)
         const reel = document.getElementById('slot-reel');
         const winnerName = getLocalizedName(item);
         reel.removeAttribute('style');
         reel.className = 'slot-reel';
+        // Убираем анимацию "idle", ставим статический текст
         reel.innerHTML = `<div class="slot-item" id="result-text" style="color:var(--text-main); font-weight:900;">${winnerName}</div>`;
         
         // 2. Описание
@@ -15175,11 +15339,11 @@
             descEl.classList.add('fade-visible');
         }
 
-        // 3. Фраза-объяснение (Над карточкой)
+        // 3. Фраза сверху
         const statusEl = document.getElementById('status-text');
         if(statusEl) {
             const explanation = getExplanationText(mode);
-            statusEl.style.display = 'flex'; // Flex для центрирования
+            statusEl.style.display = 'flex';
             statusEl.classList.remove('hidden-initial');
             
             if (explanation) {
@@ -15188,37 +15352,45 @@
             } else {
                 const comments = resultComments[currentLang];
                 statusEl.innerText = comments[Math.floor(Math.random() * comments.length)];
-                statusEl.style.color = "var(--text-secondary)"; // Серый цвет для рандома
+                statusEl.style.color = "var(--text-secondary)";
             }
         }
 
-        // 4. Снимаем спиннер с карточки
+        // 4. Настройка карточки (убираем лишние отступы/маски)
         const card = document.getElementById('card-block');
         if(card) {
             card.classList.remove('is-spinning');
             card.classList.add('has-results');
-            // Сброс позиций после свайпа
             card.style.transform = 'translate(0, 0) rotate(0)';
             card.style.transition = 'none';
-            document.querySelector('.overlay-like').style.opacity = 0;
-            document.querySelector('.overlay-nope').style.opacity = 0;
         }
 
-        // 5. Показываем/Скрываем блоки
+        // 5. Кнопка "Начать" скрыта
         const startBtn = document.getElementById('start-btn-container');
         if (startBtn) startBtn.classList.add('hidden-initial'); 
 
-        // Показываем кнопки, моды и похожие
+        // 6. ПОКАЗЫВАЕМ КНОПКИ ДЕЙСТВИЙ (Watch, Mods, Tinder)
         const idsToShow = ['main-actions', 'mods-block', 'related-block'];
         idsToShow.forEach(id => {
             const el = document.getElementById(id);
             if(el) el.classList.remove('hidden-initial', 'visually-hidden');
         });
         
-        document.querySelector('.undo-container').classList.remove('hidden-initial');
         document.querySelector('.btn-group').classList.remove('hidden-initial');
 
-        // 6. Обновления
+        // 7. ЛОГИКА КНОПКИ "ВЕРНУТЬСЯ"
+        const undoContainer = document.querySelector('.undo-container');
+        if (undoContainer) {
+            if (sessionHistoryStack && sessionHistoryStack.length > 0) {
+                undoContainer.classList.remove('hidden-initial');
+                undoContainer.style.display = 'flex'; // ПРИНУДИТЕЛЬНО ПОКАЗЫВАЕМ
+            } else {
+                undoContainer.classList.add('hidden-initial');
+                undoContainer.style.display = 'none'; // ПРИНУДИТЕЛЬНО СКРЫВАЕМ
+            }
+        }
+
+        // 8. Обновления цвета и ссылок
         updateLink();
         renderBadges();
         renderRelatedItems();
@@ -15229,21 +15401,26 @@
     function updateActionButtons() {
         if(!currentItem) return;
         
-        // Ищем НОВЫЕ кнопки
         const btnPass = document.getElementById('btn-tinder-pass');
         const btnLike = document.getElementById('btn-tinder-like');
+        const btnWL = document.getElementById('btn-watch-later'); // Новая кнопка
 
-        // Сбрасываем классы (безопасно, через ?.)
+        // Сброс
         if (btnPass) btnPass.classList.remove('active-state');
         if (btnLike) btnLike.classList.remove('active-state');
+        if (btnWL) btnWL.classList.remove('active');
 
-        // Ставим классы, если нужно
+        // Ставим классы
         if (blacklist.includes(currentItem.id)) {
             if (btnPass) btnPass.classList.add('active-state');
         } 
         if (favorites.includes(currentItem.id)) {
             if (btnLike) btnLike.classList.add('active-state');
-        } 
+        }
+        // Проверка Watch Later
+        if (watchLater.includes(currentItem.id)) {
+            if (btnWL) btnWL.classList.add('active');
+        }
     }
 
     function toggleFavorite(silent = false) {
@@ -15269,17 +15446,51 @@
         if(!currentItem) return;
         const id = currentItem.id;
         
+        // === Не добавлять в ЧС, если отложено в "Смотреть позже" ===
+        if (watchLater.includes(id)) {
+            return; // Просто выходим, ничего не делаем
+        }
+
         if (blacklist.includes(id)) {
             if (!silent) blacklist = blacklist.filter(x => x !== id);
         } else { 
             blacklist.push(id); 
             favorites = favorites.filter(x => x !== id); 
+            
+            // Уменьшаем баллы только если не было в Watch Later (двойная проверка не повредит)
             adjustTagScores(currentItem, -5);
             logActivity('dislike', id, currentItem.tags);
         }
+        
         saveLists(); 
         updateActionButtons();
         if (window.syncToCloud) window.syncToCloud(); 
+    }
+
+    function toggleWatchLater() {
+        if(!currentItem) return;
+        const id = currentItem.id;
+        const btn = document.getElementById('btn-watch-later');
+
+        if (watchLater.includes(id)) {
+            // Удаляем
+            watchLater = watchLater.filter(x => x !== id);
+            btn.classList.remove('active');
+        } else {
+            // Добавляем
+            watchLater.push(id);
+            btn.classList.add('active');
+            // Опционально: виброотклик
+            if(navigator.vibrate) navigator.vibrate(50);
+        }
+        
+        localStorage.setItem(STORAGE.WATCH_LATER, JSON.stringify(watchLater));
+        updateCounts(); // Обновит счетчик в меню
+        if (window.syncToCloud) window.syncToCloud();
+    }
+
+    function openWatchLaterCatalog() {
+        renderListModal('wl');
     }
 
 </script>
