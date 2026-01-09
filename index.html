@@ -253,9 +253,9 @@
 
         .status-text-combined {
             text-align: center; display: flex; justify-content: center; align-items: center;
-            font-size: 18px; font-weight: 800; color: var(--text-main);
-            text-transform: uppercase; letter-spacing: 1px;
-            margin-bottom: 20px; min-height: 24px; width: 100%;
+            font-size: 18px; font-weight: 600; color: var(--text-main);
+            text-transform: none; letter-spacing: 1px;
+            margin-bottom: 10px; min-height: auto; width: 100%;
             line-height: 1.3; text-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
 
@@ -268,7 +268,7 @@
             border-radius: 22px;
             min-height: 180px; width: 100%;
             display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
+            align-items: center;
             transition: all 0.3s ease-out;
         }
         .card.has-results { min-height: 0; height: auto; justify-content: flex-start; gap: 15px; padding-bottom: 30px; }
@@ -281,7 +281,6 @@
             position: relative;
             display: flex; justify-content: center; align-items: center;
             flex-shrink: 0;
-            /* Маска отключена, чтобы не было исчезания */
             border-top: 1px solid transparent; 
             border-bottom: 1px solid transparent;
         }
@@ -349,7 +348,6 @@
         .related-item-btn { background: var(--card-bg); border: 1px solid var(--border); padding: 8px 14px; border-radius: 12px; font-size: 13px; font-weight: 600; color: var(--text-main); transition: 0.2s; }
 
         /* Utility */
-        .hidden-initial { display: none !important; }
         .visually-hidden { opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .fade-hidden { opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease; display: none; }
         .fade-visible { opacity: 1; transform: translateY(0); display: flex; }
@@ -434,7 +432,7 @@
         .bottom-nav {
             display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             width: 85%; max-width: 350px; height: 65px;
-            background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            background: var(--ios-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 50px;
             z-index: 9999; padding: 0 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.6);
             justify-content: space-between;
@@ -465,6 +463,12 @@
         }
         .modal-body { 
             padding: 10px; overflow-y: auto; 
+        }
+
+        #sub-status-btn {
+            background: var(--card-bg); 
+            border: 1px solid var(--border);
+            transition: background 0.3s, border-color 0.3s;
         }
 
         /* Catalog Search */
@@ -528,8 +532,180 @@
         #modal-sub-overlay .modal { width: 90%; max-width: 400px; max-height: 90vh; }
 
         /* =========================================
-        11. OTHER COMPONENTS (Badges, History)
+        11. Tinder Logic
         ========================================= */
+        .tinder-actions {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            margin-bottom: 10px;
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+        }
+
+        .result-description {
+            margin-top: 10px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            line-height: 1.4;
+            color: var(--text-secondary);
+        }
+
+        .related-section {
+            margin-bottom: 15px;
+            background: var(--bg-color); /* Слегка выделить фон */
+            padding: 10px;
+            border-radius: 12px;
+            width: 100%;
+        }
+
+        .btn-tinder {
+            flex: 1;
+            padding: 18px 10px;
+            border-radius: 50px; /* Полностью круглые края */
+            border: none;
+            font-size: 16px;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: transform 0.1s, opacity 0.2s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-tinder:active { transform: scale(0.95); }
+
+        .btn-pass {
+            background: var(--card-bg);
+            border: 2px solid var(--highlight-red);
+            color: var(--highlight-red);
+        }
+        
+        .btn-like {
+            background: var(--accent);
+            color: #000; /* Контраст на акцентном цвете */
+            border: 2px solid var(--accent);
+        }
+
+        /* === 3. КНОПКА НАЗАД (UNDO) === */
+        .undo-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .btn-undo {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 24px;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, transform 0.2s;
+        }
+        .btn-undo:active { background: var(--nav-bg); transform: scale(0.9) rotate(-30deg); }
+
+        /* === 4. СВАЙПЫ (Карточка) === */
+        .card {
+            position: relative; 
+            overflow: hidden;
+            touch-action: none; /* Важно для свайпов на мобильных */
+            transform-origin: 50% 100%;
+            will-change: transform, opacity;
+            height: auto;
+            min-height: 300px;
+            justify-content: flex-start;
+            padding-bottom: 20px;
+        }
+
+        /* Оверлеи "LIKE" и "NOPE" при свайпе */
+        .swipe-overlay {
+            position: absolute;
+            top: 20px;
+            padding: 5px 10px;
+            border: 3px solid;
+            border-radius: 8px;
+            font-size: 32px;
+            font-weight: 900;
+            text-transform: uppercase;
+            opacity: 0;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .overlay-like {
+            left: 20px;
+            color: #2ecc71;
+            border-color: #2ecc71;
+            transform: rotate(-15deg);
+        }
+        .overlay-nope {
+            right: 20px;
+            color: #e74c3c;
+            border-color: #e74c3c;
+            transform: rotate(15deg);
+        }
+
+        /* Активные состояния для новых кнопок */
+        .btn-tinder.active-state {
+            box-shadow: inset 0 3px 8px rgba(0,0,0,0.3);
+            transform: scale(0.98);
+        }
+        .btn-like.active-state { 
+            background: #fff !important; 
+            color: var(--accent) !important; 
+            border-color: #fff !important;
+        }
+        .btn-pass.active-state { 
+            background: var(--highlight-red) !important; 
+            color: #fff !important; 
+        }
+
+        /* Анимация возврата назад */
+        @keyframes flyInLeft {
+            0% { transform: translateX(-120%) rotate(-20deg); opacity: 0; }
+            100% { transform: translateX(0) rotate(0); opacity: 1; }
+        }
+        .restore-anim { animation: flyInLeft 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        /* 1. Скрываем старые кнопки по ID, а не по классу, чтобы не задеть кнопку старта */
+        #btn-gen, #btn-similar { 
+            display: none !important; 
+        }
+
+        /* 2. Принудительно показываем контейнер старта, если у него нет класса hidden-initial */
+        #start-btn-container:not(.hidden-initial) {
+            display: flex !important;
+        }
+
+        /* 3. Гарантируем, что новые кнопки будут Flex, когда мы уберем скрывающий класс */
+        #main-actions:not(.hidden-initial) {
+            display: flex !important;
+        }
+
+        .hidden-initial {
+            display: none !important;
+        }
+        
+        /* Адаптация под мобильные */
+        @media (max-width: 768px) {
+            .card { min-height: 300px; }
+        }
+
+        /* =========================================
+        12. OTHER COMPONENTS (Badges, History)
+        ========================================= */
+
         .warning-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; color: #fff; cursor: help; }
         .badge-extreme { background: var(--highlight-red); }
         .badge-lgbt { background: #9b59b6; }
@@ -592,7 +768,7 @@
             #mount-prefs, #mount-filters, #mount-account, #mount-extras { padding: 0 15px; width: 100%; }
 
             /* Compact elements */
-            .card { padding: 10px; min-height: 140px; }
+            .card { padding: 10px;}
             .slot-item { font-size: clamp(28px, 8vw, 42px); }
             .card-actions { margin-top: 10px; gap: 10px; }
             .btn-action { padding: 8px; height: 45px; font-size: 20px; }
@@ -659,44 +835,57 @@
         <!-- TAB 1: HOME -->
         <div id="tab-home" class="tab-content active">
             <div class="center-wrapper">
-                <div class="animation-text-box">
-                    <div id="anim-text" class="animation-text"></div>
+                
+                <!-- КНОПКА СТАРТА (Вне карточки, исчезает после первого раза) -->
+                <div class="gen-controls" id="start-btn-container">
+                    <button class="btn-gen" onclick="startGeneration('random')">Start Exploring</button>
                 </div>
 
-                <!-- Единый текст статуса НАД карточкой -->
-                <div class="status-text-combined" id="status-text"></div>
-
+                <!-- КАРТОЧКА -->
                 <div class="card" id="card-block">
-                    <!-- Внутри карточки сразу идут Бейджи -->
+                    <!-- Оверлеи для свайпов -->
+                    <div class="swipe-overlay overlay-like">LIKE</div>
+                    <div class="swipe-overlay overlay-nope">NOPE</div>
+
+                    <!-- Бейджи (Экстрим и т.д.) -->
                     <div class="badge-wrapper" id="badge-wrapper"></div>
                     
-                    <!-- Слот-машина -->
+                    <!-- Окно с названием (Слот) -->
                     <div class="slot-window">
                         <div id="slot-reel" class="slot-reel">
-                            <div class="slot-item" id="result-text">Press Generate</div>
+                            <div class="slot-item" id="result-text">Press Start</div>
                         </div>
                     </div>
                     
-                    <!-- Описание -->
+                    <!-- Описание фетиша -->
                     <div id="result-desc" class="result-description"></div>
 
-                    <!-- Действия (Лайк/Дизлайк) -->
-                    <div class="card-actions hidden-initial">
-                        <button class="btn-action ban" id="btn-ban" onclick="toggleBlacklist()">👎</button>
-                        <button class="btn-action fav" id="btn-fav" onclick="toggleFavorite()">👍</button>
+                    <!-- Фраза-объяснение (Судьба / Потому что лайкнул...) -->
+                    <div class="status-text-combined" id="status-text" style="display:none; font-size: 14px; margin: 10px 0; color: var(--accent);"></div>
+
+                    <!-- Похожие (Внутри карточки) -->
+                    <div class="related-section hidden-initial" id="related-block">
+                        <div class="related-title" data-key="related_header">You might also like:</div>
+                        <div class="related-tags" id="related-tags"></div>
+                    </div>
+
+                    <!-- ЛАЙК/ДИЗЛАЙК (Внутри карточки, внизу) -->
+                    <div class="tinder-actions hidden-initial" id="main-actions">
+                        <button class="btn-tinder btn-pass" id="btn-tinder-pass" onclick="handleSwipeAction('left')">
+                            👎 Other
+                        </button>
+                        <button class="btn-tinder btn-like" id="btn-tinder-like" onclick="handleSwipeAction('right')">
+                            👍 Similar
+                        </button>
                     </div>
                 </div>
 
-                <!-- Похожие (горизонтальный скролл на мобильных уже в CSS) -->
-                <div class="related-section hidden-initial" id="related-block">
-                    <div class="related-title" data-key="related_header">You might also like:</div>
-                    <div class="related-tags" id="related-tags"></div>
+                <!-- Дополнительные кнопки (Снаружи карточки) -->
+                <div class="btn-group hidden-initial" style="margin-top: 15px;">
+                    <a href="#" target="_blank" class="btn-watch" id="watch-link" onclick="handleOutboundClick()">Watch</a>
                 </div>
 
-                <div class="btn-group hidden-initial">
-                    <a href="#" target="_blank" class="btn-watch" id="watch-link" data-key="watch" onclick="handleOutboundClick()">Watch</a>
-                </div>
-
+                <!-- Модификаторы -->
                 <div id="mods-block" class="hidden-initial" style="width:100%">
                     <div class="capsule-accordion-head" onclick="toggleAccordion('mod-container')">
                         <span data-key="add_genre">Add Genre</span> <span>▼</span>
@@ -704,10 +893,11 @@
                     <div class="accordion-body" id="mod-container" style="justify-content:center;"></div>
                 </div>
 
-                <div class="gen-controls">
-                    <button class="btn-gen secondary hidden-initial" id="btn-similar" onclick="startGeneration('similar')" data-key="btn_similar">Similar</button>
-                    <button class="btn-gen" id="btn-gen" onclick="startGeneration('random')" data-key="generate">Random Genre</button>
+                <!-- Кнопка Назад -->
+                <div class="undo-container hidden-initial">
+                    <button class="btn-undo" onclick="undoLastAction()" title="Back">↺</button>
                 </div>
+
             </div>
         </div>
 
@@ -946,26 +1136,31 @@
     </div>
 
     <!-- BLOCK: ACCOUNT-->
+
     <div id="block-account">
         <div class="ios-header" data-key="nav_account">Account</div>
         
-        <!-- Кнопка входа теперь внутри группы -->
+        <!-- Кнопка входа -->
         <div class="capsule-btn" id="login-capsule" onclick="window.handleLoginClick()" style="margin-bottom:5px;">
             <span id="login-btn-text" data-key="login_text">Sync Data</span>
             <span id="login-status-icon" class="capsule-icon" style="color: var(--accent);">G</span>
         </div>
         
-        <!-- Дата последней синхронизации -->
+        <!-- Дата синхронизации -->
         <div class="sync-date" id="last-sync-date">Not synced yet</div>
 
         <!-- Кнопка статуса подписки -->
-        <div class="capsule-btn" id="sub-status-btn" onclick="openSubModal()" style="background: linear-gradient(135deg, #1f1f1f, #141414); border: 1px solid var(--border); margin-bottom: 25px;">
-            <div style="display:flex; flex-direction:column; justify-content:center;">
-                <span style="font-size:11px; color:var(--text-secondary); line-height:1; margin-bottom:2px;">Current Plan</span>
+        <div class="capsule-btn" id="sub-status-btn" onclick="openSubModal()" 
+            style="margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; height: auto; min-height: 55px; padding: 10px 20px;">
+            
+            <!-- Левая часть: Тексты (в столбик) -->
+            <div style="display:flex; flex-direction:column; align-items: flex-start; justify-content: center; line-height: 1.2;">
+                <span style="font-size:11px; color:var(--text-secondary); margin-bottom:2px; font-weight: 500;">Current Plan</span>
                 <span id="current-plan-name" style="color:var(--text-main); font-weight:800; font-size:17px; letter-spacing:0.5px;">FREE</span>
             </div>
 
-            <span id="upgrade-badge" style="color:var(--accent); font-weight:700; font-size:13px; text-transform:uppercase; background:rgba(255,153,0,0.1); padding:5px 10px; border-radius:10px;">Upgrade ⇧</span>
+            <!-- Правая часть: Бейдж -->
+            <span id="upgrade-badge" style="color:var(--accent); font-weight:700; font-size:13px; text-transform:uppercase; background:rgba(255,153,0,0.1); padding:5px 10px; border-radius:10px; white-space: nowrap;">Upgrade ⇧</span>
         </div>
 
         <div class="ios-group">
@@ -1533,6 +1728,16 @@
     let currentStatsTab = 'tags';
     let currentStatsTimeframe = 'all';
 
+    // Tinder
+    let startX = 0, startY = 0;
+    let currentX = 0, currentY = 0;
+    let isDragging = false;
+    const card = document.getElementById('card-block');
+    const overlayLike = document.querySelector('.overlay-like');
+    const overlayNope = document.querySelector('.overlay-nope');
+
+    let sessionHistoryStack = []; // Стек для кнопки "Назад"
+
     const STORAGE = {
         THEME: 'xch_theme',
         LANG: 'xch_lang',
@@ -1544,8 +1749,6 @@
         ACTIVITY_LOG: 'xch_activity_log'
     };
 
-    // Конфигурация тем
-    // bg: цвет фона превью, accent: цвет кружочка
     const APP_THEMES = [
         // === FREE (Дефолтные из CSS) ===
         { id: 'dark', name: 'Dark', type: 'free', isLight: false, preview: '#141414' },
@@ -12938,6 +13141,7 @@
         updateCounts();
         checkLayout();
         initAgeGate();
+        initSwipeCards();
         
         // Платформа
         const savedPlatform = localStorage.getItem('xch_platform');
@@ -13024,122 +13228,6 @@
         return items[Math.floor(Math.random() * items.length)];
     }
 
-    // === GENERATION LOGIC ===
-    function startGeneration(mode) {
-        if (!checkGenerationLimit()) return; 
-        if (isGenerating) return;
-
-        // 1. Очистка интерфейса
-        const descEl = document.getElementById('result-desc');
-        descEl.style.display = 'none';
-        document.getElementById('status-text').innerText = ''; 
-        
-        document.getElementById('badge-wrapper').innerHTML = '';
-        document.querySelector('.card-actions').classList.add('hidden-initial');
-        document.querySelector('.btn-group').classList.add('hidden-initial');
-        document.getElementById('related-block').classList.add('hidden-initial');
-        document.querySelector('.gen-controls').classList.add('visually-hidden');
-        document.getElementById('mods-block').classList.add('visually-hidden');
-        document.getElementById('tab-home').classList.add('generated');
-
-        const card = document.getElementById('card-block');
-        card.classList.remove('has-results');
-        
-        // Логика обучения
-        if (mode === 'random' && currentItem && !hasInteractedWithCurrent) adjustTagScores(currentItem, -1);
-        if (mode === 'similar' && currentItem) adjustTagScores(currentItem, 1);
-
-        // Подбор кандидатов
-        let filtered = filterData();
-        if (mode === 'similar' && lastGeneratedItem) {
-            const subset = filtered.filter(item => {
-                if (item.id === lastGeneratedItem.id) return false;
-                const intersection = item.tags.filter(t => lastGeneratedItem.tags.includes(t));
-                return intersection.length >= 2;
-            });
-            if (subset.length > 0) filtered = subset;
-        }
-
-        const reel = document.getElementById('slot-reel');
-        if (filtered.length === 0) {
-            reel.innerHTML = `<div class="slot-item" style="color:var(--highlight-red);">List Empty</div>`;
-            reel.className = 'slot-reel';
-            resetControls();
-            return;
-        }
-
-        isGenerating = true;
-        hasInteractedWithCurrent = false;
-        const finalItem = getWeightedRandom(filtered);
-
-        // === СЦЕНАРИЙ АНИМАЦИИ (УЛУЧШЕННЫЙ) ===
-
-        // Увеличиваем кол-во элементов для эффекта "размытия" при вращении
-        const spinCount = 10;
-        const itemHeight = 140; 
-        let html = '';
-
-        // Генерируем "пустышки"
-        for (let i = 0; i < spinCount - 1; i++) {
-            const randomItem = filtered[Math.floor(Math.random() * filtered.length)];
-            html += `<div class="slot-item">${getLocalizedName(randomItem)}</div>`;
-        }
-        // Последний элемент - Победитель
-        const winnerName = getLocalizedName(finalItem);
-        html += `<div class="slot-item" id="result-text">${winnerName}</div>`;
-
-        // ШАГ 2: Сброс ленты в начало
-        reel.className = 'slot-reel spinning'; 
-        reel.innerHTML = html;
-        reel.style.transition = 'none'; 
-        reel.style.transform = 'translateY(0)';
-        
-        // Уменьшаем элементы для эффекта глубины
-        const items = reel.querySelectorAll('.slot-item');
-        items.forEach(el => el.classList.add('shrunk'));
-
-        // Force Reflow (Перерисовка браузера)
-        void reel.offsetWidth;
-
-        // ШАГ 3: Запуск вращения
-        // Цель - нижний элемент. Сдвиг = -(индекс * высота)
-        const targetIndex = spinCount - 1; 
-        const targetY = -(targetIndex * itemHeight);
-
-        requestAnimationFrame(() => {
-            // cubic-bezier(0.25, 1, 0.5, 1) дает резкий старт и плавную остановку
-            reel.style.transition = 'transform 1.2s cubic-bezier(0.25, 1, 0.5, 1)';
-            reel.style.transform = `translateY(${targetY}px)`;
-        });
-
-        // ШАГ 4: Финал (через 1.2 сек)
-        setTimeout(() => {
-            reel.className = 'slot-reel'; 
-            
-            // Находим победителя (последний элемент в списке)
-            const winnerEl = reel.lastElementChild;
-            
-            // Убираем уменьшение
-            items.forEach(el => el.classList.remove('shrunk'));
-            
-            // Зум победителя (Вот здесь была ошибка wrapperEl -> winnerEl)
-            if (winnerEl) winnerEl.classList.add('zoomed');
-            
-            // Вспышка карточки
-            card.classList.add('flash-active');
-            setTimeout(() => card.classList.remove('flash-active'), 400);
-
-            // Рендер UI результата
-            finishGeneration(finalItem, mode);
-            
-            // Убираем зум через паузу
-            setTimeout(() => {
-                if (winnerEl) winnerEl.classList.remove('zoomed');
-            }, 600);
-
-        }, 1200); // Тайминг должен совпадать с длительностью transition
-    }
-
     function resetControls() {
         document.querySelector('.gen-controls').classList.remove('visually-hidden');
         document.getElementById('mods-block').classList.remove('visually-hidden');
@@ -13213,73 +13301,6 @@
         return reason;
     }
 
-    // 2. Обновленная функция рендера интерфейса
-    function renderResultUI(item, mode) {
-        currentItem = item;
-        lastGeneratedItem = item;
-        
-        const reel = document.getElementById('slot-reel');
-        const winnerName = getLocalizedName(item);
-        reel.removeAttribute('style');
-
-        reel.innerHTML = `<div class="slot-item" id="result-text" style="color:var(--accent);">${winnerName}</div>`;
-        reel.style.transition = 'none';
-        reel.style.transform = 'translateY(0)';
-
-        const card = document.getElementById('card-block');
-        card.classList.remove('is-spinning');
-        card.classList.add('has-results');
-
-        if(isFirstGen) {
-            isFirstGen = false;
-            document.querySelectorAll('.hidden-initial').forEach(el => el.classList.remove('hidden-initial'));
-            document.querySelector('[data-key="generate"]').innerText = langData[currentLang].generate_again;
-        }
-        
-        document.querySelector('.gen-controls').classList.remove('visually-hidden');
-        document.getElementById('mods-block').classList.remove('visually-hidden');
-        document.querySelector('.card-actions').classList.remove('hidden-initial');
-        document.querySelector('.btn-group').classList.remove('hidden-initial');
-        document.getElementById('tab-home').classList.add('generated'); 
-
-        updateLink();
-        renderResultName();
-        renderBadges();
-        renderRelatedItems();
-        updateActionButtons();
-
-        // === ЛОГИКА ТЕКСТА СТАТУСА ===
-        const statusEl = document.getElementById('status-text');
-        const explanation = getExplanationText(mode); // Получаем объяснение
-        
-        if (explanation) {
-            // Если есть объяснение (умный подбор) - показываем его
-            statusEl.innerText = explanation;
-            statusEl.style.color = "var(--accent)"; // Выделяем цветом
-        } else {
-            // Если нет - показываем случайный комментарий
-            const comments = resultComments[currentLang];
-            statusEl.innerText = comments[Math.floor(Math.random() * comments.length)];
-            statusEl.style.color = "var(--text-secondary)"; // Обычный цвет
-        }
-        // ===================================
-
-        setTimeout(() => {
-            const descEl = document.getElementById('result-desc');
-            descEl.style.display = 'block'; 
-            
-            const idsToShow = ['result-desc', 'status-text', 'related-block'];
-            idsToShow.forEach(id => {
-                const el = document.getElementById(id);
-                if(el) {
-                    el.classList.remove('fade-hidden');
-                    el.classList.add('fade-visible');
-                    el.classList.remove('hidden-initial');
-                }
-            });
-        }, 50);
-    }
-
     // 3. Обновленная функция подготовки анимации (скрываем новый элемент)
     function prepareElementsForFadeIn() {
         // Убрали старые ID, добавили status-text
@@ -13295,13 +13316,15 @@
 
     function finishGeneration(item, mode) {
         isGenerating = false;
-        document.getElementById('anim-text').classList.remove('visible');
+        
         addToHistory(item);
         logActivity('gen', item.id, item.tags);
         
         const card = document.getElementById('card-block');
-        card.classList.add('flash-active');
-        setTimeout(() => card.classList.remove('flash-active'), 200);
+        if(card) { // Добавим проверку на всякий случай
+            card.classList.add('flash-active');
+            setTimeout(() => card.classList.remove('flash-active'), 200);
+        }
 
         renderResultUI(item, mode);
     }
@@ -13457,22 +13480,6 @@
         if (window.syncToCloud) window.syncToCloud();
     }
 
-    function toggleFavorite() {
-        if(!currentItem) return;
-        const id = currentItem.id;
-        if (favorites.includes(id)) {
-            favorites = favorites.filter(x => x !== id);
-        } else {
-            favorites.push(id); 
-            blacklist = blacklist.filter(x => x !== id);
-            adjustTagScores(currentItem, 5); 
-            hasInteractedWithCurrent = true;
-            logActivity('like', id, currentItem.tags);
-        }
-        saveLists(); updateActionButtons(); updateCounts();
-        if (window.syncToCloud) window.syncToCloud(); 
-    }
-
     function handleOutboundClick() {
         if(!currentItem) return;
         if(!hasInteractedWithCurrent) {
@@ -13493,7 +13500,6 @@
         if (window.syncToCloud) window.syncToCloud(); 
     }
 
-    // Универсальная функция для получения названия на нужном языке
     function getLocalizedName(item) {
         if (!item) return "";
         if (currentLang === 'ru' && item.name_ru) return item.name_ru;
@@ -13649,47 +13655,9 @@
         btnWatch.href = url;
     }
 
-    function toggleBlacklist() {
-        if(!currentItem) return;
-        const id = currentItem.id;
-        
-        if (blacklist.includes(id)) {
-            // Если разблокируем (убираем из ЧС)
-            blacklist = blacklist.filter(x => x !== id);
-            // Опционально: можно не логировать снятие бана, или логировать как нейтральное действие
-        }
-        else { 
-            // Если добавляем в ЧС
-            blacklist.push(id); 
-            favorites = favorites.filter(x => x !== id); 
-            
-            // Влияние на веса рандома
-            adjustTagScores(currentItem, -5);
-            
-            // Запись в статистику
-            logActivity('dislike', id, currentItem.tags);
-        }
-        saveLists(); updateActionButtons();
-        if (window.syncToCloud) window.syncToCloud(); 
-    }
-
     function saveLists() {
         localStorage.setItem(STORAGE.BLACKLIST, JSON.stringify(blacklist));
         localStorage.setItem(STORAGE.FAVORITES, JSON.stringify(favorites));
-    }
-
-    function updateActionButtons() {
-        if(!currentItem) return;
-        const btnBan = document.getElementById('btn-ban');
-        const btnFav = document.getElementById('btn-fav');
-        const t = langData[currentLang];
-        btnBan.classList.remove('active'); btnFav.classList.remove('active');
-        if (blacklist.includes(currentItem.id)) {
-            btnBan.classList.add('active'); 
-        } 
-        if (favorites.includes(currentItem.id)) {
-            btnFav.classList.add('active');
-        } 
     }
 
     function updateCounts() { document.getElementById('count-fav').innerText = favorites.length; }
@@ -13845,7 +13813,6 @@
         if(activeLabel) activeLabel.classList.add('active');
     }
 
-    // Запуск медленной анимации (Attract mode)
     function initIdleSlot() {
         const reel = document.getElementById('slot-reel');
         if (!reel) return;
@@ -14884,16 +14851,13 @@
         if (theme.colors) {
             if (theme.colors.bg) {
                 root.style.setProperty('--bg-color', theme.colors.bg);
-                root.style.setProperty('--ios-bg', theme.colors.bg); // iOS фон тоже меняем
+                root.style.setProperty('--ios-bg', theme.colors.bg);
             }
             if (theme.colors.sidebar) root.style.setProperty('--sidebar-bg', theme.colors.sidebar);
-            
-            // Карточки и блоки
             if (theme.colors.card) {
                 root.style.setProperty('--card-bg', theme.colors.card);
-                root.style.setProperty('--ios-card', theme.colors.card); // ВАЖНО для списков
+                root.style.setProperty('--ios-card', theme.colors.card);
             }
-            
             if (theme.colors.nav) root.style.setProperty('--nav-bg', theme.colors.nav);
             if (theme.colors.border) root.style.setProperty('--border', theme.colors.border);
         }
@@ -14909,6 +14873,370 @@
         if(label) label.innerText = theme.name;
         
         updateLink(); 
+    }
+
+    function initSwipeCards() {
+        const card = document.getElementById('card-block');
+        if (!card) return;
+
+        card.addEventListener('touchstart', (e) => {
+            // Если мы нажимаем на кнопку внутри карточки - не свайпаем
+            if (e.target.closest('button') || e.target.closest('.related-item-btn')) return;
+            
+            if (isGenerating) return;
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            isDragging = true;
+            card.style.transition = 'none';
+        }, {passive: false}); // passive: false иногда помогает на iOS
+
+        card.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            currentX = e.touches[0].clientX;
+            
+            let deltaX = currentX - startX;
+            // Поворот карточки
+            let rotate = deltaX * 0.05; 
+
+            card.style.transform = `translateX(${deltaX}px) rotate(${rotate}deg)`;
+
+            // Оверлеи
+            const like = document.querySelector('.overlay-like');
+            const nope = document.querySelector('.overlay-nope');
+
+            if (deltaX > 0) {
+                like.style.opacity = Math.min(deltaX / 100, 1);
+                nope.style.opacity = 0;
+            } else {
+                nope.style.opacity = Math.min(Math.abs(deltaX) / 100, 1);
+                like.style.opacity = 0;
+            }
+        }, {passive: true});
+
+        card.addEventListener('touchend', (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            let deltaX = currentX - startX;
+            
+            // Порог 100px
+            if (deltaX > 100) {
+                animateSwipeEnd(window.innerWidth + 100, 'right'); // Улетает далеко вправо
+            } else if (deltaX < -100) {
+                animateSwipeEnd(-(window.innerWidth + 100), 'left'); // Улетает далеко влево
+            } else {
+                // Возврат
+                card.style.transition = 'transform 0.3s ease';
+                card.style.transform = 'translateX(0) rotate(0)';
+                document.querySelector('.overlay-like').style.opacity = 0;
+                document.querySelector('.overlay-nope').style.opacity = 0;
+            }
+        });
+    }
+
+    function handleSwipeAction(direction) {
+        if (isGenerating) return;
+
+        // Сохраняем в историю (Undo)
+        if (currentItem) {
+            sessionHistoryStack.push(currentItem);
+        }
+
+        // Сброс карточки в центр ПЕРЕД генерацией
+        const card = document.getElementById('card-block');
+        card.style.transition = 'none';
+        card.style.transform = 'translate(0,0) rotate(0)';
+        // Скрываем оверлеи
+        document.querySelector('.overlay-like').style.opacity = 0;
+        document.querySelector('.overlay-nope').style.opacity = 0;
+
+        // Небольшая задержка, чтобы браузер отрисовал сброс позиции
+        requestAnimationFrame(() => {
+            if (direction === 'right') {
+                // ЛАЙК -> Ищем ПОХОЖЕЕ
+                toggleFavorite(true); // silent mode
+                startGeneration('similar');
+            } else {
+                // ДИЗЛАЙК -> Ищем ДРУГОЕ
+                toggleBlacklist(true);
+                startGeneration('random');
+            }
+        });
+    }
+
+    function animateSwipeEnd(moveX, direction) {
+        const card = document.getElementById('card-block');
+        card.style.transition = 'transform 0.3s ease-out';
+        card.style.transform = `translateX(${moveX}px) rotate(${moveX * 0.05}deg)`;
+        
+        // Ждем окончания анимации вылета, затем запускаем логику
+        setTimeout(() => {
+            handleSwipeAction(direction);
+        }, 300);
+    }
+
+    function undoLastAction() {
+        if (sessionHistoryStack.length === 0) {
+            alert("No history to go back to.");
+            return;
+        }
+
+        // Достаем последний элемент
+        const prevItem = sessionHistoryStack.pop();
+        
+        // Эффект появления слева
+        const card = document.getElementById('card-block');
+        card.classList.remove('restore-anim');
+        void card.offsetWidth; // trigger reflow
+        card.classList.add('restore-anim');
+
+        // Показываем результат (без запуска рулетки)
+        forceShowResult(prevItem, 'history');
+        
+    }
+
+    // === ЛОГИКА ГЕНЕРАЦИИ ===
+
+    function startGeneration(mode) {
+        if (!checkGenerationLimit()) return; 
+        if (isGenerating) return;
+
+        // 1. Скрываем кнопки и очищаем UI
+        const descEl = document.getElementById('result-desc');
+        if(descEl) descEl.style.display = 'none';
+        
+        const statusText = document.getElementById('status-text');
+        if(statusText) statusText.innerText = ''; 
+        
+        document.getElementById('badge-wrapper').innerHTML = '';
+        
+        // Скрываем Tinder-кнопки во время вращения, чтобы не нажать дважды
+        const mainActions = document.getElementById('main-actions');
+        if(mainActions) mainActions.classList.add('hidden-initial');
+        
+        // Скрываем кнопку "Назад" и "Похожие"
+        const undoBtn = document.querySelector('.undo-container');
+        if(undoBtn) undoBtn.classList.add('hidden-initial');
+        
+        const relatedBlock = document.getElementById('related-block');
+        if(relatedBlock) relatedBlock.classList.add('hidden-initial');
+
+        const card = document.getElementById('card-block');
+        if(card) {
+            card.classList.remove('has-results');
+            card.classList.remove('restore-anim'); // убираем анимацию возврата, если была
+        }
+        
+        // Логика обучения (веса)
+        if (mode === 'random' && currentItem && !hasInteractedWithCurrent) adjustTagScores(currentItem, -1);
+        if (mode === 'similar' && currentItem) adjustTagScores(currentItem, 1);
+
+        // Подбор кандидатов
+        let filtered = filterData();
+        if (mode === 'similar' && lastGeneratedItem) {
+            const subset = filtered.filter(item => {
+                if (item.id === lastGeneratedItem.id) return false;
+                const intersection = item.tags.filter(t => lastGeneratedItem.tags.includes(t));
+                return intersection.length >= 2;
+            });
+            if (subset.length > 0) filtered = subset;
+        }
+
+        const reel = document.getElementById('slot-reel');
+        if (filtered.length === 0) {
+            reel.innerHTML = `<div class="slot-item" style="color:var(--highlight-red);">List Empty</div>`;
+            reel.className = 'slot-reel';
+            // Возвращаем кнопки, если список пуст
+            if(mainActions) mainActions.classList.remove('hidden-initial');
+            return;
+        }
+
+        isGenerating = true;
+        hasInteractedWithCurrent = false;
+        const finalItem = getWeightedRandom(filtered);
+
+        // === АНИМАЦИЯ ===
+        const spinCount = 10;
+        const itemHeight = 140; 
+        let html = '';
+
+        for (let i = 0; i < spinCount - 1; i++) {
+            const randomItem = filtered[Math.floor(Math.random() * filtered.length)];
+            html += `<div class="slot-item">${getLocalizedName(randomItem)}</div>`;
+        }
+        const winnerName = getLocalizedName(finalItem);
+        html += `<div class="slot-item" id="result-text">${winnerName}</div>`;
+
+        reel.className = 'slot-reel spinning'; 
+        reel.innerHTML = html;
+        reel.style.transition = 'none'; 
+        reel.style.transform = 'translateY(0)';
+        
+        const items = reel.querySelectorAll('.slot-item');
+        items.forEach(el => el.classList.add('shrunk'));
+
+        void reel.offsetWidth; // Force Reflow
+
+        const targetIndex = spinCount - 1; 
+        const targetY = -(targetIndex * itemHeight);
+
+        requestAnimationFrame(() => {
+            reel.style.transition = 'transform 1.2s cubic-bezier(0.25, 1, 0.5, 1)';
+            reel.style.transform = `translateY(${targetY}px)`;
+        });
+
+        setTimeout(() => {
+            reel.className = 'slot-reel'; 
+            const winnerEl = reel.lastElementChild;
+            items.forEach(el => el.classList.remove('shrunk'));
+            if (winnerEl) winnerEl.classList.add('zoomed');
+            
+            if(card) {
+                card.classList.add('flash-active');
+                setTimeout(() => card.classList.remove('flash-active'), 400);
+            }
+
+            finishGeneration(finalItem, mode);
+            
+            setTimeout(() => {
+                if (winnerEl) winnerEl.classList.remove('zoomed');
+            }, 600);
+
+        }, 1200);
+    }
+
+    function renderResultUI(item, mode) {
+        currentItem = item;
+        lastGeneratedItem = item;
+        
+        // 1. Показываем результат в слоте
+        const reel = document.getElementById('slot-reel');
+        const winnerName = getLocalizedName(item);
+        
+        reel.removeAttribute('style');
+        reel.className = 'slot-reel';
+        reel.innerHTML = `<div class="slot-item" id="result-text" style="color:var(--text-main); font-weight:900;">${winnerName}</div>`;
+        
+        // 2. Показываем описание (ОБЯЗАТЕЛЬНО)
+        const descEl = document.getElementById('result-desc');
+        let desc = item.desc_en; // Логика выбора языка
+        if (currentLang === 'ru' && item.desc_ru) desc = item.desc_ru;
+        else if (currentLang === 'es' && item.desc_es) desc = item.desc_es;
+        else if (currentLang === 'de' && item.desc_de) desc = item.desc_de;
+        
+        if(descEl) {
+            descEl.innerText = desc || "";
+            descEl.style.display = 'block'; // Принудительно показываем
+            descEl.classList.remove('hidden-initial', 'fade-hidden');
+            descEl.classList.add('fade-visible');
+        }
+
+        // 3. Логика фразы-объяснения
+        const statusEl = document.getElementById('status-text');
+        if(statusEl) {
+            const explanation = getExplanationText(mode);
+            statusEl.style.display = 'block'; // Показываем блок
+            statusEl.classList.remove('hidden-initial');
+            
+            if (explanation) {
+                // Если есть причина (лайк/тег)
+                statusEl.innerText = explanation;
+                statusEl.style.color = "var(--accent)";
+            } else {
+                // Если причины нет — случайная фраза
+                const comments = resultComments[currentLang];
+                statusEl.innerText = comments[Math.floor(Math.random() * comments.length)];
+                statusEl.style.color = "var(--text-secondary)";
+            }
+        }
+
+        // 4. Убираем спиннер с карточки
+        const card = document.getElementById('card-block');
+        if(card) {
+            card.classList.remove('is-spinning');
+            card.classList.add('has-results');
+            // Сброс трансформации свайпа (важно для мобильных!)
+            card.style.transform = 'translate(0, 0) rotate(0)';
+            card.style.transition = 'none';
+            // Убираем оверлеи
+            document.querySelector('.overlay-like').style.opacity = 0;
+            document.querySelector('.overlay-nope').style.opacity = 0;
+        }
+
+        // 5. Скрываем кнопку старта, показываем интерфейс
+        const startBtn = document.getElementById('start-btn-container');
+        if (startBtn) startBtn.classList.add('hidden-initial'); 
+
+        const idsToShow = ['main-actions', 'mods-block', 'related-block'];
+        idsToShow.forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.classList.remove('hidden-initial', 'visually-hidden');
+        });
+        
+        document.querySelector('.undo-container').classList.remove('hidden-initial');
+        document.querySelector('.btn-group').classList.remove('hidden-initial');
+
+        // 6. Обновляем ссылки и бейджи
+        updateLink();
+        renderBadges();
+        renderRelatedItems();
+        updateActionButtons();
+    }
+
+    // === ФУНКЦИЯ КНОПОК  ===
+    function updateActionButtons() {
+        if(!currentItem) return;
+        
+        // Ищем НОВЫЕ кнопки
+        const btnPass = document.getElementById('btn-tinder-pass');
+        const btnLike = document.getElementById('btn-tinder-like');
+
+        // Сбрасываем классы (безопасно, через ?.)
+        if (btnPass) btnPass.classList.remove('active-state');
+        if (btnLike) btnLike.classList.remove('active-state');
+
+        // Ставим классы, если нужно
+        if (blacklist.includes(currentItem.id)) {
+            if (btnPass) btnPass.classList.add('active-state');
+        } 
+        if (favorites.includes(currentItem.id)) {
+            if (btnLike) btnLike.classList.add('active-state');
+        } 
+    }
+
+    function toggleFavorite(silent = false) {
+        if(!currentItem) return;
+        const id = currentItem.id;
+        
+        if (favorites.includes(id)) {
+            if (!silent) favorites = favorites.filter(x => x !== id);
+        } else {
+            favorites.push(id); 
+            blacklist = blacklist.filter(x => x !== id);
+            adjustTagScores(currentItem, 5); 
+            hasInteractedWithCurrent = true;
+            logActivity('like', id, currentItem.tags);
+        }
+        saveLists(); 
+        updateActionButtons(); 
+        updateCounts();
+        if (window.syncToCloud) window.syncToCloud(); 
+    }
+
+    function toggleBlacklist(silent = false) {
+        if(!currentItem) return;
+        const id = currentItem.id;
+        
+        if (blacklist.includes(id)) {
+            if (!silent) blacklist = blacklist.filter(x => x !== id);
+        } else { 
+            blacklist.push(id); 
+            favorites = favorites.filter(x => x !== id); 
+            adjustTagScores(currentItem, -5);
+            logActivity('dislike', id, currentItem.tags);
+        }
+        saveLists(); 
+        updateActionButtons();
+        if (window.syncToCloud) window.syncToCloud(); 
     }
 
 </script>
