@@ -1250,7 +1250,7 @@
             
             .center-wrapper { padding-left: 10px; padding-right: 10px; width: 100%; }
             #tab-settings .center-wrapper, #tab-account .center-wrapper { padding: 0 !important; padding-top: 40px !important; }
-            #mount-prefs, #mount-filters, #mount-account, #mount-extras { padding: 0 15px; width: 100%; }
+            #mount-prefs, #mount-account, #mount-extras { padding: 0 15px; width: 100%; }
 
             /* Compact elements */
             .card { padding: 10px;}
@@ -1595,6 +1595,17 @@
                     <span class="intensity-label" id="lbl-3" data-val="3">Extreme</span>
                 </div>
             </div>
+
+            <div class="ios-row">
+                <span class="platform-label" data-key="ori_label">Orientation</span>
+                <select id="orientation-select" class="platform-select" onchange="changeOrientation(this.value)">
+                    <option value="hetero" data-key="ori_hetero">Hetero</option>
+                    <option value="gay" data-key="ori_gay">Gay</option>
+                    <option value="trans" data-key="ori_trans">Trans</option>
+                    <option value="pan" data-key="ori_pan">Pansexual</option>
+                </select>
+            </div>
+
             <div class="ios-row">
                 <span class="platform-label" data-key="lang_label">Language</span>
                 <select id="lang-select" class="platform-select" onchange="changeLanguage(this.value)">
@@ -1617,25 +1628,6 @@
                     <span id="current-theme-name" style="color:var(--text-secondary); font-size:15px;">Dark</span>
                     <span style="color:var(--text-secondary)">›</span>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- BLOCK: FILTERS -->
-    <div id="block-filters">
-        <div class="ios-header" data-key="header_filters">Filters</div>
-        <div class="ios-group">
-            <div class="accordion">
-                <div class="accordion-head" onclick="toggleAccordion('filter-include')">
-                    <span data-key="filter_include">Include</span> <span style="color:var(--text-secondary)">▼</span>
-                </div>
-                <div class="accordion-body" id="filter-include"></div>
-            </div>
-            <div class="accordion">
-                <div class="accordion-head" onclick="toggleAccordion('filter-exclude')">
-                    <span data-key="filter_exclude">Exclude</span> <span style="color:var(--text-secondary)">▼</span>
-                </div>
-                <div class="accordion-body" id="filter-exclude"></div>
             </div>
         </div>
     </div>
@@ -1703,9 +1695,9 @@
                 <span>Reddit</span>
                 <span style="color:var(--text-secondary)">↗</span>
             </div>
-            <div class="ios-row clickable" onclick="window.open('mailto:support@xfetishhub.com')">
+            <div class="ios-row clickable" onclick="window.open('https://tally.so/r/Y50280', '_blank')">
                 <span data-key="report_issue">Report Issue</span>
-                <span style="color:var(--text-secondary)">✉</span>
+                <span style="color:var(--text-secondary)">↗</span>
             </div>
         </div>
 
@@ -2208,7 +2200,7 @@
             badge.innerText = "ERROR";
         }
     };
-    
+
     window.closeSyncInfoModal = function(e, force) {
         if (force || e.target.id === 'modal-sync-info-overlay') {
             document.getElementById('modal-sync-info-overlay').classList.remove('open');
@@ -2453,10 +2445,11 @@
     // === STATE ===
     let currentLang = 'en';
     let subscriptionLevel = localStorage.getItem('xch_sub_level') || 'free'; // 'free', 'pro', 'beast'
+    let currentOrientation = localStorage.getItem('xch_orientation') || 'hetero';
 
     /* =================== ⚒️ DEBUG MODE =========================== */
     
-    subscriptionLevel = 'pro'; 
+    // subscriptionLevel = 'pro'; 
     // subscriptionLevel = 'beast';
 
     /* =========================================================== */
@@ -2472,9 +2465,6 @@
     let isGenerating = false;
     let isFirstGen = true;
     let currentIntensity = 1; 
-
-    let includeTags = new Set(); 
-    let excludeTags = new Set(); 
     
     // STATS STATE
     let currentStatsTab = 'tags';
@@ -13366,7 +13356,11 @@
             nav_settings: "Settings",
             nav_account: "Account",
             header_prefs: "Preferences",
-            header_filters: "Filters",
+            ori_label: "Orientation",
+            ori_hetero: "Hetero",
+            ori_gay: "Gay",
+            ori_trans: "Trans",
+            ori_pan: "Pansexual",
             header_extras: "Extras",
             theme_label: "Appearance",
             theme_title: "Choose Theme",
@@ -13559,7 +13553,11 @@
             nav_settings: "Настройки",
             nav_account: "Аккаунт", // Исправлено (было Account на ПК)
             header_prefs: "Настройки",
-            header_filters: "Фильтры",
+            ori_label: "Ориентация",
+            ori_hetero: "Гетеро",
+            ori_gay: "Гей",
+            ori_trans: "Транс",
+            ori_pan: "Пансексуал",
             header_extras: "Дополнительно",
             theme_label: "Оформление",
             theme_title: "Выбор темы",
@@ -13753,7 +13751,11 @@
             nav_settings: "Ajustes",
             nav_account: "Cuenta",
             header_prefs: "Preferencias",
-            header_filters: "Filtros",
+            ori_label: "Orientación",
+            ori_hetero: "Hetero",
+            ori_gay: "Gay",
+            ori_trans: "Trans",
+            ori_pan: "Pansexual",
             header_extras: "Extras",
             theme_label: "Apariencia",
             theme_title: "Elegir Tema",
@@ -13934,7 +13936,11 @@
             nav_settings: "Einstell.",
             nav_account: "Konto",
             header_prefs: "Einstellungen",
-            header_filters: "Filter",
+            ori_label: "Orientierung",
+            ori_hetero: "Hetero",
+            ori_gay: "Schwul",
+            ori_trans: "Trans",
+            ori_pan: "Pansexuell",
             header_extras: "Extras",
             theme_label: "Aussehen",
             theme_title: "Thema wählen",
@@ -14470,7 +14476,6 @@
         initTheme();
         initIntensity();
         renderModifiers();
-        renderFilters();
         renderHistory();
         updateCounts();
         checkLayout();
@@ -14478,6 +14483,7 @@
         initSwipeCards();
         
         document.body.classList.add('tab-home-active'); 
+        document.getElementById('orientation-select').value = currentOrientation;
 
         // Платформа
         const savedPlatform = localStorage.getItem('xch_platform');
@@ -14765,28 +14771,96 @@
         
         relatedEl.innerHTML = '';
         
-        const ignoreTags = ['straight']; 
-        
-        let currentTags = currentItem.tags.filter(t => !ignoreTags.includes(t));
-        if (currentTags.length === 0) currentTags = currentItem.tags;
+        // 1. Хелпер для извлечения значимых слов (из названия и описания)
+        const getTokens = (text) => {
+            if (!text) return [];
+            const stopWords = [
+                'the', 'and', 'or', 'of', 'in', 'on', 'at', 'to', 'a', 'an', 'is', 'are', 
+                'for', 'with', 'by', 'from', 'using', 'being', 'getting', 'into', 'over', 'sex'
+            ];
+            return text.toLowerCase()
+                      .split(/[\s/\-(),.]+/g) // Разбиваем по пробелам и знакам
+                      .filter(w => w.length > 2 && !stopWords.includes(w));
+        };
+
+        // 2. Создаем "Портрет" текущего предмета
+        // Берем слова из НАЗВАНИЯ и ОПИСАНИЯ
+        const currentTokens = new Set([
+            ...getTokens(currentItem.name),
+            ...getTokens(currentItem.desc_en)
+        ]);
+
+        // Теги, которые считаем "общими" и даем за них мало очков
+        const commonTags = ['straight', 'gay', 'lesbian', 'bi', 'universal', 'male', 'female', 'adult'];
 
         let candidates = data.map(item => {
+            // Исключаем самого себя
             if (item.id === currentItem.id) return null;
+
+            // === 3. ФИЛЬТР БЕЗОПАСНОСТИ (Обязательно) ===
+            // А. Интенсивность
+            if (currentIntensity === 1) { 
+                if (item.tags.some(t => EXTREME_TAGS.includes(t) || SPICY_TAGS.includes(t))) return null;
+            } else if (currentIntensity === 2) { 
+                if (item.tags.some(t => EXTREME_TAGS.includes(t))) return null;
+            }
+
+            // Б. Ориентация (Копируем логику из filterData для консистентности)
+            const isGay = item.tags.includes('gay');
+            const isTrans = item.tags.some(t => ['trans', 'shemale', 'futanari', 'crossdresser'].includes(t));
+            const isLesbian = item.tags.includes('lesbian');
+            const isStraight = item.tags.includes('straight');
+            const isBi = item.tags.includes('bi');
+            const isLgbtForHetero = isGay || isTrans || isBi; 
+
+            if (currentOrientation === 'hetero') {
+                if (isLgbtForHetero && !isLesbian) return null;
+            }
+            else if (currentOrientation === 'gay') {
+                if (isStraight && !isGay) return null;
+            }
+            else if (currentOrientation === 'trans') {
+                if (isStraight && !isTrans) return null;
+            }
+
+            // === 4. ПОДСЧЕТ ОЧКОВ ===
+            let score = 0;
+
+            // А. Анализ ТЕКСТА (Самое важное обновление)
+            // Создаем портрет кандидата
+            const candidateTokens = [
+                ...getTokens(item.name),
+                ...getTokens(item.desc_en)
+            ];
             
-            // Ищем пересечения тегов
-            const intersection = item.tags.filter(t => currentTags.includes(t));
+            // Ищем пересечения слов
+            let textMatches = 0;
+            candidateTokens.forEach(token => {
+                if (currentTokens.has(token)) textMatches++;
+            });
             
-            if (intersection.length === 0) return null;
-            return { item: item, score: intersection.length };
+            // За каждое совпадение слова даем 4 очка. 
+            // Если совпало "Milk" в названии одного и описании другого -> +4 балла.
+            score += textMatches * 4;
+
+            // Б. Анализ ТЕГОВ
+            item.tags.forEach(tag => {
+                if (currentItem.tags.includes(tag)) {
+                    if (commonTags.includes(tag)) {
+                        score += 1; // За общий тег (типа universal) всего 1 очко
+                    } else {
+                        score += 5; // За редкий тег (типа lactation) целых 5 очков!
+                    }
+                }
+            });
+
+            // Если совсем нет совпадений - пропускаем
+            if (score === 0) return null;
+
+            return { item: item, score: score };
         }).filter(x => x !== null);
 
-        // === РАНДОМИЗАЦИЯ ===
-        // Сначала перемешиваем весь список случайным образом
-        candidates.sort(() => Math.random() - 0.5);
-
-        // А затем сортируем по очкам (релевантности).
-        // Так как массив уже перемешан, элементы с ОДИНАКОВЫМ счетом
-        // останутся в случайном порядке относительно друг друга.
+        // Сортировка по очкам
         candidates.sort((a, b) => b.score - a.score);
 
         // Берем топ-5
@@ -14795,21 +14869,25 @@
         if (topCandidates.length > 0) {
             topCandidates.forEach(cand => {
                 const item = cand.item;
-                const name = getLocalizedName(item); // Используем наш хелпер локализации
+                const name = getLocalizedName(item);
                 
                 const btn = document.createElement('div');
                 btn.className = 'related-item-btn';
+                // btn.innerText = `${name} (${cand.score})`; // Раскомментируй для отладки очков
                 btn.innerText = name;
                 btn.onclick = () => forceShowResult(item, 'similar');
                 relatedEl.appendChild(btn);
             });
             relatedBlock.classList.remove('hidden-initial');
             relatedBlock.classList.add('fade-visible');
-            btnSimilar.classList.remove('hidden-initial');
-            btnSimilar.style.display = 'block'; 
+            
+            if(btnSimilar) {
+                btnSimilar.classList.remove('hidden-initial');
+                btnSimilar.style.display = 'flex';
+            }
         } else {
             relatedBlock.classList.add('hidden-initial'); 
-            btnSimilar.style.display = 'none'; 
+            if(btnSimilar) btnSimilar.style.display = 'none'; 
         }
     }
 
@@ -14905,46 +14983,57 @@
         const recentIds = historyData.slice(0, 50).map(entry => entry.id);
 
         let candidates = data.filter(item => {
+            // 1. Черный список и История
             if (blacklist.includes(item.id)) return false;
             if (recentIds.includes(item.id)) return false;
 
-            const hasSafetyTag = item.tags.some(t => SAFETY_NET.includes(t));
-
+            // 2. Интенсивность (Safe/Spicy)
             if (currentIntensity === 1) {
-                if (item.tags.some(t => EXTREME_TAGS.includes(t))) return false;
-                if (!hasSafetyTag) {
-                    if (item.tags.some(t => LGBT_TAGS.includes(t))) return false;
-                    if (item.tags.some(t => SPICY_TAGS.includes(t))) return false;
-                }
+                // В Safe убираем экстрим и спайси
+                if (item.tags.some(t => EXTREME_TAGS.includes(t) || SPICY_TAGS.includes(t))) return false;
             }
             if (currentIntensity === 2) {
+                // В Spicy убираем только экстрим
                 if (item.tags.some(t => EXTREME_TAGS.includes(t))) return false;
             }
 
-            for(let t of item.tags) {
-                if(excludeTags.has(t)) { if (!hasSafetyTag) return false; }
-            }
+            // === 3. ФИЛЬТРАЦИЯ ПО ОРИЕНТАЦИИ ===
+            
+            // Определяем, к каким группам относится фетиш
+            const isGay = item.tags.includes('gay');
+            const isTrans = item.tags.some(t => ['trans', 'shemale', 'futanari', 'crossdresser'].includes(t));
+            const isLesbian = item.tags.includes('lesbian');
+            const isStraight = item.tags.includes('straight');
+            const isBi = item.tags.includes('bi');
+            
+            // Группа "ЛГБТ" для Гетеро-фильтра
+            const isLgbtForHetero = isGay || isTrans || isBi; 
 
-            if(includeTags.has('fav')) {
-                if(!favorites.includes(item.id)) return false;
+            if (currentOrientation === 'hetero') {
+                // "Скрывать все ЛГБТ, кроме лесби"
+                // Если есть гей/транс/би теги - скрываем.
+                if (isLgbtForHetero && !isLesbian) return false;
             }
-            const catFilters = new Set(includeTags);
-            catFilters.delete('fav');
-            if(catFilters.size === 0) return true;
-            if (item.tags.some(t => catFilters.has(t))) return true;
+            else if (currentOrientation === 'gay') {
+                // "Скрывать straight, кроме тех, где есть gay"
+                // То есть чистое гетеро скрываем. Гетеро + Гей (Би) - оставляем.
+                if (isStraight && !isGay) return false;
+            }
+            else if (currentOrientation === 'trans') {
+                // "Как с гей, только для транс"
+                // Скрываем straight, если нет транс-тегов
+                if (isStraight && !isTrans) return false;
+            }
+            // 'pan' - показывает всё, фильтров нет.
 
-            return false;
+            return true;
         });
 
+        // Fallback: Если фильтры слишком жесткие (почти невозможная ситуация с новой логикой, но оставим)
         if (candidates.length < 3) {
-            candidates = data.filter(item => {
-                if (blacklist.includes(item.id)) return false;
-                return true; 
-            }).filter(item => {
-                 if (currentIntensity === 1 && item.tags.some(t => EXTREME_TAGS.includes(t))) return false;
-                 return true;
-            });
+            candidates = data.filter(item => !blacklist.includes(item.id));
         }
+        
         return candidates;
     }
 
@@ -15109,38 +15198,6 @@
         }
     }
 
-    function renderFilters() {
-        const incCont = document.getElementById('filter-include'); incCont.innerHTML = '';
-        const favBtn = createFilterBtn('fav', 'tag_fav', includeTags.has('fav'));
-        favBtn.onclick = () => toggleInclude('fav'); incCont.appendChild(favBtn);
-        filterCats.forEach(cat => {
-            const btn = createFilterBtn(cat.id, cat.key, includeTags.has(cat.id));
-            btn.onclick = () => toggleInclude(cat.id); incCont.appendChild(btn);
-        });
-
-        const excCont = document.getElementById('filter-exclude'); excCont.innerHTML = '';
-        filterCats.forEach(cat => {
-            const btn = createFilterBtn(cat.id, cat.key, excludeTags.has(cat.id));
-            btn.onclick = () => toggleExclude(cat.id); excCont.appendChild(btn);
-        });
-        applyLanguage();
-    }
-    
-    function createFilterBtn(id, key, isActive) {
-        const div = document.createElement('div'); div.className = 'tag';
-        if(isActive) div.classList.add('selected'); div.setAttribute('data-key', key); return div;
-    }
-    
-    function toggleInclude(id) {
-        if(includeTags.has(id)) includeTags.delete(id); else includeTags.add(id);
-        renderFilters();
-    }
-    
-    function toggleExclude(id) {
-        if(excludeTags.has(id)) excludeTags.delete(id); else excludeTags.add(id);
-        renderFilters();
-    }
-
     function renderModifiers() {
         const container = document.getElementById('mod-container'); 
         container.innerHTML = '';
@@ -15212,7 +15269,6 @@
         
         // Получаем "кирпичики"
         const bPrefs = document.getElementById('block-prefs');
-        const bFilters = document.getElementById('block-filters');
         const bAccount = document.getElementById('block-account');
         const bExtras = document.getElementById('block-extras');
 
@@ -15221,7 +15277,6 @@
             const sidebar = document.getElementById('pc-settings-mount');
             // Очищаем мобильные контейнеры
             sidebar.appendChild(bPrefs);
-            sidebar.appendChild(bFilters);
             sidebar.appendChild(bAccount); // Аккаунт ПОД фильтрами
             sidebar.appendChild(bExtras);
             
@@ -17115,6 +17170,10 @@
         window.loginWithGoogle();
     }
 
+    function changeOrientation(val) {
+        currentOrientation = val;
+        localStorage.setItem('xch_orientation', val);
+    }
 
 </script>
 </body>
