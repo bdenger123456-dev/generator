@@ -1401,7 +1401,6 @@
         <div id="tab-settings" class="tab-content">
             <div class="center-wrapper">
                 <div id="mount-prefs"></div>
-                <div id="mount-filters"></div>
             </div>
         </div>
 
@@ -15267,31 +15266,39 @@
     function checkLayout() {
         const isPC = window.innerWidth > 768;
         
-        // Получаем "кирпичики"
+        // Получаем оставшиеся блоки
         const bPrefs = document.getElementById('block-prefs');
         const bAccount = document.getElementById('block-account');
         const bExtras = document.getElementById('block-extras');
+        
+        // Куда вставлять на ПК
+        const sidebar = document.getElementById('pc-settings-mount');
+
+        // Куда вставлять на Мобильном
+        const mPrefs = document.getElementById('mount-prefs');
+        const mAccount = document.getElementById('mount-account');
+        const mExtras = document.getElementById('mount-extras');
 
         if (isPC) {
             // === РЕЖИМ ПК: ВСЁ В БОКОВУЮ ПАНЕЛЬ ===
-            const sidebar = document.getElementById('pc-settings-mount');
-            // Очищаем мобильные контейнеры
-            sidebar.appendChild(bPrefs);
-            sidebar.appendChild(bAccount); // Аккаунт ПОД фильтрами
-            sidebar.appendChild(bExtras);
+            if (sidebar) {
+                if(bPrefs) sidebar.appendChild(bPrefs);
+                // Фильтров больше нет, пропускаем
+                if(bAccount) sidebar.appendChild(bAccount);
+                if(bExtras) sidebar.appendChild(bExtras);
+            }
             
             // Показываем главную вкладку
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.getElementById('tab-home').classList.add('active');
         } else {
             // === МОБИЛЬНЫЙ РЕЖИМ: РАСКИДЫВАЕМ ПО ВКЛАДКАМ ===
-            document.getElementById('mount-prefs').appendChild(bPrefs);
-            document.getElementById('mount-filters').appendChild(bFilters);
-            document.getElementById('mount-account').appendChild(bAccount);
-            document.getElementById('mount-extras').appendChild(bExtras);
+            if(mPrefs && bPrefs) mPrefs.appendChild(bPrefs);
+            if(mAccount && bAccount) mAccount.appendChild(bAccount);
+            if(mExtras && bExtras) mExtras.appendChild(bExtras);
         }
     }
-
+    
     function toggleAccordion(id) { document.getElementById(id).classList.toggle('open'); }
     
     function switchTab(tab) {
