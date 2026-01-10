@@ -2442,6 +2442,9 @@
     let currentLang = 'en';
     let subscriptionLevel = localStorage.getItem('xch_sub_level') || 'free'; // 'free', 'pro', 'beast'
     let currentOrientation = localStorage.getItem('xch_orientation') || 'hetero';
+    let cooldownList = []; // Хранит ID последних 20 показанных карточек
+    const COOLDOWN_SIZE = 20;
+    const TAG_DECAY_RATE = 0.98;
 
     /* =================== ⚒️ DEBUG MODE =========================== */
     
@@ -14551,17 +14554,32 @@
     }
 
     function adjustTagScoresByTags(tags, delta) {
-        if(!tags) return;
-        let changed = false;
+        if (!tags) return;
+        
+        // 1. Time Decay: Уменьшаем вес ВСЕХ тегов перед обновлением текущих
+        // Это гарантирует, что свежие лайки важнее старых
+        for (let key in tagScores) {
+            if (tagScores[key] > 0) tagScores[key] *= TAG_DECAY_RATE;
+        }
+
+        // 2. Обновляем текущие теги
+        const ignore = ['universal', 'straight', 'male', 'female', 'adult', 'video'];
+        
         tags.forEach(tag => {
-            // Игнорируем только самые технические теги
-            if(['universal', 'straight'].includes(tag)) return;
+            if (ignore.includes(tag)) return;
+
+            if (!tagScores[tag]) tagScores[tag] = 0;
             
-            if(!tagScores[tag]) tagScores[tag] = 0;
+            // Добавляем вес
             tagScores[tag] += delta;
-            changed = true;
+
+            // 3. Кэппинг (Ограничение): Не даем весу улететь в космос
+            // Максимум 100, Минимум -100
+            if (tagScores[tag] > 100) tagScores[tag] = 100;
+            if (tagScores[tag] < -100) tagScores[tag] = -100;
         });
-        if(changed) localStorage.setItem(STORAGE.TAG_SCORES, JSON.stringify(tagScores));
+
+        localStorage.setItem(STORAGE.TAG_SCORES, JSON.stringify(tagScores));
     }
 
     function adjustTagScores(item, delta) {
@@ -14573,87 +14591,70 @@
     // === СИСТЕМА ПОДСЧЕТА ВЕСОВ (SMART MATCH) ===
 
     function calculateItemWeight(item) {
-        // Базовый вес (для "шума", чтобы иногда попадалось что-то новое)
-        let score = 5; 
+        // 1. Жесткий фильтр (Черный список)
+        if (blacklist.includes(item.id)) return 0;
+        
+        // 2. Кулдаун (если недавно видели - вес почти ноль)
+        if (cooldownList.includes(item.id)) return 0.1;
 
-        // === 1. УМНЫЙ АНАЛИЗ ЛАЙКОВ (АГРЕССИВНЫЙ) ===
-        if (favorites.length > 0) {
-            favorites.forEach(favId => {
-                const favItem = data.find(i => i.id === favId);
-                if (favItem) {
-                    const commonTags = item.tags.filter(t => favItem.tags.includes(t));
-                    // Исключаем мусорные теги из анализа
-                    const meaningfulTags = commonTags.filter(t => !['universal', 'straight', 'male', 'female', 'adult', 'roleplay'].includes(t));
-                    
-                    if (meaningfulTags.length > 0) {
-                        // БЫЛО: +40. СТАЛО: +1500 за каждое совпадение.
-                        // Это гарантирует, что похожий предмет перебьет сотню "случайных"
-                        score += (meaningfulTags.length * 1500); 
-                    }
-                }
-            });
-        }
+        let score = 50; // Базовый вес (нейтральный)
 
-        // === 2. УМНЫЙ АНАЛИЗ ДИЗЛАЙКОВ (КАРАТЕЛЬНЫЙ) ===
-        // Если предмет похож на то, что в ЧС, мы уничтожаем его шанс.
-        if (blacklist.length > 0) {
-            blacklist.forEach(banId => {
-                const banItem = data.find(i => i.id === banId);
-                if (banItem) {
-                    const commonTags = item.tags.filter(t => banItem.tags.includes(t));
-                    const meaningfulTags = commonTags.filter(t => !['universal', 'straight', 'male', 'female', 'adult', 'roleplay'].includes(t));
-                    
-                    if (meaningfulTags.length > 0) {
-                        // Делим вес на 100. Шанс становится 0.00...1%
-                        score = score / 100;
-                    }
-                }
-            });
-        }
-
-        // === 3. БУСТ ОРИЕНТАЦИИ (ПРИОРИТЕТНЫЙ) ===
-        // Если выбрано Гей/Транс, мы хотим видеть именно профильный контент, а не "Учитель + Гей".
-        // Даем профильным тегам огромный буст.
-        if (currentOrientation === 'gay') {
-            if (item.tags.includes('gay')) {
-                score += 3000; // Профильный гей-контент получает приоритет
-            } else {
-                // Универсальный контент (без тега gay) получает штраф, чтобы не мешать
-                score = score / 2; 
+        // 3. Анализ тегов по профилю пользователя
+        item.tags.forEach(tag => {
+            if (tagScores[tag]) {
+                score += tagScores[tag]; // Если тег любимый, score растет. Если в бане (-), падает.
             }
-        } 
-        else if (currentOrientation === 'trans') {
-            if (item.tags.some(t => ['trans', 'shemale', 'futanari', 'crossdresser'].includes(t))) {
-                score += 3000;
-            } else {
-                score = score / 2;
-            }
-        }
-        // Для гетеро (по умолчанию) ничего не трогаем, пусть работает по лайкам.
+        });
 
-        // Защита от нуля
-        return Math.max(0.01, score);
+        // 4. Буст ориентации (Contextual Boost)
+        // Это временный буст, он не меняет профиль, но влияет на текущую выдачу
+        if (currentOrientation === 'gay' && item.tags.includes('gay')) score += 50;
+        if (currentOrientation === 'trans' && item.tags.some(t => ['trans', 'shemale'].includes(t))) score += 50;
+        if (currentOrientation === 'lesbian' && item.tags.includes('lesbian')) score += 50;
+
+        // 5. Штраф за несоответствие ориентации (Soft Filter)
+        if (currentOrientation === 'gay' && item.tags.includes('straight')) score -= 100;
+        if (currentOrientation === 'hetero' && (item.tags.includes('gay') || item.tags.includes('shemale'))) score -= 100;
+
+        // Защита от отрицательных чисел
+        return Math.max(1, score);
     }
 
     function getWeightedRandom(items) {
-        let totalWeight = 0;
-        
-        // Создаем массив кандидатов с рассчитанными весами
-        const candidates = items.map(item => {
-            const weight = calculateItemWeight(item);
-            totalWeight += weight;
-            return { item, weight };
+        // Шаг 1: Считаем веса
+        let weightedItems = items.map(item => {
+            return { item: item, weight: calculateItemWeight(item) };
         });
 
-        // Классический выбор взвешенного случайного
+        // Шаг 2: Убираем совсем неподходящие (вес <= 1)
+        // Но оставляем хотя бы что-то, если все отфильтровались
+        let candidates = weightedItems.filter(i => i.weight > 1);
+        if (candidates.length === 0) candidates = weightedItems;
+
+        // Шаг 3: Exploration vs Exploitation (Исследование или Использование)
+        // С шансом 20% мы игнорируем веса и берем случайное из топа 50% (чтобы подкинуть новое)
+        const isExploration = Math.random() < 0.2; 
+
+        if (isExploration && candidates.length > 5) {
+            // Берем случайный из первой половины списка (но не обязательно лучший)
+            // Сортируем по весу
+            candidates.sort((a, b) => b.weight - a.weight);
+            // Отрезаем топ 50%
+            const sliceIndex = Math.floor(candidates.length / 2);
+            const pool = candidates.slice(0, sliceIndex);
+            return pool[Math.floor(Math.random() * pool.length)].item;
+        }
+
+        // Шаг 4: Классическая рулетка (Exploitation)
+        let totalWeight = candidates.reduce((sum, i) => sum + i.weight, 0);
         let random = Math.random() * totalWeight;
+        
         for (const candidate of candidates) {
             if (random < candidate.weight) return candidate.item;
             random -= candidate.weight;
         }
-        
-        // Фолбэк (на всякий случай)
-        return items[Math.floor(Math.random() * items.length)];
+
+        return candidates[0].item;
     }
 
     function resetControls() {
@@ -14746,6 +14747,12 @@
         isGenerating = false;
         
         addToHistory(item);
+
+        cooldownList.push(item.id);
+        if (cooldownList.length > COOLDOWN_SIZE) {
+            cooldownList.shift(); // Удаляем самый старый элемент
+        }
+        
         logActivity('gen', item.id, item.tags);
         
         const card = document.getElementById('card-block');
