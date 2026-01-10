@@ -2445,7 +2445,7 @@
 
     /* =================== ⚒️ DEBUG MODE =========================== */
     
-    // subscriptionLevel = 'pro'; 
+    subscriptionLevel = 'pro'; 
     // subscriptionLevel = 'beast';
 
     /* =========================================================== */
@@ -3552,7 +3552,7 @@
             },
             {
                 id: 113, 
-                name: "Queening", name_ru: "Фейсситинг (Queening)", name_es: "Queening (Sentarse en cara)", name_de: "Queening (Gesicht sitzen)",
+                name: "Queening", name_ru: "Фейсситинг", name_es: "Queening (Sentarse en cara)", name_de: "Queening (Gesicht sitzen)",
                 slug: "queening", tags: ["straight", "lesbian", "bi"],
                 desc_en: "Facesitting focused on oral stimulation.",
                 desc_ru: "Сидение на лице с акцентом на оральный секс.",
@@ -14473,7 +14473,6 @@
         initTheme();
         initIntensity();
         renderModifiers();
-        // renderFilters(); <--- УДАЛЕНО, чтобы не вызывало ошибку
         renderHistory();
         updateCounts();
         
@@ -14850,114 +14849,106 @@
         
         relatedEl.innerHTML = '';
         
-        // 1. Хелпер для извлечения значимых слов (из названия и описания)
+        // 1. Хелпер для токенов (слов)
         const getTokens = (text) => {
             if (!text) return [];
             const stopWords = [
                 'the', 'and', 'or', 'of', 'in', 'on', 'at', 'to', 'a', 'an', 'is', 'are', 
-                'for', 'with', 'by', 'from', 'using', 'being', 'getting', 'into', 'over', 'sex'
+                'for', 'with', 'by', 'from', 'using', 'being', 'getting', 'into', 'over', 'sex',
+                'video', 'movie', 'porn', 'compilation'
             ];
             return text.toLowerCase()
-                      .split(/[\s/\-(),.]+/g) // Разбиваем по пробелам и знакам
+                      .split(/[\s/\-(),.]+/g)
                       .filter(w => w.length > 2 && !stopWords.includes(w));
         };
 
-        // 2. Создаем "Портрет" текущего предмета
-        // Берем слова из НАЗВАНИЯ и ОПИСАНИЯ
         const currentTokens = new Set([
             ...getTokens(currentItem.name),
             ...getTokens(currentItem.desc_en)
         ]);
 
-        // Теги, которые считаем "общими" и даем за них мало очков
-        const commonTags = ['straight', 'gay', 'lesbian', 'bi', 'universal', 'male', 'female', 'adult'];
+        // 2. Определение пола текущего предмета (Гендерный щит)
+        const maleTags = ['gay', 'male', 'man', 'boy', 'bear', 'twink', 'jock', 'dick', 'cock', 'father', 'grandpa'];
+        const femaleTags = ['female', 'woman', 'girl', 'lesbian', 'milf', 'mom', 'sister', 'pussy', 'tits', 'boobs', 'vagina'];
+        
+        const isCurrentMale = currentItem.tags.some(t => maleTags.includes(t));
+        const isCurrentFemale = currentItem.tags.some(t => femaleTags.includes(t));
 
         let candidates = data.map(item => {
-            // Исключаем самого себя
             if (item.id === currentItem.id) return null;
 
-            // === 3. ФИЛЬТР БЕЗОПАСНОСТИ (Обязательно) ===
-            // А. Интенсивность
+            // === БАЗОВЫЕ ФИЛЬТРЫ (Как и раньше) ===
             if (currentIntensity === 1) { 
                 if (item.tags.some(t => EXTREME_TAGS.includes(t) || SPICY_TAGS.includes(t))) return null;
             } else if (currentIntensity === 2) { 
                 if (item.tags.some(t => EXTREME_TAGS.includes(t))) return null;
             }
 
-            // Б. Ориентация (Копируем логику из filterData для консистентности)
-            const isGay = item.tags.includes('gay');
-            const isTrans = item.tags.some(t => ['trans', 'shemale', 'futanari', 'crossdresser'].includes(t));
-            const isLesbian = item.tags.includes('lesbian');
-            const isStraight = item.tags.includes('straight');
-            const isBi = item.tags.includes('bi');
-            const isLgbtForHetero = isGay || isTrans || isBi; 
+            // === ФИЛЬТР ОРИЕНТАЦИИ ДЛЯ ПОХОЖИХ ===
+            // Если мы в режиме Гей, не показываем Лесби/Гетеро в похожих, даже если теги совпадают
+            const itemIsGay = item.tags.includes('gay');
+            const itemIsStraight = item.tags.includes('straight');
+            const itemIsLesbian = item.tags.includes('lesbian');
+            
+            if (currentOrientation === 'gay' && !itemIsGay) return null;
+            if (currentOrientation === 'hetero' && itemIsGay) return null;
 
-            if (currentOrientation === 'hetero') {
-                if (isLgbtForHetero && !isLesbian) return null;
-            }
-            else if (currentOrientation === 'gay') {
-                if (isStraight && !isGay) return null;
-            }
-            else if (currentOrientation === 'trans') {
-                if (isStraight && !isTrans) return null;
-            }
+            // === ГЕНДЕРНЫЙ ЩИТ (Gender Guard) ===
+            // Если текущий предмет МУЖСКОЙ (напр. Bear), штрафуем ЖЕНСКИЕ (напр. SSBBW), даже если у них общий тег "Fat"
+            const itemIsMale = item.tags.some(t => maleTags.includes(t));
+            const itemIsFemale = item.tags.some(t => femaleTags.includes(t));
 
-            // === 4. ПОДСЧЕТ ОЧКОВ ===
+            if (isCurrentMale && !isCurrentFemale && itemIsFemale) return null; // Ищем мужское, убираем женское
+            if (isCurrentFemale && !isCurrentMale && itemIsMale) return null; // Ищем женское, убираем мужское
+
+            // === ПОДСЧЕТ ОЧКОВ ===
             let score = 0;
 
-            // А. Анализ ТЕКСТА
-            const candidateTokens = [
-                ...getTokens(item.name),
-                ...getTokens(item.desc_en)
-            ];
-            
+            // А. Текст (вес: 5)
+            const candidateTokens = [...getTokens(item.name), ...getTokens(item.desc_en)];
             let textMatches = 0;
             candidateTokens.forEach(token => {
                 if (currentTokens.has(token)) textMatches++;
             });
-            score += textMatches * 5; // Увеличили вес слов
+            score += textMatches * 5;
 
-            // Б. Анализ ТЕГОВ (Умный)
-            // Список "мусорных" тегов, которые не делают предметы похожими
-            const trashTags = ['universal', 'straight', 'gay', 'lesbian', 'bi', 'male', 'female', 'adult', 'roleplay', 'video', 'hd'];
+            // Б. Теги (Вес: 10 за редкие, 0 за мусорные)
+            // Расширенный список мусорных тегов, которые не делают предметы "похожими"
+            const trashTags = [
+                'universal', 'straight', 'gay', 'lesbian', 'bi', 'male', 'female', 'adult', 
+                'roleplay', 'video', 'hd', 'soft', 'hardcore', 'fetish', 'kinky', 'fantasy',
+                'body-part', 'action', 'hair'
+            ];
 
             item.tags.forEach(tag => {
                 if (currentItem.tags.includes(tag)) {
-                    if (trashTags.includes(tag)) {
-                        score += 0.5; // Почти не учитываем общие теги
-                    } else {
-                        score += 10; // Редкие теги (bdsm, feet, latex) дают ОЧЕНЬ много
+                    if (!trashTags.includes(tag)) {
+                        score += 15; // Увеличили вес совпадения специфичных тегов
                     }
                 }
             });
 
-            // Если совсем нет совпадений - пропускаем
-            if (score === 0) return null;
+            // Если очков мало - это случайное совпадение, убираем
+            if (score < 5) return null;
 
             return { item: item, score: score };
         }).filter(x => x !== null);
 
-        // Сортировка по очкам
         candidates.sort((a, b) => b.score - a.score);
-
-        // Берем топ-5
         const topCandidates = candidates.slice(0, 5);
 
         if (topCandidates.length > 0) {
             topCandidates.forEach(cand => {
                 const item = cand.item;
                 const name = getLocalizedName(item);
-                
                 const btn = document.createElement('div');
                 btn.className = 'related-item-btn';
-                // btn.innerText = `${name} (${cand.score})`; // Раскомментируй для отладки очков
                 btn.innerText = name;
                 btn.onclick = () => forceShowResult(item, 'similar');
                 relatedEl.appendChild(btn);
             });
             relatedBlock.classList.remove('hidden-initial');
             relatedBlock.classList.add('fade-visible');
-            
             if(btnSimilar) {
                 btnSimilar.classList.remove('hidden-initial');
                 btnSimilar.style.display = 'flex';
