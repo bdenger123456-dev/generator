@@ -1541,13 +1541,19 @@
 <div class="modal-overlay" id="modal-stats-overlay" onclick="closeStats(event)">
     <div class="modal" style="background:var(--sidebar-bg); max-height:85vh; display:flex; flex-direction:column;">
         
-        <!-- HEADER: Заголовок + Закрытие + Кнопка Wrapped -->
+        <!-- HEADER -->
         <div class="modal-header" style="flex-direction:column; gap:10px; align-items:flex-start; padding-bottom: 10px; border-bottom:none; flex-shrink: 0;">
-            <div style="display:flex; justify-content:space-between; width:100%;">
-                <span data-key="btn_stats">Statistics</span>
-                <div style="display:flex; align-items:center;">
-                    <span class="header-icon-btn" onclick="shareStats()" style="cursor:pointer; font-size: 20px; margin-right: 15px;">⤤</span>
-                    <span style="cursor:pointer" onclick="closeStats(null, true)">✕</span>
+            <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                <span data-key="btn_stats" style="font-size:20px;">Statistics</span>
+                
+                <!-- Кнопки справа -->
+                <div style="display:flex; align-items:center; gap:20px;">
+                    <div onclick="shareStats()" style="cursor:pointer; padding:5px; display:flex; align-items:center; justify-content:center;">
+                        <span style="font-size: 24px;">⤤</span>
+                    </div>
+                    <div onclick="closeStats(null, true)" style="cursor:pointer; padding:5px; display:flex; align-items:center; justify-content:center;">
+                        <span style="font-size: 26px; font-weight:400; opacity:0.7;">✕</span>
+                    </div>
                 </div>
             </div>
             
@@ -1793,18 +1799,51 @@
 
     <!-- BLOCK: EXTRAS & HISTORY -->
     <div id="block-extras">
+        
+        <!-- Заголовок группы -->
         <div class="ios-header" data-key="header_extras">Extras</div>
+        
+        <!-- ГРУППА ССЫЛОК -->
         <div class="ios-group">
+            
+            <!-- 1. Reddit -->
             <div class="ios-row clickable" onclick="window.open('https://reddit.com/r/xfetishhub', '_blank')">
                 <span>Reddit</span>
                 <span style="color:var(--text-secondary)">↗</span>
             </div>
+
+            <!-- 2. Report Issue -->
             <div class="ios-row clickable" onclick="window.open('https://tally.so/r/Y50280', '_blank')">
                 <span data-key="report_issue">Report Issue</span>
                 <span style="color:var(--text-secondary)">↗</span>
             </div>
+
+            <!-- 3. О ПРОЕКТЕ -->
+            <div class="ios-row clickable" onclick="window.openAbout()">
+                <span data-key="lbl_about">About Project</span>
+                <span style="color:var(--text-secondary)">›</span>
+            </div>
+
+            <!-- 4. Terms of Use -->
+            <div class="ios-row clickable" onclick="window.openLegal('terms')">
+                <span data-key="doc_terms">Terms of Use</span>
+                <span style="color:var(--text-secondary)">›</span>
+            </div>
+
+            <!-- 5. Privacy Policy -->
+            <div class="ios-row clickable" onclick="window.openLegal('privacy')">
+                <span data-key="doc_privacy">Privacy Policy</span>
+                <span style="color:var(--text-secondary)">›</span>
+            </div>
+
+            <!-- 6. Refund Policy -->
+            <div class="ios-row clickable" onclick="window.openLegal('refund')">
+                <span data-key="doc_refund">Refund Policy</span>
+                <span style="color:var(--text-secondary)">›</span>
+            </div>
         </div>
 
+        <!-- ИСТОРИЯ -->
         <div class="history-section" style="border:none; margin-top:20px;">
             <div class="ios-header" data-key="history_title">History</div>
             <div class="ios-group" id="history-list"></div>
@@ -1968,6 +2007,48 @@
                 </div>
             </div>
 
+        </div>
+    </div>
+</div>
+
+<!-- LEGAL MODAL -->
+<div class="modal-overlay" id="modal-legal-overlay" onclick="window.closeLegal(event)">
+    <div class="modal" style="max-width: 600px; max-height: 85vh; display: flex; flex-direction: column;">
+        <div class="modal-header">
+            <span id="legal-modal-title">Document</span>
+            <span style="cursor:pointer" onclick="window.closeLegal(null, true)">✕</span>
+        </div>
+        
+        <!-- Контент с прокруткой -->
+        <div class="modal-body" style="padding: 20px; overflow-y: auto; font-size: 13px; line-height: 1.6; color: var(--text-secondary);">
+            <div id="legal-modal-content"></div>
+        </div>
+        
+        <div style="padding: 15px; border-top: 1px solid var(--border); text-align: center;">
+            <button class="btn-gen" onclick="window.closeLegal(null, true)" data-key="btn_close" style="padding: 10px 30px; font-size: 14px; width: auto;">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- ABOUT AUTHOR MODAL -->
+<div class="modal-overlay" id="modal-about-overlay" onclick="window.closeAbout(event)" style="z-index: 21000;">
+    <div class="modal" style="max-width: 450px;">
+        <div class="modal-header">
+            <span id="about-modal-title">About</span>
+            <span style="cursor:pointer" onclick="window.closeAbout(null, true)">✕</span>
+        </div>
+        <div class="modal-body" style="padding: 20px; font-size: 15px; line-height: 1.6; color: var(--text-main);">
+            
+            <p style="margin-bottom: 15px; font-weight: 700;" id="about-intro">
+            </p>
+            
+            <p style="color: var(--text-secondary); margin-bottom: 25px;" id="about-desc">
+            </p>
+
+            <div style="background: var(--ios-card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:13px; font-weight:600; color:var(--text-secondary);">Email:</span>
+                <a href="mailto:bdengerr@gmail.com" style="color:var(--accent); font-weight:700; text-decoration:none; font-size:15px;">bdengerr@gmail.com</a>
+            </div>
         </div>
     </div>
 </div>
@@ -2570,20 +2651,17 @@
 </script>
 
 <script>
-    // === STATE ===
     let currentLang = 'en';
-    let subscriptionLevel = localStorage.getItem('xch_sub_level') || 'free'; // 'free', 'pro', 'beast'
+    let subscriptionLevel = localStorage.getItem('xch_sub_level') || 'free';
     let currentOrientation = localStorage.getItem('xch_orientation') || 'hetero';
-    let cooldownList = []; // Хранит ID последних 20 показанных карточек
+    let cooldownList = [];
     const COOLDOWN_SIZE = 20;
     const TAG_DECAY_RATE = 0.98;
     const WRAPPED_THRESHOLD = 30;
 
     /* =================== ⚒️ DEBUG MODE =========================== */
-    
     // subscriptionLevel = 'pro'; 
     // subscriptionLevel = 'beast';
-
     /* =========================================================== */
 
     const DAILY_LIMIT = 10;
@@ -2610,7 +2688,9 @@
     const overlayLike = document.querySelector('.overlay-like');
     const overlayNope = document.querySelector('.overlay-nope');
 
-    let sessionHistoryStack = []; // Стек для кнопки "Назад"
+    let sessionHistoryStack = [];
+
+    let onboardingSelectedIds = [];
 
     let currentSlideIndex = 0;
     let slideInterval;
@@ -3184,7 +3264,7 @@
             },
             {
                 id: 56, 
-                name: "Kinky", name_ru: "Кинки", name_es: "Kinky (Pervertido)", name_de: "Kinky",
+                name: "Kinky", name_ru: "Фетиши", name_es: "Kinky (Pervertido)", name_de: "Kinky",
                 slug: "kinky", tags: ["universal"],
                 desc_en: "Unconventional or taboo sexual practices.",
                 desc_ru: "Нестандартные или табуированные сексуальные практики.",
@@ -12864,7 +12944,7 @@
             },
             {
                 id: 1172, 
-                name: "Degradation Kink", name_ru: "Кинк на унижение", name_es: "Kink de Degradación", name_de: "Erniedrigungs-Kink",
+                name: "Degradation Kink", name_ru: "Фетиш на унижение", name_es: "Kink de Degradación", name_de: "Erniedrigungs-Kink",
                 slug: "degradation-kink", tags: ["attention", "verbal", "humiliation", "bdsm"],
                 desc_en: "Arousal from insults or being treated poorly.",
                 desc_ru: "Возбуждение от оскорблений или плохого обращения.",
@@ -13296,7 +13376,7 @@
             },
             {
                 id: 1221, 
-                name: "Confusion Kink", name_ru: "Кинк на замешательство", name_es: "Kink de Confusión", name_de: "Verwirrungs-Kink",
+                name: "Confusion Kink", name_ru: "Фетиш на замешательство", name_es: "Kink de Confusión", name_de: "Verwirrungs-Kink",
                 slug: "confusion-kink", tags: ["meta", "psychological"],
                 desc_en: "Being aroused but confused why.",
                 desc_ru: "Возбуждение с непониманием причины.",
@@ -13514,6 +13594,12 @@
             btn_google_signin: "Continue with Google",
             auth_security_note: "Developer has no access to data. Don't worry about your history safety 😏",
             btn_cancel: "Cancel",
+
+            info_header: "Information",
+            lbl_support_email: "Support Email",
+            doc_terms: "Terms of Use",
+            doc_privacy: "Privacy Policy",
+            doc_refund: "Refund Policy",
             
             // --- 2. Generator (Main Tab) ---
             generate: "Random Genre",
@@ -13570,16 +13656,20 @@
             btn_open_stats: "Statistics",
 
             personal_account: "Personal Account",
-            theme_midnight: "Midnight",
-            theme_forest: "Forest",
-            theme_vampire: "Vampire",
-            theme_luxury: "Luxury",
-            theme_noir: "Noir",
-            theme_sky: "Sky",
-            theme_mint: "Mint",
-            theme_rose: "Rose",
-            theme_sand: "Sand",
-            theme_rainbow: "Rainbow",
+            
+            "theme_blue-dark": "Midnight",
+            "theme_green-dark": "Forest",
+            "theme_red-dark": "Vampire",
+            "theme_gold-dark": "Luxury",
+            "theme_noir": "Noir",
+            "theme_blue-light": "Sky",
+            "theme_green-light": "Mint",
+            "theme_red-light": "Rose",
+            "theme_gold-light": "Sand",
+            "theme_rainbow": "Rainbow",
+            "theme_dark": "Dark",
+            "theme_light": "Light",
+
             history_title: "History",
             
             btn_reset: "Reset Data",
@@ -13625,11 +13715,15 @@
             feat_filters: "✨ Fetish Wrapped",
             wrapped_free_outro: "Come back in a week. Or if you want stats every day, Pro subscription is your best friend.",
             btn_close: "Close",
+            search_liked: "Search liked...",
+            search_disliked: "Search disliked...",
+            hist_empty: "History is empty",
+            limit_reset: "Reset:",
             
             tf_week: "Week", 
             tf_month: "Month", 
             tf_year: "Year", 
-            tf_all: "All",
+            tf_all: "All time",
             
             act_gen: "Generations", 
             act_watch: "Watched",
@@ -13692,6 +13786,72 @@
             onb_found: "We found:",
             onb_btn_confirm: "Add to Favorites",
             onb_skip: "Skip setup",
+
+            lbl_about: "About Project",
+            about_title: "Developer",
+            about_intro: "I am Nikolai M., 23 years old, student.",
+            about_desc: "The project's mission is to allow users to discover all adult genres through a smart recommendation system, as well as provide an opportunity to analyze their tastes for self-discovery.",
+            
+            doc_terms: "Terms of Use",
+            doc_privacy: "Privacy Policy",
+            doc_refund: "Refund Policy",
+            
+            terms_text: `
+                <h3>1. Acceptance of Terms</h3>
+                <p>By accessing and using xFetishHub (the "Service"), you confirm that you are at least 18 years of age (or the age of majority in your jurisdiction) and agree to be bound by these Terms. If you do not agree, you must exit the Service immediately.</p>
+                
+                <h3>2. Nature of Service</h3>
+                <p>xFetishHub is a search aggregator and recommendation engine. <b>We do not host, upload, or control any video content.</b> All links generated by the Service lead to third-party websites (e.g., xHamster, Pornhub). We serve as a conduit for finding content available publicly on the internet.</p>
+                
+                <h3>3. Third-Party Content</h3>
+                <p>We have no control over, and assume no responsibility for, the content, privacy policies, or practices of any third-party websites. You acknowledge and agree that xFetishHub shall not be responsible or liable, directly or indirectly, for any damage or loss caused by your use of any third-party content.</p>
+                
+                <h3>4. User Accounts & Subscriptions</h3>
+                <p>Some features require a paid subscription ("Pro" or "Beast"). Payment processing is handled by third-party providers (e.g., Telegram Stars, Lava, Cryptomus). We do not store your payment credentials. We reserve the right to terminate accounts that violate these Terms.</p>
+                
+                <h3>5. Disclaimer of Warranties</h3>
+                <p>The Service is provided on an "AS IS" and "AS AVAILABLE" basis. We do not warrant that the results generated will meet your requirements or be free of errors.</p>
+            `,
+
+            privacy_text: `
+                <h3>1. Introduction</h3>
+                <p>Your privacy is our priority. This policy explains how we handle your data. We aim to collect the absolute minimum amount of information required to provide our Service.</p>
+                
+                <h3>2. Data We Collect</h3>
+                <ul>
+                    <li><b>Authentication Data:</b> When you login via Google, we receive your email address and UID to synchronize your preferences. We do not see your password.</li>
+                    <li><b>Usage Data:</b> We store your generated history, favorite tags, and preferences ("liked" or "disliked" categories) locally on your device and encrypted in our database to provide the Service.</li>
+                    <li><b>Local Storage:</b> We use browser local storage to save your settings (theme, language, platform preference) without cookies.</li>
+                </ul>
+
+                <h3>3. How We Use Data</h3>
+                <p>Your data is used solely to:</p>
+                <ul>
+                    <li>Synchronize your progress across devices.</li>
+                    <li>Verify your subscription status.</li>
+                    <li>Train the personalization algorithm to improve suggestions.</li>
+                </ul>
+                <p><b>We do not sell, trade, or rent your personal identification information to others.</b></p>
+
+                <h3>4. Data Deletion</h3>
+                <p>You may request full deletion of your account and data at any time by contacting support or using the "Reset Data" button within the app (for local data).</p>
+            `,
+
+            refund_text: `
+                <h3>1. Digital Goods Policy</h3>
+                <p>Due to the nature of digital content, all sales of activation codes and subscriptions for xFetishHub are generally <b>final and non-refundable</b> once the code has been delivered or the subscription activated.</p>
+                
+                <h3>2. Exceptions</h3>
+                <p>We may offer a refund or replacement at our sole discretion under the following circumstances:</p>
+                <ul>
+                    <li><b>Technical Error:</b> The activation code provided was invalid or defective.</li>
+                    <li><b>Non-Delivery:</b> You paid but did not receive the service/code within 24 hours.</li>
+                    <li><b>Double Billing:</b> You were charged twice for the same billing period due to a technical glitch.</li>
+                </ul>
+
+                <h3>3. How to Request</h3>
+                <p>To request a refund, please contact support via the "Report Issue" button or email. Include your transaction ID and the date of purchase. Requests must be made within 14 days of purchase.</p>
+            `
         },
 
         ru: {
@@ -13728,6 +13888,12 @@
             btn_google_signin: "Войти через Google",
             auth_security_note: "Разработчик не имеет доступа к данным. Можешь не беспокоиться о сохранности своей истории 😏",
             btn_cancel: "Отмена",
+
+            info_header: "Информация",
+            lbl_support_email: "Почта поддержки",
+            doc_terms: "Польз. соглашение",
+            doc_privacy: "Политика конф-ти",
+            doc_refund: "Политика возвратов",
 
 
             // --- 2. Генератор ---
@@ -13779,17 +13945,19 @@
             // --- 4. Аккаунт и Данные ---
             login_text: "Вход / Синхронизация",
             personal_account: "Личный кабинет",
-            theme_midnight: "Полночь",
-            theme_forest: "Лес",
-            theme_vampire: "Вампир",
-            theme_luxury: "Роскошь",
-            theme_noir: "Нуар",
-            theme_sky: "Небо",
-            theme_mint: "Мята",
-            theme_rose: "Роза",
-            theme_sand: "Песок",
-            theme_rainbow: "Радуга",
-            history_title: "История",
+
+            "theme_blue-dark": "Полночь",
+            "theme_green-dark": "Лес",
+            "theme_red-dark": "Вампир",
+            "theme_gold-dark": "Роскошь",
+            "theme_noir": "Нуар",
+            "theme_blue-light": "Небо",
+            "theme_green-light": "Мята",
+            "theme_red-light": "Роза",
+            "theme_gold-light": "Песок",
+            "theme_rainbow": "Радуга",
+            "theme_dark": "Тёмная",
+            "theme_light": "Светлая",
 
 
             logout_text: "Выйти",
@@ -13841,7 +14009,7 @@
             tf_week: "Неделя", 
             tf_month: "Месяц", 
             tf_year: "Год", 
-            tf_all: "Всё",
+            tf_all: "Всё время",
             
             act_gen: "Генераций", 
             act_watch: "Просмотров",
@@ -13853,6 +14021,10 @@
             feat_filters: "✨ Fetish Wrapped",
             wrapped_free_outro: "Приходи сюда снова через неделю. Либо если хочешь статистику каждый день, то Pro подписка будет твоим лучшим другом.",
             btn_close: "Закрыть",
+            search_liked: "Поиск любимых...",
+            search_disliked: "Поиск нелюбимых...",
+            hist_empty: "История пуста",
+            limit_reset: "Сброс:",
 
             legend_watch: "Просмотр (+10)",
             legend_like: "Лайк / Похожее (+5)",
@@ -13909,6 +14081,72 @@
             onb_found: "Мы нашли:",
             onb_btn_confirm: "Добавить в избранное",
             onb_skip: "Пропустить",
+
+            lbl_about: "О проекте",
+            about_title: "Разработчик",
+            about_intro: "Я — Николай М., 23 года, студент.",
+            about_desc: "Миссия проекта — позволить пользователям узнать про все жанры для взрослых путём умной системы рекомендаций, а также дать возможность проанализировать свои вкусы для самопознания.",
+            
+            doc_terms: "Польз. соглашение",
+            doc_privacy: "Политика конф-ти",
+            doc_refund: "Политика возвратов",
+
+            terms_text: `
+                <h3>1. Принятие условий</h3>
+                <p>Используя сервис xFetishHub, вы подтверждаете, что вам исполнилось 18 лет (или больше, в зависимости от законов вашей страны), и вы соглашаетесь с данными условиями. Если вы не согласны, пожалуйста, покиньте сайт.</p>
+                
+                <h3>2. Суть сервиса</h3>
+                <p>xFetishHub является поисковым агрегатором и системой рекомендаций. <b>Мы не храним, не загружаем и не контролируем видеоконтент.</b> Все ссылки ведут на сторонние ресурсы (xHamster, Pornhub и др.). Мы лишь помогаем найти контент, который и так доступен в публичном доступе.</p>
+                
+                <h3>3. Сторонние ресурсы</h3>
+                <p>Мы не несем ответственности за содержание, политику конфиденциальности или действия сторонних сайтов. Переходя по ссылкам, вы действуете на свой страх и риск. Мы не отвечаем за любой ущерб, связанный с использованием внешних ресурсов.</p>
+                
+                <h3>4. Аккаунты и Подписки</h3>
+                <p>Некоторые функции доступны по подписке ("Pro" или "Beast"). Обработка платежей производится сторонними шлюзами (Lava, Cryptomus и др.). Мы не храним данные ваших карт. Мы оставляем за собой право блокировать аккаунты при нарушении правил.</p>
+                
+                <h3>5. Отказ от ответственности</h3>
+                <p>Сервис предоставляется по принципу "КАК ЕСТЬ". Мы не гарантируем, что результаты поиска будут всегда соответствовать вашим ожиданиям или работать без сбоев.</p>
+            `,
+
+            privacy_text: `
+                <h3>1. Введение</h3>
+                <p>Конфиденциальность — наш приоритет. Мы собираем абсолютный минимум данных, необходимый для работы синхронизации.</p>
+                
+                <h3>2. Сбор данных</h3>
+                <ul>
+                    <li><b>Авторизация:</b> При входе через Google мы получаем ваш Email и UID для привязки настроек. Мы не видим ваш пароль.</li>
+                    <li><b>Данные использования:</b> Мы храним историю генераций, лайки, дизлайки и веса тегов. Это нужно исключительно для работы алгоритма рекомендаций.</li>
+                    <li><b>Локальное хранилище:</b> Мы используем LocalStorage браузера для сохранения темы и языка.</li>
+                </ul>
+
+                <h3>3. Использование данных</h3>
+                <p>Ваши данные используются только для:</p>
+                <ul>
+                    <li>Синхронизации прогресса между устройствами.</li>
+                    <li>Проверки статуса подписки.</li>
+                    <li>Обучения алгоритма под ваши вкусы.</li>
+                </ul>
+                <p><b>Мы не продаем и не передаем ваши данные третьим лицам.</b></p>
+
+                <h3>4. Удаление данных</h3>
+                <p>Вы можете в любой момент сбросить данные в приложении ("Сброс данных") или написать в поддержку для полного удаления аккаунта с серверов.</p>
+            `,
+
+            refund_text: `
+                <h3>1. Политика цифровых товаров</h3>
+                <p>В связи с природой цифрового контента, все продажи кодов активации и подписок являются <b>окончательными и не подлежат возврату</b> после доставки кода или активации услуги.</p>
+                
+                <h3>2. Исключения</h3>
+                <p>Мы можем рассмотреть возврат в индивидуальном порядке в следующих случаях:</p>
+                <ul>
+                    <li><b>Техническая ошибка:</b> Выданный код оказался нерабочим.</li>
+                    <li><b>Недоставка:</b> Вы оплатили, но услуга не была предоставлена в течение 24 часов.</li>
+                    <li><b>Двойное списание:</b> Из-за сбоя оплата прошла дважды.</li>
+                </ul>
+
+                <h3>3. Запрос возврата</h3>
+                <p>Для запроса свяжитесь с поддержкой через кнопку "Сообщить о проблеме" или по Email. Укажите ID транзакции. Запросы принимаются в течение 14 дней с момента покупки.</p>
+            `
         },
 
         es: {
@@ -13941,6 +14179,19 @@
             btn_google_signin: "Continuar con Google",
             auth_security_note: "El desarrollador no tiene acceso a los datos. No te preocupes por tu historial 😏",
             btn_cancel: "Cancelar",
+
+            info_header: "Información",
+            lbl_support_email: "Correo de soporte",
+            doc_terms: "Términos de Uso",
+            doc_privacy: "Privacidad",
+            doc_refund: "Reembolsos",
+            btn_close: "Cerrar",
+
+            btn_close: "Cerrar",
+            search_liked: "Buscar favoritos...",
+            search_disliked: "Buscar bloqueados...",
+            hist_empty: "Historial vacío",
+            limit_reset: "Reinicio:",
 
             // --- Generator ---
             generate: "Género Aleatorio",
@@ -14000,18 +14251,18 @@
             btn_open_stats: "Estadísticas",
 
             // ТЕМЫ
-            theme_dark: "Oscuro",
-            theme_light: "Claro",
-            theme_midnight: "Medianoche",
-            theme_forest: "Bosque",
-            theme_vampire: "Vampiro",
-            theme_luxury: "Lujo",
-            theme_noir: "Noir",
-            theme_sky: "Cielo",
-            theme_mint: "Menta",
-            theme_rose: "Rosa",
-            theme_sand: "Arena",
-            theme_rainbow: "Arcoíris",
+            "theme_blue-dark": "Medianoche",
+            "theme_green-dark": "Bosque",
+            "theme_red-dark": "Vampiro",
+            "theme_gold-dark": "Lujo",
+            "theme_noir": "Noir",
+            "theme_blue-light": "Cielo",
+            "theme_green-light": "Menta",
+            "theme_red-light": "Rosa",
+            "theme_gold-light": "Arena",
+            "theme_rainbow": "Arcoíris",
+            "theme_dark": "Oscuro",
+            "theme_light": "Claro",
 
             history_title: "Historial",
 
@@ -14055,7 +14306,7 @@
             stats_header: "Tus Categorías",
             stats_prefs: "Preferencias",
             stats_activity: "Actividad",
-            tf_week: "Semana", tf_month: "Mes", tf_year: "Año", tf_all: "Todo",
+            tf_week: "Semana", tf_month: "Mes", tf_year: "Año", tf_all: "Todo el tiempo",
             act_gen: "Generaciones", act_watch: "Vistas",
             chart_prefs_x: "Preferencias",
             chart_points_y: "Puntos",
@@ -14064,7 +14315,6 @@
             wrapped_btn: "Fetish Wrapped ✨",
             feat_filters: "✨ Fetish Wrapped",
             wrapped_free_outro: "Vuelve en una semana. O si quieres estadísticas diarias, la suscripción Pro es tu mejor amiga.",
-            btn_close: "Cerrar",
 
             legend_watch: "Ver (+10)",
             legend_like: "Me gusta (+5)",
@@ -14115,7 +14365,73 @@
             onb_btn_check: "Buscar Categorías",
             onb_found: "Encontramos:",
             onb_btn_confirm: "Añadir a Favoritos",
-            onb_skip: "Saltar configuración"
+            onb_skip: "Saltar configuración",
+
+            lbl_about: "Sobre el proyecto",
+            about_title: "Desarrollador",
+            about_intro: "Soy Nikolai M., 23 años, estudiante.",
+            about_desc: "La misión del proyecto es permitir a los usuarios conocer todos los géneros para adultos a través de un sistema inteligente, y analizar sus gustos para el autoconocimiento.",
+            
+            doc_terms: "Términos de Uso",
+            doc_privacy: "Privacidad",
+            doc_refund: "Reembolsos",
+
+            terms_text: `
+                <h3>1. Aceptación de los Términos</h3>
+                <p>Al acceder y utilizar xFetishHub, confirma que tiene al menos 18 años de edad (o la mayoría de edad en su jurisdicción) y acepta estar sujeto a estos términos. Si no está de acuerdo, debe abandonar el servicio inmediatamente.</p>
+                
+                <h3>2. Naturaleza del Servicio</h3>
+                <p>xFetishHub es un agregador de búsqueda y motor de recomendaciones. <b>No alojamos, subimos ni controlamos ningún contenido de video.</b> Todos los enlaces generados conducen a sitios web de terceros (por ejemplo, xHamster, Pornhub). Servimos como un conducto para encontrar contenido disponible públicamente en Internet.</p>
+                
+                <h3>3. Contenido de Terceros</h3>
+                <p>No tenemos control ni asumimos responsabilidad por el contenido, las políticas de privacidad o las prácticas de sitios web de terceros. Usted reconoce y acepta que xFetishHub no será responsable, directa o indirectamente, por ningún daño o pérdida causada por su uso de cualquier contenido de terceros.</p>
+                
+                <h3>4. Cuentas y Suscripciones</h3>
+                <p>Algunas funciones requieren una suscripción paga ("Pro" o "Beast"). El procesamiento de pagos es manejado por proveedores externos. No almacenamos sus credenciales de pago. Nos reservamos el derecho de cancelar cuentas que violen estos términos.</p>
+                
+                <h3>5. Renuncia de Garantías</h3>
+                <p>El servicio se proporciona "TAL CUAL" y "SEGÚN DISPONIBILIDAD". No garantizamos que los resultados generados cumplan con sus requisitos o estén libres de errores.</p>
+            `,
+
+            privacy_text: `
+                <h3>1. Introducción</h3>
+                <p>Su privacidad es nuestra prioridad. Esta política explica cómo manejamos sus datos. Nuestro objetivo es recopilar la cantidad mínima absoluta de información requerida para proporcionar nuestro servicio.</p>
+                
+                <h3>2. Datos que Recopilamos</h3>
+                <ul>
+                    <li><b>Datos de Autenticación:</b> Al iniciar sesión a través de Google, recibimos su correo electrónico y UID para sincronizar sus preferencias. No vemos su contraseña.</li>
+                    <li><b>Datos de Uso:</b> Almacenamos su historial generado, etiquetas favoritas y preferencias localmente en su dispositivo y encriptados en nuestra base de datos para el funcionamiento del algoritmo.</li>
+                    <li><b>Almacenamiento Local:</b> Utilizamos el almacenamiento local del navegador para guardar sus configuraciones (tema, idioma) sin cookies de rastreo.</li>
+                </ul>
+
+                <h3>3. Cómo Usamos los Datos</h3>
+                <p>Sus datos se utilizan únicamente para:</p>
+                <ul>
+                    <li>Sincronizar su progreso entre dispositivos.</li>
+                    <li>Verificar el estado de su suscripción.</li>
+                    <li>Entrenar el algoritmo de personalización para mejorar las sugerencias.</li>
+                </ul>
+                <p><b>No vendemos, intercambiamos ni alquilamos su información de identificación personal a terceros.</b></p>
+
+                <h3>4. Eliminación de Datos</h3>
+                <p>Puede solicitar la eliminación completa de su cuenta y datos en cualquier momento contactando al soporte o utilizando el botón "Restablecer datos" dentro de la aplicación.</p>
+            `,
+
+            refund_text: `
+                <h3>1. Política de Bienes Digitales</h3>
+                <p>Debido a la naturaleza del contenido digital, todas las ventas de códigos de activación y suscripciones para xFetishHub son generalmente <b>finales y no reembolsables</b> una vez que el código ha sido entregado o la suscripción activada.</p>
+                
+                <h3>2. Excepciones</h3>
+                <p>Podemos ofrecer un reembolso o reemplazo a nuestra entera discreción bajo las siguientes circunstancias:</p>
+                <ul>
+                    <li><b>Error Técnico:</b> El código de activación proporcionado no era válido o estaba defectuoso.</li>
+                    <li><b>No Entrega:</b> Pagó pero no recibió el servicio/código dentro de las 24 horas.</li>
+                    <li><b>Doble Facturación:</b> Se le cobró dos veces por el mismo período debido a un fallo técnico.</li>
+                </ul>
+
+                <h3>3. Cómo Solicitar</h3>
+                <p>Para solicitar un reembolso, contacte al soporte a través del botón "Reportar Problema". Incluya su ID de transacción y la fecha de compra. Las solicitudes deben realizarse dentro de los 14 días posteriores a la compra.</p>
+            `
         },
 
         de: {
@@ -14148,6 +14464,12 @@
             btn_google_signin: "Weiter mit Google",
             auth_security_note: "Entwickler hat keinen Zugriff auf Daten. Keine Sorge um deinen Verlauf 😏",
             btn_cancel: "Abbrechen",
+
+            info_header: "Informationen",
+            lbl_support_email: "Support-E-Mail",
+            doc_terms: "Nutzungsbedingungen",
+            doc_privacy: "Datenschutz",
+            doc_refund: "Rückerstattung",
 
             btn_start: "Starten",
             btn_pass: "Andere",
@@ -14206,18 +14528,18 @@
             btn_open_stats: "Statistik",
 
             // ТЕМЫ
-            theme_dark: "Dunkel",
-            theme_light: "Hell",
-            theme_midnight: "Mitternacht",
-            theme_forest: "Wald",
-            theme_vampire: "Vampir",
-            theme_luxury: "Luxus",
-            theme_noir: "Noir",
-            theme_sky: "Himmel",
-            theme_mint: "Minze",
-            theme_rose: "Rose",
-            theme_sand: "Sand",
-            theme_rainbow: "Regenbogen",
+            "theme_blue-dark": "Mitternacht",
+            "theme_green-dark": "Wald",
+            "theme_red-dark": "Vampir",
+            "theme_gold-dark": "Luxus",
+            "theme_noir": "Noir",
+            "theme_blue-light": "Himmel",
+            "theme_green-light": "Minze",
+            "theme_red-light": "Rose",
+            "theme_gold-light": "Sand",
+            "theme_rainbow": "Regenbogen",
+            "theme_dark": "Dunkel",
+            "theme_light": "Hell",
 
             history_title: "Verlauf",
 
@@ -14261,7 +14583,7 @@
             stats_header: "Deine Favoriten",
             stats_prefs: "Vorlieben",
             stats_activity: "Aktivität",
-            tf_week: "Woche", tf_month: "Monat", tf_year: "Jahr", tf_all: "Gesamt",
+            tf_week: "Woche", tf_month: "Monat", tf_year: "Jahr", tf_all: "Gesamtzeit",
             act_gen: "Generationen", act_watch: "Angeschaut",
             chart_prefs_x: "Vorlieben",
             chart_points_y: "Punkte",
@@ -14271,6 +14593,11 @@
             feat_filters: "✨ Fetish Wrapped",
             wrapped_free_outro: "Komm in einer Woche wieder. Oder wenn du tägliche Statistiken willst, ist das Pro-Abo dein bester Freund.",
             btn_close: "Schließen",
+            btn_close: "Schließen",
+            search_liked: "Favoriten suchen...",
+            search_disliked: "Blockierte suchen...",
+            hist_empty: "Verlauf leer",
+            limit_reset: "Reset:",
 
             legend_watch: "Ansehen (+10)",
             legend_like: "Like (+5)",
@@ -14321,7 +14648,73 @@
             onb_btn_check: "Kategorien suchen",
             onb_found: "Wir haben gefunden:",
             onb_btn_confirm: "Zu Favoriten",
-            onb_skip: "Überspringen"
+            onb_skip: "Überspringen",
+
+            lbl_about: "Über das Projekt",
+            about_title: "Entwickler",
+            about_intro: "Ich bin Nikolai M., 23 Jahre alt, Student.",
+            about_desc: "Die Mission des Projekts ist es, Benutzern durch ein intelligentes System alle Erwachsenengenres näherzubringen und ihre Vorlieben zur Selbstfindung zu analysieren.",
+            
+            doc_terms: "Nutzungsbedingungen",
+            doc_privacy: "Datenschutz",
+            doc_refund: "Rückerstattung",
+
+            terms_text: `
+                <h3>1. Annahme der Bedingungen</h3>
+                <p>Durch den Zugriff auf xFetishHub bestätigen Sie, dass Sie mindestens 18 Jahre alt sind (oder das gesetzliche Mindestalter in Ihrer Gerichtsbarkeit erreicht haben) und stimmen diesen Bedingungen zu. Wenn Sie nicht zustimmen, müssen Sie den Dienst sofort verlassen.</p>
+                
+                <h3>2. Art des Dienstes</h3>
+                <p>xFetishHub ist ein Suchaggregator und eine Empfehlungsmaschine. <b>Wir hosten, laden hoch oder kontrollieren keine Videoinhalte.</b> Alle vom Dienst generierten Links führen zu Websites Dritter (z. B. xHamster, Pornhub). Wir dienen lediglich als Vermittler zum Auffinden von Inhalten, die öffentlich im Internet verfügbar sind.</p>
+                
+                <h3>3. Inhalte Dritter</h3>
+                <p>Wir haben keine Kontrolle über und übernehmen keine Verantwortung für die Inhalte, Datenschutzrichtlinien oder Praktiken von Websites Dritter. Sie erkennen an, dass xFetishHub weder direkt noch indirekt für Schäden oder Verluste haftbar gemacht werden kann, die durch Ihre Nutzung von Inhalten Dritter verursacht werden.</p>
+                
+                <h3>4. Benutzerkonten & Abonnements</h3>
+                <p>Einige Funktionen erfordern ein kostenpflichtiges Abonnement ("Pro" oder "Beast"). Die Zahlungsabwicklung erfolgt durch Drittanbieter. Wir speichern Ihre Zahlungsdaten nicht. Wir behalten uns das Recht vor, Konten zu kündigen, die gegen diese Bedingungen verstoßen.</p>
+                
+                <h3>5. Gewährleistungsausschluss</h3>
+                <p>Der Dienst wird "WIE BESEHEN" (AS IS) bereitgestellt. Wir garantieren nicht, dass die generierten Ergebnisse Ihren Anforderungen entsprechen oder fehlerfrei sind.</p>
+            `,
+
+            privacy_text: `
+                <h3>1. Einführung</h3>
+                <p>Ihre Privatsphäre ist unsere Priorität. Diese Richtlinie erklärt, wie wir mit Ihren Daten umgehen. Unser Ziel ist es, nur die absolut notwendigen Informationen zu sammeln, die für den Dienst erforderlich sind.</p>
+                
+                <h3>2. Datenerfassung</h3>
+                <ul>
+                    <li><b>Authentifizierungsdaten:</b> Wenn Sie sich über Google anmelden, erhalten wir Ihre E-Mail-Adresse und UID, um Ihre Einstellungen zu synchronisieren. Wir sehen Ihr Passwort nicht.</li>
+                    <li><b>Nutzungsdaten:</b> Wir speichern Ihren generierten Verlauf, Favoriten und Präferenzen lokal auf Ihrem Gerät und verschlüsselt in unserer Datenbank, um den Algorithmus zu betreiben.</li>
+                    <li><b>Lokaler Speicher:</b> Wir verwenden den lokalen Browserspeicher, um Ihre Einstellungen (Thema, Sprache) ohne Tracking-Cookies zu speichern.</li>
+                </ul>
+
+                <h3>3. Verwendung der Daten</h3>
+                <p>Ihre Daten werden ausschließlich verwendet für:</p>
+                <ul>
+                    <li>Synchronisierung Ihres Fortschritts über Geräte hinweg.</li>
+                    <li>Überprüfung Ihres Abonnementstatus.</li>
+                    <li>Training des Personalisierungsalgorithmus zur Verbesserung von Vorschlägen.</li>
+                </ul>
+                <p><b>Wir verkaufen, handeln oder vermieten Ihre persönlichen Identifikationsdaten nicht an Dritte.</b></p>
+
+                <h3>4. Datenlöschung</h3>
+                <p>Sie können jederzeit die vollständige Löschung Ihres Kontos und Ihrer Daten beantragen, indem Sie den Support kontaktieren oder die Schaltfläche "Daten zurücksetzen" in der App verwenden.</p>
+            `,
+
+            refund_text: `
+                <h3>1. Richtlinie für digitale Güter</h3>
+                <p>Aufgrund der Natur digitaler Inhalte sind alle Verkäufe von Aktivierungscodes und Abonnements für xFetishHub in der Regel <b>endgültig und nicht erstattungsfähig</b>, sobald der Code geliefert oder das Abonnement aktiviert wurde.</p>
+                
+                <h3>2. Ausnahmen</h3>
+                <p>Wir können nach eigenem Ermessen unter folgenden Umständen eine Rückerstattung oder einen Ersatz anbieten:</p>
+                <ul>
+                    <li><b>Technischer Fehler:</b> Der bereitgestellte Aktivierungscode war ungültig oder defekt.</li>
+                    <li><b>Nichtlieferung:</b> Sie haben bezahlt, aber den Dienst/Code nicht innerhalb von 24 Stunden erhalten.</li>
+                    <li><b>Doppelbuchung:</b> Aufgrund eines technischen Fehlers wurde Ihnen derselbe Zeitraum zweimal berechnet.</li>
+                </ul>
+
+                <h3>3. Anforderung</h3>
+                <p>Um eine Rückerstattung zu beantragen, kontaktieren Sie bitte den Support über die Schaltfläche "Problem melden". Geben Sie Ihre Transaktions-ID und das Kaufdatum an. Anfragen müssen innerhalb von 14 Tagen nach dem Kauf gestellt werden.</p>
+            `
         }
     };
 
@@ -14614,6 +15007,80 @@
         }
     };
 
+    window.openLegal = function(type) {
+        // 1. Берем текущие переводы из langData
+        const t = langData[currentLang] || langData['en'];
+
+        let titleText = "Document";
+        let bodyHTML = "<p>Loading...</p>";
+
+        // 2. Выбираем текст в зависимости от типа
+        if (type === 'terms') {
+            titleText = t.doc_terms;
+            bodyHTML = t.terms_text;
+        } 
+        else if (type === 'privacy') {
+            titleText = t.doc_privacy;
+            bodyHTML = t.privacy_text;
+        } 
+        else if (type === 'refund') {
+            titleText = t.doc_refund;
+            bodyHTML = t.refund_text;
+        }
+
+        // 3. Заполняем модальное окно
+        const titleEl = document.getElementById('legal-modal-title');
+        const contentEl = document.getElementById('legal-modal-content');
+        
+        if (titleEl) titleEl.innerText = titleText;
+        if (contentEl) contentEl.innerHTML = bodyHTML;
+
+        // 4. Открываем
+        const modal = document.getElementById('modal-legal-overlay');
+        if(modal) {
+            modal.classList.add('open');
+            modal.style.display = 'flex';
+        }
+    };
+
+    window.closeLegal = function(e, force) {
+        if (force || e.target.id === 'modal-legal-overlay') {
+            const modal = document.getElementById('modal-legal-overlay');
+            if(modal) {
+                modal.classList.remove('open');
+                modal.style.display = 'none';
+            }
+        }
+    };
+
+    window.openAbout = function() {
+        const t = langData[currentLang] || langData['en'];
+
+        const titleEl = document.getElementById('about-modal-title');
+        const introEl = document.getElementById('about-intro');
+        const descEl = document.getElementById('about-desc');
+
+        if (titleEl) titleEl.innerText = t.about_title; 
+        if (introEl) introEl.innerText = t.about_intro;
+        if (descEl) descEl.innerText = t.about_desc;
+
+        const modal = document.getElementById('modal-about-overlay');
+        if (modal) {
+            modal.classList.add('open');
+            modal.style.display = 'flex';
+        }
+    };
+    
+    window.closeAbout = function(e, force) {
+        if (force || e.target.id === 'modal-about-overlay') {
+            const modal = document.getElementById('modal-about-overlay');
+            if(modal) {
+                modal.classList.remove('open');
+                modal.style.display = 'none';
+            }
+        }
+    };
+
     const EXTREME_TAGS = ['extreme', 'blood', 'scat', 'piss', 'pain', 'torture', 'vomit', 'enema', 'fisting', 'needle-play'];
     const SPICY_TAGS = ['bdsm', 'kinky', 'fetish', 'bondage', 'domination', 'submission', 'spanking'];
     const LGBT_TAGS = ['gay', 'trans', 'shemale', 'bi', 'crossdresser'];
@@ -14687,7 +15154,6 @@
             ts: Date.now()
         };
         activityLog.push(logEntry);
-        // Trim log if too big (optional, keep last 5000)
         if (activityLog.length > 5000) activityLog = activityLog.slice(-5000);
         localStorage.setItem(STORAGE.ACTIVITY_LOG, JSON.stringify(activityLog));
         updateExploredCount();
@@ -14742,8 +15208,6 @@
         const tags = getCombinedTags(item);
         adjustTagScoresByTags(tags, delta);
     }
-
-    // === СИСТЕМА ПОДСЧЕТА ВЕСОВ (SMART MATCH) ===
 
     function calculateItemWeight(item) {
         // 1. Жесткий фильтр (Черный список)
@@ -14818,7 +15282,6 @@
         document.getElementById('card-block').classList.remove('is-spinning');
     }
 
-    // 1. Просто возвращаем текст объяснения, но не вставляем его в HTML
     function getExplanationText(mode) {
         const t = langData[currentLang];
         let reason = null;
@@ -14885,7 +15348,6 @@
         return reason;
     }
 
-    // 3. Обновленная функция подготовки анимации (скрываем новый элемент)
     function prepareElementsForFadeIn() {
         // Убрали старые ID, добавили status-text
         const ids = ['result-desc', 'status-text', 'related-block']; 
@@ -15106,7 +15568,15 @@
                 const btn = document.createElement('div');
                 btn.className = 'related-item-btn';
                 btn.innerText = name;
-                btn.onclick = () => forceShowResult(item, 'similar');
+                
+                btn.onclick = () => {
+                    // Сначала проверяем лимит
+                    if (checkGenerationLimit()) {
+                        // Если ок — открываем
+                        forceShowResult(item, 'similar');
+                    }
+                };
+                
                 relatedEl.appendChild(btn);
             });
             relatedBlock.classList.remove('hidden-initial');
@@ -15172,7 +15642,7 @@
         renderHistory();
         updateExploredCount();
     }
-
+    
     function getLocalizedName(item) {
         if (!item) return "";
         if (currentLang === 'ru' && item.name_ru) return item.name_ru;
@@ -15184,9 +15654,10 @@
     function renderHistory() {
         const list = document.getElementById('history-list');
         list.innerHTML = '';
+        const t = langData[currentLang] || langData['en'];
         
         if (historyData.length === 0) {
-            list.innerHTML = '<div class="ios-row" style="justify-content:center; color:var(--text-secondary); font-size:14px;">Empty</div>';
+            list.innerHTML = `<div class="ios-row" style="justify-content:center; color:var(--text-secondary); font-size:14px;">${t.hist_empty}</div>`;
             return;
         }
 
@@ -15567,6 +16038,7 @@
         if (window.updateLastSyncUI) window.updateLastSyncUI(); 
         renderHistory();
         renderModifiers();
+        updateThemeLabel();
         if(currentItem) { renderResultUI(currentItem, null); updateLink(); } 
         else { setInitialText(); }
         updateToggleLabels();
@@ -15625,36 +16097,29 @@
         closeSubModal(null, true);
     }
 
-    // === ЛОГИКА КАТАЛОГОВ (LIKE / DISLIKE) ===
-
-    // Открыть список лайков
     function openFavoritesCatalog() {
         renderListModal('fav');
     }
 
-    // Открыть черный список
     function openBlacklistCatalog() {
         renderListModal('ban');
     }
 
     function renderListModal(type) {
-        // Определяем параметры
         let modalId, bodyId, listData, placeholder;
-        const t = langData[currentLang];
+        const t = langData[currentLang] || langData['en']; // Получаем переводы
 
         if (type === 'fav') {
             modalId = 'modal-overlay'; bodyId = 'modal-catalog-body'; listData = favorites;
-            placeholder = "Search liked...";
+            placeholder = t.search_liked; // Локализованный плейсхолдер
         } else if (type === 'ban') {
             modalId = 'modal-blacklist-overlay'; bodyId = 'modal-blacklist-body'; listData = blacklist;
-            placeholder = "Search disliked...";
+            placeholder = t.search_disliked; // Локализованный плейсхолдер
         } else if (type === 'wl') {
             modalId = 'modal-overlay'; 
             bodyId = 'modal-catalog-body'; 
             listData = watchLater;
-            // Поиск не нужен, placeholder не важен
             
-            // Меняем заголовок модалки
             const header = document.querySelector(`#${modalId} .modal-header span`);
             if(header) header.innerText = t.watch_later;
         }
@@ -15836,8 +16301,6 @@
         forceShowResult(selected, 'tag_click');
     }
 
-    // === STATS SYSTEM ===
-
     function openStatistics() {
         const t = langData[currentLang];
         if (document.getElementById('tf-week')) document.getElementById('tf-week').innerText = t.tf_week;
@@ -15868,7 +16331,7 @@
                 const left = WRAPPED_THRESHOLD - wData.totalActions;
                 
                 const progressHTML = `
-                    <div id="wrapped-progress-ui" class="wrapped-lock-container">
+                    <div id="wrapped-progress-ui" class="wrapped-lock-container" style="margin: 0 10px 20px 10px;">
                         <div class="wrapped-lock-title">Fetish Wrapped 🔒</div>
                         <div class="wrapped-lock-desc">Make ${left} more moves to unlock your personal summary</div>
                         <div class="w-progress-track">
@@ -15924,14 +16387,13 @@
     function updateStatsLocks() {
         const isFree = subscriptionLevel === 'free';
         
-        // Элементы, которые блокируем
-        const idsToLock = ['tf-month', 'tf-year', 'stat-nav-activity'];
+        const idsToLock = ['tf-month', 'tf-year', 'tf-all', 'stat-nav-activity'];
         
         idsToLock.forEach(id => {
             const el = document.getElementById(id);
             if(!el) return;
             
-            // Сначала чистим старые замки, чтобы не дублировались
+            // Сначала чистим старые замки
             const existingLock = el.querySelector('.lock-icon-small');
             if (existingLock) existingLock.remove();
             
@@ -15941,7 +16403,6 @@
             // Если тариф бесплатный — добавляем замок и прозрачность
             if (isFree) {
                 el.style.opacity = '0.6';
-                // Добавляем иконку замка
                 const lockSpan = document.createElement('span');
                 lockSpan.className = 'lock-icon-small';
                 lockSpan.innerText = ' 🔒';
@@ -16155,10 +16616,6 @@
         }
     }
 
-    // === AGE GATE & ONBOARDING LOGIC ===
-
-    let onboardingSelectedIds = [];
-
     function initAgeGate() {
         const isVerified = localStorage.getItem('xch_age_verified');
 
@@ -16318,36 +16775,38 @@
     function resetAppHistory() {
         const t = langData[currentLang];
         
-        // Системное подтверждение (надежнее и привычнее для таких действий)
         if (confirm(t.confirm_reset)) {
-            
-            // 1. Очищаем основные данные
             localStorage.removeItem(STORAGE.HISTORY);
             localStorage.removeItem(STORAGE.ACTIVITY_LOG);
             localStorage.removeItem(STORAGE.TAG_SCORES);
-            
-            // Опционально: Очистить лайки и черный список?
-            // Обычно "Сброс данных" подразумевает и это. Если хотите оставить лайки, закомментируйте 2 строчки ниже.
             localStorage.removeItem(STORAGE.BLACKLIST);
             localStorage.removeItem(STORAGE.FAVORITES);
+            localStorage.removeItem(STORAGE.WATCH_LATER);
             
-            // 2. Сбрасываем переменные в памяти
             historyData = [];
             activityLog = [];
             tagScores = {};
             blacklist = [];
             favorites = [];
+            watchLater = [];
             
-            // 3. Обновляем интерфейс без перезагрузки страницы
             updateCounts();
             updateExploredCount();
             renderHistory();
             if (window.syncToCloud) window.syncToCloud();
             
-            // Сбрасываем график статистики, если он открыт
+            const progressUI = document.getElementById('wrapped-progress-ui');
+            if (progressUI) progressUI.remove();
+            
+            const wBtn = document.getElementById('btn-wrapped-trigger');
+            if (wBtn) wBtn.style.display = 'none';
+
+            // Сбрасываем график
             const modalBody = document.getElementById('modal-stats-body');
             if (modalBody && document.getElementById('modal-stats-overlay').classList.contains('open')) {
                 renderStatsContent();
+                // Перерисовываем заголовок статистики, чтобы обновить прогресс бар (показать заблокированный)
+                openStatistics(); 
             }
 
             alert(t.reset_done);
@@ -16411,8 +16870,6 @@
 
         document.getElementById('modal-sub-overlay').classList.add('open');
     }
-
-    // --- ФУНКЦИИ ДЛЯ ОПЛАТЫ ---
 
     function openPaymentSelection(plan) {
         // 1. Проверка авторизации
@@ -16484,34 +16941,65 @@
     function checkGenerationLimit() {
         if (subscriptionLevel !== 'free') return true; 
 
-        const today = new Date().toDateString();
-        const lastDate = localStorage.getItem('xch_limit_date');
+        const now = Date.now();
+        const oneDay = 24 * 60 * 60 * 1000;
+        
+        // Читаем сохраненные данные
         let count = parseInt(localStorage.getItem('xch_limit_count') || '0');
+        let startTime = parseInt(localStorage.getItem('xch_limit_start') || '0');
 
-        if (lastDate !== today) {
+        // Логика сброса: Если прошло 24 часа с момента старта отсчета — сбрасываем
+        if (startTime > 0 && (now - startTime > oneDay)) {
             count = 0;
-            localStorage.setItem('xch_limit_date', today);
+            startTime = 0;
+            localStorage.setItem('xch_limit_count', '0');
+            localStorage.setItem('xch_limit_start', '0');
         }
 
+        // Если лимит исчерпан
         if (count >= DAILY_LIMIT) {
             openSubModal();
-            alert(`Daily limit reached (${DAILY_LIMIT}). Upgrade to Pro!`);
+            
+            // Вычисляем точное время сброса (Старт + 24ч)
+            const resetDate = new Date(startTime + oneDay);
+            
+            // Форматируем: "12 янв, 14:35"
+            const dateStr = resetDate.toLocaleString(currentLang, { 
+                day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+            });
+
+            const t = langData[currentLang] || langData['en'];
+            // Сообщение
+            let msg = currentLang === 'ru' 
+                ? `Лимит исчерпан (${DAILY_LIMIT}).\nСброс: ${dateStr}.\nКупите Pro для безлимита!` 
+                : `Daily limit reached (${DAILY_LIMIT}).\nReset: ${dateStr}.\nGet Pro for unlimited!`;
+
+            alert(msg);
+            
+            // Обновляем кнопку (чтобы она стала красной с датой)
+            updateSubscriptionUI();
+            
             return false;
         }
 
+        // Если это первая генерация в цикле — засекаем время старта
+        if (count === 0 || startTime === 0) {
+            localStorage.setItem('xch_limit_start', now);
+        }
+
+        // Увеличиваем счетчик
         count++;
         localStorage.setItem('xch_limit_count', count);
-        localStorage.setItem('xch_limit_date', today);
         
-        // Обновляем интерфейс счетчика сразу
         updateSubscriptionUI(); 
         
         return true;
     }
 
     function updateSubscriptionUI() {
-        const nameEl = document.getElementById('current-plan-name'); // Целимся только в название плана, не в лейбл
+        const nameEl = document.getElementById('current-plan-name');
         const badgeEl = document.getElementById('upgrade-badge'); 
+        const btnFree = document.querySelector('.plan-card:nth-child(1) .plan-btn'); // Кнопка Free плана
         
         if (!nameEl) return;
 
@@ -16521,25 +17009,70 @@
             nameEl.innerText = "PRO";
             nameEl.style.color = "#ff9900";
             if(badgeEl) badgeEl.style.display = 'none';
+            if(btnFree) btnFree.innerText = t.btn_current;
         } else if (subscriptionLevel === 'beast') {
             nameEl.innerText = "BEAST";
             nameEl.style.color = "#9b59b6";
             if(badgeEl) badgeEl.style.display = 'none';
+            if(btnFree) btnFree.innerText = t.btn_current;
         } else {
-            // FREE LOGIC
+            // === FREE LOGIC (24H SLIDING WINDOW) ===
             const count = parseInt(localStorage.getItem('xch_limit_count') || '0');
-            const today = new Date().toDateString();
-            const lastDate = localStorage.getItem('xch_limit_date');
-            const usedToday = (lastDate === today) ? count : 0;
-            const remaining = Math.max(0, DAILY_LIMIT - usedToday);
+            const startTime = parseInt(localStorage.getItem('xch_limit_start') || '0');
+            const now = Date.now();
+            const oneDay = 24 * 60 * 60 * 1000;
 
-            // Используем HTML для форматирования "10/10" поменьше
+            // Проверяем, не пора ли сбросить (визуально)
+            let displayCount = count;
+            if (startTime > 0 && (now - startTime > oneDay)) {
+                displayCount = 0;
+            }
+
+            const remaining = Math.max(0, DAILY_LIMIT - displayCount);
+
+            // 1. Обновляем UI в меню аккаунта
             nameEl.innerHTML = `FREE <span style="font-size:14px; opacity:0.6; font-weight:600; margin-left:5px;">${remaining}/${DAILY_LIMIT}</span>`;
             nameEl.style.color = "var(--text-main)";
             
             if(badgeEl) {
                 badgeEl.style.display = 'inline-block';
                 badgeEl.innerText = t.btn_upgrade_short || "Upgrade ⇧"; 
+            }
+
+            // 2. Обновляем кнопку в модальном окне
+            if (btnFree) {
+                // Если счетчик запущен (startTime > 0) и мы что-то потратили
+                if (startTime > 0 && displayCount > 0) {
+                    
+                    // Время сброса = Время первого клика + 24 часа
+                    const resetDate = new Date(startTime + oneDay);
+                    
+                    // Формат: "12 янв, 14:30"
+                    const dateStr = resetDate.toLocaleString(currentLang, { 
+                        day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+                    });
+                    
+                    btnFree.innerText = `${t.limit_reset} ${dateStr}`;
+                    
+                    if (remaining === 0) {
+                        // Лимит исчерпан — красная
+                        btnFree.style.color = "var(--highlight-red)";
+                        btnFree.style.border = "1px solid var(--highlight-red)";
+                        btnFree.style.background = "rgba(231, 76, 60, 0.1)";
+                        btnFree.style.opacity = "1";
+                    } else {
+                        // Лимит идет — серая
+                        btnFree.style.color = "var(--text-secondary)";
+                        btnFree.style.border = "1px solid var(--border)";
+                        btnFree.style.background = "var(--nav-bg)";
+                    }
+                } else {
+                    // 10/10, таймер не запущен
+                    btnFree.innerText = t.btn_current;
+                    btnFree.style.color = ""; 
+                    btnFree.style.background = "";
+                    btnFree.style.border = "";
+                }
             }
         }
     }
@@ -16562,8 +17095,6 @@
         window.open(url, '_blank');
     }
 
-    // === THEME SYSTEM ===
-    
     function openThemeModal() {
         renderThemes();
         document.getElementById('modal-theme-overlay').classList.add('open');
@@ -16591,9 +17122,10 @@
             const isActive = (currentTheme === theme.id);
             
             // 1. ЛОКАЛИЗАЦИЯ НАЗВАНИЯ
-            // Ищем ключ 'theme_midnight', 'theme_dark' и т.д.
+            // Ищем ключ 'theme_midnight', 'theme_blue-dark' и т.д.
             const themeKey = 'theme_' + theme.id;
-            // Если перевод есть - берем его, иначе дефолтное английское имя
+            
+            // Если перевод есть - берем его, иначе дефолтное имя
             const localizedName = (t && t[themeKey]) ? t[themeKey] : theme.name;
 
             // 2. ЛОКАЛИЗАЦИЯ ТИПА (Light/Dark)
@@ -16679,10 +17211,29 @@
             root.style.setProperty('--card-bg', '#141414');
         }
 
-        const label = document.getElementById('current-theme-name');
-        if(label) label.innerText = theme.name;
+        // Обновляем текст кнопки (с переводом)
+        updateThemeLabel(theme.id);
         
         updateLink(); 
+    }
+
+    function updateThemeLabel(themeId) {
+        if (!themeId) themeId = localStorage.getItem('xch_theme_id') || 'dark';
+        
+        const t = langData[currentLang] || langData['en'];
+        const label = document.getElementById('current-theme-name');
+        
+        if (label) {
+            // Ищем ключ перевода, например theme_blue-dark
+            const key = 'theme_' + themeId;
+            // Если перевода нет, ищем оригинальное имя в массиве
+            if (t && t[key]) {
+                label.innerText = t[key];
+            } else {
+                const themeObj = APP_THEMES.find(x => x.id === themeId);
+                label.innerText = themeObj ? themeObj.name : themeId;
+            }
+        }
     }
 
     function initSwipeCards() {
@@ -16828,9 +17379,6 @@
         }
     }
 
-    // === ЛОГИКА ГЕНЕРАЦИИ ===
-
-    // Добавьте direction в аргументы
     function startGeneration(mode, direction = 'left') { 
         if (!checkGenerationLimit()) return; 
         if (isGenerating) return;
@@ -16960,6 +17508,7 @@
             }, 1000);
         }
     }
+    
     function startNewSession() {
         sessionHistoryStack = []; 
         isFirstGen = true;
@@ -17073,7 +17622,6 @@
         updateActionButtons();
     }
 
-    // === ФУНКЦИЯ КНОПОК  ===
     function updateActionButtons() {
         if(!currentItem) return;
         
@@ -17120,7 +17668,6 @@
         updateCounts();
     }
 
-    // 3. DISLIKE (ДРУГОЕ / ДИЗЛАЙК)
     function toggleBlacklist(silent = false) {
         if(!currentItem) return;
         const id = currentItem.id;
@@ -17254,7 +17801,6 @@
         };
     }
 
-    // Хелпер для получения случайной фразы на нужном языке
     function getWrappedPhrase(category, replacements = {}) {
         // 1. Определяем язык (если нет перевода, берем EN)
         const lang = wrappedPhrases[currentLang] ? currentLang : 'en';
@@ -17542,13 +18088,11 @@
         }
     }
 
-    // 3. Проверка: установлено ли приложение?
     function isAppInstalled() {
         // iOS Standalone или стандартный display-mode
         return (window.navigator.standalone === true) || (window.matchMedia('(display-mode: standalone)').matches);
     }
 
-    // 4. Логика пропуска окна установки
     function skipInstall() {
         document.getElementById('modal-install-overlay').classList.remove('open');
         // Помечаем, что видели (на эту сессию или навсегда - решать вам)
@@ -17558,7 +18102,6 @@
         checkOnboarding(); 
     }
 
-    // 5. Проверка онбординга
     function checkOnboarding() {
         const isOnboarded = localStorage.getItem('xch_onboarding_done');
         if (!isOnboarded) {
@@ -17589,5 +18132,8 @@
     }
 
 </script>
+
+</body>
+
 </body>
 </html>
