@@ -1236,6 +1236,24 @@
         @keyframes spinIcon { 100% { transform: rotate(360deg); } }
         .spinning-icon { animation: spinIcon 1s linear infinite; display: inline-block; }
 
+
+        /* Анимации Fetish Wrapped */
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            80% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         /* =========================================
         16. MEDIA QUERIES (ADAPTATION)
         ========================================= */
@@ -1464,11 +1482,10 @@
                 </div>
             </div>
             
-            <!-- Кнопка WRAPPED (Изначально скрыта style="display:none", JS покажет её при наличии данных) -->
+            <!-- Кнопка WRAPPED -->
             <button id="btn-wrapped-trigger" onclick="openWrapped()" 
-                style="display:none; width:100%; background: linear-gradient(45deg, #FF9900, #9B59B6); border:none; padding:10px; border-radius:12px; color:#fff; font-weight:800; font-size:14px; text-transform:uppercase; cursor:pointer; justify-content:space-between; align-items:center;">
-                <span data-key="wrapped_btn">Daily Recap ✨</span>
-                <span style="background:rgba(0,0,0,0.2); padding:2px 6px; border-radius:6px; font-size:10px;">PRO</span>
+                style="display:none; width:100%; background: linear-gradient(45deg, #FF9900, #9B59B6); border:none; padding:12px; border-radius:14px; color:#fff; font-weight:800; font-size:15px; text-transform:uppercase; cursor:pointer; justify-content:center; align-items:center; letter-spacing:1px; box-shadow: 0 4px 15px rgba(155, 89, 182, 0.4);">
+                <span data-key="wrapped_btn">Fetish Wrapped ✨</span>
             </button>
         </div>
 
@@ -1629,59 +1646,81 @@
     </div>
 
     <!-- BLOCK: ACCOUNT-->
-
     <div id="block-account">
-        <!-- ЗАГОЛОВОК С ДАТОЙ (Flexbox) -->
-        <div class="ios-header" style="display:flex; justify-content:space-between; align-items:baseline; padding-right: 16px;">
-            <span data-key="nav_account">Account</span>
-            <span id="last-sync-date" style="font-size:11px; color:var(--text-secondary); text-transform:none; font-weight:400; opacity:0.8; display:none;"></span>
-        </div>
-        
-        <!-- Кнопка входа -->
-        <div class="capsule-btn" id="login-capsule" onclick="window.handleLoginClick()" style="margin-bottom:20px;">
-            <span id="login-btn-text" data-key="login_text">Sync Data</span>
-            <span id="login-status-icon" class="capsule-icon" style="color: var(--accent);">G</span>
-        </div>
-
-        <!-- Кнопка статуса подписки -->
-        <div class="capsule-btn" id="sub-status-btn" onclick="openSubModal()" 
-            style="margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; height: auto; min-height: 55px; padding: 10px 20px;">
+            <!-- ЗАГОЛОВОК С ДАТОЙ -->
+            <div class="ios-header" style="display:flex; justify-content:space-between; align-items:baseline; padding-right: 16px;">
+                <span data-key="nav_account">Account</span>
+                <span id="last-sync-date" style="font-size:11px; color:var(--text-secondary); text-transform:none; font-weight:400; opacity:0.8; display:none;"></span>
+            </div>
             
-            <div style="display:flex; flex-direction:column; align-items: flex-start; justify-content: center; line-height: 1.2;">
-                <span style="font-size:11px; color:var(--text-secondary); margin-bottom:2px; font-weight: 500;" data-key="lbl_current_plan">Current Plan</span>
-                <span id="current-plan-name" style="color:var(--text-main); font-weight:800; font-size:17px; letter-spacing:0.5px;">FREE</span>
+            <!-- ЕДИНАЯ ГРУППА (Вход + Подписка + Списки) -->
+            <div class="ios-group">
+                
+                <!-- 1. ВХОД / ЛИЧНЫЙ КАБИНЕТ -->
+                <div class="ios-row clickable" onclick="window.handleLoginClick()" style="padding: 12px 16px;">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <span id="login-status-icon" style="font-size:20px; width:24px; text-align:center;">☁️</span>
+                        <span id="login-btn-text" style="font-weight:600; font-size:17px; color:var(--text-main);" data-key="login_text">Sync Data</span>
+                    </div>
+                    <span style="color:var(--text-secondary)">›</span>
+                </div>
+
+                <!-- 2. ПОДПИСКА -->
+                <div class="ios-row clickable" onclick="openSubModal()" style="padding: 12px 16px;">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <span style="font-size:20px; width:24px; text-align:center;">⭐</span>
+                        <div style="display:flex; flex-direction:column;">
+                            <span id="current-plan-name" style="font-weight:600; font-size:17px; color:var(--text-main);">FREE</span>
+                            <span style="font-size:11px; color:var(--text-secondary);" data-key="lbl_current_plan">Current Plan</span>
+                        </div>
+                    </div>
+                    <!-- Бейдж апгрейда -->
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span id="upgrade-badge" style="font-size:11px; font-weight:700; background:rgba(255,153,0,0.15); color:var(--accent); padding:4px 8px; border-radius:6px; text-transform:uppercase;">UPGRADE</span>
+                        <span style="color:var(--text-secondary)">›</span>
+                    </div>
+                </div>
+
+                <!-- РАЗДЕЛИТЕЛЬНАЯ ЛИНИЯ (Визуально разделяет настройки аккаунта и списки) -->
+                <div style="height:10px; background:var(--bg-color); border-top:1px solid var(--border); border-bottom:1px solid var(--border); margin:0;"></div>
+
+                <!-- 3. EXPLORED -->
+                <div class="ios-row">
+                    <span data-key="explored_label">Explored</span>
+                    <span style="color:var(--text-secondary); font-size:16px;" id="explored-count">0 / 0</span>
+                </div>
+
+                <!-- 4. LIKED -->
+                <div class="ios-row clickable" onclick="openFavoritesCatalog()">
+                    <span data-key="favorites_catalog">Liked</span>
+                    <span class="badge" id="count-fav" style="color:var(--text-secondary); font-size:17px;">0</span>
+                </div>
+
+                <!-- 5. DISLIKED (Добавлен счетчик) -->
+                <div class="ios-row clickable" onclick="openBlacklistCatalog()">
+                    <span data-key="blacklist_catalog">Disliked</span>
+                    <span class="badge" id="count-ban" style="color:var(--text-secondary); font-size:17px;">0</span>
+                </div>
+
+                <!-- 6. WATCH LATER -->
+                <div class="ios-row clickable" onclick="openWatchLaterCatalog()">
+                    <span data-key="watch_later">Watch Later</span>
+                    <span class="badge" id="count-wl" style="color:var(--text-secondary); font-size:17px;">0</span>
+                </div>
+
+                <!-- 7. RESET -->
+                <div class="ios-row clickable" onclick="resetAppHistory()" style="color: var(--highlight-red);">
+                    <span data-key="btn_reset">Reset Data</span>
+                    <span>✕</span>
+                </div>
             </div>
 
-            <span id="upgrade-badge" style="color:var(--accent); font-weight:700; font-size:13px; text-transform:uppercase; background:rgba(255,153,0,0.1); padding:5px 10px; border-radius:10px; white-space: nowrap;">Upgrade ⇧</span>
-        </div>
-
-        <div class="ios-group">
-            <div class="ios-row">
-                <span data-key="explored_label">Explored</span>
-                <span style="color:var(--text-secondary); font-size:16px;" id="explored-count">0 / 0</span>
-            </div>
-            <div class="ios-row clickable" onclick="openFavoritesCatalog()">
-                <span data-key="favorites_catalog">Liked</span>
-                <span class="badge" id="count-fav" style="color:var(--text-secondary); font-size:17px;">0</span>
-            </div>
-            <div class="ios-row clickable" onclick="openBlacklistCatalog()">
-                <span data-key="blacklist_catalog">Disliked</span>
-                <span style="color:var(--text-secondary)">›</span>
-            </div>
-            <div class="ios-row clickable" onclick="openWatchLaterCatalog()">
-                <span data-key="watch_later">Watch Later</span>
-                <span class="badge" id="count-wl" style="color:var(--text-secondary); font-size:17px;">0</span>
-            </div>
-            <div class="ios-row clickable" onclick="openStatistics()">
-                <span data-key="btn_stats">Statistics</span>
-                <span style="color:var(--text-secondary)">›</span>
-            </div>
-            <div class="ios-row clickable" onclick="resetAppHistory()" style="color: var(--highlight-red);">
-                <span data-key="btn_reset">Reset Data</span>
-                <span>✕</span>
+            <!-- ОТДЕЛЬНАЯ КАПСУЛА СТАТИСТИКИ -->
+            <div class="capsule-btn" onclick="openStatistics()" style="background: linear-gradient(135deg, var(--card-bg) 0%, var(--nav-bg) 100%); border: 1px solid var(--accent); justify-content:center; gap:10px; margin-top:10px;">
+                <span style="font-size:20px;">📊</span>
+                <span style="font-weight:800; text-transform:uppercase; color:var(--text-main);" data-key="btn_open_stats">Open Statistics</span>
             </div>
         </div>
-    </div>
 
     <!-- BLOCK: EXTRAS & HISTORY -->
     <div id="block-extras">
@@ -2061,11 +2100,25 @@
         }
     };
 
-    window.logout = async function() {
+   window.logout = async function() {
+        const user = auth.currentUser;
+        
+        // Если пользователь был залогинен, пробуем сохранить данные перед выходом
+        if (user) {
+            const btnText = document.getElementById('sync-btn-text'); // Кнопка в модалке
+            if(btnText) btnText.innerText = "Saving...";
+            try {
+                console.log("Saving data before logout...");
+                await window.syncToCloud(); // Финальное сохранение (WRITE)
+            } catch (e) {
+                console.error("Save before logout failed", e);
+            }
+        }
+
         try {
             await signOut(auth);
-            localStorage.removeItem('xch_last_sync_ts'); // Очищаем дату синхронизации
-            location.reload(); // Перезагружаем для чистого старта
+            localStorage.removeItem('xch_last_sync_ts');
+            location.reload(); 
         } catch (error) {
             console.error("Logout failed:", error);
         }
@@ -2236,42 +2289,51 @@
     onAuthStateChanged(auth, async (user) => {
         const btnText = document.getElementById('login-btn-text');
         const btnIcon = document.getElementById('login-status-icon');
+        
+        // Получаем текущие переводы
         const currentLang = localStorage.getItem('xch_lang') || 'en';
-        const t = (typeof langData !== 'undefined' && langData[currentLang]) ? langData[currentLang] : { login_text: "Sync Data", logout_text: "Logout" };
+        const t = (typeof langData !== 'undefined' && langData[currentLang]) ? langData[currentLang] : langData['en'];
 
         if (user) {
-            // ПОЛЬЗОВАТЕЛЬ ВОШЕЛ
+            // === ПОЛЬЗОВАТЕЛЬ ВОШЕЛ ===
             window.isUserLoggedIn = true;
             console.log("Authorized:", user.email);
             
-            // 1. Обновляем кнопку
-            if(btnText) btnText.innerText = `${t.logout_text} (${user.email.split('@')[0]})`;
+            // 1. Обновляем интерфейс кнопки (Личный кабинет + Email)
+            if(btnText) {
+                const activeText = t.personal_account || "Personal Account";
+                const shortEmail = user.email.split('@')[0]; // Берем часть до @
+                btnText.innerHTML = `${activeText} <span style="font-size:12px; opacity:0.6; font-weight:400; margin-left:6px;">${shortEmail}</span>`;
+            }
+            
+            // Иконка человека
             if(btnIcon) {
-                btnIcon.innerText = "✓";
-                btnIcon.style.color = "#2ecc71"; // Зеленый
+                btnIcon.innerText = "👤"; 
+                btnIcon.style.color = "var(--accent)";
             }
 
-            // 2. Показываем статус и грузим данные
-            window.updateLastSyncUI();
+            // 2. Обновляем дату синхронизации и грузим данные
+            if (window.updateLastSyncUI) window.updateLastSyncUI();
             await loadUserData(user); 
 
+            // 3. Проверка промокода в URL (если перешли по ссылке)
             const urlParams = new URLSearchParams(window.location.search);
             const code = urlParams.get('code');
-            
             if (code) {
-                // Если в ссылке есть ?code=..., пробуем его активировать
                 await window.activatePromoCode(code);
             }
         } else {
-            // ПОЛЬЗОВАТЕЛЬ ВЫШЕЛ
+            // === ПОЛЬЗОВАТЕЛЬ ВЫШЕЛ ===
             window.isUserLoggedIn = false;
             
-            if(btnText) btnText.innerText = t.login_text;
+            // Возвращаем исходный вид кнопки
+            if(btnText) btnText.innerText = t.login_text || "Sync / Login";
             if(btnIcon) {
-                btnIcon.innerText = "G";
-                btnIcon.style.color = "var(--accent)";
+                btnIcon.innerText = "☁️"; // Иконка облака
+                btnIcon.style.color = "var(--text-secondary)";
             }
-            window.updateLastSyncUI();
+            
+            if (window.updateLastSyncUI) window.updateLastSyncUI();
         }
     });
 
@@ -13431,10 +13493,24 @@
             login_alert: "Please log in to manage subscriptions!",
 
             // --- 4. Account & Data ---
-            login_text: "Log in", // Changed from "Sync Data"
+            login_text: "Sync / Login",
             logout_text: "Logout",
             login_required: "Please log in (Sync Data) first so we can identify you!",
             sync_success: "Data synced successfully!",
+            btn_open_stats: "Statistics",
+
+            personal_account: "Personal Account",
+            theme_midnight: "Midnight",
+            theme_forest: "Forest",
+            theme_vampire: "Vampire",
+            theme_luxury: "Luxury",
+            theme_noir: "Noir",
+            theme_sky: "Sky",
+            theme_mint: "Mint",
+            theme_rose: "Rose",
+            theme_sand: "Sand",
+            theme_rainbow: "Rainbow",
+            history_title: "History",
             
             btn_reset: "Reset Data",
             confirm_reset: "Are you sure? This will delete your history, statistics, and preferences learning. This cannot be undone.",
@@ -13475,7 +13551,10 @@
             stats_header: "Your Favorite Categories",
             stats_prefs: "Preferences",
             stats_activity: "Activity",
-            wrapped_btn: "Daily Recap ✨",
+            wrapped_btn: "Fetish Wrapped ✨",
+            feat_filters: "✨ Fetish Wrapped",
+            wrapped_free_outro: "Come back in a week. Or if you want stats every day, Pro subscription is your best friend.",
+            btn_close: "Close",
             
             tf_week: "Week", 
             tf_month: "Month", 
@@ -13628,10 +13707,26 @@
             login_alert: "Пожалуйста, войдите в аккаунт для управления подпиской!",
 
             // --- 4. Аккаунт и Данные ---
-            login_text: "Войти",
+            login_text: "Вход / Синхронизация",
+            personal_account: "Личный кабинет",
+            theme_midnight: "Полночь",
+            theme_forest: "Лес",
+            theme_vampire: "Вампир",
+            theme_luxury: "Роскошь",
+            theme_noir: "Нуар",
+            theme_sky: "Небо",
+            theme_mint: "Мята",
+            theme_rose: "Роза",
+            theme_sand: "Песок",
+            theme_rainbow: "Радуга",
+            history_title: "История",
+
+
             logout_text: "Выйти",
             login_required: "Пожалуйста, войдите в аккаунт, чтобы мы могли активировать подписку!",
             sync_success: "Данные синхронизированы!",
+
+            btn_open_stats: "Статистика",
 
             btn_reset: "Сброс данных",
             confirm_reset: "Вы уверены? Это удалит историю, статистику и обучение алгоритма. Это действие нельзя отменить.",
@@ -13684,7 +13779,10 @@
             chart_points_y: "Очки",
             chart_count_y: "Кол-во",
             share_btn: "Поделиться",
-            wrapped_btn: "Итоги дня ✨",
+            wrapped_btn: "Fetish Wrapped ✨",
+            feat_filters: "✨ Fetish Wrapped",
+            wrapped_free_outro: "Приходи сюда снова через неделю. Либо если хочешь статистику каждый день, то Pro подписка будет твоим лучшим другом.",
+            btn_close: "Закрыть",
 
             legend_watch: "Просмотр (+10)",
             legend_like: "Лайк / Похожее (+5)",
@@ -13827,7 +13925,26 @@
             login_alert: "¡Inicia sesión para gestionar suscripciones!",
 
             // --- Account ---
-            login_text: "Iniciar sesión",
+            login_text: "Entrar / Sincronizar",
+            personal_account: "Cuenta Personal",
+            btn_open_stats: "Estadísticas",
+
+            // ТЕМЫ
+            theme_dark: "Oscuro",
+            theme_light: "Claro",
+            theme_midnight: "Medianoche",
+            theme_forest: "Bosque",
+            theme_vampire: "Vampiro",
+            theme_luxury: "Lujo",
+            theme_noir: "Noir",
+            theme_sky: "Cielo",
+            theme_mint: "Menta",
+            theme_rose: "Rosa",
+            theme_sand: "Arena",
+            theme_rainbow: "Arcoíris",
+
+            history_title: "Historial",
+
             logout_text: "Cerrar sesión",
             login_required: "¡Por favor inicia sesión para activar tu suscripción!",
             sync_success: "¡Datos sincronizados!",
@@ -13874,7 +13991,10 @@
             chart_points_y: "Puntos",
             chart_count_y: "Cantidad",
             share_btn: "Compartir",
-            wrapped_btn: "Resumen Diario ✨",
+            wrapped_btn: "Fetish Wrapped ✨",
+            feat_filters: "✨ Fetish Wrapped",
+            wrapped_free_outro: "Vuelve en una semana. O si quieres estadísticas diarias, la suscripción Pro es tu mejor amiga.",
+            btn_close: "Cerrar",
 
             legend_watch: "Ver (+10)",
             legend_like: "Me gusta (+5)",
@@ -14011,7 +14131,26 @@
             login_alert: "Bitte anmelden, um Abos zu verwalten!",
 
             // --- Account ---
-            login_text: "Anmelden",
+            login_text: "Anmelden / Sync",
+            personal_account: "Persönliches Konto",
+            btn_open_stats: "Statistik",
+
+            // ТЕМЫ
+            theme_dark: "Dunkel",
+            theme_light: "Hell",
+            theme_midnight: "Mitternacht",
+            theme_forest: "Wald",
+            theme_vampire: "Vampir",
+            theme_luxury: "Luxus",
+            theme_noir: "Noir",
+            theme_sky: "Himmel",
+            theme_mint: "Minze",
+            theme_rose: "Rose",
+            theme_sand: "Sand",
+            theme_rainbow: "Regenbogen",
+
+            history_title: "Verlauf",
+
             logout_text: "Abmelden",
             login_required: "Bitte melde dich an, um das Abo zu aktivieren!",
             sync_success: "Daten synchronisiert!",
@@ -14058,7 +14197,10 @@
             chart_points_y: "Punkte",
             chart_count_y: "Anzahl",
             share_btn: "Teilen",
-            wrapped_btn: "Tagesrückblick ✨",
+            wrapped_btn: "Fetish Wrapped ✨",
+            feat_filters: "✨ Fetish Wrapped",
+            wrapped_free_outro: "Komm in einer Woche wieder. Oder wenn du tägliche Statistiken willst, ist das Pro-Abo dein bester Freund.",
+            btn_close: "Schließen",
 
             legend_watch: "Ansehen (+10)",
             legend_like: "Like (+5)",
@@ -14115,348 +14257,132 @@
 
     const wrappedPhrases = {
         en: {
-            intro: [
-                "Ready for your spicy recap? ✨",
-                "Let's see what turned you on... 🔥",
-                "Your daily dose of pleasure stats. 📈",
-                "Here is your passion report. 💌",
-                "Let's review your highlights. 🌟"
-            ],
-            act_high: [ // Много генераций
-                "Wow! You generated {n} categories. Impressive stamina!",
-                "Curiosity level: Maximum. {n} searches!",
-                "Someone had a fun night... {n} spins. 😉",
-                "You are a true explorer! {n} discoveries.",
-                "{n} times? You know exactly what you want."
-            ],
-            act_low: [ // Мало генераций
-                "Quick and efficient. {n} categories.",
-                "Quality over quantity. Just {n} searches. ✨",
-                "Saving energy for later? {n} spins.",
-                "Short and sweet. {n} generations.",
-                "A focused session. {n} finds."
-            ],
-            act_comment_high: [
-                "I love your enthusiasm! 🔥",
-                "You certainly have a healthy appetite.",
-                "Exploring all the possibilities, aren't we?",
-                "Never a dull moment with you.",
-                "Keep that energy up!"
-            ],
-            act_comment_low: [
-                "Sometimes less is more. 👌",
-                "Found what you needed quickly?",
-                "A connoisseur picks carefully.",
-                "Brief, but hopefully intense.",
-                "Taking it easy today."
-            ],
-            trend_up: [
-                "That's {n} more than before. Heating up! 🔥",
-                "You are beating your own records (+{n}).",
-                "The passion is growing (+{n}). Nice.",
-                "On the rise! {n} more discoveries.",
-                "You are getting more curious (+{n})."
-            ],
-            trend_down: [
-                "That's {n} less than yesterday. Recharging? 🔋",
-                "Taking a little breather (-{n}).",
-                "Slowing down to enjoy the view?",
-                "A bit quieter today (-{n}). Relaxing.",
-                "Saving the best for later (-{n})."
-            ],
-            fav_tag: [
-                "Your absolute favorite is:",
-                "Your heart beats faster for:",
-                "You seem to really enjoy:",
-                "The winner of the day:",
-                "Your top pick:"
-            ],
-            fav_comment: [
-                "Excellent taste! 🥂",
-                "A classic choice. Never gets old.",
-                "I can see why you like it.",
-                "This one suits you.",
-                "Spicy! Good selection."
-            ],
-            change_tag: [
-                "Interesting! You switched from {old} to {new}.",
-                "New mood? Yesterday: {old}, Today: {new}.",
-                "Exploring new horizons: {new} (was {old}).",
-                "Variety is key! {old} -> {new}.",
-                "Fresh desires. Now loving: {new}."
-            ],
-            change_comment: [
-                "I love that you're exploring new things.",
-                "Versatility is sexy.",
-                "It's good to mix things up!",
-                "Follow your instincts.",
-                "A man of many talents."
-            ],
-            outro: [
-                "Come back soon for more fun 😘",
-                "Sweet dreams (or fantasies) 🌙",
-                "See you next time! Don't be a stranger.",
-                "Thanks for playing with me today.",
-                "Keep exploring your desires 😈"
-            ]
+            intro_title: ["It's that time... ✨", "Ready to dive in? 🌊", "Your Fetish Wrapped 🎁", "Let's look back... ⏪"],
+            intro_sub: ["Unwrapping your desires.", "See what kept you busy.", "Your stats are ready.", "The results are in."],
+            
+            total_title: ["Total Actions", "Busy Bee", "Explorations", "Total Interactions"],
+            total_sub: ["You didn't hold back.", "That's a lot of clicking.", "Curiosity has no limits.", "Impressive numbers!"],
+            
+            top_list_title: ["Your Top Obsessions", "You kept coming back", "Your Heavy Rotation", "The Favorites"],
+            
+            top_1_title: ["The Champion 🏆", "Absolute Winner", "Your #1 Craving", "Top of the Mountain"],
+            top_1_sub: ["This one lives in your head rent-free.", "You really, really like this.", "No surprises here?", "A clear winner."],
+            
+            tags_title: ["Your Flavor Palette", "The Ingredients", "What you're made of", "Tag Cloud"],
+            tags_sub: ["A spicy mix.", "Taste the rainbow.", "Diverse choices.", "Specific tastes."],
+            
+            time_morning: "Early Bird 🌅",
+            time_day: "Daydreamer ☀️",
+            time_night: "Night Owl 🦉",
+            time_sub: ["You prefer to explore at this time.", "Your peak activity hours.", "This is when magic happens.", "Your favorite time to browse."],
+            
+            arch_explorer_name: "The Explorer 🧭",
+            arch_explorer_desc: "You love searching for new things. No stone left unturned.",
+            arch_connoisseur_name: "The Connoisseur 🍷",
+            arch_connoisseur_desc: "You know exactly what you want. Quality over quantity.",
+            arch_wild_name: "The Untamed 🦁",
+            arch_wild_desc: "No limits. Pure adrenaline. You like it intense.",
+            arch_romantic_name: "The Romantic 🌹",
+            arch_romantic_desc: "Soft, sensual, and emotional connections matter to you.",
+            
+            outro_free: "Come back in a week! Or get Pro for daily stats.",
+            outro_paid: ["See you next time! 👋", "Keep exploring! 😈", "Stay spicy! 🔥", "Until next time..."]
         },
         ru: {
-            intro: [
-                "Готов к горячей сводке? ✨",
-                "Давай посмотрим, что тебя зацепило... 🔥",
-                "Твоя ежедневная доза статистики. 📈",
-                "Отчет о твоих желаниях. 💌",
-                "Вспомним лучшие моменты. 🌟"
-            ],
-            act_high: [
-                "Воу! {n} категорий. Впечатляющая выносливость!",
-                "Уровень любопытства: Максимум. {n} поисков!",
-                "У кого-то был веселый вечер... {n} спинов. 😉",
-                "Ты настоящий исследователь! {n} открытий.",
-                "{n} раз? Ты точно знаешь, чего хочешь."
-            ],
-            act_low: [
-                "Быстро и эффективно. {n} категорий.",
-                "Качество важнее количества. Всего {n} поисков. ✨",
-                "Бережешь силы на потом? {n} спинов.",
-                "Краткость — сестра таланта. {n} генераций.",
-                "Точечный удар. {n} находок."
-            ],
-            act_comment_high: [
-                "Мне нравится твой энтузиазм! 🔥",
-                "У тебя отменный аппетит.",
-                "Исследуем все возможности?",
-                "С тобой не соскучишься.",
-                "Так держать!"
-            ],
-            act_comment_low: [
-                "Иногда меньше — значит лучше. 👌",
-                "Быстро нашел то, что искал?",
-                "Истинный ценитель выбирает тщательно.",
-                "Коротко, но, надеюсь, ярко.",
-                "Сегодня в расслабленном режиме."
-            ],
-            trend_up: [
-                "Это на {n} больше, чем вчера. Градус растет! 🔥",
-                "Ты бьешь свои рекорды (+{n}).",
-                "Страсть разгорается (+{n}). Мне нравится.",
-                "На взлете! На {n} открытий больше.",
-                "Твой интерес растет (+{n})."
-            ],
-            trend_down: [
-                "Это на {n} меньше, чем вчера. Перезарядка? 🔋",
-                "Небольшая передышка (-{n}).",
-                "Притормозил, чтобы насладиться моментом?",
-                "Сегодня поспокойнее (-{n}). Релакс.",
-                "Копишь силы на выходные? (-{n})."
-            ],
-            fav_tag: [
-                "Твой абсолютный фаворит:",
-                "Твое сердце бьется чаще от:",
-                "Кажется, тебе очень нравится:",
-                "Победитель этого дня:",
-                "Твой выбор номер один:"
-            ],
-            fav_comment: [
-                "Отличный вкус! 🥂",
-                "Классика. Никогда не надоедает.",
-                "Я понимаю, почему тебе это нравится.",
-                "Тебе это подходит.",
-                "Горячо! Хороший выбор."
-            ],
-            change_tag: [
-                "Интересно! Ты сменил {old} на {new}.",
-                "Новое настроение? Вчера: {old}, Сегодня: {new}.",
-                "Новые горизонты: {new} (было {old}).",
-                "Разнообразие — это круто! {old} -> {new}.",
-                "Свежие желания. Теперь любим: {new}."
-            ],
-            change_comment: [
-                "Люблю, когда ты пробуешь новое.",
-                "Разносторонность — это сексуально.",
-                "Полезно иногда менять обстановку!",
-                "Следуй за своими инстинктами.",
-                "Человек множества талантов."
-            ],
-            outro: [
-                "Возвращайся скорее 😘",
-                "Сладких снов (и фантазий) 🌙",
-                "До встречи! Не пропадай.",
-                "Спасибо, что провел время со мной.",
-                "Продолжай исследовать себя 😈"
-            ]
+            intro_title: ["Время пришло... ✨", "Готов нырнуть? 🌊", "Твой Fetish Wrapped 🎁", "Оглянемся назад... ⏪"],
+            intro_sub: ["Распаковываем твои желания.", "Посмотрим, чем ты был занят.", "Статистика готова.", "Результаты получены."],
+            
+            total_title: ["Всего действий", "Активность", "Исследований", "Взаимодействий"],
+            total_sub: ["Ты себя не сдерживал.", "Много кликов, однако.", "Любопытство без границ.", "Впечатляющие цифры!"],
+            
+            top_list_title: ["Твои одержимости", "Ты возвращался к этому", "Топ лист", "Избранное"],
+            
+            top_1_title: ["Чемпион 🏆", "Абсолютный лидер", "Твой №1", "Король горы"],
+            top_1_sub: ["Живет в твоей голове бесплатно.", "Тебе это реально нравится.", "Без сюрпризов?", "Явный победитель."],
+            
+            tags_title: ["Палитра вкусов", "Ингредиенты", "Из чего ты сделан", "Облако тегов"],
+            tags_sub: ["Острый микс.", "Попробуй радугу.", "Разнообразный выбор.", "Специфичные вкусы."],
+            
+            time_morning: "Ранняя пташка 🌅",
+            time_day: "Мечтатель ☀️",
+            time_night: "Ночная сова 🦉",
+            time_sub: ["Твое любимое время.", "Пик твоей активности.", "Время волшебства.", "Ты предпочитаешь это время."],
+            
+            arch_explorer_name: "Исследователь 🧭",
+            arch_explorer_desc: "Ты любишь искать новое. Ничто не останется скрытым.",
+            arch_connoisseur_name: "Ценитель 🍷",
+            arch_connoisseur_desc: "Ты точно знаешь, чего хочешь. Качество важнее количества.",
+            arch_wild_name: "Дикий 🦁",
+            arch_wild_desc: "Без границ. Чистый адреналин. Ты любишь пожестче.",
+            arch_romantic_name: "Романтик 🌹",
+            arch_romantic_desc: "Мягкость, чувственность и эмоции для тебя важнее всего.",
+            
+            outro_free: "Приходи через неделю! Или купи Pro для статистики каждый день.",
+            outro_paid: ["До встречи! 👋", "Продолжай искать! 😈", "Оставайся горячим! 🔥", "Увидимся..."]
         },
         es: {
-            intro: [
-                "¿Listo para tu resumen picante? ✨",
-                "Veamos qué te encendió... 🔥",
-                "Tu dosis diaria de placer. 📈",
-                "Aquí está tu reporte de pasión. 💌",
-                "Repasemos tus mejores momentos. 🌟"
-            ],
-            act_high: [
-                "¡Wow! Generaste {n} categorías. ¡Qué energía!",
-                "Nivel de curiosidad: Máximo. ¡{n} búsquedas!",
-                "Alguien tuvo una noche divertida... {n} giros. 😉",
-                "¡Eres un verdadero explorador! {n} descubrimientos.",
-                "¿{n} veces? Sabes exactamente lo que quieres."
-            ],
-            act_low: [
-                "Rápido y eficiente. {n} categorías.",
-                "Calidad sobre cantidad. Solo {n} búsquedas. ✨",
-                "¿Guardando energía para luego? {n} giros.",
-                "Breve y dulce. {n} generaciones.",
-                "Una sesión enfocada. {n} hallazgos."
-            ],
-            act_comment_high: [
-                "¡Me encanta tu entusiasmo! 🔥",
-                "Tienes un apetito saludable.",
-                "Explorando todas las posibilidades, ¿eh?",
-                "Nunca hay un momento aburrido contigo.",
-                "¡Mantén esa energía!"
-            ],
-            act_comment_low: [
-                "A veces menos es más. 👌",
-                "¿Encontraste rápido lo que buscabas?",
-                "Un conocedor elige con cuidado.",
-                "Breve, pero espero que intenso.",
-                "Tomándolo con calma hoy."
-            ],
-            trend_up: [
-                "Son {n} más que antes. ¡Subiendo temperatura! 🔥",
-                "Estás rompiendo tus récords (+{n}).",
-                "La pasión crece (+{n}). Qué bien.",
-                "¡En alza! {n} descubrimientos más.",
-                "Te estás volviendo más curioso (+{n})."
-            ],
-            trend_down: [
-                "Son {n} menos que ayer. ¿Recargando? 🔋",
-                "Un pequeño respiro (-{n}).",
-                "¿Frenando para disfrutar la vista?",
-                "Un poco más tranquilo hoy (-{n}). Relax.",
-                "¿Guardando lo mejor para luego? (-{n})."
-            ],
-            fav_tag: [
-                "Tu favorito absoluto es:",
-                "Tu corazón late por:",
-                "Parece que realmente disfrutas:",
-                "El ganador del día:",
-                "Tu elección número uno:"
-            ],
-            fav_comment: [
-                "¡Excelente gusto! 🥂",
-                "Un clásico. Nunca pasa de moda.",
-                "Puedo ver por qué te gusta.",
-                "Esto te queda bien.",
-                "¡Picante! Buena elección."
-            ],
-            change_tag: [
-                "¡Interesante! Cambiaste {old} por {new}.",
-                "¿Nuevo humor? Ayer: {old}, Hoy: {new}.",
-                "Nuevos horizontes: {new} (era {old}).",
-                "¡La variedad es clave! {old} -> {new}.",
-                "Deseos frescos. Ahora amas: {new}."
-            ],
-            change_comment: [
-                "Me encanta que pruebes cosas nuevas.",
-                "La versatilidad es sexy.",
-                "¡Es bueno mezclar las cosas!",
-                "Sigue tus instintos.",
-                "Un hombre de muchos talentos."
-            ],
-            outro: [
-                "Vuelve pronto para más diversión 😘",
-                "Dulces sueños (o fantasías) 🌙",
-                "¡Hasta la próxima! No te pierdas.",
-                "Gracias por jugar conmigo hoy.",
-                "Sigue explorando tus deseos 😈"
-            ]
+            intro_title: ["Llegó la hora... ✨", "¿Listo para entrar? 🌊", "Tu Fetish Wrapped 🎁", "Miremos atrás... ⏪"],
+            intro_sub: ["Desempaquetando deseos.", "Mira en qué estuviste ocupado.", "Tus estadísticas están listas.", "Los resultados están aquí."],
+            
+            total_title: ["Acciones Totales", "Muy Ocupado", "Exploraciones", "Interacciones"],
+            total_sub: ["No te contuviste.", "Eso son muchos clics.", "Curiosidad sin límites.", "¡Números impresionantes!"],
+            
+            top_list_title: ["Tus Obsesiones", "Volviste a esto", "Tu Rotación", "Los Favoritos"],
+            
+            top_1_title: ["El Campeón 🏆", "Ganador Absoluto", "Tu #1", "Rey de la Montaña"],
+            top_1_sub: ["Vive en tu mente gratis.", "Realmente te gusta esto.", "¿Sin sorpresas?", "Un claro ganador."],
+            
+            tags_title: ["Paleta de Sabores", "Ingredientes", "De qué estás hecho", "Nube de Etiquetas"],
+            tags_sub: ["Una mezcla picante.", "Prueba el arcoíris.", "Elecciones diversas.", "Gustos específicos."],
+            
+            time_morning: "Madrugador 🌅",
+            time_day: "Soñador Diurno ☀️",
+            time_night: "Búho Nocturno 🦉",
+            time_sub: ["Prefieres explorar a esta hora.", "Tus horas pico.", "Aquí ocurre la magia.", "Tu momento favorito."],
+            
+            arch_explorer_name: "El Explorador 🧭",
+            arch_explorer_desc: "Amas buscar cosas nuevas. No dejas piedra sin mover.",
+            arch_connoisseur_name: "El Conocedor 🍷",
+            arch_connoisseur_desc: "Sabes exactamente lo que quieres. Calidad sobre cantidad.",
+            arch_wild_name: "El Salvaje 🦁",
+            arch_wild_desc: "Sin límites. Pura adrenalina. Te gusta intenso.",
+            arch_romantic_name: "El Romántico 🌹",
+            arch_romantic_desc: "Lo suave, sensual y emocional es lo que importa.",
+            
+            outro_free: "¡Vuelve en una semana! O obtén Pro para stats diarias.",
+            outro_paid: ["¡Hasta la próxima! 👋", "¡Sigue explorando! 😈", "¡Mantente picante! 🔥", "Nos vemos..."]
         },
         de: {
-            intro: [
-                "Bereit für deine heiße Zusammenfassung? ✨",
-                "Mal sehen, was dich angemacht hat... 🔥",
-                "Deine tägliche Dosis Vergnügen. 📈",
-                "Hier ist dein Leidenschaftsbericht. 💌",
-                "Lass uns deine Highlights ansehen. 🌟"
-            ],
-            act_high: [
-                "Wow! {n} Kategorien. Beeindruckende Ausdauer!",
-                "Neugier-Level: Maximum. {n} Suchen!",
-                "Jemand hatte Spaß... {n} Spins. 😉",
-                "Ein wahrer Entdecker! {n} Funde.",
-                "{n} Mal? Du weißt genau, was du willst."
-            ],
-            act_low: [
-                "Schnell und effizient. {n} Kategorien.",
-                "Qualität vor Quantität. Nur {n} Suchen. ✨",
-                "Energie sparen für später? {n} Spins.",
-                "Kurz und bündig. {n} Generationen.",
-                "Eine fokussierte Sitzung. {n} Funde."
-            ],
-            act_comment_high: [
-                "Ich liebe deinen Enthusiasmus! 🔥",
-                "Du hast einen gesunden Appetit.",
-                "Wir erkunden alle Möglichkeiten, was?",
-                "Mit dir wird es nie langweilig.",
-                "Behalt diese Energie bei!"
-            ],
-            act_comment_low: [
-                "Manchmal ist weniger mehr. 👌",
-                "Schnell gefunden, was du gesucht hast?",
-                "Ein Kenner wählt sorgfältig.",
-                "Kurz, aber hoffentlich intensiv.",
-                "Heute ganz entspannt."
-            ],
-            trend_up: [
-                "Das sind {n} mehr als vorher. Es wird heiß! 🔥",
-                "Du brichst deine Rekorde (+{n}).",
-                "Die Leidenschaft wächst (+{n}). Schön.",
-                "Im Aufwind! {n} mehr Entdeckungen.",
-                "Du wirst neugieriger (+{n})."
-            ],
-            trend_down: [
-                "Das sind {n} weniger als gestern. Aufladen? 🔋",
-                "Eine kleine Atempause (-{n}).",
-                "Langsamer, um die Aussicht zu genießen?",
-                "Heute etwas ruhiger (-{n}). Entspann dich.",
-                "Das Beste für später aufheben? (-{n})."
-            ],
-            fav_tag: [
-                "Dein absoluter Favorit ist:",
-                "Dein Herz schlägt für:",
-                "Du scheinst es echt zu mögen:",
-                "Der Gewinner des Tages:",
-                "Deine Nummer Eins:"
-            ],
-            fav_comment: [
-                "Exzellenter Geschmack! 🥂",
-                "Ein Klassiker. Wird nie alt.",
-                "Ich kann sehen, warum du es magst.",
-                "Das steht dir.",
-                "Scharf! Gute Wahl."
-            ],
-            change_tag: [
-                "Interessant! Wechsel von {old} zu {new}.",
-                "Neue Laune? Gestern: {old}, Heute: {new}.",
-                "Neue Horizonte: {new} (war {old}).",
-                "Abwechslung ist der Schlüssel! {old} -> {new}.",
-                "Frische Wünsche. Jetzt beliebt: {new}."
-            ],
-            change_comment: [
-                "Ich liebe es, wenn du Neues probierst.",
-                "Vielseitigkeit ist sexy.",
-                "Es ist gut, Dinge zu mischen!",
-                "Folge deinen Instinkten.",
-                "Ein Mann vieler Talente."
-            ],
-            outro: [
-                "Komm bald wieder für mehr Spaß 😘",
-                "Süße Träume (oder Fantasien) 🌙",
-                "Bis zum nächsten Mal! Bleib nicht fern.",
-                "Danke, dass du heute mit mir gespielt hast.",
-                "Erforsche weiter deine Wünsche 😈"
-            ]
+            intro_title: ["Es ist soweit... ✨", "Bereit einzutauchen? 🌊", "Dein Fetish Wrapped 🎁", "Ein Rückblick... ⏪"],
+            intro_sub: ["Wir enthüllen deine Wünsche.", "Schau, was dich beschäftigt hat.", "Deine Statistik ist da.", "Die Ergebnisse sind da."],
+            
+            total_title: ["Gesamtaktionen", "Fleißiges Bienchen", "Erkundungen", "Interaktionen"],
+            total_sub: ["Du hast dich nicht zurückgehalten.", "Das ist viel Geklicke.", "Neugier ohne Grenzen.", "Beeindruckende Zahlen!"],
+            
+            top_list_title: ["Deine Obsessionen", "Dazu kamst du zurück", "Deine Favoriten", "Die Lieblinge"],
+            
+            top_1_title: ["Der Champion 🏆", "Absoluter Gewinner", "Deine Nr. 1", "Gipfelstürmer"],
+            top_1_sub: ["Lebt mietfrei in deinem Kopf.", "Das magst du wirklich.", "Keine Überraschungen?", "Ein klarer Sieger."],
+            
+            tags_title: ["Geschmackspalette", "Die Zutaten", "Woraus du bestehst", "Tag-Wolke"],
+            tags_sub: ["Eine würzige Mischung.", "Koste den Regenbogen.", "Vielfältige Auswahl.", "Spezifische Geschmäcker."],
+            
+            time_morning: "Frühaufsteher 🌅",
+            time_day: "Tagträumer ☀️",
+            time_night: "Nachteule 🦉",
+            time_sub: ["Du erkundest lieber zu dieser Zeit.", "Deine Spitzenzeiten.", "Hier passiert die Magie.", "Deine Lieblingszeit."],
+            
+            arch_explorer_name: "Der Entdecker 🧭",
+            arch_explorer_desc: "Du liebst es, Neues zu suchen. Nichts bleibt verborgen.",
+            arch_connoisseur_name: "Der Kenner 🍷",
+            arch_connoisseur_desc: "Du weißt genau, was du willst. Qualität vor Quantität.",
+            arch_wild_name: "Der Wilde 🦁",
+            arch_wild_desc: "Keine Grenzen. Pures Adrenalin. Du magst es intensiv.",
+            arch_romantic_name: "Der Romantiker 🌹",
+            arch_romantic_desc: "Sanfte, sinnliche und emotionale Verbindungen zählen.",
+            
+            outro_free: "Komm in einer Woche wieder! Oder hol dir Pro.",
+            outro_paid: ["Bis zum nächsten Mal! 👋", "Forsch weiter! 😈", "Bleib scharf! 🔥", "Wir sehen uns..."]
         }
     };
 
@@ -14973,9 +14899,6 @@
         
         // Обновляем цвета и ссылку (твоя старая функция)
         updateLink(); 
-        
-        // Отправляем в облако
-        if (window.syncToCloud) window.syncToCloud();
     }
 
     function getCombinedTags(item) {
@@ -15020,7 +14943,6 @@
         localStorage.setItem(STORAGE.HISTORY, JSON.stringify(historyData));
         renderHistory();
         updateExploredCount();
-        if (window.syncToCloud) window.syncToCloud(); 
     }
 
     function getLocalizedName(item) {
@@ -15196,9 +15118,14 @@
 
     function updateCounts() { 
         document.getElementById('count-fav').innerText = favorites.length; 
+        
+        const banBadge = document.getElementById('count-ban');
+        if(banBadge) banBadge.innerText = blacklist.length;
+        
         const wlBadge = document.getElementById('count-wl');
         if(wlBadge) wlBadge.innerText = watchLater.length;
-        // updateExploredCount уже есть
+        
+        updateExploredCount(); // Вызов соседней функции
     }
 
     function exportData() {
@@ -15262,9 +15189,6 @@
             localStorage.setItem(STORAGE.HISTORY, JSON.stringify(historyData));
             localStorage.setItem(STORAGE.ACTIVITY_LOG, JSON.stringify(activityLog)); // Сохраняем лог
             localStorage.setItem(STORAGE.INTENSITY, currentIntensity);
-            
-            // Синхронизируем с облаком сразу после импорта
-            if (window.syncToCloud) window.syncToCloud();
             
             alert("Import successful! Reloading page..."); 
             location.reload();
@@ -15703,9 +15627,8 @@
         const wBtn = document.getElementById('btn-wrapped-trigger');
         
         if (wBtn) {
-            // Показываем кнопку ТОЛЬКО если генераций сегодня >= 3
-            // (Можете изменить число 3 на любое другое)
-            if (wData.countToday >= 3) {
+            // Показываем кнопку ТОЛЬКО если есть данные И генераций сегодня >= 3
+            if (wData && wData.countToday >= 3) {
                 wBtn.style.display = 'flex';
             } else {
                 wBtn.style.display = 'none';
@@ -16417,6 +16340,9 @@
         const premCont = document.getElementById('theme-list-premium');
         const currentTheme = localStorage.getItem('xch_theme_id') || 'dark';
         
+        // Получаем объект переводов
+        const t = langData[currentLang] || langData['en'];
+        
         basicCont.innerHTML = '';
         premCont.innerHTML = '';
 
@@ -16424,19 +16350,30 @@
             const isLocked = (theme.type === 'pro' && subscriptionLevel === 'free');
             const isActive = (currentTheme === theme.id);
             
+            // 1. ЛОКАЛИЗАЦИЯ НАЗВАНИЯ
+            // Ищем ключ 'theme_midnight', 'theme_dark' и т.д.
+            const themeKey = 'theme_' + theme.id;
+            // Если перевод есть - берем его, иначе дефолтное английское имя
+            const localizedName = (t && t[themeKey]) ? t[themeKey] : theme.name;
+
+            // 2. ЛОКАЛИЗАЦИЯ ТИПА (Light/Dark)
+            let typeText = theme.isLight ? 'Light' : 'Dark';
+            if (currentLang === 'ru') typeText = theme.isLight ? 'Светлая' : 'Тёмная';
+            else if (currentLang === 'es') typeText = theme.isLight ? 'Claro' : 'Oscuro';
+            else if (currentLang === 'de') typeText = theme.isLight ? 'Hell' : 'Dunkel';
+
+            // Создаем элемент
             const div = document.createElement('div');
             div.className = `theme-item ${isActive ? 'active' : ''} ${isLocked ? 'locked' : ''}`;
             
-            // Превью теперь показывает ФОН темы
             div.innerHTML = `
                 <div class="theme-preview-box" style="background: ${theme.preview}; border: 1px solid var(--border);">
-                    <!-- Можно добавить иконку "A" для демонстрации цвета текста, если хотите -->
                     <span style="font-size:10px; font-weight:700; color:${theme.isLight ? '#000' : '#fff'}">Aa</span>
                 </div>
                 <div class="theme-info">
-                    <span class="theme-name">${theme.name}</span>
+                    <span class="theme-name">${localizedName}</span>
                     <span class="theme-type" style="color: ${theme.type==='pro' ? 'var(--accent)' : 'var(--text-secondary)'}">
-                        ${theme.isLight ? 'Light' : 'Dark'}
+                        ${typeText}
                     </span>
                 </div>
                 ${isLocked ? '<span class="lock-icon">🔒</span>' : ''}
@@ -16445,6 +16382,7 @@
 
             div.onclick = () => selectTheme(theme);
             
+            // Распределяем по контейнерам
             if (theme.type === 'free') basicCont.appendChild(div);
             else premCont.appendChild(div);
         });
@@ -16940,7 +16878,6 @@
         saveLists(); 
         updateActionButtons(); 
         updateCounts();
-        if (window.syncToCloud) window.syncToCloud(); 
     }
 
     // 3. DISLIKE (ДРУГОЕ / ДИЗЛАЙК)
@@ -16965,7 +16902,6 @@
         
         saveLists(); 
         updateActionButtons();
-        if (window.syncToCloud) window.syncToCloud(); 
     }
 
     function toggleWatchLater() {
@@ -16987,7 +16923,6 @@
         
         localStorage.setItem(STORAGE.WATCH_LATER, JSON.stringify(watchLater));
         updateCounts(); // Обновит счетчик в меню
-        if (window.syncToCloud) window.syncToCloud();
     }
 
     function openWatchLaterCatalog() {
@@ -16995,44 +16930,104 @@
     }
 
     function getWrappedData() {
-        // 1. Определяем периоды (Сегодня/Вчера или Текущая неделя/Прошлая)
-        const now = new Date();
-        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-        const startOfYesterday = startOfToday - 86400000;
+        // Берем данные за ВСЕ время
+        const logs = activityLog; 
         
-        // Фильтруем логи
-        const logsToday = activityLog.filter(l => l.ts >= startOfToday && l.type === 'gen');
-        const logsYesterday = activityLog.filter(l => l.ts >= startOfYesterday && l.ts < startOfToday && l.type === 'gen');
-        
-        // 2. Считаем лучший тег за сегодня
-        const tagCountsToday = {};
-        logsToday.forEach(l => {
-            l.tags.forEach(t => {
-                if(['universal','straight','gay','lesbian','trans'].includes(t)) return;
-                tagCountsToday[t] = (tagCountsToday[t] || 0) + 1;
-            });
-        });
-        const topTagToday = Object.keys(tagCountsToday).sort((a,b) => tagCountsToday[b] - tagCountsToday[a])[0];
+        if (logs.length < 5) return null; // Мало данных
 
-        // 3. Считаем лучший тег за вчера (для сравнения)
-        const tagCountsYesterday = {};
-        logsYesterday.forEach(l => {
-            l.tags.forEach(t => {
-                if(['universal','straight','gay','lesbian','trans'].includes(t)) return;
-                tagCountsYesterday[t] = (tagCountsYesterday[t] || 0) + 1;
-            });
+        // 1. Топ Предметов (ID)
+        const itemCounts = {};
+        let totalActions = 0;
+        
+        // === НОВОЕ: Счетчик за сегодня ===
+        let countToday = 0;
+        const startOfDay = new Date();
+        startOfDay.setHours(0,0,0,0);
+        // ================================
+
+        // 2. Топ Тегов
+        const tagCounts = {};
+        
+        // 3. Время суток (0-23)
+        const hours = new Array(24).fill(0);
+
+        // 4. Архетип (считаем метрики)
+        let extremeCount = 0;
+        let vanillaCount = 0;
+        let watchCount = 0;
+
+        logs.forEach(l => {
+            // Считаем только активные действия
+            if (l.type === 'watch' || l.type === 'like' || l.type === 'gen') {
+                totalActions++;
+                
+                // === НОВОЕ: Проверка даты ===
+                if (l.ts >= startOfDay.getTime()) {
+                    countToday++;
+                }
+                // ============================
+                
+                // Предметы
+                itemCounts[l.id] = (itemCounts[l.id] || 0) + (l.type === 'watch' ? 3 : 1); 
+                
+                // Теги
+                if (l.tags) {
+                    l.tags.forEach(t => {
+                        if(['universal','straight','gay','lesbian','trans','male','female','adult'].includes(t)) return;
+                        tagCounts[t] = (tagCounts[t] || 0) + 1;
+                        
+                        if (EXTREME_TAGS.includes(t)) extremeCount++;
+                        if (['vanilla', 'romantic', 'kissing', 'massage'].includes(t)) vanillaCount++;
+                    });
+                }
+
+                // Время
+                const h = new Date(l.ts).getHours();
+                hours[h]++;
+                
+                if (l.type === 'watch') watchCount++;
+            }
         });
-        const topTagYesterday = Object.keys(tagCountsYesterday).sort((a,b) => tagCountsYesterday[b] - tagCountsYesterday[a])[0];
+
+        // Сортировка Предметов
+        const topItems = Object.entries(itemCounts)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5)
+            .map(([id, score]) => {
+                const item = data.find(x => x.id == id);
+                return item ? { name: getLocalizedName(item), score } : null;
+            }).filter(x => x);
+
+        // Сортировка Тегов
+        const topTags = Object.entries(tagCounts)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5)
+            .map(([tag, count]) => tag.charAt(0).toUpperCase() + tag.slice(1));
+
+        // Пиковое время
+        const morning = hours.slice(5, 12).reduce((a,b)=>a+b,0);
+        const day = hours.slice(12, 20).reduce((a,b)=>a+b,0);
+        const night = hours.slice(20, 24).reduce((a,b)=>a+b,0) + hours.slice(0, 5).reduce((a,b)=>a+b,0);
+        
+        let peakTime = 'day';
+        if (night > day && night > morning) peakTime = 'night';
+        else if (morning > day && morning > night) peakTime = 'morning';
+
+        // Архетип
+        let archetype = 'explorer';
+        if (watchCount / totalActions > 0.4) archetype = 'connoisseur'; 
+        else if (extremeCount > vanillaCount * 2) archetype = 'wild';
+        else if (vanillaCount > extremeCount * 2) archetype = 'romantic';
 
         return {
-            countToday: logsToday.length,
-            countYesterday: logsYesterday.length,
-            diff: logsToday.length - logsYesterday.length,
-            topTag: topTagToday,
-            prevTopTag: topTagYesterday
+            totalActions,
+            countToday,
+            topItems,
+            topTags,
+            peakTime,
+            archetype
         };
     }
-
     // Хелпер для получения случайной фразы на нужном языке
     function getWrappedPhrase(category, replacements = {}) {
         // 1. Определяем язык (если нет перевода, берем EN)
@@ -17051,111 +17046,194 @@
     }
 
     function openWrapped() {
-        // Проверка подписки (Нерф)
+        const dataStats = getWrappedData();
+        const t = langData[currentLang] || langData['en'];
+
+        // --- ХЕЛПЕР ДЛЯ ПОЛУЧЕНИЯ ФРАЗ ---
+        // (Встроенная версия для удобства, берет массив или строку)
+        const getWP = (key) => {
+            const lang = wrappedPhrases[currentLang] ? currentLang : 'en';
+            const val = wrappedPhrases[lang][key];
+            if (Array.isArray(val)) return val[Math.floor(Math.random() * val.length)];
+            return val;
+        };
+
+        // --- 1. ПРОВЕРКА ДЛЯ БЕСПЛАТНЫХ (Лимит 7 дней) ---
         if (subscriptionLevel === 'free') {
-            openSubModal();
-            return;
+            const lastAccess = parseInt(localStorage.getItem('xch_last_wrapped_free') || '0');
+            const now = Date.now();
+            const cooldownTime = 7 * 24 * 60 * 60 * 1000; 
+
+            if (now - lastAccess < cooldownTime) {
+                const daysLeft = Math.ceil((lastAccess + cooldownTime - now) / (1000 * 60 * 60 * 24));
+                alert(`Fetish Wrapped: Available once every 7 days. Days left: ${daysLeft}`); 
+                openSubModal();
+                return;
+            }
+            localStorage.setItem('xch_last_wrapped_free', now);
         }
 
-        const data = getWrappedData();
-        
-        // Минимальный порог данных
-        if (data.countToday < 3) {
+        // --- 2. ПРОВЕРКА ДАННЫХ ---
+        if (!dataStats || dataStats.totalActions < 3) {
             alert(currentLang === 'ru' ? "Слишком мало данных! Сгенерируй больше фетишей сегодня 😏" : "Not enough data yet! Generate more fetishes today. 😏");
             return;
         }
 
+        // --- 3. РЕНДЕР СЛАЙДОВ ---
         const overlay = document.getElementById('wrapped-mount');
         overlay.innerHTML = '';
         overlay.classList.add('active');
         
         const slides = [];
 
-        // --- SLIDE 1: INTRO ---
+        // SLIDE 1: INTRO
         slides.push(`
             <div class="wrapped-slide bg-dark active-slide">
-                <div class="wrapped-big-text">xFetish<br><span style="color:var(--accent)">Wrapped</span></div>
-                <div class="wrapped-sub-text">${getWrappedPhrase('intro')}</div>
+                <div class="wrapped-big-text">Fetish<br><span style="color:var(--accent)">Wrapped</span></div>
+                <div class="wrapped-sub-text">${getWP('intro_title')}<br>${getWP('intro_sub')}</div>
             </div>
         `);
 
-        // --- SLIDE 2: COUNT (Количество) ---
-        const isBusy = data.countToday > 15;
-        const countPhrase = isBusy 
-            ? getWrappedPhrase('act_high', {n: data.countToday}) 
-            : getWrappedPhrase('act_low', {n: data.countToday});
-        
-        const countComment = isBusy
-            ? getWrappedPhrase('act_comment_high')
-            : getWrappedPhrase('act_comment_low');
-
+        // SLIDE 2: TOTAL ACTIONS
         slides.push(`
             <div class="wrapped-slide bg-fire">
-                <div class="wrapped-big-text">${data.countToday}</div>
-                <div class="wrapped-sub-text">
-                    ${countPhrase}
-                    <br><br>
-                    <b>${countComment}</b>
-                </div>
+                <div class="wrapped-sub-text">${getWP('total_title')}</div>
+                <div class="wrapped-big-text" style="font-size:100px; line-height:1;">${dataStats.totalActions}</div>
+                <div class="wrapped-sub-text" style="max-width:300px;">${getWP('total_sub')}</div>
             </div>
         `);
 
-        // --- SLIDE 3: TREND (Только если есть данные за вчера) ---
-        if (data.countYesterday > 0) {
-            const isUp = data.diff > 0;
-            const diffNum = Math.abs(data.diff);
-            const trendPhrase = isUp
-                ? getWrappedPhrase('trend_up', {n: diffNum})
-                : getWrappedPhrase('trend_down', {n: diffNum});
+        // SLIDE 3: TOP ITEMS (LIST)
+        let listHtml = dataStats.topItems.map((item, i) => 
+            `<div style="font-size:${24 - i*2}px; margin:10px 0; font-weight:700; opacity:0; animation: slideInRight 0.5s ease forwards ${i*0.2}s;">
+                <span style="color:rgba(255,255,255,0.6);">#${i+1}</span> ${item.name}
+            </div>`
+        ).join('');
 
-            slides.push(`
-                <div class="wrapped-slide bg-toxic">
-                    <div class="wrapped-big-text">${data.diff > 0 ? '+' : ''}${data.diff}</div>
-                    <div class="wrapped-sub-text">${trendPhrase}</div>
-                </div>
-            `);
-        }
-
-        // --- SLIDE 4: TOP TAG ---
-        if (data.topTag) {
-            const tagName = data.topTag.charAt(0).toUpperCase() + data.topTag.slice(1);
-            
-            slides.push(`
-                <div class="wrapped-slide bg-passion">
-                    <div class="wrapped-sub-text">${getWrappedPhrase('fav_tag')}</div>
-                    <div class="wrapped-big-text wrapped-highlight">${tagName}</div>
-                    <div class="wrapped-sub-text">${getWrappedPhrase('fav_comment')}</div>
-                </div>
-            `);
-            
-            // --- SLIDE 5: CHANGE (Если вкус изменился) ---
-            if (data.prevTopTag && data.prevTopTag !== data.topTag) {
-                const oldName = data.prevTopTag.charAt(0).toUpperCase() + data.prevTopTag.slice(1);
-                
-                const changePhrase = getWrappedPhrase('change_tag', {old: oldName, new: tagName});
-
-                slides.push(`
-                    <div class="wrapped-slide bg-dark">
-                        <div class="wrapped-sub-text">
-                            ${changePhrase}
-                            <br><br>
-                            ${getWrappedPhrase('change_comment')}
-                        </div>
-                    </div>
-                `);
-            }
-        }
-
-        // --- SLIDE 6: OUTRO ---
         slides.push(`
-            <div class="wrapped-slide bg-dark">
-                <div class="wrapped-big-text">👋</div>
-                <div class="wrapped-sub-text">${getWrappedPhrase('outro')}</div>
-                <button class="btn-gen" style="margin-top:30px; font-size:14px; background:#fff; color:#000;" onclick="closeWrapped()">Close</button>
+            <div class="wrapped-slide bg-toxic">
+                <div class="wrapped-big-text" style="font-size:32px; margin-bottom:30px;">${getWP('top_list_title')}</div>
+                <div style="text-align:left; width:100%; max-width:300px;">${listHtml}</div>
             </div>
         `);
 
-        // Рендер баров и контейнера
+        // SLIDE 4: #1 CHAMPION
+        if (dataStats.topItems.length > 0) {
+            slides.push(`
+                <div class="wrapped-slide" style="background: radial-gradient(circle, #ff00cc, #333399);">
+                    <div class="wrapped-sub-text">${getWP('top_1_title')}</div>
+                    <div class="wrapped-big-text" style="font-size:50px; color:#fff; text-shadow:0 0 20px rgba(255,255,255,0.5);">
+                        ${dataStats.topItems[0].name}
+                    </div>
+                    <div class="wrapped-sub-text">${getWP('top_1_sub')}</div>
+                </div>
+            `);
+        }
+
+        // SLIDE 5: TAGS CLOUD
+        let tagsHtml = dataStats.topTags.map((tag, i) => 
+            `<span style="display:inline-block; margin:5px; padding:8px 15px; background:rgba(255,255,255,0.2); border-radius:20px; font-weight:700; font-size:${20 - i}px;">${tag}</span>`
+        ).join('');
+
+        slides.push(`
+            <div class="wrapped-slide bg-passion">
+                <div class="wrapped-big-text" style="font-size:36px; margin-bottom:20px;">${getWP('tags_title')}</div>
+                <div style="display:flex; flex-wrap:wrap; justify-content:center; max-width:320px;">${tagsHtml}</div>
+                <div class="wrapped-sub-text" style="margin-top:20px;">${getWP('tags_sub')}</div>
+            </div>
+        `);
+
+        // SLIDE 6: TIME OF DAY
+        let timeTitle = getWP('time_day');
+        let timeBg = "linear-gradient(to bottom, #56ccf2, #2f80ed)";
+        let timeIcon = "☀️";
+
+        if (dataStats.peakTime === 'night') {
+            timeTitle = getWP('time_night');
+            timeBg = "linear-gradient(to bottom, #0f2027, #203a43, #2c5364)";
+            timeIcon = "🦉";
+        } else if (dataStats.peakTime === 'morning') {
+            timeTitle = getWP('time_morning');
+            timeBg = "linear-gradient(to bottom, #ff512f, #dd2476)";
+            timeIcon = "🌅";
+        }
+
+        slides.push(`
+            <div class="wrapped-slide" style="background: ${timeBg};">
+                <div class="wrapped-big-text" style="font-size:80px;">${timeIcon}</div>
+                <div class="wrapped-big-text" style="font-size:32px;">${timeTitle}</div>
+                <div class="wrapped-sub-text">${getWP('time_sub')}</div>
+            </div>
+        `);
+
+        // SLIDE 7: ARCHETYPE
+        let archName = getWP('arch_explorer_name');
+        let archDesc = getWP('arch_explorer_desc');
+        let archBg = "linear-gradient(45deg, #11998e, #38ef7d)";
+
+        if (dataStats.archetype === 'connoisseur') {
+            archName = getWP('arch_connoisseur_name');
+            archDesc = getWP('arch_connoisseur_desc');
+            archBg = "linear-gradient(45deg, #833ab4, #fd1d1d, #fcb045)";
+        } else if (dataStats.archetype === 'wild') {
+            archName = getWP('arch_wild_name');
+            archDesc = getWP('arch_wild_desc');
+            archBg = "linear-gradient(45deg, #000000, #434343)";
+        } else if (dataStats.archetype === 'romantic') {
+            archName = getWP('arch_romantic_name');
+            archDesc = getWP('arch_romantic_desc');
+            archBg = "linear-gradient(45deg, #ff9a9e, #fecfef)";
+        }
+
+        slides.push(`
+            <div class="wrapped-slide" style="background: ${archBg};">
+                <div class="wrapped-sub-text" style="text-transform:uppercase; letter-spacing:2px;">${t.w_arch_title || "Your Archetype"}</div>
+                <div class="wrapped-big-text" style="font-size:42px; margin:20px 0; border:4px solid #fff; padding:20px;">
+                    ${archName}
+                </div>
+                <div class="wrapped-sub-text">${archDesc}</div>
+            </div>
+        `);
+
+        // SLIDE 8: OUTRO
+        let outroHtml = '';
+        if (subscriptionLevel === 'free') {
+            // FREE VERSION
+            outroHtml = `
+                <div class="wrapped-big-text" style="font-size:50px;">🔒</div>
+                <div class="wrapped-sub-text" style="max-width:320px; margin-bottom:20px;">
+                    ${getWP('outro_free')}
+                </div>
+                <button class="plan-btn pro-btn" onclick="closeWrapped(); openSubModal()" 
+                    style="width:auto; padding: 15px 30px; font-size:15px; border-radius:50px; box-shadow: 0 4px 20px rgba(255, 153, 0, 0.4);">
+                    ${t.btn_get_pro || "Get Pro"}
+                </button>
+                <button onclick="closeWrapped()" 
+                    style="background:transparent; border:1px solid rgba(255,255,255,0.3); color:#fff; padding: 12px 30px; border-radius:50px; font-size:14px; margin-top:15px; cursor:pointer;">
+                    ${t.btn_close || "Close"}
+                </button>
+            `;
+        } else {
+            // PAID VERSION
+            outroHtml = `
+                <div class="wrapped-big-text">👋</div>
+                <div class="wrapped-sub-text" style="max-width:300px; margin-bottom:30px;">
+                    ${getWP('outro_paid')}
+                </div>
+                <button onclick="closeWrapped()" 
+                    style="background:var(--accent); color:#000; border:none; padding: 15px 40px; border-radius:50px; font-size:16px; font-weight:700; cursor:pointer; box-shadow: 0 4px 20px rgba(255,255,255,0.2);">
+                    ${t.btn_close || "Close"}
+                </button>
+            `;
+        }
+
+        slides.push(`
+            <div class="wrapped-slide bg-dark" style="justify-content:center; gap:15px;">
+                ${outroHtml}
+            </div>
+        `);
+
+        // --- RENDER ---
         let barsHtml = '';
         slides.forEach((_, i) => {
             barsHtml += `<div class="wrapped-progress-bar"><div class="wrapped-progress-fill" id="bar-${i}"></div></div>`;
