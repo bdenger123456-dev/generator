@@ -14574,63 +14574,68 @@
     // === СИСТЕМА ПОДСЧЕТА ВЕСОВ (SMART MATCH) ===
 
     function calculateItemWeight(item) {
-        let score = 10; // Базовый вес для всех
+        // Базовый вес (для "шума", чтобы иногда попадалось что-то новое)
+        let score = 5; 
 
-        // 1. ИСТОРИЧЕСКИЕ ВЕСА (Накопленные баллы)
-        if (item.tags) {
-            item.tags.forEach(t => {
-                score += (tagScores[t] || 0);
-            });
-        }
-
-        // 2. УМНЫЙ АНАЛИЗ (Лайки)
+        // === 1. УМНЫЙ АНАЛИЗ ЛАЙКОВ (АГРЕССИВНЫЙ) ===
         if (favorites.length > 0) {
             favorites.forEach(favId => {
                 const favItem = data.find(i => i.id === favId);
                 if (favItem) {
                     const commonTags = item.tags.filter(t => favItem.tags.includes(t));
-                    // Исключаем "технические" теги из буста, чтобы не бустить всё подряд
-                    const meaningfulTags = commonTags.filter(t => !['universal', 'straight', 'male', 'female', 'adult'].includes(t));
+                    // Исключаем мусорные теги из анализа
+                    const meaningfulTags = commonTags.filter(t => !['universal', 'straight', 'male', 'female', 'adult', 'roleplay'].includes(t));
                     
-                    // Умеренный буст за совпадения тегов с лайкнутым
                     if (meaningfulTags.length > 0) {
-                        score += (meaningfulTags.length * 40); 
+                        // БЫЛО: +40. СТАЛО: +1500 за каждое совпадение.
+                        // Это гарантирует, что похожий предмет перебьет сотню "случайных"
+                        score += (meaningfulTags.length * 1500); 
                     }
                 }
             });
         }
 
-        // 3. УМНЫЙ АНАЛИЗ (Дизлайки)
+        // === 2. УМНЫЙ АНАЛИЗ ДИЗЛАЙКОВ (КАРАТЕЛЬНЫЙ) ===
+        // Если предмет похож на то, что в ЧС, мы уничтожаем его шанс.
         if (blacklist.length > 0) {
             blacklist.forEach(banId => {
                 const banItem = data.find(i => i.id === banId);
                 if (banItem) {
                     const commonTags = item.tags.filter(t => banItem.tags.includes(t));
-                    const meaningfulTags = commonTags.filter(t => !['universal', 'straight', 'male', 'female', 'adult'].includes(t));
+                    const meaningfulTags = commonTags.filter(t => !['universal', 'straight', 'male', 'female', 'adult', 'roleplay'].includes(t));
                     
-                    // Сильный штраф, чтобы не показывать то, что похоже на дизлайкнутое
                     if (meaningfulTags.length > 0) {
-                        score -= (meaningfulTags.length * 40);
+                        // Делим вес на 100. Шанс становится 0.00...1%
+                        score = score / 100;
                     }
                 }
             });
         }
 
-        // 4. БУСТ ОРИЕНТАЦИИ (УМЕРЕННЫЙ)
-        // Было 5000, стало 100. Это дает приоритет, но оставляет шанс другим жанрам.
+        // === 3. БУСТ ОРИЕНТАЦИИ (ПРИОРИТЕТНЫЙ) ===
+        // Если выбрано Гей/Транс, мы хотим видеть именно профильный контент, а не "Учитель + Гей".
+        // Даем профильным тегам огромный буст.
         if (currentOrientation === 'gay') {
-            if (item.tags.includes('gay')) score += 100;
+            if (item.tags.includes('gay')) {
+                score += 3000; // Профильный гей-контент получает приоритет
+            } else {
+                // Универсальный контент (без тега gay) получает штраф, чтобы не мешать
+                score = score / 2; 
+            }
         } 
         else if (currentOrientation === 'trans') {
             if (item.tags.some(t => ['trans', 'shemale', 'futanari', 'crossdresser'].includes(t))) {
-                score += 100;
+                score += 3000;
+            } else {
+                score = score / 2;
             }
         }
+        // Для гетеро (по умолчанию) ничего не трогаем, пусть работает по лайкам.
 
-        // Вес не может быть меньше 0.1 (чтобы всегда был мизерный шанс на случайность)
-        return Math.max(0.1, score);
+        // Защита от нуля
+        return Math.max(0.01, score);
     }
-    
+
     function getWeightedRandom(items) {
         let totalWeight = 0;
         
@@ -14900,30 +14905,28 @@
             // === 4. ПОДСЧЕТ ОЧКОВ ===
             let score = 0;
 
-            // А. Анализ ТЕКСТА (Самое важное обновление)
-            // Создаем портрет кандидата
+            // А. Анализ ТЕКСТА
             const candidateTokens = [
                 ...getTokens(item.name),
                 ...getTokens(item.desc_en)
             ];
             
-            // Ищем пересечения слов
             let textMatches = 0;
             candidateTokens.forEach(token => {
                 if (currentTokens.has(token)) textMatches++;
             });
-            
-            // За каждое совпадение слова даем 4 очка. 
-            // Если совпало "Milk" в названии одного и описании другого -> +4 балла.
-            score += textMatches * 4;
+            score += textMatches * 5; // Увеличили вес слов
 
-            // Б. Анализ ТЕГОВ
+            // Б. Анализ ТЕГОВ (Умный)
+            // Список "мусорных" тегов, которые не делают предметы похожими
+            const trashTags = ['universal', 'straight', 'gay', 'lesbian', 'bi', 'male', 'female', 'adult', 'roleplay', 'video', 'hd'];
+
             item.tags.forEach(tag => {
                 if (currentItem.tags.includes(tag)) {
-                    if (commonTags.includes(tag)) {
-                        score += 1; // За общий тег (типа universal) всего 1 очко
+                    if (trashTags.includes(tag)) {
+                        score += 0.5; // Почти не учитываем общие теги
                     } else {
-                        score += 5; // За редкий тег (типа lactation) целых 5 очков!
+                        score += 10; // Редкие теги (bdsm, feet, latex) дают ОЧЕНЬ много
                     }
                 }
             });
