@@ -1397,22 +1397,19 @@
             </div>
         </div>
 
-        <!-- TAB 2: SETTINGS (Preferences & Filters) -->
+        <!-- TAB 2: SETTINGS -->
         <div id="tab-settings" class="tab-content">
             <div class="center-wrapper">
                 <div id="mount-prefs"></div>
             </div>
         </div>
 
-        <!-- TAB 3: ACCOUNT (Data & Login) -->
+        <!-- TAB 3: ACCOUNT (Account & Extras) -->
         <div id="tab-account" class="tab-content">
             <div class="center-wrapper">
                 <div id="mount-account"></div>
                 <div id="mount-extras"></div>
             </div>
-        </div>
-            </div> 
-
         </div>
 
 <div class="bottom-gradient-mask"></div>
@@ -14471,20 +14468,20 @@
     ];
 
     window.onload = () => {
+        // 1. Инициализация данных
         initLanguage();
         initTheme();
         initIntensity();
         renderModifiers();
+        // renderFilters(); <--- УДАЛЕНО, чтобы не вызывало ошибку
         renderHistory();
         updateCounts();
-        checkLayout();
+        
+        // 2. Инициализация систем
         initAgeGate();
         initSwipeCards();
         
-        document.body.classList.add('tab-home-active'); 
-        document.getElementById('orientation-select').value = currentOrientation;
-
-        // Платформа
+        // 3. Установка платформы
         const savedPlatform = localStorage.getItem('xch_platform');
         if (savedPlatform) {
             const platformSelect = document.getElementById('platform');
@@ -14492,12 +14489,27 @@
         }
         updateLink();
 
+        // 4. Текст и Анимация слота
         setWelcomeMessage(); 
+        
+        // Сброс флага первой генерации
+        isFirstGen = true; 
+        
+        // Запуск "холостого хода" слота (бегущая строка)
         initIdleSlot(); 
 
         updateSubscriptionUI();
         
+        // 5. Инициализация Ориентации
+        const oriSelect = document.getElementById('orientation-select');
+        if (oriSelect) oriSelect.value = currentOrientation;
+
+        // 6. Верстка (в самом конце, чтобы всё уже было готово)
+        checkLayout(); 
         window.addEventListener('resize', checkLayout);
+        
+        // Принудительно ставим класс для мобильной шапки
+        document.body.classList.add('tab-home-active');
     };
 
     function setWelcomeMessage() {
@@ -15266,39 +15278,40 @@
     function checkLayout() {
         const isPC = window.innerWidth > 768;
         
-        // Получаем оставшиеся блоки
+        // 1. Исходные блоки (Что переносим)
         const bPrefs = document.getElementById('block-prefs');
         const bAccount = document.getElementById('block-account');
         const bExtras = document.getElementById('block-extras');
         
-        // Куда вставлять на ПК
+        // 2. Целевые контейнеры (Куда переносим)
         const sidebar = document.getElementById('pc-settings-mount');
-
-        // Куда вставлять на Мобильном
         const mPrefs = document.getElementById('mount-prefs');
         const mAccount = document.getElementById('mount-account');
         const mExtras = document.getElementById('mount-extras');
 
         if (isPC) {
-            // === РЕЖИМ ПК: ВСЁ В БОКОВУЮ ПАНЕЛЬ ===
+            // === ПК РЕЖИМ ===
             if (sidebar) {
+                // Переносим только то, что существует
                 if(bPrefs) sidebar.appendChild(bPrefs);
-                // Фильтров больше нет, пропускаем
                 if(bAccount) sidebar.appendChild(bAccount);
                 if(bExtras) sidebar.appendChild(bExtras);
             }
             
-            // Показываем главную вкладку
+            // Активируем главную вкладку, скрываем мобильные
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.getElementById('tab-home').classList.add('active');
+            const homeTab = document.getElementById('tab-home');
+            if(homeTab) homeTab.classList.add('active');
+
         } else {
-            // === МОБИЛЬНЫЙ РЕЖИМ: РАСКИДЫВАЕМ ПО ВКЛАДКАМ ===
+            // === МОБИЛЬНЫЙ РЕЖИМ ===
+            // Раскидываем блоки по вкладкам
             if(mPrefs && bPrefs) mPrefs.appendChild(bPrefs);
             if(mAccount && bAccount) mAccount.appendChild(bAccount);
             if(mExtras && bExtras) mExtras.appendChild(bExtras);
         }
     }
-    
+
     function toggleAccordion(id) { document.getElementById(id).classList.toggle('open'); }
     
     function switchTab(tab) {
