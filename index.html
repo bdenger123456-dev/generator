@@ -1237,7 +1237,7 @@
         .spinning-icon { animation: spinIcon 1s linear infinite; display: inline-block; }
 
 
-        /* Анимации Fetish Wrapped */
+        /* Fetish Wrapped */
         @keyframes popIn {
             0% { transform: scale(0.5); opacity: 0; }
             80% { transform: scale(1.1); opacity: 1; }
@@ -1252,6 +1252,75 @@
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
+        }
+
+        .wrapped-lock-container {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 1px dashed var(--border);
+        }
+        .wrapped-lock-title {
+            font-size: 16px; font-weight: 800; margin-bottom: 5px;
+            background: linear-gradient(45deg, #FF9900, #9B59B6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+        }
+        .wrapped-lock-desc {
+            font-size: 12px; color: var(--text-secondary); margin-bottom: 15px;
+        }
+        .w-progress-track {
+            height: 8px; width: 100%; background: rgba(255,255,255,0.1);
+            border-radius: 4px; overflow: hidden; margin-bottom: 8px;
+        }
+        .w-progress-fill {
+            height: 100%; background: linear-gradient(90deg, #FF9900, #9B59B6);
+            width: 0%; transition: width 0.5s ease;
+        }
+        .w-progress-text {
+            font-size: 11px; font-weight: 700; color: var(--text-main);
+        }
+
+        /* Финальная сводка (Summary Card) */
+        .summary-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 24px;
+            padding: 25px;
+            width: 90%;
+            max-width: 340px;
+            text-align: left;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            opacity: 0; 
+            transform: translateY(20px);
+            animation: slideUpFade 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards 0.5s;
+        }
+        @keyframes slideUpFade {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .sum-header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding-bottom: 15px; margin-bottom: 5px;
+        }
+        .sum-logo { font-weight: 900; font-size: 18px; color: #fff; }
+        .sum-date { font-size: 10px; color: rgba(255,255,255,0.6); text-transform: uppercase; text-align: right; }
+        .sum-row { display: flex; justify-content: space-between; align-items: center; }
+        .sum-label { font-size: 12px; color: rgba(255,255,255,0.6); text-transform: uppercase; font-weight: 600; }
+        .sum-val { font-size: 18px; font-weight: 800; color: #fff; }
+        .sum-big-val { font-size: 28px; font-weight: 900; color: #ffe600; text-shadow: 0 0 20px rgba(255, 230, 0, 0.3); }
+        .sum-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+        .sum-tag { 
+            background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.1); 
+            padding: 4px 10px; border-radius: 12px; font-size: 11px; color: #fff; font-weight: 600; 
         }
 
         /* =========================================
@@ -2508,6 +2577,7 @@
     let cooldownList = []; // Хранит ID последних 20 показанных карточек
     const COOLDOWN_SIZE = 20;
     const TAG_DECAY_RATE = 0.98;
+    const WRAPPED_THRESHOLD = 30;
 
     /* =================== ⚒️ DEBUG MODE =========================== */
     
@@ -14257,138 +14327,296 @@
 
     const wrappedPhrases = {
         en: {
-            intro_title: ["It's that time... ✨", "Ready to dive in? 🌊", "Your Fetish Wrapped 🎁", "Let's look back... ⏪"],
-            intro_sub: ["Unwrapping your desires.", "See what kept you busy.", "Your stats are ready.", "The results are in."],
-            
-            total_title: ["Total Actions", "Busy Bee", "Explorations", "Total Interactions"],
-            total_sub: ["You didn't hold back.", "That's a lot of clicking.", "Curiosity has no limits.", "Impressive numbers!"],
-            
-            top_list_title: ["Your Top Obsessions", "You kept coming back", "Your Heavy Rotation", "The Favorites"],
-            
-            top_1_title: ["The Champion 🏆", "Absolute Winner", "Your #1 Craving", "Top of the Mountain"],
-            top_1_sub: ["This one lives in your head rent-free.", "You really, really like this.", "No surprises here?", "A clear winner."],
-            
-            tags_title: ["Your Flavor Palette", "The Ingredients", "What you're made of", "Tag Cloud"],
-            tags_sub: ["A spicy mix.", "Taste the rainbow.", "Diverse choices.", "Specific tastes."],
-            
-            time_morning: "Early Bird 🌅",
-            time_day: "Daydreamer ☀️",
-            time_night: "Night Owl 🦉",
-            time_sub: ["You prefer to explore at this time.", "Your peak activity hours.", "This is when magic happens.", "Your favorite time to browse."],
-            
-            arch_explorer_name: "The Explorer 🧭",
-            arch_explorer_desc: "You love searching for new things. No stone left unturned.",
-            arch_connoisseur_name: "The Connoisseur 🍷",
-            arch_connoisseur_desc: "You know exactly what you want. Quality over quantity.",
-            arch_wild_name: "The Untamed 🦁",
-            arch_wild_desc: "No limits. Pure adrenaline. You like it intense.",
-            arch_romantic_name: "The Romantic 🌹",
-            arch_romantic_desc: "Soft, sensual, and emotional connections matter to you.",
-            
-            outro_free: "Come back in a week! Or get Pro for daily stats.",
-            outro_paid: ["See you next time! 👋", "Keep exploring! 😈", "Stay spicy! 🔥", "Until next time..."]
+            // SCENARIO 1: FIRST TIME EVER (The Initiation)
+            story_first: {
+                intro: [
+                    "Hey {name}... Finally decided to peek behind the curtain? 👀<br><br>I've been quietly taking notes while you were... occupied. You think your choices were random, but I see a pattern in the chaos.",
+                    "Welcome, {name}. I was waiting for you. 🕯️<br><br>You've spent quite some time exploring your desires here. It's time to stop for a moment, catch your breath, and look at your reflection in the data mirror."
+                ],
+                activity: [
+                    "You didn't hold back, did you? The algorithm is heating up just processing your data. <br><br>Let's look at the sheer volume of your curiosity.",
+                    "Finger gymnastics at its finest. You swiped, clicked, and searched with purpose. <br><br>Here is the scale of your journey so far."
+                ],
+                timing: [
+                    "Everyone has their own rhythm. Yours? It's distinct.<br><br>While the world was spinning, you carved out specific moments for yourself. We know exactly when your demons come out to play.",
+                ],
+                obsession: [
+                    "And now... the truth. <br><br>Out of hundreds of possibilities, your brain kept rewiring itself back to specific themes. These aren't just tags; they are your map.",
+                ],
+                archetype: [
+                    "So, who are you really? <br><br>We've crunched the numbers, analyzed the heatmaps, and found your digital soulmate. This is your Archetype."
+                ]
+            },
+
+            // SCENARIO 2: REGULAR / WEEKLY (The Check-up)
+            story_regular: {
+                intro: [
+                    "Look who's back, {name}. 😏<br><br>It's been a busy week for your thumbs, hasn't it? I've collected everything you did since we last spoke. Ready to see if your tastes have evolved?",
+                    "Caught you again, {name}. ✨<br><br>Another cycle, another set of desires. You've been digging deeper this time. Let's unwrap the latest chapter of your story."
+                ],
+                activity: [
+                    "Consistency is key, and you... well, you are definitely consistent. <br><br>The numbers don't lie. You've been active. Very active.",
+                    "Your dopamine receptors must be working overtime. <br><br>We tracked every swipe and every hesitation. Here is the summary of your digital workout."
+                ],
+                timing: [
+                    "Time flies when you're having fun. <br><br>But your internal clock has a specific schedule for pleasure. Here is when the magic usually happens."
+                ],
+                obsession: [
+                    "Let's talk about what lives in your head rent-free. <br><br>You tried new things, but you always came back home to these specific categories.",
+                ],
+                archetype: [
+                    "Based on your recent behavior, your vibe has shifted... or solidified. <br><br>Here is how the algorithm sees you right now."
+                ]
+            },
+
+            // SHARED / STATIC TEXTS
+            common: {
+                total_label: "Total Interactions",
+                top_label: "Your Heavy Rotation",
+                tags_label: "The Flavor Palette",
+                arch_label: "Your Archetype",
+                
+                arch_explorer: {
+                    name: "The Voyager 🧭",
+                    desc: "You refuse to settle. While others stick to the same old vanilla, you turn every stone. You swiped left on the ordinary to find the extraordinary. Your curiosity is your superpower."
+                },
+                arch_connoisseur: {
+                    name: "The Sommelier 🍷",
+                    desc: "You don't just watch; you curate. You skipped the trash and went straight for the gold. You know exactly what turns you on, and you don't waste time on anything else. A true tastemaker."
+                },
+                arch_wild: {
+                    name: "The Untamed 🦁",
+                    desc: "Safety limits? Never heard of them. Your stats show a hunger for intensity, adrenaline, and the extreme. While others dip their toes, you dive into the deep end. Respect."
+                },
+                arch_romantic: {
+                    name: "The Dreamer 🌹",
+                    desc: "Amidst the chaos of flesh, you sought connection. Softness, intimacy, and passion drove your choices. You proved that even here, the heart wants what it wants."
+                },
+
+                outro_free: "This story disappears in a moment. Want to keep your history and see stats daily? <br><b>Upgrade to Pro.</b>",
+                outro_paid: "Your secrets are safe with us. <br>See you next time, space cowboy. 🤠"
+            }
         },
+
         ru: {
-            intro_title: ["Время пришло... ✨", "Готов нырнуть? 🌊", "Твой Fetish Wrapped 🎁", "Оглянемся назад... ⏪"],
-            intro_sub: ["Распаковываем твои желания.", "Посмотрим, чем ты был занят.", "Статистика готова.", "Результаты получены."],
-            
-            total_title: ["Всего действий", "Активность", "Исследований", "Взаимодействий"],
-            total_sub: ["Ты себя не сдерживал.", "Много кликов, однако.", "Любопытство без границ.", "Впечатляющие цифры!"],
-            
-            top_list_title: ["Твои одержимости", "Ты возвращался к этому", "Топ лист", "Избранное"],
-            
-            top_1_title: ["Чемпион 🏆", "Абсолютный лидер", "Твой №1", "Король горы"],
-            top_1_sub: ["Живет в твоей голове бесплатно.", "Тебе это реально нравится.", "Без сюрпризов?", "Явный победитель."],
-            
-            tags_title: ["Палитра вкусов", "Ингредиенты", "Из чего ты сделан", "Облако тегов"],
-            tags_sub: ["Острый микс.", "Попробуй радугу.", "Разнообразный выбор.", "Специфичные вкусы."],
-            
-            time_morning: "Ранняя пташка 🌅",
-            time_day: "Мечтатель ☀️",
-            time_night: "Ночная сова 🦉",
-            time_sub: ["Твое любимое время.", "Пик твоей активности.", "Время волшебства.", "Ты предпочитаешь это время."],
-            
-            arch_explorer_name: "Исследователь 🧭",
-            arch_explorer_desc: "Ты любишь искать новое. Ничто не останется скрытым.",
-            arch_connoisseur_name: "Ценитель 🍷",
-            arch_connoisseur_desc: "Ты точно знаешь, чего хочешь. Качество важнее количества.",
-            arch_wild_name: "Дикий 🦁",
-            arch_wild_desc: "Без границ. Чистый адреналин. Ты любишь пожестче.",
-            arch_romantic_name: "Романтик 🌹",
-            arch_romantic_desc: "Мягкость, чувственность и эмоции для тебя важнее всего.",
-            
-            outro_free: "Приходи через неделю! Или купи Pro для статистики каждый день.",
-            outro_paid: ["До встречи! 👋", "Продолжай искать! 😈", "Оставайся горячим! 🔥", "Увидимся..."]
+            // СЦЕНАРИЙ 1: ПЕРВЫЙ РАЗ (Посвящение)
+            story_first: {
+                intro: [
+                    "Хей, {name}! 😏<br><br>Наконец-то решился заглянуть за кулисы? Я тихо записывал всё, пока ты был... занят. Ты думаешь, твой выбор был случайным? О нет. В этом хаосе есть четкая система.",
+                    "Добро пожаловать, {name}. Я тебя заждался. 🕯️<br><br>Ты провел немало времени, исследуя свои желания. Пришло время остановиться, выдохнуть и посмотреть на своё отражение в зеркале данных."
+                ],
+                activity: [
+                    "Ты себя явно не сдерживал, а? <br><br>Алгоритм нагрелся, просто обрабатывая твои действия. Давай взглянем на масштаб твоего любопытства в цифрах.",
+                    "Это была отличная пальчиковая гимнастика. <br><br>Ты свайпал, кликал и искал с завидным упорством. Вот как выглядит твой путь на языке сухой статистики."
+                ],
+                timing: [
+                    "У каждого свой ритм. У тебя — особенный.<br><br>Пока мир вращался своим чередом, ты выкраивал моменты для себя. Мы точно знаем, когда твои демоны выходят поиграть.",
+                ],
+                obsession: [
+                    "А теперь... момент истины. <br><br>Из сотен возможных вариантов твой мозг снова и снова возвращался к этим темам. Это не просто теги. Это карта твоего подсознания.",
+                ],
+                archetype: [
+                    "Так кто же ты на самом деле? <br><br>Мы прогнали цифры, проанализировали тепловые карты и нашли твоего цифрового двойника. Вот твой Архетип."
+                ]
+            },
+
+            // СЦЕНАРИЙ 2: РЕГУЛЯРНЫЙ / ЕЖЕНЕДЕЛЬНЫЙ (Проверка)
+            story_regular: {
+                intro: [
+                    "С возвращением, {name}. 😏<br><br>Неделька выдалась жаркой, да? Твои пальцы потрудились на славу. Я собрал всё, что ты делал с нашей последней встречи. Готов узнать, как изменились твои вкусы?",
+                    "Снова ты, {name}. ✨<br><br>Новый цикл, новые желания. В этот раз ты копал глубже. Давай распакуем свежую главу твоей истории."
+                ],
+                activity: [
+                    "Стабильность — признак мастерства. И ты... ну, ты определенно мастер. <br><br>Цифры не врут. Ты был активен. Очень активен. Вот твой отчет о проделанной работе.",
+                    "Твои рецепторы дофамина работали сверхурочно. <br><br>Мы отследили каждый свайп и каждое колебание. Вот сводка твоей цифровой тренировки."
+                ],
+                timing: [
+                    "Время летит, когда тебе хорошо. <br><br>Но у твоих биологических часов есть четкое расписание для удовольствия. Вот когда происходит магия."
+                ],
+                obsession: [
+                    "Поговорим о том, что живет в твоей голове бесплатно. <br><br>Ты пробовал новое, экспериментировал, но в итоге всегда возвращался домой — к этим категориям.",
+                ],
+                archetype: [
+                    "Судя по твоему поведению на этой неделе, твоя аура изменилась... или стала тверже. <br><br>Вот каким алгоритм видит тебя прямо сейчас."
+                ]
+            },
+
+            common: {
+                total_label: "Твоя Активность",
+                top_label: "Твоя Одержимость",
+                tags_label: "Палитра Вкусов",
+                arch_label: "Твой Архетип",
+                
+                arch_explorer: {
+                    name: "Искатель 🧭",
+                    desc: "Ты отказываешься довольствоваться малым. Пока другие смотрят одно и то же, ты переворачиваешь каждый камень. Ты свайпал влево обыденность, чтобы найти уникальность. Любопытство — твой дар."
+                },
+                arch_connoisseur: {
+                    name: "Сомелье 🍷",
+                    desc: "Ты не просто смотришь — ты дегустируешь. Ты пропускал мусор и шел сразу за золотом. Ты точно знаешь, что тебя заводит, и не тратишь время зря. Качество важнее количества."
+                },
+                arch_wild: {
+                    name: "Неукротимый 🦁",
+                    desc: "Границы безопасности? Не слышал. Твоя статистика кричит о жажде интенсивности и адреналина. Пока другие мочат ноги у берега, ты ныряешь в бездну. Мое уважение."
+                },
+                arch_romantic: {
+                    name: "Мечтатель 🌹",
+                    desc: "Среди хаоса плоти ты искал связь. Мягкость, близость и эмоции управляли твоим выбором. Ты доказал, что даже здесь сердце хочет того, чего хочет сердце."
+                },
+
+                outro_free: "Эта история исчезнет. Хочешь сохранить историю и видеть статистику каждый день? <br><b>Переходи на Pro.</b>",
+                outro_paid: "Твои секреты в безопасности с нами. <br>До встречи, ковбой. 🤠"
+            }
         },
+
         es: {
-            intro_title: ["Llegó la hora... ✨", "¿Listo para entrar? 🌊", "Tu Fetish Wrapped 🎁", "Miremos atrás... ⏪"],
-            intro_sub: ["Desempaquetando deseos.", "Mira en qué estuviste ocupado.", "Tus estadísticas están listas.", "Los resultados están aquí."],
-            
-            total_title: ["Acciones Totales", "Muy Ocupado", "Exploraciones", "Interacciones"],
-            total_sub: ["No te contuviste.", "Eso son muchos clics.", "Curiosidad sin límites.", "¡Números impresionantes!"],
-            
-            top_list_title: ["Tus Obsesiones", "Volviste a esto", "Tu Rotación", "Los Favoritos"],
-            
-            top_1_title: ["El Campeón 🏆", "Ganador Absoluto", "Tu #1", "Rey de la Montaña"],
-            top_1_sub: ["Vive en tu mente gratis.", "Realmente te gusta esto.", "¿Sin sorpresas?", "Un claro ganador."],
-            
-            tags_title: ["Paleta de Sabores", "Ingredientes", "De qué estás hecho", "Nube de Etiquetas"],
-            tags_sub: ["Una mezcla picante.", "Prueba el arcoíris.", "Elecciones diversas.", "Gustos específicos."],
-            
-            time_morning: "Madrugador 🌅",
-            time_day: "Soñador Diurno ☀️",
-            time_night: "Búho Nocturno 🦉",
-            time_sub: ["Prefieres explorar a esta hora.", "Tus horas pico.", "Aquí ocurre la magia.", "Tu momento favorito."],
-            
-            arch_explorer_name: "El Explorador 🧭",
-            arch_explorer_desc: "Amas buscar cosas nuevas. No dejas piedra sin mover.",
-            arch_connoisseur_name: "El Conocedor 🍷",
-            arch_connoisseur_desc: "Sabes exactamente lo que quieres. Calidad sobre cantidad.",
-            arch_wild_name: "El Salvaje 🦁",
-            arch_wild_desc: "Sin límites. Pura adrenalina. Te gusta intenso.",
-            arch_romantic_name: "El Romántico 🌹",
-            arch_romantic_desc: "Lo suave, sensual y emocional es lo que importa.",
-            
-            outro_free: "¡Vuelve en una semana! O obtén Pro para stats diarias.",
-            outro_paid: ["¡Hasta la próxima! 👋", "¡Sigue explorando! 😈", "¡Mantente picante! 🔥", "Nos vemos..."]
+            // ESCENARIO 1: PRIMERA VEZ (La Iniciación)
+            story_first: {
+                intro: [
+                    "Hola, {name}... ¿Por fin te atreves a mirar detrás del telón? 👀<br><br>He estado tomando notas en silencio mientras estabas... ocupado. Crees que tus elecciones fueron al azar, pero veo un patrón claro en el caos.",
+                    "Bienvenido, {name}. Te estaba esperando. 🕯️<br><br>Has pasado bastante tiempo explorando tus deseos aquí. Es hora de detenerse, recuperar el aliento y mirar tu reflejo en el espejo de los datos."
+                ],
+                activity: [
+                    "No te contuviste, ¿verdad? <br><br>El algoritmo se está calentando solo de procesar tus datos. Echemos un vistazo al volumen de tu curiosidad en números.",
+                    "Gimnasia de dedos en su máxima expresión. <br><br>Deslizaste, hiciste clic y buscaste con un propósito claro. Aquí está la escala de tu viaje hasta ahora."
+                ],
+                timing: [
+                    "Cada uno tiene su propio ritmo. ¿El tuyo? Es inconfundible.<br><br>Mientras el mundo giraba, tú tallabas momentos específicos para ti. Sabemos exactamente cuándo salen a jugar tus demonios.",
+                ],
+                obsession: [
+                    "Y ahora... la verdad. <br><br>De cientos de posibilidades, tu cerebro seguía reconectándose con estos temas específicos. No son solo etiquetas; son tu mapa.",
+                ],
+                archetype: [
+                    "Entonces, ¿quién eres realmente? <br><br>Hemos procesado los números, analizado los mapas de calor y encontrado tu alma gemela digital. Este es tu Arquetipo."
+                ]
+            },
+
+            // ESCENARIO 2: REGULAR / SEMANAL (El Chequeo)
+            story_regular: {
+                intro: [
+                    "Mira quién ha vuelto, {name}. 😏<br><br>Ha sido una semana ocupada para tus pulgares, ¿no? He recopilado todo lo que hiciste desde que hablamos. ¿Listo para ver si tus gustos han evolucionado?",
+                    "Te atrapé de nuevo, {name}. ✨<br><br>Otro ciclo, otro conjunto de deseos. Esta vez has cavado más profundo. Vamos a desenvolver el último capítulo de tu historia."
+                ],
+                activity: [
+                    "La consistencia es clave, y tú... bueno, definitivamente eres consistente. <br><br>Los números no mienten. Has estado activo. Muy activo.",
+                    "Tus receptores de dopamina deben estar trabajando horas extras. <br><br>Rastreamos cada deslizamiento y cada duda. Aquí está el resumen de tu entrenamiento digital."
+                ],
+                timing: [
+                    "El tiempo vuela cuando te diviertes. <br><br>Pero tu reloj interno tiene un horario específico para el placer. Aquí es cuando suele ocurrir la magia."
+                ],
+                obsession: [
+                    "Hablemos de lo que vive en tu cabeza sin pagar alquiler. <br><br>Probaste cosas nuevas, pero siempre volviste a casa, a estas categorías específicas.",
+                ],
+                archetype: [
+                    "Basado en tu comportamiento reciente, tu vibra ha cambiado... o se ha solidificado. <br><br>Así es como el algoritmo te ve ahora mismo."
+                ]
+            },
+
+            // TEXTOS COMUNES
+            common: {
+                total_label: "Interacciones Totales",
+                top_label: "Tu Rotación Pesada",
+                tags_label: "Paleta de Sabores",
+                arch_label: "Tu Arquetipo",
+                
+                arch_explorer: {
+                    name: "El Viajero 🧭",
+                    desc: "Te niegas a conformarte. Mientras otros se quedan con lo habitual, tú levantas cada piedra. Deslizaste a la izquierda en lo ordinario para encontrar lo extraordinario. La curiosidad es tu superpoder."
+                },
+                arch_connoisseur: {
+                    name: "El Sommelier 🍷",
+                    desc: "No solo miras; seleccionas. Saltaste la basura y fuiste directo al oro. Sabes exactamente lo que te excita y no pierdes el tiempo en nada más. Un verdadero creador de tendencias."
+                },
+                arch_wild: {
+                    name: "El Indomable 🦁",
+                    desc: "¿Límites de seguridad? Nunca escuché de ellos. Tus estadísticas muestran hambre de intensidad, adrenalina y lo extremo. Mientras otros mojan los pies, tú te sumerges en lo profundo. Respeto."
+                },
+                arch_romantic: {
+                    name: "El Soñador 🌹",
+                    desc: "En medio del caos de la carne, buscaste conexión. La suavidad, la intimidad y la pasión impulsaron tus elecciones. Demostraste que incluso aquí, el corazón quiere lo que quiere."
+                },
+
+                outro_free: "Esta historia desaparecerá. ¿Quieres guardar tu historial y ver estadísticas diarias? <br><b>Pásate a Pro.</b>",
+                outro_paid: "Tus secretos están a salvo con nosotros. <br>Nos vemos la próxima, vaquero espacial. 🤠"
+            }
         },
+
         de: {
-            intro_title: ["Es ist soweit... ✨", "Bereit einzutauchen? 🌊", "Dein Fetish Wrapped 🎁", "Ein Rückblick... ⏪"],
-            intro_sub: ["Wir enthüllen deine Wünsche.", "Schau, was dich beschäftigt hat.", "Deine Statistik ist da.", "Die Ergebnisse sind da."],
-            
-            total_title: ["Gesamtaktionen", "Fleißiges Bienchen", "Erkundungen", "Interaktionen"],
-            total_sub: ["Du hast dich nicht zurückgehalten.", "Das ist viel Geklicke.", "Neugier ohne Grenzen.", "Beeindruckende Zahlen!"],
-            
-            top_list_title: ["Deine Obsessionen", "Dazu kamst du zurück", "Deine Favoriten", "Die Lieblinge"],
-            
-            top_1_title: ["Der Champion 🏆", "Absoluter Gewinner", "Deine Nr. 1", "Gipfelstürmer"],
-            top_1_sub: ["Lebt mietfrei in deinem Kopf.", "Das magst du wirklich.", "Keine Überraschungen?", "Ein klarer Sieger."],
-            
-            tags_title: ["Geschmackspalette", "Die Zutaten", "Woraus du bestehst", "Tag-Wolke"],
-            tags_sub: ["Eine würzige Mischung.", "Koste den Regenbogen.", "Vielfältige Auswahl.", "Spezifische Geschmäcker."],
-            
-            time_morning: "Frühaufsteher 🌅",
-            time_day: "Tagträumer ☀️",
-            time_night: "Nachteule 🦉",
-            time_sub: ["Du erkundest lieber zu dieser Zeit.", "Deine Spitzenzeiten.", "Hier passiert die Magie.", "Deine Lieblingszeit."],
-            
-            arch_explorer_name: "Der Entdecker 🧭",
-            arch_explorer_desc: "Du liebst es, Neues zu suchen. Nichts bleibt verborgen.",
-            arch_connoisseur_name: "Der Kenner 🍷",
-            arch_connoisseur_desc: "Du weißt genau, was du willst. Qualität vor Quantität.",
-            arch_wild_name: "Der Wilde 🦁",
-            arch_wild_desc: "Keine Grenzen. Pures Adrenalin. Du magst es intensiv.",
-            arch_romantic_name: "Der Romantiker 🌹",
-            arch_romantic_desc: "Sanfte, sinnliche und emotionale Verbindungen zählen.",
-            
-            outro_free: "Komm in einer Woche wieder! Oder hol dir Pro.",
-            outro_paid: ["Bis zum nächsten Mal! 👋", "Forsch weiter! 😈", "Bleib scharf! 🔥", "Wir sehen uns..."]
+            // SZENARIO 1: DAS ERSTE MAL (Die Einweihung)
+            story_first: {
+                intro: [
+                    "Hey {name}... Hast du dich endlich entschieden, hinter den Vorhang zu blicken? 👀<br><br>Ich habe leise Notizen gemacht, während du... beschäftigt warst. Du denkst, deine Wahl war zufällig? Oh nein. In diesem Chaos gibt es ein klares Muster.",
+                    "Willkommen, {name}. Ich habe auf dich gewartet. 🕯️<br><br>Du hast viel Zeit damit verbracht, deine Wünsche hier zu erforschen. Es ist Zeit, kurz innezuhalten, Luft zu holen und dein Spiegelbild im Daten-Spiegel zu betrachten."
+                ],
+                activity: [
+                    "Du hast dich nicht zurückgehalten, oder? <br><br>Der Algorithmus läuft heiß, nur um deine Daten zu verarbeiten. Lass uns das Ausmaß deiner Neugier in Zahlen betrachten.",
+                    "Fingergymnastik vom Feinsten. <br><br>Du hast gewischt, geklickt und gesucht mit einem klaren Ziel. Hier ist der Maßstab deiner bisherigen Reise."
+                ],
+                timing: [
+                    "Jeder hat seinen eigenen Rhythmus. Deiner? Er ist unverwechselbar.<br><br>Während sich die Welt weiterdrehte, hast du dir spezielle Momente für dich herausgenommen. Wir wissen genau, wann deine Dämonen zum Spielen herauskommen.",
+                ],
+                obsession: [
+                    "Und nun... die Wahrheit. <br><br>Von hunderten Möglichkeiten hat sich dein Gehirn immer wieder auf diese spezifischen Themen verschaltet. Das sind nicht nur Tags; das ist deine Landkarte.",
+                ],
+                archetype: [
+                    "Also, wer bist du wirklich? <br><br>Wir haben die Zahlen geknackt, die Heatmaps analysiert und deinen digitalen Seelenverwandten gefunden. Das ist dein Archetyp."
+                ]
+            },
+
+            // SZENARIO 2: REGELMÄẞIG / WÖCHENTLICH (Der Check-up)
+            story_regular: {
+                intro: [
+                    "Sieh mal, wer wieder da ist, {name}. 😏<br><br>Es war eine geschäftige Woche für deine Daumen, nicht wahr? Ich habe alles gesammelt, was du seit unserem letzten Gespräch getan hast. Bereit zu sehen, ob sich dein Geschmack entwickelt hat?",
+                    "Wieder erwischt, {name}. ✨<br><br>Ein neuer Zyklus, neue Wünsche. Diesmal hast du tiefer gegraben. Lass uns das neueste Kapitel deiner Geschichte auspacken."
+                ],
+                activity: [
+                    "Konsistenz ist der Schlüssel, und du... nun, du bist definitiv konsistent. <br><br>Die Zahlen lügen nicht. Du warst aktiv. Sehr aktiv. Hier ist dein Leistungsbericht.",
+                    "Deine Dopamin-Rezeptoren müssen Überstunden machen. <br><br>Wir haben jeden Swipe und jedes Zögern verfolgt. Hier ist die Zusammenfassung deines digitalen Workouts."
+                ],
+                timing: [
+                    "Die Zeit verfliegt, wenn man Spaß hat. <br><br>Aber deine innere Uhr hat einen genauen Zeitplan für das Vergnügen. Hier passiert normalerweise die Magie."
+                ],
+                obsession: [
+                    "Lass uns darüber reden, was mietfrei in deinem Kopf wohnt. <br><br>Du hast Neues ausprobiert, bist aber immer wieder zu diesen spezifischen Kategorien nach Hause gekommen.",
+                ],
+                archetype: [
+                    "Basierend auf deinem jüngsten Verhalten hat sich deine Aura verändert... oder gefestigt. <br><br>So sieht dich der Algorithmus im Moment."
+                ]
+            },
+
+            // GEMEINSAME TEXTE
+            common: {
+                total_label: "Deine Gesamtinteraktionen",
+                top_label: "Deine Dauerrotation",
+                tags_label: "Die Geschmackspalette",
+                arch_label: "Dein Archetyp",
+                
+                arch_explorer: {
+                    name: "Der Entdecker 🧭",
+                    desc: "Du gibst dich nicht zufrieden. Während andere beim gewohnten Standard bleiben, drehst du jeden Stein um. Du hast das Gewöhnliche weggewischt, um das Außergewöhnliche zu finden. Neugier ist deine Superkraft."
+                },
+                arch_connoisseur: {
+                    name: "Der Sommelier 🍷",
+                    desc: "Du schaust nicht nur zu; du kuratierst. Du hast den Müll übersprungen und bist direkt zum Gold gegangen. Du weißt genau, was dich antörnt, und verschwendest keine Zeit mit anderem. Ein echter Kenner."
+                },
+                arch_wild: {
+                    name: "Der Ungezähmte 🦁",
+                    desc: "Sicherheitsgrenzen? Nie gehört. Deine Statistik schreit nach Intensität, Adrenalin und dem Extremen. Während andere nur die Zehen ins Wasser halten, tauchst du ins Tiefe. Respekt."
+                },
+                arch_romantic: {
+                    name: "Der Träumer 🌹",
+                    desc: "Im Chaos des Fleisches hast du nach Verbindung gesucht. Sanftheit, Intimität und Leidenschaft haben deine Entscheidungen geleitet. Du hast bewiesen, dass das Herz auch hier will, was es will."
+                },
+
+                outro_free: "Diese Geschichte verschwindet gleich. Willst du deinen Verlauf behalten und tägliche Statistiken sehen? <br><b>Hol dir Pro.</b>",
+                outro_paid: "Deine Geheimnisse sind bei uns sicher. <br>Bis zum nächsten Mal, Space Cowboy. 🤠"
+            }
         }
     };
 
     const EXTREME_TAGS = ['extreme', 'blood', 'scat', 'piss', 'pain', 'torture', 'vomit', 'enema', 'fisting', 'needle-play'];
     const SPICY_TAGS = ['bdsm', 'kinky', 'fetish', 'bondage', 'domination', 'submission', 'spanking'];
-    const LGBT_TAGS = ['gay', 'trans', 'shemale', 'lesbian', 'bi', 'crossdresser'];
+    const LGBT_TAGS = ['gay', 'trans', 'shemale', 'bi', 'crossdresser'];
 
     const filterCats = [
         { id: 'straight', key: 'tag_straight' },
@@ -15611,47 +15839,59 @@
     // === STATS SYSTEM ===
 
     function openStatistics() {
-        // 1. Устанавливаем переводы на кнопки периодов
         const t = langData[currentLang];
         if (document.getElementById('tf-week')) document.getElementById('tf-week').innerText = t.tf_week;
         if (document.getElementById('tf-month')) document.getElementById('tf-month').innerText = t.tf_month;
         if (document.getElementById('tf-year')) document.getElementById('tf-year').innerText = t.tf_year;
         if (document.getElementById('tf-all')) document.getElementById('tf-all').innerText = t.tf_all;
 
-        // 2. Обновляем замки (Pro функции)
         updateStatsLocks();
 
-        // 3. ЛОГИКА WRAPPED BUTTON
-        // Проверяем, есть ли данные
+        // === ЛОГИКА WRAPPED / PROGRESS BAR ===
         const wData = getWrappedData();
         const wBtn = document.getElementById('btn-wrapped-trigger');
+        const modalHeader = document.querySelector('#modal-stats-overlay .modal-header');
         
-        if (wBtn) {
-            // Показываем кнопку ТОЛЬКО если есть данные И генераций сегодня >= 3
-            if (wData && wData.countToday >= 3) {
-                wBtn.style.display = 'flex';
+        // Удаляем старый прогресс-бар если есть, чтобы не дублировать
+        const oldProgress = document.getElementById('wrapped-progress-ui');
+        if (oldProgress) oldProgress.remove();
+
+        if (wData) {
+            // Если действий достаточно
+            if (wData.totalActions >= WRAPPED_THRESHOLD) {
+                if(wBtn) wBtn.style.display = 'flex';
             } else {
-                wBtn.style.display = 'none';
+                // Если действий МАЛО - показываем прогресс бар
+                if(wBtn) wBtn.style.display = 'none';
+                
+                const percent = Math.min(100, (wData.totalActions / WRAPPED_THRESHOLD) * 100);
+                const left = WRAPPED_THRESHOLD - wData.totalActions;
+                
+                const progressHTML = `
+                    <div id="wrapped-progress-ui" class="wrapped-lock-container">
+                        <div class="wrapped-lock-title">Fetish Wrapped 🔒</div>
+                        <div class="wrapped-lock-desc">Make ${left} more moves to unlock your personal summary</div>
+                        <div class="w-progress-track">
+                            <div class="w-progress-fill" style="width: ${percent}%"></div>
+                        </div>
+                        <div class="w-progress-text">${wData.totalActions} / ${WRAPPED_THRESHOLD}</div>
+                    </div>
+                `;
+                const modalBody = document.getElementById('modal-stats-body');
+                modalBody.insertAdjacentHTML('beforebegin', progressHTML);
             }
         }
+        // ======================================
 
-        // 4. Открываем окно
         const modal = document.getElementById('modal-stats-overlay');
         if (modal) {
             modal.classList.add('open');
-            
-            // Сброс к дефолтным значениям при открытии
             currentStatsTimeframe = 'week'; 
             currentStatsTab = 'tags';
-            
-            // Визуальный сброс активных классов
             document.querySelectorAll('.stats-tf-item').forEach(el => el.classList.remove('active'));
             document.getElementById('tf-week').classList.add('active');
-            
             document.getElementById('stat-nav-tags').classList.add('active');
             document.getElementById('stat-nav-activity').classList.remove('active');
-
-            // Рендер
             renderStatsContent();
         }
     }
@@ -16930,94 +17170,78 @@
     }
 
     function getWrappedData() {
-        // Берем данные за ВСЕ время
         const logs = activityLog; 
         
-        if (logs.length < 5) return null; // Мало данных
-
-        // 1. Топ Предметов (ID)
-        const itemCounts = {};
         let totalActions = 0;
+        let firstActionTime = Date.now();
+        let lastActionTime = 0;
+
+        const itemCounts = {};
+        const tagCounts = {};
+        const hours = new Array(24).fill(0);
         
-        // === НОВОЕ: Счетчик за сегодня ===
         let countToday = 0;
         const startOfDay = new Date();
         startOfDay.setHours(0,0,0,0);
-        // ================================
 
-        // 2. Топ Тегов
-        const tagCounts = {};
-        
-        // 3. Время суток (0-23)
-        const hours = new Array(24).fill(0);
-
-        // 4. Архетип (считаем метрики)
         let extremeCount = 0;
         let vanillaCount = 0;
         let watchCount = 0;
 
         logs.forEach(l => {
-            // Считаем только активные действия
-            if (l.type === 'watch' || l.type === 'like' || l.type === 'gen') {
+            // Учитываем все "активные" действия
+            if (l.type === 'watch' || l.type === 'like' || l.type === 'gen' || l.type === 'dislike' || l.type === 'pass') {
                 totalActions++;
                 
-                // === НОВОЕ: Проверка даты ===
-                if (l.ts >= startOfDay.getTime()) {
-                    countToday++;
-                }
-                // ============================
-                
-                // Предметы
-                itemCounts[l.id] = (itemCounts[l.id] || 0) + (l.type === 'watch' ? 3 : 1); 
-                
-                // Теги
-                if (l.tags) {
-                    l.tags.forEach(t => {
-                        if(['universal','straight','gay','lesbian','trans','male','female','adult'].includes(t)) return;
-                        tagCounts[t] = (tagCounts[t] || 0) + 1;
-                        
-                        if (EXTREME_TAGS.includes(t)) extremeCount++;
-                        if (['vanilla', 'romantic', 'kissing', 'massage'].includes(t)) vanillaCount++;
-                    });
-                }
+                if (l.ts < firstActionTime) firstActionTime = l.ts;
+                if (l.ts > lastActionTime) lastActionTime = l.ts;
+                if (l.ts >= startOfDay.getTime()) countToday++;
 
-                // Время
-                const h = new Date(l.ts).getHours();
-                hours[h]++;
-                
-                if (l.type === 'watch') watchCount++;
+                // Для статистики берем только позитивные или нейтральные (кроме дизлайков для подсчета топов)
+                if (l.type === 'watch' || l.type === 'like' || l.type === 'gen') {
+                    itemCounts[l.id] = (itemCounts[l.id] || 0) + (l.type === 'watch' ? 3 : 1);
+                    
+                    if (l.tags) {
+                        l.tags.forEach(t => {
+                            if(['universal','straight','gay','lesbian','trans','male','female','adult'].includes(t)) return;
+                            tagCounts[t] = (tagCounts[t] || 0) + 1;
+                            if (EXTREME_TAGS.includes(t)) extremeCount++;
+                            if (['vanilla', 'romantic', 'kissing', 'massage'].includes(t)) vanillaCount++;
+                        });
+                    }
+                    const h = new Date(l.ts).getHours();
+                    hours[h]++;
+                    if (l.type === 'watch') watchCount++;
+                }
             }
         });
 
-        // Сортировка Предметов
-        const topItems = Object.entries(itemCounts)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 5)
-            .map(([id, score]) => {
-                const item = data.find(x => x.id == id);
-                return item ? { name: getLocalizedName(item), score } : null;
-            }).filter(x => x);
+        // Сортировка
+        const topItems = Object.entries(itemCounts).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([id, score]) => {
+            const item = data.find(x => x.id == id);
+            return item ? { name: getLocalizedName(item), score } : null;
+        }).filter(x => x);
 
-        // Сортировка Тегов
-        const topTags = Object.entries(tagCounts)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 5)
-            .map(([tag, count]) => tag.charAt(0).toUpperCase() + tag.slice(1));
+        const topTags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([tag]) => tag.charAt(0).toUpperCase() + tag.slice(1));
 
-        // Пиковое время
+        // Время
         const morning = hours.slice(5, 12).reduce((a,b)=>a+b,0);
         const day = hours.slice(12, 20).reduce((a,b)=>a+b,0);
         const night = hours.slice(20, 24).reduce((a,b)=>a+b,0) + hours.slice(0, 5).reduce((a,b)=>a+b,0);
-        
         let peakTime = 'day';
         if (night > day && night > morning) peakTime = 'night';
         else if (morning > day && morning > night) peakTime = 'morning';
 
         // Архетип
         let archetype = 'explorer';
-        if (watchCount / totalActions > 0.4) archetype = 'connoisseur'; 
-        else if (extremeCount > vanillaCount * 2) archetype = 'wild';
-        else if (vanillaCount > extremeCount * 2) archetype = 'romantic';
+        const totalPositive = watchCount + extremeCount + vanillaCount; // Грубая оценка базы
+        if (watchCount / (totalActions || 1) > 0.4) archetype = 'connoisseur';
+        else if (extremeCount > vanillaCount * 1.5) archetype = 'wild';
+        else if (vanillaCount > extremeCount * 1.5) archetype = 'romantic';
+
+        // Форматирование дат
+        const opts = { day: 'numeric', month: 'short' };
+        const dateRange = `${new Date(firstActionTime).toLocaleDateString(currentLang, opts)} - ${new Date(lastActionTime).toLocaleDateString(currentLang, opts)}`;
 
         return {
             totalActions,
@@ -17025,9 +17249,11 @@
             topItems,
             topTags,
             peakTime,
-            archetype
+            archetype,
+            dateRange
         };
     }
+
     // Хелпер для получения случайной фразы на нужном языке
     function getWrappedPhrase(category, replacements = {}) {
         // 1. Определяем язык (если нет перевода, берем EN)
@@ -17047,193 +17273,180 @@
 
     function openWrapped() {
         const dataStats = getWrappedData();
-        const t = langData[currentLang] || langData['en'];
+        // Фоллбек на английский, если язык не поддерживается новой структурой
+        const langKey = (wrappedPhrases[currentLang] && wrappedPhrases[currentLang].story_first) ? currentLang : 'en';
+        const content = wrappedPhrases[langKey];
+        
+        // --- 1. ОПРЕДЕЛЕНИЕ СЮЖЕТА (Первый раз или нет) ---
+        const hasSeenBefore = localStorage.getItem('xch_has_seen_wrapped');
+        const storyType = hasSeenBefore ? 'story_regular' : 'story_first';
+        const story = content[storyType];
+        
+        // Помечаем, что видел
+        localStorage.setItem('xch_has_seen_wrapped', 'true');
 
-        // --- ХЕЛПЕР ДЛЯ ПОЛУЧЕНИЯ ФРАЗ ---
-        // (Встроенная версия для удобства, берет массив или строку)
-        const getWP = (key) => {
-            const lang = wrappedPhrases[currentLang] ? currentLang : 'en';
-            const val = wrappedPhrases[lang][key];
-            if (Array.isArray(val)) return val[Math.floor(Math.random() * val.length)];
-            return val;
+        // --- 2. ИМЯ ПОЛЬЗОВАТЕЛЯ ---
+        let userName = langKey === 'ru' ? "Путник" : "Stranger";
+        if (window.isUserLoggedIn && auth.currentUser && auth.currentUser.email) {
+            // Берем часть до @ и делаем первую букву заглавной
+            const emailName = auth.currentUser.email.split('@')[0];
+            userName = emailName.charAt(0).toUpperCase() + emailName.slice(1);
+        }
+
+        // Хелпер для случайной фразы с заменой имени
+        const getPhrase = (arr) => {
+            let txt = arr[Math.floor(Math.random() * arr.length)];
+            return txt.replace(/{name}/g, `<span style="color:var(--accent)">${userName}</span>`);
         };
 
-        // --- 1. ПРОВЕРКА ДЛЯ БЕСПЛАТНЫХ (Лимит 7 дней) ---
+        // ... (Проверка на FREE лимит остается без изменений) ...
         if (subscriptionLevel === 'free') {
             const lastAccess = parseInt(localStorage.getItem('xch_last_wrapped_free') || '0');
             const now = Date.now();
             const cooldownTime = 7 * 24 * 60 * 60 * 1000; 
-
             if (now - lastAccess < cooldownTime) {
                 const daysLeft = Math.ceil((lastAccess + cooldownTime - now) / (1000 * 60 * 60 * 24));
-                alert(`Fetish Wrapped: Available once every 7 days. Days left: ${daysLeft}`); 
+                alert(currentLang === 'ru' ? `Доступно раз в 7 дней. Ждать: ${daysLeft} дн.` : `Available once every 7 days. Days left: ${daysLeft}`); 
                 openSubModal();
                 return;
             }
             localStorage.setItem('xch_last_wrapped_free', now);
         }
 
-        // --- 2. ПРОВЕРКА ДАННЫХ ---
-        if (!dataStats || dataStats.totalActions < 3) {
-            alert(currentLang === 'ru' ? "Слишком мало данных! Сгенерируй больше фетишей сегодня 😏" : "Not enough data yet! Generate more fetishes today. 😏");
+        if (!dataStats || dataStats.totalActions < 5) { // Подняли порог для теста
+            alert("Not enough data to generate a story. Keep exploring!");
             return;
         }
 
-        // --- 3. РЕНДЕР СЛАЙДОВ ---
         const overlay = document.getElementById('wrapped-mount');
         overlay.innerHTML = '';
         overlay.classList.add('active');
         
         const slides = [];
 
-        // SLIDE 1: INTRO
+        // --- SLIDE 1: INTRO (Сюжетное) ---
         slides.push(`
-            <div class="wrapped-slide bg-dark active-slide">
-                <div class="wrapped-big-text">Fetish<br><span style="color:var(--accent)">Wrapped</span></div>
-                <div class="wrapped-sub-text">${getWP('intro_title')}<br>${getWP('intro_sub')}</div>
+            <div class="wrapped-slide bg-dark active-slide" style="justify-content: center; text-align: left; padding: 40px;">
+                <div class="wrapped-big-text" style="font-size:40px; margin-bottom:30px; text-align:center;">Fetish<br><span style="color:var(--accent)">Wrapped</span></div>
+                <div class="wrapped-sub-text" style="font-size:22px; line-height:1.6; font-weight:500;">
+                    ${getPhrase(story.intro)}
+                </div>
             </div>
         `);
 
-        // SLIDE 2: TOTAL ACTIONS
+        // --- SLIDE 2: ACTIVITY (Сюжетное) ---
         slides.push(`
             <div class="wrapped-slide bg-fire">
-                <div class="wrapped-sub-text">${getWP('total_title')}</div>
-                <div class="wrapped-big-text" style="font-size:100px; line-height:1;">${dataStats.totalActions}</div>
-                <div class="wrapped-sub-text" style="max-width:300px;">${getWP('total_sub')}</div>
+                <div class="wrapped-sub-text" style="opacity:0.8; margin-bottom:10px;">${content.common.total_label}</div>
+                <div class="wrapped-big-text" style="font-size:110px; line-height:1; margin: 10px 0;">${dataStats.totalActions}</div>
+                <div class="wrapped-sub-text" style="font-size:20px; line-height:1.5; max-width:340px; margin-top:20px;">
+                    ${getPhrase(story.activity)}
+                </div>
             </div>
         `);
 
-        // SLIDE 3: TOP ITEMS (LIST)
+        // --- SLIDE 3: TIME (Сюжетное) ---
+        let timeIcon = "☀️";
+        if (dataStats.peakTime === 'night') timeIcon = "🦇";
+        if (dataStats.peakTime === 'morning') timeIcon = "🌅";
+
+        slides.push(`
+            <div class="wrapped-slide" style="background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);">
+                <div class="wrapped-big-text" style="font-size:80px; margin-bottom:10px;">${timeIcon}</div>
+                <div class="wrapped-sub-text" style="font-size:20px; line-height:1.6; max-width:340px;">
+                    ${getPhrase(story.timing)}
+                </div>
+            </div>
+        `);
+
+        // --- SLIDE 4: TOP ITEMS (Сюжетное) ---
         let listHtml = dataStats.topItems.map((item, i) => 
-            `<div style="font-size:${24 - i*2}px; margin:10px 0; font-weight:700; opacity:0; animation: slideInRight 0.5s ease forwards ${i*0.2}s;">
-                <span style="color:rgba(255,255,255,0.6);">#${i+1}</span> ${item.name}
+            `<div style="font-size:${22 - i*1}px; margin:12px 0; font-weight:700; opacity:0; animation: slideInRight 0.6s ease forwards ${i*0.4}s; text-align:left; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px;">
+                <span style="color:var(--accent); margin-right:10px;">#${i+1}</span> ${item.name}
             </div>`
         ).join('');
 
         slides.push(`
             <div class="wrapped-slide bg-toxic">
-                <div class="wrapped-big-text" style="font-size:32px; margin-bottom:30px;">${getWP('top_list_title')}</div>
-                <div style="text-align:left; width:100%; max-width:300px;">${listHtml}</div>
+                <div class="wrapped-sub-text" style="font-size:18px; margin-bottom:20px;">${getPhrase(story.obsession)}</div>
+                <div style="width:100%; max-width:320px;">${listHtml}</div>
             </div>
         `);
 
-        // SLIDE 4: #1 CHAMPION
-        if (dataStats.topItems.length > 0) {
-            slides.push(`
-                <div class="wrapped-slide" style="background: radial-gradient(circle, #ff00cc, #333399);">
-                    <div class="wrapped-sub-text">${getWP('top_1_title')}</div>
-                    <div class="wrapped-big-text" style="font-size:50px; color:#fff; text-shadow:0 0 20px rgba(255,255,255,0.5);">
-                        ${dataStats.topItems[0].name}
-                    </div>
-                    <div class="wrapped-sub-text">${getWP('top_1_sub')}</div>
-                </div>
-            `);
-        }
-
-        // SLIDE 5: TAGS CLOUD
-        let tagsHtml = dataStats.topTags.map((tag, i) => 
-            `<span style="display:inline-block; margin:5px; padding:8px 15px; background:rgba(255,255,255,0.2); border-radius:20px; font-weight:700; font-size:${20 - i}px;">${tag}</span>`
-        ).join('');
-
-        slides.push(`
-            <div class="wrapped-slide bg-passion">
-                <div class="wrapped-big-text" style="font-size:36px; margin-bottom:20px;">${getWP('tags_title')}</div>
-                <div style="display:flex; flex-wrap:wrap; justify-content:center; max-width:320px;">${tagsHtml}</div>
-                <div class="wrapped-sub-text" style="margin-top:20px;">${getWP('tags_sub')}</div>
-            </div>
-        `);
-
-        // SLIDE 6: TIME OF DAY
-        let timeTitle = getWP('time_day');
-        let timeBg = "linear-gradient(to bottom, #56ccf2, #2f80ed)";
-        let timeIcon = "☀️";
-
-        if (dataStats.peakTime === 'night') {
-            timeTitle = getWP('time_night');
-            timeBg = "linear-gradient(to bottom, #0f2027, #203a43, #2c5364)";
-            timeIcon = "🦉";
-        } else if (dataStats.peakTime === 'morning') {
-            timeTitle = getWP('time_morning');
-            timeBg = "linear-gradient(to bottom, #ff512f, #dd2476)";
-            timeIcon = "🌅";
-        }
-
-        slides.push(`
-            <div class="wrapped-slide" style="background: ${timeBg};">
-                <div class="wrapped-big-text" style="font-size:80px;">${timeIcon}</div>
-                <div class="wrapped-big-text" style="font-size:32px;">${timeTitle}</div>
-                <div class="wrapped-sub-text">${getWP('time_sub')}</div>
-            </div>
-        `);
-
-        // SLIDE 7: ARCHETYPE
-        let archName = getWP('arch_explorer_name');
-        let archDesc = getWP('arch_explorer_desc');
+        // --- SLIDE 5: ARCHETYPE (Детальное описание) ---
+        let archObj = content.common.arch_explorer;
         let archBg = "linear-gradient(45deg, #11998e, #38ef7d)";
 
         if (dataStats.archetype === 'connoisseur') {
-            archName = getWP('arch_connoisseur_name');
-            archDesc = getWP('arch_connoisseur_desc');
+            archObj = content.common.arch_connoisseur;
             archBg = "linear-gradient(45deg, #833ab4, #fd1d1d, #fcb045)";
         } else if (dataStats.archetype === 'wild') {
-            archName = getWP('arch_wild_name');
-            archDesc = getWP('arch_wild_desc');
+            archObj = content.common.arch_wild;
             archBg = "linear-gradient(45deg, #000000, #434343)";
         } else if (dataStats.archetype === 'romantic') {
-            archName = getWP('arch_romantic_name');
-            archDesc = getWP('arch_romantic_desc');
+            archObj = content.common.arch_romantic;
             archBg = "linear-gradient(45deg, #ff9a9e, #fecfef)";
         }
 
         slides.push(`
-            <div class="wrapped-slide" style="background: ${archBg};">
-                <div class="wrapped-sub-text" style="text-transform:uppercase; letter-spacing:2px;">${t.w_arch_title || "Your Archetype"}</div>
-                <div class="wrapped-big-text" style="font-size:42px; margin:20px 0; border:4px solid #fff; padding:20px;">
-                    ${archName}
+            <div class="wrapped-slide" style="background: ${archBg}; justify-content:center;">
+                <div class="wrapped-sub-text" style="text-transform:uppercase; letter-spacing:2px; font-size:12px; margin-bottom:15px;">${getPhrase(story.archetype)}</div>
+                
+                <div class="wrapped-big-text" style="font-size:42px; margin:10px 0; border:4px solid #fff; padding:25px; line-height:1.1; background:rgba(0,0,0,0.2); backdrop-filter:blur(5px); border-radius:4px;">
+                    ${archObj.name}
                 </div>
-                <div class="wrapped-sub-text">${archDesc}</div>
+                
+                <div class="wrapped-sub-text" style="font-size:18px; line-height:1.6; margin-top:20px; font-weight:500; max-width:350px;">
+                    ${archObj.desc}
+                </div>
             </div>
         `);
 
-        // SLIDE 8: OUTRO
-        let outroHtml = '';
-        if (subscriptionLevel === 'free') {
-            // FREE VERSION
-            outroHtml = `
-                <div class="wrapped-big-text" style="font-size:50px;">🔒</div>
-                <div class="wrapped-sub-text" style="max-width:320px; margin-bottom:20px;">
-                    ${getWP('outro_free')}
-                </div>
-                <button class="plan-btn pro-btn" onclick="closeWrapped(); openSubModal()" 
-                    style="width:auto; padding: 15px 30px; font-size:15px; border-radius:50px; box-shadow: 0 4px 20px rgba(255, 153, 0, 0.4);">
-                    ${t.btn_get_pro || "Get Pro"}
-                </button>
-                <button onclick="closeWrapped()" 
-                    style="background:transparent; border:1px solid rgba(255,255,255,0.3); color:#fff; padding: 12px 30px; border-radius:50px; font-size:14px; margin-top:15px; cursor:pointer;">
-                    ${t.btn_close || "Close"}
-                </button>
-            `;
-        } else {
-            // PAID VERSION
-            outroHtml = `
-                <div class="wrapped-big-text">👋</div>
-                <div class="wrapped-sub-text" style="max-width:300px; margin-bottom:30px;">
-                    ${getWP('outro_paid')}
-                </div>
-                <button onclick="closeWrapped()" 
-                    style="background:var(--accent); color:#000; border:none; padding: 15px 40px; border-radius:50px; font-size:16px; font-weight:700; cursor:pointer; box-shadow: 0 4px 20px rgba(255,255,255,0.2);">
-                    ${t.btn_close || "Close"}
-                </button>
-            `;
-        }
+        // --- SLIDE 6: SUMMARY (Финал) ---
+        let sumTagsHtml = dataStats.topTags.slice(0, 3).map(tag => `<div class="sum-tag">${tag}</div>`).join('');
+        let planName = subscriptionLevel.toUpperCase();
+        let planColor = subscriptionLevel === 'free' ? '#fff' : '#9b59b6';
+        let outroText = subscriptionLevel === 'free' ? content.common.outro_free : content.common.outro_paid;
 
         slides.push(`
-            <div class="wrapped-slide bg-dark" style="justify-content:center; gap:15px;">
-                ${outroHtml}
+            <div class="wrapped-slide bg-dark">
+                <div class="summary-card">
+                    <div class="sum-header">
+                        <div class="sum-logo">Fetish<span style="color:var(--accent)">Hub</span></div>
+                        <div class="sum-date">${dataStats.dateRange}<br><span style="color:${planColor}">${planName}</span></div>
+                    </div>
+                    <div class="sum-row">
+                        <div>
+                            <div class="sum-label">${content.common.arch_label}</div>
+                            <div class="sum-big-val" style="font-size:22px;">${archObj.name.replace(/ .*/, '')}</div> 
+                        </div>
+                        <div style="text-align:right">
+                            <div class="sum-label">Actions</div>
+                            <div class="sum-val">${dataStats.totalActions}</div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="sum-label">Top Interest</div>
+                        <div class="sum-val" style="color:var(--accent); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${dataStats.topItems.length > 0 ? dataStats.topItems[0].name : '-'}</div>
+                    </div>
+                    <div>
+                        <div class="sum-label">Tags</div>
+                        <div class="sum-tags">${sumTagsHtml}</div>
+                    </div>
+                </div>
+
+                <div class="wrapped-sub-text" style="font-size:14px; margin-top:20px; max-width:300px; opacity:0.8;">
+                    ${outroText}
+                </div>
+
+                <div style="margin-top:20px; display:flex; flex-direction:column; gap:10px; width:100%; align-items:center;">
+                    <button onclick="closeWrapped()" class="btn-gen" style="padding:15px 40px; background:var(--text-main); color:var(--bg-color); width:auto; border-radius:30px; font-size:14px; text-transform:uppercase; font-weight:800;">
+                        ${langData[currentLang].btn_close || "Done"}
+                    </button>
+                </div>
             </div>
         `);
 
-        // --- RENDER ---
         let barsHtml = '';
         slides.forEach((_, i) => {
             barsHtml += `<div class="wrapped-progress-bar"><div class="wrapped-progress-fill" id="bar-${i}"></div></div>`;
@@ -17248,25 +17461,34 @@
         `;
 
         currentSlideIndex = 0;
-        startSlideTimer(slides.length);
+        startSlideTimer(slides.length, 9000); 
     }
 
-    function startSlideTimer(total) {
+    function startSlideTimer(total, duration = 9000) {
         clearInterval(slideInterval);
         
         const show = (idx) => {
             document.querySelectorAll('.wrapped-slide').forEach(el => el.classList.remove('active-slide'));
             document.querySelectorAll('.wrapped-slide')[idx].classList.add('active-slide');
             
-            // Обновляем бары
             for(let i=0; i<total; i++) {
                 const bar = document.getElementById('bar-'+i);
-                if(i < idx) bar.style.width = '100%';
-                else if(i > idx) bar.style.width = '0%';
+                if(i < idx) { 
+                    bar.style.width = '100%'; 
+                    bar.style.transition = 'none'; 
+                }
+                else if(i > idx) { 
+                    bar.style.width = '0%'; 
+                    bar.style.transition = 'none'; 
+                }
                 else {
-                    // Анимация текущего бара
                     bar.style.width = '0%';
-                    setTimeout(() => bar.style.width = '100%', 10);
+                    bar.style.transition = 'none';
+                    setTimeout(() => {
+                        // Используем linear для плавного заполнения
+                        bar.style.transition = `width ${duration}ms linear`;
+                        bar.style.width = '100%';
+                    }, 50);
                 }
             }
         };
@@ -17278,9 +17500,9 @@
                 currentSlideIndex++;
                 show(currentSlideIndex);
             } else {
-                clearInterval(slideInterval); // Конец
+                clearInterval(slideInterval); 
             }
-        }, 4000); // 4 секунды на слайд
+        }, duration);
     }
 
     function nextSlide() {
