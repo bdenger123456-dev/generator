@@ -2030,7 +2030,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 
     const firebaseConfig = {
@@ -2436,58 +2436,6 @@
         }
     };
 
-    // === ГЕНЕРАТОР ПРОМОКОДОВ (ЗАПУСТИТЬ ОДИН РАЗ И УДАЛИТЬ) ===
-    window.generateBulkCodes = async function(amount, type, days) {
-        const batchLimit = 500; // Firebase разрешает макс 500 операций за раз
-        if (amount > batchLimit) {
-            console.error(`Максимум ${batchLimit} за раз!`);
-            return;
-        }
-
-        const batch = writeBatch(db);
-        const generatedCodes = [];
-
-        // Функция создания случайной строки (например: PRO-X9A2-...)
-        const makeCode = (length) => {
-            let result = '';
-            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            for (let i = 0; i < length; i++) {
-                result += characters.charAt(Math.floor(Math.random() * characters.length));
-            }
-            return result;
-        };
-
-        console.log(`Начинаю генерацию ${amount} кодов типа "${type}"...`);
-
-        for (let i = 0; i < amount; i++) {
-            // Формат кода: TYPE-XXXX-XXXX
-            const codeString = `${type.toUpperCase()}-${makeCode(4)}-${makeCode(4)}`;
-            
-            const docRef = doc(db, "promocodes", codeString);
-            
-            // Те самые 3 поля + дата создания для удобства
-            batch.set(docRef, {
-                active: true,       // 1. Поле
-                type: type,         // 2. Поле ('pro' или 'beast')
-                days: days,         // 3. Поле (число дней)
-                createdAt: serverTimestamp() // Дополнительно: когда создан
-            });
-
-            generatedCodes.push(codeString);
-        }
-
-        try {
-            await batch.commit();
-            console.log("✅ УСПЕХ! Коды созданы и записаны в базу.");
-            console.log("👇 Скопируйте этот список кодов:");
-            console.log(generatedCodes.join('\n'));
-            alert(`Успешно создано ${amount} промокодов! Проверь консоль (F12).`);
-        } catch (e) {
-            console.error("Ошибка при записи кодов:", e);
-            alert("Ошибка! Смотри консоль.");
-        }
-    };
-    
 </script>
 
 <script>
