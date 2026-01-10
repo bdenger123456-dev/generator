@@ -14571,21 +14571,84 @@
         adjustTagScoresByTags(tags, delta);
     }
 
+    // === СИСТЕМА ПОДСЧЕТА ВЕСОВ (SMART MATCH) ===
+
+    function calculateItemWeight(item) {
+        let score = 10; // Базовый вес для всех
+
+        // 1. ИСТОРИЧЕСКИЕ ВЕСА (Накопленные баллы)
+        if (item.tags) {
+            item.tags.forEach(t => {
+                score += (tagScores[t] || 0);
+            });
+        }
+
+        // 2. УМНЫЙ АНАЛИЗ (Лайки)
+        if (favorites.length > 0) {
+            favorites.forEach(favId => {
+                const favItem = data.find(i => i.id === favId);
+                if (favItem) {
+                    const commonTags = item.tags.filter(t => favItem.tags.includes(t));
+                    // Исключаем "технические" теги из буста, чтобы не бустить всё подряд
+                    const meaningfulTags = commonTags.filter(t => !['universal', 'straight', 'male', 'female', 'adult'].includes(t));
+                    
+                    // Умеренный буст за совпадения тегов с лайкнутым
+                    if (meaningfulTags.length > 0) {
+                        score += (meaningfulTags.length * 40); 
+                    }
+                }
+            });
+        }
+
+        // 3. УМНЫЙ АНАЛИЗ (Дизлайки)
+        if (blacklist.length > 0) {
+            blacklist.forEach(banId => {
+                const banItem = data.find(i => i.id === banId);
+                if (banItem) {
+                    const commonTags = item.tags.filter(t => banItem.tags.includes(t));
+                    const meaningfulTags = commonTags.filter(t => !['universal', 'straight', 'male', 'female', 'adult'].includes(t));
+                    
+                    // Сильный штраф, чтобы не показывать то, что похоже на дизлайкнутое
+                    if (meaningfulTags.length > 0) {
+                        score -= (meaningfulTags.length * 40);
+                    }
+                }
+            });
+        }
+
+        // 4. БУСТ ОРИЕНТАЦИИ (УМЕРЕННЫЙ)
+        // Было 5000, стало 100. Это дает приоритет, но оставляет шанс другим жанрам.
+        if (currentOrientation === 'gay') {
+            if (item.tags.includes('gay')) score += 100;
+        } 
+        else if (currentOrientation === 'trans') {
+            if (item.tags.some(t => ['trans', 'shemale', 'futanari', 'crossdresser'].includes(t))) {
+                score += 100;
+            }
+        }
+
+        // Вес не может быть меньше 0.1 (чтобы всегда был мизерный шанс на случайность)
+        return Math.max(0.1, score);
+    }
+    
     function getWeightedRandom(items) {
         let totalWeight = 0;
+        
+        // Создаем массив кандидатов с рассчитанными весами
         const candidates = items.map(item => {
-            let itemScore = 0;
-            item.tags.forEach(t => itemScore += (tagScores[t] || 0));
-            const weight = Math.max(0.1, 10 + itemScore);
+            const weight = calculateItemWeight(item);
             totalWeight += weight;
             return { item, weight };
         });
 
+        // Классический выбор взвешенного случайного
         let random = Math.random() * totalWeight;
         for (const candidate of candidates) {
             if (random < candidate.weight) return candidate.item;
             random -= candidate.weight;
         }
+        
+        // Фолбэк (на всякий случай)
         return items[Math.floor(Math.random() * items.length)];
     }
 
@@ -16592,6 +16655,17 @@
         if (!checkGenerationLimit()) return; 
         if (isGenerating) return;
 
+        // === АВТО-МОДИФИКАТОРЫ ПО ОРИЕНТАЦИИ ===
+        // Если гей/транс, принудительно включаем модификатор для поиска
+        if (currentOrientation === 'gay') {
+            activeMods.add('Gay');
+        } else if (currentOrientation === 'trans') {
+            activeMods.add('Trans');
+        }
+        // Обновляем визуальное отображение тегов (синие плашки под кнопками)
+        renderModifiers();
+        // ========================================
+
         // Очистка UI
         const descEl = document.getElementById('result-desc');
         if(descEl) descEl.style.display = 'none';
@@ -16609,9 +16683,8 @@
 
         const card = document.getElementById('card-block');
         if(card) {
-            // Удаляем старые классы анимаций, чтобы можно было добавить заново
             card.classList.remove('has-results', 'restore-anim', 'anim-fly-left', 'anim-fly-right');
-            card.style.transition = 'none'; // Отключаем CSS-переходы, чтобы не мешали анимации
+            card.style.transition = 'none'; 
         }
         
         // Логика обучения
@@ -16641,6 +16714,8 @@
 
         isGenerating = true;
         hasInteractedWithCurrent = false;
+        
+        // Используем новую функцию весов
         const finalItem = getWeightedRandom(filtered);
 
         // === СЦЕНАРИЙ 1: ПЕРВЫЙ ЗАПУСК (СЛОТ) ===
@@ -16654,6 +16729,8 @@
                 const randomItem = filtered[Math.floor(Math.random() * filtered.length)];
                 html += `<div class="slot-item">${getLocalizedName(randomItem)}</div>`;
             }
+            
+            // Здесь имя пока без модификаторов, оно обновится в finishGeneration
             const winnerName = getLocalizedName(finalItem);
             html += `<div class="slot-item" id="result-text">${winnerName}</div>`;
 
@@ -16661,7 +16738,6 @@
             reel.innerHTML = html;
             reel.style.transform = 'translateY(0)';
             
-            // Возвращаем маску для слота
             document.querySelector('.slot-window').style.maskImage = "linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%)";
             document.querySelector('.slot-window').style.webkitMaskImage = "linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%)";
 
@@ -16684,29 +16760,21 @@
         
         // === СЦЕНАРИЙ 2: ПОВТОРНЫЙ ЗАПУСК (ВЫЛЕТ КАРТОЧКИ) ===
         else {
-            // Готовим текст результата
-            const winnerName = getLocalizedName(finalItem);
-            reel.className = 'slot-reel';
-            reel.style.transform = 'translateY(0)';
-            reel.innerHTML = `<div class="slot-item" id="result-text" style="color:var(--text-main); font-weight:900;">${winnerName}</div>`;
+            // Очищаем барабан перед анимацией
+            reel.innerHTML = ""; 
             
-            // Убираем маску, чтобы результат был четким
             document.querySelector('.slot-window').style.maskImage = "none";
             document.querySelector('.slot-window').style.webkitMaskImage = "none";
 
-            // Принудительная перерисовка перед запуском анимации
             void card.offsetWidth;
 
-            // Запускаем анимацию на карточке
             if (direction === 'right') {
                 card.classList.add('anim-fly-right');
             } else {
                 card.classList.add('anim-fly-left');
             }
 
-            // Ждем 1 секунду (пока идет анимация и блюр)
             setTimeout(() => {
-                // ВАЖНО: Удаляем класс анимации, чтобы блюр исчез и карточка стала интерактивной
                 card.classList.remove('anim-fly-left', 'anim-fly-right');
                 finishGeneration(finalItem, mode);
             }, 1000);
@@ -16722,13 +16790,36 @@
         currentItem = item;
         lastGeneratedItem = item;
         
+        // === 1. ФОРМИРОВАНИЕ НАЗВАНИЯ С МОДИФИКАТОРАМИ ===
+        let displayName = getLocalizedName(item);
+        
+        if (activeMods.size > 0) {
+            // Превращаем Set модификаторов в массив переведенных названий
+            const modNames = Array.from(activeMods).map(key => {
+                const m = modifiersData.find(x => x.key === key);
+                // Если перевод найден для текущего языка, берем его, иначе ключ
+                if (m) {
+                    if (currentLang === 'ru') return m.ru;
+                    if (currentLang === 'es') return m.es;
+                    if (currentLang === 'de') return m.de;
+                    return m.en;
+                }
+                return key;
+            });
+            
+            // Добавляем к названию (например: "Бондаж + Гей")
+            if (modNames.length > 0) {
+                displayName += " + " + modNames.join(" + ");
+            }
+        }
+        // =======================================================
+
         // 1. Слот (Результат)
         const reel = document.getElementById('slot-reel');
-        const winnerName = getLocalizedName(item);
         reel.removeAttribute('style');
         reel.className = 'slot-reel';
-        // Убираем анимацию "idle", ставим статический текст
-        reel.innerHTML = `<div class="slot-item" id="result-text" style="color:var(--text-main); font-weight:900;">${winnerName}</div>`;
+        // Убираем анимацию "idle", ставим статический текст с новым именем
+        reel.innerHTML = `<div class="slot-item" id="result-text" style="color:var(--text-main); font-weight:900;">${displayName}</div>`;
         
         // 2. Описание
         const descEl = document.getElementById('result-desc');
@@ -16761,7 +16852,7 @@
             }
         }
 
-        // 4. Настройка карточки (убираем лишние отступы/маски)
+        // 4. Настройка карточки
         const card = document.getElementById('card-block');
         if(card) {
             card.classList.remove('is-spinning');
@@ -16774,7 +16865,7 @@
         const startBtn = document.getElementById('start-btn-container');
         if (startBtn) startBtn.classList.add('hidden-initial'); 
 
-        // 6. ПОКАЗЫВАЕМ КНОПКИ ДЕЙСТВИЙ (Watch, Mods, Tinder)
+        // 6. ПОКАЗЫВАЕМ КНОПКИ ДЕЙСТВИЙ
         const idsToShow = ['main-actions', 'mods-block', 'related-block'];
         idsToShow.forEach(id => {
             const el = document.getElementById(id);
@@ -16788,10 +16879,10 @@
         if (undoContainer) {
             if (sessionHistoryStack && sessionHistoryStack.length > 0) {
                 undoContainer.classList.remove('hidden-initial');
-                undoContainer.style.display = 'flex'; // ПРИНУДИТЕЛЬНО ПОКАЗЫВАЕМ
+                undoContainer.style.display = 'flex'; 
             } else {
                 undoContainer.classList.add('hidden-initial');
-                undoContainer.style.display = 'none'; // ПРИНУДИТЕЛЬНО СКРЫВАЕМ
+                undoContainer.style.display = 'none';
             }
         }
 
