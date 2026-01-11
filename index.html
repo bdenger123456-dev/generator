@@ -981,102 +981,106 @@
             }
             .main-content { padding: 0 !important; }
 
-            /* 2. КОНТЕЙНЕР ГЛАВНОЙ СТРАНИЦЫ (СТРОГАЯ ВЫСОТА) */
+            /* 2. КОНТЕЙНЕР (ОГРАНИЧЕНИЕ ЭКРАНА) */
             #tab-home .center-wrapper {
-                /* Фиксируем высоту экрана с учетом адресной строки */
                 height: 100vh !important;
-                height: 100dvh !important; 
-                
-                /* Отступы, чтобы карточка не наезжала на лого и меню */
+                height: 100dvh !important;
                 padding-top: 65px !important; 
                 padding-bottom: 90px !important; 
-                
                 display: flex;
                 flex-direction: column;
                 justify-content: flex-start !important;
                 box-sizing: border-box;
-                overflow: hidden !important; /* Запрет скролла всей страницы */
+                overflow: hidden !important; 
                 width: 100% !important;
                 padding-left: 10px !important;
                 padding-right: 10px !important;
             }
 
-            /* 3. КАРТОЧКА (ОБОЛОЧКА) */
+            /* 3. КАРТОЧКА */
             .card, .card.has-results {
-                flex-grow: 1 !important; /* Занять всё место между отступами */
-                height: 100% !important; /* Принудительная высота */
+                flex-grow: 1 !important;
+                height: 100% !important;
                 max-height: 100% !important;
                 margin-bottom: 0 !important;
                 width: 100% !important;
                 padding: 10px !important;
-                
-                /* Flex-колонка */
                 display: flex !important;
                 flex-direction: column !important;
                 justify-content: space-between !important;
-                
                 box-sizing: border-box !important;
-                overflow: hidden !important; /* Обрезаем всё, что торчит */
+                overflow: hidden !important;
             }
 
-            /* === 4. УПРАВЛЕНИЕ ВНУТРЕННИМИ БЛОКАМИ КАРТОЧКИ === */
+            /* === 4. УПРАВЛЕНИЕ БЛОКАМИ ВНУТРИ === */
 
-            /* Блок 1 (Бейджи): Не сжимать */
+            /* Блок 1: БЕЙДЖИ (Верх) */
             .card > div:nth-child(1) {
-                flex: 0 0 auto !important;
+                flex: 0 0 auto !important; /* Не сжимать */
                 min-height: 30px !important;
             }
 
-            /* Блок 2 (ЦЕНТР - Барабан, Описание): РАЗРЕШАЕМ СЖИМАТЬСЯ */
-            /* Это самое важное: flex-shrink: 1 позволяет ему уступить место кнопке */
+            /* Блок 2: ЦЕНТР (Название + Описание + Теги) */
             .card > div:nth-child(2) {
-                flex: 1 1 auto !important; 
-                min-height: 0 !important; /* Критично: разрешаем сжатие до 0 */
-                overflow: hidden !important; /* Прячем текст, если он не влезает */
+                flex: 1 1 auto !important; /* Занимает всё свободное место */
+                min-height: 0 !important;
+                
+                /* ЦЕНТРИРОВАНИЕ КОНТЕНТА */
                 display: flex !important;
                 flex-direction: column !important;
-                justify-content: center !important;
+                justify-content: center !important; /* Вертикально по центру */
+                align-items: center !important;     /* Горизонтально по центру */
+                
+                overflow: hidden !important;
             }
 
-            /* Блок 3 (НИЗ - Кнопки): ЗАПРЕЩАЕМ СЖИМАТЬСЯ */
+            /* Блок 3: НИЗ (Кнопки) */
             .card > div:last-child {
-                flex: 0 0 auto !important; /* Жесткая фиксация */
-                margin-top: 5px !important;
+                flex: 0 0 auto !important; /* Не сжимать */
+                margin-top: 10px !important; /* Отступ от контента */
                 padding-bottom: 5px !important;
-                z-index: 100; /* Поверх всего */
+                z-index: 100;
             }
 
-            /* --- 5. ЭЛЕМЕНТЫ ВНУТРИ --- */
+            /* --- 5. ЭЛЕМЕНТЫ КОНТЕНТА --- */
             
-            /* Барабан */
+            /* Барабан (Название) */
             .slot-window {
                 width: 100%;
                 height: auto !important;
-                /* Пусть занимает место, но сжимается при необходимости */
-                flex: 1 1 auto !important; 
-                min-height: 0 !important; 
-                
+                flex: 0 1 auto !important; /* Может сжиматься */
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
+                margin-bottom: 10px !important; /* Отступ до описания */
             }
             
             .slot-item { 
-                font-size: clamp(28px, 9vw, 50px) !important;
+                font-size: clamp(28px, 9vw, 55px) !important;
                 line-height: 1.1 !important;
             }
 
-            /* Описание под барабаном (прячем часть, если экран микроскопический) */
+            /* Описание */
             #result-desc {
-                max-height: 80px; 
+                max-height: 25vh; /* Ограничиваем высоту, чтобы не вылезло */
                 overflow-y: auto;
-                font-size: 13px !important;
-                margin: 5px 0 !important;
+                font-size: 14px !important;
+                margin: 0 !important;
+                padding: 0 5px;
+                text-align: center;
                 flex-shrink: 1 !important;
             }
+            
+            /* Похожие (Теги) */
+            .related-section {
+                margin-top: 15px !important;
+                margin-bottom: 5px !important;
+                flex-shrink: 0 !important;
+                width: 100%;
+            }
 
-            /* Кнопка "Поехали" */
+            /* Кнопка Старт */
             #start-btn-container {
                 width: 100%;
                 min-height: 60px !important;
@@ -1085,12 +1089,7 @@
                 justify-content: center;
             }
             
-            .btn-start-capsule {
-                padding: 15px 30px !important; /* Чуть компактнее */
-                font-size: 16px !important;
-            }
-
-            /* Остальные стили */
+            /* Остальное */
             #tab-settings .center-wrapper, #tab-account .center-wrapper { 
                 padding: 40px 15px 120px 15px !important; 
                 height: auto !important; 
@@ -1098,13 +1097,11 @@
                 display: block !important;
             }
             
-            /* Скролл тегов */
             .related-tags { 
-                flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; 
-                padding-bottom: 5px; mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
-                -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+                flex-wrap: nowrap; overflow-x: auto; justify-content: center; 
+                padding-bottom: 5px; mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
+                -webkit-mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
             }
-            .related-item-btn { flex-shrink: 0; white-space: nowrap; font-size: 12px; padding: 6px 12px; }
         }
 
         .capsule-trigger {
@@ -1621,102 +1618,86 @@
         .tinder-nav-row {
             display: flex;
             align-items: center;
-            justify-content: space-evenly; /* Равномерное распределение */
+            justify-content: space-evenly;
             width: 100%;
-            margin-top: auto; /* Прижимает к низу доступного места */
+            margin-top: auto;
             margin-bottom: 10px;
-            gap: 10px;
+            gap: 15px; /* Чуть больше расстояние */
             padding: 0 5px;
         }
 
         .t-circle-btn {
             border-radius: 50%;
-            border: none;
+            border: none; /* Убираем рамки */
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+            
+            color: #ffffff !important; 
+            
+            /* Тень для объема */
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            color: #fff; /* Иконки белые */
-            text-decoration: none; /* Для тега <a> */
+            
+            text-decoration: none;
             flex-shrink: 0;
             outline: none;
             -webkit-tap-highlight-color: transparent;
         }
 
         .t-circle-btn:active {
-            transform: scale(0.9);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transform: scale(0.92);
+            filter: brightness(0.9);
         }
 
         /* Размеры */
-        .t-circle-btn.small {
-            width: 42px;
-            height: 42px;
-            font-size: 18px;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            color: var(--text-secondary);
-        }
-        
-        .t-circle-btn.medium {
-            width: 56px;
-            height: 56px;
-            font-size: 24px;
-        }
-
-        .t-circle-btn.large {
-            width: 72px;
-            height: 72px;
-            font-size: 32px;
-        }
+        .t-circle-btn.small { width: 44px; height: 44px; font-size: 20px; }
+        .t-circle-btn.medium { width: 58px; height: 58px; font-size: 26px; }
+        .t-circle-btn.large { width: 72px; height: 72px; font-size: 32px; }
 
         /* Цвета */
         .t-circle-btn.undo {
-            color: #f39c12; /* Желтый */
+            background: #f1c40f; 
+            box-shadow: 0 5px 15px rgba(241, 196, 15, 0.3);
         }
         
+        /* 2. Dislike (Красный) */
         .t-circle-btn.dislike {
-            background: #fff;
-            color: #e74c3c; /* Красный крест */
-            border: 1px solid #eee;
-        }
-        body:not(.light-theme) .t-circle-btn.dislike {
-            background: #202020;
-            border-color: #333;
+            background: #e74c3c;
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
         }
 
+        /* 3. Watch (Акцентный/Тема) */
         .t-circle-btn.watch {
-            background: var(--accent); /* Основной цвет (Фиолетовый/Тема) */
-            color: #fff;
-            box-shadow: 0 8px 20px rgba(155, 89, 182, 0.4);
+            background: var(--accent);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3); /* Тень универсальная */
         }
 
+        /* 4. Like (Зеленый) */
         .t-circle-btn.like {
-            background: #fff;
-            color: #2ecc71; /* Зеленое сердце */
-            border: 1px solid #eee;
-        }
-        body:not(.light-theme) .t-circle-btn.like {
-            background: #202020;
-            border-color: #333;
+            background: #2ecc71;
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
         }
 
+        /* 5. Watch Later (Синий) */
         .t-circle-btn.wl {
-            color: #3498db; /* Синяя звезда */
-        }
-
-        /* Активные состояния (заливка при нажатии/выборе) */
-        .t-circle-btn.wl.active {
-            background: #3498db;
-            color: #fff;
-            border-color: #3498db;
+            background: #3498db; 
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+            font-size: 22px; /* Чуть меньше иконка часов */
         }
         
-        /* Состояние Disabled для кнопки Undo */
+        /* Активное состояние WL (например, сделать темнее или добавить галочку, но пока оставим синим) */
+        .t-circle-btn.wl.active {
+            background: #2980b9; /* Темно-синий */
+            box-shadow: inset 0 3px 5px rgba(0,0,0,0.2);
+        }
+        
+        /* Disabled */
         .t-circle-btn:disabled {
-            opacity: 0.3;
+            background: #bdc3c7; /* Серый */
+            box-shadow: none;
+            opacity: 0.7;
             cursor: default;
             transform: none !important;
         }
