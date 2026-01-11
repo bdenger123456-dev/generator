@@ -356,16 +356,38 @@
         /* Slot Window */
         .slot-window {
             width: 100%;
-            height: 300px;
-            overflow: hidden;
-            position: relative;
-            display: flex; 
+            
+            /* ФИКС: Вместо резинового flex:1 ставим четкую высоту */
+            height: 220px; 
+            flex-shrink: 0; /* Запрещаем сжиматься */
+            
+            display: flex;
+            flex-direction: column;
             justify-content: center; 
             align-items: center;
-            flex-shrink: 0;
+            overflow: hidden;
+            position: relative;
             
+            /* Маска для красивого исчезновения текста */
             -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
             mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
+        }
+
+        /* На ПК делаем карточку высокой и красивой */
+        @media (min-width: 769px) {
+            .slot-window {
+                height: 450px !important;
+            }
+            .slot-item {
+                font-size: 80px !important;
+            }
+        }
+
+        /* На совсем маленьких экранах (iPhone SE и т.д.) чуть уменьшаем */
+        @media (max-height: 650px) {
+            .slot-window {
+                height: 180px !important;
+            }
         }
 
         .card.has-results .slot-window {
@@ -842,25 +864,34 @@
         }
 
         .btn-start-capsule {
-            background: linear-gradient(90deg, #ff9966, #ff5e62); /* Огненный градиент */
-            color: white;
+            /* Градиент темы: Слева светлее, Справа основной цвет */
+            background: linear-gradient(to right, var(--accent-light), var(--accent));
+            
+            color: white; /* Текст всегда белый для контраста */
             font-size: 18px;
             font-weight: 800;
             text-transform: uppercase;
             padding: 18px 40px;
-            border-radius: 50px; /* Капсула */
+            border-radius: 50px;
             border: none;
-            box-shadow: 0 10px 30px rgba(255, 94, 98, 0.4);
+            
+            /* Свечение (тень) в цвет темы */
+            box-shadow: 0 10px 40px -5px var(--accent);
+            
             transition: transform 0.2s, box-shadow 0.2s;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 10px;
+            
+            /* Чтобы кнопка не сплющивалась */
+            flex-shrink: 0; 
         }
 
         .btn-start-capsule:active {
             transform: scale(0.95);
-            box-shadow: 0 5px 15px rgba(255, 94, 98, 0.3);
+            /* Уменьшаем тень при нажатии */
+            box-shadow: 0 5px 20px -5px var(--accent);
         }
 
         /* --- 4. Анимация "Вишенка на торте" (Staggered Fade Up) --- */
@@ -940,33 +971,140 @@
         
         /* Адаптация под мобильные */
         @media (max-width: 768px) {
-            /* Контейнер на весь экран */
+            
+            /* 1. ГЛОБАЛЬНЫЕ СКРЫТИЯ */
+            .sidebar, .tinder-actions, .btn-group, .undo-container, .badge-tooltip { 
+                display: none !important; 
+            }
+            .mobile-header, .bottom-nav, .top-gradient-mask, .bottom-gradient-mask { 
+                display: flex !important; 
+            }
+            .main-content { padding: 0 !important; }
+
+            /* 2. КОНТЕЙНЕР ГЛАВНОЙ СТРАНИЦЫ (СТРОГАЯ ВЫСОТА) */
             #tab-home .center-wrapper {
-                justify-content: flex-start;
-                padding-top: 10px;
-                min-height: 100vh;
+                /* Фиксируем высоту экрана с учетом адресной строки */
+                height: 100vh !important;
+                height: 100dvh !important; 
+                
+                /* Отступы, чтобы карточка не наезжала на лого и меню */
+                padding-top: 65px !important; 
+                padding-bottom: 90px !important; 
+                
                 display: flex;
                 flex-direction: column;
-                overflow: hidden; /* Важно, чтобы анимация вылета не расширяла экран */
+                justify-content: flex-start !important;
+                box-sizing: border-box;
+                overflow: hidden !important; /* Запрет скролла всей страницы */
+                width: 100% !important;
+                padding-left: 10px !important;
+                padding-right: 10px !important;
             }
 
-            /* Карточка ВСЕГДА высокая, даже без контента */
+            /* 3. КАРТОЧКА (ОБОЛОЧКА) */
             .card, .card.has-results {
-                min-height: 70vh !important; /* Жесткая высота */
-                height: auto !important;     /* Если текст супер-длинный, она растянется */
-                margin-bottom: 90px !important;
-                justify-content: space-between !important;
+                flex-grow: 1 !important; /* Занять всё место между отступами */
+                height: 100% !important; /* Принудительная высота */
+                max-height: 100% !important;
+                margin-bottom: 0 !important;
+                width: 100% !important;
+                padding: 10px !important;
+                
+                /* Flex-колонка */
                 display: flex !important;
                 flex-direction: column !important;
+                justify-content: space-between !important;
                 
-                /* Гарантируем, что ширина всегда стабильна */
-                width: 100% !important;
-                max-width: 100% !important;
                 box-sizing: border-box !important;
+                overflow: hidden !important; /* Обрезаем всё, что торчит */
             }
 
-            .tinder-actions, .btn-group, .undo-container { display: none !important; }
-            .badge-tooltip { display: none !important; }
+            /* === 4. УПРАВЛЕНИЕ ВНУТРЕННИМИ БЛОКАМИ КАРТОЧКИ === */
+
+            /* Блок 1 (Бейджи): Не сжимать */
+            .card > div:nth-child(1) {
+                flex: 0 0 auto !important;
+                min-height: 30px !important;
+            }
+
+            /* Блок 2 (ЦЕНТР - Барабан, Описание): РАЗРЕШАЕМ СЖИМАТЬСЯ */
+            /* Это самое важное: flex-shrink: 1 позволяет ему уступить место кнопке */
+            .card > div:nth-child(2) {
+                flex: 1 1 auto !important; 
+                min-height: 0 !important; /* Критично: разрешаем сжатие до 0 */
+                overflow: hidden !important; /* Прячем текст, если он не влезает */
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+            }
+
+            /* Блок 3 (НИЗ - Кнопки): ЗАПРЕЩАЕМ СЖИМАТЬСЯ */
+            .card > div:last-child {
+                flex: 0 0 auto !important; /* Жесткая фиксация */
+                margin-top: 5px !important;
+                padding-bottom: 5px !important;
+                z-index: 100; /* Поверх всего */
+            }
+
+            /* --- 5. ЭЛЕМЕНТЫ ВНУТРИ --- */
+            
+            /* Барабан */
+            .slot-window {
+                width: 100%;
+                height: auto !important;
+                /* Пусть занимает место, но сжимается при необходимости */
+                flex: 1 1 auto !important; 
+                min-height: 0 !important; 
+                
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+            
+            .slot-item { 
+                font-size: clamp(28px, 9vw, 50px) !important;
+                line-height: 1.1 !important;
+            }
+
+            /* Описание под барабаном (прячем часть, если экран микроскопический) */
+            #result-desc {
+                max-height: 80px; 
+                overflow-y: auto;
+                font-size: 13px !important;
+                margin: 5px 0 !important;
+                flex-shrink: 1 !important;
+            }
+
+            /* Кнопка "Поехали" */
+            #start-btn-container {
+                width: 100%;
+                min-height: 60px !important;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .btn-start-capsule {
+                padding: 15px 30px !important; /* Чуть компактнее */
+                font-size: 16px !important;
+            }
+
+            /* Остальные стили */
+            #tab-settings .center-wrapper, #tab-account .center-wrapper { 
+                padding: 40px 15px 120px 15px !important; 
+                height: auto !important; 
+                overflow-y: auto !important;
+                display: block !important;
+            }
+            
+            /* Скролл тегов */
+            .related-tags { 
+                flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; 
+                padding-bottom: 5px; mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+                -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+            }
+            .related-item-btn { flex-shrink: 0; white-space: nowrap; font-size: 12px; padding: 6px 12px; }
         }
 
         .capsule-trigger {
@@ -1604,34 +1742,6 @@
         /* =========================================
         17. MEDIA QUERIES (ADAPTATION)
         ========================================= */
-        
-        /* MOBILE DEVICES (< 768px) */
-        @media (max-width: 768px) {
-            .sidebar { display: none; }
-            .mobile-header { display: flex; }
-            .bottom-nav { display: flex; }
-            .top-gradient-mask, .bottom-gradient-mask { display: block; }
-            .main-content { padding: 0; }
-            
-            .center-wrapper { padding-left: 10px; padding-right: 10px; width: 100%; }
-            #tab-settings .center-wrapper, #tab-account .center-wrapper { padding: 0 !important; padding-top: 40px !important; }
-            #mount-prefs, #mount-account, #mount-extras { padding: 0 15px; width: 100%; }
-
-            /* Compact elements */
-            .card { padding: 10px;}
-            .slot-item { font-size: clamp(28px, 8vw, 42px); }
-            .card-actions { margin-top: 10px; gap: 10px; }
-            .btn-action { padding: 8px; height: 45px; font-size: 20px; }
-            .btn-watch { padding: 12px; font-size: 14px; }
-            .btn-gen { padding: 16px; font-size: 16px; }
-            
-            .related-tags { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; padding-bottom: 10px; padding-left: 5px; padding-right: 5px; mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%); -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%); }
-            .related-item-btn { flex-shrink: 0; white-space: nowrap; }
-
-            /* Floating Button Logic */
-            #tab-home:not(.generated) { justify-content: center; height: 100vh; padding-bottom: 100px; }
-            #tab-home:not(.generated) .gen-controls { position: fixed; bottom: 95px; left: 0; width: 100%; padding: 0 20px; z-index: 100; margin-bottom: 0; }
-        }
 
         /* DESKTOP / TABLET (> 768px) */
         @media (min-width: 769px) {
@@ -17610,25 +17720,29 @@
         const isCardCentered = currentTransform === 'none' || currentTransform === 'matrix(1, 0, 0, 1, 0, 0)';
 
         if (isCardCentered) {
-            // Это КНОПКА: нужно анимировать вылет
+            // Анимация улета старой карточки
             card.style.transition = 'transform 0.3s ease-in, opacity 0.3s';
             card.style.opacity = '0';
             
             if (direction === 'right') {
-                // Улетает вправо
                 card.style.transform = 'translateX(150%) rotate(20deg)';
             } else {
-                // Улетает влево
                 card.style.transform = 'translateX(-150%) rotate(-20deg)';
             }
 
-            // Ждем завершения полета, потом грузим новое
             setTimeout(() => {
-                startGeneration(direction === 'right' ? 'similar' : 'random');
+                // ПЕРЕДАЕМ НАПРАВЛЕНИЕ ЯВНО
+                startGeneration(
+                    direction === 'right' ? 'similar' : 'random', 
+                    direction === 'right' ? 'like' : 'dislike'
+                );
             }, 300);
         } else {
-            // Это СВАЙП: карточка уже улетела (через animateSwipeEnd), запускаем сразу
-            startGeneration(direction === 'right' ? 'similar' : 'random');
+            // Если это был свайп пальцем
+            startGeneration(
+                direction === 'right' ? 'similar' : 'random', 
+                direction === 'right' ? 'like' : 'dislike'
+            );
         }
     }
 
@@ -17779,24 +17893,27 @@
         else {
             reel.innerHTML = ""; 
 
-            // 1. Фикс размера (сразу делаем прямоугольной)
+            // 1. Фикс размера
             card.classList.add('has-results'); 
             
-            // 2. Логика направления
-            // Если Дизлайк -> вылетает СЛЕВА
-            if (direction === 'dislike') {
+            // 2. Логика направления 
+            
+            if (direction === 'like') {
+                // Лайк: Новая карточка прилетает СЛЕВА направо
                 card.classList.add('anim-fly-left');
             } 
-            // Если Лайк, Старт или Возврат -> вылетает СПРАВА
             else {
+                // Дизлайк (или по умолчанию): Новая карточка прилетает СПРАВА налево
                 card.classList.add('anim-fly-right');
             }
 
-            // 3. Заполняем контент с небольшой задержкой для плавности
+            // 3. Заполняем контент...
             setTimeout(() => {
                 finishGeneration(finalItem, mode);
                 
-                // Чистим классы анимации
+                // Важно: восстанавливаем прозрачность, если она пропала
+                card.style.opacity = ''; 
+                
                 setTimeout(() => {
                     card.classList.remove('anim-fly-right', 'anim-fly-left');
                 }, 700);
