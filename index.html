@@ -17586,46 +17586,50 @@
     function handleSwipeAction(direction) {
         if (isGenerating) return;
 
+        // Сохраняем в историю для кнопки "Назад"
         if (currentItem) {
             sessionHistoryStack.push(currentItem);
         }
 
         const card = document.getElementById('card-block');
-        // Сбрасываем смещение свайпа
-        card.style.transition = 'none';
-        card.style.transform = 'none'; // Важно! Убираем смещение пальца
-        
-        document.querySelector('.overlay-like').style.opacity = 0;
-        document.querySelector('.overlay-nope').style.opacity = 0;
-
-        if(isFirstGen) initIdleSlot(); 
-        
-        // Временно убираем has-results для логики очистки, но в startGeneration мы его сразу вернем
-        card.classList.remove('has-results'); 
-        
-        document.getElementById('result-desc').style.display = 'none';
-        document.getElementById('badge-wrapper').innerHTML = '';
-        
-        document.getElementById('tinder-controls').classList.add('hidden-initial');
-        document.getElementById('mods-block').classList.add('hidden-initial');
-        document.getElementById('related-block').classList.add('hidden-initial');
-        
         const btnUndo = document.getElementById('btn-t-undo');
+        
+        // Отключаем кнопку Undo на время анимации
         if(btnUndo) btnUndo.disabled = true;
 
-        requestAnimationFrame(() => {
+        // 1. Логика данных (Лайк/Дизлайк)
+        if (direction === 'right') {
+            toggleFavorite(true); 
+        } else {
+            toggleBlacklist(true);
+        }
+
+        // 2. Анимация вылета (Если это нажатие кнопки, а не свайп пальцем)
+        // Мы проверяем transform. Если карточка в центре (transform пустой или none), значит это кнопка.
+        const currentTransform = getComputedStyle(card).transform;
+        const isCardCentered = currentTransform === 'none' || currentTransform === 'matrix(1, 0, 0, 1, 0, 0)';
+
+        if (isCardCentered) {
+            // Это КНОПКА: нужно анимировать вылет
+            card.style.transition = 'transform 0.3s ease-in, opacity 0.3s';
+            card.style.opacity = '0';
+            
             if (direction === 'right') {
-                // ЛАЙК (Свайп вправо)
-                toggleFavorite(true); 
-                // Передаем 'next' -> будет анимация СПРАВА
-                startGeneration('similar', 'next'); 
+                // Улетает вправо
+                card.style.transform = 'translateX(150%) rotate(20deg)';
             } else {
-                // ДИЗЛАЙК (Свайп влево)
-                toggleBlacklist(true);
-                // Передаем 'dislike' -> будет анимация СЛЕВА
-                startGeneration('random', 'dislike'); 
+                // Улетает влево
+                card.style.transform = 'translateX(-150%) rotate(-20deg)';
             }
-        });
+
+            // Ждем завершения полета, потом грузим новое
+            setTimeout(() => {
+                startGeneration(direction === 'right' ? 'similar' : 'random');
+            }, 300);
+        } else {
+            // Это СВАЙП: карточка уже улетела (через animateSwipeEnd), запускаем сразу
+            startGeneration(direction === 'right' ? 'similar' : 'random');
+        }
     }
 
     function animateSwipeEnd(moveX, direction) {
@@ -17700,6 +17704,7 @@
             card.style.backgroundColor = ''; // Убираем красный/зеленый
             card.style.borderColor = '';
             card.style.filter = '';          // Убираем блюр
+            card.style.opacity = ''; 
             
             void card.offsetWidth; 
         }
