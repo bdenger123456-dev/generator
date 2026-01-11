@@ -3634,7 +3634,7 @@
     const WRAPPED_THRESHOLD = 30;
 
     /* =================== ⚒️ DEBUG MODE =========================== */
-    subscriptionLevel = 'pro'; 
+    // subscriptionLevel = 'pro'; 
     // subscriptionLevel = 'beast';
     /* =========================================================== */
 
@@ -18431,24 +18431,29 @@
             
             let deltaX = currentX - startX;
             
-            // СБРОС БЛЮРА И ЦВЕТА (при любом исходе)
-            blurTargets.forEach(el => {
-                if(el) {
-                    el.style.transition = 'filter 0.3s ease'; // Плавный возврат резкости
-                    el.style.filter = 'none';
-                }
-            });
-            if (overlay) {
-                overlay.style.transition = 'background-color 0.3s ease';
-                overlay.style.backgroundColor = 'transparent';
-            }
-
-            // ЛОГИКА ЗАВЕРШЕНИЯ
+            // Если свайп успешный (далеко протащили)
             if (Math.abs(deltaX) > 100) {
                 const direction = deltaX > 0 ? 'right' : 'left';
                 const endX = deltaX > 0 ? window.innerWidth + 100 : -window.innerWidth - 100;
+                
                 animateSwipeEnd(endX, direction); 
             } else {
+                
+                // Сброс блюра
+                blurTargets.forEach(el => {
+                    if(el) {
+                        el.style.transition = 'filter 0.3s ease';
+                        el.style.filter = 'none';
+                    }
+                });
+                
+                // Сброс цвета
+                if (overlay) {
+                    overlay.style.transition = 'background-color 0.3s ease';
+                    overlay.style.backgroundColor = 'transparent';
+                }
+
+                // Возврат карточки в центр
                 card.style.transition = 'transform 0.3s ease-out';
                 card.style.transform = 'translateX(0) rotate(0)';
             }
@@ -18582,7 +18587,7 @@
         if(card) {
             card.classList.remove('anim-fly-left', 'anim-fly-right', 'anim-slow-enter');
             
-            // СБРАСЫВАЕМ ВСЕ СТИЛИ СВАЙПА
+            // Сбрасываем трансформацию и прозрачность карточки
             card.style.transform = 'none'; 
             card.style.transition = 'none';
             card.style.backgroundColor = '';
@@ -18590,7 +18595,26 @@
             card.style.filter = '';          
             card.style.opacity = ''; 
             
-            void card.offsetWidth; 
+            if (overlay) {
+                overlay.style.backgroundColor = 'transparent';
+                overlay.style.opacity = ''; // Возвращаем управление CSS
+                overlay.style.transition = 'none'; // Чтобы исчез мгновенно
+            }
+
+            const blurTargets = [
+                document.getElementById('slot-reel'),
+                document.getElementById('result-desc'),
+                document.getElementById('badge-wrapper'),
+                document.getElementById('related-block')
+            ];
+            blurTargets.forEach(el => {
+                if(el) {
+                    el.style.filter = 'none';
+                    el.style.transition = 'none';
+                }
+            });
+            
+            void card.offsetWidth; // Принудительная перерисовка
         }
         
         // Логика обучения 
