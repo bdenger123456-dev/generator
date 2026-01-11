@@ -219,8 +219,36 @@
             line-height: 1;
         }
         .logo span { 
-            color: #9b59b6 !important;
+            /* Градиент: Сверху #CB53F0, Снизу цвет темы */
+            background: linear-gradient(180deg, #CB53F0 20%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            
+            /* Уменьшенный отступ справа */
+            margin-right: 1px; 
+            
+            /* ТОНКАЯ ЧЕТКАЯ ОБВОДКА (0.8px) */
+            filter: 
+                drop-shadow(0.8px 0 0 #ffffff) 
+                drop-shadow(-0.8px 0 0 #ffffff) 
+                drop-shadow(0 0.8px 0 #ffffff) 
+                drop-shadow(0 -0.8px 0 #ffffff);
+                
+            position: relative;
+            z-index: 1;
         }
+
+        /* ДЛЯ СВЕТЛОЙ ТЕМЫ -> ЧЕРНАЯ ОБВОДКА */
+        body.light-theme .logo span {
+            filter: 
+                drop-shadow(0.8px 0 0 #000000) 
+                drop-shadow(-0.8px 0 0 #000000) 
+                drop-shadow(0 0.8px 0 #000000) 
+                drop-shadow(0 -0.8px 0 #000000);
+        }
+
         .logo-img {
             height: 48px;
             width: auto;
@@ -587,8 +615,14 @@
             padding: 12px 16px; background: var(--ios-card); min-height: 48px; position: relative;
         }
         .ios-row:not(:last-child)::after {
-            content: ""; position: absolute; bottom: 0; left: 16px; right: 0; height: 1px;
-            background-color: var(--ios-separator); transform: scaleY(0.5);
+            content: ""; 
+            position: absolute; 
+            bottom: 0; 
+            left: 16px; 
+            right: 16px;
+            height: 1px;
+            background-color: var(--ios-separator); 
+            transform: scaleY(0.5);
         }
         .ios-row.clickable { cursor: pointer; transition: background 0.2s; }
         .ios-row.clickable:active { background: var(--nav-bg); }
@@ -1725,8 +1759,87 @@
             margin-bottom: 20px;
         }
 
+        /* ROADMAP STYLES */
+        .roadmap-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0; /* Убираем gap, так как линия рисуется внутри элемента */
+        }
+
+        .roadmap-item {
+            display: flex;
+            gap: 15px;
+            position: relative;
+            /* Убираем нижний отступ у последнего, у остальных оставляем место для линии */
+            padding-bottom: 20px;
+        }
+
+        .roadmap-item:last-child {
+            padding-bottom: 0;
+        }
+
+        /* Колонка с иконкой и линией */
+        .rm-visual-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 40px; /* Фиксированная ширина */
+            flex-shrink: 0;
+        }
+
+        /* Иконка */
+        .rm-icon-box {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.05);
+            z-index: 2; /* Поверх линии */
+            background: var(--card-bg); /* Чтобы не просвечивала */
+        }
+
+        /* Линия-соединитель */
+        .rm-line {
+            width: 2px;
+            background: var(--border);
+            flex-grow: 1; /* Растягивается на всю оставшуюся высоту */
+            margin-top: 5px; /* Отступ от иконки */
+            margin-bottom: -15px; /* Залезает на следующий элемент, соединяясь */
+            min-height: 20px;
+        }
+
+        /* Контент */
+        .rm-content {
+            background: var(--ios-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 15px;
+            flex: 1;
+            /* Центрирование контента относительно иконки */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .rm-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 5px;
+        }
+
+        .rm-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
         /* =========================================
-        17. MEDIA QUERIES (ADAPTATION)
+        18. MEDIA QUERIES (ADAPTATION)
         ========================================= */
 
         /* DESKTOP / TABLET (> 768px) */
@@ -2141,9 +2254,6 @@
                     </div>
                 </div>
 
-                <!-- РАЗДЕЛИТЕЛЬНАЯ ЛИНИЯ (Визуально разделяет настройки аккаунта и списки) -->
-                <div style="height:10px; background:var(--bg-color); border-top:1px solid var(--border); border-bottom:1px solid var(--border); margin:0;"></div>
-
                 <!-- 3. EXPLORED -->
                 <div class="ios-row">
                     <span data-key="explored_label">Explored</span>
@@ -2180,6 +2290,12 @@
                 <span style="font-size:20px;">📊</span>
                 <span style="font-weight:800; text-transform:uppercase; color:var(--text-main);" data-key="btn_open_stats">Open Statistics</span>
             </div>
+
+            <div class="capsule-btn" onclick="openRoadmap()" style="background: linear-gradient(135deg, var(--card-bg) 0%, var(--nav-bg) 100%); border: 1px solid var(--border); justify-content:center; gap:10px; margin-top:10px;">
+                <span style="font-size:20px;">🚀</span>
+                <span style="font-weight:800; text-transform:uppercase; color:var(--text-secondary);" data-key="btn_roadmap">Roadmap</span>
+            </div>
+
         </div>
 
     <!-- BLOCK: EXTRAS & HISTORY -->
@@ -2201,6 +2317,14 @@
             <div class="ios-row clickable" onclick="window.open('https://tally.so/r/Y50280', '_blank')">
                 <span data-key="report_issue">Report Issue</span>
                 <span style="color:var(--text-secondary)">↗</span>
+            </div>
+
+            <div class="ios-row clickable" onclick="openQRModal()">
+                <span data-key="btn_install_phone">Install on Phone</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:20px;">📱</span>
+                    <span style="color:var(--text-secondary)">›</span>
+                </div>
             </div>
 
             <!-- 3. О ПРОЕКТЕ -->
@@ -2442,11 +2566,11 @@
 <div id="modal-install-overlay" class="modal-overlay" style="z-index: 19500;">
     <div class="modal" style="max-width: 400px; padding: 20px;">
         <div style="text-align:center; margin-bottom:20px;">
-            <!-- Иконка приложения -->
             <img src="logo.png" style="width:60px; height:60px; border-radius:15px; margin-bottom:15px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
             <h2 style="margin:0 0 10px 0; font-size:20px;" data-key="install_title">Install App</h2>
+            
             <p style="font-size:14px; color:var(--text-secondary); line-height:1.5;" data-key="install_desc">
-                Install our app for a full-screen experience and better performance. It takes less than 5 seconds!
+                Install our app for a full-screen experience. Plus, watch videos in the built-in browser to keep your main browser history clean!
             </p>
         </div>
 
@@ -2592,6 +2716,139 @@
                 <button class="btn-gen" onclick="window.logout()" style="padding:15px; font-size:15px; background:transparent; border:1px solid var(--highlight-red); color:var(--highlight-red);">
                     <span data-key="logout_text">Log Out</span>
                 </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ROADMAP MODAL -->
+<div class="modal-overlay" id="modal-roadmap-overlay" onclick="closeRoadmap(event)">
+    <div class="modal" style="max-width: 500px; max-height: 90vh;">
+        
+        <div class="modal-header" style="border-bottom:none; padding-bottom:0;">
+            <span data-key="roadmap_title">Future Plans</span>
+            <span style="cursor:pointer" onclick="closeRoadmap(null, true)">✕</span>
+        </div>
+
+        <div class="modal-body" style="padding: 20px;">
+            
+            <p style="font-size:14px; color:var(--text-secondary); line-height:1.5; margin-bottom:25px; text-align:center;" data-key="roadmap_desc">
+                With your active support, xFetishHub will evolve into the ultimate platform. Here is what we are building:
+            </p>
+
+            <!-- Контейнер с обновленной структурой -->
+            <div class="roadmap-container">
+                
+                <!-- Item 1 -->
+                <div class="roadmap-item">
+                    <div class="rm-visual-col">
+                        <div class="rm-icon-box" style="color: #9b59b6; background: rgba(155, 89, 182, 0.15);">🌐</div>
+                        <div class="rm-line"></div>
+                    </div>
+                    <div class="rm-content">
+                        <div class="rm-title" data-key="rm_global_title">Global Intelligence</div>
+                        <div class="rm-desc" data-key="rm_global_desc">
+                            Aggregation of anonymous data from all users to create the smartest recommendation engine.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 2 -->
+                <div class="roadmap-item">
+                    <div class="rm-visual-col">
+                        <div class="rm-icon-box" style="color: #2ecc71; background: rgba(46, 204, 113, 0.15);">🤝</div>
+                        <div class="rm-line"></div>
+                    </div>
+                    <div class="rm-content">
+                        <div class="rm-title" data-key="rm_coop_title">Co-op Mode</div>
+                        <div class="rm-desc" data-key="rm_coop_desc">
+                            Invite a partner or friend to a session. They will see what genres you roll in real-time.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 3 -->
+                <div class="roadmap-item">
+                    <div class="rm-visual-col">
+                        <div class="rm-icon-box" style="color: #ff9900; background: rgba(255, 153, 0, 0.15);">📚</div>
+                        <div class="rm-line"></div>
+                    </div>
+                    <div class="rm-content">
+                        <div class="rm-title" data-key="rm_content_title">5000+ Categories</div>
+                        <div class="rm-desc" data-key="rm_content_desc">
+                            Massive database expansion. Every specific micro-fetish and niche genre will be indexed.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 4 (Последний - без линии) -->
+                <div class="roadmap-item">
+                    <div class="rm-visual-col">
+                        <div class="rm-icon-box" style="color: #3498db; background: rgba(52, 152, 219, 0.15);">⭐</div>
+                        <!-- Линии нет -->
+                    </div>
+                    <div class="rm-content">
+                        <div class="rm-title" data-key="rm_actors_title">Actor Selector</div>
+                        <div class="rm-desc" data-key="rm_actors_desc">
+                            A dedicated mode to find pornstars and models based on your visual preferences.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Закрывает Roadmap -> Открывает Sub -->
+            <div style="margin-top:20px; text-align:center;">
+                <button class="btn-gen" onclick="closeRoadmap(null, true); openSubModal();" style="padding:15px; font-size:14px; background:var(--nav-bg); border:1px solid var(--accent); color:var(--text-main);">
+                    <span data-key="rm_support_btn">Support Development 🚀</span>
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- QR CODE MODAL (FOR PC) -->
+<div class="modal-overlay" id="modal-qr-overlay" onclick="closeQRModal(event)">
+    <div class="modal" style="max-width: 450px;">
+        <div class="modal-header">
+            <span data-key="qr_title">Scan to Install</span>
+            <span style="cursor:pointer" onclick="closeQRModal(null, true)">✕</span>
+        </div>
+        <div class="modal-body" style="padding: 25px; text-align: center;">
+            
+            <!-- QR Image -->
+            <div style="background: white; padding: 15px; border-radius: 20px; display: inline-block; margin-bottom: 20px;">
+                <img id="qr-code-img" src="" alt="QR Code" style="width: 200px; height: 200px; display: block;">
+            </div>
+
+            <p style="font-size:14px; color:var(--text-secondary); margin-bottom:25px; line-height: 1.5;" data-key="qr_desc">
+                Scan this QR code with your phone camera to open the site, then follow the instructions below:
+            </p>
+
+            <!-- Instructions (Static List) -->
+            <div class="ios-group" style="text-align: left;">
+                <!-- iOS -->
+                <div class="ios-row" style="display:block; padding: 12px 16px;">
+                    <div style="font-weight:700; color:var(--text-main); margin-bottom:5px; display:flex; align-items:center; gap:8px;">
+                        <span style="font-size:18px;">🍎</span> iOS (Safari)
+                    </div>
+                    <div style="font-size:12px; color:var(--text-secondary); line-height:1.4;">
+                        1. <span data-key="inst_ios_1">Tap Share</span> <span style="font-size:14px">⎋</span><br>
+                        2. <span data-key="inst_ios_2">Scroll & Tap</span> <b><span data-key="inst_ios_btn">Add to Home Screen</span></b>
+                    </div>
+                </div>
+                <!-- Android -->
+                <div class="ios-row" style="display:block; padding: 12px 16px;">
+                    <div style="font-weight:700; color:var(--text-main); margin-bottom:5px; display:flex; align-items:center; gap:8px;">
+                        <span style="font-size:18px;">🤖</span> Android (Chrome)
+                    </div>
+                    <div style="font-size:12px; color:var(--text-secondary); line-height:1.4;">
+                        1. <span data-key="inst_and_1">Tap Menu</span> <span style="font-size:14px">⋮</span><br>
+                        2. <span data-key="inst_and_btn">Install App</span>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -3045,7 +3302,7 @@
     const WRAPPED_THRESHOLD = 30;
 
     /* =================== ⚒️ DEBUG MODE =========================== */
-    subscriptionLevel = 'pro'; 
+    // subscriptionLevel = 'pro'; 
     // subscriptionLevel = 'beast';
     /* =========================================================== */
 
@@ -13985,6 +14242,20 @@
             doc_terms: "Terms of Use",
             doc_privacy: "Privacy Policy",
             doc_refund: "Refund Policy",
+
+            
+            btn_roadmap: "Roadmap",
+            roadmap_title: "Roadmap",
+            roadmap_desc: "With your active support via subscriptions, xFetishHub will evolve. Here is what we are building:",
+            rm_global_title: "Global Intelligence",
+            rm_global_desc: "Aggregation of anonymous data to create the smartest recommendation engine. Plus, view global 'Most Loved' and 'Most Hated' charts.",
+            rm_coop_title: "Co-op Mode",
+            rm_coop_desc: "Invite a partner or friend. They will see what genres you roll in real-time. Perfect for distant couples.",
+            rm_content_title: "5000+ Categories",
+            rm_content_desc: "Massive database expansion. Every specific micro-fetish and niche genre will be indexed.",
+            rm_actors_title: "Actor Selector",
+            rm_actors_desc: "A dedicated mode to find pornstars based on your visual preferences and body type filters.",
+            rm_support_btn: "Support Development 🚀",
             
             // --- 2. Generator (Main Tab) ---
             generate: "Random Genre",
@@ -14153,8 +14424,12 @@
 
             // Окно установки
             install_title: "Install App",
-            install_desc: "Add to Home Screen for the best experience. No download required!",
+            install_desc: "Install app for full-screen mode. Plus, watch videos in the built-in browser to keep your main browser history clean!",
             install_continue: "Continue in Browser",
+
+            btn_install_phone: "Install on Phone",
+            qr_title: "Scan to Install",
+            qr_desc: "Scan this QR code with your phone camera to open the site, then follow the instructions below:",
             
             inst_ios_1: "Tap the <b>Share</b> button",
             inst_ios_2: "Scroll down and tap",
@@ -14176,10 +14451,6 @@
             about_title: "Developer",
             about_intro: "I am Nikolai M., 23 years old, student.",
             about_desc: "The project's mission is to allow users to discover all adult genres through a smart recommendation system, as well as provide an opportunity to analyze their tastes for self-discovery.",
-            
-            doc_terms: "Terms of Use",
-            doc_privacy: "Privacy Policy",
-            doc_refund: "Refund Policy",
             
             terms_text: `
                 <h3>1. Acceptance of Terms</h3>
@@ -14279,6 +14550,19 @@
             doc_terms: "Польз. соглашение",
             doc_privacy: "Политика конф-ти",
             doc_refund: "Политика возвратов",
+
+            btn_roadmap: "Дорожная карта",
+            roadmap_title: "Планы развития",
+            roadmap_desc: "Благодаря вашей поддержке и подпискам, проект будет развиваться. Вот что мы планируем добавить:",
+            rm_global_title: "Глобальный Разум",
+            rm_global_desc: "Улучшение рекомендаций на основе анонимной статистики всех пользователей. Топы самых любимых и ненавистных жанров мира.",
+            rm_coop_title: "Совместный режим",
+            rm_coop_desc: "Пригласите партнера по ссылке. Он будет видеть ваши результаты в реальном времени. Идеально для пар на расстоянии.",
+            rm_content_title: "5000+ Категорий",
+            rm_content_desc: "Масштабное расширение базы. Каждый микро-фетиш и нишевый жанр будет добавлен в поиск.",
+            rm_actors_title: "Поиск Актёров",
+            rm_actors_desc: "Отдельный режим для подбора порнозвезд и моделей на основе ваших визуальных предпочтений.",
+            rm_support_btn: "Поддержать развитие 🚀",
 
 
             // --- 2. Генератор ---
@@ -14447,8 +14731,12 @@
             onb_placeholder: "например: люблю милф, анал и большую грудь...",
         
             install_title: "Установить приложение",
-            install_desc: "Добавьте на главный экран для полноэкранного режима. Это займет 5 секунд!",
+            install_desc: "Установите приложение для полного экрана. Плюс, смотрите видео во встроенном браузере, чтобы не засорять историю основного браузера!",
             install_continue: "Продолжить в браузере",
+
+            btn_install_phone: "Установить на телефон",
+            qr_title: "Сканируйте для установки",
+            qr_desc: "Наведите камеру телефона на QR-код, чтобы открыть сайт, затем следуйте инструкции:",
             
             inst_ios_1: "Нажмите кнопку <b>Поделиться</b>",
             inst_ios_2: "Пролистайте вниз и выберите",
@@ -14471,10 +14759,6 @@
             about_title: "Разработчик",
             about_intro: "Я — Николай М., 23 года, студент.",
             about_desc: "Миссия проекта — позволить пользователям узнать про все жанры для взрослых путём умной системы рекомендаций, а также дать возможность проанализировать свои вкусы для самопознания.",
-            
-            doc_terms: "Польз. соглашение",
-            doc_privacy: "Политика конф-ти",
-            doc_refund: "Политика возвратов",
 
             terms_text: `
                 <h3>1. Принятие условий</h3>
@@ -14571,6 +14855,19 @@
             doc_privacy: "Privacidad",
             doc_refund: "Reembolsos",
             btn_close: "Cerrar",
+
+            btn_roadmap: "Hoja de Ruta",
+            roadmap_title: "Planes Futuros",
+            roadmap_desc: "Con tu apoyo activo, xFetishHub evolucionará. Esto es lo que estamos construyendo:",
+            rm_global_title: "Inteligencia Global",
+            rm_global_desc: "Estadísticas anónimas de todos los usuarios para mejorar recomendaciones. Ver los fetiches más amados y odiados.",
+            rm_coop_title: "Modo Cooperativo",
+            rm_coop_desc: "Invita a tu pareja. Verán lo que generas en tiempo real. Perfecto para parejas a distancia.",
+            rm_content_title: "5000+ Categorías",
+            rm_content_desc: "Expansión masiva de la base de datos. Cada micro-fetiche será indexado.",
+            rm_actors_title: "Selector de Actores",
+            rm_actors_desc: "Un modo dedicado para encontrar estrellas porno basado en tus preferencias visuales.",
+            rm_support_btn: "Apoyar Desarrollo 🚀",
 
             btn_close: "Cerrar",
             search_liked: "Buscar favoritos...",
@@ -14733,8 +15030,12 @@
             onb_placeholder: "ej. me gustan maduras, anal y pechos grandes...",
         
             install_title: "Instalar App",
-            install_desc: "Añadir a pantalla de inicio para mejor experiencia.",
+            install_desc: "Instala la app para pantalla completa. ¡Además, mira videos en el navegador integrado para mantener limpio tu historial principal!",
             install_continue: "Continuar en navegador",
+
+            btn_install_phone: "Instalar en móvil",
+            qr_title: "Escanear para instalar",
+            qr_desc: "Escanea este código QR con tu cámara para abrir el sitio, luego sigue las instrucciones:",
             
             inst_ios_1: "Toca el botón <b>Compartir</b>",
             inst_ios_2: "Baja y selecciona",
@@ -14756,10 +15057,6 @@
             about_title: "Desarrollador",
             about_intro: "Soy Nikolai M., 23 años, estudiante.",
             about_desc: "La misión del proyecto es permitir a los usuarios conocer todos los géneros para adultos a través de un sistema inteligente, y analizar sus gustos para el autoconocimiento.",
-            
-            doc_terms: "Términos de Uso",
-            doc_privacy: "Privacidad",
-            doc_refund: "Reembolsos",
 
             terms_text: `
                 <h3>1. Aceptación de los Términos</h3>
@@ -14855,6 +15152,19 @@
             doc_terms: "Nutzungsbedingungen",
             doc_privacy: "Datenschutz",
             doc_refund: "Rückerstattung",
+
+            btn_roadmap: "Roadmap",
+            roadmap_title: "Zukunftspläne",
+            roadmap_desc: "Mit deiner Unterstützung wird sich xFetishHub weiterentwickeln. Das bauen wir:",
+            rm_global_title: "Globale Intelligenz",
+            rm_global_desc: "Verbesserte Empfehlungen basierend auf anonymen Daten aller Nutzer. Siehe globale 'Top' und 'Flop' Listen.",
+            rm_coop_title: "Koop-Modus",
+            rm_coop_desc: "Lade einen Partner ein. Er sieht in Echtzeit, was du generierst. Perfekt für Fernbeziehungen.",
+            rm_content_title: "5000+ Kategorien",
+            rm_content_desc: "Massive Erweiterung der Datenbank. Jeder Mikro-Fetisch wird indexiert.",
+            rm_actors_title: "Darsteller-Suche",
+            rm_actors_desc: "Ein Modus zum Finden von Pornostars basierend auf deinen visuellen Vorlieben.",
+            rm_support_btn: "Entwicklung unterstützen 🚀",
 
             btn_start: "Los geht's",
             btn_pass: "Andere",
@@ -15016,8 +15326,12 @@
             onb_placeholder: "z.B. ich mag Milf, Anal und große Brüste...",
         
             install_title: "App installieren",
-            install_desc: "Zum Home-Bildschirm hinzufügen für das beste Erlebnis.",
+            install_desc: "Installiere die App für Vollbild. Plus: Schaue Videos im integrierten Browser, um deinen Hauptverlauf sauber zu halten!",
             install_continue: "Im Browser fortfahren",
+
+            btn_install_phone: "Auf Handy installieren",
+            qr_title: "Scannen zum Installieren",
+            qr_desc: "Scanne diesen QR-Code mit deiner Kamera, dann befolge die Anweisungen:",
             
             inst_ios_1: "Tippe auf <b>Teilen</b>",
             inst_ios_2: "Scrolle runter und wähle",
@@ -15039,10 +15353,6 @@
             about_title: "Entwickler",
             about_intro: "Ich bin Nikolai M., 23 Jahre alt, Student.",
             about_desc: "Die Mission des Projekts ist es, Benutzern durch ein intelligentes System alle Erwachsenengenres näherzubringen und ihre Vorlieben zur Selbstfindung zu analysieren.",
-            
-            doc_terms: "Nutzungsbedingungen",
-            doc_privacy: "Datenschutz",
-            doc_refund: "Rückerstattung",
 
             terms_text: `
                 <h3>1. Annahme der Bedingungen</h3>
@@ -16354,14 +16664,12 @@
         
         // 2. Целевые контейнеры (Куда переносим)
         const sidebar = document.getElementById('pc-settings-mount');
-        const mPrefs = document.getElementById('mount-prefs');
-        const mAccount = document.getElementById('mount-account');
-        const mExtras = document.getElementById('mount-extras');
+        const mPrefs = document.getElementById('mount-prefs');     // Вкладка НАСТРОЙКИ
+        const mAccount = document.getElementById('mount-account'); // Вкладка АККАУНТ
 
         if (isPC) {
-            // === ПК РЕЖИМ ===
+            // === ПК РЕЖИМ (ВСЁ В САЙДБАРЕ) ===
             if (sidebar) {
-                // Переносим только то, что существует
                 if(bPrefs) sidebar.appendChild(bPrefs);
                 if(bAccount) sidebar.appendChild(bAccount);
                 if(bExtras) sidebar.appendChild(bExtras);
@@ -16374,10 +16682,19 @@
 
         } else {
             // === МОБИЛЬНЫЙ РЕЖИМ ===
-            // Раскидываем блоки по вкладкам
+            
+            // 1. Настройки (Preferences) -> Вкладка Settings
             if(mPrefs && bPrefs) mPrefs.appendChild(bPrefs);
+            
+            // 2. Дополнительно (Extras) -> ТЕПЕРЬ ТОЖЕ В SETTINGS (ПОД НАСТРОЙКАМИ)
+            if(mPrefs && bExtras) {
+                // Добавляем небольшой отступ сверху для красоты, если нужно
+                bExtras.style.marginTop = "20px"; 
+                mPrefs.appendChild(bExtras);
+            }
+
+            // 3. Аккаунт -> Вкладка Account
             if(mAccount && bAccount) mAccount.appendChild(bAccount);
-            if(mExtras && bExtras) mExtras.appendChild(bExtras);
         }
     }
 
@@ -18553,6 +18870,32 @@
     function changeOrientation(val) {
         currentOrientation = val;
         localStorage.setItem('xch_orientation', val);
+    }
+
+    function openRoadmap() {
+        document.getElementById('modal-roadmap-overlay').classList.add('open');
+    }
+
+    function closeRoadmap(e, force) {
+        if (force || e.target.id === 'modal-roadmap-overlay') {
+            document.getElementById('modal-roadmap-overlay').classList.remove('open');
+        }
+    }
+
+    function openQRModal() {
+        // Генерируем ссылку на текущий URL
+        const currentUrl = window.location.href;
+        // Используем API для генерации QR
+        const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data=${encodeURIComponent(currentUrl)}`;
+        
+        document.getElementById('qr-code-img').src = qrApi;
+        document.getElementById('modal-qr-overlay').classList.add('open');
+    }
+
+    function closeQRModal(e, force) {
+        if (force || e.target.id === 'modal-qr-overlay') {
+            document.getElementById('modal-qr-overlay').classList.remove('open');
+        }
     }
 
 </script>
