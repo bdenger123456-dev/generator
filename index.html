@@ -2117,16 +2117,16 @@
             width: 100%;
             height: 100%;
             
+            /* Лежит поверх всего контента */
             z-index: 50 !important; 
             
+            /* Скругляем углы под карточку */
+            border-radius: 28px;
+            
             pointer-events: none; 
-            opacity: 0;
-            transition: opacity 0.1s linear;
-            
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px); /* Для Safari/iOS */
-            
-            border-radius: 28px; 
+            opacity: 1 !important; /* Управляем цветом через RGBA, а не opacity */
+            background-color: transparent; /* По умолчанию прозрачный */
+            transition: background-color 0.1s linear;
         }
 
         /* Верхняя часть (Бейджи) */
@@ -3634,7 +3634,7 @@
     const WRAPPED_THRESHOLD = 30;
 
     /* =================== ⚒️ DEBUG MODE =========================== */
-    // subscriptionLevel = 'pro'; 
+    subscriptionLevel = 'pro'; 
     // subscriptionLevel = 'beast';
     /* =========================================================== */
 
@@ -18354,24 +18354,28 @@
         const card = document.getElementById('card-block');
         const overlay = document.querySelector('.swipe-overlay'); 
         
+        // Находим элементы, которые нужно размывать (текст, слот, бейджи)
+        // Мы ищем их заранее, чтобы не нагружать процессор при каждом движении
+        const blurTargets = [
+            document.getElementById('slot-reel'),     // Барабан
+            document.getElementById('result-desc'),   // Описание
+            document.getElementById('badge-wrapper'), // Бейджи
+            document.getElementById('related-block')  // Похожее
+        ];
+
         if (!card) return;
 
         card.addEventListener('touchstart', (e) => {
-            // Не свайпаем, если жмем на кнопки
             if (e.target.closest('button') || e.target.closest('.related-item-btn') || e.target.closest('.capsule-trigger') || e.target.closest('.tag')) return;
-            
             if (isGenerating) return;
 
             startX = e.touches[0].clientX;
             startY = e.touches[0].clientY;
-            
-            // Фикс тапа (чтобы не срабатывал дизлайк при касании)
             currentX = startX;
             currentY = startY;
-
             isDragging = true;
             
-            // Отключаем плавность для мгновенной реакции на палец
+            // Убираем плавность для мгновенной реакции
             card.style.transition = 'none';
             if(overlay) overlay.style.transition = 'none';
             
@@ -18382,30 +18386,44 @@
             
             currentX = e.touches[0].clientX;
             currentY = e.touches[0].clientY;
-            
             let deltaX = currentX - startX;
             let deltaY = currentY - startY;
 
-            // Блокируем свайп, если это скролл страницы
-            if (Math.abs(deltaY) > Math.abs(deltaX) + 10) return;
+            // Блокируем вертикальный скролл страницы при свайпе
+            if (Math.abs(deltaX) > 10) {
+                 if (e.cancelable) e.preventDefault();
+            }
 
-            // Поворот и движение карточки
+            // Двигаем карточку
             let rotate = deltaX * 0.05;
             card.style.transform = `translateX(${deltaX}px) rotate(${rotate}deg)`;
 
-            // === ЛОГИКА ОВЕРЛЕЯ (Заливка) ===
+            // === ГЛАВНОЕ: РУЧНОЕ РАЗМЫТИЕ И ЦВЕТ ===
+            // Рассчитываем силу эффекта (от 0 до 1)
+            // 150px свайпа = максимальный эффект
+            const progress = Math.min(Math.abs(deltaX) / 150, 1);
+            
             if (overlay) {
-                const opacity = Math.min(Math.abs(deltaX) / 100, 0.6);
+                // Заливаем оверлей цветом через RGBA (прозрачность зависит от progress)
+                // 0.85 = максимальная непрозрачность цвета
+                const alpha = progress * 0.85; 
                 
                 if (deltaX > 0) {
-                    overlay.style.backgroundColor = 'rgba(46, 204, 113, 0.6)';
+                    // ВПРАВО (Зеленый)
+                    overlay.style.backgroundColor = `rgba(46, 204, 113, ${alpha})`; 
                 } else {
-                    overlay.style.backgroundColor = 'rgba(231, 76, 60, 0.6)'; 
+                    // ВЛЕВО (Красный)
+                    overlay.style.backgroundColor = `rgba(231, 76, 60, ${alpha})`; 
                 }
-                overlay.style.opacity = opacity;
             }
 
-        }, {passive: true});
+            // ПРИМЕНЯЕМ BLUR К КОНТЕНТУ
+            const blurAmount = progress * 10; // Максимум 10px блюра
+            blurTargets.forEach(el => {
+                if(el) el.style.filter = `blur(${blurAmount}px)`;
+            });
+
+        }, {passive: false}); // passive: false важен для e.preventDefault()
 
         card.addEventListener('touchend', (e) => {
             if (!isDragging) return;
@@ -18413,22 +18431,26 @@
             
             let deltaX = currentX - startX;
             
-            // Если протащили далеко (> 100px) -> Срабатывание
+            // СБРОС БЛЮРА И ЦВЕТА (при любом исходе)
+            blurTargets.forEach(el => {
+                if(el) {
+                    el.style.transition = 'filter 0.3s ease'; // Плавный возврат резкости
+                    el.style.filter = 'none';
+                }
+            });
+            if (overlay) {
+                overlay.style.transition = 'background-color 0.3s ease';
+                overlay.style.backgroundColor = 'transparent';
+            }
+
+            // ЛОГИКА ЗАВЕРШЕНИЯ
             if (Math.abs(deltaX) > 100) {
                 const direction = deltaX > 0 ? 'right' : 'left';
                 const endX = deltaX > 0 ? window.innerWidth + 100 : -window.innerWidth - 100;
-                
                 animateSwipeEnd(endX, direction); 
             } else {
-                // ВОЗВРАТ (Отмена свайпа)
                 card.style.transition = 'transform 0.3s ease-out';
                 card.style.transform = 'translateX(0) rotate(0)';
-                
-                // Скрываем оверлей
-                if (overlay) {
-                    overlay.style.transition = 'opacity 0.3s ease';
-                    overlay.style.opacity = '0';
-                }
             }
         });
     }
