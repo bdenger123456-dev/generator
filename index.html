@@ -349,7 +349,7 @@
             border-radius: 28px;
             position: relative;
             overflow: hidden;
-            transition: all 0.3s ease-out;
+            transition: transform 0.3s ease-out;
         }
 
         body.light-theme .card {
@@ -2102,6 +2102,19 @@
             color: #ffffff !important;
         }
 
+        .swipe-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10; /* Поверх контента */
+            pointer-events: none; /* Чтобы пропускал клики */
+            opacity: 0; /* Скрыт по умолчанию */
+            transition: opacity 0.1s linear;
+            border-radius: 28px; /* Как у карточки */
+        }
+
         /* =========================================
         18. MEDIA QUERIES (ADAPTATION)
         ========================================= */
@@ -2188,6 +2201,8 @@
 
                 <!-- КАРТОЧКА -->
                 <div class="card" id="card-block">
+
+                    <div class="swipe-overlay"></div>
                     
                     <!-- Верхняя часть: Бейджи -->
                     <div style="width:100%; display:flex; justify-content:center; min-height: 30px;" class="stagger-item delay-1" id="badge-container-anim">
@@ -18304,40 +18319,62 @@
 
     function initSwipeCards() {
         const card = document.getElementById('card-block');
+        const overlay = document.querySelector('.swipe-overlay'); // Находим наш оверлей
+        
         if (!card) return;
 
+        // ВАЖНО: Сбрасываем переменные при каждом касании
         card.addEventListener('touchstart', (e) => {
+            // Игнорируем свайп, если нажали на кнопку или тег внутри карточки
             if (e.target.closest('button') || e.target.closest('.related-item-btn') || e.target.closest('.capsule-trigger') || e.target.closest('.tag')) return;
             
             if (isGenerating) return;
+
             startX = e.touches[0].clientX;
             startY = e.touches[0].clientY;
+            
+            // ФИКС БАГА С ТАПОМ: 
+            // Инициализируем currentX равным startX. 
+            // Если touchmove не сработает (простой тап), разница будет 0.
+            currentX = startX; 
+            currentY = startY;
+
             isDragging = true;
             card.style.transition = 'none';
+            
+            // Сброс оверлея
+            if(overlay) overlay.style.transition = 'none';
         }, {passive: false});
 
         card.addEventListener('touchmove', (e) => {
             if (!isDragging) return;
+            
             currentX = e.touches[0].clientX;
+            currentY = e.touches[0].clientY;
+            
             let deltaX = currentX - startX;
-            let rotate = deltaX * 0.05; 
+            let deltaY = currentY - startY;
 
+            // Если движение больше вертикальное, чем горизонтальное — это скролл, не свайп
+            if (Math.abs(deltaY) > Math.abs(deltaX) + 10) return;
+
+            // Поворот карточки
+            let rotate = deltaX * 0.05;
             card.style.transform = `translateX(${deltaX}px) rotate(${rotate}deg)`;
 
-            // --- НОВАЯ ЛОГИКА ЦВЕТА ---
-            // Интенсивность эффекта (0 to 1)
-            const intensity = Math.min(Math.abs(deltaX) / 150, 1);
-            
-            if (deltaX > 0) {
-                // Вправо -> Зеленый (Лайк)
-                card.style.backgroundColor = `rgba(46, 204, 113, ${0.1 + intensity * 0.8})`; // от чуть-чуть до яркого
-                card.style.borderColor = `rgba(46, 204, 113, ${intensity})`;
-                card.style.filter = `blur(${intensity * 4}px)`; // Блюр нарастает
-            } else {
-                // Влево -> Красный (Дизлайк)
-                card.style.backgroundColor = `rgba(231, 76, 60, ${0.1 + intensity * 0.8})`;
-                card.style.borderColor = `rgba(231, 76, 60, ${intensity})`;
-                card.style.filter = `blur(${intensity * 4}px)`;
+            // === ЛОГИКА ОВЕРЛЕЯ (Заливка цветом) ===
+            if (overlay) {
+                // Чем дальше тянем, тем ярче цвет (максимум 0.6 прозрачности)
+                const opacity = Math.min(Math.abs(deltaX) / 150, 0.6);
+                
+                if (deltaX > 0) {
+                    // ВПРАВО -> Зеленый (Лайк)
+                    overlay.style.backgroundColor = '#2ecc71';
+                } else {
+                    // ВЛЕВО -> Красный (Дизлайк)
+                    overlay.style.backgroundColor = '#e74c3c';
+                }
+                overlay.style.opacity = opacity;
             }
 
         }, {passive: true});
@@ -18345,25 +18382,28 @@
         card.addEventListener('touchend', (e) => {
             if (!isDragging) return;
             isDragging = false;
+            
             let deltaX = currentX - startX;
             
+            // Порог срабатывания свайпа (100px)
             if (deltaX > 100) {
                 animateSwipeEnd(window.innerWidth + 100, 'right'); 
             } else if (deltaX < -100) {
                 animateSwipeEnd(-(window.innerWidth + 100), 'left'); 
             } else {
-                // Возврат
-                card.style.transition = 'transform 0.3s ease, background-color 0.3s, border-color 0.3s, filter 0.3s';
+                // ВОЗВРАТ (Если не дотянули или это был тап)
+                card.style.transition = 'transform 0.3s ease-out';
                 card.style.transform = 'translateX(0) rotate(0)';
                 
-                // Сброс стилей цвета
-                card.style.backgroundColor = '';
-                card.style.borderColor = '';
-                card.style.filter = '';
+                // Скрываем оверлей
+                if (overlay) {
+                    overlay.style.transition = 'opacity 0.3s ease';
+                    overlay.style.opacity = '0';
+                }
             }
         });
     }
-
+    
     function handleSwipeAction(direction) {
         if (isGenerating) return;
 
