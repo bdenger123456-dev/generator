@@ -3634,7 +3634,7 @@
     const WRAPPED_THRESHOLD = 30;
 
     /* =================== ⚒️ DEBUG MODE =========================== */
-    // subscriptionLevel = 'pro'; 
+    subscriptionLevel = 'pro'; 
     // subscriptionLevel = 'beast';
     /* =========================================================== */
 
@@ -18553,38 +18553,47 @@
     }
 
     function startGeneration(mode, direction = 'next') {
+        // 1. Радужный режим (если включен)
         if (document.body.classList.contains('rainbow-mode')) {
             setRandomRainbowColor();
         }
+
+        // 2. Проверка лимитов (для Free аккаунтов)
         if (!checkGenerationLimit()) return; 
         if (isGenerating) return;
 
-        // Авто-моды (без изменений)
+        // 3. Авто-теги для ориентации
         if (currentOrientation === 'gay') activeMods.add('Gay');
         else if (currentOrientation === 'trans') activeMods.add('Trans');
         renderModifiers();
 
-        // Скрываем лишние элементы UI
+        // 4. Скрываем лишние элементы интерфейса перед генерацией
         const descEl = document.getElementById('result-desc');
         if(descEl) descEl.style.display = 'none';
+        
         const statusText = document.getElementById('status-text');
         if(statusText) statusText.innerText = ''; 
+        
         document.getElementById('badge-wrapper').innerHTML = '';
         document.getElementById('mods-capsule').classList.remove('open');
 
+        // Сброс меню тегов
         const modContainer = document.getElementById('mod-container');
         const modBtn = document.getElementById('btn-mods-trigger');
         if (modContainer) modContainer.classList.remove('open');
         if (modBtn) modBtn.classList.remove('active');
         
+        // Скрываем кнопки управления
         document.getElementById('tinder-controls').classList.add('hidden-initial');
         document.getElementById('mods-block').classList.add('hidden-initial');
         document.getElementById('related-block').classList.add('hidden-initial');
 
+        // 5. === ВАЖНО: ПОЛНЫЙ СБРОС СТИЛЕЙ КАРТОЧКИ ===
         const card = document.getElementById('card-block');
+        const overlay = document.querySelector('.swipe-overlay');
         
-        // === ПОЛНЫЙ СБРОС СТИЛЕЙ ===
         if(card) {
+            // Убираем классы анимации
             card.classList.remove('anim-fly-left', 'anim-fly-right', 'anim-slow-enter');
             
             // Сбрасываем трансформацию и прозрачность карточки
@@ -18595,12 +18604,14 @@
             card.style.filter = '';          
             card.style.opacity = ''; 
             
+            // СБРОС ОВЕРЛЕЯ (ЦВЕТА)
             if (overlay) {
                 overlay.style.backgroundColor = 'transparent';
-                overlay.style.opacity = ''; // Возвращаем управление CSS
-                overlay.style.transition = 'none'; // Чтобы исчез мгновенно
+                overlay.style.opacity = ''; 
+                overlay.style.transition = 'none';
             }
 
+            // СБРОС БЛЮРА ТЕКСТА
             const blurTargets = [
                 document.getElementById('slot-reel'),
                 document.getElementById('result-desc'),
@@ -18614,18 +18625,20 @@
                 }
             });
             
-            void card.offsetWidth; // Принудительная перерисовка
+            void card.offsetWidth; // Принудительная перерисовка браузером
         }
         
-        // Логика обучения 
+        // 6. Логика обучения алгоритма
         if (mode === 'random' && currentItem && !hasInteractedWithCurrent) {
             if (watchLater.includes(currentItem.id)) adjustTagScores(currentItem, 1);
             else adjustTagScores(currentItem, -1);
         }
         if (mode === 'similar' && currentItem) adjustTagScores(currentItem, 1);
 
-        // Фильтрация 
+        // 7. Фильтрация списка
         let filtered = filterData();
+        
+        // Если ищем "Похожее"
         if (mode === 'similar' && lastGeneratedItem) {
             const subset = filtered.filter(item => {
                 if (item.id === lastGeneratedItem.id) return false;
@@ -18635,6 +18648,7 @@
             if (subset.length > 0) filtered = subset;
         }
 
+        // Если список пуст
         const reel = document.getElementById('slot-reel');
         if (filtered.length === 0) {
             reel.innerHTML = `<div class="slot-item" style="color:var(--highlight-red);">List Empty</div>`;
@@ -18645,19 +18659,27 @@
         isGenerating = true;
         hasInteractedWithCurrent = false;
         
+        // ВЫБОР ПОБЕДИТЕЛЯ
         const finalItem = getWeightedRandom(filtered);
+        
+        // Настройки анимации
         const isPC = window.innerWidth > 768;
-        const itemHeight = isPC ? 450 : 300;
+        const itemHeight = isPC ? 450 : 300; // Должно совпадать с CSS высотой .slot-window
 
-        // СЦЕНАРИЙ 1: ПЕРВЫЙ ЗАПУСК (Slot Machine)
+        // ==========================================
+        // СЦЕНАРИЙ 1: ПЕРВЫЙ ЗАПУСК (Кнопка "Поехали")
+        // ==========================================
         if (isFirstGen) {
             isFirstGen = false;
             const spinCount = 10;
             let html = '';
+            
+            // Генерируем "фейковые" элементы для прокрутки
             for (let i = 0; i < spinCount - 1; i++) {
                 const randomItem = filtered[Math.floor(Math.random() * filtered.length)];
                 html += `<div class="slot-item">${getLocalizedName(randomItem)}</div>`;
             }
+            // Добавляем победителя в конец
             const winnerName = getLocalizedName(finalItem);
             html += `<div class="slot-item" id="result-text">${winnerName}</div>`;
 
@@ -18665,12 +18687,18 @@
             reel.innerHTML = html;
             reel.style.transform = 'translateY(0)';
             
+            // Уменьшаем шрифт во время прокрутки
             const items = reel.querySelectorAll('.slot-item');
             items.forEach(el => el.classList.add('shrunk'));
             void reel.offsetWidth; 
 
+            // Вычисляем, куда крутить
+            // На мобильных высота может быть плавающей, но для анимации используем фиксированный шаг
+            // Если на мобилке верстка ломается при кручении, можно уменьшить itemHeight
             const targetIndex = spinCount - 1; 
-            const targetY = -(targetIndex * itemHeight);
+            // Получаем реальную высоту элемента, если возможно, иначе фоллбек
+            const realHeight = reel.firstElementChild ? reel.firstElementChild.offsetHeight : itemHeight;
+            const targetY = -(targetIndex * realHeight);
 
             requestAnimationFrame(() => {
                 reel.style.transition = 'transform 1.2s cubic-bezier(0.25, 1, 0.5, 1)';
@@ -18682,33 +18710,34 @@
             }, 1200);
         } 
         
-        // СЦЕНАРИЙ 2: ОБЫЧНАЯ ГЕНЕРАЦИЯ
+        // ==========================================
+        // СЦЕНАРИЙ 2: ОБЫЧНАЯ ГЕНЕРАЦИЯ (Свайп)
+        // ==========================================
         else {
             reel.innerHTML = ""; 
 
-            // 1. Фикс размера
-            card.classList.add('has-results'); 
+            // Подготавливаем карточку
+            if(card) card.classList.add('has-results'); 
             
-            // 2. Логика направления 
-            
+            // Анимация влета новой карточки
             if (direction === 'like') {
                 // Лайк: Новая карточка прилетает СЛЕВА направо
-                card.classList.add('anim-fly-left');
+                if(card) card.classList.add('anim-fly-left');
             } 
             else {
-                // Дизлайк (или по умолчанию): Новая карточка прилетает СПРАВА налево
-                card.classList.add('anim-fly-right');
+                // Дизлайк: Новая карточка прилетает СПРАВА налево
+                if(card) card.classList.add('anim-fly-right');
             }
 
-            // 3. Заполняем контент...
+            // Задержка перед показом контента
             setTimeout(() => {
                 finishGeneration(finalItem, mode);
                 
-                // Важно: восстанавливаем прозрачность, если она пропала
-                card.style.opacity = ''; 
+                // Восстанавливаем прозрачность (если была изменена при свайпе)
+                if(card) card.style.opacity = ''; 
                 
                 setTimeout(() => {
-                    card.classList.remove('anim-fly-right', 'anim-fly-left');
+                    if(card) card.classList.remove('anim-fly-right', 'anim-fly-left');
                 }, 700);
                 
             }, 300);
