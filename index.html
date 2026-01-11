@@ -44,11 +44,13 @@
             --ios-card: #1C1C1E;
             --ios-separator: #38383A;
             --ios-header: #8E8E93;
+
+            --card-gradient: linear-gradient(165deg, #2a2a2a 0%, #141414 100%);
         }
 
         body.light-theme {
             --bg-color: #f2f2f7;
-            --sidebar-bg: #ffffff;
+            --sidebar-bg: #f2f2f7; 
             --card-bg: #ffffff;
             --nav-bg: #f9f9f9;
             --text-main: #000000;
@@ -59,6 +61,8 @@
             --ios-card: #FFFFFF;
             --ios-separator: #C6C6C8;
             --ios-header: #6D6D72;
+
+            --card-gradient: linear-gradient(165deg, #ffffff 0%, #f2f2f7 100%);
         }
 
         body {
@@ -328,8 +332,8 @@
         }
 
         .card {
-            /* Градиент для "дорогого" вида */
-            background: linear-gradient(165deg, #2a2a2a 0%, #141414 100%);
+            background: var(--card-gradient);
+            
             border: 1px solid rgba(255, 255, 255, 0.08); /* Тонкая рамка */
             box-shadow: 0 20px 50px rgba(0,0,0,0.4);
             
@@ -349,7 +353,7 @@
         }
 
         body.light-theme .card {
-            background: linear-gradient(165deg, #ffffff 0%, #f2f2f7 100%);
+            background: var(--card-gradient);
             border: 1px solid rgba(0, 0, 0, 0.05);
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         }
@@ -2897,11 +2901,11 @@
         
         // Если пользователь был залогинен, пробуем сохранить данные перед выходом
         if (user) {
-            const btnText = document.getElementById('sync-btn-text'); // Кнопка в модалке
+            const btnText = document.getElementById('sync-btn-text');
             if(btnText) btnText.innerText = "Saving...";
             try {
                 console.log("Saving data before logout...");
-                await window.syncToCloud(); // Финальное сохранение (WRITE)
+                await window.syncToCloud(); // Финальное сохранение
             } catch (e) {
                 console.error("Save before logout failed", e);
             }
@@ -2909,8 +2913,21 @@
 
         try {
             await signOut(auth);
+            
+            // 1. Удаляем метку о синхронизации
             localStorage.removeItem('xch_last_sync_ts');
-            location.reload(); 
+            
+            // 2. УДАЛЯЕМ ПОДПИСКУ (Сбрасываем на Free)
+            localStorage.removeItem('xch_sub_level');
+            
+            const currentTheme = localStorage.getItem('xch_theme_id');
+            // Если тема не стандартная (dark/light), сбрасываем
+            if (currentTheme && currentTheme !== 'dark' && currentTheme !== 'light') {
+                localStorage.setItem('xch_theme_id', 'dark');
+            }
+            // ====================
+
+            location.reload(); // Перезагрузка применит тариф Free
         } catch (error) {
             console.error("Logout failed:", error);
         }
@@ -14228,6 +14245,8 @@
             watch_later: "Watch Later",
             empty_wl: "No saved items yet",
             sync_label: "Synced: ",
+            expl_undo: "Changed your mind? 😏",
+            expl_hist: "From Archives 📜",
 
             auth_title: "Sync & Backup",
             auth_p1: "Store history and preferences on all devices",
@@ -14536,6 +14555,8 @@
             watch_later: "Смотреть позже",
             empty_wl: "Список пуст",
             sync_label: "Синхр: ",
+            expl_undo: "Передумал? 😏",
+            expl_hist: "Из архивов 📜",
 
             auth_title: "Синхронизация",
             auth_p1: "Хранение истории и предпочтений на всех устройствах",
@@ -14840,6 +14861,8 @@
             watch_later: "Ver más tarde",
             empty_wl: "Lista vacía",
             sync_label: "Sinc: ",
+            expl_undo: "¿Cambiaste de opinión? 😏",
+            expl_hist: "De los archivos 📜",
 
             auth_title: "Sincronización",
             auth_p1: "Historial y preferencias en todos los dispositivos",
@@ -15138,6 +15161,8 @@
              watch_later: "Später ansehen",
             empty_wl: "Liste leer",
             sync_label: "Sync: ",
+            expl_undo: "Meinung geändert? 😏",
+            expl_hist: "Aus dem Archiv 📜",
 
             auth_title: "Synchronisierung",
             auth_p1: "Verlauf und Vorlieben auf allen Geräten speichern",
@@ -15981,22 +16006,28 @@
         const t = langData[currentLang];
         let reason = null;
 
-        if (mode === 'similar') {
-            // Если нажали "Похожие"
+        // 1. Возврат (Кнопка Undo)
+        if (mode === 'undo') {
+            reason = t.expl_undo; 
+        }
+        // 2. История (Клик из списка)
+        else if (mode === 'history') {
+            reason = t.expl_hist;
+        }
+        // 3. Похожее (Кнопка Similar)
+        else if (mode === 'similar') {
             reason = t.expl_sim;
         } 
+        // 4. Клик по тегу (В каталоге)
         else if (mode === 'tag_click') {
-            // Если кликнули по тегу в каталоге
             reason = t.expl_tag_click; 
         } 
+        // 5. Обычная генерация (Smart / Random)
         else {
             // === УМНЫЙ ПОИСК ПРИЧИНЫ ===
-            
-            // 1. Ищем самый весомый тег текущего предмета
             let bestTag = null;
             let maxScore = 0;
             
-            // Исключаем общие теги, они не дают хорошего объяснения
             const ignoreTags = ['universal', 'straight', 'gay', 'lesbian', 'trans', 'bi', 'male', 'female'];
             
             currentItem.tags.forEach(tag => {
@@ -16009,29 +16040,22 @@
             });
             
             if (bestTag) {
-                // 2. Ищем В ИСТОРИИ или ЛАЙКАХ предмет с этим тегом
-                // Чтобы сказать "Потому что тебе зашло: [Название]"
-                
-                // Сначала ищем в лайках (это сильнее)
+                // Ищем В ИСТОРИИ или ЛАЙКАХ предмет с этим тегом
                 let sourceItem = null;
                 if (favorites.length > 0) {
                     const favItem = favorites.map(id => data.find(x => x.id === id)).find(item => item && item.tags.includes(bestTag));
                     if (favItem) sourceItem = favItem;
                 }
                 
-                // Если в лайках нет, ищем в недавней истории
                 if (!sourceItem && historyData.length > 0) {
                     const histItem = historyData.map(h => data.find(x => x.id === h.id)).find(item => item && item.id !== currentItem.id && item.tags.includes(bestTag));
                     if (histItem) sourceItem = histItem;
                 }
 
                 if (sourceItem) {
-                    // Если нашли конкретный пример
                     const reasonName = getLocalizedName(sourceItem);
-                    reason = t.expl_score + reasonName; // "Потому что тебе зашло: Порка"
+                    reason = t.expl_score + reasonName; 
                 } else {
-                    // Если не нашли конкретный пример, но тег имеет высокий вес (накопленный)
-                    // Выводим название тега с большой буквы
                     let displayTag = bestTag.charAt(0).toUpperCase() + bestTag.slice(1);
                     reason = t.expl_score + displayTag; 
                 }
@@ -17880,38 +17904,47 @@
         const theme = APP_THEMES.find(t => t.id === themeId);
         if (!theme) return;
 
-        // 1. Text color logic
+        // 1. Text color logic (Light/Dark mode class)
         document.body.classList.toggle('light-theme', theme.isLight);
         
-        // 2. Reset styles
-        const props = ['--bg-color', '--sidebar-bg', '--card-bg', '--nav-bg', '--border', '--ios-card', '--ios-bg'];
+        // 2. Reset styles (Сбрасываем кастомные переменные перед применением новых)
+        const props = ['--bg-color', '--sidebar-bg', '--card-bg', '--nav-bg', '--border', '--ios-card', '--ios-bg', '--card-gradient'];
         props.forEach(p => root.style.removeProperty(p));
         
-        // 3. Apply Custom Colors
+        // 3. Apply Custom Colors (Применяем цвета премиум темы)
         if (theme.colors) {
             if (theme.colors.bg) {
                 root.style.setProperty('--bg-color', theme.colors.bg);
                 root.style.setProperty('--ios-bg', theme.colors.bg);
             }
             if (theme.colors.sidebar) root.style.setProperty('--sidebar-bg', theme.colors.sidebar);
+            
+            // Если в теме задан цвет карточки
             if (theme.colors.card) {
                 root.style.setProperty('--card-bg', theme.colors.card);
                 root.style.setProperty('--ios-card', theme.colors.card);
+                
+                root.style.setProperty('--card-gradient', `linear-gradient(165deg, ${theme.colors.card}, ${theme.colors.bg})`);
             }
+            
             if (theme.colors.nav) root.style.setProperty('--nav-bg', theme.colors.nav);
             if (theme.colors.border) root.style.setProperty('--border', theme.colors.border);
         }
 
+        // 4. Special Case: Rainbow Theme
         if (theme.isRainbow) {
             root.style.setProperty('--bg-color', '#050505');
             root.style.setProperty('--ios-bg', '#000000');
             root.style.setProperty('--ios-card', '#111111');
             root.style.setProperty('--card-bg', '#141414');
+            // Радужный градиент для карточки
+            root.style.setProperty('--card-gradient', 'linear-gradient(45deg, #2c3e50, #000000)');
         }
 
-        // Обновляем текст кнопки (с переводом)
+        // Обновляем текст кнопки
         updateThemeLabel(theme.id);
         
+        // Обновляем акцентные цвета (ссылки и кнопки)
         updateLink(); 
     }
 
@@ -18071,15 +18104,14 @@
         card.style.transform = 'none';
         void card.offsetWidth; 
         
-        // Фикс размера
         card.classList.add('has-results');
 
-        // === ЛОГИКА ВОЗВРАТА ===
-        // Ты просил справа налево (как лайк) -> используем anim-fly-right
+        // Анимация возврата (справа налево)
         card.classList.add('anim-fly-right');
 
         setTimeout(() => {
-            forceShowResult(prevItem, 'history');
+            forceShowResult(prevItem, 'undo'); 
+            
             setTimeout(() => card.classList.remove('anim-fly-right'), 700);
         }, 50);
 
