@@ -332,24 +332,23 @@
         }
 
         .card {
-            background: var(--card-gradient);
-            
-            border: 1px solid rgba(255, 255, 255, 0.08); /* Тонкая рамка */
-            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-            
-            /* Центрирование и Flex */
+            position: relative; 
             display: flex !important;
             flex-direction: column !important;
             justify-content: space-between !important; 
             
-            /* Отступы */
-            padding: 20px !important;
-            margin: 0 auto 20px auto; 
             width: 100%;
+            min-height: 60vh; 
+            height: auto;
+            
+            background: var(--card-gradient);
+            border: 1px solid var(--border);
             border-radius: 28px;
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.3s ease-out;
+            overflow: hidden; 
+            padding: 0 !important; 
+            
+            transition: transform 0.1s linear; 
+            z-index: 5;
         }
 
         body.light-theme .card {
@@ -388,14 +387,12 @@
         /* Slot Window */
         .slot-window {
             width: 100%;
-            
-            /* ФИКС: Вместо резинового flex:1 ставим четкую высоту */
-            height: 220px; 
-            flex-shrink: 0; /* Запрещаем сжиматься */
+            /* На мобильных высота авто, чтобы не занимать лишнее место */
+            height: auto !important; 
+            min-height: 100px;
             
             display: flex;
-            flex-direction: column;
-            justify-content: center; 
+            justify-content: center;
             align-items: center;
             overflow: hidden;
             position: relative;
@@ -437,7 +434,7 @@
         }
 
         .slot-item {
-            height: 300px;
+            height: auto !important; 
             width: 100%;
             display: flex;
             align-items: center;
@@ -445,7 +442,7 @@
             text-align: center;
             line-height: 1.1;
             padding: 0 10px;
-            font-size: clamp(32px, 7vw, 54px); 
+            font-size: clamp(32px, 8vw, 60px) !important;
             font-weight: 800;
             color: var(--text-main);
             flex-shrink: 0;
@@ -468,6 +465,16 @@
             margin-left: 6px; 
             display: inline; 
         }
+
+        .card > div:last-child {
+            z-index: 20; 
+            flex: 0 0 auto; 
+            width: 100%;
+            padding-bottom: 20px;
+            margin-top: auto; 
+            background: transparent; 
+        }
+
         
         /* Animations & Effects */
         .slot-item.shrunk { transform: scale(0.8); opacity: 0.7; }
@@ -891,8 +898,6 @@
             touch-action: none; /* Важно для свайпов на мобильных */
             transform-origin: 50% 100%;
             will-change: transform, opacity;
-            height: auto;
-            min-height: 180px;
             justify-content: space-between;
             margin-bottom: 10px !important; 
         }
@@ -920,8 +925,14 @@
             width: 100%;
             display: flex;
             justify-content: center;
-            margin-top: auto; /* Прижать к низу */
-            padding-bottom: 10px;
+            margin-top: auto;
+            padding-bottom: 15px;
+            
+            flex-shrink: 0 !important; 
+            min-height: 70px;
+            
+            position: relative;
+            z-index: 30; 
         }
 
         .btn-start-capsule {
@@ -945,8 +956,8 @@
             align-items: center;
             gap: 10px;
             
-            /* Чтобы кнопка не сплющивалась */
             flex-shrink: 0; 
+            z-index: 30;
         }
 
         .btn-start-capsule:active {
@@ -2108,11 +2119,31 @@
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 10; /* Поверх контента */
-            pointer-events: none; /* Чтобы пропускал клики */
-            opacity: 0; /* Скрыт по умолчанию */
+            
+            z-index: 10; 
+            
+            pointer-events: none; /* Пропускает клики */
+            opacity: 0;
             transition: opacity 0.1s linear;
-            border-radius: 28px; /* Как у карточки */
+        }
+
+        /* Верхняя часть (Бейджи) */
+        .card > div:nth-child(2) { 
+            z-index: 15; 
+            padding-top: 20px;
+            flex: 0 0 auto; /* Не сжимать */
+        }
+
+        /* ЦЕНТРАЛЬНАЯ ЧАСТЬ (Слот + Описание) */
+        .card > div:nth-child(3) {
+            z-index: 15;
+            flex: 1 1 auto; /* Резиновая: может сжиматься и расти */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden; /* Чтобы длинное описание не ломало верстку */
+            padding: 0 15px;
         }
 
         /* =========================================
@@ -3601,7 +3632,7 @@
     const WRAPPED_THRESHOLD = 30;
 
     /* =================== ⚒️ DEBUG MODE =========================== */
-    // subscriptionLevel = 'pro'; 
+    subscriptionLevel = 'pro'; 
     // subscriptionLevel = 'beast';
     /* =========================================================== */
 
@@ -18319,13 +18350,12 @@
 
     function initSwipeCards() {
         const card = document.getElementById('card-block');
-        const overlay = document.querySelector('.swipe-overlay'); // Находим наш оверлей
+        const overlay = document.querySelector('.swipe-overlay'); 
         
         if (!card) return;
 
-        // ВАЖНО: Сбрасываем переменные при каждом касании
         card.addEventListener('touchstart', (e) => {
-            // Игнорируем свайп, если нажали на кнопку или тег внутри карточки
+            // Не свайпаем, если жмем на кнопки
             if (e.target.closest('button') || e.target.closest('.related-item-btn') || e.target.closest('.capsule-trigger') || e.target.closest('.tag')) return;
             
             if (isGenerating) return;
@@ -18333,17 +18363,16 @@
             startX = e.touches[0].clientX;
             startY = e.touches[0].clientY;
             
-            // ФИКС БАГА С ТАПОМ: 
-            // Инициализируем currentX равным startX. 
-            // Если touchmove не сработает (простой тап), разница будет 0.
-            currentX = startX; 
+            // Фикс тапа (чтобы не срабатывал дизлайк при касании)
+            currentX = startX;
             currentY = startY;
 
             isDragging = true;
-            card.style.transition = 'none';
             
-            // Сброс оверлея
+            // Отключаем плавность для мгновенной реакции на палец
+            card.style.transition = 'none';
             if(overlay) overlay.style.transition = 'none';
+            
         }, {passive: false});
 
         card.addEventListener('touchmove', (e) => {
@@ -18355,23 +18384,23 @@
             let deltaX = currentX - startX;
             let deltaY = currentY - startY;
 
-            // Если движение больше вертикальное, чем горизонтальное — это скролл, не свайп
+            // Блокируем свайп, если это скролл страницы
             if (Math.abs(deltaY) > Math.abs(deltaX) + 10) return;
 
-            // Поворот карточки
+            // Поворот и движение карточки
             let rotate = deltaX * 0.05;
             card.style.transform = `translateX(${deltaX}px) rotate(${rotate}deg)`;
 
-            // === ЛОГИКА ОВЕРЛЕЯ (Заливка цветом) ===
+            // === ЛОГИКА ОВЕРЛЕЯ (Заливка) ===
             if (overlay) {
-                // Чем дальше тянем, тем ярче цвет (максимум 0.6 прозрачности)
-                const opacity = Math.min(Math.abs(deltaX) / 150, 0.6);
+                // Рассчитываем прозрачность (0...0.8)
+                const opacity = Math.min(Math.abs(deltaX) / 150, 0.8);
                 
                 if (deltaX > 0) {
-                    // ВПРАВО -> Зеленый (Лайк)
+                    // ВПРАВО -> Зеленый
                     overlay.style.backgroundColor = '#2ecc71';
                 } else {
-                    // ВЛЕВО -> Красный (Дизлайк)
+                    // ВЛЕВО -> Красный
                     overlay.style.backgroundColor = '#e74c3c';
                 }
                 overlay.style.opacity = opacity;
@@ -18385,13 +18414,14 @@
             
             let deltaX = currentX - startX;
             
-            // Порог срабатывания свайпа (100px)
-            if (deltaX > 100) {
-                animateSwipeEnd(window.innerWidth + 100, 'right'); 
-            } else if (deltaX < -100) {
-                animateSwipeEnd(-(window.innerWidth + 100), 'left'); 
+            // Если протащили далеко (> 100px) -> Срабатывание
+            if (Math.abs(deltaX) > 100) {
+                const direction = deltaX > 0 ? 'right' : 'left';
+                const endX = deltaX > 0 ? window.innerWidth + 100 : -window.innerWidth - 100;
+                
+                animateSwipeEnd(endX, direction); 
             } else {
-                // ВОЗВРАТ (Если не дотянули или это был тап)
+                // ВОЗВРАТ (Отмена свайпа)
                 card.style.transition = 'transform 0.3s ease-out';
                 card.style.transform = 'translateX(0) rotate(0)';
                 
