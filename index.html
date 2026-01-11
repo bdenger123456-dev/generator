@@ -433,8 +433,14 @@
         .card.flash-active { background-color: #fff !important; border-color: #fff !important; transform: scale(1.02); }
         
         .result-description { 
-            font-size: 15px; font-weight: 400; color: var(--text-secondary); 
-            line-height: 1.4; max-width: 95%; margin: 0; display: none; text-align: center;
+            font-size: 19px !important; 
+            font-weight: 500 !important;
+            color: var(--text-secondary) !important;
+            line-height: 1.5 !important;
+            max-width: 90%; 
+            margin: 0 auto; 
+            text-align: center;
+            opacity: 0.2;
         }
         .result-description.fade-visible:not(:empty) { display: block; }
 
@@ -547,7 +553,15 @@
         }
 
         /* Related & Tags */
-        .related-section { width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 10px; margin-bottom: 20px; text-align: center; }
+        .related-section { 
+            width: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            margin-top: 35px !important;
+            margin-bottom: 20px; 
+            text-align: center; 
+        }
         .related-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 10px; opacity: 0.8; }
         .related-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; width: 100%; }
         .related-item-btn { background: var(--card-bg); border: 1px solid var(--border); padding: 8px 14px; border-radius: 12px; font-size: 13px; font-weight: 600; color: var(--text-main); transition: 0.2s; }
@@ -973,15 +987,11 @@
         @media (max-width: 768px) {
             
             /* 1. ГЛОБАЛЬНЫЕ СКРЫТИЯ */
-            .sidebar, .tinder-actions, .btn-group, .undo-container, .badge-tooltip { 
-                display: none !important; 
-            }
-            .mobile-header, .bottom-nav, .top-gradient-mask, .bottom-gradient-mask { 
-                display: flex !important; 
-            }
+            .sidebar, .tinder-actions, .btn-group, .undo-container, .badge-tooltip { display: none !important; }
+            .mobile-header, .bottom-nav, .top-gradient-mask, .bottom-gradient-mask { display: flex !important; }
             .main-content { padding: 0 !important; }
 
-            /* 2. КОНТЕЙНЕР (ОГРАНИЧЕНИЕ ЭКРАНА) */
+            /* 2. КОНТЕЙНЕР */
             #tab-home .center-wrapper {
                 height: 100vh !important;
                 height: 100dvh !important;
@@ -990,117 +1000,112 @@
                 display: flex;
                 flex-direction: column;
                 justify-content: flex-start !important;
-                box-sizing: border-box;
                 overflow: hidden !important; 
                 width: 100% !important;
-                padding-left: 10px !important;
-                padding-right: 10px !important;
+                padding-left: 5px !important;
+                padding-right: 5px !important;
             }
 
             /* 3. КАРТОЧКА */
             .card, .card.has-results {
                 flex-grow: 1 !important;
                 height: 100% !important;
-                max-height: 100% !important;
                 margin-bottom: 0 !important;
                 width: 100% !important;
-                padding: 10px !important;
+                padding: 10px 5px !important;
                 display: flex !important;
                 flex-direction: column !important;
                 justify-content: space-between !important;
-                box-sizing: border-box !important;
                 overflow: hidden !important;
             }
 
-            /* === 4. УПРАВЛЕНИЕ БЛОКАМИ ВНУТРИ === */
-
-            /* Блок 1: БЕЙДЖИ (Верх) */
-            .card > div:nth-child(1) {
-                flex: 0 0 auto !important; /* Не сжимать */
-                min-height: 30px !important;
-            }
-
-            /* Блок 2: ЦЕНТР (Название + Описание + Теги) */
+            /* === ВНУТРЕННИЕ БЛОКИ === */
+            .card > div:nth-child(1) { flex: 0 0 auto !important; min-height: 25px !important; } /* Бейджи */
+            
+            /* ЦЕНТР */
             .card > div:nth-child(2) {
-                flex: 1 1 auto !important; /* Занимает всё свободное место */
+                flex: 1 1 auto !important; 
                 min-height: 0 !important;
-                
-                /* ЦЕНТРИРОВАНИЕ КОНТЕНТА */
+                overflow: hidden !important; 
                 display: flex !important;
                 flex-direction: column !important;
-                justify-content: center !important; /* Вертикально по центру */
-                align-items: center !important;     /* Горизонтально по центру */
-                
-                overflow: hidden !important;
+                justify-content: center !important;
+                align-items: center !important;
+                width: 100%;
             }
 
-            /* Блок 3: НИЗ (Кнопки) */
-            .card > div:last-child {
-                flex: 0 0 auto !important; /* Не сжимать */
-                margin-top: 10px !important; /* Отступ от контента */
-                padding-bottom: 5px !important;
-                z-index: 100;
-            }
+            .card > div:last-child { flex: 0 0 auto !important; margin-top: 5px !important; width: 100%; } /* Кнопки */
 
-            /* --- 5. ЭЛЕМЕНТЫ КОНТЕНТА --- */
+            /* --- ЭЛЕМЕНТЫ КОНТЕНТА --- */
             
-            /* Барабан (Название) */
             .slot-window {
                 width: 100%;
                 height: auto !important;
-                flex: 0 1 auto !important; /* Может сжиматься */
+                flex: 0 1 auto !important;
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
-                margin-bottom: 10px !important; /* Отступ до описания */
             }
-            
             .slot-item { 
-                font-size: clamp(28px, 9vw, 55px) !important;
+                font-size: clamp(26px, 9vw, 48px) !important;
                 line-height: 1.1 !important;
             }
 
-            /* Описание */
+            /* === ОПИСАНИЕ (УЛУЧШЕНО) === */
             #result-desc {
-                max-height: 25vh; /* Ограничиваем высоту, чтобы не вылезло */
+                max-height: 25vh; 
                 overflow-y: auto;
-                font-size: 14px !important;
-                margin: 0 !important;
-                padding: 0 5px;
+                
+                /* Увеличили шрифт и сделали ярче */
+                font-size: 16px !important; 
+                color: var(--text-main) !important;
+                line-height: 1.4 !important;
+                
+                /* Отступы: 15px сверху от названия, 25px снизу до тегов */
+                margin: 15px 0 25px 0 !important; 
+                padding: 0 10px;
                 text-align: center;
-                flex-shrink: 1 !important;
             }
             
-            /* Похожие (Теги) */
+            /* === ПОХОЖИЕ (ТЕГИ) === */
             .related-section {
-                margin-top: 15px !important;
+                margin-top: 0 !important; /* Отступ уже задан в margin-bottom описания */
                 margin-bottom: 5px !important;
-                flex-shrink: 0 !important;
                 width: 100%;
-            }
-
-            /* Кнопка Старт */
-            #start-btn-container {
-                width: 100%;
-                min-height: 60px !important;
-                display: flex;
+                display: flex !important;
+                flex-direction: column;
                 align-items: center;
-                justify-content: center;
-            }
-            
-            /* Остальное */
-            #tab-settings .center-wrapper, #tab-account .center-wrapper { 
-                padding: 40px 15px 120px 15px !important; 
-                height: auto !important; 
-                overflow-y: auto !important;
-                display: block !important;
             }
             
             .related-tags { 
-                flex-wrap: nowrap; overflow-x: auto; justify-content: center; 
-                padding-bottom: 5px; mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
-                -webkit-mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
+                display: flex !important;
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                justify-content: flex-start !important;
+                width: 100%;
+                padding-bottom: 5px;
+                gap: 6px !important;
+                scrollbar-width: none; 
+                mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+                -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+            }
+            .related-item-btn { flex-shrink: 0 !important; white-space: nowrap !important; font-size: 12px; padding: 8px 14px; }
+
+            /* --- КНОПКИ --- */
+            .tinder-nav-row {
+                gap: 8px !important; margin-bottom: 5px !important;
+                justify-content: space-between !important; padding: 0 5px !important;
+            }
+            .t-circle-btn.small { width: 38px !important; height: 38px !important; font-size: 18px !important; }
+            .t-circle-btn.medium { width: 50px !important; height: 50px !important; font-size: 24px !important; }
+            .t-circle-btn.large { width: 64px !important; height: 64px !important; font-size: 28px !important; }
+
+            #start-btn-container { min-height: 50px !important; }
+            .btn-start-capsule { padding: 12px 30px !important; font-size: 16px !important; }
+
+            #tab-settings .center-wrapper, #tab-account .center-wrapper { 
+                padding: 40px 15px 120px 15px !important; height: auto !important; display: block !important;
             }
         }
 
