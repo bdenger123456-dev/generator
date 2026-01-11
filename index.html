@@ -230,27 +230,10 @@
             -webkit-text-fill-color: transparent;
             color: transparent;
             
-            /* Уменьшенный отступ справа */
             margin-right: 1px; 
-            
-            /* ТОНКАЯ ЧЕТКАЯ ОБВОДКА (0.8px) */
-            filter: 
-                drop-shadow(0.8px 0 0 #ffffff) 
-                drop-shadow(-0.8px 0 0 #ffffff) 
-                drop-shadow(0 0.8px 0 #ffffff) 
-                drop-shadow(0 -0.8px 0 #ffffff);
                 
             position: relative;
             z-index: 1;
-        }
-
-        /* ДЛЯ СВЕТЛОЙ ТЕМЫ -> ЧЕРНАЯ ОБВОДКА */
-        body.light-theme .logo span {
-            filter: 
-                drop-shadow(0.8px 0 0 #000000) 
-                drop-shadow(-0.8px 0 0 #000000) 
-                drop-shadow(0 0.8px 0 #000000) 
-                drop-shadow(0 -0.8px 0 #000000);
         }
 
         .logo-img {
@@ -279,7 +262,7 @@
         }
 
         body.tab-home-active .mobile-header .logo-img {
-            height: 28px;
+            height: 35px;
             transform: translateY(0);
         }
 
@@ -1262,7 +1245,7 @@
         }
         body.light-theme .mobile-header { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(0, 0, 0, 0.1); }
         .mobile-header .logo { font-size: 20px; margin-bottom: 0; }
-        .mobile-header .logo-img { height: 34px; margin-right: 5px; }
+        .mobile-header .logo-img { height: 40px; }
 
         /* === 12. PREMIUM STATS === */
         .locked-feature {
