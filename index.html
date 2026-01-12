@@ -4002,49 +4002,47 @@
         }
     };
 
-    window.db = db;
-    window.generateBestieCodes = generateBestieCodes;
-
-    // Функция генерации (вставь её прямо в код приложения временно)
-    import { writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"; 
-
     async function generateBestieCodes() {
-        console.log("⏳ Generating 50 BESTIE codes...");
-        
-        const batch = writeBatch(db);
-        const codesList = [];
-        const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // Без I, 1, 0, O чтобы не путать
-        
-        for (let i = 0; i < 50; i++) {
-            // Генерируем случайный хвост: XXXX-XXXX
-            let suffix = "";
-            for(let k=0; k<8; k++) {
-                if(k===4) suffix += "-";
-                suffix += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            
-            const code = `BESTIE-${suffix}`;
-            codesList.push(code);
-            
-            const ref = doc(db, "promocodes", code);
-            
-            batch.set(ref, {
-                active: true,
-                type: "bestie",
-                days: 36500, // 100 лет (считаем как Lifetime)
-                createdAt: new Date() // Текущая дата сервера
-            });
+    console.log("⏳ Generating 50 BESTIE codes...");
+    
+    // Используем writeBatch, который ты импортировал в начале файла
+    const batch = writeBatch(db);
+    const codesList = [];
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; 
+    
+    for (let i = 0; i < 50; i++) {
+        // Генерируем случайный хвост
+        let suffix = "";
+        for(let k=0; k<8; k++) {
+            if(k===4) suffix += "-";
+            suffix += chars.charAt(Math.floor(Math.random() * chars.length));
         }
-
-        try {
-            await batch.commit();
-            console.log("✅ SUCCESS! 50 Codes generated.");
-            console.log("👇 COPY THESE CODES 👇");
-            console.log(codesList.join("\n")); // Выведет списком для копирования
-        } catch (e) {
-            console.error("❌ Error generating codes:", e);
-        }
+        
+        const code = `BESTIE-${suffix}`;
+        codesList.push(code);
+        
+        const ref = doc(db, "promocodes", code);
+        
+        batch.set(ref, {
+            active: true,
+            type: "bestie",
+            days: 36500, // 100 лет = Lifetime
+            createdAt: serverTimestamp() // Используем серверное время
+        });
     }
+
+    try {
+        await batch.commit();
+        console.log("✅ SUCCESS! 50 Codes generated.");
+        console.log("👇 COPY THESE CODES 👇");
+        console.log(codesList.join("\n")); 
+    } catch (e) {
+        console.error("❌ Error generating codes:", e);
+    }
+}
+
+// Делаем функцию доступной для консоли
+window.generateBestieCodes = generateBestieCodes;
 
 </script>
 
