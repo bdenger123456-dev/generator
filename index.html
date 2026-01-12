@@ -276,12 +276,15 @@
             text-transform: uppercase;
             letter-spacing: 1px; 
             text-align: center; 
-            margin-top: 2px; 
-            margin-bottom: 35px;
+            
+            margin-top: -5px !important;   /* Тянем вверх к логотипу */
+            margin-bottom: 25px !important; /* Отступ снизу до меню */
+            
             font-weight: 600; 
             opacity: 0.7; 
             max-width: 240px; 
-            margin: 0 auto; 
+            margin-left: auto; /* Центрирование */
+            margin-right: auto;
             line-height: 1.4;
         }
 
@@ -307,11 +310,30 @@
         .animation-text.visible { opacity: 1; }
 
         .status-text-combined {
-            text-align: center; display: flex; justify-content: center; align-items: center;
-            font-size: 16px; font-weight: 700; color: var(--text-main);
-            text-transform: uppercase; letter-spacing: 1px;
-            margin-bottom: 15px; min-height: auto; width: 100%;
-            line-height: 1.3; text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            /* Позиционирование НАД карточкой */
+            position: absolute;
+            bottom: 100%; /* Приклеиваем к верху контейнера */
+            left: 0;
+            width: 100%;
+            margin-bottom: 15px; /* Отступ от карточки */
+            z-index: 25; /* Поверх декораций */
+            
+            /* Стили текста */
+            text-align: center; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            font-size: 16px; 
+            font-weight: 700; 
+            color: var(--text-main);
+            text-transform: uppercase; 
+            letter-spacing: 1px;
+            line-height: 1.3; 
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            
+            transform-origin: 50% 400px; /* Примерно центр низа карточки */
+            will-change: transform;
+            pointer-events: none; /* Чтобы текст не мешал свайпать */
         }
 
         .card {
@@ -383,16 +405,6 @@
             /* Маска для красивого исчезновения текста */
             -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
             mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
-        }
-
-        /* На ПК делаем карточку высокой и красивой */
-        @media (min-width: 769px) {
-            .slot-window {
-                height: 450px !important;
-            }
-            .slot-item {
-                font-size: 80px !important;
-            }
         }
 
         /* На совсем маленьких экранах (iPhone SE и т.д.) чуть уменьшаем */
@@ -2185,7 +2197,7 @@
                 top: 5px; /* Сдвигаем вниз от центральной линии */
             }
 
-        /* Общий стиль для сисечек/картинок */
+        /* Общий стиль для иконок */
         .deco-icon {
             position: absolute;
             z-index: 20 !important; 
@@ -2244,9 +2256,18 @@
         }
 
         @media (max-width: 768px) {
-            /* На мобильных чуть уменьшаем и двигаем, чтобы не перекрывали текст */
-            .icon-left { width: 120px; top: -30px; left: -10px; }
-            .icon-right { width: 90px; top: -20px; right: -5px; }
+            /* МОБИЛЬНАЯ ВЕРСИЯ ИКОНОК */
+            .icon-left {
+                width: 75px !important;  /* Было 120px -> стало 75px */
+                top: 5px !important;     /* Опустили ниже (было -30px) */
+                left: -5px !important;   /* Прижали ближе к краю */
+            }
+
+            .icon-right {
+                width: 60px !important;  /* Было 90px -> стало 60px */
+                top: 15px !important;    /* Опустили ниже (было -20px) */
+                right: 0px !important;   /* Прижали ближе к краю */
+            }
         }
 
         body.no-deco .deco-icon {
@@ -2265,43 +2286,92 @@
 
         /* DESKTOP / TABLET (> 768px) */
         @media (min-width: 769px) {
-            #modal-sub-overlay .modal {
-                max-width: 900px !important; 
-                width: 95%;
-            }
-            .plans-container {
-                flex-direction: row; 
-                align-items: stretch;
-                justify-content: center;
-            }
-            .plan-card {
-                flex: 1;
-            }
-            .subtitle {
-                margin-bottom: 15px !important; /* Уменьшили (было 35px) */
-                margin-top: 0 !important;
+            
+            /* 1. Глобальный контейнер таба - центрирует всё содержимое */
+            #tab-home {
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+                height: 100vh !important;
+                width: 100% !important;
+                padding: 0 !important;
+                overflow: hidden !important;
+                position: relative; 
             }
 
-            .card {
-                /* Делаем карточку заметно больше */
-                min-height: 550px !important;
-                max-width: 700px !important; 
-            }
-            
-            /* Центрируем карточку на экране */
+            /* 2. Промежуточная обертка - сжимаем её до размера контента */
             #tab-home .center-wrapper {
-                justify-content: center;
-                min-height: 85vh; /* Чтобы было по центру высоты */
+                height: auto !important;
+                width: auto !important; /* Не растягивать на всю ширину! */
+                max-width: none !important; 
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+                margin: 0 auto !important; /* Центрирование по горизонтали */
+                flex-direction: column !important;
             }
-            
-            /* Увеличиваем шрифт результата на ПК */
-            .slot-window, .slot-item {
-                height: 450px !important;
+
+            /* 3. ЯКОРЯ КАРТОЧКИ (Самое важное для иконок) */
+            /* Задаем им фиксированную ширину, чтобы иконки знали, где "край" карточки */
+            #card-anchor, #card-anim-wrapper {
+                width: 650px !important; /* Ширина равна ширине карточки */
+                max-width: 90vw !important;
+                position: relative !important;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+            }
+
+            /* 4. САМА КАРТОЧКА */
+            .card {
+                width: 100% !important; /* Занимает всю ширину якоря (650px) */
+                height: 85vh !important;
+                
+                min-height: 700px !important;
+                max-height: 950px !important;
+                
+                margin: 0 !important;
+                justify-content: space-between !important; 
+            }
+
+            /* 5. ИКОНКИ НА ПК (Возвращаем их на место) */
+            .icon-left {
+                width: 160px !important; /* Чуть крупнее для ПК */
+                top: -40px !important;
+                left: -40px !important;
+            }
+            .icon-right {
+                width: 130px !important;
+                top: -30px !important;
+                right: -30px !important;
+            }
+
+            /* 6. ТЕКСТ РЕЗУЛЬТАТА */
+            .slot-window {
+                height: 55% !important; 
+                display: flex !important;
+                align-items: center !important;
             }
             .slot-item {
-                font-size: 72px !important;
+                font-size: 110px !important; 
+                line-height: 1.1 !important;
             }
 
+            /* 7. Фраза над карточкой */
+            .status-text-combined {
+                font-size: 24px !important;
+                margin-bottom: 30px !important;
+                white-space: nowrap; /* Чтобы не переносилась */
+            }
+
+            /* 8. Кнопки управления */
+            .t-circle-btn.large { width: 90px !important; height: 90px !important; font-size: 40px !important; }
+            .t-circle-btn.medium { width: 70px !important; height: 70px !important; font-size: 30px !important; }
+            
+            /* 9. Модальные окна */
+            #modal-sub-overlay .modal { max-width: 900px !important; width: 95%; }
+            .plans-container { flex-direction: row; align-items: stretch; justify-content: center; }
+            .plan-card { flex: 1; }
         }
     </style>
 </head>
@@ -2314,7 +2384,7 @@
     <!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
         <!-- Логотип: Картинка + Текст -->
-        <div class="logo">
+        <div class="logo" onclick="resetToHome()">
             <img src="logo.png" alt="X" class="logo-img">
             <span>Fetish</span>Hub <span class="version-tag">0.1</span>
         </div>
@@ -2329,7 +2399,7 @@
     <div class="main-content">
         
         <div class="mobile-header">
-            <div class="logo">
+            <div class="logo" onclick="resetToHome()"> 
                 <img src="logo.png" alt="X" class="logo-img">
                 <span>Fetish</span>Hub <span class="version-tag">0.1</span>
             </div>
@@ -2340,18 +2410,19 @@
         <div id="tab-home" class="tab-content active">
             <div class="center-wrapper">
                 
-                <!-- ФРАЗА (Над карточкой) -->
-                <div class="status-text-combined stagger-item delay-5" id="status-text"></div>
-
-                <!-- ЯКОРЬ: Добавил min-height:0 и overflow:visible -->
+                <!-- ЯКОРЬ -->
                 <div id="card-anchor" style="position: relative; width: 100%; display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: visible;">
                     
-                    <!-- ОБЁРТКА: Исправил z-index, overflow и flex параметры -->
+                    <!-- ОБЁРТКА (Wrapper) -->
                     <div id="card-anim-wrapper" style="position: relative; width: 100%; display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: visible; z-index: 10;">
                         
-                        <!-- СИСЕЧКИ/картинки-->
+                        <!-- 1. ПЕРЕМЕСТИЛИ ФРАЗУ СЮДА -->
+                        <div class="status-text-combined stagger-item delay-5" id="status-text"></div>
+
+                        <!-- 2. Иконки -->
                         <img src="" id="deco-left" class="deco-icon icon-left" alt="">
                         <img src="" id="deco-right" class="deco-icon icon-right" alt="">
+
 
                         <!-- КАРТОЧКА -->
                         <div class="card" id="card-block">
@@ -3773,6 +3844,16 @@
         'deco6.png', 'deco7.png', 'deco8.png', 'deco9.png', 'deco10.png'
     ];
 
+    let watchStartTime = 0; // Время ухода с сайта
+
+    // Слушатель возвращения на вкладку
+    document.addEventListener("visibilitychange", () => {
+        // Если вкладка стала видимой И мы засекали время
+        if (document.visibilityState === "visible" && watchStartTime > 0) {
+            calculateWatchTime();
+        }
+    });
+
     /* =================== ⚒️ DEBUG MODE =========================== */
     // subscriptionLevel = 'pro'; 
     // subscriptionLevel = 'beast';
@@ -3960,8 +4041,24 @@
             sync_label: "Synced: ",
             expl_undo: "Changed your mind? 😏",
             expl_hist: "From Archives 📜",
-
             deco_label: "Show Decorations",
+
+            return_phrases: [
+                "A whole {t}. You acted surely 😏",
+                "Back after {t}. Did you enjoy it? 🔥",
+                "{t}... Quite a session! 😅",
+                "You were gone for {t}. Hope it was worth it.",
+                "Wow, {t}! Seems like a good choice."
+            ],
+            return_phrase_short: "Only {t}? That was quick... ⚡",
+
+            reset_phrases: [
+                "Sometimes everyone needs a break 🧘",
+                "Let's start over...",
+                "System reboot 🔄",
+                "Peace and quiet...",
+                "Clean slate ✨"
+            ],
 
             auth_title: "Sync & Backup",
             auth_p1: "Store history and preferences on all devices",
@@ -4272,8 +4369,24 @@
             sync_label: "Синхр: ",
             expl_undo: "Передумал? 😏",
             expl_hist: "Из архивов 📜",
-
             deco_label: "Показывать декор",
+
+            return_phrases: [
+                "Целых {t}. Ты действовал наверняка 😏",
+                "С возвращением спустя {t}. Понравилось? 🔥",
+                "{t}... Неплохой марафон! 😅",
+                "Тебя не было {t}. Надеюсь, оно того стоило.",
+                "Ого, {t}! Кажется, это был отличный выбор."
+            ],
+            return_phrase_short: "Всего {t}? Быстро ты... ⚡",
+
+            reset_phrases: [
+                "Порой всем нужен отдых 🧘",
+                "Давай начнём сначала...",
+                "Перезагрузка системы 🔄",
+                "Тишина и спокойствие...",
+                "Чистый лист ✨"
+            ],
 
             auth_title: "Синхронизация",
             auth_p1: "Хранение истории и предпочтений на всех устройствах",
@@ -4582,8 +4695,23 @@
             sync_label: "Sinc: ",
             expl_undo: "¿Cambiaste de opinión? 😏",
             expl_hist: "De los archivos 📜",
-
             deco_label: "Mostrar decoración",
+            return_phrases: [
+                "Todo un {t}. Fuiste a lo seguro 😏",
+                "De vuelta tras {t}. ¿Te gustó? 🔥",
+                "{t}... ¡Vaya sesión! 😅",
+                "Te fuiste por {t}. Espero que valiera la pena.",
+                "¡Wow, {t}! Parece una buena elección."
+            ],
+            return_phrase_short: "¿Solo {t}? Qué rápido... ⚡",
+
+            reset_phrases: [
+                "A veces todos necesitamos un descanso 🧘",
+                "Empecemos de nuevo...",
+                "Reinicio del sistema 🔄",
+                "Paz y tranquilidad...",
+                "Borrón y cuenta nueva ✨"
+            ],
 
             auth_title: "Sincronización",
             auth_p1: "Historial y preferencias en todos los dispositivos",
@@ -4884,8 +5012,23 @@
             sync_label: "Sync: ",
             expl_undo: "Meinung geändert? 😏",
             expl_hist: "Aus dem Archiv 📜",
-
             deco_label: "Dekoration anzeigen",
+            return_phrases: [
+                "Ganze {t}. Du warst dir sicher 😏",
+                "Zurück nach {t}. Hat es dir gefallen? 🔥",
+                "{t}... Was für eine Sitzung! 😅",
+                "Du warst {t} weg. Hoffentlich war es das wert.",
+                "Wow, {t}! Scheint eine gute Wahl zu sein."
+            ],
+            return_phrase_short: "Nur {t}? Das ging schnell... ⚡",
+
+            reset_phrases: [
+                "Manchmal braucht jeder eine Pause 🧘",
+                "Lass uns neu anfangen...",
+                "Systemneustart 🔄",
+                "Ruhe und Frieden...",
+                "Ein neuer Anfang ✨"
+            ],
 
             auth_title: "Synchronisierung",
             auth_p1: "Verlauf und Vorlieben auf allen Geräten speichern",
@@ -6127,17 +6270,16 @@
 
     function handleOutboundClick() {
         if(!currentItem) return;
+        
+        watchStartTime = Date.now();
+
         if(!hasInteractedWithCurrent) {
-            // Получаем полный список тегов (Жанр + Моды)
             const fullTags = getCombinedTags(currentItem);
             
-            // Начисляем очки всем этим тегам (+3 за клик, но в статистике мы будем считать это как WATCH = 10)
-            // adjustTagScores меняет веса для будущих генераций
             adjustTagScoresByTags(fullTags, 3); 
             
             hasInteractedWithCurrent = true;
             
-            // Логируем событие с ПОЛНЫМ списком тегов
             logActivity('watch', currentItem.id, fullTags);
         }
     }
@@ -7850,6 +7992,10 @@
             
             // 1. СТОП АНИМАЦИИ (чтобы управлять пальцем)
             card.style.transition = 'none';
+
+            const statusText = document.getElementById('status-text');
+            if (statusText) statusText.style.transition = 'none';
+
             if(overlay) overlay.style.transition = 'none';
             
             if(iconLeft) {
@@ -7876,6 +8022,12 @@
             // Карточка
             let rotate = deltaX * 0.05;
             card.style.transform = `translateX(${deltaX}px) rotate(${rotate}deg)`;
+
+            // --- Двигаем текст так же, как карточку ---
+            const statusText = document.getElementById('status-text');
+            if (statusText) {
+                statusText.style.transform = transformString;
+            }
 
             // ПАРАЛЛАКС ЭФФЕКТ
             if (iconLeft) {
@@ -7942,6 +8094,12 @@
 
                 card.style.transition = 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
                 card.style.transform = 'translateX(0) rotate(0)';
+
+                const statusText = document.getElementById('status-text');
+                if (statusText) {
+                    statusText.style.transition = 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                    statusText.style.transform = 'translateX(0) rotate(0)';
+                }
 
                 // Возврат иконок с пружинистым эффектом
                 if(iconLeft) {
@@ -8101,9 +8259,19 @@
             void card.offsetWidth; 
         }
         
-        // Возвращаем анимацию иконок
-        if(iconLeft) iconLeft.style.animation = '';
-        if(iconRight) iconRight.style.animation = '';
+        // --- ПОЛНЫЙ СБРОС ИКОНОК ---
+        if(iconLeft) {
+            iconLeft.style.transition = 'none'; // Убираем плавность, чтобы они вернулись мгновенно
+            iconLeft.style.opacity = '';        // Сбрасываем прозрачность (вернется к CSS значению)
+            iconLeft.style.transform = '';      // Возвращаем на место
+            iconLeft.style.animation = '';      // Сбрасываем паузу анимации
+        }
+        if(iconRight) {
+            iconRight.style.transition = 'none';
+            iconRight.style.opacity = '';
+            iconRight.style.transform = '';
+            iconRight.style.animation = '';
+        }
         
         // 4. Логика выбора
         if (mode === 'random' && currentItem && !hasInteractedWithCurrent) {
@@ -8931,6 +9099,164 @@
         // 3. Применяем картинки
         leftImg.src = DECO_IMAGES[idx1];
         rightImg.src = DECO_IMAGES[idx2];
+    }
+
+    function calculateWatchTime() {
+        const now = Date.now();
+        const diffInSeconds = Math.floor((now - watchStartTime) / 1000);
+        
+        // Сбрасываем таймер, чтобы не срабатывало повторно при переключении вкладок
+        watchStartTime = 0; 
+
+        // Если прошло меньше 5 секунд — считаем, что это мисклик или просто закрыл сразу
+        // Ничего не меняем
+        if (diffInSeconds < 5) return;
+
+        const t = langData[currentLang];
+        let timeString = "";
+
+        // Форматирование времени (мин + сек)
+        const minutes = Math.floor(diffInSeconds / 60);
+        const seconds = diffInSeconds % 60;
+
+        // Локализация единиц измерения
+        const minLabel = currentLang === 'ru' ? 'мин' : 'min';
+        const secLabel = currentLang === 'ru' ? 'сек' : 'sec';
+
+        if (minutes > 0) {
+            timeString = `${minutes} ${minLabel} ${seconds} ${secLabel}`;
+        } else {
+            timeString = `${seconds} ${secLabel}`;
+        }
+
+        // Выбор фразы
+        let phraseTemplate = "";
+        
+        // Если меньше 40 секунд - используем фразу "быстро"
+        if (diffInSeconds < 40) {
+            phraseTemplate = t.return_phrase_short || "Only {t}...";
+        } else {
+            // Иначе случайную из обычных
+            const phrases = t.return_phrases || ["{t} passed."];
+            phraseTemplate = phrases[Math.floor(Math.random() * phrases.length)];
+        }
+
+        // Подстановка времени
+        const finalPhrase = phraseTemplate.replace("{t}", timeString);
+
+        // Обновление UI
+        const statusEl = document.getElementById('status-text');
+        if (statusEl) {
+            // Небольшая анимация исчезновения и появления
+            statusEl.style.opacity = '0';
+            
+            setTimeout(() => {
+                statusEl.innerText = finalPhrase;
+                statusEl.style.color = "var(--text-main)"; // Делаем текст белым/черным, чтобы выделялся
+                statusEl.style.opacity = '1';
+            }, 200);
+        }
+    }
+
+    function resetToHome() {
+        // Если мы уже на стартовом экране (нет текущего предмета), ничего не делаем
+        // Или если сейчас идет генерация
+        if (!currentItem || isGenerating) return;
+
+        const wrapper = document.getElementById('card-anim-wrapper');
+        const card = document.getElementById('card-block');
+        
+        // 1. АНИМАЦИЯ УХОДА (Как Дизлайк - влево и поворот)
+        if (wrapper) {
+            wrapper.style.transition = 'transform 0.4s ease-in, opacity 0.4s';
+            wrapper.style.transform = 'translateX(-150%) rotate(-10deg)';
+            wrapper.style.opacity = '0';
+        }
+
+        // Ждем пока улетит (350мс)
+        setTimeout(() => {
+            // 2. СБРОС ДАННЫХ
+            currentItem = null;
+            lastGeneratedItem = null;
+            isFirstGen = true; // Чтобы при следующем нажатии снова была долгая анимация
+            sessionHistoryStack = []; // Очищаем историю сессии (кнопка назад)
+
+            // 3. СБРОС ИНТЕРФЕЙСА
+            
+            // Скрываем результаты
+            const uiToHide = ['result-desc', 'tinder-controls', 'mods-block', 'related-block'];
+            uiToHide.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) {
+                    el.classList.add('hidden-initial'); // Скрываем
+                    el.style.display = 'none'; // Дублируем для надежности
+                }
+            });
+
+            // Очищаем бейджи
+            document.getElementById('badge-wrapper').innerHTML = '';
+
+            // Возвращаем кнопку "Старт"
+            const startBtn = document.getElementById('start-btn-container');
+            if(startBtn) {
+                startBtn.classList.remove('hidden-initial');
+                startBtn.style.display = 'flex';
+                startBtn.style.opacity = '1';
+            }
+
+            // Возвращаем состояние Карточки (убираем класс has-results)
+            if(card) {
+                card.classList.remove('has-results');
+                card.classList.remove('flash-active');
+            }
+
+            // Запускаем "Холостой ход" слотов (блюр и 30 вариантов)
+            initIdleSlot();
+
+            // 4. СБРОС ИКОНОК (Сисечек)
+            const iconLeft = document.querySelector('.icon-left');
+            const iconRight = document.querySelector('.icon-right');
+            // Сбрасываем стили, если они были сдвинуты свайпом
+            [iconLeft, iconRight].forEach(icon => {
+                if(icon) {
+                    icon.style.transition = 'none';
+                    icon.style.opacity = '';
+                    icon.style.transform = '';
+                    icon.style.animation = ''; // Сброс, чтобы перезапустить парение
+                }
+            });
+
+            // 5. УСТАНОВКА ФРАЗЫ ОТДЫХА
+            const t = langData[currentLang];
+            const phrases = t.reset_phrases || ["Relax..."];
+            const phrase = phrases[Math.floor(Math.random() * phrases.length)];
+            
+            const statusEl = document.getElementById('status-text');
+            if(statusEl) {
+                statusEl.innerText = phrase;
+                statusEl.style.color = "var(--text-secondary)"; // Делаем цвет спокойным (серым)
+                statusEl.style.opacity = '1';
+                // Сбрасываем трансформ текста, если он был сдвинут
+                statusEl.style.transform = ''; 
+                statusEl.style.transition = 'none';
+            }
+
+            // 6. ВОЗВРАЩЕНИЕ КАРТОЧКИ (Мгновенный телепорт в центр и Fade In)
+            if (wrapper) {
+                // Мгновенно убираем трансформ (пока прозрачность 0)
+                wrapper.style.transition = 'none';
+                wrapper.style.transform = 'scale(0.95)'; // Чуть меньше, чтобы красиво появиться
+                
+                // Форсируем перерисовку браузера
+                void wrapper.offsetWidth;
+
+                // Плавное появление
+                wrapper.style.transition = 'opacity 0.5s ease, transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                wrapper.style.opacity = '1';
+                wrapper.style.transform = 'scale(1)';
+            }
+
+        }, 350);
     }
 
 </script>
