@@ -3456,47 +3456,44 @@
     // === АКТИВАЦИЯ ПРОМОКОДА ===
     window.activatePromoCode = async function(code) {
         const user = auth.currentUser;
-        if (!user) {
-            alert("Please login (Sync Data) first to activate code!");
-            return;
-        }
-
+        // Ссылки на документы
         const codeRef = doc(db, "promocodes", code);
         const userRef = doc(db, "users", user.uid);
 
         try {
+            // 1. Сначала читаем код, чтобы убедиться, что он есть (как и раньше)
             const codeSnap = await getDoc(codeRef);
-
-            if (codeSnap.exists() && codeSnap.data().active === true) {
-                const promoData = codeSnap.data();
-                
-                // 1. Вычисляем дату истечения
-                const days = promoData.days || 30;
-                const expiresAt = new Date();
-                expiresAt.setDate(expiresAt.getDate() + days); // Текущая дата + дни
-
-                // 2. Обновляем пользователя
-                await setDoc(userRef, {
-                    subscription: promoData.type,
-                    expiresAt: expiresAt // Firebase сам превратит это в Timestamp
-                }, { merge: true });
-
-                // 3. "Сжигаем" код (делаем неактивным)
-                await updateDoc(codeRef, {
-                    active: false,
-                    usedBy: user.uid,
-                    usedAt: serverTimestamp()
-                });
-
-                alert(`Success! ${promoData.type.toUpperCase()} subscription activated for ${days} days.`);
-                
-                // Перезагружаем данные пользователя чтобы обновить интерфейс
-                window.location.href = window.location.pathname; // Очищаем URL от кода
-            } else {
-                alert("This code is invalid or already used.");
+            if (!codeSnap.exists() || !codeSnap.data().active) {
+                alert("Invalid code");
+                return;
             }
+            const promoData = codeSnap.data();
+
+            // 2. Создаем ПАКЕТ (Batch)
+            const batch = writeBatch(db);
+
+            // Операция А: Сжигаем код
+            batch.update(codeRef, {
+                active: false,
+                usedBy: user.uid,
+                usedAt: serverTimestamp()
+            });
+
+            // Операция Б: Обновляем юзера
+            batch.set(userRef, {
+                subscription: promoData.type, // 'pro' или 'beast'
+                expiresAt: new Date(Date.now() + (promoData.days * 86400000)),
+                lastUsedCode: code 
+            }, { merge: true });
+
+            // 3. Отправляем всё вместе. Если хоть одно правило запретит, отменится ВСЁ.
+            await batch.commit();
+
+            alert("Success!");
+            location.reload();
+
         } catch (error) {
-            console.error("Promo error:", error);
+            console.error("Hacking attempt failed:", error);
             alert("Error activating code.");
         }
     };
