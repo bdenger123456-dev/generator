@@ -3722,30 +3722,41 @@
         const user = auth.currentUser;
         if (!user) return;
 
+        const btn = document.getElementById('btn-manual-sync');
         const btnText = document.getElementById('sync-btn-text');
         const originalText = btnText.innerText;
         
-        // Включаем анимацию загрузки
+        // Получаем перевод для успеха
+        const t = langData[currentLang] || langData['en'];
+        const successText = t.sync_btn_success || "✅ Done! Reloading...";
+
+        // Блокируем кнопку и включаем спиннер
+        btn.disabled = true;
         btnText.innerHTML = `<span class="spinning-icon">↻</span> Syncing...`;
         
         try {
-            await loadUserData(user); // Эта функция уже у тебя есть в коде выше
+            await loadUserData(user); // Это твоя функция слияния
 
-            // 2. Визуальный успех
-            btnText.innerHTML = "✅ Done!";
+            // УСПЕХ
+            btnText.innerHTML = successText;
+            btn.style.background = "var(--highlight-green)"; // Зеленый цвет
+            btn.style.color = "#fff";
+
+            // АВТОМАТИЧЕСКАЯ ПЕРЕЗАГРУЗКА ЧЕРЕЗ 1.5 СЕК
             setTimeout(() => {
-                btnText.innerText = originalText;
-                // Обновляем цифры в самом модальном окне, так как они могли измениться после мержа
-                window.openSyncInfoModal(); 
+                location.reload();
             }, 1500);
 
         } catch (e) {
             console.error("Manual sync failed:", e);
             btnText.innerText = "❌ Error";
-            setTimeout(() => btnText.innerText = originalText, 2000);
+            setTimeout(() => {
+                btnText.innerText = originalText;
+                btn.disabled = false;
+            }, 2000);
         }
     };
-
+    
     // === СЛУШАТЕЛЬ АВТОРИЗАЦИИ (Главная точка входа) ===
     onAuthStateChanged(auth, async (user) => {
         const btnText = document.getElementById('login-btn-text');
@@ -4365,7 +4376,8 @@
 
             sync_title: "Cloud Storage",
             sync_desc: "Data stored safely on Google servers",
-            sync_tip: "Click 'Synchronize' to merge Cloud data with this device.",
+            sync_tip: "Click 'Synchronize' to merge. <b>Page will reload to apply changes.</b>",
+            sync_btn_success: "✅ Done! Reloading...",
             btn_sync: "🔄 Synchronize Device",
             sub_exp: "exp:",
             sub_expired: "Expired",
@@ -4710,7 +4722,8 @@
 
             sync_title: "Облачное хранилище",
             sync_desc: "Данные безопасно хранятся на серверах Google",
-            sync_tip: "Нажми «Синхронизировать», чтобы объединить данные.",
+            sync_tip: "Нажми «Синхронизировать» для объединения. <b>Страница перезагрузится.</b>",
+            sync_btn_success: "✅ Готово! Перезагрузка...",
             btn_sync: "🔄 Синхронизировать",
             sub_exp: "ист:",
             sub_expired: "Истекла",
@@ -5064,7 +5077,8 @@
 
             sync_title: "Nube",
             sync_desc: "Datos guardados seguros en Google",
-            sync_tip: "Haz clic en 'Sincronizar' para fusionar datos.",
+            sync_tip: "Haz clic en 'Sincronizar'. <b>La página se recargará.</b>",
+            sync_btn_success: "✅ ¡Hecho! Recargando...",
             btn_sync: "🔄 Sincronizar",
             sub_exp: "exp:",
             sub_expired: "Vencido",
@@ -5390,7 +5404,8 @@
 
             sync_title: "Cloud-Speicher",
             sync_desc: "Daten sicher auf Google-Servern gespeichert",
-            sync_tip: "Klicke auf 'Synchronisieren', um Daten zusammenzuführen.",
+            sync_tip: "Klicke auf 'Synchronisieren'. <b>Seite wird neu geladen.</b>",
+            sync_btn_success: "✅ Fertig! Wird neu geladen...",
             btn_sync: "🔄 Synchronisieren",
             sub_exp: "abl:",
             sub_expired: "Abgelaufen",
@@ -7976,69 +7991,83 @@
     function updateSubscriptionUI() {
         const nameEl = document.getElementById('current-plan-name');
         const badgeEl = document.getElementById('upgrade-badge'); 
-        const btnFree = document.querySelector('.plan-card:nth-child(1) .plan-btn'); // Кнопка Free плана
+        const btnFree = document.querySelector('.plan-card:nth-child(1) .plan-btn'); 
         
         if (!nameEl) return;
 
+        // Обновляем переменную уровня подписки из памяти (на случай, если она изменилась без перезагрузки)
+        subscriptionLevel = localStorage.getItem('xch_sub_level') || 'free';
+
         const t = langData[currentLang] || langData['en'];
 
-        // Сброс стилей перед применением
+        // Сброс стилей
         nameEl.style.textShadow = 'none';
         nameEl.style.fontWeight = '900';
 
+        // --- ПРОВЕРКА BESTIE ---
         if (subscriptionLevel === 'bestie') {
-            // === BESTIE ===
             nameEl.innerText = "BESTIE";
-            nameEl.style.color = "#00d2ff"; // Голубой (Cyan)
-            nameEl.style.textShadow = "0 0 15px rgba(0, 210, 255, 0.4)"; // Свечение
+            nameEl.style.color = "#00d2ff"; 
+            nameEl.style.textShadow = "0 0 15px rgba(0, 210, 255, 0.4)";
             
             if(badgeEl) badgeEl.style.display = 'none';
-            if(btnFree) btnFree.innerText = t.btn_current;
+            
+            // Кнопка Free в модальном окне становится "You deserve better"
+            if(btnFree) {
+                btnFree.innerText = t.btn_lower_tier || "You deserve better";
+                btnFree.classList.add('current');
+                btnFree.disabled = true;
+            }
         
         } else if (subscriptionLevel === 'beast') {
-            // === BEAST ===
             nameEl.innerText = "BEAST";
-            nameEl.style.color = "#9b59b6"; // Фиолетовый
+            nameEl.style.color = "#9b59b6"; 
             
             if(badgeEl) badgeEl.style.display = 'none';
-            if(btnFree) btnFree.innerText = t.btn_current;
+            if(btnFree) {
+                btnFree.innerText = t.btn_lower_tier;
+                btnFree.classList.add('current');
+                btnFree.disabled = true;
+            }
 
         } else if (subscriptionLevel === 'pro') {
-            // === PRO ===
             nameEl.innerText = "PRO";
-            nameEl.style.color = "#ff9900"; // Оранжевый
+            nameEl.style.color = "#ff9900"; 
             
             if(badgeEl) badgeEl.style.display = 'none';
-            if(btnFree) btnFree.innerText = t.btn_current;
+            if(btnFree) {
+                btnFree.innerText = t.btn_lower_tier;
+                btnFree.classList.add('current');
+                btnFree.disabled = true;
+            }
 
         } else {
-            // === FREE LOGIC ===
+            // --- FREE ---
             const count = parseInt(localStorage.getItem('xch_limit_count') || '0');
             const startTime = parseInt(localStorage.getItem('xch_limit_start') || '0');
             const now = Date.now();
             const oneDay = 24 * 60 * 60 * 1000;
 
-            // Проверяем сброс лимита
             let displayCount = count;
             if (startTime > 0 && (now - startTime > oneDay)) {
                 displayCount = 0;
             }
-
             const remaining = Math.max(0, DAILY_LIMIT - displayCount);
 
-            // Обновляем текст в меню
             nameEl.innerHTML = `FREE <span style="font-size:14px; opacity:0.6; font-weight:600; margin-left:5px; color:var(--text-secondary);">${remaining}/${DAILY_LIMIT}</span>`;
             nameEl.style.color = "var(--text-main)";
             nameEl.style.fontWeight = "600";
             
-            // Показываем бейдж UPGRADE
             if(badgeEl) {
                 badgeEl.style.display = 'inline-block';
                 badgeEl.innerText = t.btn_upgrade_short || "Upgrade ⇧"; 
             }
 
-            // Обновляем кнопку в модальном окне (таймер/статус)
+            // Логика кнопки Free (таймер)
             if (btnFree) {
+                btnFree.disabled = true;
+                btnFree.classList.remove('current'); // Сброс класса current, чтобы стили таймера сработали
+                
                 if (startTime > 0 && displayCount > 0) {
                     const resetDate = new Date(startTime + oneDay);
                     const dateStr = resetDate.toLocaleString(currentLang, { 
@@ -8048,20 +8077,18 @@
                     btnFree.innerText = `${t.limit_reset} ${dateStr}`;
                     
                     if (remaining === 0) {
-                        // Лимит исчерпан
                         btnFree.style.color = "var(--highlight-red)";
                         btnFree.style.border = "1px solid var(--highlight-red)";
                         btnFree.style.background = "rgba(231, 76, 60, 0.1)";
                         btnFree.style.opacity = "1";
                     } else {
-                        // Лимит идет
                         btnFree.style.color = "var(--text-secondary)";
                         btnFree.style.border = "1px solid var(--border)";
                         btnFree.style.background = "var(--nav-bg)";
                     }
                 } else {
-                    // Счетчик не запущен
                     btnFree.innerText = t.btn_current;
+                    btnFree.classList.add('current');
                     btnFree.style.color = ""; 
                     btnFree.style.background = "";
                     btnFree.style.border = "";
