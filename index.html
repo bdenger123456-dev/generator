@@ -3,21 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>xFetishHub</title>
     
-    <!-- PWA Manifest (для Android) -->
+    <!-- Primary Meta Tags -->
+    <title>xFetishHub — Discover Your Desires</title>
+    <meta name="title" content="xFetishHub — Discover Your Desires">
+    <meta name="description" content="Your private, intelligent guide to adult preferences. Swipe, discover new genres, and analyze your tastes with advanced statistics. Secure, anonymous, and ad-free.">
+    <meta name="keywords" content="fetish generator, adult preferences, porn categories, random porn, fetish tracker, sex tags, fetishhub, private browser">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+    <meta name="author" content="xFetishHub">
+
+    <!-- Open Graph / Facebook / Discord -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.xfetishhub.site/">
+    <meta property="og:title" content="xFetishHub — Discover Your Desires">
+    <meta property="og:description" content="Stop searching, start discovering. The ultimate tool to find and track your adult interests with privacy.">
+    <meta property="og:image" content="https://www.xfetishhub.site/logo.png"> 
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://www.xfetishhub.site/">
+    <meta property="twitter:title" content="xFetishHub — Discover Your Desires">
+    <meta property="twitter:description" content="Stop searching, start discovering. The ultimate tool to find and track your adult interests with privacy.">
+    <meta property="twitter:image" content="https://www.xfetishhub.site/logo.png">
+
+    <!-- PWA Manifest & Icons -->
     <link rel="manifest" href="manifest.json">
-    
-    <!-- Стандартная иконка -->
     <link rel="icon" type="image/png" href="logo.png">
-    
-    <!-- iOS (iPhone/iPad) Настройки -->
     <link rel="apple-touch-icon" href="logo.png"> 
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="FetishHub">
-
     <meta name="theme-color" content="#050505">
+
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     
     <style>
@@ -4066,82 +4084,52 @@
     // === АВТО-СОХРАНЕНИЕ В ОБЛАКО ===
     window.syncToCloud = async function(immediate = false) {
         const user = auth.currentUser;
-        if (!user) return; // Если не авторизован — не сохраняем
+        if (!user) return; 
 
-        // Внутренняя функция, которая делает реальную отправку
         const performSave = async () => {
             const userRef = doc(db, "users", user.uid);
-            
-            // Читаем текущую платформу
             const currentPlatform = document.getElementById('platform') ? document.getElementById('platform').value : 'xh';
-
-            // 1. Берем ПОЛНЫЕ данные из памяти/localStorage
+            
             const fullLog = window.activityLog || [];
             const fullHistory = window.historyData || [];
             
-            // 2. Готовим ОБРЕЗАННЫЕ данные для облака (Экономия места!)
             const cloudLog = fullLog.slice(-200); 
             const cloudHistory = fullHistory.slice(-100);
 
             const dataToSave = {
-                // Маленькие списки храним полностью
                 favorites: JSON.parse(localStorage.getItem('xch_favorites')) || [],
                 blacklist: JSON.parse(localStorage.getItem('xch_blacklist')) || [],
                 watchLater: JSON.parse(localStorage.getItem('xch_watch_later')) || [],
                 tagScores: JSON.parse(localStorage.getItem('xch_tag_scores')) || {},
-                watchHistory: window.watchHistory || [],
-                
-                // ОПТИМИЗАЦИЯ: В облако льем только свежее
                 history: cloudHistory,
                 activityLog: cloudLog,
-                
+                watchHistory: window.watchHistory || [],
                 platform: currentPlatform,
-                // Подписку берем из локалки, но правила Firestore не дадут её подделать, если нет валидного кода
                 subscription: localStorage.getItem('xch_sub_level') || 'free', 
                 lastUpdated: serverTimestamp()
             };
 
             try {
-                // Отправляем с merge: true (обновляем только эти поля)
                 await setDoc(userRef, dataToSave, { merge: true });
                 
-                // Обновляем UI
                 const now = Date.now();
                 localStorage.setItem('xch_last_sync_ts', now);
                 if(window.updateLastSyncUI) window.updateLastSyncUI();
                 
-                // Сбрасываем статус в интерфейсе (если был)
-                const statusText = document.getElementById('last-sync-date');
-                if(statusText) {
-                    // Возвращаем дату (можно вызвать updateLastSyncUI, но для красоты сбросим текст)
-                    statusText.style.opacity = '0.8'; 
-                }
-                
-                console.log(`☁️ Synced: ${cloudLog.length} logs sent (Local: ${fullLog.length})`);
+                console.log(`☁️ Synced`);
             } catch (e) {
                 console.error("Auto-save error:", e);
             }
         };
 
-        // 3. ЛОГИКА DEBOUNCE (Задержка)
-        if (syncTimeout) clearTimeout(syncTimeout); // Сбрасываем предыдущий таймер
+        if (syncTimeout) clearTimeout(syncTimeout);
 
         if (immediate) {
-            // Если флаг true (например, при закрытии вкладки) — сохраняем мгновенно
             await performSave();
         } else {
-            // Иначе показываем юзеру, что процесс идет, и ждем 5 секунд
-            const statusText = document.getElementById('last-sync-date');
-            if(statusText) {
-                statusText.style.display = 'inline';
-                statusText.innerText = "Syncing...";
-            }
-            
-            // Запускаем таймер
             syncTimeout = setTimeout(performSave, 5000);
         }
     };
-
 </script>
 
 <script>
@@ -4407,6 +4395,7 @@
             hist_tab_swipes: "Swipes",
             hist_tab_watch: "Time",
             hist_empty_watch: "No watch data yet. Go watch something! 😏",
+            hist_watched: "WATCHED",
 
             stats_no_data: "No data yet",
             wrapped_lock_title: "FETISH WRAPPED 🔒",
@@ -4770,6 +4759,7 @@
             hist_tab_swipes: "Свайпы",
             hist_tab_watch: "Время",
             hist_empty_watch: "Данных о просмотрах нет. Иди глянь что-нибудь! 😏",
+            hist_watched: "ПРОСМОТРЕНО",
 
             stats_no_data: "Пока нет данных",
             wrapped_lock_title: "FETISH WRAPPED 🔒",
@@ -5129,6 +5119,7 @@
             hist_tab_swipes: "Deslizamientos",
             hist_tab_watch: "Tiempo",
             hist_empty_watch: "Aún no hay datos de visualización. ¡Ve a ver algo! 😏",
+            hist_watched: "VISTO",
 
             stats_no_data: "Aún no hay datos",
             wrapped_lock_title: "FETISH WRAPPED 🔒",
@@ -5481,6 +5472,7 @@
             hist_tab_swipes: "Swipes",
             hist_tab_watch: "Zeit",
             hist_empty_watch: "Noch keine Daten. Schau dir was an! 😏",
+            hist_watched: "GESEHEN",
 
             stats_no_data: "Noch keine Daten",
             wrapped_lock_title: "FETISH WRAPPED 🔒",
@@ -6533,18 +6525,44 @@
     function forceShowResult(item, mode = 'history') {
         isGenerating = false;
         
-        // Скролл наверх
+        // 1. ОТКЛЮЧАЕМ СТАРТОВЫЙ РЕЖИМ
+        isFirstGen = false; 
+
+        // 2. СКРЫВАЕМ КНОПКУ СТАРТА И ПОКАЗЫВАЕМ ИНТЕРФЕЙС
+        // Если пользователь зашел сразу в историю, не нажимая "Let's Go", эти элементы могут быть не в том состоянии.
+        const startBtn = document.getElementById('start-btn-container');
+        if(startBtn) {
+            startBtn.classList.add('hidden-initial');
+            startBtn.style.display = 'none';
+        }
+
+        // Убеждаемся, что обертка карточки на месте
+        const wrapper = document.getElementById('card-anim-wrapper');
+        if(wrapper) {
+            wrapper.style.transform = '';
+            wrapper.style.opacity = '1';
+            // Добавляем легкую анимацию появления (Fly In Left), чтобы было понятно, что контент сменился
+            wrapper.classList.remove('anim-fly-left', 'anim-fly-right');
+            void wrapper.offsetWidth; // Триггер перерисовки
+            wrapper.classList.add('anim-fly-left');
+        }
+
+        // 3. СКРОЛЛ НАВЕРХ
         const mainContent = document.querySelector('.main-content') || document.querySelector('.tab-content.active');
         if(mainContent) mainContent.scrollTop = 0;
         
         addToHistory(item);
         
-        // === аписываем в лог, чтобы обновился счетчик ===
-        // Используем тип 'gen', так как это открытие новой карточки
+        // Запись в лог
         logActivity('gen', item.id, item.tags);
-        // ============================================================
 
+        // 4. РЕНДЕР
         renderResultUI(item, mode);
+        
+        // Снимаем класс анимации через секунду
+        setTimeout(() => {
+            if(wrapper) wrapper.classList.remove('anim-fly-left');
+        }, 800);
     }
 
     function renderBadges() {
@@ -10034,7 +10052,6 @@
             div.style.padding = '12px 20px';
 
             const name = getLocalizedName(item);
-            // Красивая дата (Например: Вчера, 14:30)
             const d = new Date(entry.timestamp);
             const dateStr = d.toLocaleDateString() === new Date().toLocaleDateString() 
                 ? d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) 
@@ -10047,7 +10064,7 @@
                 </div>
                 <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px;">
                     <span style="font-weight:700; color:var(--text-main); font-size:15px;">${entry.durationStr}</span>
-                    <span style="font-size:10px; color:var(--accent);">WATCHED</span>
+                    <span style="font-size:10px; color:var(--accent);">${t.hist_watched}</span>
                 </div>
             `;
             
