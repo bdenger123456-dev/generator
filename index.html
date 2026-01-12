@@ -2185,28 +2185,35 @@
                 top: 5px; /* Сдвигаем вниз от центральной линии */
             }
 
-        /* Общий стиль для сисечек */
+        /* Общий стиль для сисечек/картинок */
         .deco-icon {
             position: absolute;
             z-index: 20 !important; 
             pointer-events: none; /* Клики проходят сквозь них */
             will-change: transform;
+            transition: filter 0.3s ease; /* Плавная смена цвета при смене темы */
         }
 
-        /* --- 1. ТЁМНАЯ ТЕМА --- */
+        /* --- 1. ТЁМНАЯ ТЕМА (По умолчанию) --- */
+        /* Исходники черные -> инвертируем в белые + белая тень */
         .deco-icon {
-            filter: brightness(0) invert(1) drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+            /* invert(1) делает черное белым */
+            filter: invert(1) drop-shadow(0 0 10px rgba(255, 255, 255, 0.4));
             opacity: 0.9;
         }
 
         /* --- 2. СВЕТЛАЯ ТЕМА --- */
+        /* Исходники черные -> оставляем черными (invert 0) + темная тень */
         body.light-theme .deco-icon {
-            filter: brightness(0) opacity(0.8) drop-shadow(0 5px 15px rgba(0, 0, 0, 0.1));
+            filter: invert(0) drop-shadow(0 5px 15px rgba(0, 0, 0, 0.15));
+            opacity: 0.8; 
         }
 
         /* --- 3. РАДУЖНАЯ ТЕМА --- */
+        /* Делаем белыми, чтобы выделялись на ярком фоне + сильная тень */
         body.rainbow-mode .deco-icon {
-            filter: brightness(0) invert(1) drop-shadow(0 0 15px rgba(255, 0, 255, 0.8));
+            filter: invert(1) drop-shadow(0 0 15px rgba(255, 255, 255, 0.9));
+            opacity: 1;
         }
 
         /* АНИМАЦИИ ПАРЕНИЯ */
@@ -2342,9 +2349,9 @@
                     <!-- ОБЁРТКА: Исправил z-index, overflow и flex параметры -->
                     <div id="card-anim-wrapper" style="position: relative; width: 100%; display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: visible; z-index: 10;">
                         
-                        <!-- СИСЕЧКИ: Вернул поверх карточки (z-index: 20) -->
-                        <img src="tits1.png" class="deco-icon icon-left" alt="">
-                        <img src="tits2.png" class="deco-icon icon-right" alt="">
+                        <!-- СИСЕЧКИ/картинки-->
+                        <img src="" id="deco-left" class="deco-icon icon-left" alt="">
+                        <img src="" id="deco-right" class="deco-icon icon-right" alt="">
 
                         <!-- КАРТОЧКА -->
                         <div class="card" id="card-block">
@@ -3761,8 +3768,13 @@
     const WRAPPED_THRESHOLD = 30;
     let data = [];
 
+    const DECO_IMAGES = [
+        'deco1.png', 'deco2.png', 'deco3.png', 'deco4.png', 'deco5.png',
+        'deco6.png', 'deco7.png', 'deco8.png', 'deco9.png', 'deco10.png'
+    ];
+
     /* =================== ⚒️ DEBUG MODE =========================== */
-    subscriptionLevel = 'pro'; 
+    // subscriptionLevel = 'pro'; 
     // subscriptionLevel = 'beast';
     /* =========================================================== */
 
@@ -5528,6 +5540,7 @@
         initTheme();
         initIntensity();
         initDecoSettings();
+        randomizeDecorations();
         renderModifiers();
         renderHistory();
         updateCounts();
@@ -5594,6 +5607,7 @@
         initLanguage();
         initTheme();
         initIntensity();
+        randomizeDecorations(); 
         renderModifiers();
         renderHistory();
         updateCounts();
@@ -8032,6 +8046,8 @@
         if (!checkGenerationLimit()) return; 
         if (isGenerating) return;
 
+        randomizeDecorations();
+
         // 1. Модификаторы
         if (currentOrientation === 'gay') activeMods.add('Gay');
         else if (currentOrientation === 'trans') activeMods.add('Trans');
@@ -8894,6 +8910,27 @@
         } else {
             document.body.classList.add('no-deco');
         }
+    }
+
+    function randomizeDecorations() {
+        const leftImg = document.getElementById('deco-left');
+        const rightImg = document.getElementById('deco-right');
+        
+        // Если элементов нет (например, на другой вкладке), выходим
+        if (!leftImg || !rightImg) return;
+
+        // 1. Выбираем первый случайный индекс
+        let idx1 = Math.floor(Math.random() * DECO_IMAGES.length);
+        
+        // 2. Выбираем второй индекс и следим, чтобы он не совпадал с первым
+        let idx2 = Math.floor(Math.random() * DECO_IMAGES.length);
+        while (idx2 === idx1) {
+            idx2 = Math.floor(Math.random() * DECO_IMAGES.length);
+        }
+
+        // 3. Применяем картинки
+        leftImg.src = DECO_IMAGES[idx1];
+        rightImg.src = DECO_IMAGES[idx2];
     }
 
 </script>
