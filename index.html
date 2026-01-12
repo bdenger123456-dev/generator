@@ -1079,10 +1079,10 @@
                 display: flex;
                 flex-direction: column;
                 justify-content: flex-start !important;
-                overflow: hidden !important; 
+                overflow: visible !important; 
                 width: 100% !important;
-                padding-left: 5px !important;
-                padding-right: 5px !important;
+                padding-left: 15px !important;
+                padding-right: 15px !important;
             }
 
             /* 3. КАРТОЧКА */
@@ -2282,16 +2282,28 @@
         @media (max-width: 768px) {
             /* МОБИЛЬНАЯ ВЕРСИЯ ИКОНОК */
             .icon-left {
-                width: 75px !important;  /* Было 120px -> стало 75px */
-                top: 5px !important;     /* Опустили ниже (было -30px) */
-                left: -5px !important;   /* Прижали ближе к краю */
+                width: 75px !important;  
+                top: 5px !important;    
+                left: -5px !important;   
+                z-index: 40 !important;
+                filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5)) !important;
             }
 
             .icon-right {
-                width: 60px !important;  /* Было 90px -> стало 60px */
-                top: 15px !important;    /* Опустили ниже (было -20px) */
-                right: 0px !important;   /* Прижали ближе к краю */
+                width: 60px !important;  
+                top: 15px !important;   
+                right: 0px !important;  
+                z-index: 40 !important;
+                filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5)) !important;
             }
+        }
+        #card-anchor, #card-anim-wrapper {
+            overflow: visible !important;
+        }
+
+        /* 4. ЧТОБЫ НЕ ПОЯВИЛСЯ ГОРИЗОНТАЛЬНЫЙ СКРОЛЛ ВСЕЙ СТРАНИЦЫ */
+        #tab-home {
+            overflow-x: hidden !important; 
         }
 
         body.no-deco .deco-icon {
@@ -2502,7 +2514,7 @@
                 justify-content: space-between !important; 
             }
 
-            /* 5. ИКОНКИ НА ПК (Возвращаем их на место) */
+            /* 5. ИКОНКИ НА ПК */
             .icon-left {
                 width: 160px !important; /* Чуть крупнее для ПК */
                 top: -40px !important;
@@ -9324,20 +9336,20 @@
         const t = langData[currentLang];
         let activeStatus = null;
 
-        // Проверяем статус (приоритет: Бан -> Лайк -> WL)
-        // Но обычно WL и Лайк не пересекаются, так что порядок не критичен.
-        
-        if (blacklist.includes(currentItem.id)) {
-            activeStatus = 'ban';
-            notchText.innerText = t.status_ban;
-        } 
+        // 1. Сначала проверяем Watch Later (Синий), так как это активное намерение
+        if (watchLater.includes(currentItem.id)) {
+            activeStatus = 'wl';
+            notchText.innerText = t.status_wl;
+        }
+        // 2. Затем проверяем Избранное (Зеленый)
         else if (favorites.includes(currentItem.id)) {
             activeStatus = 'fav';
             notchText.innerText = t.status_fav;
         }
-        else if (watchLater.includes(currentItem.id)) {
-            activeStatus = 'wl';
-            notchText.innerText = t.status_wl;
+        // 3. И только потом Черный список (Красный)
+        else if (blacklist.includes(currentItem.id)) {
+            activeStatus = 'ban';
+            notchText.innerText = t.status_ban;
         }
 
         // Применяем
@@ -9345,7 +9357,6 @@
             card.classList.add('status-' + activeStatus);
             
             // Небольшая задержка для чёлки, чтобы она выезжала после появления карточки
-            // Если это первый рендер
             setTimeout(() => {
                 notch.classList.add('visible');
             }, 50);
