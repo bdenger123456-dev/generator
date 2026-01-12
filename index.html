@@ -2274,6 +2274,82 @@
             display: none !important;
         }
 
+        /* === BESTIE PLAN STYLES === */
+        .plan-card.bestie {
+            border: 2px solid #00d2ff; /* Яркий голубой бордюр */
+            background: linear-gradient(165deg, rgba(0, 210, 255, 0.1), rgba(58, 123, 213, 0.05));
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.15);
+            order: -1; /* На мобильных ставим его первым, чтобы заметили */
+        }
+
+        @media (min-width: 769px) {
+            .plan-card.bestie { order: 0; }
+        }
+
+        .plan-card.bestie .plan-title {
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: #00d2ff;
+        }
+
+        .bestie-badge {
+            position: absolute;
+            top: 0; right: 0;
+            background: #00d2ff;
+            color: #000;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-bottom-left-radius: 12px;
+        }
+
+        /* Стили для счетчика (Scarcity Bar) */
+        .limit-container {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .limit-labels {
+            display: flex; 
+            justify-content: space-between; 
+            font-size: 11px; 
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+        }
+
+        .limit-track {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .limit-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            width: 96%; /* 48 из 50 */
+            box-shadow: 0 0 10px #00d2ff;
+            animation: pulseBar 2s infinite;
+        }
+
+        @keyframes pulseBar {
+            0% { opacity: 0.8; }
+            50% { opacity: 1; }
+            100% { opacity: 0.8; }
+        }
+
+        .plan-btn.bestie-btn {
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.4);
+        }
+
         /* =========================================
         18. MEDIA QUERIES (ADAPTATION)
         ========================================= */
@@ -2876,6 +2952,10 @@
                 <span data-key="doc_refund">Refund Policy</span>
                 <span style="color:var(--text-secondary)">›</span>
             </div>
+                <div class="ios-row clickable" onclick="openSponsorsModal()">
+                <span data-key="btn_early_sponsors">Early Sponsors 💎</span>
+                <span style="color:var(--text-secondary)">›</span>
+            </div>
         </div>
     </div>
     <div id="block-history" style="margin-top:20px;">
@@ -2911,8 +2991,8 @@
                     <div class="plan-price">$0</div>
                     <ul class="plan-features">
                         <li data-key="feat_limit">🎲 10 Generations / day</li>
+                        <li data-key="feat_wrapped_limited">🎁 1 Fetish Wrapped / week</li>
                         <li data-key="feat_stats_basic">📊 Basic Statistics</li>
-                        <li data-key="feat_filters">✔️ Standard Filters</li>
                     </ul>
                     <button class="plan-btn current" disabled data-key="btn_current">Current Plan</button>
                 </div>
@@ -2924,10 +3004,11 @@
                     <ul class="plan-features">
                         <li style="color:var(--text-main)" data-key="feat_unlim">🔥 <b>Unlimited</b> Generations</li>
                         <li data-key="feat_stats_adv">📈 Advanced Stats & History</li>
+                        <li data-key="feat_wrapped_unlim">✨ <b>Unlimited</b> Fetish Wrapped</li>
                         <li data-key="feat_custom">🎨 Deep Customization</li>
-                        <li data-key="feat_early">🚀 Early Access</li>
+                        <li data-key="feat_early">🚀 Early Access features</li>
                     </ul>
-                    <button class="plan-btn pro-btn" onclick="openBoosty('https://boosty.to/xfetishhub')" data-key="btn_get_pro">Get Pro</button>
+                    <button class="plan-btn pro-btn" onclick="openPaymentSelection('pro')" data-key="btn_get_pro">Get Pro</button>
                 </div>
 
                 <!-- BEAST CARD -->
@@ -2936,11 +3017,42 @@
                     <div class="plan-price">$4.99 <span style="font-size:12px">/ mo</span></div>
                     <ul class="plan-features">
                         <li style="color:var(--text-main)" data-key="feat_all_pro">👑 <b>All Pro Features</b></li>
-                        <li data-key="feat_sponsors">💎 Listed in "Sponsors"</li>
                         <li data-key="feat_discord">💬 <b>Discord</b> (Dev Chat)</li>
                         <li data-key="feat_vote">🗳️ Vote on Roadmap</li>
                     </ul>
-                    <button class="plan-btn beast-btn" onclick="openBoosty('https://boosty.to/xfetishhub')" data-key="btn_get_beast">Unleash Beast</button>
+                    <button class="plan-btn beast-btn" onclick="openPaymentSelection('beast')" data-key="btn_get_beast">Unleash Beast</button>
+                </div>
+                <!-- BESTIE CARD (LIFETIME) -->
+                <div class="plan-card bestie">
+                    <!-- Бейдж сверху -->
+                    <div class="bestie-badge" data-key="badge_limited">LIMITED OFFER</div>
+                    
+                    <!-- Заголовок -->
+                    <div class="plan-title">Bestie <span style="font-size:12px; opacity:0.7; -webkit-text-fill-color: initial; color:var(--text-secondary);" data-key="plan_bestie_sub">Lifetime</span></div>
+                    
+                    <!-- Цена -->
+                    <div class="plan-price">$49.99 <span style="font-size:12px" data-key="plan_bestie_price">/ once</span></div>
+                    
+                    <!-- Счётчик -->
+                    <div class="limit-container">
+                        <div class="limit-labels">
+                            <span style="font-weight:700; color:#ff6b6b;" data-key="limit_burn">🔥 ALMOST GONE</span>
+                            <span style="font-weight:700; color:#fff;">48 / 50 <span data-key="limit_claimed">claimed</span></span>
+                        </div>
+                        <div class="limit-track">
+                            <div class="limit-fill"></div>
+                        </div>
+                    </div>
+
+                    <!-- Список фич -->
+                    <ul class="plan-features">
+                        <li style="color:var(--text-main)" data-key="feat_lifetime">♾️ <b>Lifetime Access</b></li>
+                        <li style="color:var(--text-main)" data-key="feat_all_pro">👑 <b>All Pro Features</b></li>
+                        <li data-key="feat_sponsors">💎 Listed in "Sponsors"</li>
+                        <li data-key="feat_onetime">💸 One-time payment</li>
+                    </ul>
+                    
+                    <button class="plan-btn bestie-btn" onclick="openPaymentSelection('bestie')" data-key="btn_get_bestie">Get Forever</button>
                 </div>
             </div>
         </div>
@@ -3379,6 +3491,27 @@
     </div>
 </div>
 
+<!-- SPONSORS MODAL -->
+<div class="modal-overlay" id="modal-sponsors-overlay" onclick="closeSponsorsModal(event)">
+    <div class="modal" style="max-width: 400px; max-height: 80vh;">
+        <div class="modal-header">
+            <!-- ЗАГОЛОВОК -->
+            <span data-key="sponsors_title">Early Sponsors</span>
+            <span style="cursor:pointer" onclick="closeSponsorsModal(null, true)">✕</span>
+        </div>
+        
+        <div class="modal-body" style="padding: 0;">
+            <!-- ОПИСАНИЕ -->
+            <div style="padding: 20px 20px 10px 20px; text-align: center; color: var(--text-secondary); font-size: 13px; line-height: 1.5;" data-key="sponsors_desc">
+                These legends supported xFetishHub at the very beginning by purchasing the Bestie plan. <br>Forever grateful! 💙
+            </div>
+
+            <div class="ios-group" style="margin: 10px 15px 20px 15px;" id="sponsors-list">
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="wrapped-mount" class="wrapped-overlay"></div>
 
 <!-- FIREBASE INTEGRATION -->
@@ -3401,6 +3534,8 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
+
+    let syncTimeout = null;
 
     // Глобальное состояние входа
     window.isUserLoggedIn = false;
@@ -3672,58 +3807,72 @@
 
             if (docSnap.exists()) {
                 const cloudData = docSnap.data();
-                console.log("Cloud data received. Merging...");
+                console.log("Cloud data received. Merging smart...");
 
-                // 1. ЛАЙКИ (Favorites)
+                // --- 1. ЛАЙКИ, ЧС, WATCH LATER (Множества) ---
+                // Объединяем уникальные ID
                 const localFav = window.favorites || [];
                 const cloudFav = cloudData.favorites || [];
                 const mergedFav = [...new Set([...localFav, ...cloudFav])];
 
-                // 2. ЧЕРНЫЙ СПИСОК (Blacklist)
                 const localBan = window.blacklist || [];
                 const cloudBan = cloudData.blacklist || [];
                 const mergedBan = [...new Set([...localBan, ...cloudBan])];
 
-                // 3. СМОТРЕТЬ ПОЗЖЕ (Watch Later) — НОВОЕ
                 const localWL = window.watchLater || [];
                 const cloudWL = cloudData.watchLater || [];
                 const mergedWL = [...new Set([...localWL, ...cloudWL])];
 
-                // 4. ИСТОРИЯ (History)
+                // --- 2. ИСТОРИЯ И ЛОГИ (Умное слияние) ---
+                
+                // А. История
                 const localHist = window.historyData || [];
                 const cloudHist = cloudData.history || [];
                 const combinedHistMap = new Map();
-                [...cloudHist, ...localHist].forEach(item => combinedHistMap.set(item.id, item));
+                
+                [...localHist, ...cloudHist].forEach(item => combinedHistMap.set(item.id, item));
+                
                 const mergedHistory = Array.from(combinedHistMap.values())
                     .sort((a, b) => b.timestamp - a.timestamp)
-                    .slice(0, 50);
+                    .slice(0, 50); // В памяти держим топ-50 для UI истории
 
-                // 5. ЛОГ АКТИВНОСТИ (Activity Log)
+                // Б. Лог Активности (Самое важное для веса)
                 const localLog = window.activityLog || [];
                 const cloudLog = cloudData.activityLog || [];
                 const combinedLogMap = new Map();
-                [...cloudLog, ...localLog].forEach(item => combinedLogMap.set((item.ts || 0) + "_" + item.id, item));
+                
+                // Ключ уникальности: "timestamp_id". 
+                // Это позволит слить два массива без дублей, но сохранив всю историю.
+                [...localLog, ...cloudLog].forEach(item => combinedLogMap.set((item.ts || 0) + "_" + item.id, item));
+                
                 const mergedActivityLog = Array.from(combinedLogMap.values())
                     .sort((a, b) => a.ts - b.ts)
-                    .slice(-5000);
+                    .slice(-5000); // Локально храним до 5000 записей для статистики
 
-                // 6. ВЕСА ТЕГОВ (Tag Scores)
+                // --- 3. ВЕСА ТЕГОВ (Tag Scores) ---
+                // Берем максимум из локального и облачного веса
                 const localScores = window.tagScores || {};
                 const cloudScores = cloudData.tagScores || {};
                 const mergedScores = { ...cloudScores };
+                
                 for (const [tag, score] of Object.entries(localScores)) {
-                    if (mergedScores[tag]) mergedScores[tag] = Math.max(mergedScores[tag], score);
-                    else mergedScores[tag] = score;
+                    // Если тег есть в обоих местах, берем тот, где вес больше (значит он актуальнее/важнее)
+                    // Либо можно просто суммировать, но max безопаснее от накрутки
+                    if (mergedScores[tag]) {
+                        if (Math.abs(score) > Math.abs(mergedScores[tag])) {
+                            mergedScores[tag] = score;
+                        }
+                    } else {
+                        mergedScores[tag] = score;
+                    }
                 }
 
-                // 7. ПЛАТФОРМА (По умолчанию xHamster 'xh')
+                // --- 4. НАСТРОЙКИ ---
                 let mergedPlatform = localStorage.getItem('xch_platform') || 'xh';
                 if (cloudData.platform) mergedPlatform = cloudData.platform;
 
-                // 8. ПОДПИСКА
                 if (cloudData.subscription) {
                     localStorage.setItem('xch_sub_level', cloudData.subscription);
-                    // Обновляем UI подписки через глобальную функцию
                     if (window.updateSubscriptionUI) window.updateSubscriptionUI();
                 }
 
@@ -3732,55 +3881,43 @@
                 // А. Обновляем память (window)
                 window.favorites = mergedFav;
                 window.blacklist = mergedBan;
-                window.watchLater = mergedWL; // Сохраняем в память
+                window.watchLater = mergedWL;
                 window.historyData = mergedHistory;
                 window.tagScores = mergedScores;
                 window.activityLog = mergedActivityLog;
 
-                // Б. Обновляем LocalStorage
+                // Б. Обновляем LocalStorage (Полные версии)
                 localStorage.setItem('xch_favorites', JSON.stringify(mergedFav));
                 localStorage.setItem('xch_blacklist', JSON.stringify(mergedBan));
-                localStorage.setItem('xch_watch_later', JSON.stringify(mergedWL)); // Сохраняем локально
+                localStorage.setItem('xch_watch_later', JSON.stringify(mergedWL));
                 localStorage.setItem('xch_history', JSON.stringify(mergedHistory));
                 localStorage.setItem('xch_tag_scores', JSON.stringify(mergedScores));
                 localStorage.setItem('xch_activity_log', JSON.stringify(mergedActivityLog));
                 localStorage.setItem('xch_platform', mergedPlatform);
 
-                // В. Отправляем ОБЪЕДИНЕННЫЙ результат обратно в облако
-                await setDoc(userRef, {
-                    favorites: mergedFav,
-                    blacklist: mergedBan,
-                    watchLater: mergedWL, // Отправляем в облако
-                    history: mergedHistory,
-                    activityLog: mergedActivityLog,
-                    tagScores: mergedScores,
-                    platform: mergedPlatform,
-                    lastSynced: serverTimestamp()
-                }, { merge: true });
-
-                // Г. Обновляем UI
+                // В. Обновляем UI
                 const now = Date.now();
                 localStorage.setItem('xch_last_sync_ts', now);
-                window.updateLastSyncUI();
+                if (window.updateLastSyncUI) window.updateLastSyncUI();
 
-                // Обновляем все счетчики и списки на странице
                 if (typeof updateCounts === 'function') updateCounts();
                 if (typeof updateExploredCount === 'function') updateExploredCount();
                 if (typeof renderHistory === 'function') renderHistory();
                 if (typeof updateActionButtons === 'function') updateActionButtons();
                 
-                // Обновляем селектор сайта и ссылку
                 const platEl = document.getElementById('platform');
                 if (platEl) { 
                     platEl.value = mergedPlatform; 
                     if (typeof updateLink === 'function') updateLink(); 
                 }
 
-                console.log("Data sync complete. WatchLater:", mergedWL.length);
+                console.log(`Merge complete. History: ${mergedHistory.length}, Log: ${mergedActivityLog.length}`);
                 
+                window.syncToCloud(false); // Отложенная синхронизация результата
+
             } else {
                 console.log("No cloud data. Creating initial backup...");
-                if (window.syncToCloud) window.syncToCloud();
+                if (window.syncToCloud) window.syncToCloud(true);
             }
         } catch (error) {
             console.error("Error loading data:", error);
@@ -3788,41 +3925,126 @@
     }
 
     // === АВТО-СОХРАНЕНИЕ В ОБЛАКО ===
-    window.syncToCloud = async function() {
+    window.syncToCloud = async function(immediate = false) {
         const user = auth.currentUser;
-        if (!user) return; // Не вошел - не сохраняем
+        if (!user) return; // Если не авторизован — не сохраняем
 
-        const userRef = doc(db, "users", user.uid);
-        
-        // Читаем настройки интерфейса, если элемент существует
-        const currentPlatform = document.getElementById('platform') ? document.getElementById('platform').value : 'xh';
+        // Внутренняя функция, которая делает реальную отправку
+        const performSave = async () => {
+            const userRef = doc(db, "users", user.uid);
+            
+            // Читаем текущую платформу
+            const currentPlatform = document.getElementById('platform') ? document.getElementById('platform').value : 'xh';
 
-        // ИСПРАВЛЕНИЕ: Читаем данные напрямую из LocalStorage, так как переменные JS могут быть недоступны в модуле
-        const dataToSave = {
-            favorites: JSON.parse(localStorage.getItem('xch_favorites')) || [],
-            blacklist: JSON.parse(localStorage.getItem('xch_blacklist')) || [],
-            watchLater: JSON.parse(localStorage.getItem('xch_watch_later')) || [],
-            tagScores: JSON.parse(localStorage.getItem('xch_tag_scores')) || {},
-            history: JSON.parse(localStorage.getItem('xch_history')) || [],
-            activityLog: JSON.parse(localStorage.getItem('xch_activity_log')) || [],
-            platform: currentPlatform,
-            subscription: localStorage.getItem('xch_sub_level') || 'free',
-            lastUpdated: serverTimestamp()
+            // 1. Берем ПОЛНЫЕ данные из памяти/localStorage
+            const fullLog = window.activityLog || [];
+            const fullHistory = window.historyData || [];
+            
+            // 2. Готовим ОБРЕЗАННЫЕ данные для облака (Экономия места!)
+            const cloudLog = fullLog.slice(-200); 
+            const cloudHistory = fullHistory.slice(-100);
+
+            const dataToSave = {
+                // Маленькие списки храним полностью
+                favorites: JSON.parse(localStorage.getItem('xch_favorites')) || [],
+                blacklist: JSON.parse(localStorage.getItem('xch_blacklist')) || [],
+                watchLater: JSON.parse(localStorage.getItem('xch_watch_later')) || [],
+                tagScores: JSON.parse(localStorage.getItem('xch_tag_scores')) || {},
+                
+                // ОПТИМИЗАЦИЯ: В облако льем только свежее
+                history: cloudHistory,
+                activityLog: cloudLog,
+                
+                platform: currentPlatform,
+                // Подписку берем из локалки, но правила Firestore не дадут её подделать, если нет валидного кода
+                subscription: localStorage.getItem('xch_sub_level') || 'free', 
+                lastUpdated: serverTimestamp()
+            };
+
+            try {
+                // Отправляем с merge: true (обновляем только эти поля)
+                await setDoc(userRef, dataToSave, { merge: true });
+                
+                // Обновляем UI
+                const now = Date.now();
+                localStorage.setItem('xch_last_sync_ts', now);
+                if(window.updateLastSyncUI) window.updateLastSyncUI();
+                
+                // Сбрасываем статус в интерфейсе (если был)
+                const statusText = document.getElementById('last-sync-date');
+                if(statusText) {
+                    // Возвращаем дату (можно вызвать updateLastSyncUI, но для красоты сбросим текст)
+                    statusText.style.opacity = '0.8'; 
+                }
+                
+                console.log(`☁️ Synced: ${cloudLog.length} logs sent (Local: ${fullLog.length})`);
+            } catch (e) {
+                console.error("Auto-save error:", e);
+            }
         };
 
-        try {
-            await setDoc(userRef, dataToSave, { merge: true });
+        // 3. ЛОГИКА DEBOUNCE (Задержка)
+        if (syncTimeout) clearTimeout(syncTimeout); // Сбрасываем предыдущий таймер
+
+        if (immediate) {
+            // Если флаг true (например, при закрытии вкладки) — сохраняем мгновенно
+            await performSave();
+        } else {
+            // Иначе показываем юзеру, что процесс идет, и ждем 5 секунд
+            const statusText = document.getElementById('last-sync-date');
+            if(statusText) {
+                statusText.style.display = 'inline';
+                statusText.innerText = "Syncing...";
+            }
             
-            // Обновляем дату
-            const now = Date.now();
-            localStorage.setItem('xch_last_sync_ts', now);
-            window.updateLastSyncUI();
-            
-            console.log("Auto-save success. Items saved:", dataToSave.favorites.length);
-        } catch (e) {
-            console.error("Auto-save error:", e);
+            // Запускаем таймер
+            syncTimeout = setTimeout(performSave, 5000);
         }
     };
+
+    window.db = db;
+    window.generateBestieCodes = generateBestieCodes;
+
+    // Функция генерации (вставь её прямо в код приложения временно)
+    import { writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"; 
+
+    async function generateBestieCodes() {
+        console.log("⏳ Generating 50 BESTIE codes...");
+        
+        const batch = writeBatch(db);
+        const codesList = [];
+        const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // Без I, 1, 0, O чтобы не путать
+        
+        for (let i = 0; i < 50; i++) {
+            // Генерируем случайный хвост: XXXX-XXXX
+            let suffix = "";
+            for(let k=0; k<8; k++) {
+                if(k===4) suffix += "-";
+                suffix += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            
+            const code = `BESTIE-${suffix}`;
+            codesList.push(code);
+            
+            const ref = doc(db, "promocodes", code);
+            
+            batch.set(ref, {
+                active: true,
+                type: "bestie",
+                days: 36500, // 100 лет (считаем как Lifetime)
+                createdAt: new Date() // Текущая дата сервера
+            });
+        }
+
+        try {
+            await batch.commit();
+            console.log("✅ SUCCESS! 50 Codes generated.");
+            console.log("👇 COPY THESE CODES 👇");
+            console.log(codesList.join("\n")); // Выведет списком для копирования
+        } catch (e) {
+            console.error("❌ Error generating codes:", e);
+        }
+    }
 
 </script>
 
@@ -3835,6 +4057,11 @@
     const TAG_DECAY_RATE = 0.98;
     const WRAPPED_THRESHOLD = 30;
     let data = [];
+
+    const earlySponsors = [
+        { name: "Alex M.", date: "Jan 2026" },
+        { name: "CryptoWhale", date: "Jan 2026" }
+    ];
 
     const DECO_IMAGES = [
         'deco1.png', 'deco2.png', 'deco3.png', 'deco4.png', 'deco5.png',
@@ -4040,6 +4267,20 @@
             expl_hist: "From Archives 📜",
             deco_label: "Show Decorations",
 
+            plan_bestie_sub: "Lifetime",
+            plan_bestie_price: "/ once",
+            badge_limited: "LIMITED OFFER",
+            limit_burn: "🔥 ALMOST GONE",
+            limit_claimed: "claimed",
+            feat_lifetime: "♾️ <b>Lifetime Access</b>",
+            feat_onetime: "💸 One-time payment",
+            btn_get_bestie: "Get Forever",
+
+            // --- Sponsors ---
+            btn_early_sponsors: "Early Sponsors 💎",
+            sponsors_title: "Wall of Fame",
+            sponsors_desc: "These legends supported xFetishHub at the very beginning by purchasing the Bestie plan. Forever grateful! 💙",
+
             return_phrases: [
                 "A whole {t}. You acted surely 😏",
                 "Back after {t}. Did you enjoy it? 🔥",
@@ -4106,6 +4347,8 @@
             feat_stats_basic: "📊 Basic Statistics",
             feat_filters: "✔️ Standard Filters",
             btn_current: "Current Plan",
+            feat_wrapped_limited: "🎁 1 Fetish Wrapped / week",
+            feat_wrapped_unlim: "✨ <b>Unlimited</b> Fetish Wrapped",
 
             feat_unlim: "🔥 Unlimited Generations",
             feat_stats_adv: "📈 Advanced Stats & History",
@@ -4368,6 +4611,20 @@
             expl_hist: "Из архивов 📜",
             deco_label: "Показывать декор",
 
+            plan_bestie_sub: "Навсегда",
+            plan_bestie_price: "/ разово",
+            badge_limited: "ОГРАНИЧЕНО",
+            limit_burn: "🔥 СКОРО РАЗБЕРУТ",
+            limit_claimed: "забрали",
+            feat_lifetime: "♾️ <b>Доступ навсегда</b>",
+            feat_onetime: "💸 Разовый платёж",
+            btn_get_bestie: "Купить навсегда",
+
+            // --- Sponsors ---
+            btn_early_sponsors: "Ранние спонсоры 💎",
+            sponsors_title: "Зал Славы",
+            sponsors_desc: "Эти легенды поддержали xFetishHub в самом начале, купив тариф Bestie. Бесконечно благодарен! 💙",
+
             return_phrases: [
                 "Целых {t}. Ты действовал наверняка 😏",
                 "С возвращением спустя {t}. Понравилось? 🔥",
@@ -4434,6 +4691,8 @@
             feat_stats_basic: "📊 Базовая статистика",
             feat_filters: "✔️ Стандартные фильтры",
             btn_current: "Текущий план",
+            feat_wrapped_limited: "🎁 1 Fetish Wrapped / неделю",
+            feat_wrapped_unlim: "✨ <b>Безлимитный</b> Wrapped",
 
             feat_unlim: "🔥 Безлимитные генерации",
             feat_stats_adv: "📈 Расширенные сводки",
@@ -4693,6 +4952,21 @@
             expl_undo: "¿Cambiaste de opinión? 😏",
             expl_hist: "De los archivos 📜",
             deco_label: "Mostrar decoración",
+
+            plan_bestie_sub: "De por vida",
+            plan_bestie_price: "/ una vez",
+            badge_limited: "OFERTA LIMITADA",
+            limit_burn: "🔥 CASI AGOTADO",
+            limit_claimed: "reclamados",
+            feat_lifetime: "♾️ <b>Acceso de por vida</b>",
+            feat_onetime: "💸 Pago único",
+            btn_get_bestie: "Obtener para siempre",
+
+            // --- Sponsors ---
+            btn_early_sponsors: "Patrocinadores 💎",
+            sponsors_title: "Muro de la Fama",
+            sponsors_desc: "Estas leyendas apoyaron xFetishHub al principio comprando el plan Bestie. ¡Eternamente agradecido! 💙",
+
             return_phrases: [
                 "Todo un {t}. Fuiste a lo seguro 😏",
                 "De vuelta tras {t}. ¿Te gustó? 🔥",
@@ -4770,6 +5044,9 @@
             feat_stats_basic: "📊 Estadísticas Básicas",
             feat_filters: "✔️ Filtros Estándar",
             btn_current: "Plan Actual",
+
+            feat_wrapped_limited: "🎁 1 Fetish Wrapped / semana",
+            feat_wrapped_unlim: "✨ Fetish Wrapped <b>Ilimitado</b>",
 
             feat_unlim: "🔥 Generaciones Ilimitadas",
             feat_stats_adv: "📈 Estadísticas Avanzadas",
@@ -5010,6 +5287,21 @@
             expl_undo: "Meinung geändert? 😏",
             expl_hist: "Aus dem Archiv 📜",
             deco_label: "Dekoration anzeigen",
+
+            plan_bestie_sub: "Lebenslang",
+            plan_bestie_price: "/ einmalig",
+            badge_limited: "LIMITIERTES ANGEBOT",
+            limit_burn: "🔥 FAST WEG",
+            limit_claimed: "beansprucht",
+            feat_lifetime: "♾️ <b>Lebenslanger Zugriff</b>",
+            feat_onetime: "💸 Einmalzahlung",
+            btn_get_bestie: "Für immer holen",
+
+            // --- Sponsors ---
+            btn_early_sponsors: "Frühe Sponsoren 💎",
+            sponsors_title: "Ruhmeshalle",
+            sponsors_desc: "Diese Legenden haben xFetishHub von Anfang an mit dem Bestie-Plan unterstützt. Ewig dankbar! 💙",
+
             return_phrases: [
                 "Ganze {t}. Du warst dir sicher 😏",
                 "Zurück nach {t}. Hat es dir gefallen? 🔥",
@@ -5079,6 +5371,8 @@
             feat_stats_basic: "📊 Basis-Statistik",
             feat_filters: "✔️ Standardfilter",
             btn_current: "Aktueller Plan",
+            feat_wrapped_limited: "🎁 1 Fetish Wrapped / Woche",
+            feat_wrapped_unlim: "✨ <b>Unbegrenztes</b> Wrapped",
 
             feat_unlim: "🔥 Unbegrenzte Generationen",
             feat_stats_adv: "📈 Erweiterte Statistik",
@@ -6755,7 +7049,7 @@
         document.querySelectorAll('[data-key]').forEach(el => {
             const key = el.getAttribute('data-key');
             if(t[key]) {
-                if (key.startsWith('inst_') || key.startsWith('badge_')) {
+                if (key.startsWith('inst_') || key.startsWith('badge_') || key.startsWith('feat_')) {
                     el.innerHTML = t[key];
                 } else {
                     el.innerText = t[key];
@@ -7507,21 +7801,30 @@
     }
 
     function openSubModal() {
-        // Кнопки
-        const btnFree = document.querySelector('.plan-card:nth-child(1) .plan-btn');
+        // 1. Находим кнопки
+        const btnFree = document.querySelector('.plan-card:nth-child(1) .plan-btn'); 
+        
+        // Лучше искать по классам, чтобы порядок в HTML не влиял
         const btnPro = document.querySelector('.plan-card.pro .plan-btn');
         const btnBeast = document.querySelector('.plan-card.beast .plan-btn');
+        const btnBestie = document.querySelector('.plan-card.bestie .plan-btn');
 
-        // Тексты
-        const tCurrent = langData[currentLang].btn_current || "Current Plan";
-        const tLower = langData[currentLang].btn_lower_tier || "You deserve better";
-        const tPro = langData[currentLang].btn_get_pro;
-        const tBeast = langData[currentLang].btn_get_beast;
+        // 2. Получаем текущие переводы
+        const t = langData[currentLang] || langData['en'];
+
+        const tCurrent = t.btn_current || "Current Plan";
+        const tLower = t.btn_lower_tier || "You deserve better";
+        
+        const tPro = t.btn_get_pro || "Get Pro";
+        const tBeast = t.btn_get_beast || "Unleash Beast";
+        
+        const tBestie = t.btn_get_bestie || "Get Forever"; 
 
         // Helper: Настройка кнопки
         const configureBtn = (btn, state, buyText, planType) => {
+            if (!btn) return; 
             btn.onclick = null;
-            btn.classList.remove('current', 'pro-btn', 'beast-btn');
+            btn.classList.remove('current', 'pro-btn', 'beast-btn', 'bestie-btn');
             
             if (state === 'current') {
                 btn.disabled = true;
@@ -7535,48 +7838,68 @@
             } 
             else { // 'buy'
                 btn.disabled = false;
+                
+                // Возвращаем цвета
                 if (btn.closest('.pro')) btn.classList.add('pro-btn');
                 if (btn.closest('.beast')) btn.classList.add('beast-btn');
+                if (btn.closest('.bestie')) btn.classList.add('bestie-btn');
                 
                 btn.innerText = buyText;
-                // ВАЖНО: Теперь вызываем выбор оплаты
                 btn.onclick = () => openPaymentSelection(planType);
             }
         };
 
-        // ЛОГИКА ОТОБРАЖЕНИЯ
-        if (subscriptionLevel === 'beast') {
+        // ЛОГИКА ОТОБРАЖЕНИЯ (Кто что видит)
+        if (subscriptionLevel === 'bestie') {
+            configureBtn(btnFree, 'lower', null, null);
+            configureBtn(btnPro, 'lower', null, null);
+            configureBtn(btnBeast, 'lower', null, null);
+            configureBtn(btnBestie, 'current', null, null);
+        }
+        else if (subscriptionLevel === 'beast') {
             configureBtn(btnFree, 'lower', null, null);
             configureBtn(btnPro, 'lower', null, null);
             configureBtn(btnBeast, 'current', null, null);
+            configureBtn(btnBestie, 'buy', tBestie, 'bestie'); 
         } 
         else if (subscriptionLevel === 'pro') {
             configureBtn(btnFree, 'lower', null, null);
             configureBtn(btnPro, 'current', null, null);
             configureBtn(btnBeast, 'buy', tBeast, 'beast');
+            configureBtn(btnBestie, 'buy', tBestie, 'bestie');
         } 
         else {
+            // Free user
             configureBtn(btnFree, 'current', null, null);
             configureBtn(btnPro, 'buy', tPro, 'pro');
             configureBtn(btnBeast, 'buy', tBeast, 'beast');
+            configureBtn(btnBestie, 'buy', tBestie, 'bestie');
         }
 
         document.getElementById('modal-sub-overlay').classList.add('open');
     }
 
     function openPaymentSelection(plan) {
-        // 1. Проверка авторизации
         if (!window.isUserLoggedIn) {
             openLoginModal();
             return;
         }
 
-        // 2. Если авторизован - продолжаем логику оплаты
         pendingPlan = plan;
         
         const titleEl = document.getElementById('payment-modal-title');
-        const planName = plan === 'pro' ? 'Pro' : 'Beast';
-        const price = plan === 'pro' ? '$1.99' : '$4.99';
+        
+        let planName = 'Pro';
+        let price = '$1.99';
+
+        if (plan === 'beast') {
+            planName = 'Beast';
+            price = '$4.99';
+        } else if (plan === 'bestie') {
+            planName = 'Bestie Lifetime';
+            price = '$49.99';
+        }
+
         if(titleEl) titleEl.innerText = `Get ${planName} (${price})`;
 
         document.getElementById('modal-payment-overlay').classList.add('open');
@@ -7589,30 +7912,22 @@
     }
 
     function processPayment(provider) {
-        // === ЗАГЛУШКИ ССЫЛОК ===
-        
         let url = "";
         
         if (provider === 'telegram') {
-            // Ссылка на вашего бота
             url = "https://t.me/YourBotName?start=" + pendingPlan; 
         } 
         else if (provider === 'lava') {
-            // Ссылка на товар Lava.top
-            url = pendingPlan === 'pro' ? "https://lava.top/product/pro-link" : "https://lava.top/product/beast-link";
-        }
-        else if (provider === 'crypto') {
-            // Ссылка на Cryptomus
-            url = "https://cryptomus.com/pay/your-link";
+            if (pendingPlan === 'pro') url = "https://lava.top/product/pro-link";
+            else if (pendingPlan === 'beast') url = "https://lava.top/product/beast-link";
+            else if (pendingPlan === 'bestie') url = "https://lava.top/product/bestie-link";
         }
         else if (provider === 'boosty') {
-            url = "https://boosty.to/xfetishhub";
+            url = "https://boosty.to/xfetishhub"; // На Бусти можно сделать пост с донатом 49.99
         }
+        // ... crypto ...
 
         window.open(url, '_blank');
-        
-        // После клика можно закрыть модалку или показать инструкцию
-        // closePaymentModal(null, true);
     }
 
     function promptPromoCode() {
@@ -7631,7 +7946,7 @@
         }
     }
 
-    function checkGenerationLimit() {
+    function checkGenerationLimit(onlyCheck = false) {
         if (subscriptionLevel !== 'free') return true; 
 
         const now = Date.now();
@@ -7641,46 +7956,59 @@
         let count = parseInt(localStorage.getItem('xch_limit_count') || '0');
         let startTime = parseInt(localStorage.getItem('xch_limit_start') || '0');
 
-        // Логика сброса: Если прошло 24 часа с момента старта отсчета — сбрасываем
+        // Логика сброса: Если прошло 24 часа с момента старта отсчета — сбрасываем визуально
         if (startTime > 0 && (now - startTime > oneDay)) {
-            count = 0;
-            startTime = 0;
-            localStorage.setItem('xch_limit_count', '0');
-            localStorage.setItem('xch_limit_start', '0');
+            // Если мы только проверяем, мы не должны сбрасывать данные в хранилище,
+            // но для корректной проверки мы считаем, что счетчик равен 0
+            if (!onlyCheck) {
+                count = 0;
+                startTime = 0;
+                localStorage.setItem('xch_limit_count', '0');
+                localStorage.setItem('xch_limit_start', '0');
+            } else {
+                // Для проверки притворяемся, что счетчик сброшен
+                count = 0; 
+            }
         }
 
         // Если лимит исчерпан
         if (count >= DAILY_LIMIT) {
+            // Показываем модалку и Алерт
             openSubModal();
             
-            // Вычисляем точное время сброса (Старт + 24ч)
-            const resetDate = new Date(startTime + oneDay);
+            // Вычисляем время сброса
+            const resetTime = startTime > 0 ? startTime + oneDay : now + oneDay;
+            const resetDate = new Date(resetTime);
             
-            // Форматируем: "12 янв, 14:35"
             const dateStr = resetDate.toLocaleString(currentLang, { 
                 day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
             });
 
             const t = langData[currentLang] || langData['en'];
-            // Сообщение
             let msg = currentLang === 'ru' 
                 ? `Лимит исчерпан (${DAILY_LIMIT}).\nСброс: ${dateStr}.\nКупите Pro для безлимита!` 
                 : `Daily limit reached (${DAILY_LIMIT}).\nReset: ${dateStr}.\nGet Pro for unlimited!`;
 
             alert(msg);
             
-            // Обновляем кнопку (чтобы она стала красной с датой)
+            // Обновляем кнопку (красная)
             updateSubscriptionUI();
             
             return false;
         }
 
-        // Если это первая генерация в цикле — засекаем время старта
+        // === ЕСЛИ ЭТО ТОЛЬКО ПРОВЕРКА (без списания) ===
+        if (onlyCheck) {
+            return true; 
+        }
+
+        // === СПИСАНИЕ (только если onlyCheck = false) ===
+        
+        // Если это первая генерация в цикле
         if (count === 0 || startTime === 0) {
             localStorage.setItem('xch_limit_start', now);
         }
 
-        // Увеличиваем счетчик
         count++;
         localStorage.setItem('xch_limit_count', count);
         
@@ -7698,24 +8026,43 @@
 
         const t = langData[currentLang] || langData['en'];
 
-        if (subscriptionLevel === 'pro') {
-            nameEl.innerText = "PRO";
-            nameEl.style.color = "#ff9900";
+        // Сброс стилей перед применением
+        nameEl.style.textShadow = 'none';
+        nameEl.style.fontWeight = '900';
+
+        if (subscriptionLevel === 'bestie') {
+            // === BESTIE ===
+            nameEl.innerText = "BESTIE";
+            nameEl.style.color = "#00d2ff"; // Голубой (Cyan)
+            nameEl.style.textShadow = "0 0 15px rgba(0, 210, 255, 0.4)"; // Свечение
+            
             if(badgeEl) badgeEl.style.display = 'none';
             if(btnFree) btnFree.innerText = t.btn_current;
+        
         } else if (subscriptionLevel === 'beast') {
+            // === BEAST ===
             nameEl.innerText = "BEAST";
-            nameEl.style.color = "#9b59b6";
+            nameEl.style.color = "#9b59b6"; // Фиолетовый
+            
             if(badgeEl) badgeEl.style.display = 'none';
             if(btnFree) btnFree.innerText = t.btn_current;
+
+        } else if (subscriptionLevel === 'pro') {
+            // === PRO ===
+            nameEl.innerText = "PRO";
+            nameEl.style.color = "#ff9900"; // Оранжевый
+            
+            if(badgeEl) badgeEl.style.display = 'none';
+            if(btnFree) btnFree.innerText = t.btn_current;
+
         } else {
-            // === FREE LOGIC (24H SLIDING WINDOW) ===
+            // === FREE LOGIC ===
             const count = parseInt(localStorage.getItem('xch_limit_count') || '0');
             const startTime = parseInt(localStorage.getItem('xch_limit_start') || '0');
             const now = Date.now();
             const oneDay = 24 * 60 * 60 * 1000;
 
-            // Проверяем, не пора ли сбросить (визуально)
+            // Проверяем сброс лимита
             let displayCount = count;
             if (startTime > 0 && (now - startTime > oneDay)) {
                 displayCount = 0;
@@ -7723,24 +8070,21 @@
 
             const remaining = Math.max(0, DAILY_LIMIT - displayCount);
 
-            // 1. Обновляем UI в меню аккаунта
-            nameEl.innerHTML = `FREE <span style="font-size:14px; opacity:0.6; font-weight:600; margin-left:5px;">${remaining}/${DAILY_LIMIT}</span>`;
+            // Обновляем текст в меню
+            nameEl.innerHTML = `FREE <span style="font-size:14px; opacity:0.6; font-weight:600; margin-left:5px; color:var(--text-secondary);">${remaining}/${DAILY_LIMIT}</span>`;
             nameEl.style.color = "var(--text-main)";
+            nameEl.style.fontWeight = "600";
             
+            // Показываем бейдж UPGRADE
             if(badgeEl) {
                 badgeEl.style.display = 'inline-block';
                 badgeEl.innerText = t.btn_upgrade_short || "Upgrade ⇧"; 
             }
 
-            // 2. Обновляем кнопку в модальном окне
+            // Обновляем кнопку в модальном окне (таймер/статус)
             if (btnFree) {
-                // Если счетчик запущен (startTime > 0) и мы что-то потратили
                 if (startTime > 0 && displayCount > 0) {
-                    
-                    // Время сброса = Время первого клика + 24 часа
                     const resetDate = new Date(startTime + oneDay);
-                    
-                    // Формат: "12 янв, 14:30"
                     const dateStr = resetDate.toLocaleString(currentLang, { 
                         day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
                     });
@@ -7748,19 +8092,19 @@
                     btnFree.innerText = `${t.limit_reset} ${dateStr}`;
                     
                     if (remaining === 0) {
-                        // Лимит исчерпан — красная
+                        // Лимит исчерпан
                         btnFree.style.color = "var(--highlight-red)";
                         btnFree.style.border = "1px solid var(--highlight-red)";
                         btnFree.style.background = "rgba(231, 76, 60, 0.1)";
                         btnFree.style.opacity = "1";
                     } else {
-                        // Лимит идет — серая
+                        // Лимит идет
                         btnFree.style.color = "var(--text-secondary)";
                         btnFree.style.border = "1px solid var(--border)";
                         btnFree.style.background = "var(--nav-bg)";
                     }
                 } else {
-                    // 10/10, таймер не запущен
+                    // Счетчик не запущен
                     btnFree.innerText = t.btn_current;
                     btnFree.style.color = ""; 
                     btnFree.style.background = "";
@@ -7980,6 +8324,7 @@
         card.addEventListener('touchstart', (e) => {
             if (e.target.closest('button') || e.target.closest('.related-item-btn') || e.target.closest('.capsule-trigger') || e.target.closest('.tag')) return;
             if (isGenerating) return;
+            if (!checkGenerationLimit(true)) return; 
 
             startX = e.touches[0].clientX;
             startY = e.touches[0].clientY;
@@ -8115,6 +8460,7 @@
     }
 
     function handleSwipeAction(direction) {
+        if (!checkGenerationLimit(true)) return; 
         if (isGenerating) return;
         if (currentItem) sessionHistoryStack.push(currentItem);
 
@@ -8357,6 +8703,7 @@
     }
 
     function startNewSession() {
+        if (!checkGenerationLimit(true)) return;
         const wrapper = document.getElementById('card-anim-wrapper');
         const startBtn = document.getElementById('start-btn-container');
         
@@ -9254,6 +9601,43 @@
             }
 
         }, 350);
+    }
+
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === 'hidden') {
+            // Если пользователь залогинен, форсируем сохранение (immediate = true)
+            if (window.isUserLoggedIn) {
+                console.log("App hidden, forcing save...");
+                window.syncToCloud(true);
+            }
+        }
+    });
+
+    function openSponsorsModal() {
+        const list = document.getElementById('sponsors-list');
+        list.innerHTML = '';
+
+        earlySponsors.forEach(person => {
+            const row = document.createElement('div');
+            row.className = 'ios-row';
+            row.style.cursor = 'default'; // Не кликабельно
+            row.innerHTML = `
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:18px;">💎</span>
+                    <span style="font-weight:600; color:var(--text-main);">${person.name}</span>
+                </div>
+                <span style="font-size:12px; color:var(--text-secondary);">${person.date}</span>
+            `;
+            list.appendChild(row);
+        });
+
+        document.getElementById('modal-sponsors-overlay').classList.add('open');
+    }
+
+    function closeSponsorsModal(e, force) {
+        if (force || e.target.id === 'modal-sponsors-overlay') {
+            document.getElementById('modal-sponsors-overlay').classList.remove('open');
+        }
     }
 
 </script>
