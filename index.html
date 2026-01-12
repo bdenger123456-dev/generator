@@ -2450,6 +2450,10 @@
             .plan-card { flex: 1; }
         }
 
+        #hist-list-swipes, #hist-list-watch {
+            padding-bottom: 20px;
+        }
+
         /* =========================================
         MACOS STYLE SIDEBAR (DESKTOP ONLY)
         ========================================= */
@@ -2665,6 +2669,39 @@
     </div>
     <div class="nav-item" onclick="switchTab('account')" id="nav-account">
         <span class="nav-icon">👤</span> <span data-key="nav_account">Account</span>
+    </div>
+</div>
+
+<!-- Modal History -->
+<div class="modal-overlay" id="modal-history-overlay" onclick="closeHistoryModal(event)">
+    <div class="modal" style="background:var(--sidebar-bg); max-height:85vh; display:flex; flex-direction:column;">
+        
+        <div class="modal-header">
+            <span data-key="history_title">History</span>
+            <span style="cursor:pointer" onclick="closeHistoryModal(null, true)">✕</span>
+        </div>
+
+        <!-- Контейнеры списков (Тело с прокруткой) -->
+        <div class="modal-body" style="padding: 0; flex: 1; overflow-y: auto;">
+            <div id="hist-list-swipes" style="display:block;">
+                <!-- Сюда рендерится история генераций -->
+            </div>
+            <div id="hist-list-watch" style="display:none;">
+                <!-- Сюда рендерится история времени просмотра -->
+            </div>
+        </div>
+
+        <!-- Переключатель вкладок (Footer - Прижат к низу) -->
+        <div style="padding: 15px 20px 20px 20px; flex-shrink: 0;">
+            <div class="stats-nav-capsule" style="height: 45px;">
+                <div class="stats-nav-item active" id="hist-nav-swipes" onclick="switchHistoryTab('swipes')">
+                    <span data-key="hist_tab_swipes">Swipes</span>
+                </div>
+                <div class="stats-nav-item" id="hist-nav-watch" onclick="switchHistoryTab('watch')">
+                    <span data-key="hist_tab_watch">Time</span>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -2890,10 +2927,10 @@
             <span id="last-sync-date" style="font-size:11px; color:var(--text-secondary); text-transform:none; font-weight:400; opacity:0.8; display:none;"></span>
         </div>
         
-        <!-- ОСНОВНАЯ ГРУППА -->
+        <!-- ОСНОВНАЯ ГРУППА (УПРАВЛЕНИЕ) -->
         <div class="ios-group">
             
-            <!-- 1. ВХОД / ЛИЧНЫЙ КАБИНЕТ -->
+            <!-- 1. ВХОД -->
             <div class="ios-row clickable" onclick="window.handleLoginClick()" style="padding: 12px 16px;">
                 <div style="display:flex; align-items:center; gap:12px;">
                     <span id="login-status-icon" style="font-size:20px; width:24px; text-align:center;">☁️</span>
@@ -2917,13 +2954,7 @@
                 </div>
             </div>
 
-            <!-- 3. EXPLORED -->
-            <div class="ios-row">
-                <span data-key="explored_label">Explored</span>
-                <span style="color:var(--text-secondary); font-size:16px;" id="explored-count">0 / 0</span>
-            </div>
-
-            <!-- 4. СПИСКИ (LIKED, DISLIKED, WATCH LATER) -->
+            <!-- 3. СПИСКИ -->
             <div class="ios-row clickable" onclick="openFavoritesCatalog()">
                 <span data-key="favorites_catalog">Liked</span>
                 <span class="badge" id="count-fav" style="color:var(--text-secondary); font-size:17px;">0</span>
@@ -2937,34 +2968,50 @@
                 <span class="badge" id="count-wl" style="color:var(--text-secondary); font-size:17px;">0</span>
             </div>
 
-            <!-- 5. RESET -->
+            <!-- 4. СБРОС -->
             <div class="ios-row clickable" onclick="resetAppHistory()" style="color: var(--highlight-red);">
                 <span data-key="btn_reset">Reset Data</span>
                 <span>✕</span>
             </div>
         </div>
 
-        <!-- ОТДЕЛЬНЫЕ КАПСУЛЫ (Оформление как "Сайт") -->
-        
-        <!-- СТАТИСТИКА -->
-        <div class="capsule-btn" onclick="openStatistics()" style="margin-top: 20px;">
-            <div style="display:flex; align-items:center; gap:12px;">
-                <span style="font-size:20px;">📊</span>
-                <!-- Убрали font-weight:800 и text-transform:uppercase -->
-                <span style="font-size:16px; color:var(--text-main);" data-key="btn_open_stats">Statistics</span>
+        <!-- ИНФОРМАЦИЯ -->
+        <div class="ios-header" data-key="info_header">Information</div>
+        <div class="ios-group">
+            
+            <!-- Статистика -->
+            <div class="ios-row clickable" onclick="openStatistics()">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:18px;">📊</span>
+                    <span data-key="btn_open_stats">Statistics</span>
+                </div>
+                <span style="color:var(--text-secondary)">›</span>
             </div>
-            <span style="color:var(--text-secondary)">›</span>
-        </div>
 
-        <!-- ДОРОЖНАЯ КАРТА -->
-        <div class="capsule-btn" onclick="openRoadmap()" style="margin-top: 10px;">
-            <div style="display:flex; align-items:center; gap:12px;">
-                <span style="font-size:20px;">🚀</span>
-                <span style="font-size:16px; color:var(--text-main);" data-key="btn_roadmap">Roadmap</span>
+            <!-- История (Кнопка открытия модалки) -->
+            <div class="ios-row clickable" onclick="openHistoryModal()">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:18px;">📜</span>
+                    <span data-key="history_title">History</span>
+                </div>
+                <span style="color:var(--text-secondary)">›</span>
             </div>
-            <span style="color:var(--text-secondary)">›</span>
-        </div>
 
+            <!-- Дорожная карта -->
+            <div class="ios-row clickable" onclick="openRoadmap()">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:18px;">🚀</span>
+                    <span data-key="btn_roadmap">Roadmap</span>
+                </div>
+                <span style="color:var(--text-secondary)">›</span>
+            </div>
+
+            <!-- Explored Counter -->
+             <div class="ios-row">
+                <span data-key="explored_label">Explored</span>
+                <span style="color:var(--text-secondary); font-size:16px;" id="explored-count">0 / 0</span>
+            </div>
+        </div>
     </div>
 
     <!-- BLOCK: EXTRAS & HISTORY -->
@@ -3927,6 +3974,18 @@
                     .sort((a, b) => a.ts - b.ts)
                     .slice(-5000); // Локально храним до 5000 записей для статистики
 
+                // В. История просмотров (Watch History)
+                const localWatch = window.watchHistory || [];
+                const cloudWatch = cloudData.watchHistory || [];
+                const combinedWatchMap = new Map();
+                
+                // Сливаем по timestamp (времени), чтобы убрать дубликаты
+                [...localWatch, ...cloudWatch].forEach(item => combinedWatchMap.set(item.timestamp, item));
+                
+                const mergedWatchHistory = Array.from(combinedWatchMap.values())
+                    .sort((a, b) => b.timestamp - a.timestamp) // Сортируем: новые сверху
+                    .slice(0, 100); // Храним последние 100 записей
+
                 // --- 3. ВЕСА ТЕГОВ (Tag Scores) ---
                 // Берем максимум из локального и облачного веса
                 const localScores = window.tagScores || {};
@@ -3963,6 +4022,7 @@
                 window.historyData = mergedHistory;
                 window.tagScores = mergedScores;
                 window.activityLog = mergedActivityLog;
+                window.watchHistory = mergedWatchHistory;
 
                 // Б. Обновляем LocalStorage (Полные версии)
                 localStorage.setItem('xch_favorites', JSON.stringify(mergedFav));
@@ -3971,6 +4031,7 @@
                 localStorage.setItem('xch_history', JSON.stringify(mergedHistory));
                 localStorage.setItem('xch_tag_scores', JSON.stringify(mergedScores));
                 localStorage.setItem('xch_activity_log', JSON.stringify(mergedActivityLog));
+                localStorage.setItem('xch_watch_history', JSON.stringify(mergedWatchHistory));
                 localStorage.setItem('xch_platform', mergedPlatform);
 
                 // В. Обновляем UI
@@ -4028,6 +4089,7 @@
                 blacklist: JSON.parse(localStorage.getItem('xch_blacklist')) || [],
                 watchLater: JSON.parse(localStorage.getItem('xch_watch_later')) || [],
                 tagScores: JSON.parse(localStorage.getItem('xch_tag_scores')) || {},
+                watchHistory: window.watchHistory || [],
                 
                 // ОПТИМИЗАЦИЯ: В облако льем только свежее
                 history: cloudHistory,
@@ -4147,6 +4209,8 @@
 
     let currentSlideIndex = 0;
     let slideInterval;
+    let itemBeingWatched = null; 
+    let currentHistoryTab = 'swipes';
 
     const STORAGE = {
         THEME: 'xch_theme',
@@ -4157,7 +4221,8 @@
         INTENSITY: 'xch_intensity',
         TAG_SCORES: 'xch_tag_scores',
         HISTORY: 'xch_history',
-        ACTIVITY_LOG: 'xch_activity_log'
+        ACTIVITY_LOG: 'xch_activity_log',
+        WATCH_HISTORY: 'xch_watch_history'
     };
 
     const APP_THEMES = [
@@ -4192,7 +4257,7 @@
             accent: '#ffffff', accentLight: '#cccccc'
         },
 
-        // === PRO LIGHT (Исправленные, более насыщенные фоны) ===
+        // === LIGHT ===
         { 
             id: 'blue-light', name: 'Sky', type: 'pro', isLight: true, preview: '#cce4ff',
             // Фон стал темнее (#dbeafe), чтобы белая карточка выделялась
@@ -4214,6 +4279,42 @@
             colors: { bg: '#fef3c7', sidebar: '#fffbeb', card: '#ffffff', nav: '#ffffff', border: '#fde68a' },
             accent: '#d97706', accentLight: '#fbbf24'
         },
+
+        // ===  PINK (Pink/Cyber) ===
+        { 
+            id: 'pink-dark', name: 'Cyber', type: 'pro', isLight: false, preview: '#ff00cc',
+            colors: { bg: '#12000b', sidebar: '#1a0010', card: '#2b001b', nav: '#2b001b', border: '#4d0030' },
+            accent: '#ff00cc', accentLight: '#ff66e0'
+        },
+        { 
+            id: 'pink-light', name: 'Sakura', type: 'pro', isLight: true, preview: '#ffeef8',
+            colors: { bg: '#ffeef8', sidebar: '#fff5fb', card: '#ffffff', nav: '#ffffff', border: '#fbcfe8' },
+            accent: '#db2777', accentLight: '#f472b6'
+        },
+
+        // ===  PURPLE (Amethyst/Lavender) ===
+        { 
+            id: 'purple-dark', name: 'Amethyst', type: 'pro', isLight: false, preview: '#3b005e',
+            colors: { bg: '#0d0014', sidebar: '#180026', card: '#240038', nav: '#240038', border: '#4a0072' },
+            accent: '#9d00ff', accentLight: '#c466ff'
+        },
+        { 
+            id: 'purple-light', name: 'Lavender', type: 'pro', isLight: true, preview: '#f3e8ff',
+            colors: { bg: '#f3e8ff', sidebar: '#faf5ff', card: '#ffffff', nav: '#ffffff', border: '#d8b4fe' },
+            accent: '#9333ea', accentLight: '#c084fc'
+        },
+
+        // ===  ORANGE (Magma/Peach) ===
+        { 
+            id: 'orange-dark', name: 'Magma', type: 'pro', isLight: false, preview: '#331a00',
+            colors: { bg: '#0f0700', sidebar: '#1f0f00', card: '#331a00', nav: '#331a00', border: '#663300' },
+            accent: '#ff6600', accentLight: '#ff9933'
+        },
+        { 
+            id: 'orange-light', name: 'Peach', type: 'pro', isLight: true, preview: '#fff7ed',
+            colors: { bg: '#fff7ed', sidebar: '#fffaf5', card: '#ffffff', nav: '#ffffff', border: '#fed7aa' },
+            accent: '#ea580c', accentLight: '#fb923c'
+        },
         
         // === SPECIAL ===
         { 
@@ -4229,6 +4330,7 @@
     let watchLater = JSON.parse(localStorage.getItem(STORAGE.WATCH_LATER)) || [];
     let tagScores = JSON.parse(localStorage.getItem(STORAGE.TAG_SCORES)) || {};
     let historyData = JSON.parse(localStorage.getItem(STORAGE.HISTORY)) || [];
+    let watchHistory = JSON.parse(localStorage.getItem(STORAGE.WATCH_HISTORY)) || [];
     let activityLog = JSON.parse(localStorage.getItem(STORAGE.ACTIVITY_LOG)) || [];
 
     const modifiersData = [
@@ -4300,6 +4402,24 @@
             expl_undo: "Changed your mind? 😏",
             expl_hist: "From Archives 📜",
             deco_label: "Show Decorations",
+
+            info_header: "Information",
+            hist_tab_swipes: "Swipes",
+            hist_tab_watch: "Time",
+            hist_empty_watch: "No watch data yet. Go watch something! 😏",
+
+            stats_no_data: "No data yet",
+            wrapped_lock_title: "FETISH WRAPPED 🔒",
+            wrapped_lock_desc: "Make {n} more moves to unlock your personal summary",
+            
+            // НОВЫЕ ТЕМЫ
+            "theme_pink-dark": "Cyber",
+            "theme_pink-light": "Sakura",
+            "theme_purple-dark": "Amethyst",
+            "theme_purple-light": "Lavender",
+            "theme_orange-dark": "Magma",
+            "theme_orange-light": "Peach",
+    
 
             plan_bestie_sub: "Lifetime",
             plan_bestie_price: "/ once",
@@ -4497,7 +4617,7 @@
             legend_watch: "Watch (+10)",
             legend_like: "Like / Similar (+5)",
             legend_dislike: "Other / Dislike (-10)",
-            act_actions: "Actions",
+            act_actions: "Swipes",
             act_watches: "Watches",
 
             // --- 8. Explanations (Why did I get this?) ---
@@ -4645,6 +4765,22 @@
             expl_undo: "Передумал? 😏",
             expl_hist: "Из архивов 📜",
             deco_label: "Показывать декор",
+
+            info_header: "Информация",
+            hist_tab_swipes: "Свайпы",
+            hist_tab_watch: "Время",
+            hist_empty_watch: "Данных о просмотрах нет. Иди глянь что-нибудь! 😏",
+
+            stats_no_data: "Пока нет данных",
+            wrapped_lock_title: "FETISH WRAPPED 🔒",
+            wrapped_lock_desc: "Сделайте ещё {n} действий, чтобы открыть личную сводку",
+
+            "theme_pink-dark": "Кибер",
+            "theme_pink-light": "Сакура",
+            "theme_purple-dark": "Аметист",
+            "theme_purple-light": "Лаванда",
+            "theme_orange-dark": "Магма",
+            "theme_orange-light": "Персик",
 
             plan_bestie_sub: "Навсегда",
             plan_bestie_price: "/ разово",
@@ -4843,7 +4979,7 @@
             legend_watch: "Просмотр (+10)",
             legend_like: "Лайк / Похожее (+5)",
             legend_dislike: "Другое / Дизлайк (-10)",
-            act_actions: "Действия",
+            act_actions: "Свайпы",
             act_watches: "Просмотры",
 
             // --- 8. Объяснения ---
@@ -4988,6 +5124,22 @@
             expl_undo: "¿Cambiaste de opinión? 😏",
             expl_hist: "De los archivos 📜",
             deco_label: "Mostrar decoración",
+
+            info_header: "Información",
+            hist_tab_swipes: "Deslizamientos",
+            hist_tab_watch: "Tiempo",
+            hist_empty_watch: "Aún no hay datos de visualización. ¡Ve a ver algo! 😏",
+
+            stats_no_data: "Aún no hay datos",
+            wrapped_lock_title: "FETISH WRAPPED 🔒",
+            wrapped_lock_desc: "Haz {n} movimientos más para desbloquear tu resumen",
+
+            "theme_pink-dark": "Cyber",
+            "theme_pink-light": "Sakura",
+            "theme_purple-dark": "Amatista",
+            "theme_purple-light": "Lavanda",
+            "theme_orange-dark": "Magma",
+            "theme_orange-light": "Melocotón",
 
             plan_bestie_sub: "De por vida",
             plan_bestie_price: "/ una vez",
@@ -5184,7 +5336,7 @@
             legend_watch: "Ver (+10)",
             legend_like: "Me gusta (+5)",
             legend_dislike: "Otro / No me gusta (-10)",
-            act_actions: "Acciones",
+            act_actions: "Desliza",
             act_watches: "Vistas", 
 
             // --- Explain ---
@@ -5324,6 +5476,22 @@
             expl_undo: "Meinung geändert? 😏",
             expl_hist: "Aus dem Archiv 📜",
             deco_label: "Dekoration anzeigen",
+
+            info_header: "Informationen",
+            hist_tab_swipes: "Swipes",
+            hist_tab_watch: "Zeit",
+            hist_empty_watch: "Noch keine Daten. Schau dir was an! 😏",
+
+            stats_no_data: "Noch keine Daten",
+            wrapped_lock_title: "FETISH WRAPPED 🔒",
+            wrapped_lock_desc: "Mache noch {n} Aktionen, um deine Zusammenfassung freizuschalten",
+
+            "theme_pink-dark": "Cyber",
+            "theme_pink-light": "Sakura",
+            "theme_purple-dark": "Amethyst",
+            "theme_purple-light": "Lavendel",
+            "theme_orange-dark": "Magma",
+            "theme_orange-light": "Pfirsich",
 
             plan_bestie_sub: "Lebenslang",
             plan_bestie_price: "/ einmalig",
@@ -5517,7 +5685,7 @@
             legend_watch: "Ansehen (+10)",
             legend_like: "Like (+5)",
             legend_dislike: "Andere / Dislike (-10)",
-            act_actions: "Aktionen",
+            act_actions: "Swipes",
             act_watches: "Angeschaut",
 
             // --- Explain ---
@@ -6601,14 +6769,12 @@
         if(!currentItem) return;
         
         watchStartTime = Date.now();
+        itemBeingWatched = currentItem;
 
         if(!hasInteractedWithCurrent) {
             const fullTags = getCombinedTags(currentItem);
-            
             adjustTagScoresByTags(fullTags, 3); 
-            
             hasInteractedWithCurrent = true;
-            
             logActivity('watch', currentItem.id, fullTags);
         }
     }
@@ -6976,15 +7142,13 @@
         // 1. Исходные блоки
         const bPrefs = document.getElementById('block-prefs');    
         const bAccount = document.getElementById('block-account'); 
-        const bExtras = document.getElementById('block-extras');   // Ссылки
-        const bHistory = document.getElementById('block-history'); // История (НОВОЕ)
+        const bExtras = document.getElementById('block-extras');
         
         // 2. Целевые контейнеры
         const sidebar = document.getElementById('pc-settings-mount'); 
         
-        const mPrefs = document.getElementById('mount-prefs');     // Вкладка SETTINGS
-        const mAccount = document.getElementById('mount-account'); // Вкладка ACCOUNT (Верх)
-        const mExtras = document.getElementById('mount-extras');   // Вкладка ACCOUNT (Низ)
+        const mPrefs = document.getElementById('mount-prefs');     
+        const mAccount = document.getElementById('mount-account'); 
 
         if (isPC) {
             // === ПК РЕЖИМ (ВСЁ В САЙДБАРЕ) ===
@@ -6992,10 +7156,8 @@
                 if(bPrefs) sidebar.appendChild(bPrefs);
                 if(bAccount) sidebar.appendChild(bAccount);
                 if(bExtras) sidebar.appendChild(bExtras);
-                if(bHistory) sidebar.appendChild(bHistory); // История тоже в сайдбар
             }
             
-            // Активируем главную вкладку
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             const homeTab = document.getElementById('tab-home');
             if(homeTab) homeTab.classList.add('active');
@@ -7003,25 +7165,20 @@
         } else {
             // === МОБИЛЬНЫЙ РЕЖИМ ===
             
-            // 1. Настройки -> Вкладка Settings
+            // 1. Настройки
             if(mPrefs && bPrefs) mPrefs.appendChild(bPrefs);
             
-            // 2. Ссылки (Extras) -> ТОЖЕ В SETTINGS (под настройками)
+            // 2. Ссылки (Extras) в Settings
             if(mPrefs && bExtras) {
                 bExtras.style.marginTop = "25px"; 
                 mPrefs.appendChild(bExtras);
             }
 
-            // 3. Аккаунт -> Вкладка Account
+            // 3. Аккаунт
             if(mAccount && bAccount) mAccount.appendChild(bAccount);
-
-            // 4. История -> Вкладка Account (В НИЗ)
-            if(mExtras && bHistory) {
-                // bHistory.style.marginTop = "0"; // Если нужно убрать отступ
-                mExtras.appendChild(bHistory);
-            }
         }
     }
+
     function toggleModifiers(e) {
         if (e && e.target.classList.contains('tag')) return;
 
@@ -7345,25 +7502,25 @@
         const wBtn = document.getElementById('btn-wrapped-trigger');
         const modalHeader = document.querySelector('#modal-stats-overlay .modal-header');
         
-        // Удаляем старый прогресс-бар если есть, чтобы не дублировать
         const oldProgress = document.getElementById('wrapped-progress-ui');
         if (oldProgress) oldProgress.remove();
 
         if (wData) {
-            // Если действий достаточно
             if (wData.totalActions >= WRAPPED_THRESHOLD) {
                 if(wBtn) wBtn.style.display = 'flex';
             } else {
-                // Если действий МАЛО - показываем прогресс бар
                 if(wBtn) wBtn.style.display = 'none';
                 
                 const percent = Math.min(100, (wData.totalActions / WRAPPED_THRESHOLD) * 100);
                 const left = WRAPPED_THRESHOLD - wData.totalActions;
                 
+                const titleTxt = t.wrapped_lock_title; // "FETISH WRAPPED 🔒"
+                const descTxt = t.wrapped_lock_desc.replace('{n}', left); // "Make 30 more..."
+
                 const progressHTML = `
                     <div id="wrapped-progress-ui" class="wrapped-lock-container" style="margin: 0 10px 20px 10px;">
-                        <div class="wrapped-lock-title">Fetish Wrapped 🔒</div>
-                        <div class="wrapped-lock-desc">Make ${left} more moves to unlock your personal summary</div>
+                        <div class="wrapped-lock-title">${titleTxt}</div>
+                        <div class="wrapped-lock-desc">${descTxt}</div>
                         <div class="w-progress-track">
                             <div class="w-progress-fill" style="width: ${percent}%"></div>
                         </div>
@@ -7478,7 +7635,7 @@
             let html = `<div class="chart-wrapper"><div class="chart-scroll-view">`;
 
             if(sortedTags.length === 0) {
-                html += '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-secondary);">No data yet</div>';
+                html += `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-secondary);">${t.stats_no_data}</div>`;
             } else {
                 const maxVal = Math.max(...sortedTags.map(x => x[1]));
                 
@@ -7551,7 +7708,7 @@
             let html = `<div class="chart-wrapper"><div class="chart-scroll-view" style="justify-content: flex-start;">`;
 
             if (chartData.length === 0) {
-                html += '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-secondary);">No activity yet</div>';
+                html += `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-secondary);">${t.stats_no_data}</div>`;
             } else {
                 let maxVal = 0;
                 chartData.forEach(d => {
@@ -7807,6 +7964,7 @@
             localStorage.removeItem(STORAGE.BLACKLIST);
             localStorage.removeItem(STORAGE.FAVORITES);
             localStorage.removeItem(STORAGE.WATCH_LATER);
+            localStorage.removeItem(STORAGE.WATCH_HISTORY);
             
             historyData = [];
             activityLog = [];
@@ -7814,6 +7972,7 @@
             blacklist = [];
             favorites = [];
             watchLater = [];
+            watchHistory = [];
             
             updateCounts();
             updateExploredCount();
@@ -9580,24 +9739,22 @@
     }
 
     function calculateWatchTime() {
+        // Проверка: было ли начало просмотра и есть ли сохраненный предмет
+        if (watchStartTime === 0 || !itemBeingWatched) return;
+
         const now = Date.now();
         const diffInSeconds = Math.floor((now - watchStartTime) / 1000);
         
-        // Сбрасываем таймер, чтобы не срабатывало повторно при переключении вкладок
         watchStartTime = 0; 
 
-        // Если прошло меньше 5 секунд — считаем, что это мисклик или просто закрыл сразу
-        // Ничего не меняем
+        // Игнорируем меньше 5 сек
         if (diffInSeconds < 5) return;
 
-        const t = langData[currentLang];
+        const t = langData[currentLang] || langData['en'];
         let timeString = "";
 
-        // Форматирование времени (мин + сек)
         const minutes = Math.floor(diffInSeconds / 60);
         const seconds = diffInSeconds % 60;
-
-        // Локализация единиц измерения
         const minLabel = currentLang === 'ru' ? 'мин' : 'min';
         const secLabel = currentLang === 'ru' ? 'сек' : 'sec';
 
@@ -9607,30 +9764,41 @@
             timeString = `${seconds} ${secLabel}`;
         }
 
-        // Выбор фразы
-        let phraseTemplate = "";
+        // === СОХРАНЕНИЕ В ИСТОРИЮ ===
+        const historyEntry = {
+            id: itemBeingWatched.id,
+            timestamp: Date.now(),
+            durationStr: timeString,
+            seconds: diffInSeconds
+        };
         
-        // Если меньше 40 секунд - используем фразу "быстро"
+        // Добавляем в начало
+        watchHistory.unshift(historyEntry);
+        // Храним последние 100 записей
+        if (watchHistory.length > 100) watchHistory.pop();
+        
+        localStorage.setItem(STORAGE.WATCH_HISTORY, JSON.stringify(watchHistory));
+        
+        // Обновляем облако
+        if (window.syncToCloud) window.syncToCloud();
+        // ======================================
+
+        // Показ сообщения (старый код)
+        let phraseTemplate = "";
         if (diffInSeconds < 40) {
             phraseTemplate = t.return_phrase_short || "Only {t}...";
         } else {
-            // Иначе случайную из обычных
             const phrases = t.return_phrases || ["{t} passed."];
             phraseTemplate = phrases[Math.floor(Math.random() * phrases.length)];
         }
-
-        // Подстановка времени
         const finalPhrase = phraseTemplate.replace("{t}", timeString);
 
-        // Обновление UI
         const statusEl = document.getElementById('status-text');
         if (statusEl) {
-            // Небольшая анимация исчезновения и появления
             statusEl.style.opacity = '0';
-            
             setTimeout(() => {
                 statusEl.innerText = finalPhrase;
-                statusEl.style.color = "var(--text-main)"; // Делаем текст белым/черным, чтобы выделялся
+                statusEl.style.color = "var(--text-main)";
                 statusEl.style.opacity = '1';
             }, 200);
         }
@@ -9772,6 +9940,125 @@
         if (force || e.target.id === 'modal-sponsors-overlay') {
             document.getElementById('modal-sponsors-overlay').classList.remove('open');
         }
+    }
+
+    function openHistoryModal() {
+        document.getElementById('modal-history-overlay').classList.add('open');
+        // Рендерим текущую вкладку
+        switchHistoryTab(currentHistoryTab);
+    }
+
+    function closeHistoryModal(e, force) {
+        if (force || e.target.id === 'modal-history-overlay') {
+            document.getElementById('modal-history-overlay').classList.remove('open');
+        }
+    }
+
+    function switchHistoryTab(tab) {
+        currentHistoryTab = tab;
+        
+        const btnSwipes = document.getElementById('hist-nav-swipes');
+        const btnWatch = document.getElementById('hist-nav-watch');
+        const listSwipes = document.getElementById('hist-list-swipes');
+        const listWatch = document.getElementById('hist-list-watch');
+
+        if (tab === 'swipes') {
+            btnSwipes.classList.add('active');
+            btnWatch.classList.remove('active');
+            listSwipes.style.display = 'block';
+            listWatch.style.display = 'none';
+            renderSwipesHistoryList();
+        } else {
+            btnSwipes.classList.remove('active');
+            btnWatch.classList.add('active');
+            listSwipes.style.display = 'none';
+            listWatch.style.display = 'block';
+            renderWatchHistoryList();
+        }
+    }
+
+    function renderSwipesHistoryList() {
+        const list = document.getElementById('hist-list-swipes');
+        list.innerHTML = '';
+        const t = langData[currentLang] || langData['en'];
+        
+        if (historyData.length === 0) {
+            list.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-secondary);">${t.hist_empty}</div>`;
+            return;
+        }
+
+        historyData.forEach(entry => {
+            const item = data.find(x => x.id === entry.id);
+            if(!item) return;
+            
+            // Используем стили ios-row для красоты
+            const div = document.createElement('div');
+            div.className = 'ios-row clickable';
+            div.style.padding = '12px 20px'; // Чуть больше отступ в модалке
+            
+            const name = getLocalizedName(item);
+            
+            // Дата генерации (опционально)
+            // const dateStr = new Date(entry.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+            div.innerHTML = `
+                <div style="font-weight:500;">${name}</div>
+                <div style="color:var(--accent); font-size:18px;">↺</div>
+            `;
+            
+            div.onclick = () => { 
+                closeHistoryModal(null, true);
+                switchTab('home'); 
+                forceShowResult(item, 'history'); 
+            };
+            list.appendChild(div);
+        });
+    }
+
+    function renderWatchHistoryList() {
+        const list = document.getElementById('hist-list-watch');
+        list.innerHTML = '';
+        const t = langData[currentLang] || langData['en'];
+        
+        if (watchHistory.length === 0) {
+            list.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-secondary);">${t.hist_empty_watch}</div>`;
+            return;
+        }
+
+        watchHistory.forEach(entry => {
+            const item = data.find(x => x.id === entry.id);
+            if(!item) return;
+
+            const div = document.createElement('div');
+            div.className = 'ios-row clickable';
+            div.style.padding = '12px 20px';
+
+            const name = getLocalizedName(item);
+            // Красивая дата (Например: Вчера, 14:30)
+            const d = new Date(entry.timestamp);
+            const dateStr = d.toLocaleDateString() === new Date().toLocaleDateString() 
+                ? d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) 
+                : d.toLocaleDateString([], {day:'numeric', month:'numeric'}) + ' ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+            div.innerHTML = `
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                    <div style="font-weight:600;">${name}</div>
+                    <div style="font-size:11px; color:var(--text-secondary);">${dateStr}</div>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px;">
+                    <span style="font-weight:700; color:var(--text-main); font-size:15px;">${entry.durationStr}</span>
+                    <span style="font-size:10px; color:var(--accent);">WATCHED</span>
+                </div>
+            `;
+            
+            div.onclick = () => {
+                closeHistoryModal(null, true);
+                switchTab('home');
+                forceShowResult(item, 'history');
+            };
+            
+            list.appendChild(div);
+        });
     }
 
 </script>
