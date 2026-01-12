@@ -2374,6 +2374,74 @@
             box-shadow: 0 4px 15px rgba(0, 210, 255, 0.4);
         }
 
+        /* === NOTCH & BORDER STYLES === */
+
+        /* Базовый стиль чёлки */
+        .card-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100%); /* Спрятана сверху */
+            
+            padding: 6px 16px;
+            border-radius: 0 0 14px 14px; /* Закругления только снизу */
+            
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #fff;
+            
+            z-index: 40; /* Поверх бейджей */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            
+            /* Пружинистая анимация появления */
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s;
+            pointer-events: none; /* Чтобы сквозь неё проходили клики */
+        }
+
+        /* Класс для показа чёлки */
+        .card-notch.visible {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* --- ВАРИАНТ 1: WATCH LATER (Синий) --- */
+        .card.status-wl {
+            border: 2px solid #3498db !important;
+            box-shadow: 0 0 25px rgba(52, 152, 219, 0.15) !important;
+        }
+        .card.status-wl .card-notch {
+            background: #3498db;
+            box-shadow: 0 5px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        /* --- ВАРИАНТ 2: FAVORITE (Зеленый) --- */
+        .card.status-fav {
+            border: 2px solid #2ecc71 !important;
+            box-shadow: 0 0 25px rgba(46, 204, 113, 0.15) !important;
+        }
+        .card.status-fav .card-notch {
+            background: #2ecc71;
+            box-shadow: 0 5px 20px rgba(46, 204, 113, 0.4);
+        }
+
+        /* --- ВАРИАНТ 3: DISLIKED (Красный) - на случай просмотра истории --- */
+        .card.status-ban {
+            border: 2px solid #e74c3c !important;
+            box-shadow: 0 0 25px rgba(231, 76, 60, 0.15) !important;
+        }
+        .card.status-ban .card-notch {
+            background: #e74c3c;
+            box-shadow: 0 5px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        body.rainbow-mode .card.status-wl,
+        body.rainbow-mode .card.status-fav,
+        body.rainbow-mode .card.status-ban {
+            animation: none !important;
+            background: var(--card-gradient) !important; 
+        }
+
         /* =========================================
         18. MEDIA QUERIES (ADAPTATION)
         ========================================= */
@@ -2597,6 +2665,10 @@
 
                         <!-- КАРТОЧКА -->
                         <div class="card" id="card-block">
+
+                            <div id="card-notch" class="card-notch">
+                                <span id="card-notch-text">STATUS</span>
+                            </div>
 
                             <!-- Оверлей для цвета при свайпе -->
                             <div class="swipe-overlay"></div>
@@ -4168,11 +4240,6 @@
         }
     });
 
-    /* =================== ⚒️ DEBUG MODE =========================== */
-    // subscriptionLevel = 'pro'; 
-    // subscriptionLevel = 'beast';
-    /* =========================================================== */
-
     const DAILY_LIMIT = 10;
     let currentItem = null;
     let lastGeneratedItem = null; 
@@ -4352,6 +4419,102 @@
         de: ["Bereit für dein Genre? 😈", "Dreh das Rad der Lust!", "Lass das Schicksal entscheiden...", "Warte auf deinen Befehl..."]
     };
 
+    // === Фразы для напоминания о Watch Later ===
+    const wlReminderPhrases = {
+        en: [
+            "Seems like you wanted to watch this... 👀",
+            "You saved this for later. Is 'later' now? 😏",
+            "A reminder from your personal stash 📂",
+            "Don't let this wait forever 🔥",
+            "Your past self had good taste ✨"
+        ],
+        ru: [
+            "Кажется, ты хотел это посмотреть... 👀",
+            "Ты отложил это на потом. 'Потом' наступило? 😏",
+            "Напоминание из твоей личной коллекции 📂",
+            "Не заставляй это ждать вечно 🔥",
+            "У твоего прошлого 'я' был отличный вкус ✨"
+        ],
+        es: [
+            "Parece que querías ver esto... 👀",
+            "Guardaste esto para luego. ¿Es ahora? 😏",
+            "Un recordatorio de tu colección personal 📂",
+            "No lo hagas esperar para siempre 🔥",
+            "Tu yo del pasado tenía buen gusto ✨"
+        ],
+        de: [
+            "Scheint, als wolltest du das sehen... 👀",
+            "Du hast das für später gespeichert. Ist jetzt 'später'? 😏",
+            "Eine Erinnerung aus deiner Sammlung 📂",
+            "Lass es nicht ewig warten 🔥",
+            "Dein früheres Ich hatte guten Geschmack ✨"
+        ]
+    };
+
+    // === Фразы для напоминания о ЛЮБИМОМ (Favorites) ===
+    const favReminderPhrases = {
+        en: [
+            "Let's remember this gem? 💎",
+            "A classic from your collection ✨",
+            "Ready for round two? 🔄",
+            "You loved this one. Still do? 😏",
+            "Oldie but goldie 🔥"
+        ],
+        ru: [
+            "Давай вспомним это ещё раз? 💎",
+            "Классика твоей коллекции ✨",
+            "Готов ко второму раунду? 🔄",
+            "Тебе это нравилось. Всё ещё? 😏",
+            "Старый друг лучше новых двух 🔥"
+        ],
+        es: [
+            "¿Recordamos esta joya? 💎",
+            "Un clásico de tu colección ✨",
+            "¿Listo para la segunda ronda? 🔄",
+            "Te encantó esto. ¿Aún te gusta? 😏",
+            "Viejo pero bueno 🔥"
+        ],
+        de: [
+            "Erinnern wir uns an dieses Juwel? 💎",
+            "Ein Klassiker aus deiner Sammlung ✨",
+            "Bereit für Runde zwei? 🔄",
+            "Du hast das geliebt. Immer noch? 😏",
+            "Alt aber gold 🔥"
+        ]
+    };
+
+    // === Фразы для ВТОРОГО ШАНСА (Blacklist) ===
+    const banReminderPhrases = {
+        en: [
+            "Maybe give it another shot? 🤔",
+            "Tastes change... do yours? 🤨",
+            "Are you sure you hate this? 🧐",
+            "Everyone deserves a second chance 👻",
+            "Risky click of the day 🎲"
+        ],
+        ru: [
+            "Может дашь ещё шанс? 🤔",
+            "Вкусы меняются... а твои? 🤨",
+            "Точно уверен, что не нравится? 🧐",
+            "Все заслуживают второй шанс 👻",
+            "Рискнём ещё разок? 🎲"
+        ],
+        es: [
+            "¿Quizás darle otra oportunidad? 🤔",
+            "Los gustos cambian... ¿los tuyos? 🤨",
+            "¿Seguro que odias esto? 🧐",
+            "Todos merecen una segunda oportunidad 👻",
+            "El riesgo del día 🎲"
+        ],
+        de: [
+            "Vielleicht noch eine Chance geben? 🤔",
+            "Geschmäcker ändern sich... deiner auch? 🤨",
+            "Sicher, dass du das hasst? 🧐",
+            "Jeder verdient eine zweite Chance 👻",
+            "Risiko des Tages 🎲"
+        ]
+    };
+
     const animationPhrases = {
         en: ["Finding your fetish...", "Scanning the hub...", "What will it be?", "Looking for spicy stuff..."],
         ru: ["Ищем твой фетиш...", "Сканируем хаб...", "Что же выпадет?", "Подбираем погорячее..."],
@@ -4402,6 +4565,10 @@
             hist_tab_watch: "Time",
             hist_empty_watch: "No watch data yet. Go watch something! 😏",
             hist_watched: "WATCHED",
+
+            status_wl: "In Watch Later",
+            status_fav: "Liked",
+            status_ban: "Disliked",
 
             stats_no_data: "No data yet",
             wrapped_lock_title: "FETISH WRAPPED 🔒",
@@ -4767,6 +4934,10 @@
             hist_empty_watch: "Данных о просмотрах нет. Иди глянь что-нибудь! 😏",
             hist_watched: "ПРОСМОТРЕНО",
 
+            status_wl: "Смотреть позже",
+            status_fav: "В Избранном",
+            status_ban: "Не нравится",
+
             stats_no_data: "Пока нет данных",
             wrapped_lock_title: "FETISH WRAPPED 🔒",
             wrapped_lock_desc: "Сделайте ещё {n} действий, чтобы открыть личную сводку",
@@ -5127,6 +5298,10 @@
             hist_empty_watch: "Aún no hay datos de visualización. ¡Ve a ver algo! 😏",
             hist_watched: "VISTO",
 
+            status_wl: "Ver más tarde",
+            status_fav: "Me gusta",
+            status_ban: "No me gusta",
+
             stats_no_data: "Aún no hay datos",
             wrapped_lock_title: "FETISH WRAPPED 🔒",
             wrapped_lock_desc: "Haz {n} movimientos más para desbloquear tu resumen",
@@ -5479,6 +5654,10 @@
             hist_tab_watch: "Zeit",
             hist_empty_watch: "Noch keine Daten. Schau dir was an! 😏",
             hist_watched: "GESEHEN",
+
+            status_wl: "Später ansehen",
+            status_fav: "Gefällt mir",
+            status_ban: "Gefällt nicht",
 
             stats_no_data: "Noch keine Daten",
             wrapped_lock_title: "FETISH WRAPPED 🔒",
@@ -6435,23 +6614,36 @@
         const t = langData[currentLang];
         let reason = null;
 
-        // 1. Возврат (Кнопка Undo)
-        if (mode === 'undo') {
+        // 1. Напоминание посмотреть/повторить/одуматься
+        if (mode === 'wl_reminder') {
+            const phrases = wlReminderPhrases[currentLang] || wlReminderPhrases['en'];
+            return phrases[Math.floor(Math.random() * phrases.length)];
+        }
+        else if (mode === 'fav_reminder') {
+            const phrases = favReminderPhrases[currentLang] || favReminderPhrases['en'];
+            return phrases[Math.floor(Math.random() * phrases.length)];
+        }
+        else if (mode === 'ban_reminder') {
+            const phrases = banReminderPhrases[currentLang] || banReminderPhrases['en'];
+            return phrases[Math.floor(Math.random() * phrases.length)];
+        }
+        // 2. Возврат (Кнопка Undo)
+        else if (mode === 'undo') {
             reason = t.expl_undo; 
         }
-        // 2. История (Клик из списка)
+        // 3. История (Клик из списка)
         else if (mode === 'history') {
             reason = t.expl_hist;
         }
-        // 3. Похожее (Кнопка Similar)
+        // 4. Похожее (Кнопка Similar)
         else if (mode === 'similar') {
             reason = t.expl_sim;
         } 
-        // 4. Клик по тегу (В каталоге)
+        // 5. Клик по тегу (В каталоге)
         else if (mode === 'tag_click') {
             reason = t.expl_tag_click; 
         } 
-        // 5. Обычная генерация (Smart / Random)
+        // 6. Обычная генерация (Smart / Random)
         else {
             // === УМНЫЙ ПОИСК ПРИЧИНЫ ===
             let bestTag = null;
@@ -8849,6 +9041,82 @@
 
         randomizeDecorations();
 
+        if (mode === 'random') {
+            const roll = Math.random(); // Генерируем число от 0.0 до 1.0
+            const depth = sessionHistoryStack.length; // Глубина текущей сессии
+
+            // Хелпер для проверки валидности предмета (чтобы не дублировать код)
+            const isValidInjection = (item) => {
+                if (!item) return false;
+                if (cooldownList.includes(item.id)) return false; // Недавно было
+                
+                // Проверка ориентации (не показывать гей-контент в гетеро режиме и наоборот)
+                if (currentOrientation === 'gay' && !item.tags.includes('gay')) return false;
+                if (currentOrientation === 'hetero' && item.tags.includes('gay')) return false;
+                if (currentOrientation === 'trans' && !item.tags.some(t=>['trans','shemale'].includes(t))) return false;
+                
+                return true;
+            };
+
+            let targetItem = null;
+            let injectionMode = null;
+
+            // 1. WATCH LATER (Приоритет: Высокий, Шанс: ~12%, Глубина: >2)
+            if (roll < 0.12 && watchLater.length > 0 && depth > 2) {
+                const candidate = data.find(x => x.id === watchLater[Math.floor(Math.random() * watchLater.length)]);
+                if (isValidInjection(candidate)) {
+                    targetItem = candidate;
+                    injectionMode = 'wl_reminder';
+                }
+            }
+            
+            // 2. FAVORITES (Приоритет: Средний, Шанс: ~4% (0.12 - 0.16), Глубина: >5)
+            // Напоминаем о любимом, только если уже немного посвайпали
+            else if (roll >= 0.12 && roll < 0.16 && favorites.length > 0 && depth > 5) {
+                const candidate = data.find(x => x.id === favorites[Math.floor(Math.random() * favorites.length)]);
+                if (isValidInjection(candidate)) {
+                    targetItem = candidate;
+                    injectionMode = 'fav_reminder';
+                }
+            }
+
+            // 3. BLACKLIST (Приоритет: Низкий, Шанс: ~1.5% (0.16 - 0.175), Глубина: >10)
+            // Очень редко и только если сессия долгая
+            else if (roll >= 0.16 && roll < 0.175 && blacklist.length > 0 && depth > 10) {
+                const candidate = data.find(x => x.id === blacklist[Math.floor(Math.random() * blacklist.length)]);
+                if (isValidInjection(candidate)) {
+                    targetItem = candidate;
+                    injectionMode = 'ban_reminder';
+                }
+            }
+
+            // ЕСЛИ ВБРОС СРАБОТАЛ:
+            if (targetItem && injectionMode) {
+                console.log(`Injection Triggered: ${injectionMode}`);
+                isGenerating = true;
+                hasInteractedWithCurrent = false;
+
+                const wrapper = document.getElementById('card-anim-wrapper');
+                if(wrapper) wrapper.style.opacity = '0';
+                
+                // Запускаем с особым режимом
+                finishGeneration(targetItem, injectionMode);
+
+                if(wrapper) {
+                    wrapper.style.transform = '';
+                    void wrapper.offsetWidth; 
+                    wrapper.style.opacity = '1';
+                    const animClass = (direction === 'like') ? 'anim-fly-left' : 'anim-fly-right';
+                    wrapper.classList.add(animClass);
+                    setTimeout(() => {
+                        wrapper.classList.remove('anim-fly-right', 'anim-fly-left');
+                        wrapper.style.transform = '';
+                    }, 800);
+                }
+                return; 
+            }
+        }
+
         // 1. Модификаторы
         if (currentOrientation === 'gay') activeMods.add('Gay');
         else if (currentOrientation === 'trans') activeMods.add('Trans');
@@ -9042,6 +9310,48 @@
         }, 350);
     }
 
+    function updateCardStatusVisuals() {
+        const card = document.getElementById('card-block');
+        const notch = document.getElementById('card-notch');
+        const notchText = document.getElementById('card-notch-text');
+        
+        if (!card || !notch || !currentItem) return;
+
+        // Сброс классов
+        card.classList.remove('status-wl', 'status-fav', 'status-ban');
+        notch.classList.remove('visible');
+
+        const t = langData[currentLang];
+        let activeStatus = null;
+
+        // Проверяем статус (приоритет: Бан -> Лайк -> WL)
+        // Но обычно WL и Лайк не пересекаются, так что порядок не критичен.
+        
+        if (blacklist.includes(currentItem.id)) {
+            activeStatus = 'ban';
+            notchText.innerText = t.status_ban;
+        } 
+        else if (favorites.includes(currentItem.id)) {
+            activeStatus = 'fav';
+            notchText.innerText = t.status_fav;
+        }
+        else if (watchLater.includes(currentItem.id)) {
+            activeStatus = 'wl';
+            notchText.innerText = t.status_wl;
+        }
+
+        // Применяем
+        if (activeStatus) {
+            card.classList.add('status-' + activeStatus);
+            
+            // Небольшая задержка для чёлки, чтобы она выезжала после появления карточки
+            // Если это первый рендер
+            setTimeout(() => {
+                notch.classList.add('visible');
+            }, 50);
+        }
+    }
+
     function renderResultUI(item, mode) {
         currentItem = item;
         lastGeneratedItem = item;
@@ -9178,6 +9488,7 @@
         renderBadges();
         renderRelatedItems();
         updateActionButtons();
+        updateCardStatusVisuals();
     }
 
     function updateActionButtons() {
@@ -9227,6 +9538,7 @@
         saveLists(); 
         updateActionButtons(); 
         updateCounts();
+        updateCardStatusVisuals(); 
     }
 
     function toggleBlacklist(silent = false) {
