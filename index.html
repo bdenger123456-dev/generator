@@ -1224,8 +1224,14 @@
         }
         .history-item-ios:active { background: var(--nav-bg); }
         .history-item-ios:not(:last-child)::after {
-            content: ""; position: absolute; bottom: 0; left: 16px; right: 0; height: 1px;
-            background-color: var(--ios-separator); transform: scaleY(0.5);
+            content: ""; 
+            position: absolute; 
+            bottom: 0; 
+            left: 16px; 
+            right: 16px;
+            height: 1px;
+            background-color: var(--ios-separator); 
+            transform: scaleY(0.5);
         }
 
         /* Onboarding & Age Gate */
@@ -2162,9 +2168,93 @@
         /* Скрываем скроллбар для красоты */
         #onb-tags-container::-webkit-scrollbar { display: none; }
 
+        .version-tag {
+                font-size: 11px;
+                font-weight: 500;
+                
+                /* Сброс градиента */
+                background: none !important;
+                -webkit-text-fill-color: var(--text-secondary) !important; 
+                color: var(--text-secondary) !important;
+                
+                opacity: 0.5;
+                margin-left: 6px;
+                
+                /* Выравнивание */
+                position: relative;
+                top: 5px; /* Сдвигаем вниз от центральной линии */
+            }
+
+        /* Общий стиль для сисечек */
+        .deco-icon {
+            position: absolute;
+            z-index: 20 !important; 
+            pointer-events: none; /* Клики проходят сквозь них */
+            will-change: transform;
+        }
+
+        /* --- 1. ТЁМНАЯ ТЕМА --- */
+        .deco-icon {
+            filter: brightness(0) invert(1) drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+            opacity: 0.9;
+        }
+
+        /* --- 2. СВЕТЛАЯ ТЕМА --- */
+        body.light-theme .deco-icon {
+            filter: brightness(0) opacity(0.8) drop-shadow(0 5px 15px rgba(0, 0, 0, 0.1));
+        }
+
+        /* --- 3. РАДУЖНАЯ ТЕМА --- */
+        body.rainbow-mode .deco-icon {
+            filter: brightness(0) invert(1) drop-shadow(0 0 15px rgba(255, 0, 255, 0.8));
+        }
+
+        /* АНИМАЦИИ ПАРЕНИЯ */
+        @keyframes floatLeft {
+            0% { transform: translate3d(0, 0, 0) rotate(-20deg) scale(1); }
+            50% { transform: translate3d(-8px, -12px, 0) rotate(-15deg) scale(1.05); }
+            100% { transform: translate3d(0, 0, 0) rotate(-20deg) scale(1); }
+        }
+
+        @keyframes floatRight {
+            0% { transform: translate3d(0, 0, 0) rotate(15deg) scale(1); }
+            50% { transform: translate3d(8px, -12px, 0) rotate(20deg) scale(1.05); }
+            100% { transform: translate3d(0, 0, 0) rotate(15deg) scale(1); }
+        }
+
+        .icon-left {
+            width: 140px;
+            top: -40px; 
+            left: -20px;
+            animation: floatLeft 6s ease-in-out infinite;
+        }
+
+        .icon-right {
+            width: 110px;
+            top: -20px;
+            right: -10px;
+            animation: floatRight 7s ease-in-out infinite;
+        }
+
+        @media (max-width: 768px) {
+            /* На мобильных чуть уменьшаем и двигаем, чтобы не перекрывали текст */
+            .icon-left { width: 120px; top: -30px; left: -10px; }
+            .icon-right { width: 90px; top: -20px; right: -5px; }
+        }
+
+        body.no-deco .deco-icon {
+            display: none !important;
+        }
+
         /* =========================================
         18. MEDIA QUERIES (ADAPTATION)
         ========================================= */
+
+        @media (max-width: 768px) {
+            #row-install-app {
+                display: none !important;
+            }
+        }
 
         /* DESKTOP / TABLET (> 768px) */
         @media (min-width: 769px) {
@@ -2219,7 +2309,7 @@
         <!-- Логотип: Картинка + Текст -->
         <div class="logo">
             <img src="logo.png" alt="X" class="logo-img">
-            <span>Fetish</span>Hub
+            <span>Fetish</span>Hub <span class="version-tag">0.1</span>
         </div>
         
         <!-- Подзаголовок (Обязательно оставляем) -->
@@ -2234,7 +2324,7 @@
         <div class="mobile-header">
             <div class="logo">
                 <img src="logo.png" alt="X" class="logo-img">
-                <span>Fetish</span>Hub
+                <span>Fetish</span>Hub <span class="version-tag">0.1</span>
             </div>
             <div class="subtitle" data-key="subtitle">Your home for adult preferences</div>
         </div>
@@ -2243,74 +2333,87 @@
         <div id="tab-home" class="tab-content active">
             <div class="center-wrapper">
                 
-                <!-- ФРАЗА (Вишенка на торте - вынесена наверх визуально, но анимируется последней) -->
+                <!-- ФРАЗА (Над карточкой) -->
                 <div class="status-text-combined stagger-item delay-5" id="status-text"></div>
 
-                <!-- КАРТОЧКА -->
-                <div class="card" id="card-block">
-
-                    <div class="swipe-overlay"></div>
+                <!-- ЯКОРЬ: Добавил min-height:0 и overflow:visible -->
+                <div id="card-anchor" style="position: relative; width: 100%; display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: visible;">
                     
-                    <!-- Верхняя часть: Бейджи -->
-                    <div style="width:100%; display:flex; justify-content:center; min-height: 30px;" class="stagger-item delay-1" id="badge-container-anim">
-                        <div class="badge-wrapper" id="badge-wrapper"></div>
-                    </div>
-
-                    <!-- ЦЕНТРАЛЬНАЯ ЧАСТЬ -->
-                    <div style="width:100%; display:flex; flex-direction:column; align-items:center; justify-content: center; flex-grow: 1;">
+                    <!-- ОБЁРТКА: Исправил z-index, overflow и flex параметры -->
+                    <div id="card-anim-wrapper" style="position: relative; width: 100%; display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: visible; z-index: 10;">
                         
-                        <!-- Название -->
-                        <div class="slot-window">
-                            <div id="slot-reel" class="slot-reel">
-                                <!-- Начальный текст -->
-                                <div class="slot-item" id="result-text" style="opacity: 0.8; font-size: 32px;">Ready?</div>
-                            </div>
-                        </div>
-                        
-                        <!-- Описание -->
-                        <div id="result-desc" class="result-description stagger-item delay-2"></div>
-                        
-                        <!-- "Вам может понравиться" -->
-                        <div class="related-section hidden-initial stagger-item delay-3" id="related-block">
-                            <div class="related-title" data-key="related_header">You might also like:</div>
-                            <div class="related-tags" id="related-tags"></div>
-                        </div>
-                    </div>
+                        <!-- СИСЕЧКИ: Вернул поверх карточки (z-index: 20) -->
+                        <img src="tits1.png" class="deco-icon icon-left" alt="">
+                        <img src="tits2.png" class="deco-icon icon-right" alt="">
 
-                    <!-- НИЖНЯЯ ЧАСТЬ: Кнопки -->
-                    <div style="width:100%; display:flex; flex-direction:column; align-items:center; margin-top: auto;">
-                        
-                        <!-- 1. Кнопка СТАРТА (Внутри карточки) -->
-                        <div id="start-btn-container">
-                            <button class="btn-start-capsule" onclick="startNewSession()">
-                                🔥 <span data-key="btn_start">Let's Go</span>
-                            </button>
-                        </div>
+                        <!-- КАРТОЧКА -->
+                        <div class="card" id="card-block">
 
-                        <!-- 2. КНОПКИ TINDER (Скрыты в начале) -->
-                        <div class="tinder-nav-row hidden-initial stagger-item delay-4" id="tinder-controls">
-                            <button class="t-circle-btn small undo" id="btn-t-undo" onclick="undoLastAction()">↺</button>
-                            <button class="t-circle-btn medium dislike" id="btn-t-pass" onclick="handleSwipeAction('left')">✕</button>
-                            <a href="#" target="_blank" class="t-circle-btn large watch" id="btn-t-watch" onclick="handleOutboundClick()">▶</a>
-                            <button class="t-circle-btn medium like" id="btn-t-like" onclick="handleSwipeAction('right')">♥</button>
-                            <button class="t-circle-btn small wl" id="btn-t-wl" onclick="toggleWatchLater()">🕓</button>
-                        </div>
-
-                        <!-- 3. Модификаторы (Expandable Capsule) -->
-                        <div id="mods-block" class="hidden-initial stagger-item delay-4" style="width:100%; display: flex; justify-content: center;">
+                            <!-- Оверлей для цвета при свайпе -->
+                            <div class="swipe-overlay"></div>
                             
-                            <!-- Сама капсула -->
-                            <div id="mods-capsule" class="mods-wrapper-expanded" onclick="toggleModifiers(event)">
-                                <!-- Иконка (Плюс / Крестик) -->
-                                <div class="mods-icon-plus">+</div>
+                            <!-- Верхняя часть: Бейджи -->
+                            <div style="width:100%; display:flex; justify-content:center; min-height: 30px; flex-shrink: 0;" class="stagger-item delay-1" id="badge-container-anim">
+                                <div class="badge-wrapper" id="badge-wrapper"></div>
+                            </div>
+
+                            <!-- ЦЕНТРАЛЬНАЯ ЧАСТЬ (flex-grow: 1, чтобы занимать всё свободное место) -->
+                            <div style="width:100%; display:flex; flex-direction:column; align-items:center; justify-content: center; flex-grow: 1; overflow: hidden;">
                                 
-                                <!-- Контейнер для тегов (Сюда JS будет вставлять кнопки) -->
-                                <div class="mods-content" id="mod-container">
+                                <!-- Название (Слот-машина) -->
+                                <div class="slot-window">
+                                    <div id="slot-reel" class="slot-reel">
+                                        <!-- Начальный текст -->
+                                        <div class="slot-item" id="result-text" style="opacity: 0.8; font-size: 32px;">Ready?</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Описание -->
+                                <div id="result-desc" class="result-description stagger-item delay-2"></div>
+                                
+                                <!-- "Вам может понравиться" -->
+                                <div class="related-section hidden-initial stagger-item delay-3" id="related-block">
+                                    <div class="related-title" data-key="related_header">You might also like:</div>
+                                    <div class="related-tags" id="related-tags"></div>
                                 </div>
                             </div>
 
-                        </div>
-                    </div>
+                            <!-- НИЖНЯЯ ЧАСТЬ: Кнопки (flex-shrink: 0, чтобы не сжимались) -->
+                            <div style="width:100%; display:flex; flex-direction:column; align-items:center; margin-top: auto; flex-shrink: 0; padding-bottom: 5px;">
+                                
+                                <!-- 1. Кнопка СТАРТА (Внутри карточки) -->
+                                <div id="start-btn-container">
+                                    <button class="btn-start-capsule" onclick="startNewSession()">
+                                        🔥 <span data-key="btn_start">Let's Go</span>
+                                    </button>
+                                </div>
+
+                                <!-- 2. КНОПКИ TINDER (Скрыты в начале) -->
+                                <div class="tinder-nav-row hidden-initial stagger-item delay-4" id="tinder-controls">
+                                    <button class="t-circle-btn small undo" id="btn-t-undo" onclick="undoLastAction()">↺</button>
+                                    <button class="t-circle-btn medium dislike" id="btn-t-pass" onclick="handleSwipeAction('left')">✕</button>
+                                    <a href="#" target="_blank" class="t-circle-btn large watch" id="btn-t-watch" onclick="handleOutboundClick()">▶</a>
+                                    <button class="t-circle-btn medium like" id="btn-t-like" onclick="handleSwipeAction('right')">♥</button>
+                                    <button class="t-circle-btn small wl" id="btn-t-wl" onclick="toggleWatchLater()">🕓</button>
+                                </div>
+
+                                <!-- 3. Модификаторы (Expandable Capsule) -->
+                                <div id="mods-block" class="hidden-initial stagger-item delay-4" style="width:100%; display: flex; justify-content: center;">
+                                    
+                                    <!-- Сама капсула -->
+                                    <div id="mods-capsule" class="mods-wrapper-expanded" onclick="toggleModifiers(event)">
+                                        <!-- Иконка (Плюс / Крестик) -->
+                                        <div class="mods-icon-plus">+</div>
+                                        
+                                        <!-- Контейнер для тегов (Сюда JS будет вставлять кнопки) -->
+                                        <div class="mods-content" id="mod-container">
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div> <!-- Конец .card -->
+                    </div> <!-- Конец #card-anim-wrapper -->
                 </div>
             </div>
         </div>
@@ -2346,24 +2449,24 @@
 
 <!-- Modal Favorites -->
 <div class="modal-overlay" id="modal-overlay" onclick="closeList(event)">
-    <div class="modal"> 
+    <div class="modal" style="max-height: 85vh; display: flex; flex-direction: column;"> 
         <div class="modal-header">
             <span data-key="favorites_catalog">Liked</span>
             <span style="cursor:pointer" onclick="closeList(null, true)">✕</span>
         </div>
-        <div class="modal-body" id="modal-catalog-body" style="overflow:visible;">
+        <div class="modal-body" id="modal-catalog-body" style="overflow-y: auto; flex: 1; padding: 15px;">
         </div>
     </div>
 </div>
 
 <!-- Modal Blacklist -->
 <div class="modal-overlay" id="modal-blacklist-overlay" onclick="closeBlacklist(event)">
-    <div class="modal">
+    <div class="modal" style="max-height: 85vh; display: flex; flex-direction: column;">
         <div class="modal-header">
             <span data-key="blacklist_catalog">Disliked</span>
             <span style="cursor:pointer" onclick="closeBlacklist(null, true)">✕</span>
         </div>
-        <div class="modal-body" id="modal-blacklist-body" style="overflow:visible;">
+        <div class="modal-body" id="modal-blacklist-body" style="overflow-y: auto; flex: 1; padding: 15px;">
         </div>
     </div>
 </div>
@@ -2548,88 +2651,100 @@
                     <span style="color:var(--text-secondary)">›</span>
                 </div>
             </div>
+            <div class="ios-row">
+                <span class="toggle-text" data-key="deco_label">Show Decorations</span>
+                <label class="switch">
+                    <input type="checkbox" id="deco-toggle" checked onchange="toggleDecoIcons(this.checked)">
+                    <span class="slider"></span>
+                </label>
+            </div>
         </div>
     </div>
 
-    <!-- BLOCK: ACCOUNT-->
+    <!-- BLOCK: ACCOUNT -->
     <div id="block-account">
-            <!-- ЗАГОЛОВОК С ДАТОЙ -->
-            <div class="ios-header" style="display:flex; justify-content:space-between; align-items:baseline; padding-right: 16px;">
-                <span data-key="nav_account">Account</span>
-                <span id="last-sync-date" style="font-size:11px; color:var(--text-secondary); text-transform:none; font-weight:400; opacity:0.8; display:none;"></span>
-            </div>
+        <!-- ЗАГОЛОВОК С ДАТОЙ -->
+        <div class="ios-header" style="display:flex; justify-content:space-between; align-items:baseline; padding-right: 16px;">
+            <span data-key="nav_account">Account</span>
+            <span id="last-sync-date" style="font-size:11px; color:var(--text-secondary); text-transform:none; font-weight:400; opacity:0.8; display:none;"></span>
+        </div>
+        
+        <!-- ОСНОВНАЯ ГРУППА -->
+        <div class="ios-group">
             
-            <!-- ЕДИНАЯ ГРУППА (Вход + Подписка + Списки) -->
-            <div class="ios-group">
-                
-                <!-- 1. ВХОД / ЛИЧНЫЙ КАБИНЕТ -->
-                <div class="ios-row clickable" onclick="window.handleLoginClick()" style="padding: 12px 16px;">
-                    <div style="display:flex; align-items:center; gap:12px;">
-                        <span id="login-status-icon" style="font-size:20px; width:24px; text-align:center;">☁️</span>
-                        <span id="login-btn-text" style="font-weight:600; font-size:17px; color:var(--text-main);" data-key="login_text">Sync Data</span>
+            <!-- 1. ВХОД / ЛИЧНЫЙ КАБИНЕТ -->
+            <div class="ios-row clickable" onclick="window.handleLoginClick()" style="padding: 12px 16px;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <span id="login-status-icon" style="font-size:20px; width:24px; text-align:center;">☁️</span>
+                    <span id="login-btn-text" style="font-weight:600; font-size:17px; color:var(--text-main);" data-key="login_text">Sync Data</span>
+                </div>
+                <span style="color:var(--text-secondary)">›</span>
+            </div>
+
+            <!-- 2. ПОДПИСКА -->
+            <div class="ios-row clickable" onclick="openSubModal()" style="padding: 12px 16px;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <span style="font-size:20px; width:24px; text-align:center;">⭐</span>
+                    <div style="display:flex; flex-direction:column;">
+                        <span id="current-plan-name" style="font-weight:600; font-size:17px; color:var(--text-main);">FREE</span>
+                        <span style="font-size:11px; color:var(--text-secondary);" data-key="lbl_current_plan">Current Plan</span>
                     </div>
+                </div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span id="upgrade-badge" style="font-size:11px; font-weight:700; background:rgba(255,153,0,0.15); color:var(--accent); padding:4px 8px; border-radius:6px; text-transform:uppercase;">UPGRADE</span>
                     <span style="color:var(--text-secondary)">›</span>
                 </div>
-
-                <!-- 2. ПОДПИСКА -->
-                <div class="ios-row clickable" onclick="openSubModal()" style="padding: 12px 16px;">
-                    <div style="display:flex; align-items:center; gap:12px;">
-                        <span style="font-size:20px; width:24px; text-align:center;">⭐</span>
-                        <div style="display:flex; flex-direction:column;">
-                            <span id="current-plan-name" style="font-weight:600; font-size:17px; color:var(--text-main);">FREE</span>
-                            <span style="font-size:11px; color:var(--text-secondary);" data-key="lbl_current_plan">Current Plan</span>
-                        </div>
-                    </div>
-                    <!-- Бейдж апгрейда -->
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span id="upgrade-badge" style="font-size:11px; font-weight:700; background:rgba(255,153,0,0.15); color:var(--accent); padding:4px 8px; border-radius:6px; text-transform:uppercase;">UPGRADE</span>
-                        <span style="color:var(--text-secondary)">›</span>
-                    </div>
-                </div>
-
-                <!-- 3. EXPLORED -->
-                <div class="ios-row">
-                    <span data-key="explored_label">Explored</span>
-                    <span style="color:var(--text-secondary); font-size:16px;" id="explored-count">0 / 0</span>
-                </div>
-
-                <!-- 4. LIKED -->
-                <div class="ios-row clickable" onclick="openFavoritesCatalog()">
-                    <span data-key="favorites_catalog">Liked</span>
-                    <span class="badge" id="count-fav" style="color:var(--text-secondary); font-size:17px;">0</span>
-                </div>
-
-                <!-- 5. DISLIKED (Добавлен счетчик) -->
-                <div class="ios-row clickable" onclick="openBlacklistCatalog()">
-                    <span data-key="blacklist_catalog">Disliked</span>
-                    <span class="badge" id="count-ban" style="color:var(--text-secondary); font-size:17px;">0</span>
-                </div>
-
-                <!-- 6. WATCH LATER -->
-                <div class="ios-row clickable" onclick="openWatchLaterCatalog()">
-                    <span data-key="watch_later">Watch Later</span>
-                    <span class="badge" id="count-wl" style="color:var(--text-secondary); font-size:17px;">0</span>
-                </div>
-
-                <!-- 7. RESET -->
-                <div class="ios-row clickable" onclick="resetAppHistory()" style="color: var(--highlight-red);">
-                    <span data-key="btn_reset">Reset Data</span>
-                    <span>✕</span>
-                </div>
             </div>
 
-            <!-- ОТДЕЛЬНАЯ КАПСУЛА СТАТИСТИКИ -->
-            <div class="capsule-btn" onclick="openStatistics()" style="background: linear-gradient(135deg, var(--card-bg) 0%, var(--nav-bg) 100%); border: 1px solid var(--accent); justify-content:center; gap:10px; margin-top:10px;">
-                <span style="font-size:20px;">📊</span>
-                <span style="font-weight:800; text-transform:uppercase; color:var(--text-main);" data-key="btn_open_stats">Open Statistics</span>
+            <!-- 3. EXPLORED -->
+            <div class="ios-row">
+                <span data-key="explored_label">Explored</span>
+                <span style="color:var(--text-secondary); font-size:16px;" id="explored-count">0 / 0</span>
             </div>
 
-            <div class="capsule-btn" onclick="openRoadmap()" style="background: linear-gradient(135deg, var(--card-bg) 0%, var(--nav-bg) 100%); border: 1px solid var(--border); justify-content:center; gap:10px; margin-top:10px;">
-                <span style="font-size:20px;">🚀</span>
-                <span style="font-weight:800; text-transform:uppercase; color:var(--text-secondary);" data-key="btn_roadmap">Roadmap</span>
+            <!-- 4. СПИСКИ (LIKED, DISLIKED, WATCH LATER) -->
+            <div class="ios-row clickable" onclick="openFavoritesCatalog()">
+                <span data-key="favorites_catalog">Liked</span>
+                <span class="badge" id="count-fav" style="color:var(--text-secondary); font-size:17px;">0</span>
+            </div>
+            <div class="ios-row clickable" onclick="openBlacklistCatalog()">
+                <span data-key="blacklist_catalog">Disliked</span>
+                <span class="badge" id="count-ban" style="color:var(--text-secondary); font-size:17px;">0</span>
+            </div>
+            <div class="ios-row clickable" onclick="openWatchLaterCatalog()">
+                <span data-key="watch_later">Watch Later</span>
+                <span class="badge" id="count-wl" style="color:var(--text-secondary); font-size:17px;">0</span>
             </div>
 
+            <!-- 5. RESET -->
+            <div class="ios-row clickable" onclick="resetAppHistory()" style="color: var(--highlight-red);">
+                <span data-key="btn_reset">Reset Data</span>
+                <span>✕</span>
+            </div>
         </div>
+
+        <!-- ОТДЕЛЬНЫЕ КАПСУЛЫ (Оформление как "Сайт") -->
+        
+        <!-- СТАТИСТИКА -->
+        <div class="capsule-btn" onclick="openStatistics()" style="margin-top: 20px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+                <span style="font-size:20px;">📊</span>
+                <!-- Убрали font-weight:800 и text-transform:uppercase -->
+                <span style="font-size:16px; color:var(--text-main);" data-key="btn_open_stats">Statistics</span>
+            </div>
+            <span style="color:var(--text-secondary)">›</span>
+        </div>
+
+        <!-- ДОРОЖНАЯ КАРТА -->
+        <div class="capsule-btn" onclick="openRoadmap()" style="margin-top: 10px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+                <span style="font-size:20px;">🚀</span>
+                <span style="font-size:16px; color:var(--text-main);" data-key="btn_roadmap">Roadmap</span>
+            </div>
+            <span style="color:var(--text-secondary)">›</span>
+        </div>
+
+    </div>
 
     <!-- BLOCK: EXTRAS & HISTORY -->
     <div id="block-extras">
@@ -2652,7 +2767,7 @@
                 <span style="color:var(--text-secondary)">↗</span>
             </div>
 
-            <div class="ios-row clickable" onclick="openQRModal()">
+            <div id="row-install-app" class="ios-row clickable" onclick="openQRModal()">
                 <span data-key="btn_install_phone">Install on Phone</span>
                 <div style="display:flex; align-items:center; gap:10px;">
                     <span style="font-size:20px;">📱</span>
@@ -2684,12 +2799,10 @@
                 <span style="color:var(--text-secondary)">›</span>
             </div>
         </div>
-
-        <!-- ИСТОРИЯ -->
-        <div class="history-section" style="border:none; margin-top:20px;">
-            <div class="ios-header" data-key="history_title">History</div>
-            <div class="ios-group" id="history-list"></div>
-        </div>
+    </div>
+    <div id="block-history" style="margin-top:20px;">
+        <div class="ios-header" data-key="history_title">History</div>
+        <div class="ios-group" id="history-list"></div>
     </div>
 
 </div>
@@ -3649,7 +3762,7 @@
     let data = [];
 
     /* =================== ⚒️ DEBUG MODE =========================== */
-    // subscriptionLevel = 'pro'; 
+    subscriptionLevel = 'pro'; 
     // subscriptionLevel = 'beast';
     /* =========================================================== */
 
@@ -3835,6 +3948,8 @@
             sync_label: "Synced: ",
             expl_undo: "Changed your mind? 😏",
             expl_hist: "From Archives 📜",
+
+            deco_label: "Show Decorations",
 
             auth_title: "Sync & Backup",
             auth_p1: "Store history and preferences on all devices",
@@ -4146,6 +4261,8 @@
             expl_undo: "Передумал? 😏",
             expl_hist: "Из архивов 📜",
 
+            deco_label: "Показывать декор",
+
             auth_title: "Синхронизация",
             auth_p1: "Хранение истории и предпочтений на всех устройствах",
             auth_p2: "Активация Pro / Beast статуса",
@@ -4236,6 +4353,8 @@
             "theme_rainbow": "Радуга",
             "theme_dark": "Тёмная",
             "theme_light": "Светлая",
+
+            history_title: "История",
 
 
             logout_text: "Выйти",
@@ -4451,6 +4570,8 @@
             sync_label: "Sinc: ",
             expl_undo: "¿Cambiaste de opinión? 😏",
             expl_hist: "De los archivos 📜",
+
+            deco_label: "Mostrar decoración",
 
             auth_title: "Sincronización",
             auth_p1: "Historial y preferencias en todos los dispositivos",
@@ -4751,6 +4872,8 @@
             sync_label: "Sync: ",
             expl_undo: "Meinung geändert? 😏",
             expl_hist: "Aus dem Archiv 📜",
+
+            deco_label: "Dekoration anzeigen",
 
             auth_title: "Synchronisierung",
             auth_p1: "Verlauf und Vorlieben auf allen Geräten speichern",
@@ -5404,6 +5527,7 @@
         initLanguage();
         initTheme();
         initIntensity();
+        initDecoSettings();
         renderModifiers();
         renderHistory();
         updateCounts();
@@ -6364,15 +6488,18 @@
     function checkLayout() {
         const isPC = window.innerWidth > 768;
         
-        // 1. Исходные блоки (Что переносим)
-        const bPrefs = document.getElementById('block-prefs');
-        const bAccount = document.getElementById('block-account');
-        const bExtras = document.getElementById('block-extras');
+        // 1. Исходные блоки
+        const bPrefs = document.getElementById('block-prefs');    
+        const bAccount = document.getElementById('block-account'); 
+        const bExtras = document.getElementById('block-extras');   // Ссылки
+        const bHistory = document.getElementById('block-history'); // История (НОВОЕ)
         
-        // 2. Целевые контейнеры (Куда переносим)
-        const sidebar = document.getElementById('pc-settings-mount');
-        const mPrefs = document.getElementById('mount-prefs');     // Вкладка НАСТРОЙКИ
-        const mAccount = document.getElementById('mount-account'); // Вкладка АККАУНТ
+        // 2. Целевые контейнеры
+        const sidebar = document.getElementById('pc-settings-mount'); 
+        
+        const mPrefs = document.getElementById('mount-prefs');     // Вкладка SETTINGS
+        const mAccount = document.getElementById('mount-account'); // Вкладка ACCOUNT (Верх)
+        const mExtras = document.getElementById('mount-extras');   // Вкладка ACCOUNT (Низ)
 
         if (isPC) {
             // === ПК РЕЖИМ (ВСЁ В САЙДБАРЕ) ===
@@ -6380,9 +6507,10 @@
                 if(bPrefs) sidebar.appendChild(bPrefs);
                 if(bAccount) sidebar.appendChild(bAccount);
                 if(bExtras) sidebar.appendChild(bExtras);
+                if(bHistory) sidebar.appendChild(bHistory); // История тоже в сайдбар
             }
             
-            // Активируем главную вкладку, скрываем мобильные
+            // Активируем главную вкладку
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             const homeTab = document.getElementById('tab-home');
             if(homeTab) homeTab.classList.add('active');
@@ -6390,21 +6518,25 @@
         } else {
             // === МОБИЛЬНЫЙ РЕЖИМ ===
             
-            // 1. Настройки (Preferences) -> Вкладка Settings
+            // 1. Настройки -> Вкладка Settings
             if(mPrefs && bPrefs) mPrefs.appendChild(bPrefs);
             
-            // 2. Дополнительно (Extras) -> ТЕПЕРЬ ТОЖЕ В SETTINGS (ПОД НАСТРОЙКАМИ)
+            // 2. Ссылки (Extras) -> ТОЖЕ В SETTINGS (под настройками)
             if(mPrefs && bExtras) {
-                // Добавляем небольшой отступ сверху для красоты, если нужно
-                bExtras.style.marginTop = "20px"; 
+                bExtras.style.marginTop = "25px"; 
                 mPrefs.appendChild(bExtras);
             }
 
             // 3. Аккаунт -> Вкладка Account
             if(mAccount && bAccount) mAccount.appendChild(bAccount);
+
+            // 4. История -> Вкладка Account (В НИЗ)
+            if(mExtras && bHistory) {
+                // bHistory.style.marginTop = "0"; // Если нужно убрать отступ
+                mExtras.appendChild(bHistory);
+            }
         }
     }
-
     function toggleModifiers(e) {
         if (e && e.target.classList.contains('tag')) return;
 
@@ -7675,16 +7807,22 @@
         const card = document.getElementById('card-block');
         const overlay = document.querySelector('.swipe-overlay'); 
         
-        // Находим элементы, которые нужно размывать (текст, слот, бейджи)
-        // Мы ищем их заранее, чтобы не нагружать процессор при каждом движении
+        // Ищем иконки (теперь они вне карточки, но querySelector найдет их)
+        const iconLeft = document.querySelector('.icon-left');
+        const iconRight = document.querySelector('.icon-right');
+
         const blurTargets = [
-            document.getElementById('slot-reel'),     // Барабан
-            document.getElementById('result-desc'),   // Описание
-            document.getElementById('badge-wrapper'), // Бейджи
-            document.getElementById('related-block')  // Похожее
+            document.getElementById('slot-reel'),
+            document.getElementById('result-desc'),
+            document.getElementById('badge-wrapper'),
+            document.getElementById('related-block')
         ];
 
         if (!card) return;
+
+        // Базовые углы (должны совпадать с CSS @keyframes 0%)
+        const leftBaseRot = -20;
+        const rightBaseRot = 15;
 
         card.addEventListener('touchstart', (e) => {
             if (e.target.closest('button') || e.target.closest('.related-item-btn') || e.target.closest('.capsule-trigger') || e.target.closest('.tag')) return;
@@ -7696,9 +7834,18 @@
             currentY = startY;
             isDragging = true;
             
-            // Убираем плавность для мгновенной реакции
+            // 1. СТОП АНИМАЦИИ (чтобы управлять пальцем)
             card.style.transition = 'none';
             if(overlay) overlay.style.transition = 'none';
+            
+            if(iconLeft) {
+                iconLeft.style.transition = 'none';
+                iconLeft.style.animation = 'none'; // Пауза парения
+            }
+            if(iconRight) {
+                iconRight.style.transition = 'none';
+                iconRight.style.animation = 'none'; // Пауза парения
+            }
             
         }, {passive: false});
 
@@ -7708,43 +7855,35 @@
             currentX = e.touches[0].clientX;
             currentY = e.touches[0].clientY;
             let deltaX = currentX - startX;
-            let deltaY = currentY - startY;
+            let deltaY = currentY - startY; 
 
-            // Блокируем вертикальный скролл страницы при свайпе
-            if (Math.abs(deltaX) > 10) {
-                 if (e.cancelable) e.preventDefault();
-            }
+            if (Math.abs(deltaX) > 10 && e.cancelable) e.preventDefault();
 
-            // Двигаем карточку
+            // Карточка
             let rotate = deltaX * 0.05;
             card.style.transform = `translateX(${deltaX}px) rotate(${rotate}deg)`;
 
-            // === ГЛАВНОЕ: РУЧНОЕ РАЗМЫТИЕ И ЦВЕТ ===
-            // Рассчитываем силу эффекта (от 0 до 1)
-            // 150px свайпа = максимальный эффект
-            const progress = Math.min(Math.abs(deltaX) / 150, 1);
-            
-            if (overlay) {
-                // Заливаем оверлей цветом через RGBA (прозрачность зависит от progress)
-                // 0.85 = максимальная непрозрачность цвета
-                const alpha = progress * 0.85; 
-                
-                if (deltaX > 0) {
-                    // ВПРАВО (Зеленый)
-                    overlay.style.backgroundColor = `rgba(46, 204, 113, ${alpha})`; 
-                } else {
-                    // ВЛЕВО (Красный)
-                    overlay.style.backgroundColor = `rgba(231, 76, 60, ${alpha})`; 
-                }
+            // ПАРАЛЛАКС ЭФФЕКТ
+            if (iconLeft) {
+                // Левая: движется сильно (ближний план)
+                iconLeft.style.transform = `translate(${deltaX * 1.2}px, ${deltaY * 0.6}px) rotate(${leftBaseRot + (deltaX * 0.1)}deg)`;
+            }
+            if (iconRight) {
+                // Правая: движется слабее (средний план)
+                iconRight.style.transform = `translate(${deltaX * 0.7}px, ${deltaY * 0.3}px) rotate(${rightBaseRot - (deltaX * 0.05)}deg)`;
             }
 
-            // ПРИМЕНЯЕМ BLUR К КОНТЕНТУ
-            const blurAmount = progress * 10; // Максимум 10px блюра
-            blurTargets.forEach(el => {
-                if(el) el.style.filter = `blur(${blurAmount}px)`;
-            });
+            // Оверлей
+            const progress = Math.min(Math.abs(deltaX) / 150, 1);
+            if (overlay) {
+                const alpha = progress * 0.85; 
+                if (deltaX > 0) overlay.style.backgroundColor = `rgba(46, 204, 113, ${alpha})`; 
+                else overlay.style.backgroundColor = `rgba(231, 76, 60, ${alpha})`; 
+            }
+            const blurAmount = progress * 10;
+            blurTargets.forEach(el => { if(el) el.style.filter = `blur(${blurAmount}px)`; });
 
-        }, {passive: false}); // passive: false важен для e.preventDefault()
+        }, {passive: false});
 
         card.addEventListener('touchend', (e) => {
             if (!isDragging) return;
@@ -7752,81 +7891,96 @@
             
             let deltaX = currentX - startX;
             
-            // Если свайп успешный (далеко протащили)
             if (Math.abs(deltaX) > 100) {
+                // === УЛЕТАЮТ ===
                 const direction = deltaX > 0 ? 'right' : 'left';
-                const endX = deltaX > 0 ? window.innerWidth + 100 : -window.innerWidth - 100;
+                const endX = deltaX > 0 ? window.innerWidth + 150 : -window.innerWidth - 150;
                 
-                animateSwipeEnd(endX, direction); 
-            } else {
                 
-                // Сброс блюра
-                blurTargets.forEach(el => {
-                    if(el) {
-                        el.style.transition = 'filter 0.3s ease';
-                        el.style.filter = 'none';
-                    }
-                });
-                
-                // Сброс цвета
-                if (overlay) {
-                    overlay.style.transition = 'background-color 0.3s ease';
-                    overlay.style.backgroundColor = 'transparent';
+                const card = document.getElementById('card-block');
+                card.style.transition = 'transform 0.3s ease-out';
+                card.style.transform = `translateX(${endX}px) rotate(${endX * 0.05}deg)`;
+
+                // Убираем иконки красиво
+                const iconLeft = document.querySelector('.icon-left');
+                const iconRight = document.querySelector('.icon-right');
+                if(iconLeft) {
+                    iconLeft.style.transition = 'transform 0.3s ease-out, opacity 0.3s';
+                    iconLeft.style.opacity = '0';
+                    // Летит в ту же сторону
+                    iconLeft.style.transform = `translate(${endX}px, -50px)`;
+                }
+                if(iconRight) {
+                    iconRight.style.transition = 'transform 0.3s ease-out, opacity 0.3s';
+                    iconRight.style.opacity = '0';
+                    iconRight.style.transform = `translate(${endX}px, -20px)`;
                 }
 
-                // Возврат карточки в центр
-                card.style.transition = 'transform 0.3s ease-out';
+                setTimeout(() => {
+                    handleSwipeAction(direction);
+                }, 300);
+
+
+            } else {
+                // === ВОЗВРАТ НА МЕСТО ===
+                blurTargets.forEach(el => { if(el) { el.style.transition = 'filter 0.3s ease'; el.style.filter = 'none'; } });
+                if (overlay) { overlay.style.transition = 'background-color 0.3s ease'; overlay.style.backgroundColor = 'transparent'; }
+
+                card.style.transition = 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
                 card.style.transform = 'translateX(0) rotate(0)';
+
+                // Возврат иконок с пружинистым эффектом
+                if(iconLeft) {
+                    iconLeft.style.transition = 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                    iconLeft.style.transform = `translate(0px, 0px) rotate(${leftBaseRot}deg)`;
+                    // Возобновляем парение через 400мс
+                    setTimeout(() => { iconLeft.style.animation = ''; }, 400);
+                }
+                if(iconRight) {
+                    iconRight.style.transition = 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                    iconRight.style.transform = `translate(0px, 0px) rotate(${rightBaseRot}deg)`;
+                    setTimeout(() => { iconRight.style.animation = ''; }, 400);
+                }
             }
         });
     }
 
     function handleSwipeAction(direction) {
         if (isGenerating) return;
+        if (currentItem) sessionHistoryStack.push(currentItem);
 
-        // Сохраняем в историю для кнопки "Назад"
-        if (currentItem) {
-            sessionHistoryStack.push(currentItem);
-        }
-
-        const card = document.getElementById('card-block');
+        const wrapper = document.getElementById('card-anim-wrapper'); // Работаем с оберткой
+        const card = document.getElementById('card-block'); // Для проверки трансформации
         const btnUndo = document.getElementById('btn-t-undo');
-        
-        // Отключаем кнопку Undo на время анимации
         if(btnUndo) btnUndo.disabled = true;
 
-        // 1. Логика данных (Лайк/Дизлайк)
-        if (direction === 'right') {
-            toggleFavorite(true); 
-        } else {
-            toggleBlacklist(true);
-        }
+        if (direction === 'right') toggleFavorite(true); 
+        else toggleBlacklist(true);
 
-        // 2. Анимация вылета (Если это нажатие кнопки, а не свайп пальцем)
-        // Мы проверяем transform. Если карточка в центре (transform пустой или none), значит это кнопка.
+        // Проверяем, сдвинута ли карточка пальцем
         const currentTransform = getComputedStyle(card).transform;
         const isCardCentered = currentTransform === 'none' || currentTransform === 'matrix(1, 0, 0, 1, 0, 0)';
 
-        if (isCardCentered) {
-            // Анимация улета старой карточки
-            card.style.transition = 'transform 0.3s ease-in, opacity 0.3s';
-            card.style.opacity = '0';
+        if (isCardCentered && wrapper) {
+            // Если это КНОПКА -> Анимируем улет всей ОБЁРТКИ
+            wrapper.style.transition = 'transform 0.4s ease-in, opacity 0.4s';
+            wrapper.style.opacity = '0';
             
             if (direction === 'right') {
-                card.style.transform = 'translateX(150%) rotate(20deg)';
+                wrapper.style.transform = 'translateX(150%) rotate(10deg)';
             } else {
-                card.style.transform = 'translateX(-150%) rotate(-20deg)';
+                wrapper.style.transform = 'translateX(-150%) rotate(-10deg)';
             }
 
             setTimeout(() => {
-                // ПЕРЕДАЕМ НАПРАВЛЕНИЕ ЯВНО
                 startGeneration(
                     direction === 'right' ? 'similar' : 'random', 
                     direction === 'right' ? 'like' : 'dislike'
                 );
             }, 300);
         } else {
-            // Если это был свайп пальцем
+            // Если это был СВАЙП ПАЛЬЦЕМ, то startGeneration вызовется из animateSwipeEnd
+            // Там мы ничего не меняем, так как свайп уже увел карточку за экран
             startGeneration(
                 direction === 'right' ? 'similar' : 'random', 
                 direction === 'right' ? 'like' : 'dislike'
@@ -7874,92 +8028,75 @@
     }
 
     function startGeneration(mode, direction = 'next') {
-        // 1. Радужный режим (если включен)
-        if (document.body.classList.contains('rainbow-mode')) {
-            setRandomRainbowColor();
-        }
-
-        // 2. Проверка лимитов (для Free аккаунтов)
+        if (document.body.classList.contains('rainbow-mode')) setRandomRainbowColor();
         if (!checkGenerationLimit()) return; 
         if (isGenerating) return;
 
-        // 3. Авто-теги для ориентации
+        // 1. Модификаторы
         if (currentOrientation === 'gay') activeMods.add('Gay');
         else if (currentOrientation === 'trans') activeMods.add('Trans');
         renderModifiers();
 
-        // 4. Скрываем лишние элементы интерфейса перед генерацией
+        // 2. Чистка UI
         const descEl = document.getElementById('result-desc');
         if(descEl) descEl.style.display = 'none';
-        
         const statusText = document.getElementById('status-text');
         if(statusText) statusText.innerText = ''; 
-        
         document.getElementById('badge-wrapper').innerHTML = '';
-        document.getElementById('mods-capsule').classList.remove('open');
-
-        // Сброс меню тегов
-        const modContainer = document.getElementById('mod-container');
-        const modBtn = document.getElementById('btn-mods-trigger');
-        if (modContainer) modContainer.classList.remove('open');
-        if (modBtn) modBtn.classList.remove('active');
         
-        // Скрываем кнопки управления
+        document.getElementById('mods-capsule').classList.remove('open');
+        const modContainer = document.getElementById('mod-container');
+        if (modContainer) modContainer.classList.remove('open');
+        
         document.getElementById('tinder-controls').classList.add('hidden-initial');
         document.getElementById('mods-block').classList.add('hidden-initial');
         document.getElementById('related-block').classList.add('hidden-initial');
 
-        // 5. === ВАЖНО: ПОЛНЫЙ СБРОС СТИЛЕЙ КАРТОЧКИ ===
+        // 3. Элементы
         const card = document.getElementById('card-block');
+        const wrapper = document.getElementById('card-anim-wrapper');
+        const iconLeft = document.querySelector('.icon-left');
+        const iconRight = document.querySelector('.icon-right');
         const overlay = document.querySelector('.swipe-overlay');
         
+        // === СБРОС СОСТОЯНИЯ ===
+        if (wrapper) {
+            wrapper.classList.remove('anim-fly-left', 'anim-fly-right');
+            wrapper.style.transform = '';
+            wrapper.style.transition = '';
+            wrapper.style.opacity = '1';
+        }
+
         if(card) {
-            // Убираем классы анимации
-            card.classList.remove('anim-fly-left', 'anim-fly-right', 'anim-slow-enter');
-            
-            // Сбрасываем трансформацию и прозрачность карточки
-            card.style.transform = 'none'; 
-            card.style.transition = 'none';
+            card.classList.remove('flash-active', 'has-results'); 
+            card.style.transform = ''; 
+            card.style.transition = '';
+            card.style.opacity = '1'; 
             card.style.backgroundColor = '';
             card.style.borderColor = '';
-            card.style.filter = '';          
-            card.style.opacity = ''; 
-            
-            // СБРОС ОВЕРЛЕЯ (ЦВЕТА)
+            card.style.filter = '';
             if (overlay) {
                 overlay.style.backgroundColor = 'transparent';
                 overlay.style.opacity = ''; 
                 overlay.style.transition = 'none';
             }
-
-            // СБРОС БЛЮРА ТЕКСТА
-            const blurTargets = [
-                document.getElementById('slot-reel'),
-                document.getElementById('result-desc'),
-                document.getElementById('badge-wrapper'),
-                document.getElementById('related-block')
-            ];
-            blurTargets.forEach(el => {
-                if(el) {
-                    el.style.filter = 'none';
-                    el.style.transition = 'none';
-                }
-            });
-            
-            void card.offsetWidth; // Принудительная перерисовка браузером
+            const blurTargets = [document.getElementById('slot-reel'), document.getElementById('result-desc'), document.getElementById('badge-wrapper'), document.getElementById('related-block')];
+            blurTargets.forEach(el => { if(el) { el.style.filter = 'none'; el.style.transition = 'none'; }});
+            void card.offsetWidth; 
         }
         
-        // 6. Логика обучения алгоритма
+        // Возвращаем анимацию иконок
+        if(iconLeft) iconLeft.style.animation = '';
+        if(iconRight) iconRight.style.animation = '';
+        
+        // 4. Логика выбора
         if (mode === 'random' && currentItem && !hasInteractedWithCurrent) {
             if (watchLater.includes(currentItem.id)) adjustTagScores(currentItem, 1);
             else adjustTagScores(currentItem, -1);
         }
         if (mode === 'similar' && currentItem) adjustTagScores(currentItem, 1);
 
-        // 7. Фильтрация списка
         let filtered = filterData();
-        
-        // Если ищем "Похожее"
         if (mode === 'similar' && lastGeneratedItem) {
             const subset = filtered.filter(item => {
                 if (item.id === lastGeneratedItem.id) return false;
@@ -7969,7 +8106,6 @@
             if (subset.length > 0) filtered = subset;
         }
 
-        // Если список пуст
         const reel = document.getElementById('slot-reel');
         if (filtered.length === 0) {
             reel.innerHTML = `<div class="slot-item" style="color:var(--highlight-red);">List Empty</div>`;
@@ -7979,108 +8115,88 @@
 
         isGenerating = true;
         hasInteractedWithCurrent = false;
-        
-        // ВЫБОР ПОБЕДИТЕЛЯ
         const finalItem = getWeightedRandom(filtered);
-        
-        // Настройки анимации
-        const isPC = window.innerWidth > 768;
-        const itemHeight = isPC ? 450 : 300; // Должно совпадать с CSS высотой .slot-window
 
-        // ==========================================
-        // СЦЕНАРИЙ 1: ПЕРВЫЙ ЗАПУСК (Кнопка "Поехали")
-        // ==========================================
+        // === АНИМАЦИЯ ===
+
         if (isFirstGen) {
-            isFirstGen = false;
+            // Сценарий 1: Первый запуск
             const spinCount = 10;
             let html = '';
-            
-            // Генерируем "фейковые" элементы для прокрутки
             for (let i = 0; i < spinCount - 1; i++) {
                 const randomItem = filtered[Math.floor(Math.random() * filtered.length)];
                 html += `<div class="slot-item">${getLocalizedName(randomItem)}</div>`;
             }
-            // Добавляем победителя в конец
             const winnerName = getLocalizedName(finalItem);
             html += `<div class="slot-item" id="result-text">${winnerName}</div>`;
-
+            
             reel.className = 'slot-reel spinning'; 
             reel.innerHTML = html;
+            reel.querySelectorAll('.slot-item').forEach(el => el.classList.add('shrunk'));
             reel.style.transform = 'translateY(0)';
             
-            // Уменьшаем шрифт во время прокрутки
-            const items = reel.querySelectorAll('.slot-item');
-            items.forEach(el => el.classList.add('shrunk'));
-            void reel.offsetWidth; 
-
-            // Вычисляем, куда крутить
-            // На мобильных высота может быть плавающей, но для анимации используем фиксированный шаг
-            // Если на мобилке верстка ломается при кручении, можно уменьшить itemHeight
-            const targetIndex = spinCount - 1; 
-            // Получаем реальную высоту элемента, если возможно, иначе фоллбек
-            const realHeight = reel.firstElementChild ? reel.firstElementChild.offsetHeight : itemHeight;
-            const targetY = -(targetIndex * realHeight);
-
-            requestAnimationFrame(() => {
-                reel.style.transition = 'transform 1.2s cubic-bezier(0.25, 1, 0.5, 1)';
-                reel.style.transform = `translateY(${targetY}px)`;
-            });
+            // Влет обёртки
+            if(wrapper) wrapper.classList.add('anim-fly-left'); 
 
             setTimeout(() => {
-                finishGeneration(finalItem, mode);
-            }, 1200);
-        } 
-        
-        // ==========================================
-        // СЦЕНАРИЙ 2: ОБЫЧНАЯ ГЕНЕРАЦИЯ (Свайп)
-        // ==========================================
-        else {
-            reel.innerHTML = ""; 
-
-            // Подготавливаем карточку
-            if(card) card.classList.add('has-results'); 
-            
-            // Анимация влета новой карточки
-            if (direction === 'like') {
-                // Лайк: Новая карточка прилетает СЛЕВА направо
-                if(card) card.classList.add('anim-fly-left');
-            } 
-            else {
-                // Дизлайк: Новая карточка прилетает СПРАВА налево
-                if(card) card.classList.add('anim-fly-right');
-            }
-
-            // Задержка перед показом контента
-            setTimeout(() => {
-                finishGeneration(finalItem, mode);
+                isFirstGen = false;
+                const isPC = window.innerWidth > 768;
+                const itemHeight = isPC ? 450 : 300;
+                const realHeight = reel.firstElementChild ? reel.firstElementChild.offsetHeight : itemHeight;
+                const targetIndex = 9; 
+                const targetY = -(targetIndex * realHeight);
                 
-                // Восстанавливаем прозрачность (если была изменена при свайпе)
-                if(card) card.style.opacity = ''; 
-                
-                setTimeout(() => {
-                    if(card) card.classList.remove('anim-fly-right', 'anim-fly-left');
-                }, 700);
-                
+                requestAnimationFrame(() => {
+                    reel.style.transition = 'transform 1.2s cubic-bezier(0.25, 1, 0.5, 1)';
+                    reel.style.transform = `translateY(${targetY}px)`;
+                });
+                setTimeout(() => { finishGeneration(finalItem, mode); }, 1200);
             }, 300);
+
+        } else {
+            // Сценарий 2: Обычная генерация
+            if(wrapper) wrapper.style.opacity = '0'; // Скрываем на мгновение
+            
+            finishGeneration(finalItem, mode);
+
+            if(wrapper) {
+                wrapper.style.transform = '';
+                void wrapper.offsetWidth; 
+                wrapper.style.opacity = '1';
+
+                const animClass = (direction === 'like') ? 'anim-fly-left' : 'anim-fly-right';
+                wrapper.classList.add(animClass);
+
+                setTimeout(() => {
+                    wrapper.classList.remove('anim-fly-right', 'anim-fly-left');
+                    wrapper.style.transform = '';
+                }, 800);
+            }
         }
     }
 
     function startNewSession() {
-        // Сброс истории сессии
-        sessionHistoryStack = []; 
-        isFirstGen = true;
-        
-        // Мгновенно скрываем кнопку старта
+        const wrapper = document.getElementById('card-anim-wrapper');
         const startBtn = document.getElementById('start-btn-container');
+        
         if(startBtn) {
             startBtn.classList.add('hidden-initial');
             startBtn.style.display = 'none';
         }
 
-        // Запускаем генерацию
-        startGeneration('random');
+        if(wrapper) {
+                wrapper.style.transition = 'transform 0.4s ease-in, opacity 0.4s';
+                wrapper.style.opacity = '0';
+                wrapper.style.transform = 'translateX(150%) rotate(10deg)'; 
+        }
+
+        setTimeout(() => {
+            sessionHistoryStack = []; 
+            isFirstGen = false; 
+            startGeneration('random', 'like'); 
+        }, 350);
     }
-    
+
     function renderResultUI(item, mode) {
         currentItem = item;
         lastGeneratedItem = item;
@@ -8751,6 +8867,32 @@
     function closeQRModal(e, force) {
         if (force || e.target.id === 'modal-qr-overlay') {
             document.getElementById('modal-qr-overlay').classList.remove('open');
+        }
+    }
+
+    function initDecoSettings() {
+        // По умолчанию true (показывать), если в памяти нет записи
+        const saved = localStorage.getItem('xch_show_deco');
+        const isEnabled = saved !== 'false'; // Если null или 'true', то true
+
+        // Обновляем состояние чекбокса
+        const toggle = document.getElementById('deco-toggle');
+        if (toggle) toggle.checked = isEnabled;
+
+        // Применяем класс
+        applyDecoState(isEnabled);
+    }
+
+    function toggleDecoIcons(isChecked) {
+        localStorage.setItem('xch_show_deco', isChecked);
+        applyDecoState(isChecked);
+    }
+
+    function applyDecoState(isEnabled) {
+        if (isEnabled) {
+            document.body.classList.remove('no-deco');
+        } else {
+            document.body.classList.add('no-deco');
         }
     }
 

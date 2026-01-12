@@ -2509,19 +2509,6 @@
     "desc_de": "Sex untergetaucht in Pools oder Ozeanen."
   },
   {
-    "id": 198,
-    "name": "Squirting",
-    "name_ru": "Сквирт",
-    "name_es": "Squirting",
-    "name_de": "Squirting",
-    "slug": "female-ejaculation",
-    "tags": ["straight", "lesbian"],
-    "desc_en": "Intense release of fluids during orgasm.",
-    "desc_ru": "Интенсивный выброс жидкости во время оргазма.",
-    "desc_es": "Liberación intensa de fluidos durante el orgasmo.",
-    "desc_de": "Intensive Flüssigkeitsfreisetzung beim Orgasmus."
-  },
-  {
     "id": 199,
     "name": "Happy Ending",
     "name_ru": "Счастливый конец",
@@ -14336,7 +14323,7 @@
     "ritual"
     ],
     "desc_en": "Connecting with the divine through kink and sensation.",
-    "desc_ru": "Связь с божественным через кинк и ощущения.",
+    "desc_ru": "Связь с божественным через фетиш и ощущения.",
     "desc_es": "Conectando con lo divino a través del kink y la sensación.",
     "desc_de": "Verbindung mit dem Göttlichen durch Kink und Empfindung."
     },
