@@ -2449,6 +2449,73 @@
             .plans-container { flex-direction: row; align-items: stretch; justify-content: center; }
             .plan-card { flex: 1; }
         }
+
+        /* =========================================
+        MACOS STYLE SIDEBAR (DESKTOP ONLY)
+        ========================================= */
+        @media (min-width: 769px) {
+            
+            body {
+                /* Добавляем немного отступа контенту, чтобы он не прилипал к парящему сайдбару */
+                overflow: hidden; /* Убираем скролл у всего body */
+            }
+
+            .sidebar {
+                /* 1. РАЗМЕРЫ И ОТСТУПЫ (Парящий эффект) */
+                height: calc(100vh - 40px) !important; /* Отступ сверху и снизу по 20px */
+                margin-top: 20px !important;
+                margin-left: 20px !important;
+                margin-bottom: 20px !important;
+                margin-right: 0 !important; /* Справа не нужен отступ, там контент */
+                
+                border-radius: 24px !important; /* Сильные закругления */
+                
+                /* 2. ЭФФЕКТ СТЕКЛА (Glassmorphism) */
+                /* Полупрозрачный черный фон */
+                background: rgba(28, 28, 30, 0.65) !important; 
+                
+                /* Блюр заднего фона (Самое важное для macOS стиля) */
+                backdrop-filter: blur(25px) saturate(180%) !important;
+                -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+                
+                /* 3. ГРАНИЦЫ И ТЕНИ */
+                /* Тонкая светлая обводка (Inset) для объема */
+                border: 1px solid rgba(255, 255, 255, 0.1) !important;
+                border-right: 1px solid rgba(255, 255, 255, 0.1) !important; /* Перебиваем старый border-right */
+                
+                /* Глубокая тень для ощущения "парения" */
+                box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5) !important;
+                
+                z-index: 100 !important;
+            }
+
+            /* Адаптация для СВЕТЛОЙ ТЕМЫ */
+            body.light-theme .sidebar {
+                /* Полупрозрачный белый */
+                background: rgba(255, 255, 255, 0.65) !important;
+                border: 1px solid rgba(0, 0, 0, 0.05) !important;
+                box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15) !important;
+            }
+
+            /* Адаптация для РАДУЖНОЙ ТЕМЫ */
+            body.rainbow-mode .sidebar {
+                background: rgba(20, 20, 20, 0.4) !important; /* Более прозрачный */
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            }
+
+            /* Убираем скроллбар внутри сайдбара, чтобы было красиво, но оставляем возможность скроллить */
+            .sidebar::-webkit-scrollbar {
+                width: 0px;
+                background: transparent;
+            }
+            
+            /* Корректируем логотип, чтобы он красиво смотрелся в стекле */
+            .sidebar .logo {
+                margin-top: 10px;
+                margin-bottom: 5px;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -3756,7 +3823,7 @@
             }, 2000);
         }
     };
-    
+
     // === СЛУШАТЕЛЬ АВТОРИЗАЦИИ (Главная точка входа) ===
     onAuthStateChanged(auth, async (user) => {
         const btnText = document.getElementById('login-btn-text');
@@ -8287,27 +8354,38 @@
         const card = document.getElementById('card-block');
         const overlay = document.querySelector('.swipe-overlay'); 
         
-        // Ищем иконки (теперь они вне карточки, но querySelector найдет их)
+        // Элементы декора (Иконки)
         const iconLeft = document.querySelector('.icon-left');
         const iconRight = document.querySelector('.icon-right');
+        const statusText = document.getElementById('status-text');
 
+        // Элементы, которые нужно размывать
         const blurTargets = [
             document.getElementById('slot-reel'),
             document.getElementById('result-desc'),
             document.getElementById('badge-wrapper'),
-            document.getElementById('related-block')
+            document.getElementById('related-block'),
+            document.getElementById('tinder-controls') 
         ];
 
         if (!card) return;
 
-        // Базовые углы (должны совпадать с CSS @keyframes 0%)
+        // Базовые углы наклона иконок
         const leftBaseRot = -20;
         const rightBaseRot = 15;
 
+        // --- 1. START ---
         card.addEventListener('touchstart', (e) => {
-            if (e.target.closest('button') || e.target.closest('.related-item-btn') || e.target.closest('.capsule-trigger') || e.target.closest('.tag')) return;
+            // Игнорируем клики по кнопкам внутри карточки
+            if (e.target.closest('button') || 
+                e.target.closest('.related-item-btn') || 
+                e.target.closest('.capsule-trigger') || 
+                e.target.closest('.tag')) return;
+            
             if (isGenerating) return;
-            if (!checkGenerationLimit(true)) return; 
+
+            // ПРОВЕРКА ЛИМИТА (Без списания, только алерт)
+            if (typeof checkGenerationLimit === 'function' && !checkGenerationLimit(true)) return;
 
             startX = e.touches[0].clientX;
             startY = e.touches[0].clientY;
@@ -8315,25 +8393,24 @@
             currentY = startY;
             isDragging = true;
             
-            // 1. СТОП АНИМАЦИИ (чтобы управлять пальцем)
+            // Отключаем плавность для мгновенной реакции на палец
             card.style.transition = 'none';
-
-            const statusText = document.getElementById('status-text');
             if (statusText) statusText.style.transition = 'none';
-
-            if(overlay) overlay.style.transition = 'none';
+            if (overlay) overlay.style.transition = 'none';
             
+            // Пауза анимации иконок
             if(iconLeft) {
                 iconLeft.style.transition = 'none';
-                iconLeft.style.animation = 'none'; // Пауза парения
+                iconLeft.style.animation = 'none'; 
             }
             if(iconRight) {
                 iconRight.style.transition = 'none';
-                iconRight.style.animation = 'none'; // Пауза парения
+                iconRight.style.animation = 'none'; 
             }
             
         }, {passive: false});
 
+        // --- 2. MOVE ---
         card.addEventListener('touchmove', (e) => {
             if (!isDragging) return;
             
@@ -8342,63 +8419,76 @@
             let deltaX = currentX - startX;
             let deltaY = currentY - startY; 
 
+            // Блокируем скролл страницы, если тянем карточку
             if (Math.abs(deltaX) > 10 && e.cancelable) e.preventDefault();
 
-            // Карточка
+            // А. ДВИЖЕНИЕ КАРТОЧКИ
             let rotate = deltaX * 0.05;
             card.style.transform = `translateX(${deltaX}px) rotate(${rotate}deg)`;
 
-            // --- Двигаем текст так же, как карточку ---
-            const statusText = document.getElementById('status-text');
+            // Б. ДВИЖЕНИЕ ТЕКСТА (Над карточкой)
             if (statusText) {
-                statusText.style.transform = transformString;
+                statusText.style.transform = `translateX(${deltaX}px) rotate(${rotate}deg)`;
             }
 
-            // ПАРАЛЛАКС ЭФФЕКТ
+            // В. ПАРАЛЛАКС ИКОНОК (Если они есть)
             if (iconLeft) {
-                // Левая: движется сильно (ближний план)
                 iconLeft.style.transform = `translate(${deltaX * 1.2}px, ${deltaY * 0.6}px) rotate(${leftBaseRot + (deltaX * 0.1)}deg)`;
             }
             if (iconRight) {
-                // Правая: движется слабее (средний план)
                 iconRight.style.transform = `translate(${deltaX * 0.7}px, ${deltaY * 0.3}px) rotate(${rightBaseRot - (deltaX * 0.05)}deg)`;
             }
 
-            // Оверлей
-            const progress = Math.min(Math.abs(deltaX) / 150, 1);
+            // Г. ЭФФЕКТЫ (ЦВЕТ + БЛЮР) - Самое важное!
+            const progress = Math.min(Math.abs(deltaX) / 150, 1); // 0...1 (1 = полный свайп)
+            
+            // Заливка цветом
             if (overlay) {
-                const alpha = progress * 0.85; 
-                if (deltaX > 0) overlay.style.backgroundColor = `rgba(46, 204, 113, ${alpha})`; 
-                else overlay.style.backgroundColor = `rgba(231, 76, 60, ${alpha})`; 
+                const alpha = progress * 0.85; // Максимум 85% непрозрачности
+                if (deltaX > 0) {
+                    // Вправо (Зеленый)
+                    overlay.style.backgroundColor = `rgba(46, 204, 113, ${alpha})`; 
+                } else {
+                    // Влево (Красный)
+                    overlay.style.backgroundColor = `rgba(231, 76, 60, ${alpha})`; 
+                }
             }
-            const blurAmount = progress * 10;
-            blurTargets.forEach(el => { if(el) el.style.filter = `blur(${blurAmount}px)`; });
+
+            // Блюр контента
+            const blurAmount = progress * 8; // Максимум 8px блюра
+            blurTargets.forEach(el => { 
+                if(el) el.style.filter = `blur(${blurAmount}px)`; 
+            });
 
         }, {passive: false});
 
+        // --- 3. END ---
         card.addEventListener('touchend', (e) => {
             if (!isDragging) return;
             isDragging = false;
             
             let deltaX = currentX - startX;
-            
-            if (Math.abs(deltaX) > 100) {
-                // === УЛЕТАЮТ ===
+            const threshold = window.innerWidth * 0.25; // Свайпнуть нужно на 25% ширины экрана
+
+            if (Math.abs(deltaX) > threshold) {
+                // === УЛЕТАЕТ ===
                 const direction = deltaX > 0 ? 'right' : 'left';
-                const endX = deltaX > 0 ? window.innerWidth + 150 : -window.innerWidth - 150;
+                const endX = deltaX > 0 ? window.innerWidth + 200 : -window.innerWidth - 200;
                 
-                
-                const card = document.getElementById('card-block');
+                // Запускаем анимацию вылета
                 card.style.transition = 'transform 0.3s ease-out';
                 card.style.transform = `translateX(${endX}px) rotate(${endX * 0.05}deg)`;
 
-                // Убираем иконки красиво
-                const iconLeft = document.querySelector('.icon-left');
-                const iconRight = document.querySelector('.icon-right');
+                // Текст тоже улетает
+                if (statusText) {
+                    statusText.style.transition = 'transform 0.3s ease-out';
+                    statusText.style.transform = `translateX(${endX}px) rotate(${endX * 0.05}deg)`;
+                }
+
+                // Иконки улетают
                 if(iconLeft) {
                     iconLeft.style.transition = 'transform 0.3s ease-out, opacity 0.3s';
                     iconLeft.style.opacity = '0';
-                    // Летит в ту же сторону
                     iconLeft.style.transform = `translate(${endX}px, -50px)`;
                 }
                 if(iconRight) {
@@ -8407,31 +8497,43 @@
                     iconRight.style.transform = `translate(${endX}px, -20px)`;
                 }
 
+                // Вызываем логику
                 setTimeout(() => {
                     handleSwipeAction(direction);
                 }, 300);
 
-
             } else {
-                // === ВОЗВРАТ НА МЕСТО ===
-                blurTargets.forEach(el => { if(el) { el.style.transition = 'filter 0.3s ease'; el.style.filter = 'none'; } });
-                if (overlay) { overlay.style.transition = 'background-color 0.3s ease'; overlay.style.backgroundColor = 'transparent'; }
+                // === ВОЗВРАТ НА МЕСТО (Отмена свайпа) ===
+                
+                // Убираем блюр плавно
+                blurTargets.forEach(el => { 
+                    if(el) { 
+                        el.style.transition = 'filter 0.3s ease'; 
+                        el.style.filter = 'none'; 
+                    } 
+                });
 
-                card.style.transition = 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                // Убираем цвет оверлея плавно
+                if (overlay) { 
+                    overlay.style.transition = 'background-color 0.3s ease'; 
+                    overlay.style.backgroundColor = 'transparent'; 
+                }
+
+                // Возвращаем карточку
+                card.style.transition = 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
                 card.style.transform = 'translateX(0) rotate(0)';
 
-                const statusText = document.getElementById('status-text');
+                // Возвращаем текст
                 if (statusText) {
-                    statusText.style.transition = 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                    statusText.style.transition = 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
                     statusText.style.transform = 'translateX(0) rotate(0)';
                 }
 
-                // Возврат иконок с пружинистым эффектом
+                // Возвращаем иконки
                 if(iconLeft) {
                     iconLeft.style.transition = 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
                     iconLeft.style.transform = `translate(0px, 0px) rotate(${leftBaseRot}deg)`;
-                    // Возобновляем парение через 400мс
-                    setTimeout(() => { iconLeft.style.animation = ''; }, 400);
+                    setTimeout(() => { iconLeft.style.animation = ''; }, 400); // Возвращаем парение
                 }
                 if(iconRight) {
                     iconRight.style.transition = 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
@@ -8443,24 +8545,57 @@
     }
 
     function handleSwipeAction(direction) {
-        if (!checkGenerationLimit(true)) return; 
+        // 1. Проверка лимита
+        if (typeof checkGenerationLimit === 'function' && !checkGenerationLimit(true)) return;
+
         if (isGenerating) return;
         if (currentItem) sessionHistoryStack.push(currentItem);
 
-        const wrapper = document.getElementById('card-anim-wrapper'); // Работаем с оберткой
-        const card = document.getElementById('card-block'); // Для проверки трансформации
+        const wrapper = document.getElementById('card-anim-wrapper');
+        const card = document.getElementById('card-block');
         const btnUndo = document.getElementById('btn-t-undo');
+        
+        // Элементы для эффектов (Те же, что и в свайпах)
+        const overlay = document.querySelector('.swipe-overlay');
+        const blurTargets = [
+            document.getElementById('slot-reel'),
+            document.getElementById('result-desc'),
+            document.getElementById('badge-wrapper'),
+            document.getElementById('related-block'),
+            document.getElementById('tinder-controls')
+        ];
+
         if(btnUndo) btnUndo.disabled = true;
 
         if (direction === 'right') toggleFavorite(true); 
         else toggleBlacklist(true);
 
         // Проверяем, сдвинута ли карточка пальцем
+        // Если transform == 'none', значит карточка стоит в центре -> это клик по кнопке
         const currentTransform = getComputedStyle(card).transform;
         const isCardCentered = currentTransform === 'none' || currentTransform === 'matrix(1, 0, 0, 1, 0, 0)';
 
         if (isCardCentered && wrapper) {
-            // Если это КНОПКА -> Анимируем улет всей ОБЁРТКИ
+            // === ЭТО КЛИК ПО КНОПКЕ ===
+            
+            // 1. Применяем цвет и блюр (Визуальный отклик)
+            if (overlay) {
+                overlay.style.transition = 'background-color 0.2s ease';
+                if (direction === 'right') {
+                    overlay.style.backgroundColor = 'rgba(46, 204, 113, 0.8)'; // Зеленый
+                } else {
+                    overlay.style.backgroundColor = 'rgba(231, 76, 60, 0.8)'; // Красный
+                }
+            }
+
+            blurTargets.forEach(el => {
+                if(el) {
+                    el.style.transition = 'filter 0.2s ease';
+                    el.style.filter = 'blur(5px)'; // Блюрим контент
+                }
+            });
+
+            // 2. Анимируем улет всей ОБЁРТКИ
             wrapper.style.transition = 'transform 0.4s ease-in, opacity 0.4s';
             wrapper.style.opacity = '0';
             
@@ -8477,8 +8612,7 @@
                 );
             }, 300);
         } else {
-            // Если это был СВАЙП ПАЛЬЦЕМ, то startGeneration вызовется из animateSwipeEnd
-            // Там мы ничего не меняем, так как свайп уже увел карточку за экран
+            // === ЭТО БЫЛ СВАЙП ПАЛЬЦЕМ (Эффекты уже применены в touchmove) ===
             startGeneration(
                 direction === 'right' ? 'similar' : 'random', 
                 direction === 'right' ? 'like' : 'dislike'
@@ -8575,14 +8709,31 @@
             card.style.backgroundColor = '';
             card.style.borderColor = '';
             card.style.filter = '';
+            
+            // Сброс оверлея
             if (overlay) {
+                overlay.style.transition = 'none'; // Убираем анимацию, чтобы сбросилось мгновенно
                 overlay.style.backgroundColor = 'transparent';
                 overlay.style.opacity = ''; 
-                overlay.style.transition = 'none';
             }
-            const blurTargets = [document.getElementById('slot-reel'), document.getElementById('result-desc'), document.getElementById('badge-wrapper'), document.getElementById('related-block')];
-            blurTargets.forEach(el => { if(el) { el.style.filter = 'none'; el.style.transition = 'none'; }});
-            void card.offsetWidth; 
+            
+            // Сброс блюра на элементах
+            const blurTargets = [
+                document.getElementById('slot-reel'), 
+                document.getElementById('result-desc'), 
+                document.getElementById('badge-wrapper'), 
+                document.getElementById('related-block'),
+                document.getElementById('tinder-controls') // Добавили кнопки
+            ];
+            
+            blurTargets.forEach(el => { 
+                if(el) { 
+                    el.style.transition = 'none'; // Мгновенно
+                    el.style.filter = 'none'; 
+                }
+            });
+            
+            void card.offsetWidth; // Force reflow
         }
         
         // --- ПОЛНЫЙ СБРОС ИКОНОК ---
