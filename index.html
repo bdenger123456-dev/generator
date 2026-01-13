@@ -2754,6 +2754,42 @@
             </div>
         </div>
 
+        <!-- ADMIN PANEL (Hidden by default) -->
+        <div id="admin-panel" style="display:none; margin-top:30px; border-top:1px solid var(--border); padding-top:20px; width:100%;">
+            <div class="ios-header" style="color:#ff0000;">👑 Admin Control</div>
+            
+            <!-- Генератор кодов -->
+            <div class="ios-group" style="padding:15px;">
+                <div style="font-weight:700; margin-bottom:10px;">Generate Promo</div>
+                <div style="display:flex; gap:10px; margin-bottom:10px;">
+                    <select id="admin-code-type" class="promo-input" style="flex:1;">
+                        <option value="pro">Pro</option>
+                        <option value="beast">Beast</option>
+                        <option value="bestie">Bestie</option>
+                    </select>
+                    <input type="number" id="admin-code-days" class="promo-input" style="width:80px;" value="30" placeholder="Days">
+                </div>
+                <button class="btn-gen" onclick="adminGenerateCode()" style="padding:10px; font-size:14px; background:var(--card-bg);">Create Code</button>
+                <div id="admin-code-result" style="margin-top:10px; font-family:monospace; font-size:16px; color:#2ecc71; user-select:all;"></div>
+            </div>
+
+            <!-- Подарок подписки (Поиск по Email) -->
+            <div class="ios-group" style="padding:15px;">
+                <div style="font-weight:700; margin-bottom:10px;">Gift Subscription (By Email)</div>
+                <input type="text" id="admin-gift-email" class="promo-input" placeholder="User Email..." style="margin-bottom:10px;">
+                
+                <div style="display:flex; gap:10px; margin-bottom:10px;">
+                    <select id="admin-gift-type" class="promo-input" style="flex:1;">
+                        <option value="pro">Pro</option>
+                        <option value="beast">Beast</option>
+                    </select>
+                    <input type="number" id="admin-gift-days" class="promo-input" style="width:80px;" value="30">
+                </div>
+                
+                <button class="btn-gen" onclick="adminGiftSub()" style="padding:10px; font-size:14px; background:var(--accent); color:#000;">Activate Sub</button>
+            </div>
+        </div>
+
 <div class="bottom-gradient-mask"></div>
 
 <div class="bottom-nav">
@@ -3728,7 +3764,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp, writeBatch, query, where, collection } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 
     const firebaseConfig = {
@@ -3739,6 +3775,8 @@
         messagingSenderId: "617015941952",
         appId: "1:617015941952:web:4f75df1239b0c114d8f8a5"
     };
+
+    const ADMIN_UID = "Tqk5aauZ8JVzQ4Bs7Z0BCT5dZKf1";
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -4017,7 +4055,94 @@
             
             if (window.updateLastSyncUI) window.updateLastSyncUI();
         }
+
+        if (user && user.uid === ADMIN_UID) {
+            const adminPanel = document.getElementById('admin-panel');
+            if(adminPanel) adminPanel.style.display = 'block';
+        }
+
     });
+
+    // 2. Генерация промокода
+    window.adminGenerateCode = async function() {
+        const user = auth.currentUser;
+        if (!user || user.uid !== ADMIN_UID) return;
+
+        const type = document.getElementById('admin-code-type').value;
+        const days = parseInt(document.getElementById('admin-code-days').value);
+        
+        // Генерируем читаемый код (XF-TYPE-XXXX)
+        const randomPart = Math.random().toString(36).substr(2, 5).toUpperCase();
+        const code = `XF-${type.toUpperCase()}-${randomPart}`;
+
+        try {
+            await setDoc(doc(db, "promocodes", code), {
+                active: true,
+                type: type,
+                days: days,
+                createdAt: serverTimestamp(),
+                createdBy: "admin_ui"
+            });
+            document.getElementById('admin-code-result').innerText = code;
+            alert(`Code created: ${code}`);
+        } catch (e) {
+            alert("Error: " + e.message);
+        }
+    };
+
+    // 3. Выдача подписки по Email
+    window.adminGiftSub = async function() {
+        const user = auth.currentUser;
+        if (!user || user.uid !== ADMIN_UID) return;
+
+        const targetEmail = document.getElementById('admin-gift-email').value.trim();
+        const type = document.getElementById('admin-gift-type').value;
+        const days = parseInt(document.getElementById('admin-gift-days').value);
+
+        if (!targetEmail) { alert("Enter email!"); return; }
+
+        const btn = event.target;
+        btn.innerText = "Searching...";
+        btn.disabled = true;
+
+        try {
+            // Ищем пользователя в базе по полю email
+            const usersRef = collection(db, "users");
+            const q = query(usersRef, where("email", "==", targetEmail));
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                alert("User not found in Database. Ask them to Login/Sync first.");
+                btn.innerText = "Activate Sub";
+                btn.disabled = false;
+                return;
+            }
+
+            // Берем первого найденного 
+            let targetUserDoc = null;
+            querySnapshot.forEach((doc) => { targetUserDoc = doc; });
+
+            // Вычисляем дату
+            const now = new Date();
+            const expireDate = new Date(now.getTime() + (days * 24 * 60 * 60 * 1000));
+
+            // Обновляем документ ЧУЖОГО пользователя
+            await updateDoc(targetUserDoc.ref, {
+                subscription: type,
+                expiresAt: Timestamp.fromDate(expireDate)
+            });
+
+            alert(`Success! ${targetEmail} is now ${type} for ${days} days.`);
+            document.getElementById('admin-gift-email').value = "";
+
+        } catch (e) {
+            console.error(e);
+            alert("Error: " + e.message);
+        } finally {
+            btn.innerText = "Activate Sub";
+            btn.disabled = false;
+        }
+    };
 
     // === ЗАГРУЗКА И СЛИЯНИЕ ДАННЫХ (СЕРДЦЕ СИНХРОНИЗАЦИИ) ===
     async function loadUserData(user) {
@@ -4184,6 +4309,7 @@
                 watchHistory: window.watchHistory || [],
                 platform: currentPlatform,
                 subscription: localStorage.getItem('xch_sub_level') || 'free', 
+                email: user.email,
                 lastUpdated: serverTimestamp()
             };
 
@@ -4250,6 +4376,7 @@
     let activeMods = new Set();
     let isGenerating = false;
     let isFirstGen = true;
+    let hasWatchedCurrentItem = false;
     let currentIntensity = 1; 
     
     // STATS STATE
@@ -4287,53 +4414,51 @@
     };
 
     const APP_THEMES = [
-        // === FREE ===
+        // === BASIC (Row 1) ===
         { id: 'dark', name: 'Dark', type: 'free', isLight: false, preview: '#141414', accent: null },
         { id: 'light', name: 'Light', type: 'free', isLight: true, preview: '#ffffff', accent: null },
         
-        // === PRO DARK ===
+        // === BLUE (Row 2) ===
         { 
             id: 'blue-dark', name: 'Midnight', type: 'pro', isLight: false, preview: '#0a192f',
             colors: { bg: '#020c1b', sidebar: '#0a192f', card: '#112240', nav: '#112240', border: '#233554' },
             accent: '#64ffda', accentLight: '#94ffea'
         },
         { 
+            id: 'blue-light', name: 'Sky', type: 'pro', isLight: true, preview: '#cce4ff',
+            colors: { bg: '#dbeafe', sidebar: '#f0f9ff', card: '#ffffff', nav: '#ffffff', border: '#bfdbfe' },
+            accent: '#2563eb', accentLight: '#60a5fa' 
+        },
+
+        // === GREEN (Row 3) ===
+        { 
             id: 'green-dark', name: 'Forest', type: 'pro', isLight: false, preview: '#051405',
             colors: { bg: '#020a02', sidebar: '#051405', card: '#0f290f', nav: '#0f290f', border: '#1a401a' },
             accent: '#2ecc71', accentLight: '#58d68d'
-        },
-        { 
-            id: 'red-dark', name: 'Vampire', type: 'pro', isLight: false, preview: '#1a0000',
-            colors: { bg: '#0d0000', sidebar: '#1a0000', card: '#330000', nav: '#330000', border: '#4d0000' },
-            accent: '#e74c3c', accentLight: '#ff6b6b'
-        },
-        { 
-            id: 'gold-dark', name: 'Luxury', type: 'pro', isLight: false, preview: '#141100',
-            colors: { bg: '#0a0900', sidebar: '#141100', card: '#292200', nav: '#292200', border: '#4d4000' },
-            accent: '#f1c40f', accentLight: '#f4d03f'
-        },
-        { 
-            id: 'noir', name: 'Noir', type: 'pro', isLight: false, preview: '#000000',
-            colors: { bg: '#000000', sidebar: '#0a0a0a', card: '#141414', nav: '#141414', border: '#333333' },
-            accent: '#ffffff', accentLight: '#cccccc'
-        },
-
-        // === LIGHT ===
-        { 
-            id: 'blue-light', name: 'Sky', type: 'pro', isLight: true, preview: '#cce4ff',
-            // Фон стал темнее (#dbeafe), чтобы белая карточка выделялась
-            colors: { bg: '#dbeafe', sidebar: '#f0f9ff', card: '#ffffff', nav: '#ffffff', border: '#bfdbfe' },
-            accent: '#2563eb', accentLight: '#60a5fa' 
         },
         { 
             id: 'green-light', name: 'Mint', type: 'pro', isLight: true, preview: '#dcfce7',
             colors: { bg: '#dcfce7', sidebar: '#f0fdf4', card: '#ffffff', nav: '#ffffff', border: '#86efac' },
             accent: '#16a34a', accentLight: '#4ade80'
         },
+
+        // === RED (Row 4) ===
+        { 
+            id: 'red-dark', name: 'Vampire', type: 'pro', isLight: false, preview: '#1a0000',
+            colors: { bg: '#0d0000', sidebar: '#1a0000', card: '#330000', nav: '#330000', border: '#4d0000' },
+            accent: '#e74c3c', accentLight: '#ff6b6b'
+        },
         { 
             id: 'red-light', name: 'Rose', type: 'pro', isLight: true, preview: '#ffe4e6',
             colors: { bg: '#ffe4e6', sidebar: '#fff1f2', card: '#ffffff', nav: '#ffffff', border: '#fecdd3' },
             accent: '#e11d48', accentLight: '#fb7185'
+        },
+
+        // === GOLD / ORANGE (Row 5) ===
+        { 
+            id: 'gold-dark', name: 'Luxury', type: 'pro', isLight: false, preview: '#141100',
+            colors: { bg: '#0a0900', sidebar: '#141100', card: '#292200', nav: '#292200', border: '#4d4000' },
+            accent: '#f1c40f', accentLight: '#f4d03f'
         },
         { 
             id: 'gold-light', name: 'Sand', type: 'pro', isLight: true, preview: '#fef3c7',
@@ -4341,7 +4466,7 @@
             accent: '#d97706', accentLight: '#fbbf24'
         },
 
-        // ===  PINK (Pink/Cyber) ===
+        // === PINK (Row 6) ===
         { 
             id: 'pink-dark', name: 'Cyber', type: 'pro', isLight: false, preview: '#ff00cc',
             colors: { bg: '#12000b', sidebar: '#1a0010', card: '#2b001b', nav: '#2b001b', border: '#4d0030' },
@@ -4353,7 +4478,7 @@
             accent: '#db2777', accentLight: '#f472b6'
         },
 
-        // ===  PURPLE (Amethyst/Lavender) ===
+        // === PURPLE (Row 7) ===
         { 
             id: 'purple-dark', name: 'Amethyst', type: 'pro', isLight: false, preview: '#3b005e',
             colors: { bg: '#0d0014', sidebar: '#180026', card: '#240038', nav: '#240038', border: '#4a0072' },
@@ -4365,7 +4490,7 @@
             accent: '#9333ea', accentLight: '#c084fc'
         },
 
-        // ===  ORANGE (Magma/Peach) ===
+        // === ORANGE (Row 8) ===
         { 
             id: 'orange-dark', name: 'Magma', type: 'pro', isLight: false, preview: '#331a00',
             colors: { bg: '#0f0700', sidebar: '#1f0f00', card: '#331a00', nav: '#331a00', border: '#663300' },
@@ -4376,16 +4501,21 @@
             colors: { bg: '#fff7ed', sidebar: '#fffaf5', card: '#ffffff', nav: '#ffffff', border: '#fed7aa' },
             accent: '#ea580c', accentLight: '#fb923c'
         },
-        
-        // === SPECIAL ===
+
+        // === SPECIAL (Row 9) ===
+        { 
+            id: 'noir', name: 'Noir', type: 'pro', isLight: false, preview: '#000000',
+            colors: { bg: '#000000', sidebar: '#0a0a0a', card: '#141414', nav: '#141414', border: '#333333' },
+            accent: '#ffffff', accentLight: '#cccccc'
+        },
         { 
             id: 'rainbow', name: 'Rainbow', type: 'pro', isLight: false, 
             preview: 'linear-gradient(135deg, #ff0000, #ffff00, #0000ff)',
             isRainbow: true,
-            accent: null // Accent генерируется динамически
+            accent: null 
         }
     ];
-
+    
     let blacklist = JSON.parse(localStorage.getItem(STORAGE.BLACKLIST)) || [];
     let favorites = JSON.parse(localStorage.getItem(STORAGE.FAVORITES)) || [];
     let watchLater = JSON.parse(localStorage.getItem(STORAGE.WATCH_LATER)) || [];
@@ -6725,6 +6855,8 @@
         
         // 1. ОТКЛЮЧАЕМ СТАРТОВЫЙ РЕЖИМ
         isFirstGen = false; 
+        hasInteractedWithCurrent = false; 
+        hasWatchedCurrentItem = false; 
 
         // 2. СКРЫВАЕМ КНОПКУ СТАРТА И ПОКАЗЫВАЕМ ИНТЕРФЕЙС
         // Если пользователь зашел сразу в историю, не нажимая "Let's Go", эти элементы могут быть не в том состоянии.
@@ -6984,14 +7116,21 @@
     function handleOutboundClick() {
         if(!currentItem) return;
         
+        // Таймер запускаем ВСЕГДА (чтобы считалось время просмотра при возврате)
         watchStartTime = Date.now();
         itemBeingWatched = currentItem;
 
-        if(!hasInteractedWithCurrent) {
+        // Логика начисления очков (ТОЛЬКО ОДИН РАЗ на карточку)
+        if(!hasWatchedCurrentItem) {
             const fullTags = getCombinedTags(currentItem);
+            
             adjustTagScoresByTags(fullTags, 3); 
-            hasInteractedWithCurrent = true;
+            
             logActivity('watch', currentItem.id, fullTags);
+            
+            hasWatchedCurrentItem = true;
+            
+            hasInteractedWithCurrent = true;
         }
     }
 
@@ -7460,7 +7599,7 @@
         document.querySelectorAll('[data-key]').forEach(el => {
             const key = el.getAttribute('data-key');
             if(t[key]) {
-                if (key.startsWith('inst_') || key.startsWith('badge_') || key.startsWith('feat_')) {
+                if (key.startsWith('inst_') || key.startsWith('badge_') || key.startsWith('feat_') || key === 'sync_tip') {
                     el.innerHTML = t[key];
                 } else {
                     el.innerText = t[key];
@@ -9153,6 +9292,7 @@
         }
 
         if(card) {
+            card.classList.remove('status-wl', 'status-fav', 'status-ban');
             card.classList.remove('flash-active', 'has-results'); 
             card.style.transform = ''; 
             card.style.transition = '';
@@ -9227,6 +9367,7 @@
 
         isGenerating = true;
         hasInteractedWithCurrent = false;
+        hasWatchedCurrentItem = false;
         const finalItem = getWeightedRandom(filtered);
 
         // === АНИМАЦИЯ ===
@@ -9545,17 +9686,20 @@
         if(!currentItem) return;
         const id = currentItem.id;
         
-        // Если в Watch Later, не добавляем в ЧС
-        if (watchLater.includes(id)) return;
+        // Не баним, если это Watch Later ИЛИ Favorites (вброс)
+        if (watchLater.includes(id) || favorites.includes(id)) {
+            return;
+        }
 
         if (blacklist.includes(id)) {
             if (!silent) blacklist = blacklist.filter(x => x !== id);
         } else { 
             blacklist.push(id); 
+
             favorites = favorites.filter(x => x !== id); 
             
             const fullTags = getCombinedTags(currentItem);
-            adjustTagScoresByTags(fullTags, -5); // Уменьшаем вес
+            adjustTagScoresByTags(fullTags, -5); 
             
             logActivity('dislike', id, fullTags);
         }
@@ -10086,18 +10230,22 @@
         // Игнорируем меньше 5 сек
         if (diffInSeconds < 5) return;
 
-        const t = langData[currentLang] || langData['en'];
+        // Если больше 30 минут (1800 сек), ставим заглушку
         let timeString = "";
-
-        const minutes = Math.floor(diffInSeconds / 60);
-        const seconds = diffInSeconds % 60;
         const minLabel = currentLang === 'ru' ? 'мин' : 'min';
         const secLabel = currentLang === 'ru' ? 'сек' : 'sec';
 
-        if (minutes > 0) {
-            timeString = `${minutes} ${minLabel} ${seconds} ${secLabel}`;
+        if (diffInSeconds > 1800) {
+            timeString = `30+ ${minLabel}`;
         } else {
-            timeString = `${seconds} ${secLabel}`;
+            const minutes = Math.floor(diffInSeconds / 60);
+            const seconds = diffInSeconds % 60;
+            
+            if (minutes > 0) {
+                timeString = `${minutes} ${minLabel} ${seconds} ${secLabel}`;
+            } else {
+                timeString = `${seconds} ${secLabel}`;
+            }
         }
 
         // === СОХРАНЕНИЕ В ИСТОРИЮ ===
@@ -10119,15 +10267,23 @@
         if (window.syncToCloud) window.syncToCloud();
         // ======================================
 
-        // Показ сообщения (старый код)
+        // Показ сообщения
+        const t = langData[currentLang] || langData['en'];
         let phraseTemplate = "";
-        if (diffInSeconds < 40) {
+        
+        // Если смотрел долго (или сработала заглушка 30+)
+        if (diffInSeconds > 1800) {
+             phraseTemplate = (currentLang === 'ru') ? "Долгое погружение... 🌊" : "Deep dive... 🌊";
+             // Перезаписываем timeString в шаблоне, если нужно, или просто выводим фразу
+        } else if (diffInSeconds < 40) {
             phraseTemplate = t.return_phrase_short || "Only {t}...";
         } else {
             const phrases = t.return_phrases || ["{t} passed."];
             phraseTemplate = phrases[Math.floor(Math.random() * phrases.length)];
         }
-        const finalPhrase = phraseTemplate.replace("{t}", timeString);
+        
+        // Если phraseTemplate не содержит {t}, просто выводим её
+        const finalPhrase = phraseTemplate.includes("{t}") ? phraseTemplate.replace("{t}", timeString) : phraseTemplate;
 
         const statusEl = document.getElementById('status-text');
         if (statusEl) {
