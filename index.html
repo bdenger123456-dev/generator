@@ -2496,6 +2496,64 @@
             font-size: 13px;
         }
 
+        /* ===  ВЫБОР РЕЖИМА === */
+
+        /* Контейнер выбора режима - всегда по центру */
+        .mode-selector-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1; /* Под карточкой */
+            transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s;
+            padding: 20px;
+        }
+
+        /* Когда карточка активна, меню уезжает немного назад и исчезает */
+        .mode-selector-container.inactive {
+            transform: scale(0.9);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Контейнер карточки (Якорь) */
+        #card-anchor {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 100; /* Поверх меню */
+            
+            display: flex;
+            flex-direction: column;
+            
+            /* Анимация */
+            transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+            will-change: transform;
+        }
+
+        /* Изначальное состояние - спрятан внизу */
+        .card-anchor-hidden {
+            transform: translateY(110%);
+        }
+
+        /* Активное состояние - на экране */
+        .card-anchor-visible {
+            transform: translateY(0);
+        }
+
+        @keyframes floatIcon {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
         /* =========================================
         18. MEDIA QUERIES (ADAPTATION)
         ========================================= */
@@ -2711,24 +2769,52 @@
         </div>
 
        <!-- TAB 1: HOME -->
-        <div id="tab-home" class="tab-content active">
-            <div class="center-wrapper">
+        <div id="tab-home" class="tab-content active" style="position: relative; overflow: hidden;">
+            
+            <!-- 1. НОВЫЙ БЛОК: ВЫБОР РЕЖИМА (Виден сразу) -->
+            <div id="home-mode-selector" class="center-wrapper mode-selector-container">
+                <div style="font-size: 60px; margin-bottom: 20px; animation: floatIcon 3s ease-in-out infinite;">🧭</div>
+                <h2 style="margin-bottom:10px; font-size: 24px; text-align: center;" data-key="mode_select_title">Choose Your Path</h2>
+                <p style="color:var(--text-secondary); margin-bottom:40px; line-height:1.5; text-align: center; max-width: 300px;" data-key="mode_select_desc">
+                    We know what you like. How should we proceed today?
+                </p>
                 
-                <!-- ЯКОРЬ -->
-                <div id="card-anchor" style="position: relative; width: 100%; display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: visible;">
+                <div style="display:flex; flex-direction:column; gap:15px; width:100%; max-width: 340px;">
+                    <!-- Button Explore -->
+                    <button class="btn-gen secondary" onclick="selectStartupMode('explore')" style="display:flex; align-items:center; justify-content:space-between; padding: 20px; text-align:left; border: 2px solid var(--border); background: var(--card-bg);">
+                        <div>
+                            <div style="font-size:17px; font-weight:800; color:var(--text-main); margin-bottom:4px;" data-key="mode_explore">Something New</div>
+                            <div style="font-size:12px; color:var(--text-secondary); text-transform:none; font-weight:500;" data-key="mode_explore_desc">Rare & unseen genres</div>
+                        </div>
+                        <span style="font-size:24px;">🎲</span>
+                    </button>
+
+                    <!-- Button Enjoy -->
+                    <button class="btn-gen" onclick="selectStartupMode('enjoy')" style="display:flex; align-items:center; justify-content:space-between; padding: 20px; text-align:left; background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 100%); border: none; color: white;">
+                        <div>
+                            <div style="font-size:17px; font-weight:800; color:#fff; margin-bottom:4px;" data-key="mode_enjoy">Something Familiar</div>
+                            <div style="font-size:12px; color:rgba(255,255,255,0.8); text-transform:none; font-weight:500;" data-key="mode_enjoy_desc">Based on your likes</div>
+                        </div>
+                        <span style="font-size:24px;">❤️</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2. КАРТОЧКА (Изначально спрятана внизу) -->
+            <div id="card-anchor" class="card-anchor-hidden">
+                <div class="center-wrapper" style="height: 100%; justify-content: center;">
                     
                     <!-- ОБЁРТКА (Wrapper) -->
                     <div id="card-anim-wrapper" style="position: relative; width: 100%; display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: visible; z-index: 10;">
                         
-                        <!-- 1. ПЕРЕМЕСТИЛИ ФРАЗУ СЮДА -->
+                        <!-- ФРАЗА СТАТУСА (Над карточкой) -->
                         <div class="status-text-combined stagger-item delay-5" id="status-text"></div>
 
-                        <!-- 2. Иконки -->
+                        <!-- Иконки -->
                         <img src="" id="deco-left" class="deco-icon icon-left" alt="">
                         <img src="" id="deco-right" class="deco-icon icon-right" alt="">
 
-
-                        <!-- КАРТОЧКА -->
+                        <!-- САМА КАРТОЧКА -->
                         <div class="card" id="card-block">
 
                             <div id="card-notch" class="card-notch">
@@ -2743,13 +2829,12 @@
                                 <div class="badge-wrapper" id="badge-wrapper"></div>
                             </div>
 
-                            <!-- ЦЕНТРАЛЬНАЯ ЧАСТЬ (flex-grow: 1, чтобы занимать всё свободное место) -->
+                            <!-- ЦЕНТРАЛЬНАЯ ЧАСТЬ -->
                             <div style="width:100%; display:flex; flex-direction:column; align-items:center; justify-content: center; flex-grow: 1; overflow: hidden;">
                                 
                                 <!-- Название (Слот-машина) -->
                                 <div class="slot-window">
                                     <div id="slot-reel" class="slot-reel">
-                                        <!-- Начальный текст -->
                                         <div class="slot-item" id="result-text" style="opacity: 0.8; font-size: 32px;">Ready?</div>
                                     </div>
                                 </div>
@@ -2764,17 +2849,17 @@
                                 </div>
                             </div>
 
-                            <!-- НИЖНЯЯ ЧАСТЬ: Кнопки (flex-shrink: 0, чтобы не сжимались) -->
+                            <!-- НИЖНЯЯ ЧАСТЬ -->
                             <div style="width:100%; display:flex; flex-direction:column; align-items:center; margin-top: auto; flex-shrink: 0; padding-bottom: 5px;">
                                 
-                                <!-- 1. Кнопка СТАРТА (Внутри карточки) -->
+                                <!-- 1. Кнопка СТАРТА -->
                                 <div id="start-btn-container">
                                     <button class="btn-start-capsule" onclick="startNewSession()">
                                         🔥 <span data-key="btn_start">Let's Go</span>
                                     </button>
                                 </div>
 
-                                <!-- 2. КНОПКИ TINDER (Скрыты в начале) -->
+                                <!-- 2. КНОПКИ TINDER -->
                                 <div class="tinder-nav-row hidden-initial stagger-item delay-4" id="tinder-controls">
                                     <button class="t-circle-btn small undo" id="btn-t-undo" onclick="undoLastAction()">↺</button>
                                     <button class="t-circle-btn medium dislike" id="btn-t-pass" onclick="handleSwipeAction('left')">✕</button>
@@ -2783,19 +2868,12 @@
                                     <button class="t-circle-btn small wl" id="btn-t-wl" onclick="toggleWatchLater()">🕓</button>
                                 </div>
 
-                                <!-- 3. Модификаторы (Expandable Capsule) -->
+                                <!-- 3. Модификаторы -->
                                 <div id="mods-block" class="hidden-initial stagger-item delay-4" style="width:100%; display: flex; justify-content: center;">
-                                    
-                                    <!-- Сама капсула -->
                                     <div id="mods-capsule" class="mods-wrapper-expanded" onclick="toggleModifiers(event)">
-                                        <!-- Иконка (Плюс / Крестик) -->
                                         <div class="mods-icon-plus">+</div>
-                                        
-                                        <!-- Контейнер для тегов (Сюда JS будет вставлять кнопки) -->
-                                        <div class="mods-content" id="mod-container">
-                                        </div>
+                                        <div class="mods-content" id="mod-container"></div>
                                     </div>
-
                                 </div>
                             </div>
                         </div> <!-- Конец .card -->
@@ -3857,38 +3935,6 @@
 </div>
 
 <div id="wrapped-mount" class="wrapped-overlay"></div>
-
-<!-- STARTUP MODE SELECTION OVERLAY -->
-<div id="startup-mode-overlay" class="modal-overlay" style="z-index: 21000; background: var(--bg-color); display: none;">
-    <div class="center-wrapper" style="text-align:center; padding:20px; max-width: 400px;">
-        
-        <div style="font-size: 60px; margin-bottom: 20px;">🧭</div>
-        <h2 style="margin-bottom:10px; font-size: 24px;" data-key="mode_select_title">Choose Your Path</h2>
-        <p style="color:var(--text-secondary); margin-bottom:40px; line-height:1.5;" data-key="mode_select_desc">
-            We know what you like. How should we proceed today?
-        </p>
-        
-        <div style="display:flex; flex-direction:column; gap:15px; width:100%;">
-            <!-- Button Explore -->
-            <button class="btn-gen secondary" onclick="selectStartupMode('explore')" style="display:flex; align-items:center; justify-content:space-between; padding: 20px; text-align:left; border: 2px solid var(--border);">
-                <div>
-                    <div style="font-size:17px; font-weight:800; color:var(--text-main); margin-bottom:4px;" data-key="mode_explore">Something New</div>
-                    <div style="font-size:12px; color:var(--text-secondary); text-transform:none; font-weight:500;" data-key="mode_explore_desc">Rare & unseen genres</div>
-                </div>
-                <span style="font-size:24px;">🎲</span>
-            </button>
-
-            <!-- Button Enjoy -->
-            <button class="btn-gen" onclick="selectStartupMode('enjoy')" style="display:flex; align-items:center; justify-content:space-between; padding: 20px; text-align:left; background: var(--card-gradient); border: 2px solid var(--accent);">
-                <div>
-                    <div style="font-size:17px; font-weight:800; color:#fff; margin-bottom:4px;" data-key="mode_enjoy">Something Familiar</div>
-                    <div style="font-size:12px; color:rgba(255,255,255,0.7); text-transform:none; font-weight:500;" data-key="mode_enjoy_desc">Based on your likes</div>
-                </div>
-                <span style="font-size:24px;">❤️</span>
-            </button>
-        </div>
-    </div>
-</div>
 
 <!-- MODE CHANGE MODAL (Small) -->
 <div class="modal-overlay" id="modal-mode-change" onclick="closeModeModal(event)">
@@ -10605,37 +10651,37 @@
     }
 
     function resetToHome() {
-        // Если мы уже на стартовом экране (нет текущего предмета), ничего не делаем
-        // Или если сейчас идет генерация
-        if (!currentItem || isGenerating) return;
+        // Если мы уже на выборе режима (карточка скрыта), ничего не делаем
+        const cardAnchor = document.getElementById('card-anchor');
+        if (cardAnchor.classList.contains('card-anchor-hidden')) return;
 
-        const wrapper = document.getElementById('card-anim-wrapper');
-        const card = document.getElementById('card-block');
+        // Если идет генерация, тоже стоп
+        if (isGenerating) return;
+
+        // 1. Анимация ухода карточки ВНИЗ
+        cardAnchor.classList.remove('card-anchor-visible');
+        cardAnchor.classList.add('card-anchor-hidden');
         
-        // 1. АНИМАЦИЯ УХОДА (Как Дизлайк - влево и поворот)
-        if (wrapper) {
-            wrapper.style.transition = 'transform 0.4s ease-in, opacity 0.4s';
-            wrapper.style.transform = 'translateX(-150%) rotate(-10deg)';
-            wrapper.style.opacity = '0';
-        }
+        // 2. Возвращение меню выбора
+        document.getElementById('home-mode-selector').classList.remove('inactive');
 
-        // Ждем пока улетит (350мс)
+        // Сбрасываем выбор сессии
+        sessionStorage.removeItem('xch_mode_selected');
+
+        // 3. Очистка данных через 500мс (пока едет анимация)
         setTimeout(() => {
-            // 2. СБРОС ДАННЫХ
             currentItem = null;
             lastGeneratedItem = null;
-            isFirstGen = true; // Чтобы при следующем нажатии снова была долгая анимация
-            sessionHistoryStack = []; // Очищаем историю сессии (кнопка назад)
+            isFirstGen = true;
+            sessionHistoryStack = [];
 
-            // 3. СБРОС ИНТЕРФЕЙСА
-            
-            // Скрываем результаты
+            // Скрываем результаты UI
             const uiToHide = ['result-desc', 'tinder-controls', 'mods-block', 'related-block'];
             uiToHide.forEach(id => {
                 const el = document.getElementById(id);
                 if(el) {
-                    el.classList.add('hidden-initial'); // Скрываем
-                    el.style.display = 'none'; // Дублируем для надежности
+                    el.classList.add('hidden-initial'); 
+                    el.style.display = 'none';
                 }
             });
 
@@ -10647,62 +10693,29 @@
             if(startBtn) {
                 startBtn.classList.remove('hidden-initial');
                 startBtn.style.display = 'flex';
-                startBtn.style.opacity = '1';
             }
 
-            // Возвращаем состояние Карточки (убираем класс has-results)
+            // Сброс карточки
+            const card = document.getElementById('card-block');
             if(card) {
-                card.classList.remove('has-results');
-                card.classList.remove('flash-active');
+                card.classList.remove('has-results', 'flash-active', 'status-wl', 'status-fav', 'status-ban');
+                // Сброс иконок
+                const iconLeft = document.querySelector('.icon-left');
+                const iconRight = document.querySelector('.icon-right');
+                if(iconLeft) iconLeft.style.transform = '';
+                if(iconRight) iconRight.style.transform = '';
             }
 
-            // Запускаем "Холостой ход" слотов (блюр и 30 вариантов)
             initIdleSlot();
-
-            // 4. СБРОС ИКОНОК (Сисечек)
-            const iconLeft = document.querySelector('.icon-left');
-            const iconRight = document.querySelector('.icon-right');
-            // Сбрасываем стили, если они были сдвинуты свайпом
-            [iconLeft, iconRight].forEach(icon => {
-                if(icon) {
-                    icon.style.transition = 'none';
-                    icon.style.opacity = '';
-                    icon.style.transform = '';
-                    icon.style.animation = ''; // Сброс, чтобы перезапустить парение
-                }
-            });
-
-            // 5. УСТАНОВКА ФРАЗЫ ОТДЫХА
-            const t = langData[currentLang];
-            const phrases = t.reset_phrases || ["Relax..."];
-            const phrase = phrases[Math.floor(Math.random() * phrases.length)];
             
+            // Очистка текста
             const statusEl = document.getElementById('status-text');
             if(statusEl) {
-                statusEl.innerText = phrase;
-                statusEl.style.color = "var(--text-secondary)"; // Делаем цвет спокойным (серым)
-                statusEl.style.opacity = '1';
-                // Сбрасываем трансформ текста, если он был сдвинут
-                statusEl.style.transform = ''; 
-                statusEl.style.transition = 'none';
+                statusEl.innerText = "";
+                statusEl.style.transform = '';
             }
 
-            // 6. ВОЗВРАЩЕНИЕ КАРТОЧКИ (Мгновенный телепорт в центр и Fade In)
-            if (wrapper) {
-                // Мгновенно убираем трансформ (пока прозрачность 0)
-                wrapper.style.transition = 'none';
-                wrapper.style.transform = 'scale(0.95)'; // Чуть меньше, чтобы красиво появиться
-                
-                // Форсируем перерисовку браузера
-                void wrapper.offsetWidth;
-
-                // Плавное появление
-                wrapper.style.transition = 'opacity 0.5s ease, transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-                wrapper.style.opacity = '1';
-                wrapper.style.transform = 'scale(1)';
-            }
-
-        }, 350);
+        }, 500);
     }
 
     document.addEventListener("visibilitychange", () => {
@@ -10900,27 +10913,64 @@
     };
 
     function checkStartupMode() {
-        // Показываем выбор только если есть история (юзер не новичок)
-        // И если он еще не выбрал режим в этой сессии
-        if ((favorites.length + blacklist.length > 3) && !sessionStorage.getItem('xch_mode_selected')) {
-            document.getElementById('startup-mode-overlay').style.display = 'flex';
-            // Скрываем основной контент пока не выберут
-            document.getElementById('tab-home').style.display = 'none';
-        } else {
-            // Если новичок или уже выбрал - ставим дефолт
+        // Если уже выбирали в этой сессии - сразу показываем карточку
+        if (sessionStorage.getItem('xch_mode_selected')) {
+            document.getElementById('home-mode-selector').classList.add('inactive');
+            document.getElementById('card-anchor').classList.remove('card-anchor-hidden');
+            document.getElementById('card-anchor').classList.add('card-anchor-visible');
+            
+            // Восстанавливаем состояние (опционально)
             updateModeCapsule();
+        } else {
+            // Если нет - показываем меню выбора (карточка скрыта классом card-anchor-hidden)
+            document.getElementById('home-mode-selector').classList.remove('inactive');
+            document.getElementById('card-anchor').classList.add('card-anchor-hidden');
+            document.getElementById('card-anchor').classList.remove('card-anchor-visible');
         }
+        
+        // Всегда показываем таб
+        document.getElementById('tab-home').style.display = 'flex';
     }
 
     function selectStartupMode(mode) {
         setMode(mode);
         sessionStorage.setItem('xch_mode_selected', 'true');
         
-        // Прячем оверлей, показываем таб
-        document.getElementById('startup-mode-overlay').style.display = 'none';
-        document.getElementById('tab-home').style.display = 'flex';
+        // 1. Анимация ухода меню
+        document.getElementById('home-mode-selector').classList.add('inactive');
         
-        // Запускаем перерисовку лэйаута на всякий случай
+        // 2. Анимация появления карточки (выезд снизу)
+        const cardAnchor = document.getElementById('card-anchor');
+        cardAnchor.classList.remove('card-anchor-hidden');
+        cardAnchor.classList.add('card-anchor-visible');
+        
+        // 3. Установка фразы над карточкой (Комментарий)
+        const t = langData[currentLang];
+        const statusEl = document.getElementById('status-text');
+        
+        if (statusEl) {
+            let comment = "";
+            // Фразы для разных режимов
+            if (mode === 'explore') {
+                comment = currentLang === 'ru' ? "Отличный выбор. Ищем новое..." : "Great choice. Exploring new horizons...";
+            } else {
+                comment = currentLang === 'ru' ? "Зона комфорта. Подбираем любимое..." : "Comfort zone. Picking favorites...";
+            }
+            
+            statusEl.innerText = comment;
+            statusEl.style.opacity = '0';
+            statusEl.style.transform = 'translateY(20px)';
+            
+            // Показываем текст с задержкой после выезда карточки
+            setTimeout(() => {
+                statusEl.style.transition = 'all 0.5s ease';
+                statusEl.style.opacity = '1';
+                statusEl.style.transform = 'translateY(0)';
+                statusEl.style.color = "var(--text-secondary)";
+            }, 600);
+        }
+
+        // Запускаем перерисовку лэйаута
         checkLayout(); 
     }
 
