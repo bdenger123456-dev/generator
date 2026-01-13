@@ -772,7 +772,22 @@
         /* Catalog Search */
         .modal-search-box { width: 100%; margin-bottom: 15px; position: relative; }
         .modal-search-input { width: 100%; background: var(--ios-card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; font-size: 16px; color: var(--text-main); }
-        .modal-suggestions { display: none; flex-direction: column; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; margin-top: 5px; max-height: 200px; overflow-y: auto; position: absolute; width: 100%; z-index: 100; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .modal-suggestions { 
+            display: none; 
+            flex-direction: column; 
+            background: var(--card-bg); 
+            border: 1px solid var(--border); 
+            border-radius: 12px; 
+            margin-top: 5px; 
+            max-height: 250px; 
+            overflow-y: auto; 
+            
+            position: relative; 
+            width: 100%; 
+            z-index: 100; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            margin-bottom: 10px; /* Отступ снизу от тегов */
+        }
         .suggestion-row { padding: 10px 15px; border-bottom: 1px solid var(--border); font-size: 14px; cursor: pointer; display: flex; justify-content: space-between; }
         
         .catalog-item { padding: 8px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: default; display: inline-flex; align-items: center; gap: 8px; margin: 3px; }
@@ -1252,6 +1267,10 @@
             margin-bottom: 10px; border: 1px solid var(--border); z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
         .warning-badge:hover .badge-tooltip { opacity: 1; pointer-events: auto; }
+
+        .badge-fantasy { background: #8e44ad; } /* Фиолетовый */
+        .badge-roleplay { background: #2980b9; } /* Синий */
+        .badge-public { background: #e67e22; } /* Оранжевый */
 
         .history-item-ios {
             display: flex; justify-content: space-between; align-items: center;
@@ -2442,6 +2461,41 @@
             background: var(--card-gradient) !important; 
         }
 
+        /* MODE CAPSULE STYLES */
+        .mode-capsule {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 6px 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            margin-top: 5px; /* Отступ от лого/субтитра */
+            margin-bottom: 5px;
+            transition: all 0.2s;
+            align-self: center; /* Для центрирования в flex-контейнере */
+        }
+
+        .mode-capsule:active {
+            background: var(--nav-bg);
+            transform: scale(0.95);
+        }
+
+        .mode-icon { font-size: 14px; }
+        .mode-text { 
+            font-size: 11px; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+        }
+        .mode-arrow { font-size: 8px; color: var(--text-secondary); opacity: 0.7; }
+
+        .plan-card.bestie .plan-features li {
+            font-size: 13px;
+        }
+
         /* =========================================
         18. MEDIA QUERIES (ADAPTATION)
         ========================================= */
@@ -2628,8 +2682,14 @@
             <span>Fetish</span>Hub <span class="version-tag">0.1</span>
         </div>
         
-        <!-- Подзаголовок (Обязательно оставляем) -->
+        <!-- Подзаголовок -->
         <div class="subtitle" data-key="subtitle">Your home for adult preferences</div>
+
+        <div id="mode-capsule-ui" class="mode-capsule" onclick="openModeModal()">
+            <span class="mode-icon">🧭</span>
+            <span class="mode-text" id="mode-text-display">Exploration</span>
+            <span class="mode-arrow">▼</span>
+        </div>
         
         <div id="pc-settings-mount"></div>
     </div>
@@ -2643,6 +2703,11 @@
                 <span>Fetish</span>Hub <span class="version-tag">0.1</span>
             </div>
             <div class="subtitle" data-key="subtitle">Your home for adult preferences</div>
+            <div id="mode-capsule-ui" class="mode-capsule" onclick="openModeModal()">
+                <span class="mode-icon">🧭</span>
+                <span class="mode-text" id="mode-text-display">Exploration</span>
+                <span class="mode-arrow">▼</span>
+            </div>
         </div>
 
        <!-- TAB 1: HOME -->
@@ -3266,7 +3331,7 @@
                     <!-- Список фич -->
                     <ul class="plan-features">
                         <li style="color:var(--text-main)" data-key="feat_lifetime">♾️ <b>Lifetime Access</b></li>
-                        <li style="color:var(--text-main)" data-key="feat_all_pro">👑 <b>All Pro Features</b></li>
+                        <li style="color:var(--text-main)" data-key="feat_all_beast">👑 <b>All Beast Features</b></li>
                         <li data-key="feat_sponsors">💎 Listed in "Sponsors"</li>
                         <li data-key="feat_onetime">💸 One-time payment</li>
                     </ul>
@@ -3792,6 +3857,57 @@
 </div>
 
 <div id="wrapped-mount" class="wrapped-overlay"></div>
+
+<!-- STARTUP MODE SELECTION OVERLAY -->
+<div id="startup-mode-overlay" class="modal-overlay" style="z-index: 21000; background: var(--bg-color); display: none;">
+    <div class="center-wrapper" style="text-align:center; padding:20px; max-width: 400px;">
+        
+        <div style="font-size: 60px; margin-bottom: 20px;">🧭</div>
+        <h2 style="margin-bottom:10px; font-size: 24px;" data-key="mode_select_title">Choose Your Path</h2>
+        <p style="color:var(--text-secondary); margin-bottom:40px; line-height:1.5;" data-key="mode_select_desc">
+            We know what you like. How should we proceed today?
+        </p>
+        
+        <div style="display:flex; flex-direction:column; gap:15px; width:100%;">
+            <!-- Button Explore -->
+            <button class="btn-gen secondary" onclick="selectStartupMode('explore')" style="display:flex; align-items:center; justify-content:space-between; padding: 20px; text-align:left; border: 2px solid var(--border);">
+                <div>
+                    <div style="font-size:17px; font-weight:800; color:var(--text-main); margin-bottom:4px;" data-key="mode_explore">Something New</div>
+                    <div style="font-size:12px; color:var(--text-secondary); text-transform:none; font-weight:500;" data-key="mode_explore_desc">Rare & unseen genres</div>
+                </div>
+                <span style="font-size:24px;">🎲</span>
+            </button>
+
+            <!-- Button Enjoy -->
+            <button class="btn-gen" onclick="selectStartupMode('enjoy')" style="display:flex; align-items:center; justify-content:space-between; padding: 20px; text-align:left; background: var(--card-gradient); border: 2px solid var(--accent);">
+                <div>
+                    <div style="font-size:17px; font-weight:800; color:#fff; margin-bottom:4px;" data-key="mode_enjoy">Something Familiar</div>
+                    <div style="font-size:12px; color:rgba(255,255,255,0.7); text-transform:none; font-weight:500;" data-key="mode_enjoy_desc">Based on your likes</div>
+                </div>
+                <span style="font-size:24px;">❤️</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- MODE CHANGE MODAL (Small) -->
+<div class="modal-overlay" id="modal-mode-change" onclick="closeModeModal(event)">
+    <div class="modal" style="max-width: 300px; padding: 20px;">
+        <div class="modal-header" style="padding-top:0; border:none;">
+            <span data-key="mode_switch_title">Switch Mode</span>
+        </div>
+        <div class="ios-group">
+            <div class="ios-row clickable" onclick="setMode('explore')">
+                <span data-key="mode_explore_short">Exploration</span>
+                <span id="check-explore"></span>
+            </div>
+            <div class="ios-row clickable" onclick="setMode('enjoy')">
+                <span data-key="mode_enjoy_short">Enjoyment</span>
+                <span id="check-enjoy"></span>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- FIREBASE INTEGRATION -->
 <script type="module">
@@ -4477,6 +4593,8 @@
 
     let onboardingSelectedIds = [];
 
+    let currentGenMode = 'explore'; 
+
     let currentSlideIndex = 0;
     let slideInterval;
     let itemBeingWatched = null; 
@@ -4734,6 +4852,21 @@
         de: ["Suche deinen Fetisch...", "Scanne den Hub...", "Was wird es sein?", "Suche etwas Scharfes..."]
     };
 
+    const modeStatusPhrases = {
+        explore: {
+            en: ["Venturing into the unknown...", "Expanding horizons...", "Digging deep for new gems...", "Something different?"],
+            ru: ["Идем в неизведанное...", "Расширяем горизонты...", "Ищем новые алмазы...", "Что-то новенькое?"],
+            es: ["Aventurándose en lo desconocido...", "Expandiendo horizontes...", "¿Algo diferente?"],
+            de: ["Ins Unbekannte vorstoßen...", "Horizont erweitern...", "Etwas anderes?"]
+        },
+        enjoy: {
+            en: ["Comfort zone activated...", "You'll love this...", "Classic choice for you...", "Reliable pleasure..."],
+            ru: ["Зона комфорта активирована...", "Тебе это понравится...", "Классика для тебя...", "Проверенное удовольствие..."],
+            es: ["Zona de confort activada...", "Te encantará esto...", "Placer confiable..."],
+            de: ["Komfortzone aktiviert...", "Das wirst du lieben...", "Verlässliches Vergnügen..."]
+        }
+    };
+
     const resultComments = {
         en: ["Like it? Go watch 😈", "Not bad, huh? 😏", "Enjoy your time 🔥", "Go for it! 😀"],
         ru: ["Заинтересовало? Иди и смотри 😈", "Неплохой фетиш, а? 😏", "Приятного просмотра 🔥", "Ну всё, беги смотреть! 😀"],
@@ -4803,6 +4936,24 @@
             feat_lifetime: "♾️ <b>Lifetime Access</b>",
             feat_onetime: "💸 One-time payment",
             btn_get_bestie: "Get Forever",
+
+            feat_all_beast: "👑 All Beast Features",
+            badge_fantasy: "Fantasy",
+            badge_desc_fantasy: "✨ <b>Unreal Scenarios</b><br>Situations that defy reality or involve supernatural elements.",
+            badge_roleplay: "Roleplay",
+            badge_desc_roleplay: "🎭 <b>Acting & Costumes</b><br>Assuming characters or professions for pleasure.",
+            badge_public: "Public",
+            badge_desc_public: "🌳 <b>Exhibitionism</b><br>Risk of being seen or outdoors.",
+
+            mode_select_title: "Choose Your Path",
+            mode_select_desc: "We know what you like. How should we proceed today?",
+            mode_explore: "Something New",
+            mode_explore_desc: "Rare & unseen genres",
+            mode_enjoy: "Something Familiar",
+            mode_enjoy_desc: "Based on your likes",
+            mode_switch_title: "Switch Mode",
+            mode_explore_short: "Exploration",
+            mode_enjoy_short: "Enjoyment",
 
             // --- Sponsors ---
             btn_early_sponsors: "Early Sponsors 💎",
@@ -5170,6 +5321,24 @@
             feat_onetime: "💸 Разовый платёж",
             btn_get_bestie: "Купить навсегда",
 
+            feat_all_beast: "👑 Всё, что есть в Beast",
+            badge_fantasy: "Фантазия",
+            badge_desc_fantasy: "✨ <b>Нереальные сценарии</b><br>Ситуации, нарушающие законы физики, или сверхъестественное.",
+            badge_roleplay: "Ролевая",
+            badge_desc_roleplay: "🎭 <b>Образы и Костюмы</b><br>Отыгрыш ролей, профессий или персонажей.",
+            badge_public: "Публично",
+            badge_desc_public: "🌳 <b>На людях</b><br>Риск быть замеченным или секс на улице.",
+
+            mode_select_title: "Выбери путь",
+            mode_select_desc: "Мы уже знаем твои вкусы. Как построим подборку сегодня?",
+            mode_explore: "Что-то новое",
+            mode_explore_desc: "Редкие и новые жанры",
+            mode_enjoy: "Что-то знакомое",
+            mode_enjoy_desc: "Похоже на твои лайки",
+            mode_switch_title: "Режим подбора",
+            mode_explore_short: "Исследование",
+            mode_enjoy_short: "Наслаждение",
+
             // --- Sponsors ---
             btn_early_sponsors: "Ранние спонсоры 💎",
             sponsors_title: "Зал Славы",
@@ -5534,6 +5703,24 @@
             feat_onetime: "💸 Pago único",
             btn_get_bestie: "Obtener para siempre",
 
+            feat_all_beast: "👑 Todo lo de Beast",
+            badge_fantasy: "Fantasía",
+            badge_desc_fantasy: "✨ <b>Escenarios Irreales</b>",
+            badge_roleplay: "Rol",
+            badge_desc_roleplay: "🎭 <b>Actuación y Disfraces</b>",
+            badge_public: "Público",
+            badge_desc_public: "🌳 <b>Exhibicionismo</b>",
+
+            mode_select_title: "Elige tu Camino",
+            mode_select_desc: "Sabemos lo que te gusta. ¿Cómo procedemos?",
+            mode_explore: "Algo Nuevo",
+            mode_explore_desc: "Géneros raros",
+            mode_enjoy: "Algo Familiar",
+            mode_enjoy_desc: "Basado en tus gustos",
+            mode_switch_title: "Cambiar Modo",
+            mode_explore_short: "Exploración",
+            mode_enjoy_short: "Disfrute",
+
             // --- Sponsors ---
             btn_early_sponsors: "Patrocinadores 💎",
             sponsors_title: "Muro de la Fama",
@@ -5889,6 +6076,24 @@
             feat_lifetime: "♾️ <b>Lebenslanger Zugriff</b>",
             feat_onetime: "💸 Einmalzahlung",
             btn_get_bestie: "Für immer holen",
+
+            feat_all_beast: "👑 Alles von Beast",
+            badge_fantasy: "Fantasie",
+            badge_desc_fantasy: "✨ <b>Irreale Szenarien</b>",
+            badge_roleplay: "Rollenspiel",
+            badge_desc_roleplay: "🎭 <b>Schauspiel & Kostüme</b>",
+            badge_public: "Öffentlich",
+            badge_desc_public: "🌳 <b>Exhibitionismus</b>",
+
+            mode_select_title: "Wähle deinen Weg",
+            mode_select_desc: "Wir kennen deinen Geschmack. Wie geht es weiter?",
+            mode_explore: "Etwas Neues",
+            mode_explore_desc: "Seltene Genres",
+            mode_enjoy: "Etwas Vertrautes",
+            mode_enjoy_desc: "Basiert auf Likes",
+            mode_switch_title: "Modus wechseln",
+            mode_explore_short: "Erkundung",
+            mode_enjoy_short: "Genuss",
 
             // --- Sponsors ---
             btn_early_sponsors: "Frühe Sponsoren 💎",
@@ -6670,6 +6875,7 @@
         window.addEventListener('resize', checkLayout);
         
         document.body.classList.add('tab-home-active');
+        checkStartupMode();
     }
 
     window.onload = loadData;
@@ -6748,32 +6954,50 @@
     }
 
     function calculateItemWeight(item) {
-        // 1. Жесткий фильтр (Черный список)
         if (blacklist.includes(item.id)) return 0;
-        
-        // 2. Кулдаун (если недавно видели - вес почти ноль)
         if (cooldownList.includes(item.id)) return 0.1;
 
-        let score = 50; // Базовый вес (нейтральный)
+        let score = 50; 
 
-        // 3. Анализ тегов по профилю пользователя
+        // Базовый анализ тегов
         item.tags.forEach(tag => {
-            if (tagScores[tag]) {
-                score += tagScores[tag]; // Если тег любимый, score растет. Если в бане (-), падает.
-            }
+            if (tagScores[tag]) score += tagScores[tag];
         });
 
-        // 4. Буст ориентации (Contextual Boost)
-        // Это временный буст, он не меняет профиль, но влияет на текущую выдачу
+        // --- ЛОГИКА РЕЖИМОВ ---
+        if (currentGenMode === 'enjoy') {
+            // РЕЖИМ НАСЛАЖДЕНИЕ: Бустим то, что нравится
+            
+            // Если это прямой фаворит - небольшой буст (чтобы иногда повторялось)
+            if (favorites.includes(item.id)) score += 100;
+            
+            // Если высокий скор по тегам - огромный буст
+            if (score > 100) score *= 2; 
+            
+            // Штрафуем неизвестное
+            if (score < 50) score *= 0.5;
+
+        } else {
+            // РЕЖИМ ИССЛЕДОВАНИЕ (Default): Бустим новое
+            
+            // Если уже видели/лайкали - штраф
+            if (favorites.includes(item.id) || historyData.some(h => h.id === item.id)) {
+                score *= 0.2; 
+            }
+            
+            // Если скор нейтральный (неизвестное) - буст
+            if (score >= 40 && score <= 60) score += 30;
+        }
+        // -----------------------------
+
+        // Contextual Boosts (Ориентация)
         if (currentOrientation === 'gay' && item.tags.includes('gay')) score += 50;
         if (currentOrientation === 'trans' && item.tags.some(t => ['trans', 'shemale'].includes(t))) score += 50;
         if (currentOrientation === 'lesbian' && item.tags.includes('lesbian')) score += 50;
 
-        // 5. Штраф за несоответствие ориентации (Soft Filter)
         if (currentOrientation === 'gay' && item.tags.includes('straight')) score -= 100;
         if (currentOrientation === 'hetero' && (item.tags.includes('gay') || item.tags.includes('shemale'))) score -= 100;
 
-        // Защита от отрицательных чисел
         return Math.max(1, score);
     }
 
@@ -6980,40 +7204,39 @@
         badgeWrapper.innerHTML = '';
         const t = langData[currentLang];
         
-        const safetyTags = ['straight', 'universal', 'vanilla'];
-        const isSafe = currentItem.tags.some(t => safetyTags.includes(t));
-        const isExtreme = currentItem.tags.some(t => EXTREME_TAGS.includes(t));
-        const isBDSM = currentItem.tags.includes('bdsm') || currentItem.tags.includes('bondage');
-        const hasLgbtTag = currentItem.tags.some(t => ['gay','trans','shemale','lesbian', 'bi'].includes(t));
-        const showLgbt = hasLgbtTag && !isSafe;
-        const isNiche = currentItem.tags.includes('fetish') || currentItem.tags.includes('scat');
+        // Списки тегов для категорий
+        const fantasyTags = ['fantasy', 'monster', 'alien', 'giantess', 'transformation', 'hypnosis', 'ghost'];
+        const roleplayTags = ['roleplay', 'teacher', 'nurse', 'maid', 'police', 'office', 'mom', 'sister'];
+        const publicTags = ['public', 'outdoor', 'risk', 'exhibitionism', 'car'];
 
-        // Функция для создания HTML бейджа с тултипом
+        // Проверки
+        const isSafe = currentItem.tags.some(t => ['straight', 'universal', 'vanilla'].includes(t));
+        const isExtreme = currentItem.tags.some(t => EXTREME_TAGS.includes(t));
+        const showLgbt = currentItem.tags.some(t => ['gay','trans','shemale','lesbian'].includes(t)) && !isSafe;
+        const isNiche = currentItem.tags.includes('fetish') || currentItem.tags.includes('scat');
+        
+        const isFantasy = currentItem.tags.some(t => fantasyTags.includes(t));
+        const isRoleplay = currentItem.tags.some(t => roleplayTags.includes(t));
+        const isPublic = currentItem.tags.some(t => publicTags.includes(t));
+
         const createBadge = (className, label, desc) => {
-            return `
-                <div class="warning-badge ${className}" style="position:relative; overflow:visible; cursor:help;">
-                    ${label}
-                    <div class="badge-tooltip">${desc}</div>
-                </div>
-            `;
+            return `<div class="warning-badge ${className}" style="position:relative; overflow:visible; cursor:help;">${label}<div class="badge-tooltip">${desc}</div></div>`;
         };
 
-        // Логика добавления бейджей (теперь с тултипами внутри)
-        // Добавляем класс 'has-tooltip' для обработки кликов на мобильных (опционально через CSS :hover)
+        // Рендер (Порядок важен)
+        if(isExtreme) badgeWrapper.innerHTML += createBadge('badge-extreme', t.badge_extreme, t.badge_desc_extreme);
         
-        if(isExtreme) { 
-            badgeWrapper.innerHTML += createBadge('badge-extreme', t.badge_extreme, t.badge_desc_extreme);
-        }
-        else if(isBDSM) { 
-            badgeWrapper.innerHTML += createBadge('', t.badge_bdsm, t.badge_desc_bdsm); // Default dark style
-            // Добавим стиль для BDSM если его нет в CSS
+        if(showLgbt) badgeWrapper.innerHTML += createBadge('badge-lgbt', t.badge_lgbt, t.badge_desc_lgbt);
+        
+        if(isFantasy) badgeWrapper.innerHTML += createBadge('badge-fantasy', t.badge_fantasy, t.badge_desc_fantasy);
+        else if(isRoleplay) badgeWrapper.innerHTML += createBadge('badge-roleplay', t.badge_roleplay, t.badge_desc_roleplay);
+        else if(isPublic) badgeWrapper.innerHTML += createBadge('badge-public', t.badge_public, t.badge_desc_public);
+        
+        if(isNiche) badgeWrapper.innerHTML += createBadge('badge-niche', t.badge_niche, t.badge_desc_niche);
+        
+        if(currentItem.tags.includes('bdsm')) {
+            badgeWrapper.innerHTML += createBadge('', t.badge_bdsm, t.badge_desc_bdsm);
             badgeWrapper.lastElementChild.style.background = "#333";
-        }
-        else if(showLgbt) { 
-            badgeWrapper.innerHTML += createBadge('badge-lgbt', t.badge_lgbt, t.badge_desc_lgbt);
-        }
-        else if(isNiche) {
-            badgeWrapper.innerHTML += createBadge('badge-niche', t.badge_niche, t.badge_desc_niche);
         }
     }
 
@@ -9645,8 +9868,13 @@
                 statusEl.innerText = explanation;
                 statusEl.style.color = "var(--accent)";
             } else {
-                const comments = resultComments[currentLang];
-                statusEl.innerText = comments[Math.floor(Math.random() * comments.length)];
+                const phrases = modeStatusPhrases[currentGenMode][currentLang] || modeStatusPhrases[currentGenMode]['en'];
+                // Смешиваем с общими фразами для разнообразия (50/50 шанс)
+                const commonPhrases = resultComments[currentLang];
+                
+                const finalPool = Math.random() > 0.5 ? phrases : commonPhrases;
+                
+                statusEl.innerText = finalPool[Math.floor(Math.random() * finalPool.length)];
                 statusEl.style.color = "var(--text-secondary)";
             }
         }
@@ -10563,19 +10791,48 @@
             const item = data.find(x => x.id === entry.id);
             if(!item) return;
             
-            // Используем стили ios-row для красоты
             const div = document.createElement('div');
             div.className = 'ios-row clickable';
-            div.style.padding = '12px 20px'; // Чуть больше отступ в модалке
+            div.style.padding = '10px 16px'; // Чуть компактнее
             
             const name = getLocalizedName(item);
             
-            // Дата генерации (опционально)
-            // const dateStr = new Date(entry.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            // 1. Форматирование Даты и Времени
+            const dateObj = new Date(entry.timestamp);
+            const dateStr = dateObj.toLocaleDateString();
+            const timeStr = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            // 2. Определение Статуса (Иконки)
+            let statusIcon = '';
+            let statusColor = 'transparent';
+            
+            if (favorites.includes(item.id)) {
+                statusIcon = '❤️'; // Лайк
+            } else if (blacklist.includes(item.id)) {
+                statusIcon = '💀'; // Дизлайк (Череп или крестик)
+            } else if (watchLater.includes(item.id)) {
+                statusIcon = '🕓'; // Смотреть позже
+            } else {
+                statusIcon = '👁️'; // Ничего (Просто просмотрено)
+                statusColor = 'opacity: 0.3;'; // Делаем бледнее
+            }
 
+            // 3. HTML Структура
             div.innerHTML = `
-                <div style="font-weight:500;">${name}</div>
-                <div style="color:var(--accent); font-size:18px;">↺</div>
+                <div style="display:flex; flex-direction:column; gap:3px; flex:1;">
+                    <div style="font-weight:600; font-size:15px; color:var(--text-main);">${name}</div>
+                    <div style="font-size:11px; color:var(--text-secondary);">
+                        ${dateStr} <span style="opacity:0.5; margin:0 4px;">•</span> ${timeStr}
+                    </div>
+                </div>
+                
+                <div style="display:flex; align-items:center; gap:15px;">
+                    <!-- Иконка статуса -->
+                    <div style="font-size:18px; ${statusColor}" title="Status">${statusIcon}</div>
+                    
+                    <!-- Кнопка повтора -->
+                    <div style="color:var(--accent); font-size:20px; opacity:0.8;">↺</div>
+                </div>
             `;
             
             div.onclick = () => { 
@@ -10641,6 +10898,66 @@
             document.getElementById('modal-admin-overlay').classList.remove('open');
         }
     };
+
+    function checkStartupMode() {
+        // Показываем выбор только если есть история (юзер не новичок)
+        // И если он еще не выбрал режим в этой сессии
+        if ((favorites.length + blacklist.length > 3) && !sessionStorage.getItem('xch_mode_selected')) {
+            document.getElementById('startup-mode-overlay').style.display = 'flex';
+            // Скрываем основной контент пока не выберут
+            document.getElementById('tab-home').style.display = 'none';
+        } else {
+            // Если новичок или уже выбрал - ставим дефолт
+            updateModeCapsule();
+        }
+    }
+
+    function selectStartupMode(mode) {
+        setMode(mode);
+        sessionStorage.setItem('xch_mode_selected', 'true');
+        
+        // Прячем оверлей, показываем таб
+        document.getElementById('startup-mode-overlay').style.display = 'none';
+        document.getElementById('tab-home').style.display = 'flex';
+        
+        // Запускаем перерисовку лэйаута на всякий случай
+        checkLayout(); 
+    }
+
+    function setMode(mode) {
+        currentGenMode = mode;
+        updateModeCapsule();
+        closeModeModal();
+        
+    }
+
+    function updateModeCapsule() {
+        const t = langData[currentLang];
+        const textEl = document.querySelectorAll('#mode-text-display'); // Их может быть 2 (мобилка и пк)
+        const icon = currentGenMode === 'explore' ? '🧭' : '❤️';
+        const label = currentGenMode === 'explore' ? t.mode_explore_short : t.mode_enjoy_short;
+        
+        // Обновляем все капсулы (и в сайдбаре, и в хедере)
+        document.querySelectorAll('.mode-capsule').forEach(cap => {
+            cap.querySelector('.mode-icon').innerText = icon;
+            cap.querySelector('.mode-text').innerText = label;
+        });
+    }
+
+    function openModeModal() {
+        const t = langData[currentLang];
+        document.getElementById('modal-mode-change').classList.add('open');
+        
+        // Галочки
+        document.getElementById('check-explore').innerText = currentGenMode === 'explore' ? '✓' : '';
+        document.getElementById('check-enjoy').innerText = currentGenMode === 'enjoy' ? '✓' : '';
+    }
+
+    function closeModeModal(e) {
+        if (!e || e.target.id === 'modal-mode-change' || !e.target.id) {
+            document.getElementById('modal-mode-change').classList.remove('open');
+        }
+    }
 
 </script>
 </body>
