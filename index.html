@@ -2753,55 +2753,7 @@
                 <div id="mount-extras"></div>
             </div>
         </div>
-
-        <!-- TAB 4: ADMIN PANEL (Hidden by default) -->
-        <div id="admin-panel" style="display:none; margin-top:30px; border-top:1px solid var(--border); padding-top:20px; width:100%;">
-            <div class="ios-header" style="color:#ff0000;">👑 Admin Control</div>
-            
-            <!-- Генератор кодов -->
-            <div class="ios-group" style="padding:15px;">
-                <div style="font-weight:700; margin-bottom:10px;">Generate Promo</div>
-                <div style="display:flex; gap:10px; margin-bottom:10px;">
-                    <select id="admin-code-type" class="promo-input" style="flex:1;">
-                        <option value="pro">Pro</option>
-                        <option value="beast">Beast</option>
-                        <option value="bestie">Bestie</option>
-                    </select>
-                    <input type="number" id="admin-code-days" class="promo-input" style="width:80px;" value="30" placeholder="Days">
-                </div>
-                <button class="btn-gen" onclick="adminGenerateCode()" style="padding:10px; font-size:14px; background:var(--card-bg);">Create Code</button>
-                <div id="admin-code-result" style="margin-top:10px; font-family:monospace; font-size:16px; color:#2ecc71; user-select:all;"></div>
-            </div>
-
-            <!-- Подарок подписки (Поиск по Email) -->
-            <div class="ios-group" style="padding:15px;">
-                <div style="font-weight:700; margin-bottom:10px;">Gift Subscription (By Email)</div>
-                <input type="text" id="admin-gift-email" class="promo-input" placeholder="User Email..." style="margin-bottom:10px;">
-                
-                <div style="display:flex; gap:10px; margin-bottom:10px;">
-                    <select id="admin-gift-type" class="promo-input" style="flex:1;">
-                        <option value="pro">Pro</option>
-                        <option value="beast">Beast</option>
-                    </select>
-                    <input type="number" id="admin-gift-days" class="promo-input" style="width:80px;" value="30">
-                </div>
-                
-                <button class="btn-gen" onclick="adminGiftSub()" style="padding:10px; font-size:14px; background:var(--accent); color:#000;">Activate Sub</button>
-            </div>
-
-            <!-- Сброс подписки (Reset to Free) -->
-            <div class="ios-group" style="padding:15px; margin-top:15px; border: 1px solid rgba(231, 76, 60, 0.3);">
-                <div style="font-weight:700; margin-bottom:10px; color:var(--highlight-red);">Reset Subscription ⚠️</div>
-                <input type="text" id="admin-reset-email" class="promo-input" placeholder="User Email to reset..." style="margin-bottom:10px;">
-                
-                <button class="btn-gen" onclick="adminResetSub()" style="padding:10px; font-size:14px; background:rgba(231, 76, 60, 0.1); border:1px solid var(--highlight-red); color:var(--highlight-red);">
-                    Set to FREE
-                </button>
-            </div>
-
-        </div>
     </div>
-
  </div>
 
 <div class="bottom-gradient-mask"></div>
@@ -3113,11 +3065,18 @@
                 <span data-key="watch_later">Watch Later</span>
                 <span class="badge" id="count-wl" style="color:var(--text-secondary); font-size:17px;">0</span>
             </div>
-
             <!-- 4. СБРОС -->
             <div class="ios-row clickable" onclick="resetAppHistory()" style="color: var(--highlight-red);">
                 <span data-key="btn_reset">Reset Data</span>
                 <span>✕</span>
+            </div>
+            <!-- ADMIN BUTTON (Hidden by default) -->
+            <div id="btn-admin-trigger" class="ios-row clickable" onclick="openAdminModal()" style="display:none; color: #ff0000;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <span style="font-size:20px;">⚡</span>
+                    <span style="font-weight:700;">Admin Panel</span>
+                </div>
+                <span style="color:var(--text-secondary)">›</span>
             </div>
         </div>
 
@@ -3431,6 +3390,66 @@
         
         <div style="padding: 15px; border-top: 1px solid var(--border); text-align: center;">
             <button class="btn-gen" onclick="window.closeLegal(null, true)" data-key="btn_close" style="padding: 10px 30px; font-size: 14px; width: auto;">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- ADMIN MODAL -->
+<div class="modal-overlay" id="modal-admin-overlay" onclick="closeAdminModal(event)" style="z-index: 25000;">
+    <div class="modal" style="max-width: 450px; background: var(--sidebar-bg);">
+        
+        <div class="modal-header" style="border-bottom: 1px solid var(--border);">
+            <div style="display:flex; align-items:center; gap:10px; color:#ff0000;">
+                <span>👑</span>
+                <span>Admin Control</span>
+            </div>
+            <span style="cursor:pointer; opacity:0.7;" onclick="closeAdminModal(null, true)">✕</span>
+        </div>
+
+        <div class="modal-body" style="padding: 20px;">
+            
+            <!-- Генератор кодов -->
+            <div class="ios-group" style="padding:15px; margin-bottom: 20px;">
+                <div style="font-weight:700; margin-bottom:10px; font-size:13px; text-transform:uppercase; color:var(--text-secondary);">Generate Promo Code</div>
+                <div style="display:flex; gap:10px; margin-bottom:10px;">
+                    <select id="admin-code-type" class="promo-input" style="flex:1;">
+                        <option value="pro">Pro</option>
+                        <option value="beast">Beast</option>
+                        <option value="bestie">Bestie</option>
+                    </select>
+                    <input type="number" id="admin-code-days" class="promo-input" style="width:80px;" value="30" placeholder="Days">
+                </div>
+                <button class="btn-gen" onclick="adminGenerateCode()" style="padding:12px; font-size:14px; background:var(--card-bg);">Create Code</button>
+                <div id="admin-code-result" style="margin-top:15px; font-family:monospace; font-size:18px; color:#2ecc71; user-select:all; text-align:center; font-weight:800; min-height:20px;"></div>
+            </div>
+
+            <!-- Подарок подписки (Поиск по Email) -->
+            <div class="ios-group" style="padding:15px; margin-bottom: 20px;">
+                <div style="font-weight:700; margin-bottom:10px; font-size:13px; text-transform:uppercase; color:var(--text-secondary);">Gift Sub (By Email)</div>
+                <input type="text" id="admin-gift-email" class="promo-input" placeholder="User Email..." style="margin-bottom:10px;">
+                
+                <div style="display:flex; gap:10px; margin-bottom:10px;">
+                    <select id="admin-gift-type" class="promo-input" style="flex:1;">
+                        <option value="pro">Pro</option>
+                        <option value="beast">Beast</option>
+                        <option value="bestie">Bestie</option>
+                    </select>
+                    <input type="number" id="admin-gift-days" class="promo-input" style="width:80px;" value="30">
+                </div>
+                
+                <button class="btn-gen" onclick="adminGiftSub()" style="padding:12px; font-size:14px; background:var(--accent); color:#000;">Activate Sub</button>
+            </div>
+
+            <!-- Сброс подписки (Reset to Free) -->
+            <div class="ios-group" style="padding:15px; border: 1px solid rgba(231, 76, 60, 0.3);">
+                <div style="font-weight:700; margin-bottom:10px; color:var(--highlight-red); font-size:13px; text-transform:uppercase;">Reset Subscription ⚠️</div>
+                <input type="text" id="admin-reset-email" class="promo-input" placeholder="User Email to reset..." style="margin-bottom:10px;">
+                
+                <button class="btn-gen" onclick="adminResetSub()" style="padding:12px; font-size:14px; background:rgba(231, 76, 60, 0.15); border:1px solid var(--highlight-red); color:var(--highlight-red);">
+                    Set to FREE
+                </button>
+            </div>
+
         </div>
     </div>
 </div>
@@ -4071,10 +4090,10 @@
         }
 
         if (user && user.uid === ADMIN_UID) {
-            const adminPanel = document.getElementById('admin-panel');
-            if(adminPanel) adminPanel.style.display = 'block';
+            // Показываем кнопку в меню аккаунта
+            const btn = document.getElementById('btn-admin-trigger');
+            if(btn) btn.style.display = 'flex';
         }
-
     });
 
     // 2. Генерация промокода
@@ -10615,6 +10634,16 @@
             list.appendChild(div);
         });
     }
+
+    window.openAdminModal = function() {
+        document.getElementById('modal-admin-overlay').classList.add('open');
+    };
+
+    window.closeAdminModal = function(e, force) {
+        if (force || e.target.id === 'modal-admin-overlay') {
+            document.getElementById('modal-admin-overlay').classList.remove('open');
+        }
+    };
 
 </script>
 </body>
