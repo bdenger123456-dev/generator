@@ -2556,8 +2556,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 20px;
+            justify-content: space-between !important;
+            padding: 40px 20px 30px 20px !important;
             transition: opacity 0.3s;
         }
 
@@ -2567,57 +2567,59 @@
         }
 
         .mode-greeting-text {
-            font-size: 22px;
-            font-weight: 800;
+            font-size: clamp(28px, 6vw, 42px) !important; 
+            font-weight: 900 !important;
+            line-height: 1.1 !important;
             text-align: center;
-            margin-bottom: 40px;
             color: var(--text-main);
-            line-height: 1.4;
-            max-width: 280px;
+            
+            margin-top: auto; 
+            margin-bottom: auto;
+            max-width: 90%;
         }
 
         .mode-buttons-circle-row {
             display: flex;
             justify-content: center;
-            gap: 30px;
+            gap: 25px;
             width: 100%;
+            margin-top: auto; 
+            margin-bottom: 10px;
         }
 
         .mode-circle-btn {
-            width: 80px;
-            height: 80px;
+            width: 75px;
+            height: 75px;
             border-radius: 50%;
-            border: none;
-            font-size: 36px;
+            border: none !important;
+            font-size: 32px;
+            
+            /* Тень и позиционирование */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            color: #fff; /* Эмодзи всегда яркие */
+            
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
-            background: var(--ios-card);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-            position: relative;
         }
 
         .mode-circle-btn:active {
-            transform: scale(0.9);
+            transform: scale(0.92);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
-        /* Explore (Красный оттенок при нажатии/ховере) */
-        .mode-circle-btn.explore { border: 2px solid rgba(231, 76, 60, 0.3); }
-        .mode-circle-btn.explore:active { background: rgba(231, 76, 60, 0.1); }
+        /* Градиенты для кнопок */
+        .mode-circle-btn.explore {
+            /* Красный градиент */
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            box-shadow: 0 10px 30px rgba(231, 76, 60, 0.4);
+        }
 
-        /* Pleasure (Зеленый оттенок) */
-        .mode-circle-btn.pleasure { border: 2px solid rgba(46, 204, 113, 0.3); }
-        .mode-circle-btn.pleasure:active { background: rgba(46, 204, 113, 0.1); }
-
-        .mode-hint {
-            margin-top: 30px;
-            font-size: 11px;
-            color: var(--text-secondary);
-            opacity: 0.5;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        .mode-circle-btn.pleasure {
+            /* Зеленый градиент */
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            box-shadow: 0 10px 30px rgba(46, 204, 113, 0.4);
         }
 
         /* === 3. РАСПОЛОЖЕНИЕ КАПСУЛЫ (PC vs MOBILE) === */
@@ -2627,12 +2629,19 @@
             display: flex;
             justify-content: center;
             width: 100%;
-            margin-bottom: 15px; /* Отступ до карточки */
-            margin-top: -10px;
+            margin-top: -15px !important; 
+            margin-bottom: 25px !important;
+            position: relative;
+            z-index: 60;
         }
 
         #pc-mode-mount {
-            display: none; /* Скрыт на мобильных */
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 15px; 
+            border-top: none !important;
+            padding-top: 0 !important;
         }
 
         /* PC ВЕРСИЯ */
@@ -2651,8 +2660,9 @@
             
             /* Капсула на ПК растягивается или имеет свой стиль */
             #pc-mode-mount .mode-capsule-btn {
-                width: 100%;
-                justify-content: space-between;
+                width: auto; 
+                min-width: 140px;
+                justify-content: center;
             }
         }
 
@@ -5053,7 +5063,12 @@
             expl_hist: "From Archives 📜",
             deco_label: "Show Decorations",
 
-            mode_greeting_hint: "What are we watching today: something new 🔭 or familiar 🥰?",
+            mode_greeting_hint: [
+                "Something new 🔭 or familiar favorites 🥰?",
+                "Explore the unknown 🔭 or stick to the hits 🥰?",
+                "Feeling adventurous 🔭 or nostalgic 🥰?",
+                "Trust the algorithm 🔭 or trust your gut 🥰?"
+            ],
             mode_explore: "Explore",
             mode_pleasure: "Pleasure",
 
@@ -5425,7 +5440,13 @@
             expl_hist: "Из архивов 📜",
             deco_label: "Показывать декор",
 
-            mode_greeting_hint: "Что смотрим сегодня: что-то новое 🔭 или привычное 🥰?",
+            mode_greeting_hint: [
+                "Что-то новенькое 🔭 или проверенное 🥰?",
+                "Эксперименты 🔭 или любимая классика 🥰?",
+                "В поиск 🔭 или в зону комфорта 🥰?",
+                "Рискнем 🔭 или пойдем по лайкам 🥰?"
+            ],
+
             mode_explore: "Исследование",
             mode_pleasure: "Наслаждение",
 
@@ -5793,7 +5814,12 @@
             expl_hist: "De los archivos 📜",
             deco_label: "Mostrar decoración",
 
-            mode_greeting_hint: "¿Qué veremos hoy: algo nuevo 🔭 o familiar 🥰?",
+            mode_greeting_hint: [
+                "¿Algo nuevo 🔭 o tus favoritos 🥰?",
+                "¿Explorar lo desconocido 🔭 o ir a lo seguro 🥰?",
+                "¿Aventurero 🔭 o nostálgico 🥰?",
+                "¿Confiar en el azar 🔭 o en tu gusto 🥰?"
+            ],
             mode_explore: "Explorar",
             mode_pleasure: "Placer",
 
@@ -6153,7 +6179,12 @@
             expl_hist: "Aus dem Archiv 📜",
             deco_label: "Dekoration anzeigen",
 
-            mode_greeting_hint: "Was schauen wir heute: etwas Neues 🔭 oder Bekanntes 🥰?",
+            mode_greeting_hint: [
+                "Etwas Neues 🔭 oder bekannte Favoriten 🥰?",
+                "Unbekanntes entdecken 🔭 oder bei Hits bleiben 🥰?",
+                "Abenteuerlustig 🔭 oder nostalgisch 🥰?",
+                "Dem Zufall vertrauen 🔭 oder dem Geschmack 🥰?"
+            ],
             mode_explore: "Erkunden",
             mode_pleasure: "Genießen",
 
@@ -10708,62 +10739,95 @@
     }
 
     function resetToHome() {
-        // Если мы уже на стартовом экране (нет текущего предмета), ничего не делаем
-        // Или если сейчас идет генерация
+        // Если мы уже на стартовом экране или идет генерация — выходим
         if (!currentItem || isGenerating) return;
 
         const wrapper = document.getElementById('card-anim-wrapper');
         const card = document.getElementById('card-block');
         
-        // 1. АНИМАЦИЯ УХОДА (Как Дизлайк - влево и поворот)
+        // 1. АНИМАЦИЯ УХОДА (Улетает влево)
         if (wrapper) {
             wrapper.style.transition = 'transform 0.4s ease-in, opacity 0.4s';
             wrapper.style.transform = 'translateX(-150%) rotate(-10deg)';
             wrapper.style.opacity = '0';
         }
 
-        // Ждем пока улетит (350мс)
+        // Ждем окончания анимации (350мс)
         setTimeout(() => {
             // 2. СБРОС ДАННЫХ
             currentItem = null;
             lastGeneratedItem = null;
-            isFirstGen = true; // Чтобы при следующем нажатии снова была долгая анимация
-            sessionHistoryStack = []; // Очищаем историю сессии (кнопка назад)
+            isFirstGen = true; 
+            sessionHistoryStack = []; 
 
-            // 3. СБРОС ИНТЕРФЕЙСА
-            
-            // Скрываем результаты
+            // 3. СБРОС ИНТЕРФЕЙСА (Скрываем результаты)
             const uiToHide = ['result-desc', 'tinder-controls', 'mods-block', 'related-block'];
             uiToHide.forEach(id => {
                 const el = document.getElementById(id);
                 if(el) {
-                    el.classList.add('hidden-initial'); // Скрываем
-                    el.style.display = 'none'; // Дублируем для надежности
+                    el.classList.add('hidden-initial'); 
+                    el.style.display = 'none'; 
                 }
             });
 
-            // Очищаем бейджи
+            // Очищаем бейджи и статус
             document.getElementById('badge-wrapper').innerHTML = '';
+            const statusEl = document.getElementById('status-text');
+            if(statusEl) statusEl.innerText = ''; // Очищаем верхний текст
 
-            // Возвращаем кнопку "Старт"
+            // Сброс классов карточки
+            if(card) {
+                card.classList.remove('has-results', 'flash-active', 'status-wl', 'status-fav', 'status-ban');
+                const notch = document.getElementById('card-notch');
+                if(notch) notch.classList.remove('visible');
+            }
+
+            // Запускаем "Холостой ход" слотов
+            initIdleSlot();
+
+            // Сброс иконок (декора)
+            const iconLeft = document.querySelector('.icon-left');
+            const iconRight = document.querySelector('.icon-right');
+            [iconLeft, iconRight].forEach(icon => {
+                if(icon) {
+                    icon.style.transition = 'none';
+                    icon.style.opacity = '';
+                    icon.style.transform = '';
+                    icon.style.animation = ''; 
+                }
+            });
+
             const totalInteractions = favorites.length + blacklist.length;
+            const startBtn = document.getElementById('start-btn-container');
+            const overlay = document.getElementById('mode-start-overlay');
+
             if (totalInteractions >= 10) {
-                // Если опытный пользователь -> Показываем Оверлей с выбором
-                const overlay = document.getElementById('mode-start-overlay');
+                // ВАРИАНТ А: Опытный пользователь -> Показываем ВЫБОР РЕЖИМА
+                
+                // 1. Обновляем фразу (чтобы не была одной и той же)
+                randomizeModeGreeting(); 
+
+                // 2. Показываем оверлей с кнопками 🔭 и 🥰
                 if(overlay) {
                     overlay.classList.remove('hidden');
                     overlay.style.opacity = '1';
                     overlay.style.transform = 'scale(1)';
                 }
-                isModeSelectionActive = true;
                 
-                // Убеждаемся, что старая кнопка скрыта
-                const startBtn = document.getElementById('start-btn-container');
+                // 3. Включаем флаг, чтобы работали свайпы для выбора
+                isModeSelectionActive = true; 
+                
+                // 4. Скрываем старую кнопку "Поехали"
                 if(startBtn) startBtn.style.display = 'none';
-                
+
             } else {
-                // Новичок -> Старая кнопка "Поехали"
-                const startBtn = document.getElementById('start-btn-container');
+                // ВАРИАНТ Б: Новичок -> Старая кнопка "Поехали"
+                
+                // 1. Скрываем оверлей выбора
+                if(overlay) overlay.classList.add('hidden');
+                isModeSelectionActive = false;
+
+                // 2. Показываем кнопку "Let's Go"
                 if(startBtn) {
                     startBtn.classList.remove('hidden-initial');
                     startBtn.style.display = 'flex';
@@ -10771,53 +10835,14 @@
                 }
             }
 
-            // Возвращаем состояние Карточки (убираем класс has-results)
-            if(card) {
-                card.classList.remove('has-results');
-                card.classList.remove('flash-active');
-            }
 
-            // Запускаем "Холостой ход" слотов (блюр и 30 вариантов)
-            initIdleSlot();
-
-            // 4. СБРОС ИКОНОК (Сисечек)
-            const iconLeft = document.querySelector('.icon-left');
-            const iconRight = document.querySelector('.icon-right');
-            // Сбрасываем стили, если они были сдвинуты свайпом
-            [iconLeft, iconRight].forEach(icon => {
-                if(icon) {
-                    icon.style.transition = 'none';
-                    icon.style.opacity = '';
-                    icon.style.transform = '';
-                    icon.style.animation = ''; // Сброс, чтобы перезапустить парение
-                }
-            });
-
-            // 5. УСТАНОВКА ФРАЗЫ ОТДЫХА
-            const t = langData[currentLang];
-            const phrases = t.reset_phrases || ["Relax..."];
-            const phrase = phrases[Math.floor(Math.random() * phrases.length)];
-            
-            const statusEl = document.getElementById('status-text');
-            if(statusEl) {
-                statusEl.innerText = phrase;
-                statusEl.style.color = "var(--text-secondary)"; // Делаем цвет спокойным (серым)
-                statusEl.style.opacity = '1';
-                // Сбрасываем трансформ текста, если он был сдвинут
-                statusEl.style.transform = ''; 
-                statusEl.style.transition = 'none';
-            }
-
-            // 6. ВОЗВРАЩЕНИЕ КАРТОЧКИ (Мгновенный телепорт в центр и Fade In)
+            // 6. ВОЗВРАЩЕНИЕ КАРТОЧКИ (Телепорт в центр и Fade In)
             if (wrapper) {
-                // Мгновенно убираем трансформ (пока прозрачность 0)
                 wrapper.style.transition = 'none';
-                wrapper.style.transform = 'scale(0.95)'; // Чуть меньше, чтобы красиво появиться
+                wrapper.style.transform = 'scale(0.95)'; // Чуть меньше для эффекта
                 
-                // Форсируем перерисовку браузера
-                void wrapper.offsetWidth;
+                void wrapper.offsetWidth; // Reflow
 
-                // Плавное появление
                 wrapper.style.transition = 'opacity 0.5s ease, transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
                 wrapper.style.opacity = '1';
                 wrapper.style.transform = 'scale(1)';
@@ -11000,6 +11025,7 @@
         const startBtn = document.getElementById('start-btn-container');
 
         if (hasEnoughData) {
+            randomizeModeGreeting();
             // 1. Показываем капсулы (CSS media query решит, какую именно)
             capsules.forEach(el => el.style.display = 'block');
             
@@ -11030,6 +11056,18 @@
                 startBtn.style.display = 'flex';
             }
         }
+    }
+
+    function randomizeModeGreeting() {
+        const el = document.querySelector('.mode-greeting-text');
+        if (!el) return;
+        
+        const t = langData[currentLang] || langData['en'];
+        const phrases = Array.isArray(t.mode_greeting_hint) 
+            ? t.mode_greeting_hint 
+            : [t.mode_greeting_hint];
+            
+        el.innerText = phrases[Math.floor(Math.random() * phrases.length)];
     }
 
     function toggleModeDropdown(type) {
