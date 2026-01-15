@@ -2468,6 +2468,184 @@
             background: var(--card-gradient) !important; 
         }
 
+        /* === MODE SWITCHER (CAPSULE) === */
+        .mode-capsule-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 20px;
+            z-index: 50;
+            transition: opacity 0.3s;
+        }
+
+        /* Скрываем по умолчанию, показываем JS-ом если есть 10 действий */
+        .mode-capsule-container.hidden {
+            display: none !important;
+        }
+
+        .mode-switch {
+            display: flex;
+            background: var(--ios-card);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 4px;
+            position: relative;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .mode-option {
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            z-index: 2;
+            transition: color 0.3s;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .mode-option.active {
+            color: #fff;
+        }
+
+        /* Бегающий фон капсулы */
+        .mode-bg {
+            position: absolute;
+            top: 4px;
+            bottom: 4px;
+            left: 4px;
+            width: calc(50% - 4px);
+            border-radius: 40px;
+            background: var(--nav-bg);
+            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.3s;
+            z-index: 1;
+        }
+
+        /* Цвета режимов */
+        .mode-switch[data-mode="explore"] .mode-bg {
+            transform: translateX(0);
+            background: #e74c3c; /* Красный */
+            box-shadow: 0 2px 10px rgba(231, 76, 60, 0.4);
+        }
+
+        .mode-switch[data-mode="pleasure"] .mode-bg {
+            transform: translateX(100%); /* Сдвиг на вторую половину */
+            background: #2ecc71; /* Зеленый */
+            box-shadow: 0 2px 10px rgba(46, 204, 113, 0.4);
+        }
+
+        /* === START SCREEN MODES (CARD CONTENT) === */
+        .mode-start-view {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0; left: 0;
+            background: var(--card-gradient);
+            z-index: 60; /* Поверх слота */
+            padding: 20px;
+            text-align: center;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .mode-start-view.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.95);
+        }
+
+        .mode-greeting {
+            font-size: 24px;
+            font-weight: 900;
+            margin-bottom: 30px;
+            color: var(--text-main);
+            line-height: 1.3;
+        }
+
+        .mode-buttons-row {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-mode-select {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 10px;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-mode-select:active {
+            transform: scale(0.95);
+        }
+
+        .btn-mode-select.explore {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            box-shadow: 0 10px 30px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-mode-select.pleasure {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            box-shadow: 0 10px 30px rgba(46, 204, 113, 0.3);
+        }
+
+        .btn-mode-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .btn-mode-title {
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .btn-mode-desc {
+            font-size: 10px;
+            opacity: 0.8;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        /* Мобильная адаптация капсулы */
+        @media (max-width: 768px) {
+            .mode-capsule-container {
+                position: absolute; /* Фиксируем под хедером */
+                top: 75px; 
+                left: 0;
+                width: 100%;
+                margin-bottom: 0;
+                pointer-events: none; /* Чтобы клики проходили сквозь контейнер */
+            }
+            .mode-switch {
+                pointer-events: auto; /* Возвращаем клики кнопке */
+                background: rgba(20, 20, 20, 0.8);
+                backdrop-filter: blur(10px);
+            }
+            
+            /* Сдвигаем контент вниз, если капсула активна */
+            body.modes-active #tab-home .center-wrapper {
+                padding-top: 120px !important;
+            }
+        }
+
         /* =========================================
         18. MEDIA QUERIES (ADAPTATION)
         ========================================= */
@@ -2666,9 +2844,9 @@
             <span>Fetish</span>Hub <span class="version-tag">0.1</span>
         </div>
         
-        <!-- Подзаголовок (Обязательно оставляем) -->
+        <!-- Подзаголовок -->
         <div class="subtitle" data-key="subtitle">Your home for adult preferences</div>
-        
+
         <div id="pc-settings-mount"></div>
     </div>
 
@@ -2681,19 +2859,33 @@
                 <span>Fetish</span>Hub <span class="version-tag">0.1</span>
             </div>
             <div class="subtitle" data-key="subtitle">Your home for adult preferences</div>
+            
         </div>
 
        <!-- TAB 1: HOME -->
         <div id="tab-home" class="tab-content active">
             <div class="center-wrapper">
                 
+                <!-- CAPSULE MODE SWITCHER (Изначально скрыт) -->
+                <div id="mode-capsule-wrapper" class="mode-capsule-container hidden">
+                    <div class="mode-switch" id="mode-switch-ui" data-mode="explore">
+                        <div class="mode-bg"></div>
+                        <div class="mode-option" id="opt-explore" onclick="selectMode('explore')">
+                            <span>🔭</span> <span data-key="mode_explore">Explore</span>
+                        </div>
+                        <div class="mode-option" id="opt-pleasure" onclick="selectMode('pleasure')">
+                            <span>🔥</span> <span data-key="mode_pleasure">Pleasure</span>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- ЯКОРЬ -->
                 <div id="card-anchor" style="position: relative; width: 100%; display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: visible;">
                     
                     <!-- ОБЁРТКА (Wrapper) -->
                     <div id="card-anim-wrapper" style="position: relative; width: 100%; display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: visible; z-index: 10;">
                         
-                        <!-- 1. ПЕРЕМЕСТИЛИ ФРАЗУ СЮДА -->
+                        <!-- 1. ФРАЗА СЮДА -->
                         <div class="status-text-combined stagger-item delay-5" id="status-text"></div>
 
                         <!-- 2. Иконки -->
@@ -2706,6 +2898,27 @@
 
                             <div id="card-notch" class="card-notch">
                                 <span id="card-notch-text">STATUS</span>
+                            </div>
+
+                            <!-- START SCREEN: MODE SELECTION (Появляется вместо слота) -->
+                            <div id="mode-start-screen" class="mode-start-view hidden">
+                                <div class="mode-greeting" id="mode-greeting-text">What are we doing today? 😏</div>
+                                
+                                <div class="mode-buttons-row">
+                                    <!-- Левая: Исследование (Swipe Left) -->
+                                    <button class="btn-mode-select explore" onclick="selectModeAndStart('explore')">
+                                        <span class="btn-mode-icon">🔭</span>
+                                        <span class="btn-mode-title" data-key="mode_explore">Explore</span>
+                                        <span class="btn-mode-desc" data-key="mode_desc_explore">New & Spicy</span>
+                                    </button>
+
+                                    <!-- Правая: Наслаждение (Swipe Right) -->
+                                    <button class="btn-mode-select pleasure" onclick="selectModeAndStart('pleasure')">
+                                        <span class="btn-mode-icon">🔥</span>
+                                        <span class="btn-mode-title" data-key="mode_pleasure">Pleasure</span>
+                                        <span class="btn-mode-desc" data-key="mode_desc_pleasure">Trusted Hits</span>
+                                    </button>
+                                </div>
                             </div>
 
                             <!-- Оверлей для цвета при свайпе -->
@@ -4520,6 +4733,9 @@
     let itemBeingWatched = null; 
     let currentHistoryTab = 'swipes';
 
+    let currentAppMode = 'explore';
+    let isModeSelectActive = false; 
+    
     const STORAGE = {
         THEME: 'xch_theme',
         LANG: 'xch_lang',
@@ -4809,6 +5025,12 @@
             expl_undo: "Changed your mind? 😏",
             expl_hist: "From Archives 📜",
             deco_label: "Show Decorations",
+
+            mode_explore: "Explore",
+            mode_pleasure: "Pleasure",
+            mode_desc_explore: "Discover New",
+            mode_desc_pleasure: "Guaranteed Fun",
+            greeting_modes: ["What's the plan? 😏", "Ready to choose? 🔥", "Explore or Enjoy? 🎲"],
 
             info_header: "Information",
             hist_tab_swipes: "Swipes",
@@ -5178,6 +5400,12 @@
             expl_hist: "Из архивов 📜",
             deco_label: "Показывать декор",
 
+            mode_explore: "Исследование",
+            mode_pleasure: "Наслаждение",
+            mode_desc_explore: "Искать новое",
+            mode_desc_pleasure: "Проверенное",
+            greeting_modes: ["Чем займёмся? 😏", "Новое или любимое? 🔥", "Выбирай мудро 🎲"],
+
             info_header: "Информация",
             hist_tab_swipes: "Свайпы",
             hist_tab_watch: "Время",
@@ -5542,6 +5770,12 @@
             expl_hist: "De los archivos 📜",
             deco_label: "Mostrar decoración",
 
+            mode_explore: "Explorar",
+            mode_pleasure: "Placer",
+            mode_desc_explore: "Algo Nuevo",
+            mode_desc_pleasure: "Éxito Seguro",
+            greeting_modes: ["¿Cuál es el plan? 😏", "¿Explorar o Disfrutar? 🔥"],
+
             info_header: "Información",
             hist_tab_swipes: "Deslizamientos",
             hist_tab_watch: "Tiempo",
@@ -5897,6 +6131,12 @@
             expl_undo: "Meinung geändert? 😏",
             expl_hist: "Aus dem Archiv 📜",
             deco_label: "Dekoration anzeigen",
+
+            mode_explore: "Erkunden",
+            mode_pleasure: "Genießen",
+            mode_desc_explore: "Entdecken",
+            mode_desc_pleasure: "Bewährt",
+            greeting_modes: ["Was ist der Plan? 😏", "Entdecken oder Genießen? 🔥"],
 
             info_header: "Informationen",
             hist_tab_swipes: "Swipes",
@@ -6680,6 +6920,7 @@
         // Инициализация систем
         initAgeGate();
         initSwipeCards();
+        initModes();
         
         // Установка платформы
         const savedPlatform = localStorage.getItem('xch_platform');
@@ -6786,32 +7027,66 @@
     }
 
     function calculateItemWeight(item) {
-        // 1. Жесткий фильтр (Черный список)
+        // 1. БАЗОВЫЕ ПРОВЕРКИ (Одинаковые для обоих режимов)
         if (blacklist.includes(item.id)) return 0;
-        
-        // 2. Кулдаун (если недавно видели - вес почти ноль)
         if (cooldownList.includes(item.id)) return 0.1;
 
-        let score = 50; // Базовый вес (нейтральный)
+        let score = 50; 
 
-        // 3. Анализ тегов по профилю пользователя
-        item.tags.forEach(tag => {
-            if (tagScores[tag]) {
-                score += tagScores[tag]; // Если тег любимый, score растет. Если в бане (-), падает.
+        // 2. РАЗДЕЛЕНИЕ ПО РЕЖИМАМ
+        if (currentAppMode === 'pleasure') {
+            // === РЕЖИМ НАСЛАЖДЕНИЯ ===
+            // Цель: Показать то, что точно нравится (включая повторы избранного)
+            
+            // Огромный буст для избранного
+            if (favorites.includes(item.id)) {
+                score += 500; 
             }
-        });
 
-        // 4. Буст ориентации (Contextual Boost)
-        // Это временный буст, он не меняет профиль, но влияет на текущую выдачу
+            // Сильное влияние тегов
+            item.tags.forEach(tag => {
+                if (tagScores[tag]) {
+                    // Усиливаем влияние положительных тегов x2
+                    score += (tagScores[tag] * 2); 
+                }
+            });
+
+        } else {
+            // === РЕЖИМ ИССЛЕДОВАНИЯ (Default) ===
+            // Цель: Искать новое, избегать заезженного
+            
+            // Штраф за избранное (мы и так знаем, что оно нам нравится)
+            if (favorites.includes(item.id)) {
+                score = 1; // Минимальный вес, чтобы почти не выпадало
+            }
+
+            // Обычное влияние тегов, но...
+            item.tags.forEach(tag => {
+                if (tagScores[tag]) {
+                    // Если тег УЖЕ очень прокачан (мы его знаем), уменьшаем его влияние,
+                    // чтобы дать шанс тегам с весом 0 (новым)
+                    if (tagScores[tag] > 50) {
+                        score += (tagScores[tag] * 0.5); 
+                    } else {
+                        score += tagScores[tag];
+                    }
+                }
+            });
+            
+            // Небольшой буст для предметов, которые мы вообще никогда не видели
+            // (Требует проверки лога, можно упростить: просто рандомный буст)
+            if (Math.random() > 0.5) score += 20;
+        }
+
+        // 3. БУСТЫ ОРИЕНТАЦИИ (Оставляем как было)
         if (currentOrientation === 'gay' && item.tags.includes('gay')) score += 50;
         if (currentOrientation === 'trans' && item.tags.some(t => ['trans', 'shemale'].includes(t))) score += 50;
         if (currentOrientation === 'lesbian' && item.tags.includes('lesbian')) score += 50;
 
-        // 5. Штраф за несоответствие ориентации (Soft Filter)
+        // 4. ФИЛЬТРЫ
         if (currentOrientation === 'gay' && item.tags.includes('straight')) score -= 100;
         if (currentOrientation === 'hetero' && (item.tags.includes('gay') || item.tags.includes('shemale'))) score -= 100;
 
-        // Защита от отрицательных чисел
         return Math.max(1, score);
     }
 
@@ -9105,6 +9380,28 @@
             if (Math.abs(deltaX) > threshold) {
                 // === УЛЕТАЕТ ===
                 const direction = deltaX > 0 ? 'right' : 'left';
+
+                if (isModeSelectActive) {
+                    // Убираем анимацию карточки
+                    card.style.transition = 'transform 0.3s ease-out';
+                    card.style.transform = `translateX(${direction === 'right' ? 500 : -500}px)`;
+
+                    setTimeout(() => {
+                        // Возвращаем карточку на место мгновенно (скрытно)
+                        card.style.transition = 'none';
+                        card.style.transform = '';
+                        
+                        // Запускаем режим
+                        if (direction === 'right') {
+                            selectModeAndStart('pleasure'); // Вправо -> Наслаждение (Зеленое)
+                        } else {
+                            selectModeAndStart('explore');  // Влево -> Исследование (Красное)
+                        }
+                    }, 300);
+                    
+                    return; // ПРЕКРАЩАЕМ ВЫПОЛНЕНИЕ, чтобы не сработал лайк/дизлайк
+                }
+
                 const endX = deltaX > 0 ? window.innerWidth + 200 : -window.innerWidth - 200;
                 
                 // Запускаем анимацию вылета
@@ -10453,11 +10750,17 @@
             document.getElementById('badge-wrapper').innerHTML = '';
 
             // Возвращаем кнопку "Старт"
-            const startBtn = document.getElementById('start-btn-container');
-            if(startBtn) {
-                startBtn.classList.remove('hidden-initial');
-                startBtn.style.display = 'flex';
-                startBtn.style.opacity = '1';
+            const totalInteractions = favorites.length + blacklist.length;
+            if (totalInteractions >= 10) {
+                showModeStartScreen(); // Показываем карточку выбора
+            } else {
+                // Старая логика
+                const startBtn = document.getElementById('start-btn-container');
+                if(startBtn) {
+                    startBtn.classList.remove('hidden-initial');
+                    startBtn.style.display = 'flex';
+                    startBtn.style.opacity = '1';
+                }
             }
 
             // Возвращаем состояние Карточки (убираем класс has-results)
@@ -10679,6 +10982,82 @@
             document.getElementById('modal-admin-overlay').classList.remove('open');
         }
     };
+
+    function initModes() {
+        // Проверяем активность пользователя (10+ действий)
+        const totalInteractions = favorites.length + blacklist.length;
+        
+        if (totalInteractions >= 10) {
+            // Активируем функционал
+            document.getElementById('mode-capsule-wrapper').classList.remove('hidden');
+            document.body.classList.add('modes-active'); // Для CSS отступов
+            
+            // Показываем экран выбора вместо стандартной кнопки Let's Go
+            showModeStartScreen();
+        } else {
+            // Скрываем, если мало действий
+            document.getElementById('mode-capsule-wrapper').classList.add('hidden');
+            document.getElementById('mode-start-screen').classList.add('hidden');
+        }
+    }
+
+    function showModeStartScreen() {
+        const screen = document.getElementById('mode-start-screen');
+        const startBtn = document.getElementById('start-btn-container');
+        
+        if (screen) {
+            screen.classList.remove('hidden');
+            isModeSelectActive = true;
+            
+            // Ставим случайную фразу
+            const t = langData[currentLang];
+            const phrases = t.greeting_modes || ["Choose mode"];
+            document.getElementById('mode-greeting-text').innerText = phrases[Math.floor(Math.random() * phrases.length)];
+        }
+        
+        // Скрываем старую кнопку "Let's Go", так как выбор теперь через карточку
+        if (startBtn) startBtn.style.display = 'none';
+    }
+
+    function selectMode(mode) {
+        currentAppMode = mode;
+        
+        // Обновляем UI капсулы
+        const switchUi = document.getElementById('mode-switch-ui');
+        if (switchUi) switchUi.setAttribute('data-mode', mode);
+        
+        const opts = document.querySelectorAll('.mode-option');
+        opts.forEach(el => el.classList.remove('active'));
+        document.getElementById('opt-' + mode).classList.add('active');
+        
+        // Вибрация
+        if(navigator.vibrate) navigator.vibrate(10);
+        
+        console.log("Mode switched to:", mode);
+    }
+
+    function selectModeAndStart(mode) {
+        selectMode(mode);
+        
+        // Убираем экран выбора
+        const screen = document.getElementById('mode-start-screen');
+        if(screen) {
+            screen.style.transition = 'opacity 0.2s, transform 0.2s';
+            screen.style.opacity = '0';
+            screen.style.transform = 'scale(1.1)';
+            
+            setTimeout(() => {
+                screen.classList.add('hidden');
+                screen.style.transform = '';
+                screen.style.opacity = '';
+            }, 300);
+        }
+        
+        isModeSelectActive = false;
+        
+        // Запускаем генерацию
+        startNewSession();
+    }
 
 </script>
 <!-- SEO CONTEXT BLOCK -->
