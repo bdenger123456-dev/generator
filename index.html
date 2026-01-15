@@ -4721,9 +4721,36 @@
         { name: "CryptoWhale", date: "Jan 2026" }
     ];
 
-    const DECO_IMAGES = [
+    const TAG_ICONS = {
+        // БДСМ / Жесткое
+        'bdsm': ['bdsm1.png', 'bdsm2.png'], 
+        'bondage': ['bondage1.png', 'bondage2.png'],
+
+        // Анал / Попы
+        'anal': ['anal1.png', 'anal2.png', 'anal3.png'],
+
+        // Ноги
+        'feet': ['feet1.png', 'feet2.png'],
+        
+        // Групповое
+        'group': ['group1.png', 'group2.png', 'group3.png'],
+
+        // ЛГБТ
+        'lesbian': ['lesbian1.png', 'lesbian2.png','lesbian3.png'],
+        'gay': ['gay1.png', 'gay2.png', 'gay3.png'],
+        'trans': ['trans1.png', 'trans2.png', 'trans3.png'],
+
+        // Игрушки
+        'toys': ['toys1.png', 'toys2.png'],
+
+        // Романтика / Ваниль
+        'romantic': ['romantic1.png', 'romantic2.png']
+    };
+
+    // 2. Нейтральные иконки
+    const NEUTRAL_DECOS = [
         'deco1.png', 'deco2.png', 'deco3.png', 'deco4.png', 'deco5.png',
-        'deco6.png', 'deco7.png', 'deco8.png', 'deco9.png', 'deco10.png'
+        'deco6.png', 'deco7.png', 'deco8.png', 'deco9.png', 'deco10.png', 'deco11.png'
     ];
 
     let watchStartTime = 0; // Время ухода с сайта
@@ -10072,6 +10099,7 @@
         renderRelatedItems();
         updateActionButtons();
         updateCardStatusVisuals();
+        randomizeDecorations(item);
     }
 
     function updateActionButtons() {
@@ -10639,25 +10667,56 @@
         }
     }
 
-    function randomizeDecorations() {
+    function randomizeDecorations(item = null) {
         const leftImg = document.getElementById('deco-left');
         const rightImg = document.getElementById('deco-right');
         
-        // Если элементов нет (например, на другой вкладке), выходим
         if (!leftImg || !rightImg) return;
 
-        // 1. Выбираем первый случайный индекс
-        let idx1 = Math.floor(Math.random() * DECO_IMAGES.length);
-        
-        // 2. Выбираем второй индекс и следим, чтобы он не совпадал с первым
-        let idx2 = Math.floor(Math.random() * DECO_IMAGES.length);
-        while (idx2 === idx1) {
-            idx2 = Math.floor(Math.random() * DECO_IMAGES.length);
+        let selectedIcons = [];
+
+        // ШАГ 1: Пытаемся найти специфичные иконки, если передан предмет
+        if (item && item.tags) {
+            // Проходим по всем тегам предмета
+            item.tags.forEach(tag => {
+                if (TAG_ICONS[tag]) {
+                    // Добавляем все иконки, связанные с этим тегом
+                    selectedIcons.push(...TAG_ICONS[tag]);
+                }
+            });
         }
 
-        // 3. Применяем картинки
-        leftImg.src = DECO_IMAGES[idx1];
-        rightImg.src = DECO_IMAGES[idx2];
+        // Убираем дубликаты (если один файл прописан в разных тегах)
+        selectedIcons = [...new Set(selectedIcons)];
+        
+        // Перемешиваем найденные специфичные иконки
+        selectedIcons.sort(() => 0.5 - Math.random());
+
+        // ШАГ 2: Заполняем пропуски нейтральными
+        // Нам нужно ровно 2 иконки (левая и правая)
+        
+        // Если специфичных нет вообще -> берем две нейтральные
+        if (selectedIcons.length === 0) {
+            selectedIcons.push(getRandomNeutral());
+            selectedIcons.push(getRandomNeutral(selectedIcons[0])); // Передаем первую, чтобы вторая не совпала
+        } 
+        // Если есть только одна специфичная -> добавляем к ней одну нейтральную
+        else if (selectedIcons.length === 1) {
+            selectedIcons.push(getRandomNeutral());
+        }
+        // Если специфичных 2 или больше -> массив уже заполнен (лишние обрежутся ниже)
+
+        // ШАГ 3: Применяем
+        leftImg.src = selectedIcons[0];
+        rightImg.src = selectedIcons[1];
+    }
+
+    function getRandomNeutral(excludeSrc = null) {
+        let pool = NEUTRAL_DECOS;
+        if (excludeSrc) {
+            pool = pool.filter(src => src !== excludeSrc);
+        }
+        return pool[Math.floor(Math.random() * pool.length)];
     }
 
     function calculateWatchTime() {
@@ -10784,6 +10843,7 @@
 
             // Запускаем "Холостой ход" слотов
             initIdleSlot();
+            randomizeDecorations();
 
             // Сброс иконок (декора)
             const iconLeft = document.querySelector('.icon-left');
