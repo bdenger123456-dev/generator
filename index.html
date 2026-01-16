@@ -1088,144 +1088,202 @@
             transition: opacity 0.3s ease;
         }
         
-        /* Адаптация под мобильные */
         @media (max-width: 768px) {
             
-            /* 1. ГЛОБАЛЬНЫЕ СКРЫТИЯ */
-            .sidebar, .tinder-actions, .btn-group, .undo-container, .badge-tooltip { display: none !important; }
-            .mobile-header, .bottom-nav, .top-gradient-mask, .bottom-gradient-mask { display: flex !important; }
-            .main-content { padding: 0 !important; }
-
-            /* 2. КОНТЕЙНЕР */
-            #tab-home .center-wrapper {
-                height: 100vh !important;
-                height: 100dvh !important;
-                padding-top: 65px !important; 
-                padding-bottom: 90px !important; 
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-start !important;
-                overflow: hidden !important; 
-                width: 100% !important;
-                padding-left: 5px !important;
-                padding-right: 5px !important;
+            /* 1. GLOBAL HIDES (Скрываем ПК элементы) */
+            .sidebar, 
+            .tinder-actions, 
+            .btn-group, 
+            .undo-container, 
+            .badge-tooltip,
+            #pc-mode-mount,
+            #pc-settings-mount,
+            #row-install-app { 
+                display: none !important; 
             }
 
-            /* 3. КАРТОЧКА */
-            .card, .card.has-results {
-                flex-grow: 1 !important;
-                height: 100% !important;
-                margin-bottom: 0 !important;
-                width: 100% !important;
-                padding: 10px 5px !important;
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: space-between !important;
+            /* 2. SHOW MOBILE ELEMENTS */
+            .mobile-header, 
+            .bottom-nav, 
+            .top-gradient-mask, 
+            .bottom-gradient-mask { 
+                display: flex !important; 
+            }
+
+            .main-content { 
+                padding: 0 !important; 
+                height: 100dvh !important; /* Фикс высоты для мобильных браузеров */
                 overflow: hidden !important;
             }
 
-            /* === ВНУТРЕННИЕ БЛОКИ === */
-            .card > div:nth-child(1) { flex: 0 0 auto !important; min-height: 25px !important; } /* Бейджи */
+            /* 3. MAIN CONTAINER LAYOUT */
+            #tab-home .center-wrapper {
+                height: 100% !important;
+                width: 100% !important;
+                padding-top: 60px !important;  /* Место под шапку */
+                padding-bottom: 75px !important; /* Место под нижнее меню */
+                padding-left: 10px !important;
+                padding-right: 10px !important;
+                
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: flex-start !important;
+                align-items: center !important;
+                overflow: hidden !important;
+            }
+
+            /* 4. MODE CAPSULE (КАПСУЛА РЕЖИМА) */
+            #mobile-mode-mount {
+                /* Показываем как блок в потоке, чтобы он толкал карточку вниз */
+                display: flex !important;
+                justify-content: center;
+                align-items: center;
+                width: 100%;
+                min-height: 50px; /* Фиксированная высота */
+                flex-shrink: 0;   /* Не сжимать */
+                z-index: 60;
+                margin-top: 5px !important;
+                margin-bottom: 5px !important;
+                position: relative !important;
+                top: auto !important;
+                left: auto !important;
+                opacity: 1 !important;
+                transition: opacity 0.3s ease;
+            }
+
+            /* Если мы на стартовом экране - скрываем капсулу полностью, чтобы карточка была выше */
+            body.is-start-screen #mobile-mode-mount {
+                display: none !important;
+            }
+
+            /* 5. CARD ANCHOR (ОБЛАСТЬ КАРТОЧКИ) */
+            #card-anchor {
+                flex: 1 1 auto !important; /* Занимает всё оставшееся место */
+                display: flex !important;
+                flex-direction: column !important;
+                width: 100% !important;
+                min-height: 0 !important; /* Важно для работы скролла внутри */
+                overflow: visible !important;
+                justify-content: center !important; /* Центруем карточку по вертикали */
+            }
+
+            /* 6. STATUS TEXT (Фраза над карточкой) */
+            .status-text-combined {
+                position: relative !important;
+                width: 100%;
+                margin-bottom: 8px !important;
+                flex-shrink: 0;
+                height: auto;
+                min-height: 20px;
+                font-size: 14px !important;
+            }
             
-            /* ЦЕНТР */
-            .card > div:nth-child(2) {
+            /* Скрываем фразу на стартовом экране */
+            body.is-start-screen .status-text-combined {
+                display: none !important;
+            }
+
+            /* 7. CARD (САМА КАРТОЧКА) */
+            .card {
+                flex: 1 1 auto !important; /* Растягивается на доступное место */
+                width: 100% !important;
+                height: 100% !important;
+                margin: 0 !important;
+                
+                /* Внутренняя структура */
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important;
+                padding: 10px 5px !important;
+            }
+
+            /* На стартовом экране можно сделать карточку чуть компактнее или центрированнее */
+            body.is-start-screen .card {
+                max-height: 85vh !important; 
+            }
+
+            /* Внутренности карточки */
+            .card > div:nth-child(2) { /* Центр карточки (слот) */
                 flex: 1 1 auto !important;
                 display: flex !important;
                 flex-direction: column !important;
-                justify-content: space-evenly !important; 
-                align-items: center !important;
+                justify-content: center !important;
                 overflow: hidden !important; 
-                padding: 10px 0 !important;
             }
 
-            .card > div:last-child { flex: 0 0 auto !important; margin-top: 5px !important; width: 100%; } /* Кнопки */
-
-            /* --- ЭЛЕМЕНТЫ КОНТЕНТА --- */
-            
             .slot-window {
-                width: 100%;
                 height: auto !important;
-                flex: 0 1 auto !important;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
+                flex-shrink: 1;
             }
-            .slot-item { 
-                font-size: clamp(26px, 9vw, 48px) !important;
+            
+            .slot-item {
+                font-size: clamp(32px, 10vw, 50px) !important;
                 line-height: 1.1 !important;
+                white-space: normal !important;
             }
 
-            /* === ОПИСАНИЕ (УЛУЧШЕНО) === */
-             #result-desc {
-                max-height: none !important; 
-                overflow-y: visible !important;
-                
-                flex-shrink: 0 !important; 
-                
-                font-size: 15px !important;
-                line-height: 1.35 !important;
-                margin: 10px 0 15px 0 !important;
-                white-space: normal !important; 
-                
-                display: -webkit-box;
-                -webkit-line-clamp: 6; /* Показать максимум 6 строк */
-                -webkit-box-orient: vertical;
-                overflow: hidden !important; 
+            /* Описание и теги */
+            #result-desc {
+                max-height: 12vh !important; /* Ограничиваем высоту описания */
+                overflow-y: auto !important;
+                margin: 10px 0 !important;
+                font-size: 14px !important;
+                -webkit-line-clamp: 4;
             }
-            
-            /* === ПОХОЖИЕ (ТЕГИ) === */
+
+            /* Блок "Похожие" */
             .related-section {
-                margin-top: 0 !important; /* Отступ уже задан в margin-bottom описания */
+                margin-top: 0 !important;
                 margin-bottom: 5px !important;
-                width: 100%;
-                display: flex !important;
-                flex-direction: column;
-                align-items: center;
+                flex-shrink: 0;
             }
             
-            .related-tags { 
-                display: flex !important;
-                flex-wrap: nowrap !important; /* Запрещаем перенос строк */
-                overflow-x: auto !important;  /* Разрешаем горизонтальный скролл */
-                justify-content: flex-start !important; /* Выравнивание по началу */
-                width: 100%;
+            .related-tags {
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                justify-content: flex-start !important;
                 padding-bottom: 5px;
-                gap: 6px !important;
-                
-                scrollbar-width: none; 
-                -ms-overflow-style: none;
-                
-                mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
-                -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+                scrollbar-width: none;
             }
-            .related-tags::-webkit-scrollbar { 
-                display: none; 
+
+            /* Нижняя часть карточки (Кнопки) */
+            .card > div:last-child {
+                flex-shrink: 0 !important;
+                padding-bottom: 5px !important;
+            }
+
+            .tinder-nav-row {
+                margin-bottom: 0 !important;
+                gap: 10px !important;
             }
             
-            .related-item-btn { 
-                flex-shrink: 0 !important; /* Запрещаем кнопкам сжиматься */
-                white-space: nowrap !important; 
-                font-size: 12px; 
-                padding: 8px 14px; 
+            /* Кнопки управления */
+            .t-circle-btn.small { width: 40px !important; height: 40px !important; }
+            .t-circle-btn.medium { width: 52px !important; height: 52px !important; }
+            .t-circle-btn.large { width: 66px !important; height: 66px !important; font-size: 28px !important; }
+
+            /* Иконки декора */
+            .icon-left {
+                width: 70px !important;
+                top: -10px !important;
+                left: -10px !important;
+            }
+            .icon-right {
+                width: 60px !important;
+                top: 0px !important;
+                right: -5px !important;
             }
 
-            /* --- КНОПКИ --- */
-            .tinder-nav-row {
-                gap: 8px !important; margin-bottom: 5px !important;
-                justify-content: space-between !important; padding: 0 5px !important;
-            }
-            .t-circle-btn.small { width: 38px !important; height: 38px !important; font-size: 18px !important; }
-            .t-circle-btn.medium { width: 50px !important; height: 50px !important; font-size: 24px !important; }
-            .t-circle-btn.large { width: 64px !important; height: 64px !important; font-size: 28px !important; }
-
-            #start-btn-container { min-height: 50px !important; }
-            .btn-start-capsule { padding: 12px 30px !important; font-size: 16px !important; }
-
+            /* Настройки и Аккаунт (Центровка) */
             #tab-settings .center-wrapper, #tab-account .center-wrapper { 
-                padding: 40px 15px 120px 15px !important; height: auto !important; display: block !important;
+                display: block !important;
+                padding-top: 80px !important;
+                padding-bottom: 100px !important;
+                height: auto !important;
+                overflow-y: auto !important;
             }
         }
+
 
         .capsule-trigger {
             background: rgba(255, 255, 255, 0.07);
@@ -2326,21 +2384,6 @@
             animation: floatRight 7s ease-in-out infinite;
         }
 
-        @media (max-width: 768px) {
-            /* МОБИЛЬНАЯ ВЕРСИЯ ИКОНОК */
-            .icon-left {
-                width: 75px !important;  /* Было 120px -> стало 75px */
-                top: 5px !important;     /* Опустили ниже (было -30px) */
-                left: -5px !important;   /* Прижали ближе к краю */
-            }
-
-            .icon-right {
-                width: 60px !important;  /* Было 90px -> стало 60px */
-                top: 15px !important;    /* Опустили ниже (было -20px) */
-                right: 0px !important;   /* Прижали ближе к краю */
-            }
-        }
-
         body.no-deco .deco-icon {
             display: none !important;
         }
@@ -2712,115 +2755,13 @@
             }
         }
 
-        /* МОБИЛЬНАЯ ВЕРСИЯ */
-        @media (max-width: 768px) {
-    
-            /* 1. КОНТЕЙНЕР: Используем 100dvh (учитывает адресную строку и вкладки) */
-            #tab-home .center-wrapper {
-                height: 100dvh !important; 
-                padding-top: 60px !important;  /* Минимальный отступ под шапку */
-                padding-bottom: 80px !important; /* Отступ под нижнее меню (оно ~65px) */
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: flex-start !important;
-                overflow: hidden !important;
-            }
-
-            /* 2. КАПСУЛА РЕЖИМА (Верхняя) */
-            #mobile-mode-mount {
-                position: absolute !important; /* Не fixed, а absolute внутри wrapper */
-                top: 60px !important;          /* Сразу под шапкой */
-                left: 0 !important;
-                width: 100% !important;
-                height: 40px !important;       /* Компактная высота */
-                z-index: 80 !important;
-                display: flex !important;
-                justify-content: center !important;
-                align-items: center !important;
-                transition: opacity 0.3s ease, transform 0.3s ease;
-            }
-
-            /* СКРЫВАЕМ КАПСУЛУ, ЕСЛИ МЫ НА СТАРТОВОМ ЭКРАНЕ (класс is-start-screen) */
-            body.is-start-screen #mobile-mode-mount {
-                opacity: 0 !important;
-                pointer-events: none !important;
-                transform: translateY(-20px) !important;
-            }
-
-            /* 3. ЯКОРЬ КАРТОЧКИ */
-            #card-anchor {
-                flex: 1 1 auto !important;     /* Занимает всё доступное место */
-                margin-top: 0 !important;
-                height: auto !important;
-                min-height: 0 !important;      /* ВАЖНО для вложенного скролла/флекса */
-                display: flex !important;
-                flex-direction: column !important;
-                /* Если мы не на старте, сдвигаем карточку чуть вниз, чтобы дать место капсуле */
-                padding-top: 10px !important; 
-            }
-            
-            /* На стартовом экране убираем отступ, чтобы карточка была по центру */
-            body.is-start-screen #card-anchor {
-                padding-top: 0 !important;
-                justify-content: center !important; /* Центруем по вертикали */
-            }
-
-            /* 4. ФРАЗА НАД КАРТОЧКОЙ */
-            .status-text-combined {
-                position: relative !important; /* Возвращаем в поток, чтобы не наезжала */
-                bottom: auto !important;
-                left: auto !important;
-                margin-bottom: 5px !important; /* Минимальный отступ до карточки */
-                margin-top: 30px !important;   /* Отступ от капсулы сверху */
-                height: 24px !important;       /* Фикс высота, чтобы не прыгало */
-                flex-shrink: 0 !important;
-            }
-            
-            body.is-start-screen .status-text-combined {
-                display: none !important; /* На старте фраза не нужна (или мешает) */
-            }
-
-            /* 5. КАРТОЧКА */
-            .card {
-                flex: 1 1 auto !important; /* Растягивается */
-                height: auto !important;   /* Авто-высота */
-                max-height: 100% !important;
-                margin-bottom: 0 !important;
-            }
-
-            .slot-item {
-                padding-top: 10px !important;    /* Место сверху для букв */
-                padding-bottom: 10px !important; /* Место снизу */
-                line-height: 1.1 !important;
-                font-size: clamp(30px, 8vw, 55px) !important;
-            }
-
-            /* 7. ПОХОЖИЕ ФЕТИШИ */
-            .related-section {
-                flex-shrink: 0 !important; /* Запрещаем сжимать этот блок */
-                margin-bottom: 5px !important;
-                min-height: 50px !important; /* Минимальная высота */
-            }
-            
-            /* Если экран совсем маленький, уменьшаем описание, чтобы влезли "Похожие" */
-            #result-desc {
-                flex-shrink: 1 !important; 
-                max-height: 15vh !important; 
-                overflow-y: auto !important; 
-                -webkit-line-clamp: unset !important; 
-                display: block !important;
-            }
+        body:not(.has-modes) .mode-capsule-wrapper {
+            display: none !important;
         }
 
         /* =========================================
         18. MEDIA QUERIES (ADAPTATION)
         ========================================= */
-
-        @media (max-width: 768px) {
-            #row-install-app {
-                display: none !important;
-            }
-        }
 
         /* DESKTOP / TABLET (> 768px) */
         @media (min-width: 769px) {
@@ -11253,22 +11194,17 @@
 
         if (hasEnoughData) {
             randomizeModeGreeting();
-            // 1. Показываем капсулы (CSS media query решит, какую именно)
-            capsules.forEach(el => el.style.display = 'block');
             
-            // 2. Показываем Оверлей выбора в карточке
+            document.body.classList.add('has-modes');
+
             if(startOverlay) {
                 startOverlay.classList.remove('hidden');
                 isModeSelectionActive = true;
             }
-
-            // 3. Скрываем старую кнопку "Поехали" (она нам не нужна)
             if(startBtn) {
-                startBtn.classList.add('hidden-initial'); // Скрываем через класс
-                startBtn.style.display = 'none'; // И на всякий случай инлайном
+                startBtn.classList.add('hidden-initial');
+                startBtn.style.display = 'none';
             }
-            
-            // Обновляем текст в капсулах
             updateCapsuleUI();
 
         } else {
