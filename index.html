@@ -6853,23 +6853,30 @@
 
     async function loadData() {
         try {
-            // Пытаемся загрузить JSON файл (1200+ фетишей)
-            const response = await fetch('data.json');
+            // Было: const response = await fetch('data.json');
+            // Стало: Запрос к нашему API
+            const response = await fetch('/api/database', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Можно добавить кастомный заголовок для красоты
+                    'X-Client-Version': '1.0' 
+                }
+            });
             
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error(`Server error! status: ${response.status}`);
             }
             
-            // Парсим JSON в переменную data
             data = await response.json();
-            console.log(`Успешно загружено ${data.length} категорий.`);
+            console.log(`[SYSTEM] Database loaded secure: ${data.length} items.`);
 
-            // 3. Запускаем инициализацию приложения ТОЛЬКО после загрузки данных
+            // Запускаем инициализацию приложения
             initApp();
 
         } catch (error) {
-            console.error('Ошибка загрузки data.json:', error);
-            document.body.innerHTML = '<h2 style="color:white;text-align:center;margin-top:50px;">Error loading data.json. Check console.</h2>';
+            console.error('Data load failed:', error);
+            document.body.innerHTML = '<h2 style="color:white;text-align:center;margin-top:50px;">Connection Error. Please reload.</h2>';
         }
     }
 
@@ -7489,28 +7496,51 @@
         return item.name; // По умолчанию английский
     }
 
-    function renderHistory() {
+    async function renderHistory() {
         const list = document.getElementById('history-list');
-        list.innerHTML = '';
-        const t = langData[currentLang] || langData['en'];
+        list.innerHTML = '<div style="text-align:center; padding:10px;">Loading...</div>';
         
         if (historyData.length === 0) {
-            list.innerHTML = `<div class="ios-row" style="justify-content:center; color:var(--text-secondary); font-size:14px;">${t.hist_empty}</div>`;
+            list.innerHTML = `<div class="ios-row" style="justify-content:center;">History empty</div>`;
             return;
         }
 
-        historyData.forEach(entry => {
-            const item = data.find(x => x.id === entry.id);
-            if(!item) return;
-            const div = document.createElement('div');
-            div.className = 'history-item-ios'; 
+        // 1. Берем ID из истории (топ 20, чтобы не грузить лишнее)
+        const idsToFetch = historyData.slice(0, 20).map(entry => entry.id);
+
+        try {
+            // 2. Спрашиваем у сервера детали этих предметов
+            const response = await fetch('/api/get-items', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ids: idsToFetch })
+            });
             
-            const name = getLocalizedName(item);
+            const itemsFromServer = await response.json();
             
-            div.innerHTML = `<span>${name}</span><span style="color:var(--accent); font-size:18px;">↺</span>`;
-            div.onclick = () => { switchTab('home'); forceShowResult(item, 'history'); };
-            list.appendChild(div);
-        });
+            // 3. Рендерим
+            list.innerHTML = '';
+            
+            // Важно: идем по historyData, чтобы сохранить хронологию
+            historyData.slice(0, 20).forEach(entry => {
+                // Ищем данные в том, что прислал сервер
+                const item = itemsFromServer.find(x => x.id === entry.id);
+                if(!item) return;
+
+                const div = document.createElement('div');
+                div.className = 'history-item-ios';
+                div.innerHTML = `<span>${getLocalizedName(item)}</span><span style="color:var(--accent);">↺</span>`;
+                
+                // При клике открываем результат (но item у нас теперь "обрезанный", 
+                // если нужно полное описание - можно передать item целиком)
+                div.onclick = () => { switchTab('home'); forceShowResult(item, 'history'); };
+                list.appendChild(div);
+            });
+
+        } catch (e) {
+            console.error("History fetch error:", e);
+            list.innerHTML = '<div style="text-align:center; color:red;">Connection Error</div>';
+        }
     }
 
     function filterData() {
@@ -7984,117 +8014,175 @@
         renderListModal('ban');
     }
 
-    function renderListModal(type) {
-        let modalId, bodyId, listData, placeholder;
-        const t = langData[currentLang] || langData['en']; // Получаем переводы
+    async function renderListModal(type) {
+        // Определяем переменные в зависимости от типа
+        let modalId, bodyId, listIds, placeholder, title;
+        const t = langData[currentLang] || langData['en'];
 
         if (type === 'fav') {
-            modalId = 'modal-overlay'; bodyId = 'modal-catalog-body'; listData = favorites;
-            placeholder = t.search_liked; // Локализованный плейсхолдер
+            modalId = 'modal-overlay'; bodyId = 'modal-catalog-body'; listIds = window.favorites || [];
+            placeholder = t.search_liked; title = t.favorites_catalog;
         } else if (type === 'ban') {
-            modalId = 'modal-blacklist-overlay'; bodyId = 'modal-blacklist-body'; listData = blacklist;
-            placeholder = t.search_disliked; // Локализованный плейсхолдер
+            modalId = 'modal-blacklist-overlay'; bodyId = 'modal-blacklist-body'; listIds = window.blacklist || [];
+            placeholder = t.search_disliked; title = t.blacklist_catalog;
         } else if (type === 'wl') {
-            modalId = 'modal-overlay'; 
-            bodyId = 'modal-catalog-body'; 
-            listData = watchLater;
-            
-            const header = document.querySelector(`#${modalId} .modal-header span`);
-            if(header) header.innerText = t.watch_later;
+            modalId = 'modal-overlay'; bodyId = 'modal-catalog-body'; listIds = window.watchLater || [];
+            placeholder = ""; title = t.watch_later; // В Watch Later поиска обычно нет
         }
 
         const modal = document.getElementById(modalId);
         const body = document.getElementById(bodyId);
-        
-        body.innerHTML = '';
-        body.style.display = 'block';
-        body.style.padding = '15px';
+        const headerTitle = modal.querySelector('.modal-header span');
+        if(headerTitle) headerTitle.innerText = title;
 
-        // 1. ПОЛЕ ПОИСКА (Только если это НЕ Watch Later)
-        if (type !== 'wl') {
-            const searchBox = document.createElement('div');
-            searchBox.className = 'modal-search-box';
-            searchBox.innerHTML = `
-                <input type="text" class="modal-search-input" placeholder="${placeholder}" id="search-${type}">
-                <div class="modal-suggestions" id="suggest-${type}"></div>
-            `;
-            body.appendChild(searchBox);
-        }
-
-        // 2. Контейнер тегов
-        const tagsContainer = document.createElement('div');
-        tagsContainer.style.display = 'flex';
-        tagsContainer.style.flexWrap = 'wrap';
-        tagsContainer.style.gap = '8px';
-        body.appendChild(tagsContainer);
-
-        // 3. Рендер тегов
-        renderCurrentTags(type, listData, tagsContainer);
-
-        // 4. Логика поиска (Только если поле создано)
-        if (type !== 'wl') {
-            const input = document.getElementById(`search-${type}`);
-            const suggestBox = document.getElementById(`suggest-${type}`);
-
-            input.oninput = (e) => {
-                const val = e.target.value.toLowerCase().trim();
-                if (val.length < 2) { suggestBox.style.display = 'none'; return; }
-
-                const matches = data.filter(item => {
-                    if (listData.includes(item.id)) return false;
-                    const terms = [item.name, item.name_ru || "", item.name_es || "", item.name_de || "", item.slug].map(x => x.toLowerCase());
-                    return terms.some(term => term.includes(val));
-                }).slice(0, 10);
-
-                suggestBox.innerHTML = '';
-                if (matches.length > 0) {
-                    suggestBox.style.display = 'flex';
-                    matches.forEach(item => {
-                        const row = document.createElement('div');
-                        row.className = 'suggestion-row';
-                        row.innerHTML = `${getLocalizedName(item)} <span>+</span>`;
-                        
-                        row.onclick = () => {
-                            if (type === 'fav') {
-                                favorites.push(item.id);
-                                if (blacklist.includes(item.id)) blacklist = blacklist.filter(x => x !== item.id);
-                                adjustTagScores(item, 5);
-                                logActivity('like', item.id, item.tags);
-                            } else if (type === 'ban') {
-                                blacklist.push(item.id);
-                                if (favorites.includes(item.id)) favorites = favorites.filter(x => x !== item.id);
-                                adjustTagScores(item, -5);
-                                logActivity('dislike', item.id, item.tags);
-                            } 
-                            
-                            localStorage.setItem(STORAGE.FAVORITES, JSON.stringify(favorites));
-                            localStorage.setItem(STORAGE.BLACKLIST, JSON.stringify(blacklist));
-                            
-                            updateCounts();
-                            if (window.syncToCloud) window.syncToCloud();
-                            
-                            input.value = ''; 
-                            suggestBox.style.display = 'none';
-                            renderListModal(type);
-                            if(currentItem && currentItem.id === item.id) updateActionButtons();
-                        };
-                        suggestBox.appendChild(row);
-                    });
-                } else {
-                    suggestBox.style.display = 'none';
-                }
-            };
-        }
-
-        // Возврат заголовка для Fav при закрытии (или при следующем открытии Fav само исправится)
-        if (type === 'fav') {
-             const header = document.querySelector(`#${modalId} .modal-header span`);
-             if(header) header.innerText = t.favorites_catalog;
-        }
-
+        // Показываем загрузку
+        body.innerHTML = '<div style="text-align:center; padding:20px;">Loading list...</div>';
         modal.classList.add('open');
-    }
 
+        try {
+            // 1. ПОДГРУЗКА ДАННЫХ С СЕРВЕРА
+            // Если список пуст, не шлем запрос
+            let items = [];
+            if (listIds.length > 0) {
+                const res = await fetch('/api/get-items', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ids: listIds })
+                });
+                items = await res.json();
+            }
+
+            body.innerHTML = '';
+            body.style.display = 'block';
+            body.style.padding = '15px';
+
+            // 2. ПОЛЕ ПОИСКА (Только для FAV и BAN)
+            if (type !== 'wl') {
+                const searchBox = document.createElement('div');
+                searchBox.className = 'modal-search-box';
+                searchBox.innerHTML = `
+                    <input type="text" class="modal-search-input" placeholder="${placeholder}" id="search-${type}">
+                    <div class="modal-suggestions" id="suggest-${type}"></div>
+                `;
+                body.appendChild(searchBox);
+
+                // --- ЛОГИКА ПОИСКА (ЧЕРЕЗ СЕРВЕР) ---
+                const input = searchBox.querySelector('input');
+                const suggestBox = searchBox.querySelector('.modal-suggestions');
+                let debounceTimer;
+
+                input.oninput = (e) => {
+                    const val = e.target.value.trim();
+                    if (val.length < 2) { suggestBox.style.display = 'none'; return; }
+
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(async () => {
+                        try {
+                            const searchRes = await fetch('/api/search', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ query: val, excludeIds: listIds }) // Исключаем то, что уже добавлено
+                            });
+                            const matches = await searchRes.json();
+
+                            suggestBox.innerHTML = '';
+                            if (matches.length > 0) {
+                                suggestBox.style.display = 'flex';
+                                matches.forEach(m => {
+                                    const row = document.createElement('div');
+                                    row.className = 'suggestion-row';
+                                    row.innerHTML = `${getLocalizedName(m)} <span>+</span>`;
+                                    
+                                    row.onclick = () => {
+                                        // ДОБАВЛЕНИЕ (Копируем логику add)
+                                        if (type === 'fav') {
+                                            window.favorites.push(m.id);
+                                            // Удаляем из бана если был
+                                            window.blacklist = window.blacklist.filter(x => x !== m.id);
+                                            // Учитываем вес
+                                            if (typeof adjustTagScores === 'function') adjustTagScores(m, 5);
+                                        } else { // ban
+                                            window.blacklist.push(m.id);
+                                            window.favorites = window.favorites.filter(x => x !== m.id);
+                                            if (typeof adjustTagScores === 'function') adjustTagScores(m, -5);
+                                        }
+                                        
+                                        // Сохраняем
+                                        if (typeof saveLists === 'function') saveLists();
+                                        if (typeof updateCounts === 'function') updateCounts();
+                                        
+                                        // Перерисовываем
+                                        renderListModal(type);
+                                    };
+                                    suggestBox.appendChild(row);
+                                });
+                            } else {
+                                suggestBox.style.display = 'none';
+                            }
+                        } catch (err) {
+                            console.error("Search error", err);
+                        }
+                    }, 300); // Задержка 300мс
+                };
+            }
+
+            // 3. ОТРИСОВКА СПИСКА ТЕГОВ
+            const tagsContainer = document.createElement('div');
+            tagsContainer.style.display = 'flex';
+            tagsContainer.style.flexWrap = 'wrap';
+            tagsContainer.style.gap = '8px';
+            body.appendChild(tagsContainer);
+
+            if (items.length === 0) {
+                tagsContainer.innerHTML = `<div style="width:100%; text-align:center; color:var(--text-secondary); margin-top:20px;">${t.empty_wl || "List is empty"}</div>`;
+            } else {
+                // Сортировка по имени
+                items.sort((a, b) => getLocalizedName(a).localeCompare(getLocalizedName(b)));
+
+                items.forEach(item => {
+                    const div = document.createElement('div');
+                    let className = 'catalog-item';
+                    if (type === 'fav') className += ' active';
+                    else if (type === 'ban') className += ' ban-active';
+                    else className += ' wl-active';
+                    
+                    div.className = className;
+                    div.innerHTML = `${getLocalizedName(item)} <span class="catalog-remove-btn">✕</span>`;
+
+                    // Клик на крестик (Удаление)
+                    div.querySelector('.catalog-remove-btn').onclick = (e) => {
+                        e.stopPropagation();
+                        if (type === 'fav') window.favorites = window.favorites.filter(x => x !== item.id);
+                        else if (type === 'ban') window.blacklist = window.blacklist.filter(x => x !== item.id);
+                        else window.watchLater = window.watchLater.filter(x => x !== item.id);
+                        
+                        if (typeof saveLists === 'function') saveLists();
+                        if (typeof updateCounts === 'function') updateCounts();
+                        
+                        // Анимация удаления
+                        div.style.opacity = '0';
+                        setTimeout(() => div.remove(), 200);
+                    };
+
+                    // Клик на тег (Переход к нему)
+                    div.onclick = (e) => {
+                        if(e.target.classList.contains('catalog-remove-btn')) return;
+                        closeList(null, true);
+                        if (typeof closeBlacklist === 'function') closeBlacklist(null, true);
+                        if (typeof switchTab === 'function') switchTab('home');
+                        if (typeof forceShowResult === 'function') forceShowResult(item, 'history');
+                    }
+
+                    tagsContainer.appendChild(div);
+                });
+            }
+
+        } catch (e) {
+            console.error("Render List Error:", e);
+            body.innerHTML = '<div style="color:red; text-align:center;">Failed to load list. Server error.</div>';
+        }
+    }
+    
     function renderCurrentTags(type, listIds, container) {
         container.innerHTML = '';
         const t = langData[currentLang];
@@ -9548,258 +9636,123 @@
         }
     }
 
-    function startGeneration(mode, direction = 'next') {
-        if (document.body.classList.contains('rainbow-mode')) setRandomRainbowColor();
-        if (!checkGenerationLimit()) return; 
+    async function startGeneration(mode, direction = 'next') {
+        // Проверка лимитов перед запросом (локально)
+        if (typeof checkGenerationLimit === 'function' && !checkGenerationLimit(true)) return;
         if (isGenerating) return;
 
-        randomizeDecorations();
-
-        if (mode === 'random') {
-            const roll = Math.random(); // Генерируем число от 0.0 до 1.0
-            const depth = sessionHistoryStack.length; // Глубина текущей сессии
-
-            // Хелпер для проверки валидности предмета (чтобы не дублировать код)
-            const isValidInjection = (item) => {
-                if (!item) return false;
-                if (cooldownList.includes(item.id)) return false; // Недавно было
-                
-                // Проверка ориентации (не показывать гей-контент в гетеро режиме и наоборот)
-                if (currentOrientation === 'gay' && !item.tags.includes('gay')) return false;
-                if (currentOrientation === 'hetero' && item.tags.includes('gay')) return false;
-                if (currentOrientation === 'trans' && !item.tags.some(t=>['trans','shemale'].includes(t))) return false;
-                
-                return true;
-            };
-
-            let targetItem = null;
-            let injectionMode = null;
-
-            // 1. WATCH LATER (Приоритет: Высокий, Шанс: ~12%, Глубина: >2)
-            if (roll < 0.12 && watchLater.length > 0 && depth > 2) {
-                const candidate = data.find(x => x.id === watchLater[Math.floor(Math.random() * watchLater.length)]);
-                if (isValidInjection(candidate)) {
-                    targetItem = candidate;
-                    injectionMode = 'wl_reminder';
-                }
-            }
-            
-            // 2. FAVORITES (Приоритет: Средний, Шанс: ~4% (0.12 - 0.16), Глубина: >5)
-            // Напоминаем о любимом, только если уже немного посвайпали
-            else if (roll >= 0.12 && roll < 0.16 && favorites.length > 0 && depth > 5) {
-                const candidate = data.find(x => x.id === favorites[Math.floor(Math.random() * favorites.length)]);
-                if (isValidInjection(candidate)) {
-                    targetItem = candidate;
-                    injectionMode = 'fav_reminder';
-                }
-            }
-
-            // 3. BLACKLIST (Приоритет: Низкий, Шанс: ~1.5% (0.16 - 0.175), Глубина: >10)
-            // Очень редко и только если сессия долгая
-            else if (roll >= 0.16 && roll < 0.175 && blacklist.length > 0 && depth > 10) {
-                const candidate = data.find(x => x.id === blacklist[Math.floor(Math.random() * blacklist.length)]);
-                if (isValidInjection(candidate)) {
-                    targetItem = candidate;
-                    injectionMode = 'ban_reminder';
-                }
-            }
-
-            // ЕСЛИ ВБРОС СРАБОТАЛ:
-            if (targetItem && injectionMode) {
-                console.log(`Injection Triggered: ${injectionMode}`);
-                isGenerating = true;
-                hasInteractedWithCurrent = false;
-
-                const wrapper = document.getElementById('card-anim-wrapper');
-                if(wrapper) wrapper.style.opacity = '0';
-                
-                // Запускаем с особым режимом
-                finishGeneration(targetItem, injectionMode);
-
-                if(wrapper) {
-                    wrapper.style.transform = '';
-                    void wrapper.offsetWidth; 
-                    wrapper.style.opacity = '1';
-                    const animClass = (direction === 'like') ? 'anim-fly-left' : 'anim-fly-right';
-                    wrapper.classList.add(animClass);
-                    setTimeout(() => {
-                        wrapper.classList.remove('anim-fly-right', 'anim-fly-left');
-                        wrapper.style.transform = '';
-                    }, 800);
-                }
-                return; 
-            }
+        // Если включена радужная тема - меняем цвет
+        if (document.body.classList.contains('rainbow-mode') && typeof setRandomRainbowColor === 'function') {
+            setRandomRainbowColor();
         }
 
-        // 1. Модификаторы
-        if (currentOrientation === 'gay') activeMods.add('Gay');
-        else if (currentOrientation === 'trans') activeMods.add('Trans');
-        renderModifiers();
+        // Рандомизация декора (иконок)
+        if (typeof randomizeDecorations === 'function') randomizeDecorations();
 
-        // 2. Чистка UI
+        // Сброс UI (скрываем старые результаты)
         const descEl = document.getElementById('result-desc');
         if(descEl) descEl.style.display = 'none';
+        
         const statusText = document.getElementById('status-text');
-        if(statusText) statusText.innerText = ''; 
+        if(statusText) statusText.innerText = '';
+        
         document.getElementById('badge-wrapper').innerHTML = '';
-        
-        document.getElementById('mods-capsule').classList.remove('open');
-        const modContainer = document.getElementById('mod-container');
-        if (modContainer) modContainer.classList.remove('open');
-        
         document.getElementById('tinder-controls').classList.add('hidden-initial');
         document.getElementById('mods-block').classList.add('hidden-initial');
         document.getElementById('related-block').classList.add('hidden-initial');
 
-        // 3. Элементы
+        // Подготовка карточки
         const card = document.getElementById('card-block');
-        const wrapper = document.getElementById('card-anim-wrapper');
-        const iconLeft = document.querySelector('.icon-left');
-        const iconRight = document.querySelector('.icon-right');
-        const overlay = document.querySelector('.swipe-overlay');
-        
-        // === СБРОС СОСТОЯНИЯ ===
-        if (wrapper) {
-            wrapper.classList.remove('anim-fly-left', 'anim-fly-right');
-            wrapper.style.transform = '';
-            wrapper.style.transition = '';
-            wrapper.style.opacity = '1';
-        }
-
         if(card) {
-            card.classList.remove('status-wl', 'status-fav', 'status-ban');
-            card.classList.remove('flash-active', 'has-results'); 
-            card.style.transform = ''; 
-            card.style.transition = '';
-            card.style.opacity = '1'; 
-            card.style.backgroundColor = '';
-            card.style.borderColor = '';
-            card.style.filter = '';
-            
-            // Сброс оверлея
-            if (overlay) {
-                overlay.style.transition = 'none'; // Убираем анимацию, чтобы сбросилось мгновенно
-                overlay.style.backgroundColor = 'transparent';
-                overlay.style.opacity = ''; 
-            }
-            
-            // Сброс блюра на элементах
-            const blurTargets = [
-                document.getElementById('slot-reel'), 
-                document.getElementById('result-desc'), 
-                document.getElementById('badge-wrapper'), 
-                document.getElementById('related-block'),
-                document.getElementById('tinder-controls') // Добавили кнопки
-            ];
-            
-            blurTargets.forEach(el => { 
-                if(el) { 
-                    el.style.transition = 'none'; // Мгновенно
-                    el.style.filter = 'none'; 
-                }
-            });
-            
-            void card.offsetWidth; // Force reflow
-        }
-        
-        // --- ПОЛНЫЙ СБРОС ИКОНОК ---
-        if(iconLeft) {
-            iconLeft.style.transition = 'none'; // Убираем плавность, чтобы они вернулись мгновенно
-            iconLeft.style.opacity = '';        // Сбрасываем прозрачность (вернется к CSS значению)
-            iconLeft.style.transform = '';      // Возвращаем на место
-            iconLeft.style.animation = '';      // Сбрасываем паузу анимации
-        }
-        if(iconRight) {
-            iconRight.style.transition = 'none';
-            iconRight.style.opacity = '';
-            iconRight.style.transform = '';
-            iconRight.style.animation = '';
-        }
-        
-        // 4. Логика выбора
-        if (mode === 'random' && currentItem && !hasInteractedWithCurrent) {
-            if (watchLater.includes(currentItem.id)) adjustTagScores(currentItem, 1);
-            else adjustTagScores(currentItem, -1);
-        }
-        if (mode === 'similar' && currentItem) adjustTagScores(currentItem, 1);
-
-        let filtered = filterData();
-        if (mode === 'similar' && lastGeneratedItem) {
-            const subset = filtered.filter(item => {
-                if (item.id === lastGeneratedItem.id) return false;
-                const intersection = item.tags.filter(t => lastGeneratedItem.tags.includes(t));
-                return intersection.length >= 2;
-            });
-            if (subset.length > 0) filtered = subset;
-        }
-
-        const reel = document.getElementById('slot-reel');
-        if (filtered.length === 0) {
-            reel.innerHTML = `<div class="slot-item" style="color:var(--highlight-red);">List Empty</div>`;
-            document.getElementById('tinder-controls').classList.remove('hidden-initial');
-            return;
+            card.classList.remove('status-wl', 'status-fav', 'status-ban', 'flash-active', 'has-results');
+            // Сброс оверлея цвета
+            const overlay = document.querySelector('.swipe-overlay');
+            if(overlay) { overlay.style.transition = 'none'; overlay.style.backgroundColor = 'transparent'; }
         }
 
         isGenerating = true;
-        hasInteractedWithCurrent = false;
-        hasWatchedCurrentItem = false;
-        const finalItem = getWeightedRandom(filtered);
+        const reelEl = document.getElementById('slot-reel');
+        // Показываем, что думаем
+        if (isFirstGen) reelEl.innerHTML = `<div class="slot-item">Loading...</div>`;
 
-        // === АНИМАЦИЯ ===
+        try {
+            // === 1. ЗАПРОС К СЕРВЕРУ ===
+            // Отправляем наши предпочтения, сервер сам всё посчитает
+            const response = await fetch('/api/roll', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    blacklist: window.blacklist || [],
+                    tagScores: window.tagScores || {},
+                    orientation: window.currentOrientation || 'hetero',
+                    mode: mode // 'explore' или 'pleasure'
+                })
+            });
 
-        if (isFirstGen) {
-            // Сценарий 1: Первый запуск
-            const spinCount = 10;
+            if (!response.ok) throw new Error("Server API Error");
+
+            // Получаем массив (барабан). Последний элемент = Победитель.
+            const reelData = await response.json();
+            if (!reelData || reelData.length === 0) throw new Error("Empty response");
+
+            const finalItem = reelData[reelData.length - 1]; // Выигрыш
+            window.currentItem = finalItem; // Сохраняем глобально
+
+            // === 2. ОТРИСОВКА БАРАБАНА ===
             let html = '';
-            for (let i = 0; i < spinCount - 1; i++) {
-                const randomItem = filtered[Math.floor(Math.random() * filtered.length)];
-                html += `<div class="slot-item">${getLocalizedName(randomItem)}</div>`;
+            // Рисуем всё кроме последнего (для мелькания)
+            for (let i = 0; i < reelData.length - 1; i++) {
+                html += `<div class="slot-item">${getLocalizedName(reelData[i])}</div>`;
             }
-            const winnerName = getLocalizedName(finalItem);
-            html += `<div class="slot-item" id="result-text">${winnerName}</div>`;
-            
-            reel.className = 'slot-reel spinning'; 
-            reel.innerHTML = html;
-            reel.querySelectorAll('.slot-item').forEach(el => el.classList.add('shrunk'));
-            reel.style.transform = 'translateY(0)';
-            
-            // Влет обёртки
-            if(wrapper) wrapper.classList.add('anim-fly-left'); 
+            // Добавляем победителя
+            html += `<div class="slot-item" id="result-text">${getLocalizedName(finalItem)}</div>`;
 
-            setTimeout(() => {
-                isFirstGen = false;
-                const isPC = window.innerWidth > 768;
-                const itemHeight = isPC ? 450 : 300;
-                const realHeight = reel.firstElementChild ? reel.firstElementChild.offsetHeight : itemHeight;
-                const targetIndex = 9; 
-                const targetY = -(targetIndex * realHeight);
+            reelEl.className = 'slot-reel spinning';
+            reelEl.innerHTML = html;
+            
+            // Если это не первый запуск, делаем шрифт чуть меньше для эффекта движения
+            reelEl.querySelectorAll('.slot-item').forEach(el => el.classList.add('shrunk'));
+
+            // === 3. АНИМАЦИЯ ===
+            // Вычисляем высоту скролла
+            requestAnimationFrame(() => {
+                // Высота одного элемента (берем первый, если есть, или дефолт)
+                const firstEl = reelEl.firstElementChild;
+                const itemHeight = firstEl ? firstEl.offsetHeight : (window.innerWidth > 768 ? 450 : 300);
                 
-                requestAnimationFrame(() => {
-                    reel.style.transition = 'transform 1.2s cubic-bezier(0.25, 1, 0.5, 1)';
-                    reel.style.transform = `translateY(${targetY}px)`;
-                });
-                setTimeout(() => { finishGeneration(finalItem, mode); }, 1200);
-            }, 300);
+                // Целевая позиция Y (чтобы последний элемент оказался в центре)
+                const targetY = -((reelData.length - 1) * itemHeight);
 
-        } else {
-            // Сценарий 2: Обычная генерация
-            if(wrapper) wrapper.style.opacity = '0'; // Скрываем на мгновение
-            
-            finishGeneration(finalItem, mode);
+                // Запускаем CSS анимацию
+                reelEl.style.transition = 'transform 1.2s cubic-bezier(0.25, 1, 0.5, 1)';
+                reelEl.style.transform = `translateY(${targetY}px)`;
+            });
 
-            if(wrapper) {
-                wrapper.style.transform = '';
-                void wrapper.offsetWidth; 
-                wrapper.style.opacity = '1';
+            // Обновляем флаги
+            isFirstGen = false;
+            hasInteractedWithCurrent = false;
+            hasWatchedCurrentItem = false;
 
-                const animClass = (direction === 'like') ? 'anim-fly-left' : 'anim-fly-right';
-                wrapper.classList.add(animClass);
+            // Списываем лимит
+            checkGenerationLimit(); 
 
-                setTimeout(() => {
-                    wrapper.classList.remove('anim-fly-right', 'anim-fly-left');
-                    wrapper.style.transform = '';
-                }, 800);
-            }
+            // === 4. ЗАВЕРШЕНИЕ (через 1.2 сек) ===
+            setTimeout(() => {
+                if (typeof finishGeneration === 'function') {
+                    finishGeneration(finalItem, mode);
+                } else {
+                    // Fallback если функции нет (для отладки)
+                    console.log("Winner:", finalItem.name);
+                    isGenerating = false;
+                }
+            }, 1200);
+
+        } catch (e) {
+            console.error("Spin Error:", e);
+            isGenerating = false;
+            reelEl.innerHTML = `<div class="slot-item" style="color:var(--highlight-red)">Connection Error</div>`;
+            // Возвращаем кнопки управления, чтобы юзер не застрял
+            document.getElementById('tinder-controls').classList.remove('hidden-initial');
         }
     }
 
