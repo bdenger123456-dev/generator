@@ -6807,47 +6807,35 @@
     ];
 
     window.onload = () => {
-        initLanguage();
         initTheme();
-        initIntensity();
-        initDecoSettings();
-        randomizeDecorations();
-        renderModifiers();
-        renderHistory();
+        initIntensity(); 
+        initDecoSettings(); 
+        
+        window.favorites = window.favorites || [];
+        window.blacklist = window.blacklist || [];
+        window.watchLater = window.watchLater || [];
+        
         updateCounts();
-        
-        // 2. Инициализация систем
         initAgeGate();
-        initSwipeCards();
         
-        // 3. Установка платформы
-        const savedPlatform = localStorage.getItem('xch_platform');
-        if (savedPlatform) {
-            const platformSelect = document.getElementById('platform');
-            if (platformSelect) platformSelect.value = savedPlatform;
-        }
-        updateLink();
+        // Слот в режим ожидания
+        const reel = document.getElementById('slot-reel');
+        if(reel) reel.innerHTML = '<div class="slot-item" style="opacity:0.7">Ready?</div>';
 
-        // 4. Текст и Анимация слота
-        setWelcomeMessage(); 
+        // --- AUTH LISTENER ---
+        onAuthStateChanged(auth, async (user) => {
+            const btnText = document.getElementById('login-btn-text');
+            if (user) {
+                window.isUserLoggedIn = true;
+                if(btnText) btnText.innerText = "Account: " + user.email.split('@')[0];
+                await loadUserData(user); // Запуск синхронизации
+            } else {
+                window.isUserLoggedIn = false;
+                if(btnText) btnText.innerText = "Sync / Login";
+                updateSubscriptionUI();
+            }
+        });
         
-        // Сброс флага первой генерации
-        isFirstGen = true; 
-        
-        // Запуск "холостого хода" слота (бегущая строка)
-        initIdleSlot(); 
-
-        updateSubscriptionUI();
-        
-        // 5. Инициализация Ориентации
-        const oriSelect = document.getElementById('orientation-select');
-        if (oriSelect) oriSelect.value = currentOrientation;
-
-        // 6. Верстка (в самом конце, чтобы всё уже было готово)
-        checkLayout(); 
-        window.addEventListener('resize', checkLayout);
-        
-        // Принудительно ставим класс для мобильной шапки
         document.body.classList.add('tab-home-active');
     };
 
@@ -7711,15 +7699,28 @@
     }
 
     function updateCounts() { 
-        document.getElementById('count-fav').innerText = favorites.length; 
+        // Получаем элементы в переменные
+        const elFav = document.getElementById('count-fav');
+        const elBan = document.getElementById('count-ban');
+        const elWl = document.getElementById('count-wl');
         
-        const banBadge = document.getElementById('count-ban');
-        if(banBadge) banBadge.innerText = blacklist.length;
+        // Проверяем: "Если элемент существует, то обнови текст"
+        // Также страхуемся от того, что массив может быть undefined (window.favorites || [])
+        if (elFav) {
+            elFav.innerText = (window.favorites || []).length;
+        }
         
-        const wlBadge = document.getElementById('count-wl');
-        if(wlBadge) wlBadge.innerText = watchLater.length;
+        if (elBan) {
+            elBan.innerText = (window.blacklist || []).length;
+        }
         
-        updateExploredCount(); // Вызов соседней функции
+        if (elWl) {
+            elWl.innerText = (window.watchLater || []).length;
+        }
+        
+        if (typeof updateExploredCount === 'function') {
+            updateExploredCount(); 
+        }
     }
 
     function exportData() {
@@ -8015,171 +8016,103 @@
     }
 
     async function renderListModal(type) {
-        // Определяем переменные в зависимости от типа
-        let modalId, bodyId, listIds, placeholder, title;
-        const t = langData[currentLang] || langData['en'];
-
-        if (type === 'fav') {
-            modalId = 'modal-overlay'; bodyId = 'modal-catalog-body'; listIds = window.favorites || [];
-            placeholder = t.search_liked; title = t.favorites_catalog;
-        } else if (type === 'ban') {
-            modalId = 'modal-blacklist-overlay'; bodyId = 'modal-blacklist-body'; listIds = window.blacklist || [];
-            placeholder = t.search_disliked; title = t.blacklist_catalog;
-        } else if (type === 'wl') {
-            modalId = 'modal-overlay'; bodyId = 'modal-catalog-body'; listIds = window.watchLater || [];
-            placeholder = ""; title = t.watch_later; // В Watch Later поиска обычно нет
+        let listIds = [];
+        let modalId = 'modal-overlay'; // По умолчанию лайки
+        let title = 'List';
+        
+        // Определяем, какой список открываем
+        if (type === 'fav') { 
+            listIds = window.favorites || []; 
+            title = 'Liked'; 
+        } else if (type === 'ban') { 
+            listIds = window.blacklist || []; 
+            modalId = 'modal-blacklist-overlay'; 
+            title = 'Disliked'; 
+        } else if (type === 'wl') { 
+            listIds = window.watchLater || []; 
+            title = 'Watch Later'; 
         }
 
         const modal = document.getElementById(modalId);
-        const body = document.getElementById(bodyId);
-        const headerTitle = modal.querySelector('.modal-header span');
-        if(headerTitle) headerTitle.innerText = title;
-
-        // Показываем загрузку
-        body.innerHTML = '<div style="text-align:center; padding:20px;">Loading list...</div>';
+        // Пытаемся найти тело модалки (учитывая разные ID в твоем HTML)
+        const body = document.getElementById(type === 'ban' ? 'modal-blacklist-body' : 'modal-catalog-body');
+        const head = modal.querySelector('.modal-header span');
+        
+        if(head) head.innerText = title;
+        
         modal.classList.add('open');
+        body.innerHTML = '<div style="text-align:center; padding:20px;">Loading...</div>';
+
+        if (listIds.length === 0) {
+            body.innerHTML = '<div style="text-align:center; padding:20px; color:#888;">List is empty</div>';
+            return;
+        }
 
         try {
-            // 1. ПОДГРУЗКА ДАННЫХ С СЕРВЕРА
-            // Если список пуст, не шлем запрос
-            let items = [];
-            if (listIds.length > 0) {
-                const res = await fetch('/api/get-items', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ ids: listIds })
-                });
-                items = await res.json();
-            }
-
+            // === ЗАПРОС К СЕРВЕРУ ЗА ДАННЫМИ ===
+            const res = await fetch('/api/get-items', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ids: listIds })
+            });
+            
+            if (!res.ok) throw new Error("Network error");
+            
+            const items = await res.json();
+            
             body.innerHTML = '';
-            body.style.display = 'block';
-            body.style.padding = '15px';
+            const container = document.createElement('div');
+            container.style.cssText = "display:flex; flex-wrap:wrap; gap:8px; padding:10px;";
+            
+            // Сортировка по имени
+            items.sort((a,b) => getLocalizedName(a).localeCompare(getLocalizedName(b)));
 
-            // 2. ПОЛЕ ПОИСКА (Только для FAV и BAN)
-            if (type !== 'wl') {
-                const searchBox = document.createElement('div');
-                searchBox.className = 'modal-search-box';
-                searchBox.innerHTML = `
-                    <input type="text" class="modal-search-input" placeholder="${placeholder}" id="search-${type}">
-                    <div class="modal-suggestions" id="suggest-${type}"></div>
-                `;
-                body.appendChild(searchBox);
-
-                // --- ЛОГИКА ПОИСКА (ЧЕРЕЗ СЕРВЕР) ---
-                const input = searchBox.querySelector('input');
-                const suggestBox = searchBox.querySelector('.modal-suggestions');
-                let debounceTimer;
-
-                input.oninput = (e) => {
-                    const val = e.target.value.trim();
-                    if (val.length < 2) { suggestBox.style.display = 'none'; return; }
-
-                    clearTimeout(debounceTimer);
-                    debounceTimer = setTimeout(async () => {
-                        try {
-                            const searchRes = await fetch('/api/search', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ query: val, excludeIds: listIds }) // Исключаем то, что уже добавлено
-                            });
-                            const matches = await searchRes.json();
-
-                            suggestBox.innerHTML = '';
-                            if (matches.length > 0) {
-                                suggestBox.style.display = 'flex';
-                                matches.forEach(m => {
-                                    const row = document.createElement('div');
-                                    row.className = 'suggestion-row';
-                                    row.innerHTML = `${getLocalizedName(m)} <span>+</span>`;
-                                    
-                                    row.onclick = () => {
-                                        // ДОБАВЛЕНИЕ (Копируем логику add)
-                                        if (type === 'fav') {
-                                            window.favorites.push(m.id);
-                                            // Удаляем из бана если был
-                                            window.blacklist = window.blacklist.filter(x => x !== m.id);
-                                            // Учитываем вес
-                                            if (typeof adjustTagScores === 'function') adjustTagScores(m, 5);
-                                        } else { // ban
-                                            window.blacklist.push(m.id);
-                                            window.favorites = window.favorites.filter(x => x !== m.id);
-                                            if (typeof adjustTagScores === 'function') adjustTagScores(m, -5);
-                                        }
-                                        
-                                        // Сохраняем
-                                        if (typeof saveLists === 'function') saveLists();
-                                        if (typeof updateCounts === 'function') updateCounts();
-                                        
-                                        // Перерисовываем
-                                        renderListModal(type);
-                                    };
-                                    suggestBox.appendChild(row);
-                                });
-                            } else {
-                                suggestBox.style.display = 'none';
-                            }
-                        } catch (err) {
-                            console.error("Search error", err);
-                        }
-                    }, 300); // Задержка 300мс
-                };
-            }
-
-            // 3. ОТРИСОВКА СПИСКА ТЕГОВ
-            const tagsContainer = document.createElement('div');
-            tagsContainer.style.display = 'flex';
-            tagsContainer.style.flexWrap = 'wrap';
-            tagsContainer.style.gap = '8px';
-            body.appendChild(tagsContainer);
-
-            if (items.length === 0) {
-                tagsContainer.innerHTML = `<div style="width:100%; text-align:center; color:var(--text-secondary); margin-top:20px;">${t.empty_wl || "List is empty"}</div>`;
-            } else {
-                // Сортировка по имени
-                items.sort((a, b) => getLocalizedName(a).localeCompare(getLocalizedName(b)));
-
-                items.forEach(item => {
-                    const div = document.createElement('div');
-                    let className = 'catalog-item';
-                    if (type === 'fav') className += ' active';
-                    else if (type === 'ban') className += ' ban-active';
-                    else className += ' wl-active';
-                    
-                    div.className = className;
-                    div.innerHTML = `${getLocalizedName(item)} <span class="catalog-remove-btn">✕</span>`;
-
-                    // Клик на крестик (Удаление)
-                    div.querySelector('.catalog-remove-btn').onclick = (e) => {
-                        e.stopPropagation();
-                        if (type === 'fav') window.favorites = window.favorites.filter(x => x !== item.id);
-                        else if (type === 'ban') window.blacklist = window.blacklist.filter(x => x !== item.id);
-                        else window.watchLater = window.watchLater.filter(x => x !== item.id);
+            items.forEach(item => {
+                const tag = document.createElement('div');
+                let cls = 'catalog-item';
+                if(type === 'fav') cls += ' active'; 
+                else if(type === 'wl') cls += ' wl-active'; 
+                else cls += ' ban-active';
+                
+                tag.className = cls;
+                tag.innerHTML = `${getLocalizedName(item)} <span style="margin-left:5px; opacity:0.6; cursor:pointer;">✕</span>`;
+                
+                // Удаление
+                tag.querySelector('span').onclick = (e) => {
+                    e.stopPropagation();
+                    if(confirm("Remove from list?")) {
+                        if(type==='fav') window.favorites = window.favorites.filter(x=>x!==item.id);
+                        if(type==='ban') window.blacklist = window.blacklist.filter(x=>x!==item.id);
+                        if(type==='wl') window.watchLater = window.watchLater.filter(x=>x!==item.id);
                         
-                        if (typeof saveLists === 'function') saveLists();
-                        if (typeof updateCounts === 'function') updateCounts();
+                        // Сохраняем изменения
+                        if(typeof saveLists === 'function') saveLists();
+                        if(typeof updateCounts === 'function') updateCounts();
                         
-                        // Анимация удаления
-                        div.style.opacity = '0';
-                        setTimeout(() => div.remove(), 200);
-                    };
-
-                    // Клик на тег (Переход к нему)
-                    div.onclick = (e) => {
-                        if(e.target.classList.contains('catalog-remove-btn')) return;
-                        closeList(null, true);
-                        if (typeof closeBlacklist === 'function') closeBlacklist(null, true);
-                        if (typeof switchTab === 'function') switchTab('home');
-                        if (typeof forceShowResult === 'function') forceShowResult(item, 'history');
+                        tag.remove();
                     }
+                };
+                
+                // Переход к элементу
+                tag.onclick = (e) => {
+                    if(e.target.tagName === 'SPAN') return;
+                    
+                    // Закрываем все модалки
+                    document.querySelectorAll('.modal-overlay').forEach(el => el.classList.remove('open'));
+                    
+                    // Переключаем на главную и показываем
+                    if(typeof switchTab === 'function') switchTab('home');
+                    if(typeof forceShowResult === 'function') forceShowResult(item, 'history');
+                };
+                
+                container.appendChild(tag);
+            });
+            
+            body.appendChild(container);
 
-                    tagsContainer.appendChild(div);
-                });
-            }
-
-        } catch (e) {
-            console.error("Render List Error:", e);
-            body.innerHTML = '<div style="color:red; text-align:center;">Failed to load list. Server error.</div>';
+        } catch(e) {
+            console.error(e);
+            body.innerHTML = '<div style="color:red; text-align:center;">Connection Error</div>';
         }
     }
     
@@ -9637,47 +9570,37 @@
     }
 
     async function startGeneration(mode, direction = 'next') {
-        // Проверка лимитов перед запросом (локально)
-        if (typeof checkGenerationLimit === 'function' && !checkGenerationLimit(true)) return;
         if (isGenerating) return;
-
-        // Если включена радужная тема - меняем цвет
-        if (document.body.classList.contains('rainbow-mode') && typeof setRandomRainbowColor === 'function') {
-            setRandomRainbowColor();
-        }
-
-        // Рандомизация декора (иконок)
-        if (typeof randomizeDecorations === 'function') randomizeDecorations();
-
-        // Сброс UI (скрываем старые результаты)
-        const descEl = document.getElementById('result-desc');
-        if(descEl) descEl.style.display = 'none';
         
-        const statusText = document.getElementById('status-text');
-        if(statusText) statusText.innerText = '';
-        
+        // Проверка лимита (если функция есть)
+        if (typeof checkGenerationLimit === 'function' && !checkGenerationLimit(true)) return;
+
+        // Сброс UI (скрываем старое)
+        const reelEl = document.getElementById('slot-reel');
+        document.getElementById('result-desc').style.display = 'none';
+        document.getElementById('status-text').innerText = '';
         document.getElementById('badge-wrapper').innerHTML = '';
         document.getElementById('tinder-controls').classList.add('hidden-initial');
         document.getElementById('mods-block').classList.add('hidden-initial');
         document.getElementById('related-block').classList.add('hidden-initial');
+        document.getElementById('start-btn-container').classList.add('hidden-initial'); // Скрываем кнопку старта
+        document.getElementById('start-btn-container').style.display = 'none';
 
-        // Подготовка карточки
+        // Сброс карточки
         const card = document.getElementById('card-block');
         if(card) {
             card.classList.remove('status-wl', 'status-fav', 'status-ban', 'flash-active', 'has-results');
-            // Сброс оверлея цвета
+            card.style.transform = '';
             const overlay = document.querySelector('.swipe-overlay');
-            if(overlay) { overlay.style.transition = 'none'; overlay.style.backgroundColor = 'transparent'; }
+            if(overlay) overlay.style.backgroundColor = 'transparent';
         }
 
         isGenerating = true;
-        const reelEl = document.getElementById('slot-reel');
-        // Показываем, что думаем
-        if (isFirstGen) reelEl.innerHTML = `<div class="slot-item">Loading...</div>`;
+        if(isFirstGen && reelEl) reelEl.innerHTML = '<div class="slot-item">Loading...</div>';
 
         try {
-            // === 1. ЗАПРОС К СЕРВЕРУ ===
-            // Отправляем наши предпочтения, сервер сам всё посчитает
+            // === ЗАПРОС К СЕРВЕРУ ===
+            // Просим сервер дать нам 30 элементов для анимации и победителя
             const response = await fetch('/api/roll', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -9685,73 +9608,66 @@
                     blacklist: window.blacklist || [],
                     tagScores: window.tagScores || {},
                     orientation: window.currentOrientation || 'hetero',
-                    mode: mode // 'explore' или 'pleasure'
+                    mode: mode
                 })
             });
 
-            if (!response.ok) throw new Error("Server API Error");
-
-            // Получаем массив (барабан). Последний элемент = Победитель.
+            if (!response.ok) throw new Error("API Error");
+            
             const reelData = await response.json();
-            if (!reelData || reelData.length === 0) throw new Error("Empty response");
-
-            const finalItem = reelData[reelData.length - 1]; // Выигрыш
+            
+            // Последний элемент массива — это результат
+            const finalItem = reelData[reelData.length - 1];
             window.currentItem = finalItem; // Сохраняем глобально
 
-            // === 2. ОТРИСОВКА БАРАБАНА ===
+            // === ОТРИСОВКА БАРАБАНА ===
             let html = '';
-            // Рисуем всё кроме последнего (для мелькания)
+            // Рисуем всё кроме последнего (для анимации мелькания)
             for (let i = 0; i < reelData.length - 1; i++) {
                 html += `<div class="slot-item">${getLocalizedName(reelData[i])}</div>`;
             }
-            // Добавляем победителя
+            // Добавляем победителя в конец
             html += `<div class="slot-item" id="result-text">${getLocalizedName(finalItem)}</div>`;
-
-            reelEl.className = 'slot-reel spinning';
-            reelEl.innerHTML = html;
             
-            // Если это не первый запуск, делаем шрифт чуть меньше для эффекта движения
-            reelEl.querySelectorAll('.slot-item').forEach(el => el.classList.add('shrunk'));
-
-            // === 3. АНИМАЦИЯ ===
-            // Вычисляем высоту скролла
-            requestAnimationFrame(() => {
-                // Высота одного элемента (берем первый, если есть, или дефолт)
-                const firstEl = reelEl.firstElementChild;
-                const itemHeight = firstEl ? firstEl.offsetHeight : (window.innerWidth > 768 ? 450 : 300);
+            if(reelEl) {
+                reelEl.className = 'slot-reel spinning';
+                reelEl.innerHTML = html;
                 
-                // Целевая позиция Y (чтобы последний элемент оказался в центре)
-                const targetY = -((reelData.length - 1) * itemHeight);
+                // Если не первый раз, уменьшаем шрифт остальных элементов
+                if (!isFirstGen) reelEl.querySelectorAll('.slot-item').forEach(el => el.classList.add('shrunk'));
 
-                // Запускаем CSS анимацию
-                reelEl.style.transition = 'transform 1.2s cubic-bezier(0.25, 1, 0.5, 1)';
-                reelEl.style.transform = `translateY(${targetY}px)`;
-            });
-
-            // Обновляем флаги
-            isFirstGen = false;
-            hasInteractedWithCurrent = false;
-            hasWatchedCurrentItem = false;
+                // === АНИМАЦИЯ ===
+                requestAnimationFrame(() => {
+                    const firstEl = reelEl.firstElementChild;
+                    // Вычисляем высоту элемента (или берем дефолт)
+                    const h = firstEl ? firstEl.offsetHeight : (window.innerWidth > 768 ? 450 : 300);
+                    // Скроллим так, чтобы последний элемент встал в центр
+                    const targetY = -((reelData.length - 1) * h);
+                    
+                    reelEl.style.transition = 'transform 1.2s cubic-bezier(0.25, 1, 0.5, 1)';
+                    reelEl.style.transform = `translateY(${targetY}px)`;
+                });
+            }
 
             // Списываем лимит
-            checkGenerationLimit(); 
+            if (typeof checkGenerationLimit === 'function') checkGenerationLimit();
+            isFirstGen = false;
 
-            // === 4. ЗАВЕРШЕНИЕ (через 1.2 сек) ===
+            // === ФИНАЛ ЧЕРЕЗ 1.2 СЕК ===
             setTimeout(() => {
-                if (typeof finishGeneration === 'function') {
+                if (typeof finishGenerationUI === 'function') {
+                    finishGenerationUI(finalItem);
+                } else if (typeof finishGeneration === 'function') {
                     finishGeneration(finalItem, mode);
-                } else {
-                    // Fallback если функции нет (для отладки)
-                    console.log("Winner:", finalItem.name);
-                    isGenerating = false;
                 }
+                isGenerating = false;
             }, 1200);
 
         } catch (e) {
-            console.error("Spin Error:", e);
+            console.error("Spin error:", e);
+            if(reelEl) reelEl.innerHTML = '<div class="slot-item" style="color:red">Error</div>';
             isGenerating = false;
-            reelEl.innerHTML = `<div class="slot-item" style="color:var(--highlight-red)">Connection Error</div>`;
-            // Возвращаем кнопки управления, чтобы юзер не застрял
+            // Показываем кнопки, чтобы не застрять
             document.getElementById('tinder-controls').classList.remove('hidden-initial');
         }
     }
