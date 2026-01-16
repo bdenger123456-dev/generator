@@ -2714,44 +2714,101 @@
 
         /* МОБИЛЬНАЯ ВЕРСИЯ */
         @media (max-width: 768px) {
-            /* 1. Увеличиваем отступ сверху для всего контейнера */
+    
+            /* 1. КОНТЕЙНЕР: Используем 100dvh (учитывает адресную строку и вкладки) */
             #tab-home .center-wrapper {
-                padding-top: 125px !important; 
-                justify-content: flex-start !important; 
+                height: 100dvh !important; 
+                padding-top: 60px !important;  /* Минимальный отступ под шапку */
+                padding-bottom: 80px !important; /* Отступ под нижнее меню (оно ~65px) */
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: flex-start !important;
+                overflow: hidden !important;
             }
 
-            /* 2. Фиксируем капсулу выбора режима */
+            /* 2. КАПСУЛА РЕЖИМА (Верхняя) */
             #mobile-mode-mount {
-                position: fixed !important; 
-                top: 65px !important;      
+                position: absolute !important; /* Не fixed, а absolute внутри wrapper */
+                top: 60px !important;          /* Сразу под шапкой */
                 left: 0 !important;
                 width: 100% !important;
-                margin: 0 !important;
-                z-index: 80 !important;     
-                pointer-events: none;      
-                background: transparent !important;
-                height: 50px !important;
+                height: 40px !important;       /* Компактная высота */
+                z-index: 80 !important;
                 display: flex !important;
-                align-items: center !important;
                 justify-content: center !important;
+                align-items: center !important;
+                transition: opacity 0.3s ease, transform 0.3s ease;
             }
 
-            /* Включаем клики только на саму кнопку капсулы */
-            #mobile-mode-mount .mode-capsule-wrapper {
-                pointer-events: auto !important;
+            /* СКРЫВАЕМ КАПСУЛУ, ЕСЛИ МЫ НА СТАРТОВОМ ЭКРАНЕ (класс is-start-screen) */
+            body.is-start-screen #mobile-mode-mount {
+                opacity: 0 !important;
+                pointer-events: none !important;
+                transform: translateY(-20px) !important;
             }
 
-            /* 3. Текст статуса ("Ready...") */
-            .status-text-combined {
-                bottom: 100% !important;
-                margin-bottom: 10px !important;
-                z-index: 70 !important;
-            }
-
-            /* 4. Якорь карточки */
+            /* 3. ЯКОРЬ КАРТОЧКИ */
             #card-anchor {
+                flex: 1 1 auto !important;     /* Занимает всё доступное место */
                 margin-top: 0 !important;
-                height: 100% !important;
+                height: auto !important;
+                min-height: 0 !important;      /* ВАЖНО для вложенного скролла/флекса */
+                display: flex !important;
+                flex-direction: column !important;
+                /* Если мы не на старте, сдвигаем карточку чуть вниз, чтобы дать место капсуле */
+                padding-top: 10px !important; 
+            }
+            
+            /* На стартовом экране убираем отступ, чтобы карточка была по центру */
+            body.is-start-screen #card-anchor {
+                padding-top: 0 !important;
+                justify-content: center !important; /* Центруем по вертикали */
+            }
+
+            /* 4. ФРАЗА НАД КАРТОЧКОЙ */
+            .status-text-combined {
+                position: relative !important; /* Возвращаем в поток, чтобы не наезжала */
+                bottom: auto !important;
+                left: auto !important;
+                margin-bottom: 5px !important; /* Минимальный отступ до карточки */
+                margin-top: 30px !important;   /* Отступ от капсулы сверху */
+                height: 24px !important;       /* Фикс высота, чтобы не прыгало */
+                flex-shrink: 0 !important;
+            }
+            
+            body.is-start-screen .status-text-combined {
+                display: none !important; /* На старте фраза не нужна (или мешает) */
+            }
+
+            /* 5. КАРТОЧКА */
+            .card {
+                flex: 1 1 auto !important; /* Растягивается */
+                height: auto !important;   /* Авто-высота */
+                max-height: 100% !important;
+                margin-bottom: 0 !important;
+            }
+
+            .slot-item {
+                padding-top: 10px !important;    /* Место сверху для букв */
+                padding-bottom: 10px !important; /* Место снизу */
+                line-height: 1.1 !important;
+                font-size: clamp(30px, 8vw, 55px) !important;
+            }
+
+            /* 7. ПОХОЖИЕ ФЕТИШИ */
+            .related-section {
+                flex-shrink: 0 !important; /* Запрещаем сжимать этот блок */
+                margin-bottom: 5px !important;
+                min-height: 50px !important; /* Минимальная высота */
+            }
+            
+            /* Если экран совсем маленький, уменьшаем описание, чтобы влезли "Похожие" */
+            #result-desc {
+                flex-shrink: 1 !important; 
+                max-height: 15vh !important; 
+                overflow-y: auto !important; 
+                -webkit-line-clamp: unset !important; 
+                display: block !important;
             }
         }
 
@@ -7117,6 +7174,7 @@
         window.addEventListener('resize', checkLayout);
         
         document.body.classList.add('tab-home-active');
+        document.body.classList.add('is-start-screen');
     }
 
     window.onload = loadData;
@@ -9757,6 +9815,8 @@
 
         randomizeDecorations();
 
+        document.body.classList.remove('is-start-screen');
+
         if (mode === 'random') {
             const roll = Math.random(); // Генерируем число от 0.0 до 1.0
             const depth = sessionHistoryStack.length; // Глубина текущей сессии
@@ -10904,7 +10964,6 @@
     }
 
     function resetToHome() {
-        // Если мы уже на стартовом экране или идет генерация — выходим
         if (!currentItem || isGenerating) return;
 
         const wrapper = document.getElementById('card-anim-wrapper');
@@ -11015,6 +11074,8 @@
             }
 
         }, 350);
+        
+        document.body.classList.add('is-start-screen');
     }
 
     document.addEventListener("visibilitychange", () => {
