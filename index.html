@@ -2675,7 +2675,7 @@
             display: flex;
             justify-content: center;
             width: 100%;
-            margin-top: -35px !important; 
+            margin-top: -100px !important; 
             margin-bottom: 20px !important;
             position: relative;
             z-index: 60;
@@ -7940,9 +7940,6 @@
             tag.className = 'tag';
             if(activeMods.has(mod.key)) tag.classList.add('selected');
             
-            // ВСЕГДА используем текущий язык для отображения на кнопке
-            // Логика формирования ссылки для поиска (Search EN) находится в updateLink(), 
-            // здесь мы отвечаем только за UI.
             let text = mod.en;
             if (mod[currentLang]) {
                 text = mod[currentLang];
