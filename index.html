@@ -1089,8 +1089,8 @@
         }
         
         @media (max-width: 768px) {
-            
-            /* 1. GLOBAL HIDES (Скрываем ПК элементы) */
+
+            /* --- 1. ГЛОБАЛЬНЫЕ СКРЫТИЯ (ПК элементы) --- */
             .sidebar, 
             .tinder-actions, 
             .btn-group, 
@@ -1102,179 +1102,230 @@
                 display: none !important; 
             }
 
-            /* 2. SHOW MOBILE ELEMENTS */
-            .mobile-header, 
-            .bottom-nav, 
-            .top-gradient-mask, 
-            .bottom-gradient-mask { 
-                display: flex !important; 
+            /* --- 2. СТРУКТУРА СТРАНИЦЫ (Убираем скроллы и пустоты) --- */
+            html, body {
+                height: 100% !important;
+                overflow: hidden !important;
+                position: fixed; /* Фиксируем body, чтобы не было "резиновой" прокрутки */
+                width: 100%;
             }
 
             .main-content { 
                 padding: 0 !important; 
-                height: 100dvh !important; /* Фикс высоты для мобильных браузеров */
+                height: 100% !important;
+                width: 100% !important;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .mobile-header {
+                display: flex !important;
+                /* Шапка фиксирована, но не занимает место в потоке flex */
+                position: fixed;
+                top: 0; 
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: 1000;
+                width: 90%;
+                margin-top: 10px;
+            }
+
+            .bottom-nav {
+                display: flex !important;
+                z-index: 1000;
+            }
+
+            /* --- 3. ГЛАВНЫЙ КОНТЕЙНЕР ТАБА --- */
+            #tab-home {
+                height: 100% !important;
+                width: 100% !important;
+                display: flex !important;
+                flex-direction: column !important;
+                padding: 0 !important;
                 overflow: hidden !important;
             }
 
-            /* 3. MAIN CONTAINER LAYOUT */
             #tab-home .center-wrapper {
-                height: 100% !important;
+                flex: 1 1 auto !important; /* Растягивается на всю высоту */
                 width: 100% !important;
-                padding-top: 60px !important;  /* Место под шапку */
-                padding-bottom: 75px !important; /* Место под нижнее меню */
-                padding-left: 10px !important;
-                padding-right: 10px !important;
-                
                 display: flex !important;
                 flex-direction: column !important;
                 justify-content: flex-start !important;
                 align-items: center !important;
+                
+                /* ОТСТУПЫ: Сверху под шапку, Снизу под меню */
+                padding-top: 70px !important; 
+                padding-bottom: 85px !important; 
+                padding-left: 10px !important;
+                padding-right: 10px !important;
+                box-sizing: border-box !important;
                 overflow: hidden !important;
             }
 
-            /* 4. MODE CAPSULE (КАПСУЛА РЕЖИМА) */
+            /* --- 4. КАПСУЛА ВЫБОРА РЕЖИМА --- */
             #mobile-mode-mount {
-                /* Показываем как блок в потоке, чтобы он толкал карточку вниз */
+                /* Flex-контейнер, занимает место в потоке */
                 display: flex !important;
                 justify-content: center;
                 align-items: center;
                 width: 100%;
-                min-height: 50px; /* Фиксированная высота */
-                flex-shrink: 0;   /* Не сжимать */
-                z-index: 60;
-                margin-top: 5px !important;
+                height: 50px !important;
+                min-height: 50px !important;
+                flex-shrink: 0 !important; /* Не сжиматься! */
                 margin-bottom: 5px !important;
-                position: relative !important;
-                top: auto !important;
-                left: auto !important;
-                opacity: 1 !important;
-                transition: opacity 0.3s ease;
+                z-index: 50;
+                
+                transition: all 0.3s ease;
+                opacity: 1;
+                transform: translateY(0);
             }
 
-            /* Если мы на стартовом экране - скрываем капсулу полностью, чтобы карточка была выше */
+            /* Когда мы на стартовом экране - скрываем капсулу и убираем отступ */
             body.is-start-screen #mobile-mode-mount {
-                display: none !important;
+                height: 0 !important;
+                min-height: 0 !important;
+                margin: 0 !important;
+                opacity: 0 !important;
+                overflow: hidden !important;
+                pointer-events: none;
             }
 
-            /* 5. CARD ANCHOR (ОБЛАСТЬ КАРТОЧКИ) */
+            /* --- 5. ОБЛАСТЬ КАРТОЧКИ (Anchor) --- */
             #card-anchor {
-                flex: 1 1 auto !important; /* Занимает всё оставшееся место */
+                flex: 1 1 auto !important; /* Занимает ВСЁ оставшееся место */
+                width: 100% !important;
                 display: flex !important;
                 flex-direction: column !important;
-                width: 100% !important;
-                min-height: 0 !important; /* Важно для работы скролла внутри */
-                overflow: visible !important;
-                justify-content: center !important; /* Центруем карточку по вертикали */
+                position: relative !important;
+                min-height: 0 !important; /* Критично для flex-дочерних элементов */
             }
 
-            /* 6. STATUS TEXT (Фраза над карточкой) */
+            #card-anim-wrapper {
+                flex: 1 1 auto !important;
+                display: flex !important;
+                flex-direction: column !important;
+                height: 100% !important;
+            }
+
+            /* Фраза "Finding your fetish..." */
             .status-text-combined {
                 position: relative !important;
-                width: 100%;
-                margin-bottom: 8px !important;
-                flex-shrink: 0;
-                height: auto;
-                min-height: 20px;
-                font-size: 14px !important;
+                height: 20px !important;
+                margin-bottom: 5px !important;
+                flex-shrink: 0 !important;
+                display: flex !important;
             }
-            
-            /* Скрываем фразу на стартовом экране */
             body.is-start-screen .status-text-combined {
                 display: none !important;
             }
 
-            /* 7. CARD (САМА КАРТОЧКА) */
+            /* --- 6. САМА КАРТОЧКА --- */
             .card {
-                flex: 1 1 auto !important; /* Растягивается на доступное место */
+                flex: 1 1 auto !important; /* Растягивается */
                 width: 100% !important;
-                height: 100% !important;
+                height: 100% !important; 
                 margin: 0 !important;
                 
-                /* Внутренняя структура */
                 display: flex !important;
                 flex-direction: column !important;
                 justify-content: space-between !important;
-                padding: 10px 5px !important;
+                
+                padding: 5px !important;
             }
 
-            /* На стартовом экране можно сделать карточку чуть компактнее или центрированнее */
-            body.is-start-screen .card {
-                max-height: 85vh !important; 
+            /* Верх: Бейджи */
+            .card > div:nth-child(2) { 
+                /* Изменили nth-child, так как DOM может меняться. Лучше по смыслу, но оставим как есть */
+                flex: 0 0 auto !important;
+                padding-top: 5px !important;
+                min-height: 30px !important;
             }
 
-            /* Внутренности карточки */
-            .card > div:nth-child(2) { /* Центр карточки (слот) */
-                flex: 1 1 auto !important;
+            /* СЕРЕДИНА: Слот + Описание */
+            .card > div:nth-child(3) {
+                flex: 1 1 auto !important; /* Занимает центр */
                 display: flex !important;
                 flex-direction: column !important;
                 justify-content: center !important;
-                overflow: hidden !important; 
+                align-items: center !important;
+                overflow: hidden !important; /* Обрезает лишнее */
+                min-height: 0 !important;    /* Позволяет сжиматься */
             }
 
+            /* ОКНО СЛОТА (Где текст "Ready?") */
             .slot-window {
-                height: auto !important;
-                flex-shrink: 1;
-            }
-            
-            .slot-item {
-                font-size: clamp(32px, 10vw, 50px) !important;
-                line-height: 1.1 !important;
-                white-space: normal !important;
+                width: 100%;
+                flex: 0 1 auto !important; /* Может сжиматься, но не исчезать */
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                min-height: 60px !important; /* Гарантируем высоту */
             }
 
-            /* Описание и теги */
+            .slot-item {
+                font-size: clamp(36px, 12vw, 55px) !important;
+                line-height: 1.1 !important;
+                padding: 5px 0 !important;
+            }
+
+            /* Описание (result-desc) */
             #result-desc {
-                max-height: 12vh !important; /* Ограничиваем высоту описания */
+                flex: 0 1 auto !important;
+                max-height: 15vh !important; /* Не более 15% высоты экрана */
                 overflow-y: auto !important;
-                margin: 10px 0 !important;
+                margin-top: 10px !important;
                 font-size: 14px !important;
-                -webkit-line-clamp: 4;
+                display: block !important; /* Убеждаемся, что видно */
             }
 
             /* Блок "Похожие" */
             .related-section {
-                margin-top: 0 !important;
-                margin-bottom: 5px !important;
-                flex-shrink: 0;
+                flex: 0 0 auto !important;
+                margin-top: 5px !important;
+                min-height: 40px !important;
+                display: flex !important;
+                flex-direction: column !important;
             }
             
             .related-tags {
                 flex-wrap: nowrap !important;
                 overflow-x: auto !important;
                 justify-content: flex-start !important;
-                padding-bottom: 5px;
-                scrollbar-width: none;
+                padding-bottom: 5px !important;
+                width: 100%;
             }
 
-            /* Нижняя часть карточки (Кнопки) */
+            /* НИЗ: Кнопки */
             .card > div:last-child {
-                flex-shrink: 0 !important;
+                flex: 0 0 auto !important;
+                width: 100%;
+                margin-top: auto !important;
                 padding-bottom: 5px !important;
             }
 
+            /* Кнопки управления (Tinder) */
             .tinder-nav-row {
-                margin-bottom: 0 !important;
-                gap: 10px !important;
+                height: 60px !important;
+                margin-bottom: 5px !important;
             }
             
-            /* Кнопки управления */
-            .t-circle-btn.small { width: 40px !important; height: 40px !important; }
-            .t-circle-btn.medium { width: 52px !important; height: 52px !important; }
-            .t-circle-btn.large { width: 66px !important; height: 66px !important; font-size: 28px !important; }
+            .t-circle-btn.small { width: 42px !important; height: 42px !important; }
+            .t-circle-btn.medium { width: 54px !important; height: 54px !important; }
+            .t-circle-btn.large { width: 68px !important; height: 68px !important; font-size: 28px !important; }
 
-            /* Иконки декора */
+            /* --- 7. ДЕКОРАЦИИ --- */
             .icon-left {
                 width: 70px !important;
-                top: -10px !important;
+                top: 65px !important; /* Опускаем ниже шапки */
                 left: -10px !important;
             }
             .icon-right {
                 width: 60px !important;
-                top: 0px !important;
+                top: 75px !important;
                 right: -5px !important;
             }
 
-            /* Настройки и Аккаунт (Центровка) */
+            /* --- 8. НАСТРОЙКИ И АККАУНТ --- */
             #tab-settings .center-wrapper, #tab-account .center-wrapper { 
                 display: block !important;
                 padding-top: 80px !important;
@@ -11188,37 +11239,37 @@
         const totalInteractions = favorites.length + blacklist.length;
         const hasEnoughData = totalInteractions >= 10;
 
-        const capsules = document.querySelectorAll('.mode-capsule-wrapper');
         const startOverlay = document.getElementById('mode-start-overlay');
         const startBtn = document.getElementById('start-btn-container');
 
         if (hasEnoughData) {
             randomizeModeGreeting();
             
-            document.body.classList.add('has-modes');
-
+            // Если есть данные, показываем оверлей выбора
             if(startOverlay) {
                 startOverlay.classList.remove('hidden');
                 isModeSelectionActive = true;
             }
+            // Скрываем старую кнопку
             if(startBtn) {
                 startBtn.classList.add('hidden-initial');
                 startBtn.style.display = 'none';
             }
             updateCapsuleUI();
-
         } else {
-            // Если мало действий — скрываем всё новое, работаем как раньше
-            capsules.forEach(el => el.style.display = 'none');
+            // Если новичок - скрываем оверлей
             if(startOverlay) startOverlay.classList.add('hidden');
             isModeSelectionActive = false;
             
-            // Убеждаемся, что кнопка старта видна
+            // Показываем кнопку "Поехали"
             if(startBtn) {
                 startBtn.classList.remove('hidden-initial');
                 startBtn.style.display = 'flex';
             }
         }
+        
+        // ВАЖНО: Убеждаемся, что мы на стартовом экране
+        document.body.classList.add('is-start-screen');
     }
 
     function randomizeModeGreeting() {
@@ -11258,7 +11309,7 @@
     function setAppModeAndStart(mode) {
         setAppMode(mode);
         
-        // Анимация скрытия оверлея
+        // 1. Убираем оверлей
         const overlay = document.getElementById('mode-start-overlay');
         if(overlay) {
             overlay.style.transition = 'opacity 0.3s, transform 0.3s';
@@ -11269,7 +11320,10 @@
         
         isModeSelectionActive = false;
         
-        // Запуск
+        // 2. Убираем класс стартового экрана у body
+        document.body.classList.remove('is-start-screen');
+        
+        // 3. Запускаем генерацию
         startNewSession();
     }
 
