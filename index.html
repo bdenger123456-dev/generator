@@ -4023,6 +4023,7 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    window.auth = auth;
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
@@ -8835,7 +8836,7 @@
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    uid: auth.currentUser.uid, // Берем ID текущего пользователя
+                    uid: window.auth.currentUser.uid,
                     plan: plan                 // 'pro', 'beast' или 'bestie'
                 })
             });
