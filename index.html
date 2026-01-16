@@ -2675,7 +2675,7 @@
             display: flex;
             justify-content: center;
             width: 100%;
-            margin-top: -100px !important; 
+            margin-top: -35px !important; 
             margin-bottom: 20px !important;
             position: relative;
             z-index: 60;
@@ -2709,6 +2709,49 @@
                 width: auto; 
                 min-width: 140px;
                 justify-content: center;
+            }
+        }
+
+        /* МОБИЛЬНАЯ ВЕРСИЯ */
+        @media (max-width: 768px) {
+            /* 1. Увеличиваем отступ сверху для всего контейнера */
+            #tab-home .center-wrapper {
+                padding-top: 125px !important; 
+                justify-content: flex-start !important; 
+            }
+
+            /* 2. Фиксируем капсулу выбора режима */
+            #mobile-mode-mount {
+                position: fixed !important; 
+                top: 65px !important;      
+                left: 0 !important;
+                width: 100% !important;
+                margin: 0 !important;
+                z-index: 80 !important;     
+                pointer-events: none;      
+                background: transparent !important;
+                height: 50px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+            }
+
+            /* Включаем клики только на саму кнопку капсулы */
+            #mobile-mode-mount .mode-capsule-wrapper {
+                pointer-events: auto !important;
+            }
+
+            /* 3. Текст статуса ("Ready...") */
+            .status-text-combined {
+                bottom: 100% !important;
+                margin-bottom: 10px !important;
+                z-index: 70 !important;
+            }
+
+            /* 4. Якорь карточки */
+            #card-anchor {
+                margin-top: 0 !important;
+                height: 100% !important;
             }
         }
 
