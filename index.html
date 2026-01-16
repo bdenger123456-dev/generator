@@ -6807,32 +6807,38 @@
     ];
 
     window.onload = () => {
-        initTheme();
-        initIntensity(); 
-        initDecoSettings(); 
+        // 1. Инициализация настроек
+        const savedPlatform = localStorage.getItem('xch_platform');
+        if (document.getElementById('platform') && savedPlatform) {
+            document.getElementById('platform').value = savedPlatform;
+        }
         
-        window.favorites = window.favorites || [];
-        window.blacklist = window.blacklist || [];
-        window.watchLater = window.watchLater || [];
+        const oriSelect = document.getElementById('orientation-select');
+        if (oriSelect) oriSelect.value = window.currentOrientation;
+
+        // 2. Запуск вспомогательных функций (с проверками)
+        if (typeof initTheme === 'function') initTheme();
+        if (typeof updateLink === 'function') updateLink();
+        if (typeof updateCounts === 'function') updateCounts();
+        if (typeof initAgeGate === 'function') initAgeGate();
+        if (typeof initModes === 'function') initModes();
         
-        updateCounts();
-        initAgeGate();
-        
-        // Слот в режим ожидания
+        // 3. Подготовка слота
         const reel = document.getElementById('slot-reel');
         if(reel) reel.innerHTML = '<div class="slot-item" style="opacity:0.7">Ready?</div>';
 
-        // --- AUTH LISTENER ---
+        // 4. Авторизация 
         onAuthStateChanged(auth, async (user) => {
             const btnText = document.getElementById('login-btn-text');
             if (user) {
                 window.isUserLoggedIn = true;
                 if(btnText) btnText.innerText = "Account: " + user.email.split('@')[0];
-                await loadUserData(user); // Запуск синхронизации
+                // Запускаем загрузку профиля
+                if (typeof loadUserData === 'function') await loadUserData(user);
             } else {
                 window.isUserLoggedIn = false;
                 if(btnText) btnText.innerText = "Sync / Login";
-                updateSubscriptionUI();
+                if (typeof updateSubscriptionUI === 'function') updateSubscriptionUI();
             }
         });
         
