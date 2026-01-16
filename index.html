@@ -4046,35 +4046,29 @@
    window.logout = async function() {
         const user = auth.currentUser;
         
-        // Если пользователь был залогинен, пробуем сохранить данные перед выходом
+        // Попытка сохранить данные перед выходом
         if (user) {
             const btnText = document.getElementById('sync-btn-text');
             if(btnText) btnText.innerText = "Saving...";
             try {
-                console.log("Saving data before logout...");
-                await window.syncToCloud(); // Финальное сохранение
-            } catch (e) {
-                console.error("Save before logout failed", e);
-            }
+                await window.syncToCloud(true);
+            } catch (e) { console.error(e); }
         }
 
         try {
             await signOut(auth);
             
-            // 1. Удаляем метку о синхронизации
+            // === ПОЛНАЯ ОЧИСТКА ДАННЫХ ПОДПИСКИ ===
             localStorage.removeItem('xch_last_sync_ts');
+            localStorage.removeItem('xch_sub_level'); // УДАЛЯЕМ ПОДПИСКУ
             
-            // 2. УДАЛЯЕМ ПОДПИСКУ (Сбрасываем на Free)
-            localStorage.removeItem('xch_sub_level');
+            // Сбрасываем переменную в памяти
+            subscriptionLevel = 'free';
             
-            const currentTheme = localStorage.getItem('xch_theme_id');
-            // Если тема не стандартная (dark/light), сбрасываем
-            if (currentTheme && currentTheme !== 'dark' && currentTheme !== 'light') {
-                localStorage.setItem('xch_theme_id', 'dark');
-            }
-            // ====================
-
-            location.reload(); // Перезагрузка применит тариф Free
+            console.log("Logged out. Local subscription data cleared.");
+            
+            // Перезагрузка страницы применит Free тариф (т.к. в localStorage ничего нет)
+            location.reload(); 
         } catch (error) {
             console.error("Logout failed:", error);
         }
@@ -4392,7 +4386,8 @@
     window.adminResetSub = async function() {
         const user = auth.currentUser;
         
-        if (!user || user.uid !== ADMIN_UID) return;
+        // Проверка на админа (замените ADMIN_UID на вашу константу)
+        if (!user || user.uid !== "Tqk5aauZ8JVzQ4Bs7Z0BCT5dZKf1") return; 
 
         const targetEmail = document.getElementById('admin-reset-email').value.trim();
 
@@ -4411,7 +4406,7 @@
             const querySnapshot = await getDocs(q);
 
             if (querySnapshot.empty) {
-                alert("User not found via Email. They need to Login/Sync first.");
+                alert("User not found via Email.");
                 return;
             }
 
@@ -4419,13 +4414,14 @@
             let targetUserDoc = null;
             querySnapshot.forEach((doc) => { targetUserDoc = doc; });
 
-            // 2. Сбрасываем подписку
+            // 2. Сбрасываем подписку (Удаляем поля)
             await updateDoc(targetUserDoc.ref, {
-                subscription: "free",       // Ставим статус free
-                expiresAt: deleteField()    // Полностью удаляем поле даты окончания
+                subscription: "free",       // Явно ставим free
+                expiresAt: deleteField(),   // Удаляем поле даты окончания
+                lastPaymentId: deleteField() // Удаляем ID последнего платежа
             });
 
-            alert(`Done! ${targetEmail} is now Free.`);
+            alert(`Done! ${targetEmail} is now Free in Database.\nUser needs to click 'Synchronize' to see changes.`);
             document.getElementById('admin-reset-email').value = "";
 
         } catch (e) {
@@ -4436,7 +4432,7 @@
             btn.disabled = false;
         }
     };
-
+    
     // === ЗАГРУЗКА И СЛИЯНИЕ ДАННЫХ (СЕРДЦЕ СИНХРОНИЗАЦИИ) ===
     async function loadUserData(user) {
         const userRef = doc(db, "users", user.uid);
@@ -4446,131 +4442,101 @@
 
             if (docSnap.exists()) {
                 const cloudData = docSnap.data();
-                console.log("Cloud data received. Merging smart...");
+                console.log("Cloud data received. Merging...");
 
-                // --- 1. ЛАЙКИ, ЧС, WATCH LATER (Множества) ---
-                // Объединяем уникальные ID
-                const localFav = window.favorites || [];
+                // --- 1. СИНХРОНИЗАЦИЯ ПОДПИСКИ ---
+                const cloudSub = cloudData.subscription || 'free';
+                
+                // Перезаписываем локальные данные
+                localStorage.setItem('xch_sub_level', cloudSub);
+                subscriptionLevel = cloudSub; // Обновляем глобальную переменную
+                
+                // Мгновенно обновляем интерфейс (карточки планов)
+                if (window.updateSubscriptionUI) window.updateSubscriptionUI();
+
+                // --- 2. СЛИЯНИЕ СПИСКОВ (Избранное, ЧС, Watch Later) ---
+                const localFav = JSON.parse(localStorage.getItem('xch_favorites')) || [];
                 const cloudFav = cloudData.favorites || [];
                 const mergedFav = [...new Set([...localFav, ...cloudFav])];
 
-                const localBan = window.blacklist || [];
+                const localBan = JSON.parse(localStorage.getItem('xch_blacklist')) || [];
                 const cloudBan = cloudData.blacklist || [];
                 const mergedBan = [...new Set([...localBan, ...cloudBan])];
 
-                const localWL = window.watchLater || [];
+                const localWL = JSON.parse(localStorage.getItem('xch_watch_later')) || [];
                 const cloudWL = cloudData.watchLater || [];
                 const mergedWL = [...new Set([...localWL, ...cloudWL])];
 
-                // --- 2. ИСТОРИЯ И ЛОГИ (Умное слияние) ---
-                
-                // А. История
-                const localHist = window.historyData || [];
+                // --- 3. СЛИЯНИЕ ИСТОРИИ И ЛОГОВ ---
+                // История (топ-50)
+                const localHist = JSON.parse(localStorage.getItem('xch_history')) || [];
                 const cloudHist = cloudData.history || [];
                 const combinedHistMap = new Map();
-                
                 [...localHist, ...cloudHist].forEach(item => combinedHistMap.set(item.id, item));
-                
                 const mergedHistory = Array.from(combinedHistMap.values())
                     .sort((a, b) => b.timestamp - a.timestamp)
-                    .slice(0, 50); // В памяти держим топ-50 для UI истории
+                    .slice(0, 50);
 
-                // Б. Лог Активности (Самое важное для веса)
-                const localLog = window.activityLog || [];
+                // Активность (для статистики)
+                const localLog = JSON.parse(localStorage.getItem('xch_activity_log')) || [];
                 const cloudLog = cloudData.activityLog || [];
                 const combinedLogMap = new Map();
-                
-                // Ключ уникальности: "timestamp_id". 
-                // Это позволит слить два массива без дублей, но сохранив всю историю.
+                // Ключ уникальности: ts + id
                 [...localLog, ...cloudLog].forEach(item => combinedLogMap.set((item.ts || 0) + "_" + item.id, item));
-                
                 const mergedActivityLog = Array.from(combinedLogMap.values())
                     .sort((a, b) => a.ts - b.ts)
-                    .slice(-5000); // Локально храним до 5000 записей для статистики
+                    .slice(-5000);
 
-                // В. История просмотров (Watch History)
-                const localWatch = window.watchHistory || [];
-                const cloudWatch = cloudData.watchHistory || [];
-                const combinedWatchMap = new Map();
-                
-                // Сливаем по timestamp (времени), чтобы убрать дубликаты
-                [...localWatch, ...cloudWatch].forEach(item => combinedWatchMap.set(item.timestamp, item));
-                
-                const mergedWatchHistory = Array.from(combinedWatchMap.values())
-                    .sort((a, b) => b.timestamp - a.timestamp) // Сортируем: новые сверху
-                    .slice(0, 100); // Храним последние 100 записей
-
-                // --- 3. ВЕСА ТЕГОВ (Tag Scores) ---
-                // Берем максимум из локального и облачного веса
-                const localScores = window.tagScores || {};
+                // --- 4. ВЕСА ТЕГОВ ---
+                const localScores = JSON.parse(localStorage.getItem('xch_tag_scores')) || {};
                 const cloudScores = cloudData.tagScores || {};
                 const mergedScores = { ...cloudScores };
-                
                 for (const [tag, score] of Object.entries(localScores)) {
-                    // Если тег есть в обоих местах, берем тот, где вес больше (значит он актуальнее/важнее)
-                    // Либо можно просто суммировать, но max безопаснее от накрутки
-                    if (mergedScores[tag]) {
-                        if (Math.abs(score) > Math.abs(mergedScores[tag])) {
-                            mergedScores[tag] = score;
-                        }
-                    } else {
+                    if (Math.abs(score) > Math.abs(mergedScores[tag] || 0)) {
                         mergedScores[tag] = score;
                     }
                 }
 
-                // --- 4. НАСТРОЙКИ ---
-                let mergedPlatform = localStorage.getItem('xch_platform') || 'xh';
-                if (cloudData.platform) mergedPlatform = cloudData.platform;
-
-                if (cloudData.subscription) {
-                    localStorage.setItem('xch_sub_level', cloudData.subscription);
-                    if (window.updateSubscriptionUI) window.updateSubscriptionUI();
-                }
-
-                // === ПРИМЕНЕНИЕ ДАННЫХ (APPLY) ===
-                
-                // А. Обновляем память (window)
+                // --- 5. ПРИМЕНЕНИЕ (СОХРАНЕНИЕ В ПАМЯТЬ) ---
                 window.favorites = mergedFav;
                 window.blacklist = mergedBan;
                 window.watchLater = mergedWL;
                 window.historyData = mergedHistory;
-                window.tagScores = mergedScores;
                 window.activityLog = mergedActivityLog;
-                window.watchHistory = mergedWatchHistory;
+                window.tagScores = mergedScores;
 
-                // Б. Обновляем LocalStorage (Полные версии)
                 localStorage.setItem('xch_favorites', JSON.stringify(mergedFav));
                 localStorage.setItem('xch_blacklist', JSON.stringify(mergedBan));
                 localStorage.setItem('xch_watch_later', JSON.stringify(mergedWL));
                 localStorage.setItem('xch_history', JSON.stringify(mergedHistory));
-                localStorage.setItem('xch_tag_scores', JSON.stringify(mergedScores));
                 localStorage.setItem('xch_activity_log', JSON.stringify(mergedActivityLog));
-                localStorage.setItem('xch_watch_history', JSON.stringify(mergedWatchHistory));
-                localStorage.setItem('xch_platform', mergedPlatform);
+                localStorage.setItem('xch_tag_scores', JSON.stringify(mergedScores));
 
-                // В. Обновляем UI
+                // --- 6. ФИНАЛ ---
                 const now = Date.now();
                 localStorage.setItem('xch_last_sync_ts', now);
+                
                 if (window.updateLastSyncUI) window.updateLastSyncUI();
-
                 if (typeof updateCounts === 'function') updateCounts();
-                if (typeof updateExploredCount === 'function') updateExploredCount();
                 if (typeof renderHistory === 'function') renderHistory();
                 if (typeof updateActionButtons === 'function') updateActionButtons();
                 
-                const platEl = document.getElementById('platform');
-                if (platEl) { 
-                    platEl.value = mergedPlatform; 
-                    if (typeof updateLink === 'function') updateLink(); 
-                }
-
-                console.log(`Merge complete. History: ${mergedHistory.length}, Log: ${mergedActivityLog.length}`);
+                console.log(`Sync complete. Subscription is: ${cloudSub}`);
                 
-                window.syncToCloud(false); // Отложенная синхронизация результата
+                // Отправляем объединенные данные обратно в облако (чтобы сохранить локальные изменения там)
+                window.syncToCloud(false); 
 
             } else {
-                console.log("No cloud data. Creating initial backup...");
-                if (window.syncToCloud) window.syncToCloud(true);
+                // === СЦЕНАРИЙ: ДОКУМЕНТ УДАЛЕН (СБРОС ПОДПИСКИ) ===
+                console.log("User document not found in Cloud. Resetting subscription to Free.");
+                
+                // Сбрасываем подписку
+                localStorage.setItem('xch_sub_level', 'free');
+                subscriptionLevel = 'free';
+                if (window.updateSubscriptionUI) window.updateSubscriptionUI();
+
+                // Создаем новый чистый документ для юзера
+                window.syncToCloud(true);
             }
         } catch (error) {
             console.error("Error loading data:", error);
