@@ -1088,9 +1088,12 @@
             transition: opacity 0.3s ease;
         }
         
-            @media (max-width: 768px) {
+        /* ============================================================
+         MOBILE STYLES
+        ============================================================ */
+        @media (max-width: 768px) {
 
-            /* --- 1. СКРЫВАЕМ ЛИШНЕЕ (ПК Элементы) --- */
+            /* 1. СКРЫВАЕМ ЛИШНЕЕ */
             .sidebar, 
             .tinder-actions, 
             .btn-group, 
@@ -1102,183 +1105,223 @@
                 display: none !important; 
             }
 
-            /* --- 2. БАЗОВАЯ СТРУКТУРА (Исправление скролла) --- */
-            html, body {
-                height: 100% !important;
-                overflow: hidden !important; /* Блокируем скролл всей страницы */
-                position: relative !important;
+            /* 2. БАЗА */
+            body {
+                height: 100dvh !important; /* Используем динамическую высоту */
+                width: 100% !important;
+                overflow: hidden !important; /* Запрет скролла body */
+                position: fixed;
             }
 
-            .main-content { 
-                padding: 0 !important; 
+            .main-content {
                 height: 100% !important;
                 width: 100% !important;
-                position: relative;
+                padding: 0 !important;
             }
 
-            /* --- 3. ВКЛАДКА HOME (Фиксированная, без скролла страницы) --- */
+            /* 3. ШАПКА И МЕНЮ */
+            .mobile-header {
+                position: absolute;
+                top: 0; left: 0; right: 0;
+                height: 60px;
+                z-index: 100;
+                background: transparent; /* Прозрачный, чтобы видеть контент под ним при скролле, или добавьте блюр */
+                pointer-events: none; /* Чтобы клики проходили, если шапка прозрачная */
+            }
+            .mobile-header > * { pointer-events: auto; } /* Возвращаем клики элементам */
+
+            .bottom-nav {
+                z-index: 100;
+            }
+
+            /* 4. Вкладка HOME */
             #tab-home {
                 height: 100% !important;
                 width: 100% !important;
-                overflow: hidden !important; /* Важно! Скрываем скроллбар самого таба */
                 display: flex !important;
                 flex-direction: column !important;
-                position: relative;
+                padding: 0 !important;
+                overflow: hidden !important;
             }
 
-            /* Контейнер Home */
+            /* КОНТЕЙНЕР HOME */
             #tab-home .center-wrapper {
-                flex: 1 !important;
-                width: 100% !important;
-                height: 100% !important;
-                padding: 0 10px !important; /* Отступы по бокам */
-                
-                /* ГЛАВНОЕ: Отступы под шапку и меню */
-                padding-top: 70px !important; 
-                padding-bottom: 80px !important; 
-                
                 display: flex !important;
                 flex-direction: column !important;
+                height: 100% !important;
+                width: 100% !important;
+                
+                /* ОТСТУПЫ (ЖЕСТКИЕ) */
+                padding-top: 65px !important;
+                padding-bottom: 85px !important;
+                padding-left: 10px !important;
+                padding-right: 10px !important;
+                
                 box-sizing: border-box !important;
             }
 
-            /* --- 4. КАПСУЛА РЕЖИМА (Исправление) --- */
+            /* 5. КАПСУЛА РЕЖИМА */
             #mobile-mode-mount {
                 display: flex !important;
-                justify-content: center;
-                align-items: center;
                 width: 100%;
-                
-                /* Анимация появления */
-                height: 50px !important;
-                opacity: 1 !important;
-                margin-bottom: 15px !important; /* ОТСТУП ОТ КАРТОЧКИ (Пункт 1) */
-                flex-shrink: 0 !important;
-                
-                transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-                overflow: hidden !important;
-                transform: translateY(0);
+                min-height: 45px !important;
+                margin-bottom: 10px !important;
+                flex-shrink: 0 !important; /* ЗАПРЕТ СЖАТИЯ */
+                z-index: 50;
+                transition: all 0.3s ease;
             }
 
-            /* Состояние скрытия (На старте) */
+            /* Если старт экран - скрываем капсулу (display:none надежнее) */
             body.is-start-screen #mobile-mode-mount {
-                height: 0 !important;
-                margin-bottom: 0 !important;
-                opacity: 0 !important;
-                transform: translateY(-10px);
-                pointer-events: none;
+                display: none !important;
             }
 
-            /* --- 5. КАРТОЧКА (Растягивание) --- */
+            /* 6. ЯКОРЬ КАРТОЧКИ */
             #card-anchor {
                 flex: 1 !important; /* Занимает всё место */
                 display: flex !important;
                 flex-direction: column !important;
-                min-height: 0 !important; /* Фикс для вложенных флексов */
+                min-height: 0 !important; /* Фикс переполнения */
                 width: 100%;
             }
 
             #card-anim-wrapper {
-                flex: 1 !important;
-                display: flex !important;
-                flex-direction: column !important;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
                 height: 100%;
             }
 
+            /* Фраза над карточкой */
+            .status-text-combined {
+                flex-shrink: 0 !important;
+                min-height: 20px;
+                margin-bottom: 5px;
+                position: relative;
+            }
+            body.is-start-screen .status-text-combined { display: none !important; }
+
+            /* 7. КАРТОЧКА */
             .card {
-                flex: 1 !important;
+                flex: 1 !important; /* Растягивается */
                 width: 100% !important;
-                margin: 0 !important;
                 display: flex !important;
                 flex-direction: column !important;
                 justify-content: space-between !important;
+                margin: 0 !important;
                 padding: 5px !important;
+                overflow: hidden !important;
             }
 
-            /* --- 6. ТЕГИ В ОДНУ СТРОКУ (Пункт 3) --- */
+            /* Верх: Бейджи (не сжимать) */
+            .card > div:nth-child(2) {
+                flex: 0 0 auto !important; 
+                min-height: 25px;
+            }
+
+            /* СЕРЕДИНА (Слот + Описание) */
+            .card > div:nth-child(3) {
+                flex: 1 1 auto !important; /* Может расти и сжиматься */
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+                align-items: center !important;
+                overflow: hidden !important;
+                min-height: 100px !important; /* Минимальная высота, чтобы не исчезло */
+            }
+
+            /* СЛОТ (Название) */
+            .slot-window {
+                flex: 0 0 auto !important; /* НЕ СЖИМАТЬ */
+                width: 100%;
+                min-height: 50px !important;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .slot-item {
+                font-size: clamp(28px, 9vw, 42px) !important;
+                line-height: 1.1 !important;
+                white-space: normal !important;
+                text-align: center;
+                padding: 5px 0;
+            }
+
+            /* ОПИСАНИЕ */
+            #result-desc {
+                flex: 0 1 auto !important; /* Может сжиматься */
+                overflow-y: auto !important;
+                max-height: 12vh !important;
+                margin-top: 10px !important;
+                margin-bottom: 10px !important;
+                font-size: 14px !important;
+                display: block !important;
+            }
+
+            /* ПОХОЖИЕ (ТЕГИ В ОДНУ СТРОКУ) */
+            .related-section {
+                flex: 0 0 auto !important; /* НЕ СЖИМАТЬ */
+                margin-top: 0 !important;
+                margin-bottom: 5px !important;
+                min-height: 35px;
+            }
+
             .related-tags {
                 display: flex !important;
-                flex-wrap: nowrap !important; /* ЗАПРЕТ ПЕРЕНОСА */
-                overflow-x: auto !important;  /* Горизонтальный скролл */
-                justify-content: flex-start !important;
+                flex-wrap: nowrap !important; /* Запрет переноса */
+                overflow-x: auto !important;
                 gap: 8px !important;
-                padding-bottom: 5px !important;
+                padding-bottom: 5px;
                 width: 100%;
-                
-                /* Скрываем скроллбар */
-                scrollbar-width: none; 
-                -ms-overflow-style: none;
+                justify-content: flex-start !important;
             }
-            .related-tags::-webkit-scrollbar { display: none; }
-
+            
             .related-item-btn {
-                flex-shrink: 0 !important; /* ЗАПРЕТ СЖАТИЯ КНОПОК */
-                white-space: nowrap !important; /* Текст в одну строку */
+                white-space: nowrap !important;
+                flex-shrink: 0 !important;
             }
 
-            /* --- 7. ИСПРАВЛЕНИЕ НАСТРОЕК И АККАУНТА (Пункт 2) --- */
-            /* Эти табы должны скроллиться нормально и иметь отступ сверху */
+            /* НИЗ: Кнопки */
+            .card > div:last-child {
+                flex: 0 0 auto !important; /* НЕ СЖИМАТЬ */
+                width: 100%;
+                margin-top: auto;
+            }
+
+            .tinder-nav-row {
+                min-height: 60px;
+                margin-bottom: 5px !important;
+            }
+
+            /* 8. ВКЛАДКИ SETTINGS И ACCOUNT */
             #tab-settings, #tab-account {
-                display: none; /* Скрыты по умолчанию, JS включает flex */
+                display: none;
                 height: 100% !important;
                 width: 100% !important;
-                overflow-y: auto !important; /* Включаем вертикальный скролл */
+                background: var(--bg-color);
+                z-index: 200; /* Поверх всего */
+                overflow-y: auto !important;
                 -webkit-overflow-scrolling: touch;
-                background: var(--bg-color); /* Чтобы перекрыть декор */
-                z-index: 50; /* Поверх декора */
             }
 
             #tab-settings.active, #tab-account.active {
-                display: block !important; /* Block, чтобы работал обычный поток */
+                display: block !important;
             }
 
             #tab-settings .center-wrapper, #tab-account .center-wrapper {
                 display: block !important;
-                height: auto !important;
-                min-height: 100%;
-                
-                /* Отступ чтобы не залезало под шапку */
-                padding-top: 90px !important; 
-                padding-bottom: 100px !important;
+                padding-top: 90px !important; /* Отступ от шапки */
+                padding-bottom: 100px !important; /* Отступ от низа */
                 padding-left: 15px !important;
                 padding-right: 15px !important;
+                height: auto !important;
             }
 
-            /* Скрываем декор и фразу на вкладках, отличных от Home */
-            body:not(.tab-home-active) .deco-icon,
-            body:not(.tab-home-active) .status-text-combined {
-                display: none !important;
-            }
-
-            /* --- 8. ПРОЧИЕ ФИКСЫ --- */
-            .status-text-combined {
-                position: relative !important;
-                margin-bottom: 5px !important;
-                flex-shrink: 0 !important;
-                min-height: 24px;
-                display: flex !important;
-            }
-            /* Скрываем фразу на старте */
-            body.is-start-screen .status-text-combined {
-                display: none !important;
-            }
-
-            /* Иконки декора (Home) */
-            .icon-left {
-                width: 70px !important;
-                top: 75px !important; /* Ниже шапки */
-                left: -10px !important;
-            }
-            .icon-right {
-                width: 60px !important;
-                top: 85px !important;
-                right: -5px !important;
-            }
-            
-            /* Скрываем на стартовом экране, если карточка высоко, или настраиваем */
-            body.is-start-screen .icon-left { top: 75px !important; }
+            /* Скрываем декор на других вкладках */
+            body:not(.tab-home-active) .deco-icon { display: none !important; }
         }
-        
+
         .capsule-trigger {
             background: rgba(255, 255, 255, 0.07);
             border: 1px solid rgba(255, 255, 255, 0.1);
