@@ -6839,35 +6839,6 @@
         document.body.classList.add('tab-home-active');
     };
 
-    async function loadData() {
-        try {
-            // Было: const response = await fetch('data.json');
-            // Стало: Запрос к нашему API
-            const response = await fetch('/api/database', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    // Можно добавить кастомный заголовок для красоты
-                    'X-Client-Version': '1.0' 
-                }
-            });
-            
-            if (!response.ok) {
-                throw new Error(`Server error! status: ${response.status}`);
-            }
-            
-            data = await response.json();
-            console.log(`[SYSTEM] Database loaded secure: ${data.length} items.`);
-
-            // Запускаем инициализацию приложения
-            initApp();
-
-        } catch (error) {
-            console.error('Data load failed:', error);
-            document.body.innerHTML = '<h2 style="color:white;text-align:center;margin-top:50px;">Connection Error. Please reload.</h2>';
-        }
-    }
-
     function initApp() {
         // Инициализация данных
         initLanguage();
@@ -7486,48 +7457,56 @@
 
     async function renderHistory() {
         const list = document.getElementById('history-list');
-        list.innerHTML = '<div style="text-align:center; padding:10px;">Loading...</div>';
         
-        if (historyData.length === 0) {
-            list.innerHTML = `<div class="ios-row" style="justify-content:center;">History empty</div>`;
+        if (!list) return; 
+        
+        if (window.historyData.length === 0) {
+            list.innerHTML = `<div class="ios-row" style="justify-content:center; padding:15px; color:#888;">History Empty</div>`;
             return;
         }
 
-        // 1. Берем ID из истории (топ 20, чтобы не грузить лишнее)
-        const idsToFetch = historyData.slice(0, 20).map(entry => entry.id);
+        list.innerHTML = '<div style="text-align:center; padding:10px;">Loading...</div>';
+
+        // Берем последние 30 ID
+        const ids = window.historyData.slice(0, 30).map(x => x.id);
 
         try {
-            // 2. Спрашиваем у сервера детали этих предметов
-            const response = await fetch('/api/get-items', {
+            const res = await fetch('/api/get-items', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ids: idsToFetch })
+                body: JSON.stringify({ ids: ids })
             });
             
-            const itemsFromServer = await response.json();
+            if (!res.ok) throw new Error("Server Error");
             
-            // 3. Рендерим
+            const items = await res.json();
+            
             list.innerHTML = '';
-            
-            // Важно: идем по historyData, чтобы сохранить хронологию
-            historyData.slice(0, 20).forEach(entry => {
-                // Ищем данные в том, что прислал сервер
-                const item = itemsFromServer.find(x => x.id === entry.id);
-                if(!item) return;
-
-                const div = document.createElement('div');
-                div.className = 'history-item-ios';
-                div.innerHTML = `<span>${getLocalizedName(item)}</span><span style="color:var(--accent);">↺</span>`;
-                
-                // При клике открываем результат (но item у нас теперь "обрезанный", 
-                // если нужно полное описание - можно передать item целиком)
-                div.onclick = () => { switchTab('home'); forceShowResult(item, 'history'); };
-                list.appendChild(div);
+            // Сохраняем хронологию
+            window.historyData.slice(0, 30).forEach(entry => {
+                const item = items.find(x => x.id === entry.id);
+                if(item) {
+                    const div = document.createElement('div');
+                    div.className = 'ios-row clickable';
+                    // Добавляем стили отступов, чтобы выглядело красиво
+                    div.style.padding = "12px 16px";
+                    
+                    div.innerHTML = `<span>${getLocalizedName(item)}</span><span style="color:var(--accent)">↺</span>`;
+                    
+                    div.onclick = () => {
+                        // Закрываем модалку истории, если она открыта
+                        if (typeof closeHistoryModal === 'function') closeHistoryModal(null, true);
+                        // Переходим на главную
+                        if (typeof switchTab === 'function') switchTab('home');
+                        // Показываем результат
+                        if (typeof forceShowResult === 'function') forceShowResult(item, 'history');
+                    };
+                    list.appendChild(div);
+                }
             });
-
-        } catch (e) {
-            console.error("History fetch error:", e);
-            list.innerHTML = '<div style="text-align:center; color:red;">Connection Error</div>';
+        } catch(e) {
+            console.error(e);
+            list.innerHTML = '<div style="text-align:center; color:red; padding:10px;">Connection Error</div>';
         }
     }
 
@@ -10966,6 +10945,8 @@
             document.querySelectorAll('.mode-capsule-wrapper').forEach(el => el.classList.remove('open'));
         }
     });
+
+    window.renderHistory = renderHistory;
 
 </script>
 
