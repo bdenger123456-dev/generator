@@ -1306,14 +1306,35 @@
         .mobile-header {
             display: none; position: fixed; top: calc(10px + env(safe-area-inset-top)); 
             left: 50%; transform: translateX(-50%); width: auto; min-width: 260px; max-width: 90%;
-            background: rgba(20, 20, 20, 0.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 35px; z-index: 9999;
+            background: var(--ios-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border); border-radius: 35px; z-index: 9999;
             padding: 12px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             flex-direction: column; align-items: center; justify-content: center;
         }
         body.light-theme .mobile-header { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(0, 0, 0, 0.1); }
         .mobile-header .logo { font-size: 20px; margin-bottom: 0; }
         .mobile-header .logo-img { height: 40px; }
+
+        body:not(.tab-home-active) .center-wrapper {
+            padding-top: 85px !important;
+            padding-bottom: 100px !important;
+            display: block !important;
+        }
+
+        body:not(.tab-home-active) #mobile-mode-mount {
+            display: none !important;
+        }
+
+        .mod-title {
+            width: 100%;
+            text-align: center;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
 
         /* === 12. PREMIUM STATS === */
         .locked-feature {
@@ -2407,23 +2428,48 @@
             position: absolute;
             top: 0;
             left: 50%;
-            transform: translateX(-50%) translateY(-100%); /* Спрятана сверху */
+            transform: translateX(-50%) translateY(-100%); 
             
-            padding: 6px 16px;
-            border-radius: 0 0 14px 14px; /* Закругления только снизу */
+            /* Размеры и форма */
+            padding: 8px 24px;
+            border-radius: 0 0 22px 22px; 
             
             font-size: 11px;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
             color: #fff;
             
-            z-index: 40; /* Поверх бейджей */
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 40;
             
-            /* Пружинистая анимация появления */
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s;
-            pointer-events: none; /* Чтобы сквозь неё проходили клики */
+            /* Переменная для цвета фона (чтобы псевдо-элементы тоже красились) */
+            --notch-bg: transparent; 
+            background: var(--notch-bg);
+            
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+        }
+
+        /* Плавные переходы в рамку (уши) */
+        .card-notch::before, .card-notch::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 14px;
+            height: 14px;
+            pointer-events: none;
+        }
+
+        /* Левое ухо */
+        .card-notch::before {
+            right: 100%; /* Прилегает слева */
+            background: radial-gradient(circle at 0 100%, transparent 14px, var(--notch-bg) 14.5px);
+        }
+
+        /* Правое ухо */
+        .card-notch::after {
+            left: 100%; /* Прилегает справа */
+            background: radial-gradient(circle at 100% 100%, transparent 14px, var(--notch-bg) 14.5px);
         }
 
         /* Класс для показа чёлки */
@@ -2629,8 +2675,8 @@
             display: flex;
             justify-content: center;
             width: 100%;
-            margin-top: -15px !important; 
-            margin-bottom: 25px !important;
+            margin-top: -35px !important; 
+            margin-bottom: 20px !important;
             position: relative;
             z-index: 60;
         }
@@ -4940,6 +4986,8 @@
         { key: 'Vintage', en: 'Vintage', ru: 'Ретро', es: 'Vintage', de: 'Vintage' },
         { key: 'Solo', en: 'Solo', ru: 'Соло', es: 'Solo', de: 'Solo' },
         { key: 'AI', en: 'AI', ru: 'ИИ', es: 'IA', de: 'KI' },
+        { key: 'Squirt', en: 'Squirt', ru: 'Сквирт', es: 'Squirt', de: 'Squirt' },
+        { key: 'Cowgirl', en: 'Cowgirl', ru: 'Наездница', es: 'Vaquera', de: 'Reiterstellung' },
     ];
 
     const welcomePhrases = {
@@ -5565,7 +5613,7 @@
             search: "Найти",
             related_header: "Вам также может понравиться:",
             add_genre: "Добавить к жанру:",
-            search_en_label: "Искать на EN",
+            search_en_label: "Поиск на Англ.",
             site_label: "Сайт",
             exploration_mode: "Откровенность",
 
@@ -7564,20 +7612,21 @@
     function handleOutboundClick() {
         if(!currentItem) return;
         
-        // Таймер запускаем ВСЕГДА (чтобы считалось время просмотра при возврате)
+        // Таймер
         watchStartTime = Date.now();
         itemBeingWatched = currentItem;
 
-        // Логика начисления очков (ТОЛЬКО ОДИН РАЗ на карточку)
+        // === 1. УДАЛЕНИЕ ИЗ WATCH LATER ===
+        if (watchLater.includes(currentItem.id)) {
+            toggleWatchLater(); // Эта функция сама удалит ID, обновит счетчик и кнопку
+        }
+
+        // === 2. ЛОГИКА ОЧКОВ (Один раз) ===
         if(!hasWatchedCurrentItem) {
             const fullTags = getCombinedTags(currentItem);
-            
             adjustTagScoresByTags(fullTags, 3); 
-            
             logActivity('watch', currentItem.id, fullTags);
-            
             hasWatchedCurrentItem = true;
-            
             hasInteractedWithCurrent = true;
         }
     }
@@ -7876,21 +7925,27 @@
     function renderModifiers() {
         const container = document.getElementById('mod-container'); 
         container.innerHTML = '';
-        const searchEn = document.getElementById('force-en').checked;
         
+        // === ЗАГОЛОВОК ===
+        const t = langData[currentLang] || langData['en'];
+        const titleText = t.add_genre || "Add to genre:";
+        
+        const titleDiv = document.createElement('div');
+        titleDiv.className = 'mod-title';
+        titleDiv.innerText = titleText;
+        container.appendChild(titleDiv);
+
         modifiersData.forEach(mod => {
             const tag = document.createElement('div'); 
             tag.className = 'tag';
             if(activeMods.has(mod.key)) tag.classList.add('selected');
             
+            // ВСЕГДА используем текущий язык для отображения на кнопке
+            // Логика формирования ссылки для поиска (Search EN) находится в updateLink(), 
+            // здесь мы отвечаем только за UI.
             let text = mod.en;
-            
-            // Если галочка "Search EN" НЕ стоит, пытаемся найти перевод
-            if (!searchEn) {
-                // Если в объекте модификатора есть ключ, соответствующий currentLang (ru, es, de)
-                if (mod[currentLang]) {
-                    text = mod[currentLang];
-                }
+            if (mod[currentLang]) {
+                text = mod[currentLang];
             }
             
             tag.innerText = text;
@@ -8405,7 +8460,7 @@
     function renderStatsContent() {
         const body = document.getElementById('modal-stats-body');
         body.innerHTML = '';
-        const t = langData[currentLang];
+        const t = langData[currentLang] || langData['en'];
 
         // --- ЛОГИКА 1: ПРЕДПОЧТЕНИЯ (TAGS) ---
         if (currentStatsTab === 'tags') {
@@ -8418,7 +8473,7 @@
                     if (log.type === 'watch') weight = 10;
                     else if (log.type === 'like' || log.type === 'similar') weight = 5;
                     else if (log.type === 'gen' || log.type === 'pass') weight = 0;
-                    else if (log.type === 'dislike') weight = -5; // Исключаем из топа, но не убиваем совсем
+                    else if (log.type === 'dislike') weight = -5;
 
                     if (weight !== 0) {
                         log.tags.forEach(tag => {
@@ -8441,10 +8496,8 @@
                 html += `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-secondary);">${t.stats_no_data}</div>`;
             } else {
                 const maxVal = Math.max(...sortedTags.map(x => x[1]));
-                
                 sortedTags.forEach(([tag, score]) => {
                     const height = Math.max(5, (score / maxVal) * 100);
-                    
                     let displayTag = tag.charAt(0).toUpperCase() + tag.slice(1);
                     if (displayTag.length > 9) displayTag = displayTag.substring(0, 7) + '..';
 
@@ -8457,18 +8510,12 @@
                     `;
                 });
             }
-            
             html += `</div></div>`;
-
-            // Легенда
             html += `
                 <div style="margin-top:15px; display:flex; flex-direction:column; gap:5px; align-items:center;">
                     <div style="display:flex; gap:15px; font-size:10px; color:var(--text-secondary);">
                         <div style="display:flex; align-items:center; gap:4px;"><span style="color:var(--accent)">●</span> ${t.legend_watch}</div>
                         <div style="display:flex; align-items:center; gap:4px;"><span style="color:var(--text-main)">●</span> ${t.legend_like}</div>
-                    </div>
-                    <div style="display:flex; gap:15px; font-size:10px; color:var(--text-secondary);">
-                        <div style="display:flex; align-items:center; gap:4px;"><span style="color:var(--highlight-red)">●</span> ${t.legend_dislike}</div>
                     </div>
                 </div>
             `;
@@ -8486,24 +8533,36 @@
             else if (currentStatsTimeframe === 'month') cutoffTime = now - 30 * oneDay;
             else if (currentStatsTimeframe === 'year') cutoffTime = now - 365 * oneDay;
             
+            // 1. Считаем Действия (Swipes/Generations)
             activityLog.forEach(log => {
                 if (log.ts < cutoffTime) return;
-
                 const d = new Date(log.ts);
-                let key, label;
+                let key = (currentStatsTimeframe === 'year' || currentStatsTimeframe === 'all') 
+                    ? `${d.getFullYear()}-${d.getMonth()}`
+                    : d.toISOString().split('T')[0];
+                    
+                let label = (currentStatsTimeframe === 'year' || currentStatsTimeframe === 'all')
+                    ? d.toLocaleDateString(currentLang, { month: 'short' }).replace('.', '')
+                    : d.toLocaleDateString(currentLang, { day: 'numeric', month: 'numeric' });
 
-                if (currentStatsTimeframe === 'year' || currentStatsTimeframe === 'all') {
-                    key = `${d.getFullYear()}-${d.getMonth()}`;
-                    label = d.toLocaleDateString(currentLang, { month: 'short' }).replace('.', '');
-                } else {
-                    key = d.toISOString().split('T')[0];
-                    label = d.toLocaleDateString(currentLang, { day: 'numeric', month: 'numeric' });
-                }
-
-                if (!aggregated[key]) aggregated[key] = { gen: 0, watch: 0, label: label, sort: d.getTime() };
+                if (!aggregated[key]) aggregated[key] = { gen: 0, watch: 0, mins: 0, label: label, sort: d.getTime() };
                 
                 if (log.type === 'watch') aggregated[key].watch++;
                 else if (['like', 'gen', 'pass', 'dislike'].includes(log.type)) aggregated[key].gen++;
+            });
+
+            // 2. Считаем Минуты (из Watch History)
+            watchHistory.forEach(entry => {
+                if (entry.timestamp < cutoffTime) return;
+                const d = new Date(entry.timestamp);
+                let key = (currentStatsTimeframe === 'year' || currentStatsTimeframe === 'all') 
+                    ? `${d.getFullYear()}-${d.getMonth()}`
+                    : d.toISOString().split('T')[0];
+                
+                if (aggregated[key]) {
+                    // Добавляем минуты (секунды / 60)
+                    aggregated[key].mins += (entry.seconds || 0) / 60;
+                }
             });
 
             const chartData = Object.values(aggregated).sort((a, b) => a.sort - b.sort);
@@ -8517,26 +8576,31 @@
                 chartData.forEach(d => {
                     if (d.gen > maxVal) maxVal = d.gen;
                     if (d.watch > maxVal) maxVal = d.watch;
+                    if (d.mins > maxVal) maxVal = d.mins; 
                 });
                 if (maxVal === 0) maxVal = 1;
 
                 chartData.forEach(d => {
                     const hGen = Math.max(2, (d.gen / maxVal) * 80);
                     const hWatch = Math.max(2, (d.watch / maxVal) * 80);
+                    const hMins = Math.max(2, (d.mins / maxVal) * 80);
+                    const minsDisplay = Math.round(d.mins);
 
-                    // Отрисовка с flex-grow (act-bar-group) для расширения
                     html += `
                         <div class="act-col">
-                            <div class="act-bar-group">
-                                <!-- Gen Bar (Серый) - 45% ширины группы -->
-                                <div style="width:45%; background:var(--text-secondary); height:${hGen}%; border-radius:3px 3px 0 0; opacity:0.3;"></div>
-                                <!-- Watch Bar (Акцент) - 45% ширины группы -->
-                                <div style="width:45%; background:var(--accent); height:${hWatch}%; border-radius:3px 3px 0 0;"></div>
+                            <div class="act-bar-group" style="gap:2px; max-width:60px;">
+                                <!-- Свайпы (Серый) -->
+                                <div style="width:30%; background:var(--text-secondary); height:${hGen}%; border-radius:3px 3px 0 0; opacity:0.3;"></div>
+                                <!-- Клики Watch (Акцент) -->
+                                <div style="width:30%; background:var(--accent); height:${hWatch}%; border-radius:3px 3px 0 0;"></div>
+                                <!-- Минуты (Фиолетовый) -->
+                                <div style="width:30%; background:#9b59b6; height:${hMins}%; border-radius:3px 3px 0 0;"></div>
                             </div>
                             
-                            <div class="act-values">
+                            <div class="act-values" style="gap:3px;">
                                 <span style="color:var(--text-secondary); opacity:0.6;">${d.gen}</span>
                                 <span style="color:var(--accent);">${d.watch}</span>
+                                <span style="color:#9b59b6;">${minsDisplay}m</span>
                             </div>
                             
                             <div class="chart-label-x" style="font-size:9px;">${d.label}</div>
@@ -8547,9 +8611,9 @@
 
             html += `</div></div>`; 
 
-            // Легенда активности (Локализованная)
+            // Легенда активности (3 пункта)
             html += `
-                <div style="margin-top:15px; display:flex; justify-content:center; gap:20px; font-size:11px;">
+                <div style="margin-top:15px; display:flex; justify-content:center; gap:15px; font-size:10px; flex-wrap:wrap;">
                     <div style="display:flex; align-items:center; gap:6px;">
                         <div style="width:10px; height:10px; background:var(--text-secondary); opacity:0.3; border-radius:2px;"></div>
                         <span>${t.act_actions}</span>
@@ -8557,6 +8621,10 @@
                     <div style="display:flex; align-items:center; gap:6px;">
                         <div style="width:10px; height:10px; background:var(--accent); border-radius:2px;"></div>
                         <span>${t.act_watches}</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <div style="width:10px; height:10px; background:#9b59b6; border-radius:2px;"></div>
+                        <span>${t.time_d ? (currentLang==='ru'?'Время (мин)':'Time (min)') : 'Mins'}</span>
                     </div>
                 </div>
             `;
@@ -9920,7 +9988,7 @@
         }, 350);
     }
 
-    function updateCardStatusVisuals() {
+    function updateCardStatusVisuals(suppressColors = false) {
         const card = document.getElementById('card-block');
         const notch = document.getElementById('card-notch');
         const notchText = document.getElementById('card-notch-text');
@@ -9931,12 +9999,13 @@
         card.classList.remove('status-wl', 'status-fav', 'status-ban');
         notch.classList.remove('visible');
 
+        // Если это "Напоминание", мы хотим показать карточку нейтральной,
+        // чтобы пользователь принял решение заново.
+        if (suppressColors) return;
+
         const t = langData[currentLang];
         let activeStatus = null;
 
-        // Проверяем статус (приоритет: Бан -> Лайк -> WL)
-        // Но обычно WL и Лайк не пересекаются, так что порядок не критичен.
-        
         if (blacklist.includes(currentItem.id)) {
             activeStatus = 'ban';
             notchText.innerText = t.status_ban;
@@ -9950,12 +10019,8 @@
             notchText.innerText = t.status_wl;
         }
 
-        // Применяем
         if (activeStatus) {
             card.classList.add('status-' + activeStatus);
-            
-            // Небольшая задержка для чёлки, чтобы она выезжала после появления карточки
-            // Если это первый рендер
             setTimeout(() => {
                 notch.classList.add('visible');
             }, 50);
@@ -10098,7 +10163,8 @@
         renderBadges();
         renderRelatedItems();
         updateActionButtons();
-        updateCardStatusVisuals();
+        const isReminder = mode && mode.includes('reminder');
+        updateCardStatusVisuals(isReminder);
         randomizeDecorations(item);
     }
 
