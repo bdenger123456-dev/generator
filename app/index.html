@@ -2711,12 +2711,26 @@
             z-index: 60;
             padding: 20px;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transform: scale(0.9) translateY(20px); 
+            transition: 
+                opacity 0.4s ease,
+                transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            
+            pointer-events: none;
         }
 
         .assistant-ui.visible {
             display: flex;
             opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+        }
+
+        .fade-out-up {
+            opacity: 0 !important;
+            transform: translateY(-30px) scale(0.9) !important;
+            pointer-events: none !important;
+            transition: opacity 0.3s ease, transform 0.3s ease;
         }
 
         .assistant-prompt {
@@ -2839,6 +2853,33 @@
         /* Радужная тема -> Делаем белым с сильной тенью */
         body.rainbow-mode .ai-icon-img {
             filter: invert(1) drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
+        }
+
+        .voice-icon-img {
+            width: 24px; /* Чуть меньше кнопки */
+            height: 24px;
+            object-fit: contain;
+            pointer-events: none;
+            
+            /* Темная тема (Default): Инвертируем черный в белый */
+            filter: invert(1) drop-shadow(0 0 2px rgba(255, 255, 255, 0.3));
+            transition: filter 0.3s ease, transform 0.2s;
+        }
+
+        /* Светлая тема: Оставляем черным */
+        body.light-theme .voice-icon-img {
+            filter: invert(0) opacity(0.7);
+        }
+
+        /* Радужная тема: Белый с сильным свечением */
+        body.rainbow-mode .voice-icon-img {
+            filter: invert(1) drop-shadow(0 0 5px rgba(255, 255, 255, 0.9));
+        }
+
+        /* Анимация при записи (Красное свечение) */
+        .btn-mic-trigger.listening .voice-icon-img {
+            filter: invert(1) drop-shadow(0 0 8px #e74c3c) !important;
+            transform: scale(1.1);
         }
 
         /* =========================================
@@ -3146,8 +3187,11 @@
                                     <div class="assistant-prompt" data-key="ai_prompt">What do you desire? 😏</div>
                                     
                                     <div class="assistant-input-group">
-                                        <input type="text" id="ai-input" class="assistant-input" data-key="ai_placeholder" placeholder="..." autocomplete="off">
-                                        <button class="btn-mic-trigger" id="btn-mic" onclick="toggleVoiceInput()">🎙️</button>
+                                        <input type="text" id="ai-input" class="assistant-input" placeholder="..." autocomplete="off">
+                                        
+                                        <button class="btn-mic-trigger" id="btn-mic" onclick="toggleVoiceInput()">
+                                            <img src="voice.png" class="voice-icon-img" alt="Voice">
+                                        </button>
                                     </div>
 
                                     <button id="btn-ai-go" class="btn-ai-confirm" onclick="processAiRequest()">
@@ -11280,7 +11324,7 @@
 
         }, 350);
     }
-    
+
     document.addEventListener("visibilitychange", () => {
         if (document.visibilityState === 'hidden') {
             // Если пользователь залогинен, форсируем сохранение (immediate = true)
@@ -11753,57 +11797,76 @@
     }
 
     function openAssistantUI() {
-        // Скрываем текст и кнопки плавно
-        document.getElementById('mode-start-text').style.opacity = '0';
-        document.getElementById('mode-buttons-container').style.opacity = '0';
-        document.getElementById('mode-buttons-container').style.pointerEvents = 'none';
-
-        const ui = document.getElementById('assistant-ui');
-        ui.classList.add('visible');
+        // 1. Анимируем уход старых элементов (Текст и Кнопки)
+        const startText = document.getElementById('mode-start-text');
+        const modeBtns = document.getElementById('mode-buttons-container');
         
-        // === РАНДОМИЗАЦИЯ ФРАЗ ===
-        const t = langData[currentLang] || langData['en'];
-        
-        // 1. Случайный заголовок
-        const prompts = Array.isArray(t.ai_prompt) ? t.ai_prompt : [t.ai_prompt];
-        const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
-        document.querySelector('.assistant-prompt').innerText = randomPrompt;
+        // Добавляем класс, который уводит их вверх и делает прозрачными
+        if(startText) startText.classList.add('fade-out-up');
+        if(modeBtns) modeBtns.classList.add('fade-out-up');
 
-        // 2. Случайный плейсхолдер
-        const placeholders = Array.isArray(t.ai_placeholder) ? t.ai_placeholder : [t.ai_placeholder];
-        const randomPlaceholder = placeholders[Math.floor(Math.random() * placeholders.length)];
-        
-        const input = document.getElementById('ai-input');
-        input.placeholder = randomPlaceholder;
-        input.value = ""; // Очищаем прошлое значение
-        
-        // Обновляем текст кнопки (если вдруг язык поменялся)
-        const btnText = document.querySelector('#btn-ai-go span');
-        if(btnText) btnText.innerText = t.ai_btn_go || "Find It";
+        // 2. Открываем интерфейс ассистента с задержкой (чтобы старое успело начать исчезать)
+        setTimeout(() => {
+            const ui = document.getElementById('assistant-ui');
+            ui.classList.add('visible'); // Сработает CSS анимация scale + opacity
+            
+            // --- РАНДОМИЗАЦИЯ ТЕКСТА (Как и было) ---
+            const t = langData[currentLang] || langData['en'];
+            
+            const prompts = Array.isArray(t.ai_prompt) ? t.ai_prompt : [t.ai_prompt];
+            const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
+            document.querySelector('.assistant-prompt').innerText = randomPrompt;
 
-        // Фокус
-        setTimeout(() => input.focus(), 300);
+            const placeholders = Array.isArray(t.ai_placeholder) ? t.ai_placeholder : [t.ai_placeholder];
+            const randomPlaceholder = placeholders[Math.floor(Math.random() * placeholders.length)];
+            
+            const input = document.getElementById('ai-input');
+            input.placeholder = randomPlaceholder;
+            input.value = "";
+            
+            const btnText = document.querySelector('#btn-ai-go span');
+            if(btnText) btnText.innerText = t.ai_btn_go || "Find It";
 
-        // Логика кнопки Enter и ввода
-        input.oninput = (e) => {
-            const btn = document.getElementById('btn-ai-go');
-            if (e.target.value.trim().length > 0) btn.classList.add('visible');
-            else btn.classList.remove('visible');
-        };
-        input.onkeydown = (e) => {
-            if (e.key === 'Enter') processAiRequest();
-        };
+            // Фокус чуть позже, когда анимация закончится
+            setTimeout(() => input.focus(), 300);
+
+            // Логика ввода
+            input.oninput = (e) => {
+                const btn = document.getElementById('btn-ai-go');
+                if (e.target.value.trim().length > 0) btn.classList.add('visible');
+                else btn.classList.remove('visible');
+            };
+            input.onkeydown = (e) => {
+                if (e.key === 'Enter') processAiRequest();
+            };
+        }, 50); // Небольшая задержка для наложения анимаций
     }
 
     function closeAssistantUI() {
         const ui = document.getElementById('assistant-ui');
+        
+        // 1. Скрываем интерфейс ассистента
         ui.classList.remove('visible');
         
-        // Возвращаем исходный вид
-        document.getElementById('mode-start-text').style.opacity = '1';
-        const btns = document.getElementById('mode-buttons-container');
-        btns.style.opacity = '1';
-        btns.style.pointerEvents = 'auto';
+        // 2. Возвращаем кнопки и текст (убираем класс ухода)
+        const startText = document.getElementById('mode-start-text');
+        const modeBtns = document.getElementById('mode-buttons-container');
+        
+        // Ждем пока поле исчезнет, потом возвращаем кнопки
+        setTimeout(() => {
+            if(startText) {
+                startText.classList.remove('fade-out-up');
+                // Сброс инлайновых стилей на всякий случай
+                startText.style.opacity = ''; 
+                startText.style.transform = '';
+            }
+            if(modeBtns) {
+                modeBtns.classList.remove('fade-out-up');
+                modeBtns.style.opacity = '';
+                modeBtns.style.transform = '';
+                modeBtns.style.pointerEvents = 'auto';
+            }
+        }, 200);
         
         document.getElementById('ai-input').value = '';
         document.getElementById('btn-ai-go').classList.remove('visible');
