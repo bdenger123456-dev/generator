@@ -2819,6 +2819,27 @@
             margin-bottom: 20px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .ai-icon-img {
+            width: 45px;
+            height: 45px;
+            object-fit: contain;
+            pointer-events: none; /* Чтобы клик проходил сквозь картинку на кнопку */
+            
+            /* По умолчанию (Темная тема) -> Инвертируем черный в белый */
+            filter: invert(1) drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+            transition: filter 0.3s ease;
+        }
+
+        /* Светлая тема -> Оставляем черным */
+        body.light-theme .ai-icon-img {
+            filter: invert(0) drop-shadow(0 0 2px rgba(0, 0, 0, 0.1));
+        }
+
+        /* Радужная тема -> Делаем белым с сильной тенью */
+        body.rainbow-mode .ai-icon-img {
+            filter: invert(1) drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
+        }
 
         /* =========================================
         18. MEDIA QUERIES (ADAPTATION)
@@ -3107,9 +3128,11 @@
                                 </div>
                                 
                                 <!-- Кнопки (Треугольник) -->
-                                <div id="mode-buttons-container" class="mode-triangle-layout">
-                                    <!-- Верх: Ассистент -->
-                                    <button class="mode-circle-btn ai-assist" onclick="openAssistantUI()">🎙️</button>
+                               <div id="mode-buttons-container" class="mode-triangle-layout">
+                                    <!-- Верх: Ассистент (Иконка AI) -->
+                                    <button class="mode-circle-btn ai-assist" onclick="openAssistantUI()">
+                                        <img src="ai.png" class="ai-icon-img" alt="AI">
+                                    </button>
                                     
                                     <!-- Низ: Обычные режимы -->
                                     <div class="mode-triangle-row">
@@ -5339,8 +5362,18 @@
             rm_actors_desc: "A dedicated mode to find pornstars based on your visual preferences and body type filters.",
             rm_support_btn: "Support Development 🚀",
 
-            ai_prompt: "What do you desire today? 😏",
-            ai_placeholder: "Describe it (e.g. 'big tits, no anal')...",
+            ai_prompt: [
+                "What do you desire today? 😏",
+                "Describe your fantasy...",
+                "What are you in the mood for?",
+                "Tell me, what turns you on right now?"
+            ],
+            ai_placeholder: [
+                "e.g. big tits, no anal...",
+                "I want something passionate...",
+                "Surprise me with redhead...",
+                "Hardcore, outdoor, maybe spitting..."
+            ],
             ai_thinking: "Searching the hub...",
             ai_btn_go: "Find It",
             ai_phrases_success: [
@@ -5736,8 +5769,18 @@
             rm_actors_desc: "Отдельный режим для подбора порнозвезд и моделей на основе ваших визуальных предпочтений.",
             rm_support_btn: "Поддержать развитие 🚀",
 
-            ai_prompt: "Что хочешь посмотреть сегодня? 😏",
-            ai_placeholder: "Опиши (напр. 'хочу большую грудь, без анала')...",
+            ai_prompt: [
+                "Что хочешь посмотреть сегодня? 😏",
+                "Опиши свою фантазию...",
+                "Какое настроение?",
+                "Расскажи, что тебя заводит прямо сейчас?"
+            ],
+            ai_placeholder: [
+                "напр. большая грудь, без анала...",
+                "Хочу что-то страстное...",
+                "Удиви меня рыжими...",
+                "Жестко, на улице, может быть плевки..."
+            ],
             ai_thinking: "Анализирую...",
             ai_btn_go: "Найти",
             ai_phrases_success: [
@@ -6129,8 +6172,18 @@
             rm_actors_desc: "Un modo dedicado para encontrar estrellas porno basado en tus preferencias visuales.",
             rm_support_btn: "Apoyar Desarrollo 🚀",
 
-            ai_prompt: "¿Qué deseas ver hoy? 😏",
-            ai_placeholder: "Descríbelo (ej. 'pechos grandes, sin anal')...",
+            ai_prompt: [
+                "¿Qué deseas ver hoy? 😏",
+                "Describe tu fantasía...",
+                "¿De qué tienes ganas?",
+                "Dime, ¿qué te excita ahora mismo?"
+            ],
+            ai_placeholder: [
+                "ej. pechos grandes, sin anal...",
+                "Quiero algo apasionado...",
+                "Sorpréndeme con pelirrojas...",
+                "Duro, al aire libre..."
+            ],
             ai_thinking: "Pensando...",
             ai_btn_go: "Buscar",
             ai_phrases_success: [
@@ -6512,8 +6565,18 @@
             rm_actors_desc: "Ein Modus zum Finden von Pornostars basierend auf deinen visuellen Vorlieben.",
             rm_support_btn: "Entwicklung unterstützen 🚀",
 
-            ai_prompt: "Was möchtest du heute sehen? 😏",
-            ai_placeholder: "Beschreibe es...",
+            ai_prompt: [
+                "Was möchtest du heute sehen? 😏",
+                "Beschreibe deine Fantasie...",
+                "Wonach ist dir heute?",
+                "Sag mir, was dich gerade anmacht?"
+            ],
+            ai_placeholder: [
+                "z.B. große Brüste, kein Anal...",
+                "Ich will etwas Leidenschaftliches...",
+                "Überrasch mich...",
+                "Hart, draußen..."
+            ],
             ai_thinking: "Nachdenken...",
             ai_btn_go: "Finden",
             ai_phrases_success: [
@@ -11646,21 +11709,36 @@
         const ui = document.getElementById('assistant-ui');
         ui.classList.add('visible');
         
-        // Обновляем переводы в UI (на случай смены языка)
-        document.querySelector('.assistant-prompt').innerText = getTranslation("ai_prompt");
-        document.getElementById('ai-input').placeholder = getTranslation("ai_placeholder");
-        document.querySelector('#btn-ai-go span').innerText = getTranslation("ai_btn_go");
+        // === РАНДОМИЗАЦИЯ ФРАЗ ===
+        const t = langData[currentLang] || langData['en'];
+        
+        // 1. Случайный заголовок
+        const prompts = Array.isArray(t.ai_prompt) ? t.ai_prompt : [t.ai_prompt];
+        const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
+        document.querySelector('.assistant-prompt').innerText = randomPrompt;
 
-        setTimeout(() => document.getElementById('ai-input').focus(), 300);
+        // 2. Случайный плейсхолдер
+        const placeholders = Array.isArray(t.ai_placeholder) ? t.ai_placeholder : [t.ai_placeholder];
+        const randomPlaceholder = placeholders[Math.floor(Math.random() * placeholders.length)];
+        
+        const input = document.getElementById('ai-input');
+        input.placeholder = randomPlaceholder;
+        input.value = ""; // Очищаем прошлое значение
+        
+        // Обновляем текст кнопки (если вдруг язык поменялся)
+        const btnText = document.querySelector('#btn-ai-go span');
+        if(btnText) btnText.innerText = t.ai_btn_go || "Find It";
+
+        // Фокус
+        setTimeout(() => input.focus(), 300);
 
         // Логика кнопки Enter и ввода
-        const inp = document.getElementById('ai-input');
-        inp.oninput = (e) => {
+        input.oninput = (e) => {
             const btn = document.getElementById('btn-ai-go');
             if (e.target.value.trim().length > 0) btn.classList.add('visible');
             else btn.classList.remove('visible');
         };
-        inp.onkeydown = (e) => {
+        input.onkeydown = (e) => {
             if (e.key === 'Enter') processAiRequest();
         };
     }
