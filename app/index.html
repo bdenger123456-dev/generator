@@ -2666,6 +2666,160 @@
             }
         }
 
+        /* === AI ASSISTANT MODE STYLES === */
+
+        /* Контейнер треугольника */
+        .mode-triangle-layout {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+            margin-top: auto;
+            margin-bottom: 20px;
+        }
+
+        .mode-triangle-row {
+            display: flex;
+            justify-content: center;
+            gap: 40px; /* Расстояние между нижними кнопками */
+            width: 100%;
+        }
+
+        /* Стиль для кнопки ассистента (сверху) */
+        .mode-circle-btn.ai-assist {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 10px 30px rgba(118, 75, 162, 0.4);
+            width: 85px; /* Чуть больше остальных */
+            height: 85px;
+            font-size: 36px;
+            z-index: 10;
+        }
+
+        /* UI ВВОДА ЗАПРОСА (Скрыт по умолчанию) */
+        .assistant-ui {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: var(--card-gradient);
+            z-index: 60;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .assistant-ui.visible {
+            display: flex;
+            opacity: 1;
+        }
+
+        .assistant-prompt {
+            font-size: 24px;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--text-main);
+            line-height: 1.2;
+        }
+
+        .assistant-input-group {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 5px 5px 5px 15px;
+            margin-bottom: 20px;
+        }
+
+        .assistant-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+            padding: 10px 0;
+        }
+        .assistant-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .btn-mic-trigger {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-mic-trigger.listening {
+            background: #e74c3c;
+            animation: pulseMic 1.5s infinite;
+        }
+
+        @keyframes pulseMic {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+
+        .btn-ai-confirm {
+            background: #fff;
+            color: #000;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s;
+            pointer-events: none;
+        }
+        .btn-ai-confirm.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        /* АНИМАЦИЯ "ДУМАЮ..." */
+        .thinking-ui {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 70;
+            background: var(--card-gradient);
+        }
+        .thinking-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255,255,255,0.1);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
         /* =========================================
         18. MEDIA QUERIES (ADAPTATION)
         ========================================= */
@@ -2944,17 +3098,46 @@
                                 <span id="card-notch-text">STATUS</span>
                             </div>
 
-                            <!-- START SCREEN OVERLAY (Заменяет контент при старте) -->
+                            <!-- START SCREEN OVERLAY -->
                             <div id="mode-start-overlay" class="mode-start-overlay hidden">
-                                <!-- Текст с намёком -->
-                                <div class="mode-greeting-text" data-key="mode_greeting_hint">
-                                    What are we watching today: something new 🔭 or familiar 🥰?
+                                
+                                <!-- Текст-приветствие -->
+                                <div id="mode-start-text" class="mode-greeting-text" data-key="mode_greeting_hint">
+                                    What are we watching today?
                                 </div>
                                 
-                                <!-- Круглые кнопки -->
-                                <div class="mode-buttons-circle-row">
-                                    <button class="mode-circle-btn explore" onclick="setAppModeAndStart('explore')">🔭</button>
-                                    <button class="mode-circle-btn pleasure" onclick="setAppModeAndStart('pleasure')">🥰</button>
+                                <!-- Кнопки (Треугольник) -->
+                                <div id="mode-buttons-container" class="mode-triangle-layout">
+                                    <!-- Верх: Ассистент -->
+                                    <button class="mode-circle-btn ai-assist" onclick="openAssistantUI()">🎙️</button>
+                                    
+                                    <!-- Низ: Обычные режимы -->
+                                    <div class="mode-triangle-row">
+                                        <button class="mode-circle-btn explore" onclick="setAppModeAndStart('explore')">🔭</button>
+                                        <button class="mode-circle-btn pleasure" onclick="setAppModeAndStart('pleasure')">🥰</button>
+                                    </div>
+                                </div>
+
+                                <!-- UI АССИСТЕНТА -->
+                                <div id="assistant-ui" class="assistant-ui">
+                                    <div class="assistant-prompt" data-key="ai_prompt">What do you desire? 😏</div>
+                                    
+                                    <div class="assistant-input-group">
+                                        <input type="text" id="ai-input" class="assistant-input" data-key="ai_placeholder" placeholder="..." autocomplete="off">
+                                        <button class="btn-mic-trigger" id="btn-mic" onclick="toggleVoiceInput()">🎙️</button>
+                                    </div>
+
+                                    <button id="btn-ai-go" class="btn-ai-confirm" onclick="processAiRequest()">
+                                        <span data-key="ai_btn_go">Find It</span>
+                                    </button>
+                                    
+                                    <div style="margin-top: 20px; font-size: 14px; opacity: 0.5; cursor: pointer;" onclick="closeAssistantUI()" data-key="btn_cancel">Cancel</div>
+                                </div>
+
+                                <!-- UI ДУМАНИЯ -->
+                                <div id="thinking-ui" class="thinking-ui">
+                                    <div class="thinking-spinner"></div>
+                                    <div style="font-size: 18px; font-weight: 700; color: var(--text-secondary);" id="ai-thinking-text" data-key="ai_thinking">Thinking...</div>
                                 </div>
                             </div>
 
@@ -4633,7 +4816,7 @@
         'toys': ['toys1.png', 'toys2.png'],
 
         // Романтика / Ваниль
-        'romantic': ['romantic1.png', 'romantic2.png']
+        'romance': ['romantic1.png', 'romantic2.png']
     };
 
     // 2. Нейтральные иконки
@@ -5069,6 +5252,13 @@
             rm_actors_title: "Actor Selector",
             rm_actors_desc: "A dedicated mode to find pornstars based on your visual preferences and body type filters.",
             rm_support_btn: "Support Development 🚀",
+
+            ai_prompt: "What do you desire today? 😏",
+            ai_placeholder: "Describe it (e.g. 'big tits, no anal')...",
+            ai_thinking: "Searching the hub...",
+            ai_btn_go: "Find It",
+            ai_error: "I couldn't find exactly that, but try this:",
+            ai_success: "As you requested:",
             
             // --- 2. Generator (Main Tab) ---
             generate: "Random Genre",
@@ -5445,6 +5635,13 @@
             rm_actors_desc: "Отдельный режим для подбора порнозвезд и моделей на основе ваших визуальных предпочтений.",
             rm_support_btn: "Поддержать развитие 🚀",
 
+            ai_prompt: "Что хочешь посмотреть сегодня? 😏",
+            ai_placeholder: "Опиши (напр. 'хочу большую грудь, без анала')...",
+            ai_thinking: "Анализирую...",
+            ai_btn_go: "Найти",
+            ai_error: "Точного совпадения нет, но как насчет этого:",
+            ai_success: "Как ты и просил:",
+
 
             // --- 2. Генератор ---
             generate: "Случайный жанр",
@@ -5819,6 +6016,13 @@
             rm_actors_desc: "Un modo dedicado para encontrar estrellas porno basado en tus preferencias visuales.",
             rm_support_btn: "Apoyar Desarrollo 🚀",
 
+            ai_prompt: "¿Qué deseas ver hoy? 😏",
+            ai_placeholder: "Descríbelo (ej. 'pechos grandes, sin anal')...",
+            ai_thinking: "Pensando...",
+            ai_btn_go: "Buscar",
+            ai_error: "No encontré eso exacto, pero prueba esto:",
+            ai_success: "Como pediste:",
+
             search_liked: "Buscar favoritos...",
             search_disliked: "Buscar bloqueados...",
             hist_empty: "Historial vacío",
@@ -6182,6 +6386,13 @@
             rm_actors_title: "Darsteller-Suche",
             rm_actors_desc: "Ein Modus zum Finden von Pornostars basierend auf deinen visuellen Vorlieben.",
             rm_support_btn: "Entwicklung unterstützen 🚀",
+
+            ai_prompt: "Was möchtest du heute sehen? 😏",
+            ai_placeholder: "Beschreibe es...",
+            ai_thinking: "Nachdenken...",
+            ai_btn_go: "Finden",
+            ai_error: "Nicht genau gefunden, aber versuch das:",
+            ai_success: "Wie gewünscht:",
 
             btn_start: "Los geht's",
             btn_pass: "Andere",
@@ -11097,6 +11308,272 @@
             document.querySelectorAll('.mode-capsule-wrapper').forEach(el => el.classList.remove('open'));
         }
     });
+
+    const STOP_WORDS = [
+        "i", "want", "need", "show", "me", "some", "video", "porn", "please", "today", "now", "like", "love", "looking", "for",
+        "я", "хочу", "покажи", "мне", "что-то", "сегодня", "сейчас", "люблю", "нравится", "нужен", "нужна", "посоветуй",
+        "quiero", "ver", "dame", "algo", "hoy", "ahora", "gusta", "necesito",
+        "ich", "will", "möchte", "zeig", "mir", "heute", "jetzt"
+    ];
+
+    // Слова-отрицания
+    const NEGATIVES = ["no ", "not ", "non ", "не ", "без ", "кроме ", "sin ", "kein ", "ohne ", "don't "];
+
+    // 1. Функция анализа
+    function analyzeUserRequest(text) {
+        text = text.toLowerCase();
+
+        // -- ПРОВЕРКА НА ИСТОРИЮ (ВЧЕРА/ПРОШЛОЕ) --
+        const historyKeywords = ["yesterday", "last", "previous", "back", "вчера", "прошл", "ayer", "pasado", "gestern"];
+        if (historyKeywords.some(kw => text.includes(kw))) {
+            if (historyData.length > 0) {
+                const lastId = historyData[0].id;
+                const item = data.find(x => x.id === lastId);
+                if (item) return { item: item, reason: getTranslation("expl_hist") || "From History" };
+            }
+        }
+
+        // -- ПАРСИНГ ЗАПРОСА --
+        let positiveQuery = text;
+        let negativeTerms = [];
+
+        // Попытка найти отрицания (например: "без анала")
+        NEGATIVES.forEach(neg => {
+            if (positiveQuery.includes(neg)) {
+                const parts = positiveQuery.split(neg);
+                if (parts.length > 1) {
+                    // Берем слово ПОСЛЕ отрицания (грубое приближение, но работает)
+                    const blockedPart = parts[1].split(" ")[0]; 
+                    if (blockedPart.length > 2) negativeTerms.push(blockedPart);
+                }
+            }
+        });
+
+        // Очистка запроса от стоп-слов и пунктуации
+        let tokens = positiveQuery
+            .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
+            .split(/\s+/)
+            .filter(word => word.length > 2 && !STOP_WORDS.includes(word) && !negativeTerms.includes(word));
+
+        if (tokens.length === 0) return null; // Если остались только "хочу" и "ы"
+
+        // -- ПОИСК ПО БАЗЕ (SCORING SYSTEM) --
+        let candidates = data.map(item => {
+            let score = 0;
+            
+            // Строка для поиска внутри предмета (все языки + теги)
+            const itemString = [
+                item.name, item.name_ru, item.name_es, item.name_de, 
+                item.slug, 
+                ...item.tags,
+                item.desc_en, item.desc_ru // Описание тоже учитываем, но с меньшим весом
+            ].join(" ").toLowerCase();
+
+            // 1. ПРОВЕРКА НА МИНУС-СЛОВА (БАН)
+            // Если в предмете есть слово из "не хочу", обнуляем его
+            const hasNegative = negativeTerms.some(neg => itemString.includes(neg));
+            if (hasNegative) return { item, score: -1 };
+
+            // 2. ПОДСЧЕТ ОЧКОВ
+            tokens.forEach(token => {
+                // Точное совпадение в названии (самый высокий приоритет)
+                if ((item.name && item.name.toLowerCase() === token) || 
+                    (item.name_ru && item.name_ru.toLowerCase() === token)) {
+                    score += 50;
+                }
+                // Частичное совпадение в названии
+                else if ((item.name && item.name.toLowerCase().includes(token)) || 
+                        (item.name_ru && item.name_ru.toLowerCase().includes(token))) {
+                    score += 20;
+                }
+                // Совпадение в тегах
+                else if (item.tags.includes(token)) {
+                    score += 15;
+                }
+                // Совпадение в описании или slug
+                else if (itemString.includes(token)) {
+                    score += 5;
+                }
+            });
+
+            // Небольшой рандом, чтобы не выдавать одно и то же на одинаковый запрос
+            if (score > 0) score += Math.random() * 5;
+
+            return { item, score };
+        });
+
+        // Сортируем по очкам
+        candidates.sort((a, b) => b.score - a.score);
+
+        // Берем победителя, если очки > 0
+        if (candidates.length > 0 && candidates[0].score > 0) {
+            return { 
+                item: candidates[0].item, 
+                reason: getTranslation("ai_success") // "Как вы и заказывали"
+            };
+        }
+
+        return null;
+    }
+
+    function getTranslation(key) {
+        const t = langData[currentLang] || langData['en'];
+        return t[key] || "";
+    }
+
+    function processAiRequest() {
+        const input = document.getElementById('ai-input');
+        const text = input.value.trim();
+        if (!text) return;
+
+        // Скрываем UI ввода
+        document.getElementById('assistant-ui').classList.remove('visible');
+        // Показываем спиннер
+        document.getElementById('thinking-ui').style.display = 'flex';
+        
+        const thinkTxt = document.getElementById('ai-thinking-text');
+        thinkTxt.innerText = getTranslation("ai_thinking");
+
+        // Имитация "думания" (1.5 сек)
+        setTimeout(() => {
+            const result = analyzeUserRequest(text);
+            
+            // Скрываем весь оверлей старта
+            const overlay = document.getElementById('mode-start-overlay');
+            overlay.classList.add('hidden'); 
+            
+            // Сброс UI
+            setTimeout(() => {
+                document.getElementById('thinking-ui').style.display = 'none';
+                document.getElementById('ai-input').value = '';
+                document.getElementById('btn-ai-go').classList.remove('visible');
+                
+                // Восстанавливаем кнопки меню на будущее
+                document.getElementById('mode-start-text').style.opacity = '1';
+                document.getElementById('mode-buttons-container').style.opacity = '1';
+                document.getElementById('mode-buttons-container').style.pointerEvents = 'auto';
+            }, 500);
+
+            const statusEl = document.getElementById('status-text');
+
+            if (result) {
+                // УСПЕХ
+                if(statusEl) {
+                    statusEl.innerText = result.reason; // "Как ты и просил"
+                    statusEl.style.color = "var(--accent)";
+                }
+                forceShowResult(result.item, 'ai_request');
+                
+                // Анимация вылета
+                const wrapper = document.getElementById('card-anim-wrapper');
+                if(wrapper) {
+                    wrapper.classList.remove('anim-fly-left', 'anim-fly-right');
+                    void wrapper.offsetWidth; 
+                    wrapper.classList.add('anim-fly-left');
+                }
+
+            } else {
+                // НЕУДАЧА (Запрос "ы" или бред)
+                const failReason = getTranslation("ai_error"); // "Не понял, но держи это"
+                
+                if(statusEl) {
+                    statusEl.innerText = failReason;
+                    statusEl.style.color = "var(--text-secondary)";
+                }
+                // Запускаем режим Наслаждение как фоллбек
+                setAppModeAndStart('pleasure');
+            }
+
+        }, 1500);
+    }
+
+    function openAssistantUI() {
+        // Скрываем текст и кнопки плавно
+        document.getElementById('mode-start-text').style.opacity = '0';
+        document.getElementById('mode-buttons-container').style.opacity = '0';
+        document.getElementById('mode-buttons-container').style.pointerEvents = 'none';
+
+        const ui = document.getElementById('assistant-ui');
+        ui.classList.add('visible');
+        
+        // Обновляем переводы в UI (на случай смены языка)
+        document.querySelector('.assistant-prompt').innerText = getTranslation("ai_prompt");
+        document.getElementById('ai-input').placeholder = getTranslation("ai_placeholder");
+        document.querySelector('#btn-ai-go span').innerText = getTranslation("ai_btn_go");
+
+        setTimeout(() => document.getElementById('ai-input').focus(), 300);
+
+        // Логика кнопки Enter и ввода
+        const inp = document.getElementById('ai-input');
+        inp.oninput = (e) => {
+            const btn = document.getElementById('btn-ai-go');
+            if (e.target.value.trim().length > 0) btn.classList.add('visible');
+            else btn.classList.remove('visible');
+        };
+        inp.onkeydown = (e) => {
+            if (e.key === 'Enter') processAiRequest();
+        };
+    }
+
+    function closeAssistantUI() {
+        const ui = document.getElementById('assistant-ui');
+        ui.classList.remove('visible');
+        
+        // Возвращаем исходный вид
+        document.getElementById('mode-start-text').style.opacity = '1';
+        const btns = document.getElementById('mode-buttons-container');
+        btns.style.opacity = '1';
+        btns.style.pointerEvents = 'auto';
+        
+        document.getElementById('ai-input').value = '';
+        document.getElementById('btn-ai-go').classList.remove('visible');
+    }
+
+    function toggleVoiceInput() {
+        const btn = document.getElementById('btn-mic');
+        
+        if (!('webkitSpeechRecognition' in window)) {
+            alert("Voice input not supported in this browser.");
+            return;
+        }
+
+        if (window.recognition && window.isListening) {
+            window.recognition.stop();
+            return;
+        }
+
+        const recognition = new webkitSpeechRecognition();
+        window.recognition = recognition;
+        
+        // Выбираем язык распознавания на основе текущего языка приложения
+        const langMap = { 'en': 'en-US', 'ru': 'ru-RU', 'es': 'es-ES', 'de': 'de-DE' };
+        recognition.lang = langMap[currentLang] || 'en-US';
+        
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        recognition.onstart = () => {
+            window.isListening = true;
+            btn.classList.add('listening');
+            document.getElementById('ai-input').placeholder = "Listening...";
+        };
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            const input = document.getElementById('ai-input');
+            input.value = transcript;
+            document.getElementById('btn-ai-go').classList.add('visible');
+            // Не отправляем сразу, даем пользователю проверить текст
+        };
+
+        recognition.onend = () => {
+            window.isListening = false;
+            btn.classList.remove('listening');
+            document.getElementById('ai-input').placeholder = getTranslation("ai_placeholder");
+        };
+
+        recognition.start();
+    }
 
 </script>
 
