@@ -408,8 +408,33 @@
 
         body.light-theme .card {
             background: var(--card-gradient);
+            border: 1px solid rgba(0,0,0,0.05) !important;
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+        }
+
+        body.light-theme .mobile-header {
+            background: rgba(255, 255, 255, 0.85) !important;
+            border: 1px solid rgba(0, 0, 0, 0.05) !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        body.light-theme .bottom-nav {
+            background: rgba(255, 255, 255, 0.85);
             border: 1px solid rgba(0, 0, 0, 0.05);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        body.light-theme .ios-group,
+        body.light-theme .capsule-btn,
+        body.light-theme .mode-capsule-btn {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+            border-color: rgba(0, 0, 0, 0.05);
+        }
+
+        body.light-theme .voice-icon-img,
+        body.light-theme .ai-icon-img {
+            filter: invert(0) drop-shadow(0 2px 5px rgba(0, 0, 0, 0.05));
+            opacity: 0.6;
         }
 
         .card.has-results {
@@ -1227,6 +1252,22 @@
             }
         }
 
+        #tab-settings #mobile-mode-mount {
+            margin-top: 0 !important;
+            margin-bottom: 20px !important;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        #tab-settings .mode-capsule-btn {
+            width: 100%; 
+            max-width: 200px;
+            justify-content: center;
+            background: var(--ios-card);
+            height: 44px;
+        }
+
         .capsule-trigger {
             background: rgba(255, 255, 255, 0.07);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1306,10 +1347,11 @@
         .mobile-header {
             display: none; position: fixed; top: calc(10px + env(safe-area-inset-top)); 
             left: 50%; transform: translateX(-50%); width: auto; min-width: 260px; max-width: 90%;
-            background: rgba(20, 20, 20, 0.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 35px; z-index: 9999;
+            background: var(--ios-card) !important; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border) !important; border-radius: 35px; z-index: 9999;
             padding: 12px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             flex-direction: column; align-items: center; justify-content: center;
+            color: var(--text-main);
         }
         body.light-theme .mobile-header { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(0, 0, 0, 0.1); }
         .mobile-header .logo { font-size: 20px; margin-bottom: 0; }
@@ -3120,24 +3162,6 @@
        <!-- TAB 1: HOME -->
         <div id="tab-home" class="tab-content active">
             <div class="center-wrapper">
-                
-                <div id="mobile-mode-mount">
-                    <div class="mode-capsule-wrapper" id="mode-capsule-mobile">
-                        <button class="mode-capsule-btn" onclick="toggleModeDropdown('mobile')">
-                            <span class="current-mode-icon">🔭</span>
-                            <span class="current-mode-text">Explore</span>
-                        </button>
-                        <!-- Выпадающий список -->
-                        <div class="mode-dropdown">
-                            <div class="mode-item" onclick="setAppMode('explore')">
-                                <span>🔭</span> <span data-key="mode_explore">Explore</span>
-                            </div>
-                            <div class="mode-item" onclick="setAppMode('pleasure')">
-                                <span>🥰</span> <span data-key="mode_pleasure">Pleasure</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- ЯКОРЬ -->
                 <div id="card-anchor" style="position: relative; width: 100%; display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: visible;">
@@ -3280,6 +3304,23 @@
         <!-- TAB 2: SETTINGS -->
         <div id="tab-settings" class="tab-content">
             <div class="center-wrapper">
+                <div id="mobile-mode-mount">
+                    <div class="mode-capsule-wrapper" id="mode-capsule-mobile">
+                        <button class="mode-capsule-btn" onclick="toggleModeDropdown('mobile')">
+                            <span class="current-mode-icon">🔭</span>
+                            <span class="current-mode-text">Explore</span>
+                        </button>
+                        <!-- Выпадающий список -->
+                        <div class="mode-dropdown">
+                            <div class="mode-item" onclick="setAppMode('explore')">
+                                <span>🔭</span> <span data-key="mode_explore">Explore</span>
+                            </div>
+                            <div class="mode-item" onclick="setAppMode('pleasure')">
+                                <span>🥰</span> <span data-key="mode_pleasure">Pleasure</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div id="mount-prefs"></div>
             </div>
         </div>
