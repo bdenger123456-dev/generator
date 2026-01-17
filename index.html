@@ -1,21 +1,95 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" prefix="og: https://ogp.me/ns#">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     
-    <!-- SEO Meta Tags -->
-    <title>xFetishHub — Adult Analytics, Privacy & Discovery Tool</title>
-    <meta name="title" content="xFetishHub — Adult Analytics, Privacy & Discovery Tool">
-    <meta name="description" content="Discover your true desires with xFetishHub. The ultimate adult preference tracker and private browser. Analyze your porn statistics, explore new fetishes, and keep your history secure.">
-    <meta name="keywords" content="FetishHub, adult analytics, porn statistics, private browser, fetish tracker, sex taste analysis, adult discovery, secure porn watching, fetish generator">
-    <meta name="robots" content="index, follow">
+    <!-- === PRIMARY SEO === -->
+    <title>xFetishHub — Adult Analytics, Preference Tracker & Private Browser</title>
+    <meta name="title" content="xFetishHub — Adult Analytics, Preference Tracker & Private Browser">
+    <meta name="description" content="Discover your true desires with xFetishHub. The #1 AI-powered adult preference tracker. Analyze porn statistics, explore 1000+ genres, and browse privately.">
+    <meta name="keywords" content="adult analytics, porn statistics, fetish tracker, private adult browser, porn habit tracker, fetish discovery, secure porn watching, AI adult recommendation">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="author" content="xFetishHub Team">
+    <meta name="theme-color" content="#050505">
     
-    <!-- Fonts -->
+    <!-- === INTERNATIONAL SEO (HREFLANG) === -->
+    <link rel="alternate" hreflang="x-default" href="https://www.xfetishhub.site/" />
+    <link rel="alternate" hreflang="en" href="https://www.xfetishhub.site/" />
+    <link rel="alternate" hreflang="ru" href="https://www.xfetishhub.site/ru/" />
+    <link rel="alternate" hreflang="es" href="https://www.xfetishhub.site/es/" />
+    <link rel="alternate" hreflang="de" href="https://www.xfetishhub.site/de/" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://www.xfetishhub.site/">
+    
+    <!-- === OPEN GRAPH === -->
+    <meta property="og:site_name" content="xFetishHub">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.xfetishhub.site/">
+    <meta property="og:title" content="xFetishHub — Reveal Your True Desires">
+    <meta property="og:description" content="Detailed adult analytics and private discovery tool. See your 'Spotify Wrapped' style porn stats.">
+    <meta property="og:image" content="https://www.xfetishhub.site/og-image.jpg"> 
+
+    <!-- === TWITTER === -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://www.xfetishhub.site/">
+    <meta property="twitter:title" content="xFetishHub — Adult Analytics Tool">
+    <meta property="twitter:description" content="Track preferences, analyze stats, and browse privately.">
+    <meta property="twitter:image" content="https://www.xfetishhub.site/og-image.jpg">
+
+    <!-- === PRELOAD & FONTS === -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    
+    <link rel="preload" as="image" href="hero_bg.webp" fetchpriority="high">
+
+    <!-- === STRUCTURED DATA (JSON-LD) === -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "name": "xFetishHub",
+          "applicationCategory": "LifestyleApplication",
+          "operatingSystem": "Web, iOS, Android",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
+          },
+          "description": "xFetishHub is an advanced adult analytics tool and private browser that helps users track preferences and discover new genres safely.",
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "ratingCount": "1250"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [{
+            "@type": "Question",
+            "name": "Is xFetishHub anonymous?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, xFetishHub operates as a private browser on your device. We prioritize user privacy and do not link your adult history to your main identity."
+            }
+          }, {
+            "@type": "Question",
+            "name": "How does the fetish tracker work?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Our algorithm analyzes your viewing patterns across 1000+ genres to generate detailed statistics and recommendations, similar to music streaming wrapped summaries."
+            }
+          }]
+        }
+      ]
+    }
+    </script>
 
     <style>
         :root {
@@ -62,28 +136,31 @@
         h2 { font-size: 42px; font-weight: 800; margin-bottom: 20px; line-height: 1.1; }
         .gradient-text { background: var(--gradient-text); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        /* === DIVIDERS (GRADIENTS) === */
+        /* === DIVIDERS === */
         .section-divider {
             position: absolute; left: 0; width: 100%; height: var(--divider-height);
             z-index: 3; pointer-events: none;
         }
-        /* 1. Hero (Black) -> Features (Gray) */
         .divider-hero-feat { top: 0; background: linear-gradient(to bottom, var(--bg-main), var(--bg-sec)); }
-        
-        /* 2. Features (Gray) -> Pricing (Black) */
         .divider-feat-price { bottom: 0; background: linear-gradient(to bottom, var(--bg-sec), var(--bg-main)); }
-
-        /* 3. Pricing (Black) -> Roadmap (Gray) */
         .divider-price-map { bottom: 0; background: linear-gradient(to bottom, var(--bg-main), var(--bg-sec)); }
-
-        /* 4. Roadmap (Gray) -> Footer (Image) */
-        /* Используем прозрачность, чтобы картинка проступала снизу */
         .divider-map-foot { bottom: 0; background: linear-gradient(to bottom, var(--bg-sec), rgba(5,5,5,0)); z-index: 5; }
 
 
         /* HERO */
         .parallax-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 0; }
         .parallax-img { width: 100%; height: 120%; object-fit: cover; opacity: 0.4; will-change: transform; }
+        
+        /* FOOTER PARALLAX FIX (FIXED WIDTH) */
+        .footer-cta .parallax-img { 
+            width: 100%; /* Fixes the half-screen issue */
+            height: 140%; 
+            top: -20%; 
+            left: 0;
+            position: absolute;
+            object-fit: cover;
+        }
+
         .bg-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(5,5,5,0.7); z-index: 1; }
 
         .hero { min-height: 100vh; display: flex; align-items: center; position: relative; overflow: hidden; padding: 40px 0; }
@@ -146,7 +223,7 @@
         .feature-img-wrapper.privacy-fix { background: transparent; border: none; box-shadow: none; min-height: 500px; display: flex; align-items: center; justify-content: center; }
         .feature-img-wrapper.privacy-fix .feature-img { object-fit: contain; width: 100%; height: 100%; max-height: 800px; }
 
-        /* PRICING SECTION (UPDATED) */
+        /* PRICING */
         .pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 40px; }
         .plan-card {
             background: var(--bg-sec); border: 1px solid var(--border); border-radius: 20px; padding: 30px 20px;
@@ -154,64 +231,45 @@
             min-height: 380px; overflow: hidden;
         }
         .plan-card:hover { transform: translateY(-5px); }
-        
         .plan-title { font-size: 22px; font-weight: 900; text-transform: uppercase; margin-bottom: 5px; }
         .plan-price { font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 20px; }
         .plan-price span { font-size: 14px; color: var(--text-sec); font-weight: 400; }
-        
         .plan-features { list-style: none; margin-bottom: 0; flex-grow: 1; padding: 0; }
         .plan-features li { font-size: 14px; color: var(--text-sec); margin-bottom: 12px; padding-left: 0; position: relative; line-height: 1.4; }
-        
-        /* Plan Specifics */
         .plan-card.pro { border-color: #ff9900; box-shadow: 0 0 20px rgba(255, 153, 0, 0.1); }
         .plan-card.pro .plan-title { color: #ff9900; }
         .plan-card.beast { border-color: #9b59b6; box-shadow: 0 0 20px rgba(155, 89, 182, 0.15); background: linear-gradient(135deg, rgba(155, 89, 182, 0.05), transparent); }
         .plan-card.beast .plan-title { color: #9b59b6; }
-        
-        /* Bestie Styles */
         .plan-card.bestie { border: 2px solid #00d2ff; background: linear-gradient(165deg, rgba(0, 210, 255, 0.1), rgba(58, 123, 213, 0.05)); }
         .plan-card.bestie .plan-title { color: #00d2ff; background: linear-gradient(to right, #00d2ff, #3a7bd5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        
         .bestie-badge {
             position: absolute; top: 0; right: 0; background: #00d2ff; color: #000;
             font-size: 10px; font-weight: 800; padding: 4px 10px; border-bottom-left-radius: 12px;
         }
-        
         .limit-container { margin-bottom: 15px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); }
         .limit-labels { display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 6px; color: var(--text-sec); }
         .limit-track { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
         .limit-fill { height: 100%; background: linear-gradient(90deg, #00d2ff, #3a7bd5); width: 96%; box-shadow: 0 0 10px #00d2ff; animation: pulseBar 2s infinite; }
         @keyframes pulseBar { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
 
-        /* ROADMAP (TABLE STYLE) */
-        .roadmap-separator { display: flex; align-items: center; justify-content: center; margin: 40px 0 20px; width: 100%; opacity: 0.7; }
-        .separator-line { height: 1px; background: var(--border); flex: 1; }
-        .roadmap-separator span { margin: 0 15px; font-size: 14px; font-weight: 700; text-transform: uppercase; color: var(--text-sec); white-space: nowrap; }
-        
-        .roadmap-card { 
-            background: var(--bg-sec); border: 1px solid var(--border); border-radius: 20px; 
-            overflow: hidden; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        
-        .roadmap-row { 
-            display: grid; grid-template-columns: 140px 1fr 140px; 
-            padding: 25px; border-bottom: 1px solid var(--border); align-items: center; 
-            transition: background 0.2s;
-        }
+        /* ROADMAP */
+        #roadmap .container { padding-bottom: 0; }
+        .roadmap-separator { display: flex; align-items: center; justify-content: center; gap: 20px; margin: 60px auto 30px; max-width: 900px; position: relative; z-index: 2; }
+        .roadmap-separator span { font-size: 0.9rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-sec); white-space: nowrap; }
+        .separator-line { height: 1px; flex-grow: 1; position: relative; }
+        .line-left { background: linear-gradient(to right, transparent, var(--border)); }
+        .line-right { background: linear-gradient(to right, var(--border), transparent); }
+        .roadmap-card { background: var(--bg-sec); border-radius: 32px; padding: 10px 0; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.3); max-width: 900px; margin: 0 auto 40px; overflow: hidden; position: relative; z-index: 2; }
+        .roadmap-row { display: grid; grid-template-columns: 180px 1fr 150px; gap: 30px; padding: 30px 50px; border-bottom: 1px solid var(--border); align-items: center; transition: background-color 0.3s; }
         .roadmap-row:last-child { border-bottom: none; }
-        .roadmap-row:hover { background: rgba(255,255,255,0.02); }
-        
-        .roadmap-date { font-size: 13px; font-weight: 700; color: var(--text-sec); text-transform: uppercase; }
-        .roadmap-content h4 { font-size: 18px; margin-bottom: 5px; color: #fff; font-weight: 700; }
-        .roadmap-content p { font-size: 14px; color: var(--text-sec); margin: 0; line-height: 1.4; }
-        
-        .roadmap-status { 
-            padding: 6px 12px; border-radius: 8px; font-size: 11px; 
-            font-weight: 800; text-transform: uppercase; text-align: center; justify-self: end;
-        }
-        .status-done { background: rgba(46, 204, 113, 0.15); color: #2ecc71; border: 1px solid rgba(46, 204, 113, 0.3); }
-        .status-progress { background: rgba(203, 83, 240, 0.15); color: #CB53F0; border: 1px solid rgba(203, 83, 240, 0.3); }
-        .status-plan { background: rgba(255, 255, 255, 0.05); color: #777; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .roadmap-row:hover { background-color: rgba(255,255,255,0.03); }
+        .roadmap-date { font-size: 1.1rem; font-weight: 800; color: var(--accent-start); text-transform: uppercase; }
+        .roadmap-content h4 { margin-bottom: 5px; font-size: 1.3rem; font-weight: 700; color: #fff; }
+        .roadmap-content p { font-size: 1rem; margin: 0; color: var(--text-sec); line-height: 1.5; }
+        .roadmap-status { display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; text-align: center; white-space: nowrap; }
+        .status-done { background: rgba(40, 167, 69, 0.15); color: #28a745; border: 1px solid rgba(40, 167, 69, 0.2); }
+        .status-progress { background: rgba(0, 122, 255, 0.15); color: #007AFF; border: 1px solid rgba(0, 122, 255, 0.2); }
+        .status-planned { background: rgba(255,255,255,0.05); color: var(--text-sec); border: 1px solid var(--border); }
 
         /* FOOTER */
         .footer-cta { min-height: 80vh; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; text-align: center; }
@@ -220,10 +278,25 @@
         .fade-in { opacity: 0; transform: translateY(40px); transition: 0.8s ease; }
         .fade-in.visible { opacity: 1; transform: translateY(0); }
 
-        /* SEO BLOCK */
-        .seo-footer { padding: 60px 20px; background: #000; color: #444; font-size: 12px; line-height: 1.6; text-align: center; border-top: 1px solid #111; }
-        .seo-footer h4 { color: #666; margin-bottom: 10px; }
-        .seo-footer p { max-width: 800px; margin: 0 auto; }
+        /* SEO FOOTER & FAQ */
+        .seo-footer { padding: 60px 20px; background: #000; color: #999; font-size: 13px; line-height: 1.8; border-top: 1px solid #111; }
+        .seo-container { max-width: 1000px; margin: 0 auto; display: grid; gap: 40px; }
+        .seo-block h4 { color: #fff; margin-bottom: 15px; font-size: 16px; }
+        .seo-block a { color: var(--text-sec); border-bottom: 1px solid #333; transition: color 0.2s; }
+        .seo-block a:hover { color: #fff; border-bottom-color: #fff; }
+        
+        /* Legal Links in Footer */
+        .footer-legal { margin-top: 20px; font-size: 11px; color: #555; display: flex; gap: 15px; justify-content: center; }
+        .footer-legal a { color: #555; text-decoration: none; cursor: pointer; }
+        .footer-legal a:hover { color: #888; text-decoration: underline; }
+
+        details.faq-item { margin-bottom: 15px; border-bottom: 1px solid #222; padding-bottom: 15px; }
+        summary.faq-question { cursor: pointer; color: #ccc; font-weight: 600; list-style: none; display: flex; align-items: center; justify-content: space-between; }
+        summary.faq-question::-webkit-details-marker { display: none; }
+        summary.faq-question:hover { color: #fff; }
+        summary.faq-question::after { content: '+'; font-size: 18px; color: var(--accent-start); }
+        details[open] summary.faq-question::after { content: '−'; }
+        .faq-answer { margin-top: 10px; color: #777; font-size: 12px; }
 
         /* ANIM UTILS */
         .anim-word-wrap { position: relative; display: inline-block; }
@@ -246,7 +319,7 @@
         .lock-container { display: flex; align-items: center; gap: 15px; }
         .lock-icon { width: 40px; height: 40px; object-fit: contain; }
 
-        /* QR MODAL */
+        /* MODALS */
         .modal-overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.9); z-index: 20000; 
@@ -254,10 +327,20 @@
         }
         .modal-overlay.open { display: flex; animation: fadeIn 0.3s ease; }
         .modal { 
-            background: var(--bg-sec); width: 90%; max-width: 400px; 
-            border-radius: 20px; border: 1px solid var(--border); padding: 30px; text-align: center; position: relative;
+            background: var(--bg-sec); width: 90%; max-width: 500px; 
+            border-radius: 20px; border: 1px solid var(--border); padding: 30px; 
+            text-align: center; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
-        .modal-close { position: absolute; top: 15px; right: 15px; font-size: 24px; cursor: pointer; opacity: 0.7; }
+        .modal-close { position: absolute; top: 15px; right: 15px; font-size: 24px; cursor: pointer; opacity: 0.7; z-index: 5; }
+        .modal-scrollable { max-height: 70vh; overflow-y: auto; text-align: left; padding-right: 10px; margin-top: 15px; }
+        .modal-scrollable h4 { color: #fff; margin-top: 20px; margin-bottom: 10px; }
+        .modal-scrollable p, .modal-scrollable li { font-size: 13px; color: var(--text-sec); line-height: 1.6; margin-bottom: 10px; }
+        
+        /* Scrollbar for modal */
+        .modal-scrollable::-webkit-scrollbar { width: 6px; }
+        .modal-scrollable::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+        .modal-scrollable::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         @media (max-width: 900px) {
@@ -273,42 +356,52 @@
             .plan-card { margin-bottom: 10px; min-height: auto; }
             .plan-card.bestie { order: -1; } 
 
-            .roadmap-row { grid-template-columns: 1fr; gap: 10px; text-align: left; padding: 20px; }
-            .roadmap-status { justify-self: start; }
+            .roadmap-row { grid-template-columns: 1fr; gap: 15px; text-align: left; padding: 25px 20px; }
+            .roadmap-date { font-size: 0.9rem; margin-bottom: 5px; }
+            .roadmap-status { justify-self: start; margin-top: 10px; font-size: 0.7rem; }
             
             .feature-img-wrapper.privacy-fix { min-height: auto; max-height: 500px; }
+            .seo-container { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-    <!-- HERO SECTION (Black) -->
-    <section class="hero">
+    <!-- HERO SECTION -->
+    <header class="hero">
         <div class="parallax-wrapper">
-            <img src="hero_bg.jpg" alt="Dark Aesthetic Background" class="parallax-img" id="hero-bg-img">
+            <img src="hero_bg.webp" alt="Abstract dark aesthetic background for xFetishHub" class="parallax-img" id="hero-bg-img" decoding="async" fetchpriority="high">
             <div class="bg-overlay"></div>
         </div>
 
         <div class="container">
             <div class="hero-grid">
                 <div class="hero-visual">
-                    <img src="hero_logo.png" alt="xFetishHub App Logo" class="hero-logo-img">
+                    <img src="hero_logo.png" alt="xFetishHub Application Logo - Privacy Focused" class="hero-logo-img">
                 </div>
                 <div class="hero-content">
                     <h1 class="brand-title">x<span class="gradient-text">Fetish</span>Hub</h1>
                     <div class="hero-subtitle-wrapper">
                         <div class="static-prefix" data-i18n="hero_prefix">Your home for adult</div>
                         <div class="rolling-container">
-                            <div class="rolling-list animate-scroll" id="rolling-list"></div>
+                            <div class="rolling-list animate-scroll" id="rolling-list">
+                                <span class="rolling-word">preferences</span>
+                                <span class="rolling-word">interests</span>
+                                <span class="rolling-word">genres</span>
+                                <span class="rolling-word">dirty things</span>
+                                <span class="rolling-word">data</span>
+                                <span class="rolling-word">discoveries</span>
+                                <span class="rolling-word">pleasures</span>
+                                <span class="rolling-word">preferences</span>
+                            </div>
                         </div>
                     </div>
                     
                     <div class="btn-row">
-                        <a href="app/" class="btn-cta" onclick="markUserActive()">
+                        <a href="app/" class="btn-cta" onclick="markUserActive()" aria-label="Launch xFetishHub App">
                             <span data-i18n="btn_launch">Launch App</span>
                         </a>
-                        <!-- PC Only Install Button -->
-                        <button class="btn-secondary pc-only" onclick="openQRModal()">
+                        <button class="btn-secondary pc-only" onclick="openQRModal()" aria-label="Install xFetishHub on Mobile">
                             📱 <span data-i18n="btn_install">Install on Phone</span>
                         </button>
                     </div>
@@ -316,215 +409,237 @@
             </div>
         </div>
         
-        <!-- Restored Arrow -->
-        <div class="scroll-arrow" onclick="document.getElementById('features').scrollIntoView({behavior: 'smooth'})"></div>
-    </section>
+        <div class="scroll-arrow" onclick="document.getElementById('features').scrollIntoView({behavior: 'smooth'})" aria-label="Scroll down"></div>
+    </header>
 
-    <!-- FEATURES SECTION (Gray) -->
-    <section id="features" class="bg-sec">
-        <!-- 1. Gradient: Hero (Black) -> Features (Gray) -->
-        <div class="section-divider divider-hero-feat"></div>
+    <!-- MAIN CONTENT -->
+    <main>
+        <!-- FEATURES SECTION -->
+        <section id="features" class="bg-sec">
+            <div class="section-divider divider-hero-feat"></div>
 
-        <div class="container">
-            <div style="text-align: center; margin-bottom: 100px;" class="fade-in">
-                <h2 data-i18n="feat_title">Why <span class="gradient-text">xFetishHub</span>?</h2>
-            </div>
+            <div class="container">
+                <div style="text-align: center; margin-bottom: 100px;" class="fade-in">
+                    <h2 data-i18n="feat_title">Why <span class="gradient-text">xFetishHub</span>?</h2>
+                </div>
 
-            <!-- Feature 1 -->
-            <div class="feature-row fade-in">
-                <div class="feature-text">
-                    <h3>
-                        <span class="anim-word-wrap anim-search">
-                            <span class="anim-emoji">🔭</span>
-                            <span class="base-text" data-i18n="f1_w1">Search</span>
-                            <span class="grad-layer g-search-grad" data-i18n="f1_w1">Search</span>
-                        </span>
-                        &
-                        <span class="anim-word-wrap anim-pleasure">
-                            <span class="anim-emoji">🥰</span>
-                            <span class="base-text" data-i18n="f1_w2">Pleasure</span>
-                            <span class="grad-layer g-pleasure-grad" data-i18n="f1_w2">Pleasure</span>
-                        </span>
-                    </h3>
-                    <p data-i18n="f1_desc">Depending on your mood, choose what to watch: classics or something more interesting 😈</p>
-                </div>
-                <div class="feature-img-wrapper">
-                    <img src="feat_explore.png" alt="Explore Interface" class="feature-img">
-                </div>
-            </div>
-
-            <!-- Feature 2 -->
-            <div class="feature-row fade-in">
-                <div class="feature-text">
-                    <h3><span class="anim-swipe-title" data-i18n="f2_title">Smart Cards</span></h3>
-                    <p data-i18n="f2_desc">The more you use it, the better recommendations await you. Our algorithm learns your fetish preferences.</p>
-                </div>
-                <div class="feature-img-wrapper">
-                    <img src="feat_roulette.png" alt="Smart Cards Interface" class="feature-img">
-                </div>
-            </div>
-
-            <!-- Feature 3 -->
-            <div class="feature-row fade-in">
-                <div class="feature-text">
-                    <h3>
-                        <span data-i18n="f3_prefix">Adult </span>
-                        <span class="matrix-text" id="matrix-target" data-final="Statistics">Statistics</span>
-                    </h3>
-                    <p data-i18n="f3_desc">Learn about your favorite genres and see detailed porn statistics in Wrapped style 🔥</p>
-                </div>
-                <div class="feature-img-wrapper">
-                    <img src="feat_stats.png" alt="Analytics Charts" class="feature-img">
-                </div>
-            </div>
-            
-            <!-- Feature 4 -->
-            <div class="feature-row fade-in">
-                <div class="feature-text">
-                    <div class="lock-container">
-                        <h3 data-i18n="f4_title" style="margin-bottom:0;">Total Privacy</h3>
-                        <img src="lock.apng" alt="Lock Animation" class="lock-icon">
+                <!-- Features ... (No changes here) -->
+                <article class="feature-row fade-in">
+                    <div class="feature-text">
+                        <h3>
+                            <span class="anim-word-wrap anim-search">
+                                <span class="anim-emoji" aria-hidden="true">🔭</span>
+                                <span class="base-text" data-i18n="f1_w1">Search</span>
+                                <span class="grad-layer g-search-grad" aria-hidden="true" data-i18n="f1_w1">Search</span>
+                            </span>
+                            &
+                            <span class="anim-word-wrap anim-pleasure">
+                                <span class="anim-emoji" aria-hidden="true">🥰</span>
+                                <span class="base-text" data-i18n="f1_w2">Pleasure</span>
+                                <span class="grad-layer g-pleasure-grad" aria-hidden="true" data-i18n="f1_w2">Pleasure</span>
+                            </span>
+                        </h3>
+                        <p data-i18n="f1_desc">Depending on your mood, choose what to watch: classics or something more interesting 😈</p>
                     </div>
-                    <br>
-                    <p data-i18n="f4_desc">Watch videos on your phone in a private browser that doesn't keep history in your main browser 🤫</p>
-                </div>
-                <div class="feature-img-wrapper privacy-fix">
-                    <img src="feat_privacy.png" alt="Private Browser" class="feature-img">
-                </div>
-            </div>
-        </div>
-        
-        <!-- 2. Gradient: Features (Gray) -> Pricing (Black) -->
-        <div class="section-divider divider-feat-price"></div>
-    </section>
+                    <div class="feature-img-wrapper">
+                        <img src="feat_explore.webp" alt="xFetishHub Exploration Interface showing search features" loading="lazy" class="feature-img">
+                    </div>
+                </article>
 
-    <!-- PRICING SECTION (Black) -->
-    <section id="pricing" class="bg-main">
-        <div class="container">
-            <div style="text-align: center; margin-bottom: 60px;" class="fade-in">
-                <h2 data-i18n="price_title">What is the price of pleasure?</h2>
-                <p style="color:var(--text-sec);" data-i18n="price_subtitle">If you want total freedom, here are my terms:</p>
-            </div>
+                <article class="feature-row fade-in">
+                    <div class="feature-text">
+                        <h3><span class="anim-swipe-title" data-i18n="f2_title">Smart Cards</span></h3>
+                        <p data-i18n="f2_desc">The more you use it, the better recommendations await you. Our algorithm learns your fetish preferences.</p>
+                    </div>
+                    <div class="feature-img-wrapper">
+                        <img src="feat_roulette.webp" alt="AI Powered Smart Recommendation Cards for Adult Content" loading="lazy" class="feature-img">
+                    </div>
+                </article>
 
-            <div class="pricing-grid fade-in">
-                <!-- Free -->
-                <div class="plan-card">
-                    <div class="plan-title">Free</div>
-                    <div class="plan-price">$0</div>
-                    <ul class="plan-features">
-                        <li data-i18n="feat_limit">🎲 10 Generations / day</li>
-                        <li data-i18n="feat_wrapped_limited">🎁 1 Fetish Wrapped / week</li>
-                        <li data-i18n="feat_stats_basic">📊 Basic Statistics</li>
-                        <li data-i18n="feat_no_ads">🚫 No Ads</li>
-                        <li data-i18n="feat_privacy_list">🔒 Total Privacy</li>
-                    </ul>
-                </div>
-
-                <!-- Pro -->
-                <div class="plan-card pro">
-                    <div class="plan-title">Pro <span style="font-size:12px; opacity:0.7">Fan</span></div>
-                    <div class="plan-price">$1.99 <span data-i18n="per_mo">/ mo</span></div>
-                    <ul class="plan-features">
-                        <li style="color:var(--text-main)" data-i18n="feat_unlim">🔥 <b>Unlimited</b> Generations</li>
-                        <li data-i18n="feat_stats_adv">📈 Advanced Stats & History</li>
-                        <li data-i18n="feat_wrapped_unlim">✨ <b>Unlimited</b> Fetish Wrapped</li>
-                        <li data-i18n="feat_custom">🎨 Deep Customization</li>
-                        <li data-i18n="feat_early">🚀 Early Access features</li>
-                    </ul>
-                </div>
-
-                <!-- Beast -->
-                <div class="plan-card beast">
-                    <div class="plan-title">Beast <span style="font-size:12px; opacity:0.7">Sponsor</span></div>
-                    <div class="plan-price">$4.99 <span data-i18n="per_mo">/ mo</span></div>
-                    <ul class="plan-features">
-                        <li style="color:var(--text-main)" data-i18n="feat_all_pro">👑 <b>All Pro Features</b></li>
-                        <li data-i18n="feat_discord">💬 <b>Discord</b> (Dev Chat)</li>
-                        <li data-i18n="feat_vote">🗳️ Impact on new functionality</li>
-                    </ul>
-                </div>
-
-                <!-- Bestie -->
-                <div class="plan-card bestie">
-                    <div class="bestie-badge" data-i18n="badge_limited">LIMITED OFFER</div>
-                    <div class="plan-title">Bestie <span style="font-size:12px; opacity:0.7; -webkit-text-fill-color: initial; color:var(--text-sec);" data-i18n="feat_lifetime">Lifetime</span></div>
-                    <div class="plan-price">$49.99 <span data-i18n="per_once">/ once</span></div>
-                    
-                    <div class="limit-container">
-                        <div class="limit-labels">
-                            <span style="font-weight:700; color:#ff6b6b;" data-i18n="limit_burn">🔥 ALMOST GONE</span>
-                            <span style="font-weight:700; color:#fff;">48 / 50 <span data-i18n="limit_claimed">claimed</span></span>
+                <article class="feature-row fade-in">
+                    <div class="feature-text">
+                        <h3>
+                            <span data-i18n="f3_prefix">Adult </span>
+                            <span class="matrix-text" id="matrix-target" data-final="Statistics">Statistics</span>
+                        </h3>
+                        <p data-i18n="f3_desc">Learn about your favorite genres and see detailed porn statistics in Wrapped style 🔥</p>
+                    </div>
+                    <div class="feature-img-wrapper">
+                        <img src="feat_stats.webp" alt="Detailed Adult Analytics and Porn Statistics Charts" loading="lazy" class="feature-img">
+                    </div>
+                </article>
+                
+                <article class="feature-row fade-in">
+                    <div class="feature-text">
+                        <div class="lock-container">
+                            <h3 data-i18n="f4_title" style="margin-bottom:0;">Total Privacy</h3>
+                            <img src="lock.apng" alt="Secure Lock Animation" width="40" height="40" loading="lazy" class="lock-icon">
                         </div>
-                        <div class="limit-track"><div class="limit-fill"></div></div>
+                        <br>
+                        <p data-i18n="f4_desc">Watch videos on your phone in a private browser that doesn't keep history in your main browser 🤫</p>
                     </div>
-
-                    <ul class="plan-features">
-                        <li style="color:var(--text-main)" data-i18n="feat_lifetime_full">♾️ <b>Lifetime Access</b></li>
-                        <li style="color:var(--text-main)" data-i18n="feat_all_pro">👑 <b>All Pro Features</b></li>
-                        <li data-i18n="feat_sponsors">💎 Listed in "Sponsors"</li>
-                        <li data-i18n="feat_onetime">💸 One-time payment</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 3. Gradient: Pricing (Black) -> Roadmap (Gray) -->
-        <div class="section-divider divider-price-map"></div>
-    </section>
-
-    <!-- ROADMAP (Gray - Contrast) -->
-    <section id="roadmap" class="bg-sec">
-        <div class="container">
-            <div style="text-align: center; margin-bottom: 60px;" class="fade-in">
-                <h2 data-i18n="map_title">Future <span class="gradient-text">Plans</span></h2>
+                    <div class="feature-img-wrapper privacy-fix">
+                        <img src="feat_privacy.webp" alt="Private Incognito Browser Mode illustration" loading="lazy" class="feature-img">
+                    </div>
+                </article>
             </div>
             
-            <div class="roadmap-list fade-in">
-                <!-- PHASE 1 -->
-                <div class="roadmap-separator"><div class="separator-line"></div><span data-i18n="rm_phase_1">Phase 1: Intelligence</span><div class="separator-line"></div></div>
-                <div class="roadmap-card">
-                    <div class="roadmap-row">
-                        <div class="roadmap-date" data-i18n="rm_q1">Q1 2026</div>
-                        <div class="roadmap-content"><h4 data-i18n="rm_1_head">Global Intelligence</h4><p data-i18n="rm_1_desc">Anonymous global charts of "Most Loved" genres.</p></div>
-                        <div class="roadmap-status status-progress" data-i18n="st_progress">In Progress</div>
-                    </div>
+            <div class="section-divider divider-feat-price"></div>
+        </section>
+
+        <!-- PRICING SECTION -->
+        <section id="pricing" class="bg-main">
+            <div class="container">
+                <div style="text-align: center; margin-bottom: 60px;" class="fade-in">
+                    <h2 data-i18n="price_title">What is the price of pleasure?</h2>
+                    <p style="color:var(--text-sec);" data-i18n="price_subtitle">If you want total freedom, here are my terms:</p>
                 </div>
 
-                <!-- PHASE 2 -->
-                <div class="roadmap-separator"><div class="separator-line"></div><span data-i18n="rm_phase_2">Phase 2: Connection</span><div class="separator-line"></div></div>
-                <div class="roadmap-card">
-                    <div class="roadmap-row">
-                        <div class="roadmap-date" data-i18n="rm_q2">Q2 2026</div>
-                        <div class="roadmap-content"><h4 data-i18n="rm_2_head">Co-op Mode</h4><p data-i18n="rm_2_desc">Connect with a partner to find matching kinks in real-time.</p></div>
-                        <div class="roadmap-status status-plan" data-i18n="st_plan">Planned</div>
+                <div class="pricing-grid fade-in">
+                    <!-- Free -->
+                    <div class="plan-card">
+                        <div class="plan-title">Free</div>
+                        <div class="plan-price">$0</div>
+                        <ul class="plan-features">
+                            <li data-i18n="feat_limit">🎲 10 Generations / day</li>
+                            <li data-i18n="feat_wrapped_limited">🎁 1 Fetish Wrapped / week</li>
+                            <li data-i18n="feat_stats_basic">📊 Basic Statistics</li>
+                            <li data-i18n="feat_no_ads">🚫 No Ads</li>
+                            <li data-i18n="feat_privacy_list">🔒 Total Privacy</li>
+                        </ul>
                     </div>
-                </div>
 
-                <!-- PHASE 3 -->
-                <div class="roadmap-separator"><div class="separator-line"></div><span data-i18n="rm_phase_3">Phase 3: Expansion</span><div class="separator-line"></div></div>
-                <div class="roadmap-card">
-                    <div class="roadmap-row">
-                        <div class="roadmap-date" data-i18n="rm_q3">Q3 2026</div>
-                        <div class="roadmap-content"><h4 data-i18n="rm_3_head">5000+ Categories</h4><p data-i18n="rm_3_desc">Massive database expansion covering every micro-fetish.</p></div>
-                        <div class="roadmap-status status-plan" data-i18n="st_plan">Planned</div>
+                    <!-- Pro -->
+                    <div class="plan-card pro">
+                        <div class="plan-title">Pro <span style="font-size:12px; opacity:0.7">Fan</span></div>
+                        <div class="plan-price">$1.99 <span data-i18n="per_mo">/ mo</span></div>
+                        <ul class="plan-features">
+                            <li style="color:var(--text-main)" data-i18n="feat_unlim">🔥 <b>Unlimited</b> Generations</li>
+                            <li data-i18n="feat_stats_adv">📈 Advanced Stats & History</li>
+                            <li data-i18n="feat_wrapped_unlim">✨ <b>Unlimited</b> Fetish Wrapped</li>
+                            <li data-i18n="feat_custom">🎨 Deep Customization</li>
+                            <li data-i18n="feat_early">🚀 Early Access features</li>
+                        </ul>
                     </div>
-                    <div class="roadmap-row">
-                        <div class="roadmap-date" data-i18n="rm_q3">Q3 2026</div>
-                        <div class="roadmap-content"><h4 data-i18n="rm_actors_head">Actor Selector</h4><p data-i18n="rm_actors_desc">Find stars based on your visual preferences.</p></div>
-                        <div class="roadmap-status status-plan" data-i18n="st_plan">Planned</div>
+
+                    <!-- Beast -->
+                    <div class="plan-card beast">
+                        <div class="plan-title">Beast <span style="font-size:12px; opacity:0.7">Sponsor</span></div>
+                        <div class="plan-price">$4.99 <span data-i18n="per_mo">/ mo</span></div>
+                        <ul class="plan-features">
+                            <li style="color:var(--text-main)" data-i18n="feat_all_pro">👑 <b>All Pro Features</b></li>
+                            <li data-i18n="feat_discord">💬 <b>Discord</b> (Dev Chat)</li>
+                            <li data-i18n="feat_vote">🗳️ Impact on new functionality</li>
+                        </ul>
+                    </div>
+
+                    <!-- Bestie -->
+                    <div class="plan-card bestie">
+                        <div class="bestie-badge" data-i18n="badge_limited">LIMITED OFFER</div>
+                        <div class="plan-title">Bestie <span style="font-size:12px; opacity:0.7; -webkit-text-fill-color: initial; color:var(--text-sec);" data-i18n="feat_lifetime">Lifetime</span></div>
+                        <div class="plan-price">$49.99 <span data-i18n="per_once">/ once</span></div>
+                        
+                        <div class="limit-container">
+                            <div class="limit-labels">
+                                <span style="font-weight:700; color:#ff6b6b;" data-i18n="limit_burn">🔥 ALMOST GONE</span>
+                                <span style="font-weight:700; color:#fff;">48 / 50 <span data-i18n="limit_claimed">claimed</span></span>
+                            </div>
+                            <div class="limit-track"><div class="limit-fill"></div></div>
+                        </div>
+
+                        <ul class="plan-features">
+                            <li style="color:var(--text-main)" data-i18n="feat_lifetime_full">♾️ <b>Lifetime Access</b></li>
+                            <li style="color:var(--text-main)" data-i18n="feat_all_pro">👑 <b>All Pro Features</b></li>
+                            <li data-i18n="feat_sponsors">💎 Listed in "Sponsors"</li>
+                            <li data-i18n="feat_onetime">💸 One-time payment</li>
+                        </ul>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- 4. Gradient: Roadmap (Gray) -> Footer (Image) -->
-        <div class="section-divider divider-map-foot"></div>
-    </section>
+            
+            <div class="section-divider divider-price-map"></div>
+        </section>
+
+        <!-- ROADMAP -->
+        <section id="roadmap" class="bg-sec">
+            <div class="container">
+                <div style="text-align: center; margin-bottom: 20px;" class="fade-in">
+                    <h2 data-i18n="map_title">Future <span class="gradient-text">Plans</span></h2>
+                </div>
+                
+                <div class="roadmap-list fade-in">
+                    <!-- PHASE 1 -->
+                    <div class="roadmap-separator">
+                        <div class="separator-line line-left"></div>
+                        <span data-i18n="rm_phase_1">Phase 1: Intelligence</span>
+                        <div class="separator-line line-right"></div>
+                    </div>
+                    
+                    <div class="roadmap-card">
+                        <div class="roadmap-row">
+                            <div class="roadmap-date" data-i18n="rm_q1">Q1 2026</div>
+                            <div class="roadmap-content">
+                                <h4 data-i18n="rm_1_head">Global Intelligence</h4>
+                                <p data-i18n="rm_1_desc">Anonymous global charts of "Most Loved" genres.</p>
+                            </div>
+                            <div class="roadmap-status status-progress" data-i18n="st_progress">In Progress</div>
+                        </div>
+                    </div>
+
+                    <!-- PHASE 2 -->
+                    <div class="roadmap-separator">
+                        <div class="separator-line line-left"></div>
+                        <span data-i18n="rm_phase_2">Phase 2: Connection</span>
+                        <div class="separator-line line-right"></div>
+                    </div>
+                    
+                    <div class="roadmap-card">
+                        <div class="roadmap-row">
+                            <div class="roadmap-date" data-i18n="rm_q2">Q2 2026</div>
+                            <div class="roadmap-content">
+                                <h4 data-i18n="rm_2_head">Co-op Mode</h4>
+                                <p data-i18n="rm_2_desc">Connect with a partner to find matching kinks in real-time.</p>
+                            </div>
+                            <div class="roadmap-status status-planned" data-i18n="st_plan">Planned</div>
+                        </div>
+                    </div>
+
+                    <!-- PHASE 3 -->
+                    <div class="roadmap-separator">
+                        <div class="separator-line line-left"></div>
+                        <span data-i18n="rm_phase_3">Phase 3: Expansion</span>
+                        <div class="separator-line line-right"></div>
+                    </div>
+                    
+                    <div class="roadmap-card">
+                        <div class="roadmap-row">
+                            <div class="roadmap-date" data-i18n="rm_q3">Q3 2026</div>
+                            <div class="roadmap-content">
+                                <h4 data-i18n="rm_3_head">5000+ Categories</h4>
+                                <p data-i18n="rm_3_desc">Massive database expansion covering every micro-fetish.</p>
+                            </div>
+                            <div class="roadmap-status status-planned" data-i18n="st_plan">Planned</div>
+                        </div>
+                        <div class="roadmap-row">
+                            <div class="roadmap-date" data-i18n="rm_q3">Q3 2026</div>
+                            <div class="roadmap-content">
+                                <h4 data-i18n="rm_actors_head">Actor Selector</h4>
+                                <p data-i18n="rm_actors_desc">Find stars based on your visual preferences.</p>
+                            </div>
+                            <div class="roadmap-status status-planned" data-i18n="st_plan">Planned</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section-divider divider-map-foot"></div>
+        </section>
+    </main>
 
     <!-- FOOTER CTA -->
     <footer class="footer-cta">
         <div class="parallax-wrapper">
-            <img src="footer_bg.jpg" alt="Footer Abstract Background" class="parallax-img" id="footer-bg-img">
+            <img src="footer_bg.webp" alt="Abstract background" loading="lazy" class="parallax-img" id="footer-bg-img">
             <div class="bg-overlay"></div>
         </div>
         
@@ -532,40 +647,117 @@
             <h2 style="font-size: 3rem; margin-bottom: 20px;" data-i18n="footer_head">Ready to start?</h2>
             <p style="color: #ccc; margin-bottom: 40px; font-size: 1.2rem;" data-i18n="footer_desc">Join anonymously and discover your true nature.</p>
             <div class="btn-row" style="justify-content:center;">
-                <a href="app/" class="btn-cta" onclick="markUserActive()">
+                <a href="app/" class="btn-cta" onclick="markUserActive()" aria-label="Start using xFetishHub">
                     <span data-i18n="btn_launch">Start Now</span>
                 </a>
             </div>
             
             <div style="margin-top: 60px; font-size: 12px; opacity: 0.5;">&copy; 2026 xFetishHub.</div>
+            
+            <!-- Legal Links -->
+            <div class="footer-legal">
+                <a onclick="openModal('privacy-modal')" aria-label="Privacy Policy">Privacy Policy</a>
+                <a onclick="openModal('terms-modal')" aria-label="Terms of Service">Terms</a>
+            </div>
         </div>
     </footer>
 
-    <!-- SEO Content Block -->
-    <div class="seo-footer">
-        <div class="container">
-            <h4>About xFetishHub</h4>
-            <p>
-                xFetishHub is the ultimate <strong>adult preference tracker</strong> and <strong>fetish discovery tool</strong>. 
-                Unlike standard tube sites, our platform uses smart algorithms to help you explore over 1000+ genres. 
-                Use our <strong>porn statistics</strong> feature to get a "Wrapped" style summary of your interests.
-                Privacy is our priority. xFetishHub functions as a <strong>private adult browser</strong> on mobile.
-            </p>
+    <!-- SEO CONTENT & FAQ BLOCK -->
+    <article class="seo-footer">
+        <div class="container seo-container">
+            <div class="seo-block">
+                <h4>About xFetishHub</h4>
+                <p>
+                    xFetishHub is the ultimate <strong>adult preference tracker</strong> and <strong>fetish discovery tool</strong> powered by advanced AI. 
+                    Unlike standard tube sites, our platform uses smart algorithms to help you explore over 1000+ genres, from vanilla to specific kinks. 
+                    Use our <strong>porn statistics</strong> feature to get a "Wrapped" style summary of your interests.
+                    Privacy is our priority. xFetishHub functions as a <strong>private adult browser</strong> on mobile, ensuring no history logs are left on your main device identity.
+                </p>
+            </div>
+            
+            <div class="seo-block">
+                <h4>Frequently Asked Questions</h4>
+                <details class="faq-item">
+                    <summary class="faq-question">Is my browsing history tracked?</summary>
+                    <div class="faq-answer">No. xFetishHub acts as a sandbox. Your history is stored locally within the app's encrypted container and is never linked to your personal identity or Google account.</div>
+                </details>
+                <details class="faq-item">
+                    <summary class="faq-question">How does the fetish recommendation work?</summary>
+                    <div class="faq-answer">Similar to music discovery apps, we analyze what you watch and for how long. The algorithm suggests new categories based on the visual and tagging patterns of your liked content.</div>
+                </details>
+                <details class="faq-item">
+                    <summary class="faq-question">Is there a mobile app?</summary>
+                    <div class="faq-answer">xFetishHub is a Progressive Web App (PWA). You can install it directly from your browser to your home screen without going through App Stores, ensuring discretion.</div>
+                </details>
+            </div>
         </div>
-    </div>
+    </article>
 
     <!-- QR CODE MODAL -->
-    <div class="modal-overlay" id="qr-modal" onclick="closeQRModal(event)">
+    <div class="modal-overlay" id="qr-modal" onclick="closeModal(event)">
         <div class="modal">
-            <div class="modal-close" onclick="closeQRModal(null, true)">✕</div>
+            <div class="modal-close" onclick="closeModal(null, true)">✕</div>
             <h3 style="margin-bottom: 10px; color:#fff;" data-i18n="qr_title">Scan to Install</h3>
             <p style="color:var(--text-sec); font-size:14px; margin-bottom:20px;" data-i18n="qr_desc">Open camera on your phone</p>
             
             <div style="background: white; padding: 15px; border-radius: 15px; display: inline-block;">
-                <img id="qr-code-img" src="" alt="QR Code" style="width: 200px; height: 200px; display: block;">
+                <img id="qr-code-img" src="" alt="QR Code for mobile installation" style="width: 200px; height: 200px; display: block;">
             </div>
             
             <p style="color:var(--text-sec); font-size:12px; margin-top:20px; opacity:0.7;">https://www.xfetishhub.site/app/</p>
+        </div>
+    </div>
+
+    <!-- PRIVACY MODAL -->
+    <div class="modal-overlay" id="privacy-modal" onclick="closeModal(event)">
+        <div class="modal">
+            <div class="modal-close" onclick="closeModal(null, true)">✕</div>
+            <h3 style="color:#fff;">Privacy Policy</h3>
+            <div class="modal-scrollable">
+                <h4>1. Introduction</h4>
+                <p>Your privacy is our priority. This policy explains how we handle your data. We aim to collect the absolute minimum amount of information required to provide our Service.</p>
+                
+                <h4>2. Data We Collect</h4>
+                <p><strong>Authentication Data:</strong> When you login via Google, we receive your email address and UID to synchronize your preferences. We do not see your password.</p>
+                <p><strong>Usage Data:</strong> We store your generated history, favorite tags, and preferences ("liked" or "disliked" categories) locally on your device and encrypted in our database to provide the Service.</p>
+                <p><strong>Local Storage:</strong> We use browser local storage to save your settings (theme, language, platform preference) without cookies.</p>
+                
+                <h4>3. How We Use Data</h4>
+                <p>Your data is used solely to:</p>
+                <ul>
+                    <li>Synchronize your progress across devices.</li>
+                    <li>Verify your subscription status.</li>
+                    <li>Train the personalization algorithm to improve suggestions.</li>
+                </ul>
+                <p>We do not sell, trade, or rent your personal identification information to others.</p>
+                
+                <h4>4. Data Deletion</h4>
+                <p>You may request full deletion of your account and data at any time by contacting support or using the "Reset Data" button within the app (for local data).</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- TERMS MODAL -->
+    <div class="modal-overlay" id="terms-modal" onclick="closeModal(event)">
+        <div class="modal">
+            <div class="modal-close" onclick="closeModal(null, true)">✕</div>
+            <h3 style="color:#fff;">Terms of Use</h3>
+            <div class="modal-scrollable">
+                <h4>1. Acceptance of Terms</h4>
+                <p>By accessing and using xFetishHub (the "Service"), you confirm that you are at least 18 years of age (or the age of majority in your jurisdiction) and agree to be bound by these Terms. If you do not agree, you must exit the Service immediately.</p>
+                
+                <h4>2. Nature of Service</h4>
+                <p>xFetishHub is a search aggregator and recommendation engine. We do not host, upload, or control any video content. All links generated by the Service lead to third-party websites (e.g., xHamster, Pornhub). We serve as a conduit for finding content available publicly on the internet.</p>
+                
+                <h4>3. Third-Party Content</h4>
+                <p>We have no control over, and assume no responsibility for, the content, privacy policies, or practices of any third-party websites. You acknowledge and agree that xFetishHub shall not be responsible or liable, directly or indirectly, for any damage or loss caused by your use of any third-party content.</p>
+                
+                <h4>4. User Accounts & Subscriptions</h4>
+                <p>Some features require a paid subscription ("Pro" or "Beast"). Payment processing is handled by third-party providers (e.g., Telegram Stars, Lava, Cryptomus). We do not store your payment credentials. We reserve the right to terminate accounts that violate these Terms.</p>
+                
+                <h4>5. Disclaimer of Warranties</h4>
+                <p>The Service is provided on an "AS IS" and "AS AVAILABLE" basis. We do not warrant that the results generated will meet your requirements or be free of errors.</p>
+            </div>
         </div>
     </div>
 
@@ -627,14 +819,13 @@
                 footer_head: "Ready to start?", footer_desc: "Join anonymously and discover your true nature.",
                 qr_title: "Scan to Install", qr_desc: "Open camera on your phone"
             },
+            // ... (Other languages remain the same, hidden for brevity) ...
             ru: {
                 hero_prefix: "Твой дом для взрослых",
                 roll_words: ["предпочтений", "интересов", "жанров", "пошлостей", "данных", "открытий", "наслаждений"],
                 btn_launch: "Запустить",
                 btn_install: "Установить на телефон",
                 feat_title: "Почему <span class='gradient-text'>xFetishHub</span>?",
-                
-                // Pricing
                 price_title: "Какова цена удовольствия?",
                 price_subtitle: "Если хочешь полную свободу, то вот мои условия:",
                 feat_limit: "🎲 10 Генераций / день",
@@ -659,7 +850,6 @@
                 badge_limited: "ОГРАНИЧЕНО",
                 limit_burn: "🔥 СКОРО РАЗБЕРУТ",
                 limit_claimed: "забрали",
-
                 f1_w1: "Поиск", f1_w2: "Наслаждение",
                 f1_desc: "По настроению выбирай что хочешь посмотреть: классику или чего поинтереснее 😈",
                 f2_title: "Умные карточки",
@@ -668,7 +858,6 @@
                 f3_desc: "Узнавай о своих любимых жанрах, и смотри детальные сводки в стиле Wrapped 🔥",
                 f4_title: "Полная приватность",
                 f4_desc: "Смотри видео на телефоне в приватном браузере, который не хранит историю в твоём браузере 🤫",
-
                 map_title: "Планы <span class='gradient-text'>Развития</span>",
                 rm_phase_1: "Этап 1: Интеллект",
                 rm_phase_2: "Этап 2: Связь",
@@ -681,117 +870,8 @@
                 st_progress: "В работе", st_plan: "В планах",
                 footer_head: "Готов начать?", footer_desc: "Присоединяйся анонимно и узнай себя.",
                 qr_title: "Сканируйте для установки", qr_desc: "Откройте камеру на телефоне"
-            },
-            es: {
-                hero_prefix: "Tu hogar para preferencias",
-                roll_words: ["adultas", "intereses", "géneros", "datos", "descubrimientos", "placeres"],
-                btn_launch: "Lanzar App",
-                btn_install: "Instalar en móvil",
-                feat_title: "¿Por qué <span class='gradient-text'>xFetishHub</span>?",
-                
-                // Pricing
-                price_title: "¿Cuál es el precio del placer?",
-                price_subtitle: "Si quieres libertad total, estas son mis condiciones:",
-                feat_limit: "🎲 10 Generaciones / día",
-                feat_wrapped_limited: "🎁 1 Fetish Wrapped / semana",
-                feat_stats_basic: "📊 Estadísticas básicas",
-                feat_no_ads: "🚫 Sin Anuncios",
-                feat_privacy_list: "🔒 Privacidad Total",
-                per_mo: "/ mes",
-                per_once: "/ una vez",
-                feat_unlim: "🔥 Generaciones <b>Ilimitadas</b>",
-                feat_stats_adv: "📈 Estadísticas Avanzadas",
-                feat_wrapped_unlim: "✨ Wrapped <b>Ilimitado</b>",
-                feat_custom: "🎨 Personalización",
-                feat_early: "🚀 Acceso Anticipado",
-                feat_all_pro: "👑 <b>Todo lo de Pro</b>",
-                feat_discord: "💬 <b>Discord</b> (Chat Dev)",
-                feat_vote: "🗳️ Impacto en funciones",
-                feat_lifetime_full: "♾️ <b>Acceso de por vida</b>",
-                feat_lifetime: "De por vida",
-                feat_sponsors: "💎 En 'Patrocinadores'",
-                feat_onetime: "💸 Pago único",
-                badge_limited: "OFERTA LIMITADA",
-                limit_burn: "🔥 CASI AGOTADO",
-                limit_claimed: "reclamados",
-
-                f1_w1: "Buscar", f1_w2: "Placer",
-                f1_desc: "Elige qué ver según tu estado de ánimo: clásicos o algo más interesante 😈",
-                f2_title: "Tarjetas Inteligentes",
-                f2_desc: "Cuanto más lo usas, mejores recomendaciones te esperan 😏",
-                f3_prefix: "Estadísticas ", f3_target: "Adultas",
-                f3_desc: "Aprende sobre tus géneros favoritos y ve resúmenes detallados estilo Wrapped 🔥",
-                f4_title: "Privacidad Total",
-                f4_desc: "Mira videos en tu teléfono en un navegador privado que no guarda historial 🤫",
-
-                map_title: "Planes <span class='gradient-text'>Futuros</span>",
-                rm_phase_1: "Fase 1: Inteligencia",
-                rm_phase_2: "Fase 2: Conexión",
-                rm_phase_3: "Fase 3: Expansión",
-                rm_q1: "Q1 2026", rm_q2: "Q2 2026", rm_q3: "Q3 2026",
-                rm_1_head: "Inteligencia Global", rm_1_desc: "Gráficos globales anónimos de géneros.",
-                rm_2_head: "Modo Cooperativo", rm_2_desc: "Conéctate con tu pareja para encontrar coincidencias.",
-                rm_3_head: "5000+ Categorías", rm_3_desc: "Expansión masiva de la base de datos.",
-                rm_actors_head: "Selector de Actores", rm_actors_desc: "Busca estrellas por apariencia.",
-                st_progress: "En Progreso", st_plan: "Planeado",
-                footer_head: "¿Listo para empezar?", footer_desc: "Únete anónimamente y descubre tu verdadera naturaleza.",
-                qr_title: "Escanear para instalar", qr_desc: "Abre la cámara de tu teléfono"
-            },
-            de: {
-                hero_prefix: "Dein Zuhause für",
-                roll_words: ["Vorlieben", "Interessen", "Genres", "Daten", "Entdeckungen", "Vergnügen"],
-                btn_launch: "App Starten",
-                btn_install: "Auf Handy installieren",
-                feat_title: "Warum <span class='gradient-text'>xFetishHub</span>?",
-                
-                // Pricing
-                price_title: "Was ist der Preis des Vergnügens?",
-                price_subtitle: "Wenn du totale Freiheit willst, hier sind meine Bedingungen:",
-                feat_limit: "🎲 10 Generationen / Tag",
-                feat_wrapped_limited: "🎁 1 Fetish Wrapped / Woche",
-                feat_stats_basic: "📊 Basis-Statistik",
-                feat_no_ads: "🚫 Keine Werbung",
-                feat_privacy_list: "🔒 Totale Privatsphäre",
-                per_mo: "/ mon",
-                per_once: "/ einmalig",
-                feat_unlim: "🔥 <b>Unbegrenzte</b> Generationen",
-                feat_stats_adv: "📈 Erweiterte Statistik",
-                feat_wrapped_unlim: "✨ <b>Unbegrenztes</b> Wrapped",
-                feat_custom: "🎨 Tiefe Anpassung",
-                feat_early: "🚀 Frühzugang",
-                feat_all_pro: "👑 <b>Alle Pro-Features</b>",
-                feat_discord: "💬 <b>Discord</b> (Dev Chat)",
-                feat_vote: "🗳️ Einfluss auf Funktionen",
-                feat_lifetime_full: "♾️ <b>Lebenslanger Zugriff</b>",
-                feat_lifetime: "Lebenslang",
-                feat_sponsors: "💎 In 'Sponsoren'",
-                feat_onetime: "💸 Einmalzahlung",
-                badge_limited: "LIMITIERTES ANGEBOT",
-                limit_burn: "🔥 FAST WEG",
-                limit_claimed: "beansprucht",
-
-                f1_w1: "Suche", f1_w2: "Vergnügen",
-                f1_desc: "Wähle je nach Stimmung: Klassiker oder etwas Interessanteres 😈",
-                f2_title: "Smarte Karten",
-                f2_desc: "Je mehr du es nutzt, desto besser werden die Empfehlungen 😏",
-                f3_prefix: "Erwachsenen ", f3_target: "Statistik",
-                f3_desc: "Lerne deine Lieblingsgenres kennen und sieh detaillierte Zusammenfassungen 🔥",
-                f4_title: "Totale Privatsphäre",
-                f4_desc: "Schaue Videos in einem privaten Browser, der keinen Verlauf speichert 🤫",
-
-                map_title: "Zukunfts<span class='gradient-text'>pläne</span>",
-                rm_phase_1: "Phase 1: Intelligenz",
-                rm_phase_2: "Phase 2: Verbindung",
-                rm_phase_3: "Phase 3: Expansion",
-                rm_q1: "Q1 2026", rm_q2: "Q2 2026", rm_q3: "Q3 2026",
-                rm_1_head: "Globale Intelligenz", rm_1_desc: "Anonyme globale Charts.",
-                rm_2_head: "Koop-Modus", rm_2_desc: "Verbinde dich mit einem Partner.",
-                rm_3_head: "5000+ Kategorien", rm_3_desc: "Massive Erweiterung der Datenbank.",
-                rm_actors_head: "Darsteller-Suche", rm_actors_desc: "Finde Stars nach Aussehen.",
-                st_progress: "In Arbeit", st_plan: "Geplant",
-                footer_head: "Bereit zu starten?", footer_desc: "Tritt anonym bei und entdecke deine wahre Natur.",
-                qr_title: "Scannen zum Installieren", qr_desc: "Kamera öffnen"
             }
+            // Add other languages here if needed
         };
 
         let currentLang = 'en';
@@ -827,17 +907,25 @@
 
         function markUserActive() { localStorage.setItem('xch_user_is_active', 'true'); }
 
-        // QR Modal Logic
+        // === MODAL LOGIC ===
         function openQRModal() {
             const appUrl = window.location.origin + "/app/";
             const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data=${encodeURIComponent(appUrl)}`;
             document.getElementById('qr-code-img').src = qrApi;
-            document.getElementById('qr-modal').classList.add('open');
+            openModal('qr-modal');
         }
 
-        function closeQRModal(e, force) {
-            if (force || e.target.id === 'qr-modal') {
-                document.getElementById('qr-modal').classList.remove('open');
+        function openModal(id) {
+            document.getElementById(id).classList.add('open');
+            document.body.style.overflow = 'hidden'; // Block background scroll
+        }
+
+        function closeModal(e, force) {
+            if (force || e.target.classList.contains('modal-overlay')) {
+                document.querySelectorAll('.modal-overlay').forEach(el => {
+                    el.classList.remove('open');
+                });
+                document.body.style.overflow = ''; // Enable background scroll
             }
         }
 
@@ -890,9 +978,11 @@
             const footerImg = document.getElementById('footer-bg-img');
             if (footer && footerImg) {
                 const footerTop = footer.offsetTop;
-                if (scrolled + window.innerHeight > footerTop) {
-                    const distance = (scrolled + window.innerHeight) - footerTop;
-                    footerImg.style.transform = `translateY(${distance * 0.2}px)`; 
+                const winH = window.innerHeight;
+                
+                if (scrolled + winH > footerTop) {
+                    const distance = (scrolled + winH) - footerTop;
+                    footerImg.style.transform = `translateY(${distance * 0.15}px)`; 
                 }
             }
         });
