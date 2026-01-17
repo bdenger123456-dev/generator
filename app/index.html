@@ -5272,10 +5272,10 @@
             deco_label: "Show Decorations",
 
             mode_greeting_hint: [
-                "Explore 🔭, Enjoy 🥰, or Ask 🎙️?",
-                "Trust the dice 🔭, your history 🥰, or your voice 🎙️?",
-                "Something new 🔭, familiar 🥰, or specific 🎙️?",
-                "Roll the dice 🔭, replay hits 🥰, or say what you want 🎙️?"
+                "Explore 🔭, Enjoy 🥰, or a Wish ✨?",
+                "Trust the dice 🔭, your history 🥰, or AI ✨?",
+                "Something new 🔭, familiar 🥰, or specific ✨?",
+                "Roll the dice 🔭, replay hits 🥰, or describe a fantasy ✨?"
             ],
             mode_explore: "Explore",
             mode_pleasure: "Pleasure",
@@ -5681,10 +5681,10 @@
             deco_label: "Показывать декор",
 
             mode_greeting_hint: [
-                "Поиск 🔭, Любимое 🥰 или Запрос 🎙️?",
-                "Доверься случаю 🔭, опыту 🥰 или голосу 🎙️?",
-                "Что-то новое 🔭, знакомое 🥰 или конкретное 🎙️?",
-                "Рискнем 🔭, повторим 🥰 или скажешь сам 🎙️?"
+                "Поиск 🔭, Любимое 🥰 или Желание ✨?",
+                "Доверься случаю 🔭, опыту 🥰 или Магии ✨?",
+                "Что-то новое 🔭, знакомое 🥰 или конкретная фантазия ✨?",
+                "Рискнем 🔭, повторим 🥰 или загадаешь сам ✨?"
             ],
 
             mode_explore: "Исследование",
@@ -6085,9 +6085,9 @@
             deco_label: "Mostrar decoración",
 
             mode_greeting_hint: [
-                "¿Explorar 🔭, Disfrutar 🥰 o Pedir 🎙️?",
-                "¿Confiar en el azar 🔭, tu historia 🥰 o tu voz 🎙️?",
-                "¿Algo nuevo 🔭, familiar 🥰 o específico 🎙️?"
+                "¿Explorar 🔭, Disfrutar 🥰 o una Fantasía ✨?",
+                "¿Confiar en el azar 🔭, tu historia 🥰 o la Magia ✨?",
+                "¿Algo nuevo 🔭, familiar 🥰 o específico ✨?"
             ],
             mode_explore: "Explorar",
             mode_pleasure: "Placer",
@@ -6479,9 +6479,9 @@
             deco_label: "Dekoration anzeigen",
 
             mode_greeting_hint: [
-                "Erkunden 🔭, Genießen 🥰 oder Fragen 🎙️?",
-                "Zufall 🔭, Geschichte 🥰 oder Stimme 🎙️?",
-                "Etwas Neues 🔭, Bekanntes 🥰 oder Spezifisches 🎙️?"
+                "Erkunden 🔭, Genießen 🥰 oder ein Wunsch ✨?",
+                "Zufall 🔭, Geschichte 🥰 oder Magie ✨?",
+                "Etwas Neues 🔭, Bekanntes 🥰 oder Spezifisches ✨?"
             ],
             mode_explore: "Erkunden",
             mode_pleasure: "Genießen",
@@ -7606,36 +7606,65 @@
         isFirstGen = false; 
         hasInteractedWithCurrent = false; 
         hasWatchedCurrentItem = false; 
+        // Важно: отключаем режим выбора, чтобы свайпы работали как Лайк/Дизлайк
+        isModeSelectionActive = false; 
 
-        // 2. СКРЫВАЕМ КНОПКУ СТАРТА И ПОКАЗЫВАЕМ ИНТЕРФЕЙС
-        // Если пользователь зашел сразу в историю, не нажимая "Let's Go", эти элементы могут быть не в том состоянии.
+        // === ОЧИСТКА НАЧАЛЬНОГО ЭКРАНА ===
+        const startOverlay = document.getElementById('mode-start-overlay');
+        const assistantUI = document.getElementById('assistant-ui');
+        const thinkingUI = document.getElementById('thinking-ui');
         const startBtn = document.getElementById('start-btn-container');
-        if(startBtn) {
+
+        // Жестко скрываем оверлей с треугольником
+        if (startOverlay) {
+            startOverlay.classList.add('hidden');
+            startOverlay.style.display = 'none'; // Принудительно
+            startOverlay.style.opacity = '0';
+            startOverlay.style.pointerEvents = 'none';
+        }
+        
+        // Скрываем UI ассистента и думания (на случай если остались)
+        if (assistantUI) assistantUI.classList.remove('visible');
+        if (thinkingUI) thinkingUI.style.display = 'none';
+
+        // Скрываем старую кнопку "Поехали"
+        if (startBtn) {
             startBtn.classList.add('hidden-initial');
             startBtn.style.display = 'none';
         }
+        // ========================================================
 
-        // Убеждаемся, что обертка карточки на месте
+        // 2. СБРОС СЛОТ-МАШИНЫ (Убираем бегущую строку Idle)
+        const reel = document.getElementById('slot-reel');
+        if (reel) {
+            reel.className = 'slot-reel'; // Убираем класс 'idle'
+            reel.style.transform = '';    // Сбрасываем позицию
+            reel.innerHTML = '';          // Очищаем старый текст
+        }
+
+        // 3. АНИМАЦИЯ ПОЯВЛЕНИЯ КАРТОЧКИ
         const wrapper = document.getElementById('card-anim-wrapper');
         if(wrapper) {
             wrapper.style.transform = '';
             wrapper.style.opacity = '1';
-            // Добавляем легкую анимацию появления (Fly In Left), чтобы было понятно, что контент сменился
-            wrapper.classList.remove('anim-fly-left', 'anim-fly-right');
-            void wrapper.offsetWidth; // Триггер перерисовки
-            wrapper.classList.add('anim-fly-left');
+            
+            // Если это не прямой ввод (а например из истории), делаем анимацию
+            if (mode !== 'ai_request') {
+                wrapper.classList.remove('anim-fly-left', 'anim-fly-right');
+                void wrapper.offsetWidth; // Триггер перерисовки
+                wrapper.classList.add('anim-fly-left');
+            }
         }
 
-        // 3. СКРОЛЛ НАВЕРХ
+        // 4. СКРОЛЛ НАВЕРХ
         const mainContent = document.querySelector('.main-content') || document.querySelector('.tab-content.active');
         if(mainContent) mainContent.scrollTop = 0;
         
+        // Логика истории
         addToHistory(item);
-        
-        // Запись в лог
         logActivity('gen', item.id, item.tags);
 
-        // 4. РЕНДЕР
+        // 5. РЕНДЕР
         renderResultUI(item, mode);
         
         // Снимаем класс анимации через секунду
@@ -11136,6 +11165,10 @@
             lastGeneratedItem = null;
             isFirstGen = true; 
             sessionHistoryStack = []; 
+
+            // Очистка поля AI
+            const aiInput = document.getElementById('ai-input');
+            if (aiInput) aiInput.value = '';
 
             // 3. СБРОС ИНТЕРФЕЙСА (Скрываем результаты)
             const uiToHide = ['result-desc', 'tinder-controls', 'mods-block', 'related-block'];
