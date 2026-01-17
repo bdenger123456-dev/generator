@@ -1,27 +1,33 @@
 {
   "name": "xFetishHub",
   "short_name": "FetishHub",
+  "description": "Discover, Analyze & Watch. Your Private Adult Guide.",
+  "id": "/app/",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#050505",
   "theme_color": "#050505",
-  "orientation": "portrait",
+  "orientation": "portrait-primary",
+  "categories": ["entertainment", "lifestyle"],
   "icons": [
     {
       "src": "logo.png",
       "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "logo.png",
-      "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "logo.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
