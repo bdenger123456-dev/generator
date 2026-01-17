@@ -11145,13 +11145,13 @@
     }
 
     function resetToHome() {
-        // Если мы уже на стартовом экране или идет генерация — выходим
-        if (!currentItem || isGenerating) return;
+        // Если идет генерация — не прерываем
+        if (isGenerating) return;
 
         const wrapper = document.getElementById('card-anim-wrapper');
         const card = document.getElementById('card-block');
         
-        // 1. АНИМАЦИЯ УХОДА (Улетает влево)
+        // 1. АНИМАЦИЯ УХОДА ТЕКУЩЕЙ КАРТОЧКИ
         if (wrapper) {
             wrapper.style.transition = 'transform 0.4s ease-in, opacity 0.4s';
             wrapper.style.transform = 'translateX(-150%) rotate(-10deg)';
@@ -11166,11 +11166,7 @@
             isFirstGen = true; 
             sessionHistoryStack = []; 
 
-            // Очистка поля AI
-            const aiInput = document.getElementById('ai-input');
-            if (aiInput) aiInput.value = '';
-
-            // 3. СБРОС ИНТЕРФЕЙСА (Скрываем результаты)
+            // 3. СБРОС ИНТЕРФЕЙСА РЕЗУЛЬТАТОВ
             const uiToHide = ['result-desc', 'tinder-controls', 'mods-block', 'related-block'];
             uiToHide.forEach(id => {
                 const el = document.getElementById(id);
@@ -11183,16 +11179,20 @@
             // Очищаем бейджи и статус
             document.getElementById('badge-wrapper').innerHTML = '';
             const statusEl = document.getElementById('status-text');
-            if(statusEl) statusEl.innerText = ''; // Очищаем верхний текст
+            if(statusEl) statusEl.innerText = ''; 
 
-            // Сброс классов карточки
+            // Сброс классов карточки (цвета рамок и т.д.)
             if(card) {
                 card.classList.remove('has-results', 'flash-active', 'status-wl', 'status-fav', 'status-ban');
+                card.style.transform = ''; 
+                // Важно: сбрасываем фильтры (блюр), если они остались
+                card.style.filter = 'none';
+                
                 const notch = document.getElementById('card-notch');
                 if(notch) notch.classList.remove('visible');
             }
 
-            // Запускаем "Холостой ход" слотов
+            // Запускаем "Холостой ход" слотов (бегущая строка)
             initIdleSlot();
             randomizeDecorations();
 
@@ -11208,37 +11208,57 @@
                 }
             });
 
+            // === 4. ВОССТАНОВЛЕНИЕ НАЧАЛЬНОГО ЭКРАНА (FIX) ===
             const totalInteractions = favorites.length + blacklist.length;
             const startBtn = document.getElementById('start-btn-container');
             const overlay = document.getElementById('mode-start-overlay');
+            
+            // Гарантированно закрываем UI ассистента и думания
+            document.getElementById('assistant-ui').classList.remove('visible');
+            document.getElementById('thinking-ui').style.display = 'none';
+            document.getElementById('ai-input').value = ''; // Чистим поле
 
             if (totalInteractions >= 10) {
-                // ВАРИАНТ А: Опытный пользователь -> Показываем ВЫБОР РЕЖИМА
+                // --- ВАРИАНТ А: Опытный (Выбор режимов) ---
                 
-                // 1. Обновляем фразу (чтобы не была одной и той же)
                 randomizeModeGreeting(); 
 
-                // 2. Показываем оверлей с кнопками 🔭 и 🥰
                 if(overlay) {
                     overlay.classList.remove('hidden');
+                    
+                    // ПРИНУДИТЕЛЬНО возвращаем стили, которые могли быть скрыты
+                    overlay.style.display = 'flex'; 
                     overlay.style.opacity = '1';
+                    overlay.style.pointerEvents = 'auto';
                     overlay.style.transform = 'scale(1)';
+                    
+                    // Восстанавливаем внутренние элементы (текст и кнопки), если AI их скрыл
+                    const startText = document.getElementById('mode-start-text');
+                    const modeBtns = document.getElementById('mode-buttons-container');
+                    
+                    if(startText) startText.style.opacity = '1';
+                    if(modeBtns) {
+                        modeBtns.style.opacity = '1';
+                        modeBtns.style.pointerEvents = 'auto';
+                    }
                 }
                 
-                // 3. Включаем флаг, чтобы работали свайпы для выбора
                 isModeSelectionActive = true; 
                 
-                // 4. Скрываем старую кнопку "Поехали"
-                if(startBtn) startBtn.style.display = 'none';
+                if(startBtn) {
+                    startBtn.classList.add('hidden-initial');
+                    startBtn.style.display = 'none';
+                }
 
             } else {
-                // ВАРИАНТ Б: Новичок -> Старая кнопка "Поехали"
+                // --- ВАРИАНТ Б: Новичок (Кнопка Let's Go) ---
                 
-                // 1. Скрываем оверлей выбора
-                if(overlay) overlay.classList.add('hidden');
+                if(overlay) {
+                    overlay.classList.add('hidden');
+                    overlay.style.display = 'none'; // Скрываем оверлей полностью
+                }
                 isModeSelectionActive = false;
 
-                // 2. Показываем кнопку "Let's Go"
                 if(startBtn) {
                     startBtn.classList.remove('hidden-initial');
                     startBtn.style.display = 'flex';
@@ -11246,11 +11266,10 @@
                 }
             }
 
-
-            // 6. ВОЗВРАЩЕНИЕ КАРТОЧКИ (Телепорт в центр и Fade In)
+            // 5. ВОЗВРАЩЕНИЕ КАРТОЧКИ (Телепорт в центр и Fade In)
             if (wrapper) {
                 wrapper.style.transition = 'none';
-                wrapper.style.transform = 'scale(0.95)'; // Чуть меньше для эффекта
+                wrapper.style.transform = 'scale(0.95)'; 
                 
                 void wrapper.offsetWidth; // Reflow
 
@@ -11261,7 +11280,7 @@
 
         }, 350);
     }
-
+    
     document.addEventListener("visibilitychange", () => {
         if (document.visibilityState === 'hidden') {
             // Если пользователь залогинен, форсируем сохранение (immediate = true)
