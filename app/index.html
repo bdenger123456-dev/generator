@@ -319,6 +319,47 @@
         body.tab-home-active #tab-home {
             padding-top: 80px !important; 
         }
+
+        /* 1. Скрываем подзаголовок на ВСЕХ вкладках */
+        body.tab-home-active .mobile-header .subtitle,
+        body.tab-settings-active .mobile-header .subtitle,
+        body.tab-account-active .mobile-header .subtitle {
+            display: none !important;
+        }
+
+        /* 2. Превращаем хедер в компактную капсулу на ВСЕХ вкладках */
+        body.tab-home-active .mobile-header,
+        body.tab-settings-active .mobile-header,
+        body.tab-account-active .mobile-header {
+            min-width: auto;
+            width: auto;
+            padding: 8px 20px;      /* Компактные отступы */
+            border-radius: 50px;    /* Полная капсула */
+            min-height: 50px;
+            flex-direction: row;    /* Элементы в строку */
+        }
+
+        /* 3. Уменьшаем размер шрифта логотипа */
+        body.tab-home-active .mobile-header .logo,
+        body.tab-settings-active .mobile-header .logo,
+        body.tab-account-active .mobile-header .logo {
+            font-size: 22px;
+            margin: 0;
+        }
+
+        /* 4. Уменьшаем картинку логотипа */
+        body.tab-home-active .mobile-header .logo-img,
+        body.tab-settings-active .mobile-header .logo-img,
+        body.tab-account-active .mobile-header .logo-img {
+            height: 35px;
+            transform: translateY(0);
+        }
+
+        /* 5. Корректируем отступ контента сверху (так как шапка стала меньше) */
+        body.tab-settings-active #tab-settings,
+        body.tab-account-active #tab-account {
+            padding-top: 90px !important; /* Было 110px, уменьшаем под размер капсулы */
+        }
         
         .subtitle {
             font-size: 11px; 
