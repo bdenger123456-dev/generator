@@ -3125,6 +3125,49 @@
             transition: filter 0.3s ease;
         }
 
+        /* Стили для иконок внутри кнопок действий */
+        .action-icon-img {
+            width: 50%;
+            height: 50%;
+            object-fit: contain;
+            pointer-events: none;
+            
+            /* Темная тема (Default): Инвертируем черный в белый */
+            filter: invert(1);
+            transition: filter 0.3s ease;
+        }
+
+        /* Кнопка WATCH: Всегда белая иконка (т.к. фон цветной) */
+        .t-circle-btn.watch .action-icon-img {
+            filter: brightness(0) invert(1) !important;
+            width: 45%; /* Чуть меньше для Play */
+            height: 45%;
+            margin-left: 2px; /* Визуальная коррекция для треугольника */
+        }
+
+        /* Светлая тема: Иконки черные (кроме Watch) */
+        body.light-theme .action-icon-img {
+            filter: invert(0);
+        }
+        body.light-theme .t-circle-btn.watch .action-icon-img {
+            filter: brightness(0) invert(1) !important; /* Оставляем белой */
+        }
+
+        /* Watch Later ACTIVE: Когда кнопка синяя, иконка должна быть белой */
+        .t-circle-btn.wl.active .action-icon-img {
+            filter: brightness(0) invert(1) !important;
+        }
+
+        /* Тема NOIR */
+        body[data-theme="noir"] .action-icon-img {
+            filter: invert(1) !important;
+        }
+        /* В Noir при нажатии фон белый, иконка должна стать черной */
+        body[data-theme="noir"] .t-circle-btn:active .action-icon-img,
+        body[data-theme="noir"] .t-circle-btn.active .action-icon-img {
+            filter: invert(0) !important;
+        }
+
         body.light-theme .side-icon-img {
             filter: invert(0) drop-shadow(0 0 2px rgba(0, 0, 0, 0.1));
         }
@@ -3500,13 +3543,33 @@
                                     </button>
                                 </div>
 
-                                <!-- 2. КНОПКИ TINDER (Скрыты в начале) -->
+                                <!-- 2. КНОПКИ УПРАВЛЕНИЯ -->
                                 <div class="tinder-nav-row hidden-initial stagger-item delay-4" id="tinder-controls">
-                                    <button class="t-circle-btn small undo" id="btn-t-undo" onclick="undoLastAction()">↺</button>
-                                    <button class="t-circle-btn medium dislike" id="btn-t-pass" onclick="handleSwipeAction('left')">✕</button>
-                                    <a href="#" target="_blank" class="t-circle-btn large watch" id="btn-t-watch" onclick="handleOutboundClick()">▶</a>
-                                    <button class="t-circle-btn medium like" id="btn-t-like" onclick="handleSwipeAction('right')">♥</button>
-                                    <button class="t-circle-btn small wl" id="btn-t-wl" onclick="toggleWatchLater()">🕓</button>
+                                    
+                                    <!-- BACK -->
+                                    <button class="t-circle-btn small undo" id="btn-t-undo" onclick="undoLastAction()">
+                                        <img src="back.png" class="action-icon-img" alt="Undo">
+                                    </button>
+                                    
+                                    <!-- DISLIKE -->
+                                    <button class="t-circle-btn medium dislike" id="btn-t-pass" onclick="handleSwipeAction('left')">
+                                        <img src="dislike.png" class="action-icon-img" alt="Pass">
+                                    </button>
+                                    
+                                    <!-- WATCH -->
+                                    <a href="#" target="_blank" class="t-circle-btn large watch" id="btn-t-watch" onclick="handleOutboundClick()">
+                                        <img src="watch.png" class="action-icon-img" alt="Watch">
+                                    </a>
+                                    
+                                    <!-- LIKE -->
+                                    <button class="t-circle-btn medium like" id="btn-t-like" onclick="handleSwipeAction('right')">
+                                        <img src="like.png" class="action-icon-img" alt="Like">
+                                    </button>
+                                    
+                                    <!-- WATCH LATER -->
+                                    <button class="t-circle-btn small wl" id="btn-t-wl" onclick="toggleWatchLater()">
+                                        <img src="watchlater.png" class="action-icon-img" alt="Later">
+                                    </button>
                                 </div>
 
                                 <!-- 3. Модификаторы (Expandable Capsule) -->
@@ -11499,22 +11562,20 @@
             const statusEl = document.getElementById('status-text');
             if(statusEl) statusEl.innerText = ''; 
 
-            // Сброс классов карточки (цвета рамок и т.д.)
+            // Сброс классов карточки
             if(card) {
                 card.classList.remove('has-results', 'flash-active', 'status-wl', 'status-fav', 'status-ban');
                 card.style.transform = ''; 
-                // Важно: сбрасываем фильтры (блюр), если они остались
                 card.style.filter = 'none';
                 
                 const notch = document.getElementById('card-notch');
                 if(notch) notch.classList.remove('visible');
             }
 
-            // Запускаем "Холостой ход" слотов (бегущая строка)
             initIdleSlot();
             randomizeDecorations();
 
-            // Сброс иконок (декора)
+            // Сброс декоративных иконок
             const iconLeft = document.querySelector('.icon-left');
             const iconRight = document.querySelector('.icon-right');
             [iconLeft, iconRight].forEach(icon => {
@@ -11526,39 +11587,45 @@
                 }
             });
 
-            // === 4. ВОССТАНОВЛЕНИЕ НАЧАЛЬНОГО ЭКРАНА ===
+            // === 4. ВОССТАНОВЛЕНИЕ НАЧАЛЬНОГО ЭКРАНА (FIXED) ===
             const totalInteractions = favorites.length + blacklist.length;
             const startBtn = document.getElementById('start-btn-container');
             const overlay = document.getElementById('mode-start-overlay');
             
-            // Гарантированно закрываем UI ассистента и думания
+            // Сброс UI ассистента
             document.getElementById('assistant-ui').classList.remove('visible');
             document.getElementById('thinking-ui').style.display = 'none';
-            document.getElementById('ai-input').value = ''; // Чистим поле
+            document.getElementById('ai-input').value = '';
+
+            // Элементы внутри оверлея
+            const startText = document.getElementById('mode-start-text');
+            const modeBtns = document.getElementById('mode-buttons-container');
+
+            // ПРИНУДИТЕЛЬНЫЙ СБРОС СТИЛЕЙ (Убираем последствия анимаций)
+            if(startText) {
+                startText.classList.remove('fade-out-up');
+                startText.style.opacity = '1';
+                startText.style.display = 'block';
+                startText.style.transform = 'translate(0,0)';
+            }
+            if(modeBtns) {
+                modeBtns.classList.remove('fade-out-up');
+                modeBtns.style.opacity = '1';
+                modeBtns.style.pointerEvents = 'auto';
+                modeBtns.style.display = 'flex';
+                modeBtns.style.transform = 'translate(0,0)';
+            }
 
             if (totalInteractions >= 10) {
-                // --- ВАРИАНТ А: Опытный (Выбор режимов) ---
-                
+                // Опытный: Показываем оверлей режимов
                 randomizeModeGreeting(); 
 
                 if(overlay) {
                     overlay.classList.remove('hidden');
-                    
-                    // ПРИНУДИТЕЛЬНО возвращаем стили, которые могли быть скрыты
                     overlay.style.display = 'flex'; 
                     overlay.style.opacity = '1';
                     overlay.style.pointerEvents = 'auto';
                     overlay.style.transform = 'scale(1)';
-                    
-                    // Восстанавливаем внутренние элементы (текст и кнопки), если AI их скрыл
-                    const startText = document.getElementById('mode-start-text');
-                    const modeBtns = document.getElementById('mode-buttons-container');
-                    
-                    if(startText) startText.style.opacity = '1';
-                    if(modeBtns) {
-                        modeBtns.style.opacity = '1';
-                        modeBtns.style.pointerEvents = 'auto';
-                    }
                 }
                 
                 isModeSelectionActive = true; 
@@ -11569,11 +11636,10 @@
                 }
 
             } else {
-                // --- ВАРИАНТ Б: Новичок (Кнопка Let's Go) ---
-                
+                // Новичок: Показываем кнопку "Let's Go"
                 if(overlay) {
                     overlay.classList.add('hidden');
-                    overlay.style.display = 'none'; // Скрываем оверлей полностью
+                    overlay.style.display = 'none';
                 }
                 isModeSelectionActive = false;
 
@@ -11584,13 +11650,11 @@
                 }
             }
 
-            // 5. ВОЗВРАЩЕНИЕ КАРТОЧКИ (Телепорт в центр и Fade In)
+            // 5. ВОЗВРАЩЕНИЕ КАРТОЧКИ
             if (wrapper) {
                 wrapper.style.transition = 'none';
                 wrapper.style.transform = 'scale(0.95)'; 
-                
-                void wrapper.offsetWidth; // Reflow
-
+                void wrapper.offsetWidth; 
                 wrapper.style.transition = 'opacity 0.5s ease, transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
                 wrapper.style.opacity = '1';
                 wrapper.style.transform = 'scale(1)';
