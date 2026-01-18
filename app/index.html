@@ -79,10 +79,14 @@
             --sidebar-bg: #1a0010;
             --card-bg: #2b001b;
             --nav-bg: #2b001b;
+            
             --text-main: #ffffff;
-            --text-secondary: #ffb3d9; 
+            --text-secondary: #888888;
+            
+            /* PINK ACCENTS ONLY */
             --accent: #ff00cc; 
             --accent-light: #ff66e0;
+            
             --border: #4d0030;
             --highlight-green: #2ecc71;
             --highlight-red: #e74c3c;
@@ -93,7 +97,7 @@
             --ios-bg: #12000b;
             --ios-card: #2b001b;
             --ios-separator: #4d0030;
-            --ios-header: #ff66e0;
+            --ios-header: #8E8E93; 
 
             --card-gradient: linear-gradient(165deg, #2b001b 0%, #1a0010 100%);
         }
@@ -103,8 +107,10 @@
             --sidebar-bg: #fff5fb; 
             --card-bg: #ffffff;
             --nav-bg: #ffffff;
+            
             --text-main: #000000;
-            --text-secondary: #995c7b;
+            --text-secondary: #666666; 
+            
             --border: #fbcfe8;
             --modal-bg: rgba(255, 255, 255, 0.95);
             
@@ -114,23 +120,97 @@
             --ios-bg: #ffeef8;
             --ios-card: #ffffff;
             --ios-separator: #fbcfe8;
-            --ios-header: #db2777;
+            --ios-header: #6D6D72; 
 
             --card-gradient: linear-gradient(165deg, #ffffff 0%, #ffeef8 100%);
         }
 
+        body[data-theme="noir"] {
+            --accent: #ffffff;
+            --accent-light: #cccccc;
+            --highlight-green: #ffffff;
+            --highlight-red: #ffffff;
+            --text-secondary: #aaaaaa;
+            --border: #333333;
+        }
+
+        /* 1. Кнопки управления (Tinder-style) */
+        body[data-theme="noir"] .t-circle-btn {
+            background: #000000 !important;
+            border: 1px solid #ffffff !important;
+            color: #ffffff !important;
+            box-shadow: none !important;
+            background-image: none !important;
+        }
+
+        /* Активное состояние кнопок (инверсия) */
+        body[data-theme="noir"] .t-circle-btn:active,
+        body[data-theme="noir"] .t-circle-btn.active,
+        body[data-theme="noir"] .t-circle-btn.wl.active {
+            background: #ffffff !important;
+            color: #000000 !important;
+            border-color: #ffffff !important;
+        }
+
+        /* 2. Большая кнопка генерации/старта */
+        body[data-theme="noir"] .btn-gen,
+        body[data-theme="noir"] .btn-start-capsule,
+        body[data-theme="noir"] .btn-watch {
+            background: #000000 !important;
+            border: 1px solid #ffffff !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 15px rgba(255,255,255,0.1) !important;
+            background-image: none !important;
+        }
+        
+        body[data-theme="noir"] .btn-gen:active,
+        body[data-theme="noir"] .btn-start-capsule:active {
+            background: #ffffff !important;
+            color: #000000 !important;
+        }
+
+        /* 3. Тумблеры (Switch) */
+        body[data-theme="noir"] input:checked + .slider {
+            background-color: #ffffff !important;
+        }
         body[data-theme="noir"] input:checked + .slider:before {
             background-color: #000000 !important;
+            transform: translateX(20px);
         }
-        
-        body[data-theme="noir"] .btn-watch,
-        body[data-theme="noir"] .t-circle-btn.watch {
-            color: #000000 !important;
-            border: 1px solid #333 !important; 
-        }
-        
         body[data-theme="noir"] .slider {
-            background-color: #333; 
+            background-color: #333333; /* Серый фон выключенного */
+        }
+
+        /* 4. Бейджи (Extreme, LGBT...) */
+        body[data-theme="noir"] .warning-badge {
+            background: #000000 !important;
+            border: 1px solid #ffffff !important;
+            color: #ffffff !important;
+        }
+
+        /* 5. Иконки в настройках и навбаре */
+        body[data-theme="noir"] .nav-item.active .nav-icon {
+            color: #ffffff !important;
+        }
+        
+        /* 6. Активные элементы списков */
+        body[data-theme="noir"] .theme-item.active {
+            border-color: #ffffff !important;
+        }
+        body[data-theme="noir"] .lock-icon {
+            color: #ffffff !important;
+        }
+
+        /* 7. График статистики */
+        body[data-theme="noir"] .chart-bar {
+            background: #ffffff !important;
+        }
+        
+        /* 8. Логотип (Fetish часть) */
+        body[data-theme="noir"] .logo span {
+            background: #ffffff !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
         }
 
         body {
