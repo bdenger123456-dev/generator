@@ -1163,11 +1163,10 @@
             .main-content { padding: 0 !important; }
 
             /* 2. КОНТЕЙНЕР */
-            #tab-home .center-wrapper {
-                height: 100vh !important;
-                height: 100dvh !important;
-                padding-top: 65px !important; 
-                padding-bottom: 90px !important; 
+           #tab-home .center-wrapper {
+                height: 100dvh !important; 
+                padding-top: 60px !important; 
+                padding-bottom: 80px !important; 
                 display: flex;
                 flex-direction: column;
                 justify-content: flex-start !important;
@@ -1181,6 +1180,7 @@
             .card, .card.has-results {
                 flex-grow: 1 !important;
                 height: 100% !important;
+                max-height: 100% !important;
                 margin-bottom: 0 !important;
                 width: 100% !important;
                 padding: 10px 5px !important;
@@ -1194,17 +1194,23 @@
             .card > div:nth-child(1) { flex: 0 0 auto !important; min-height: 25px !important; } /* Бейджи */
             
             /* ЦЕНТР */
-            .card > div:nth-child(2) {
-                flex: 1 1 auto !important;
+            .card > div:nth-child(2) { 
+                flex: 1 1 auto !important; 
                 display: flex !important;
                 flex-direction: column !important;
-                justify-content: space-evenly !important; 
+                justify-content: center !important; 
                 align-items: center !important;
-                overflow: hidden !important; 
-                padding: 10px 0 !important;
+                overflow-y: auto !important; 
+                padding: 0 !important;
+                min-height: 0 !important;
             }
 
-            .card > div:last-child { flex: 0 0 auto !important; margin-top: 5px !important; width: 100%; } /* Кнопки */
+            .card > div:last-child { 
+                flex: 0 0 auto !important; 
+                margin-top: 0 !important; 
+                width: 100%; 
+                padding-bottom: 5px !important;
+            }
 
             /* --- ЭЛЕМЕНТЫ КОНТЕНТА --- */
             
@@ -1222,7 +1228,7 @@
                 line-height: 1.1 !important;
             }
 
-            /* === ОПИСАНИЕ (УЛУЧШЕНО) === */
+            /* === ОПИСАНИЕ === */
              #result-desc {
                 max-height: none !important; 
                 overflow-y: visible !important;
@@ -1235,14 +1241,15 @@
                 white-space: normal !important; 
                 
                 display: -webkit-box;
-                -webkit-line-clamp: 6; /* Показать максимум 6 строк */
+                -webkit-line-clamp: 4;
                 -webkit-box-orient: vertical;
                 overflow: hidden !important; 
             }
             
             /* === ПОХОЖИЕ (ТЕГИ) === */
             .related-section {
-                margin-top: 0 !important; /* Отступ уже задан в margin-bottom описания */
+                flex-shrink: 0 !important; 
+                margin-top: auto !important; 
                 margin-bottom: 5px !important;
                 width: 100%;
                 display: flex !important;
