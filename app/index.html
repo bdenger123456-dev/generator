@@ -1166,10 +1166,10 @@
            #tab-home .center-wrapper {
                 height: 100dvh !important;
                 padding-top: 60px !important; 
-                padding-bottom: 80px !important; 
+                padding-bottom: 85px !important; 
                 display: flex;
                 flex-direction: column;
-                justify-content: center !important;
+                justify-content: flex-start !important;
                 width: 100% !important;
                 padding-left: 5px !important;
                 padding-right: 5px !important;
@@ -1177,16 +1177,14 @@
 
             /* 3. КАРТОЧКА */
             .card, .card.has-results {
-                flex-grow: 0 !important; 
-                height: auto !important; 
-                min-height: 55vh !important;
-                max-height: 85dvh !important;
+                flex-grow: 1 !important;
+                height: 100% !important;
+                margin-bottom: 0 !important;
                 width: 100% !important;
                 padding: 10px 5px !important;
                 display: flex !important;
                 flex-direction: column !important;
-                justify-content: space-between !important;
-                margin: auto 0 !important; 
+                justify-content: space-between !important; 
             }
 
             /* === ВНУТРЕННИЕ БЛОКИ === */
@@ -1194,12 +1192,11 @@
             
             /* ЦЕНТР */
             .card > div:nth-child(2) {
-                flex: 1 1 auto !important;
+                flex: 1 1 auto !important; 
                 display: flex !important;
                 flex-direction: column !important;
                 justify-content: center !important; 
                 align-items: center !important;
-                gap: 15px !important; 
                 overflow-y: auto !important;
                 padding: 5px 0 !important;
             }
@@ -1230,9 +1227,10 @@
             /* === ОПИСАНИЕ === */
              #result-desc {
                 flex-shrink: 0 !important; 
-                margin: 0 !important;
+                margin: 10px 0 25px 0 !important; 
+                
                 display: -webkit-box;
-                -webkit-line-clamp: 6;
+                -webkit-line-clamp: 6; 
                 -webkit-box-orient: vertical;
                 overflow: hidden !important; 
             }
@@ -1240,8 +1238,8 @@
             /* === ПОХОЖИЕ (ТЕГИ) === */
             .related-section {
                 flex-shrink: 0 !important;
-                margin-top: 0 !important;
-                margin-bottom: 0 !important;
+                margin-top: 0 !important; 
+                margin-bottom: 5px !important;
                 width: 100%;
                 display: flex !important;
                 flex-direction: column;
