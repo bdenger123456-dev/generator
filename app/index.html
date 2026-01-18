@@ -2316,6 +2316,54 @@
             visibility: visible;
         }
 
+        /* Заголовок в выпадающем окне карточки */
+        .mods-header {
+            width: 100%;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            opacity: 0.7;
+        }
+
+        /* Чипы в модальном окне настроек */
+        .mod-chip {
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+            border: 1px solid transparent;
+        }
+
+        /* Активные (Зеленые) */
+        .mod-chip.active {
+            background: rgba(46, 204, 113, 0.15);
+            color: #2ecc71;
+            border-color: rgba(46, 204, 113, 0.3);
+        }
+        .mod-chip.active::after {
+            content: " ✓";
+            font-size: 10px;
+            opacity: 0.6;
+        }
+
+        /* Неактивные (Серые) */
+        .mod-chip.inactive {
+            background: var(--ios-card);
+            color: var(--text-secondary);
+            border-color: var(--border);
+            opacity: 0.8;
+        }
+        .mod-chip.inactive:hover {
+            opacity: 1;
+            background: var(--nav-bg);
+        }
+
         /* Обновленный стиль тегов */
         .tag {
             padding: 8px 14px;
@@ -3912,7 +3960,16 @@
                 </div>
             </div>
 
-            <!-- 8. Декор -->
+            <!-- 8. Управление модификаторами -->
+            <div class="ios-row clickable" onclick="openModifiersSettings()">
+                <span class="toggle-text" data-key="mod_manage">Manage Modifiers</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:18px;">🏷️</span>
+                    <span style="color:var(--text-secondary)">›</span>
+                </div>
+            </div>
+
+            <!-- 9. Декор -->
             <div class="ios-row">
                 <span class="toggle-text" data-key="deco_label">Show Decorations</span>
                 <label class="switch">
@@ -4198,6 +4255,38 @@
 
             <div class="ios-header" style="margin-left:0;" data-key="theme_premium">Premium (Pro)</div>
             <div class="theme-grid" id="theme-list-premium"></div>
+
+        </div>
+    </div>
+</div>
+
+<!-- MODIFIERS SETTINGS MODAL -->
+<div class="modal-overlay" id="modal-mods-overlay" onclick="closeModifiersSettings(event)">
+    <div class="modal" style="max-width: 450px;">
+        <div class="modal-header">
+            <span data-key="mod_title">Modifiers</span>
+            <span id="mods-counter" style="font-size:14px; color:var(--text-secondary); margin-left:auto; margin-right:15px;">0/10</span>
+            <span style="cursor:pointer" onclick="closeModifiersSettings(null, true)">✕</span>
+        </div>
+        <div class="modal-body" style="padding: 20px;">
+            
+            <!-- ACTIVE -->
+            <div style="font-size:12px; text-transform:uppercase; color:var(--text-secondary); margin-bottom:10px; font-weight:700;" data-key="mod_active_sec">
+                Active (In Card)
+            </div>
+            <div id="mods-list-active" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:25px; min-height:50px;">
+                <!-- JS вставит кнопки сюда -->
+            </div>
+
+            <div style="height:1px; background:var(--border); margin-bottom:20px;"></div>
+
+            <!-- INACTIVE -->
+            <div style="font-size:12px; text-transform:uppercase; color:var(--text-secondary); margin-bottom:10px; font-weight:700;" data-key="mod_inactive_sec">
+                Inactive (Hidden)
+            </div>
+            <div id="mods-list-inactive" style="display:flex; flex-wrap:wrap; gap:8px;">
+                <!-- JS вставит кнопки сюда -->
+            </div>
 
         </div>
     </div>
@@ -4773,6 +4862,12 @@
 
             if (docSnap.exists()) {
                 const d = docSnap.data();
+
+                const cloudMods = cloudData.modifiersPool || null;
+                if (cloudMods && Array.isArray(cloudMods)) {
+                    userModifiersPool = cloudMods;
+                    localStorage.setItem('xch_user_mods', JSON.stringify(userModifiersPool));
+                }
                 
                 // === ПОДПИСКА ===
                 const plan = d.subscription || 'free';
@@ -5186,7 +5281,8 @@
                 platform: currentPlatform,
                 subscription: localStorage.getItem('xch_sub_level') || 'free', 
                 email: user.email,
-                lastUpdated: serverTimestamp()
+                lastUpdated: serverTimestamp(),
+                modifiersPool: userModifiersPool || []
             };
 
             try {
@@ -5520,7 +5616,13 @@
         { key: 'Vintage', en: 'Vintage', ru: 'Ретро', es: 'Vintage', de: 'Vintage' },
         { key: 'Solo', en: 'Solo', ru: 'Соло', es: 'Solo', de: 'Solo' },
         { key: 'AI', en: 'AI', ru: 'ИИ', es: 'IA', de: 'KI' },
+        { key: 'Squirt', en: 'Squirt', ru: 'Сквирт', es: 'Squirt', de: 'Squirt' } // NEW
     ];
+
+    // Дефолтный пул (сохраняется в аккаунте)
+    const DEFAULT_MODS_POOL = ['Amateur', 'POV', 'Gay', 'BBW', 'Trans', 'Orgy', 'Compilation'];
+    // Глобальная переменная для текущего пула пользователя
+    let userModifiersPool = JSON.parse(localStorage.getItem('xch_user_mods')) || [...DEFAULT_MODS_POOL];
 
     const welcomePhrases = {
         en: ["Ready to find your genre? 😈", "Spin the wheel of lust!", "Let fate decide...", "Waiting for your command..."],
@@ -5802,6 +5904,11 @@
             watch: "Watch",
             search: "Search", // For Google mode
             related_header: "You may also like:",
+            mod_manage: "Manage Modifiers",
+            mod_title: "Modifiers",
+            mod_active_sec: "Active (Visible)",
+            mod_inactive_sec: "Inactive (Hidden)",
+            mod_limit_reached: "Limit reached (Max 10)!",
             add_genre: "Add to genre:",
             search_en_label: "Search EN",
             site_label: "Site",
@@ -6210,6 +6317,11 @@
             watch: "Смотреть",
             search: "Найти",
             related_header: "Вам также может понравиться:",
+            mod_manage: "Настроить теги",
+            mod_title: "Модификаторы",
+            mod_active_sec: "Активные (В карточке)",
+            mod_inactive_sec: "Неактивные (Скрыты)",
+            mod_limit_reached: "Лимит достигнут (Макс 10)!",
             add_genre: "Добавить к жанру:",
             search_en_label: "Поиск на Англ.",
             site_label: "Сайт",
@@ -6619,6 +6731,11 @@
             watch: "Ver",
             search: "Buscar",
             related_header: "También te puede interesar:",
+            mod_manage: "Gestionar Mods",
+            mod_title: "Modificadores",
+            mod_active_sec: "Activos",
+            mod_inactive_sec: "Inactivos",
+            mod_limit_reached: "¡Límite alcanzado!",
             add_genre: "Añadir al género:",
             search_en_label: "Buscar en EN",
             site_label: "Sitio",
@@ -7014,6 +7131,11 @@
             watch: "Ansehen",
             search: "Suchen",
             related_header: "Das könnte Ihnen auch gefallen:",
+            mod_manage: "Mods verwalten",
+            mod_title: "Modifikatoren",
+            mod_active_sec: "Aktiv",
+            mod_inactive_sec: "Inaktiv",
+            mod_limit_reached: "Limit erreicht!",
             add_genre: "Zum Genre:",
             search_en_label: "Suche auf EN",
             site_label: "Webseite",
@@ -8608,37 +8730,6 @@
             console.error(e);
             alert("Error parsing data! Check format."); 
         }
-    }
-
-    function renderModifiers() {
-        const container = document.getElementById('mod-container'); 
-        container.innerHTML = '';
-        const searchEn = document.getElementById('force-en').checked;
-        
-        modifiersData.forEach(mod => {
-            const tag = document.createElement('div'); 
-            tag.className = 'tag';
-            if(activeMods.has(mod.key)) tag.classList.add('selected');
-            
-            let text = mod.en;
-            
-            // Если галочка "Search EN" НЕ стоит, пытаемся найти перевод
-            if (!searchEn) {
-                // Если в объекте модификатора есть ключ, соответствующий currentLang (ru, es, de)
-                if (mod[currentLang]) {
-                    text = mod[currentLang];
-                }
-            }
-            
-            tag.innerText = text;
-            tag.onclick = () => {
-                if(activeMods.has(mod.key)) activeMods.delete(mod.key); else activeMods.add(mod.key);
-                renderModifiers(); 
-                renderResultName(); 
-                updateLink();
-            };
-            container.appendChild(tag);
-        });
     }
 
     function initIntensity() {
@@ -10369,31 +10460,32 @@
     }
 
     function undoLastAction() {
-        if (sessionHistoryStack.length === 0) return;
+        // Если стек пуст, возвращаемся на стартовый экран
+        if (sessionHistoryStack.length === 0) {
+            resetToHome();
+            return;
+        }
 
+        // Иначе выполняем стандартный откат
         const prevItem = sessionHistoryStack.pop();
         const card = document.getElementById('card-block');
         
-        // Сброс стилей
         card.classList.remove('restore-anim', 'anim-fly-left', 'anim-fly-right');
         card.style.transform = 'none';
         void card.offsetWidth; 
         
         card.classList.add('has-results');
-
-        // Анимация возврата (справа налево)
         card.classList.add('anim-fly-right');
 
         setTimeout(() => {
             forceShowResult(prevItem, 'undo'); 
-            
             setTimeout(() => card.classList.remove('anim-fly-right'), 700);
         }, 50);
 
-        if (sessionHistoryStack.length === 0) {
-            const undoBtn = document.getElementById('btn-t-undo');
-            if(undoBtn) undoBtn.disabled = true;
-        }
+        // После отката проверяем кнопку снова (визуально можно сделать её ярче или тусклее, 
+        // но теперь она всегда активна, т.к. ведет домой)
+        const undoBtn = document.getElementById('btn-t-undo');
+        if(undoBtn) undoBtn.disabled = false;
     }
 
     function startGeneration(mode, direction = 'next') {
@@ -12302,6 +12394,119 @@
         };
 
         recognition.start();
+    }
+
+    function openModifiersSettings() {
+        renderModifiersModal();
+        document.getElementById('modal-mods-overlay').classList.add('open');
+    }
+
+    function closeModifiersSettings(e, force) {
+        if (force || e.target.id === 'modal-mods-overlay') {
+            document.getElementById('modal-mods-overlay').classList.remove('open');
+            // При закрытии сохраняем в облако, если изменилось
+            if (window.isUserLoggedIn) window.syncToCloud();
+        }
+    }
+
+    function toggleModInPool(key) {
+        const index = userModifiersPool.indexOf(key);
+        
+        if (index > -1) {
+            // Если есть -> удаляем (переносим в неактивные)
+            userModifiersPool.splice(index, 1);
+        } else {
+            // Если нет -> добавляем, но проверяем лимит
+            if (userModifiersPool.length >= 10) {
+                const t = langData[currentLang] || langData['en'];
+                alert(t.mod_limit_reached || "Max 10 modifiers!");
+                return;
+            }
+            userModifiersPool.push(key);
+        }
+        
+        // Сохраняем локально
+        localStorage.setItem('xch_user_mods', JSON.stringify(userModifiersPool));
+        renderModifiersModal(); // Перерисовываем окно
+        
+        // Обновляем список в карточке реального времени, если она открыта
+        if (currentItem) renderModifiersInCard(); 
+    }
+
+    function renderModifiersModal() {
+        const activeContainer = document.getElementById('mods-list-active');
+        const inactiveContainer = document.getElementById('mods-list-inactive');
+        const counter = document.getElementById('mods-counter');
+        
+        activeContainer.innerHTML = '';
+        inactiveContainer.innerHTML = '';
+        
+        // Обновляем счетчик
+        counter.innerText = `${userModifiersPool.length} / 10`;
+        counter.style.color = userModifiersPool.length >= 10 ? 'var(--highlight-red)' : 'var(--text-secondary)';
+
+        modifiersData.forEach(mod => {
+            const isActive = userModifiersPool.includes(mod.key);
+            const label = mod[currentLang] || mod.en;
+            
+            const btn = document.createElement('div');
+            // Классы для стилизации
+            btn.className = isActive ? 'mod-chip active' : 'mod-chip inactive';
+            btn.innerText = label;
+            
+            btn.onclick = () => toggleModInPool(mod.key);
+            
+            if (isActive) activeContainer.appendChild(btn);
+            else inactiveContainer.appendChild(btn);
+        });
+    }
+
+    function renderModifiersInCard() {
+        const container = document.getElementById('mod-container'); 
+        container.innerHTML = '';
+        
+        // 1. Заголовок "Добавить к жанру:"
+        const t = langData[currentLang] || langData['en'];
+        const header = document.createElement('div');
+        header.className = 'mods-header';
+        header.innerText = t.add_genre;
+        container.appendChild(header);
+
+        // 2. Сбор тегов текущей карточки для фильтрации
+        const itemTags = currentItem ? currentItem.tags : [];
+        const itemName = currentItem ? currentItem.name.toLowerCase() : "";
+
+        // 3. Рендер только тех, что в пуле пользователя
+        userModifiersPool.forEach(modKey => {
+            const modObj = modifiersData.find(m => m.key === modKey);
+            if (!modObj) return;
+
+            // SMART FILTER: Пропускаем, если тег/название уже есть в карточке
+            if (itemTags.includes(modKey.toLowerCase())) return;
+            if (itemName.includes(modKey.toLowerCase())) return;
+
+            const tag = document.createElement('div'); 
+            tag.className = 'tag';
+            if(activeMods.has(modKey)) tag.classList.add('selected');
+            
+            // Локализация названия
+            let text = modObj[currentLang] || modObj.en;
+            
+            tag.innerText = text;
+            tag.onclick = () => {
+                if(activeMods.has(modKey)) activeMods.delete(modKey); 
+                else activeMods.add(modKey);
+                
+                renderModifiersInCard();
+                renderResultName(); 
+                updateLink();
+            };
+            container.appendChild(tag);
+        });
+    }
+
+    function renderModifiers() {
+        renderModifiersInCard();
     }
 
 </script>
