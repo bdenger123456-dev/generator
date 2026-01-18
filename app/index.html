@@ -178,7 +178,7 @@
             transform: translateX(20px);
         }
         body[data-theme="noir"] .slider {
-            background-color: #333333; /* Серый фон выключенного */
+            background-color: #333333;
         }
 
         /* 4. Бейджи (Extreme, LGBT...) */
@@ -212,6 +212,28 @@
             -webkit-background-clip: text !important;
             -webkit-text-fill-color: transparent !important;
         }
+
+        /* 9. Кнопки выбора режима (Start Screen) */
+        body[data-theme="noir"] .mode-circle-btn {
+            background: #000000 !important;      
+            border: 1px solid #ffffff !important; 
+            box-shadow: none !important;         
+            color: #ffffff !important;           
+        }
+        
+        body[data-theme="noir"] .mode-circle-btn:active {
+            background: #ffffff !important;       
+            color: #000000 !important;
+        }
+
+        body[data-theme="noir"] .ai-icon-img {
+            filter: invert(1) !important; 
+        }
+        body[data-theme="noir"] .mode-circle-btn:active .ai-icon-img {
+            filter: invert(0) !important; 
+        }
+
+
 
         body {
             font-family: var(--font-main);
@@ -2790,19 +2812,6 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
-        /* Градиенты для кнопок */
-        .mode-circle-btn.explore {
-            /* Красный градиент */
-            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-            box-shadow: 0 10px 30px rgba(231, 76, 60, 0.4);
-        }
-
-        .mode-circle-btn.pleasure {
-            /* Зеленый градиент */
-            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-            box-shadow: 0 10px 30px rgba(46, 204, 113, 0.4);
-        }
-
         /* === 3. РАСПОЛОЖЕНИЕ КАПСУЛЫ (PC vs MOBILE) === */
 
         /* По умолчанию (Mobile): Капсула под хедером */
@@ -2849,32 +2858,57 @@
 
         /* === AI ASSISTANT MODE STYLES === */
 
-        /* Контейнер треугольника */
-        .mode-triangle-layout {
+        .mode-buttons-row {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 15px;
+            justify-content: center;
+            gap: 25px; 
             width: 100%;
             margin-top: auto;
             margin-bottom: 20px;
         }
 
-        .mode-triangle-row {
+        .mode-circle-btn {
+            border-radius: 50%;
+            border: none !important; 
             display: flex;
+            align-items: center;
             justify-content: center;
-            gap: 40px; /* Расстояние между нижними кнопками */
-            width: 100%;
+            color: #fff;
+            transition: transform 0.1s, background 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .mode-circle-btn:active {
+            transform: scale(0.92);
         }
 
-        /* Стиль для кнопки ассистента (сверху) */
-        .mode-circle-btn.ai-assist {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            box-shadow: 0 10px 30px rgba(118, 75, 162, 0.4);
-            width: 85px; /* Чуть больше остальных */
+        .mode-circle-btn.center-btn {
+            width: 85px;
             height: 85px;
-            font-size: 36px;
+            font-size: 40px;
             z-index: 10;
+            /* Градиент по умолчанию */
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 10px 30px rgba(118, 75, 162, 0.5);
+        }
+
+        .mode-circle-btn.side-btn {
+            width: 60px;
+            height: 60px;
+            font-size: 26px;
+            z-index: 5;
+        }
+
+        .mode-circle-btn.explore {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            box-shadow: 0 5px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        .mode-circle-btn.pleasure {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            box-shadow: 0 5px 20px rgba(46, 204, 113, 0.4);
         }
 
         /* UI ВВОДА ЗАПРОСА (Скрыт по умолчанию) */
@@ -3331,18 +3365,20 @@
                                     What are we watching today?
                                 </div>
                                 
-                                <!-- Кнопки (Треугольник) -->
-                               <div id="mode-buttons-container" class="mode-triangle-layout">
-                                    <!-- Верх: Ассистент (Иконка AI) -->
-                                    <button class="mode-circle-btn ai-assist" onclick="openAssistantUI()">
+                                <!-- КНОПКИ РЕЖИМОВ -->
+                                <div id="mode-buttons-container" class="mode-buttons-row">
+                                    
+                                    <!-- 1. Explore (Слева, поменьше) -->
+                                    <button class="mode-circle-btn side-btn explore" onclick="setAppModeAndStart('explore')">🔭</button>
+                                    
+                                    <!-- 2. AI Assistant (Центр, Большая) -->
+                                    <button class="mode-circle-btn center-btn ai-assist" onclick="openAssistantUI()">
                                         <img src="ai.png" class="ai-icon-img" alt="AI">
                                     </button>
                                     
-                                    <!-- Низ: Обычные режимы -->
-                                    <div class="mode-triangle-row">
-                                        <button class="mode-circle-btn explore" onclick="setAppModeAndStart('explore')">🔭</button>
-                                        <button class="mode-circle-btn pleasure" onclick="setAppModeAndStart('pleasure')">🥰</button>
-                                    </div>
+                                    <!-- 3. Pleasure (Справа, поменьше) -->
+                                    <button class="mode-circle-btn side-btn pleasure" onclick="setAppModeAndStart('pleasure')">🥰</button>
+                                
                                 </div>
 
                                 <!-- UI АССИСТЕНТА -->
