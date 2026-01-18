@@ -7662,6 +7662,46 @@
         }
     };
 
+    const KEYWORD_ALIASES = {
+        'anal': ['ass', 'butt', 'анал', 'жопа', 'culo', 'trasero', 'arsch', 'hintern', 'anal'],
+        'milf': ['mom', 'mother', 'мамка', 'мать', 'madre', 'mama', 'mutter', 'reif'],
+        'teen': ['school', 'student', 'young', '18', 'школьница', 'студентка', 'joven', 'estudiante', 'jung', 'schülerin'],
+        'group': ['orgy', 'gangbang', 'threesome', 'групповой', 'оргия', 'trio', 'orgía', 'grupo', 'orgie', 'groupsex', 'dreier'],
+        'bdsm': ['rough', 'hard', 'slave', 'bondage', 'жестко', 'грубо', 'бдсм', 'duro', 'esclava', 'hart', 'fesseln', 'domina'],
+        'big-tits': ['tits', 'boobs', 'busty', 'сиськи', 'грудь', 'tetas', 'pechos', 'titten', 'große'],
+        'feet': ['foot', 'toes', 'ноги', 'ступни', 'pies', 'patas', 'füße', 'fuss'],
+        'lesbian': ['girl-on-girl', 'tribadism', 'лесби', 'ножницы', 'lesbiana', 'tijeras', 'lesbisch'],
+        'cum': ['creampie', 'facial', 'сперма', 'кончил', 'leche', 'corrida', 'sperma', 'besamung']
+    };
+
+    const CONTEXT_TRIGGERS = {
+        'harder': [
+            'harder', 'rougher', 'extreme', 'more intense', // EN
+            'жестче', 'грубее', 'сильнее', 'пожестче', // RU
+            'mas duro', 'más fuerte', 'intenso', 'violento', // ES
+            'härter', 'stärker', 'intensiver', 'wilder' // DE
+        ],
+        'softer': [
+            'softer', 'gentle', 'vanilla', 'less intense', // EN
+            'мягче', 'нежнее', 'ваниль', 'полегче', // RU
+            'suave', 'lento', 'cariñoso', 'mas suave', // ES
+            'sanfter', 'weicher', 'zärtlich', 'ruhiger' // DE
+        ],
+        'more': [
+            'more', 'another', 'else', 'similar', // EN
+            'еще', 'другое', 'похожее', // RU
+            'mas', 'otro', 'quiero mas', // ES
+            'mehr', 'noch eins', 'anderes' // DE
+        ]
+    };
+    
+    const THINKING_STEPS = {
+        en: ["Analyzing preferences...", "Checking history...", "Filtering tags...", "Selecting best match..."],
+        ru: ["Анализирую вкусы...", "Сверяю с историей...", "Отсеиваю лишнее...", "Выбираю лучшее..."],
+        es: ["Analizando gustos...", "Revisando historial...", "Filtrando etiquetas...", "Seleccionando..."],
+        de: ["Analysiere...", "Prüfe Verlauf...", "Filtere Tags...", "Wähle aus..."]
+    };
+
     window.openLegal = function(type) {
         // 1. Берем текущие переводы из langData
         const t = langData[currentLang] || langData['en'];
@@ -8128,7 +8168,7 @@
         renderResultUI(item, mode);
     }
 
-    function forceShowResult(item, mode = 'history') {
+    function forceShowResult(item, mode = 'history', customStatus = null) {
         isGenerating = false;
         
         // 1. ОТКЛЮЧАЕМ СТАРТОВЫЙ РЕЖИМ
@@ -8194,7 +8234,7 @@
         logActivity('gen', item.id, item.tags);
 
         // 5. РЕНДЕР
-        renderResultUI(item, mode);
+        renderResultUI(item, mode, customStatus);
         
         // Снимаем класс анимации через секунду
         setTimeout(() => {
@@ -10835,7 +10875,7 @@
         }
     }
 
-    function renderResultUI(item, mode) {
+    function renderResultUI(item, mode, customReason = null) {
         currentItem = item;
         lastGeneratedItem = item;
         
@@ -10899,17 +10939,26 @@
         // 4. Фраза сверху
         const statusEl = document.getElementById('status-text');
         if(statusEl) {
-            const explanation = getExplanationText(mode);
             statusEl.style.display = 'flex'; 
-            statusEl.classList.remove('hidden-initial'); // Важно убрать скрытие
+            statusEl.classList.remove('hidden-initial'); 
             
-            if (explanation) {
-                statusEl.innerText = explanation;
+            // ПРИОРИТЕТ 1: Если передан customReason (от ИИ), используем его
+            if (customReason) {
+                // innerHTML, чтобы работали теги цвета внутри фразы
+                statusEl.innerHTML = customReason;
                 statusEl.style.color = "var(--accent)";
-            } else {
-                const comments = resultComments[currentLang];
-                statusEl.innerText = comments[Math.floor(Math.random() * comments.length)];
-                statusEl.style.color = "var(--text-secondary)";
+            } 
+            // ПРИОРИТЕТ 2: Обычная логика
+            else {
+                const explanation = getExplanationText(mode);
+                if (explanation) {
+                    statusEl.innerText = explanation;
+                    statusEl.style.color = "var(--accent)";
+                } else {
+                    const comments = resultComments[currentLang];
+                    statusEl.innerText = comments[Math.floor(Math.random() * comments.length)];
+                    statusEl.style.color = "var(--text-secondary)";
+                }
             }
         }
 
@@ -12091,97 +12140,179 @@
     // Слова-отрицания
     const NEGATIVES = ["no ", "not ", "non ", "не ", "без ", "кроме ", "sin ", "kein ", "ohne ", "don't "];
 
-    // 1. Функция анализа
     function analyzeUserRequest(text) {
         text = text.toLowerCase();
-
-        // -- ПРОВЕРКА НА ИСТОРИЮ (ВЧЕРА/ПРОШЛОЕ) --
-        const historyKeywords = ["yesterday", "last", "previous", "back", "вчера", "прошл", "ayer", "pasado", "gestern"];
-        if (historyKeywords.some(kw => text.includes(kw))) {
-            if (historyData.length > 0) {
-                const lastId = historyData[0].id;
-                const item = data.find(x => x.id === lastId);
-                if (item) return { item: item, reason: getTranslation("expl_hist") || "From History" };
-            }
-        }
-
-        // -- ПАРСИНГ ЗАПРОСА --
+        
+        // --- 1. ПАРСИНГ ОТРИЦАНИЙ (Negation Logic) ---
+        const NEGATIVES = ["no ", "not ", "non ", "не ", "без ", "кроме ", "sin ", "kein ", "ohne ", "don't "];
         let positiveQuery = text;
         let negativeTerms = [];
 
-        // Попытка найти отрицания (например: "без анала")
         NEGATIVES.forEach(neg => {
             if (positiveQuery.includes(neg)) {
                 const parts = positiveQuery.split(neg);
                 if (parts.length > 1) {
-                    // Берем слово ПОСЛЕ отрицания (грубое приближение, но работает)
-                    const blockedPart = parts[1].split(" ")[0]; 
+                    // Берем слово после отрицания и удаляем знаки препинания
+                    const blockedPart = parts[1].split(/[ ,.!]+/)[0]; 
                     if (blockedPart.length > 2) negativeTerms.push(blockedPart);
                 }
             }
         });
 
-        // Очистка запроса от стоп-слов и пунктуации
-        let tokens = positiveQuery
+        // --- 2. НОРМАЛИЗАЦИЯ (Alias Mapping) ---
+        // Превращаем текст в токены
+        let rawTokens = positiveQuery
             .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
             .split(/\s+/)
-            .filter(word => word.length > 2 && !STOP_WORDS.includes(word) && !negativeTerms.includes(word));
+            .filter(w => w.length > 2 && !STOP_WORDS.includes(w) && !negativeTerms.includes(w));
 
-        if (tokens.length === 0) return null; // Если остались только "хочу" и "ы"
+        let tokens = [];
+        let contextMode = null; // 'harder', 'softer', 'more'
 
-        // -- ПОИСК ПО БАЗЕ (SCORING SYSTEM) --
+        rawTokens.forEach(token => {
+            let found = false;
+            
+            // Проверка на контекстные команды
+            if (CONTEXT_TRIGGERS.harder.includes(token)) contextMode = 'harder';
+            else if (CONTEXT_TRIGGERS.softer.includes(token)) contextMode = 'softer';
+            
+            // Проверка синонимов
+            for (const [key, aliases] of Object.entries(KEYWORD_ALIASES)) {
+                if (aliases.includes(token) || key === token) {
+                    tokens.push(key); // Заменяем "сиськи" на "big-tits"
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) tokens.push(token); // Если не нашли синоним, оставляем как есть
+        });
+
+        // --- 3. ИМПЛИЦИТНЫЙ КОНТЕКСТ (Память) ---
+        // Если пользователь просит "пожестче" или "еще", а токенов мало, добавляем теги прошлого предмета
+        if (contextMode && lastGeneratedItem) {
+            if (contextMode === 'harder') {
+                tokens.push(...['extreme', 'rough', 'bdsm']);
+                // Убираем софт теги
+                tokens = tokens.filter(t => !['vanilla', 'romantic', 'soft'].includes(t));
+            } else if (contextMode === 'softer') {
+                tokens.push(...['romantic', 'soft', 'vanilla']);
+                // Убираем хард теги
+                tokens = tokens.filter(t => !['extreme', 'rough', 'hardcore'].includes(t));
+            } else if (contextMode === 'more') {
+                // Добавляем теги прошлого видео
+                tokens.push(...lastGeneratedItem.tags.slice(0, 3)); 
+            }
+        }
+
+        if (tokens.length === 0 && !contextMode) return null;
+
+        // --- 4. SCORING SYSTEM ---
         let candidates = data.map(item => {
             let score = 0;
-            
-            // Строка для поиска внутри предмета (все языки + теги)
+            let matchReasons = []; // Запоминаем, почему совпало
+
             const itemString = [
                 item.name, item.name_ru, item.name_es, item.name_de, 
-                item.slug, 
-                ...item.tags,
-                item.desc_en, item.desc_ru // Описание тоже учитываем, но с меньшим весом
+                item.slug, ...item.tags
             ].join(" ").toLowerCase();
 
-            // 1. ПРОВЕРКА НА МИНУС-СЛОВА (БАН)
-            // Если в предмете есть слово из "не хочу", обнуляем его
-            const hasNegative = negativeTerms.some(neg => itemString.includes(neg));
-            if (hasNegative) return { item, score: -1 };
+            // A. БАН ЗА ОТРИЦАНИЯ
+            const hasNegative = negativeTerms.some(neg => {
+                // Проверяем синонимы для запрещенного слова
+                let bannedWords = [neg];
+                for (const [key, aliases] of Object.entries(KEYWORD_ALIASES)) {
+                    if (key === neg || aliases.includes(neg)) {
+                        bannedWords = [key, ...aliases];
+                        break;
+                    }
+                }
+                return bannedWords.some(bw => itemString.includes(bw));
+            });
+            
+            if (hasNegative) return { item, score: -1000 };
 
-            // 2. ПОДСЧЕТ ОЧКОВ
+            // B. ПОДСЧЕТ ОЧКОВ
             tokens.forEach(token => {
-                // Точное совпадение в названии (самый высокий приоритет)
-                if ((item.name && item.name.toLowerCase() === token) || 
-                    (item.name_ru && item.name_ru.toLowerCase() === token)) {
+                // Точное совпадение в названии (+50)
+                if (item.name.toLowerCase().includes(token)) {
                     score += 50;
+                    if (!matchReasons.includes(token)) matchReasons.push(token);
                 }
-                // Частичное совпадение в названии
-                else if ((item.name && item.name.toLowerCase().includes(token)) || 
-                        (item.name_ru && item.name_ru.toLowerCase().includes(token))) {
-                    score += 20;
-                }
-                // Совпадение в тегах
+                // Совпадение в тегах (+30)
                 else if (item.tags.includes(token)) {
-                    score += 15;
-                }
-                // Совпадение в описании или slug
-                else if (itemString.includes(token)) {
-                    score += 5;
+                    score += 30;
+                    if (!matchReasons.includes(token)) matchReasons.push(token);
                 }
             });
 
-            // Небольшой рандом, чтобы не выдавать одно и то же на одинаковый запрос
-            if (score > 0) score += Math.random() * 5;
+            // C. БОНУСЫ
+            if (score > 0) {
+                // Комбо-бонус (если совпало больше 2 критериев)
+                if (matchReasons.length >= 2) score += 20;
 
-            return { item, score };
+                // Исторический бонус (если уже лайкал)
+                if (favorites.includes(item.id)) score += 10;
+
+                // Анти-повтор (если только что смотрел)
+                if (cooldownList.includes(item.id)) score -= 30; 
+                
+                // Рандом для живости
+                score += Math.random() * 5;
+            }
+
+            return { item, score, reasons: matchReasons };
         });
 
-        // Сортируем по очкам
+        // Сортировка
         candidates.sort((a, b) => b.score - a.score);
 
-        // Берем победителя, если очки > 0
+        // --- 5. ФОРМИРОВАНИЕ ОТВЕТА ---
         if (candidates.length > 0 && candidates[0].score > 0) {
+            const winner = candidates[0];
+            const mainTrigger = winner.reasons[0] 
+                ? (winner.reasons[0].charAt(0).toUpperCase() + winner.reasons[0].slice(1)) 
+                : "Context";
+            
+            // База фраз для ответов
+            const AI_RESPONSES = {
+                en: {
+                    harder: "Spiced it up 🔥",
+                    softer: "Something gentler ✨",
+                    mention: "You mentioned "
+                },
+                ru: {
+                    harder: "Добавил перчинки 🔥",
+                    softer: "Что-то понежнее ✨",
+                    mention: "Ты упомянул "
+                },
+                es: {
+                    harder: "Le puse más picante 🔥",
+                    softer: "Algo más suave ✨",
+                    mention: "Mencionaste "
+                },
+                de: {
+                    harder: "Etwas Schärfe dazu 🔥",
+                    softer: "Etwas Sanfteres ✨",
+                    mention: "Du erwähntest "
+                }
+            };
+
+            // Выбираем язык (фоллбек на EN)
+            const phrases = AI_RESPONSES[currentLang] || AI_RESPONSES['en'];
+            
+            let reasonText = "";
+            
+            if (contextMode === 'harder') {
+                reasonText = phrases.harder;
+            } else if (contextMode === 'softer') {
+                reasonText = phrases.softer;
+            } else {
+                reasonText = phrases.mention + `<span style="color:#fff">${mainTrigger}</span>`;
+            }
+
             return { 
-                item: candidates[0].item, 
-                reason: getTranslation("ai_success") // "Как вы и заказывали"
+                item: winner.item, 
+                reason: reasonText 
             };
         }
 
@@ -12198,58 +12329,54 @@
         const text = input.value.trim();
         if (!text) return;
 
-        // 1. Скрываем UI, показываем спиннер
+        // 1. UI: Скрываем ввод, показываем спиннер
         document.getElementById('assistant-ui').classList.remove('visible');
         document.getElementById('thinking-ui').style.display = 'flex';
         
-        // Фраза "Думаю"
         const thinkTxt = document.getElementById('ai-thinking-text');
-        // Можно добавить вариативность и сюда, если захочешь
-        const t = langData[currentLang] || langData['en'];
-        thinkTxt.innerText = t.ai_thinking || "Thinking..."; 
+        
+        // 2. АНИМАЦИЯ МЫШЛЕНИЯ (Микровариативность)
+        const steps = THINKING_STEPS[currentLang] || THINKING_STEPS['en'];
+        let stepIndex = 0;
+        
+        // Сразу ставим первую фразу
+        thinkTxt.innerText = steps[0];
 
-        // 2. Имитация работы нейросети (1.5 - 2 сек)
+        const thinkInterval = setInterval(() => {
+            stepIndex = (stepIndex + 1) % steps.length;
+            thinkTxt.innerText = steps[stepIndex];
+        }, 450); // Каждые 450мс меняем фразу
+
+        // 3. ОБРАБОТКА (Имитация задержки 1.8 сек)
         setTimeout(() => {
-            const result = analyzeUserRequest(text); // Твоя функция анализа
+            clearInterval(thinkInterval); // Останавливаем анимацию
+            
+            const result = analyzeUserRequest(text); 
             
             // Скрываем оверлей
             const overlay = document.getElementById('mode-start-overlay');
             overlay.classList.add('hidden'); 
             
-            // Сброс UI
+            // Сброс UI (с задержкой)
             setTimeout(() => {
                 document.getElementById('thinking-ui').style.display = 'none';
                 document.getElementById('ai-input').value = '';
                 document.getElementById('btn-ai-go').classList.remove('visible');
-                
-                // Восстанавливаем кнопки меню
                 document.getElementById('mode-start-text').style.opacity = '1';
                 document.getElementById('mode-buttons-container').style.opacity = '1';
                 document.getElementById('mode-buttons-container').style.pointerEvents = 'auto';
-                
-                // ГЕНЕРИРУЕМ НОВУЮ ПРИВЕТСТВЕННУЮ ФРАЗУ ДЛЯ СЛЕДУЮЩЕГО РАЗА
                 randomizeModeGreeting();
             }, 500);
 
             const statusEl = document.getElementById('status-text');
-            
-            // Получаем массивы фраз для текущего языка
-            const successPhrases = t.ai_phrases_success || ["Here you go:"];
+            const t = langData[currentLang] || langData['en'];
             const failPhrases = t.ai_phrases_fail || ["Try this instead:"];
-
-            // Выбираем случайную
-            const randomSuccess = successPhrases[Math.floor(Math.random() * successPhrases.length)];
             const randomFail = failPhrases[Math.floor(Math.random() * failPhrases.length)];
 
             if (result) {
-                // УСПЕХ
-                if(statusEl) {
-                    // Если analyzeUserRequest вернул свою причину (например "Из истории"), используем её,
-                    // иначе берем случайную успешную фразу
-                    statusEl.innerText = (result.reason === "As requested (History)") ? result.reason : randomSuccess;
-                    statusEl.style.color = "var(--accent)";
-                }
-                forceShowResult(result.item, 'ai_request');
+                // УСПЕХ: Передаем reason в forceShowResult
+                // Важно: statusEl здесь не трогаем, он обновится внутри renderResultUI
+                forceShowResult(result.item, 'ai_request', result.reason);
                 
                 // Анимация прилета
                 const wrapper = document.getElementById('card-anim-wrapper');
@@ -12260,7 +12387,7 @@
                 }
 
             } else {
-                // НЕУДАЧА (Фолбек на Pleasure)
+                // НЕУДАЧА
                 if(statusEl) {
                     statusEl.innerText = randomFail;
                     statusEl.style.color = "var(--text-secondary)";
@@ -12268,7 +12395,7 @@
                 setAppModeAndStart('pleasure');
             }
 
-        }, 1500);
+        }, 1800);
     }
 
     function openAssistantUI() {
