@@ -2959,39 +2959,32 @@
             display: flex;
             align-items: center;
             width: 100%;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            padding: 5px 5px 5px 15px;
-            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.15) !important; 
+            border: 1px solid rgba(255, 255, 255, 0.3) !important; 
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 24px !important;
+            padding: 8px 8px 8px 20px !important;
+            margin-bottom: 25px !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
         .assistant-input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: #fff;
-            font-size: 18px;
-            font-weight: 600;
-            padding: 10px 0;
+            font-size: 20px !important;
+            font-weight: 700 !important;
+            color: #ffffff !important;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .assistant-input::placeholder {
-            color: rgba(255, 255, 255, 0.4);
+            color: rgba(255, 255, 255, 0.5) !important;
+            font-weight: 500 !important;
         }
 
         .btn-mic-trigger {
-            width: 44px;
-            height: 44px;
-            border-radius: 14px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            color: #fff;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
+            background: rgba(0, 0, 0, 0.2) !important;
+            width: 40px !important;
+            height: 40px !important;
+            border-radius: 50% !important;
         }
         .btn-mic-trigger.listening {
             background: #e74c3c;
@@ -3005,25 +2998,36 @@
         }
 
         .btn-ai-confirm {
-            background: #fff;
-            color: #000;
-            border: none;
-            padding: 15px 40px;
-            border-radius: 30px;
-            font-size: 16px;
-            font-weight: 800;
+            background: #ffffff !important;
+            color: #000000 !important;
+            box-shadow: 0 5px 20px rgba(255, 255, 255, 0.3) !important;
+            transform: translateY(10px);
+        }
+        .btn-ai-confirm:active {
+            transform: translateY(10px) scale(0.95) !important;
+        }
+
+        .btn-ai-cancel {
+            margin-top: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 10px 24px;
+            border-radius: 50px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+            font-weight: 600;
             text-transform: uppercase;
             cursor: pointer;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.3s;
-            pointer-events: none;
+            transition: all 0.2s;
+            backdrop-filter: blur(5px);
         }
-        .btn-ai-confirm.visible {
-            opacity: 1;
-            transform: translateY(0);
-            pointer-events: auto;
+
+        .btn-ai-cancel:active {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            transform: scale(0.95);
         }
+
 
         /* АНИМАЦИЯ "ДУМАЮ..." */
         .thinking-ui {
@@ -3494,7 +3498,9 @@
                                         <span data-key="ai_btn_go">Find It</span>
                                     </button>
                                     
-                                    <div style="margin-top: 20px; font-size: 14px; opacity: 0.5; cursor: pointer;" onclick="closeAssistantUI()" data-key="btn_cancel">Cancel</div>
+                                    <div class="btn-ai-cancel" onclick="closeAssistantUI()">
+                                        <span data-key="btn_cancel">Cancel</span>
+                                    </div>
                                 </div>
 
                                 <!-- UI ДУМАНИЯ -->
@@ -10625,8 +10631,9 @@
         }
     }
 
-    function startNewSession() {
+    function startNewSession(direction = 'right') {
         if (!checkGenerationLimit(true)) return;
+        
         const wrapper = document.getElementById('card-anim-wrapper');
         const startBtn = document.getElementById('start-btn-container');
         
@@ -10636,9 +10643,13 @@
         }
 
         if(wrapper) {
-                wrapper.style.transition = 'transform 0.4s ease-in, opacity 0.4s';
-                wrapper.style.opacity = '0';
-                wrapper.style.transform = 'translateX(150%) rotate(10deg)'; 
+            // Вычисляем координаты вылета
+            const moveX = direction === 'left' ? -150 : 150; // -150% или +150%
+            const rotate = direction === 'left' ? -15 : 15;
+
+            wrapper.style.transition = 'transform 0.4s ease-in, opacity 0.4s';
+            wrapper.style.opacity = '0';
+            wrapper.style.transform = `translateX(${moveX}%) rotate(${rotate}deg)`; 
         }
 
         setTimeout(() => {
@@ -11913,14 +11924,14 @@
         if(overlay) {
             overlay.style.transition = 'opacity 0.3s, transform 0.3s';
             overlay.style.opacity = '0';
-            overlay.style.transform = 'scale(1.1)';
             setTimeout(() => overlay.classList.add('hidden'), 300);
         }
         
         isModeSelectionActive = false;
         
-        // Запуск
-        startNewSession();
+        const direction = (mode === 'explore') ? 'left' : 'right';
+        
+        startNewSession(direction);
     }
 
     function updateCapsuleUI() {
