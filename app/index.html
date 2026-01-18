@@ -75,44 +75,62 @@
         1. VARIABLES & RESET & THEMES
         ========================================= */
         :root {
-            --bg-color: #050505;
-            --sidebar-bg: #101010;
-            --card-bg: #141414;
-            --nav-bg: #1a1a1a;
+            --bg-color: #12000b;
+            --sidebar-bg: #1a0010;
+            --card-bg: #2b001b;
+            --nav-bg: #2b001b;
             --text-main: #ffffff;
-            --text-secondary: #888888;
-            --accent: #9b59b6; 
-            --accent-light: #b07cc6;
-            --border: #2a2a2a;
+            --text-secondary: #ffb3d9; 
+            --accent: #ff00cc; 
+            --accent-light: #ff66e0;
+            --border: #4d0030;
             --highlight-green: #2ecc71;
             --highlight-red: #e74c3c;
             --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            --modal-bg: rgba(0, 0, 0, 0.9);
+            --modal-bg: rgba(18, 0, 11, 0.95);
             
             /* iOS Style Colors */
-            --ios-bg: #000000;
-            --ios-card: #1C1C1E;
-            --ios-separator: #38383A;
-            --ios-header: #8E8E93;
+            --ios-bg: #12000b;
+            --ios-card: #2b001b;
+            --ios-separator: #4d0030;
+            --ios-header: #ff66e0;
 
-            --card-gradient: linear-gradient(165deg, #2a2a2a 0%, #141414 100%);
+            --card-gradient: linear-gradient(165deg, #2b001b 0%, #1a0010 100%);
         }
 
         body.light-theme {
-            --bg-color: #f2f2f7;
-            --sidebar-bg: #f2f2f7; 
+            --bg-color: #ffeef8;
+            --sidebar-bg: #fff5fb; 
             --card-bg: #ffffff;
-            --nav-bg: #f9f9f9;
+            --nav-bg: #ffffff;
             --text-main: #000000;
-            --text-secondary: #666666;
-            --border: #d1d1d6;
+            --text-secondary: #995c7b;
+            --border: #fbcfe8;
             --modal-bg: rgba(255, 255, 255, 0.95);
-            --ios-bg: #F2F2F7;
-            --ios-card: #FFFFFF;
-            --ios-separator: #C6C6C8;
-            --ios-header: #6D6D72;
+            
+            --accent: #db2777;
+            --accent-light: #f472b6;
 
-            --card-gradient: linear-gradient(165deg, #ffffff 0%, #f2f2f7 100%);
+            --ios-bg: #ffeef8;
+            --ios-card: #ffffff;
+            --ios-separator: #fbcfe8;
+            --ios-header: #db2777;
+
+            --card-gradient: linear-gradient(165deg, #ffffff 0%, #ffeef8 100%);
+        }
+
+        body[data-theme="noir"] input:checked + .slider:before {
+            background-color: #000000 !important;
+        }
+        
+        body[data-theme="noir"] .btn-watch,
+        body[data-theme="noir"] .t-circle-btn.watch {
+            color: #000000 !important;
+            border: 1px solid #333 !important; 
+        }
+        
+        body[data-theme="noir"] .slider {
+            background-color: #333; 
         }
 
         body {
@@ -5121,8 +5139,8 @@
 
     const APP_THEMES = [
         // === BASIC (Row 1) ===
-        { id: 'dark', name: 'Dark', type: 'free', isLight: false, preview: '#141414', accent: null },
-        { id: 'light', name: 'Light', type: 'free', isLight: true, preview: '#ffffff', accent: null },
+        { id: 'dark', name: 'Dark (Cyber)', type: 'free', isLight: false, preview: '#ff00cc', accent: null },
+        { id: 'light', name: 'Light (Sakura)', type: 'free', isLight: true, preview: '#ffeef8', accent: null },
         
         // === BLUE (Row 2) ===
         { 
@@ -5172,19 +5190,7 @@
             accent: '#d97706', accentLight: '#fbbf24'
         },
 
-        // === PINK (Row 6) ===
-        { 
-            id: 'pink-dark', name: 'Cyber', type: 'pro', isLight: false, preview: '#ff00cc',
-            colors: { bg: '#12000b', sidebar: '#1a0010', card: '#2b001b', nav: '#2b001b', border: '#4d0030' },
-            accent: '#ff00cc', accentLight: '#ff66e0'
-        },
-        { 
-            id: 'pink-light', name: 'Sakura', type: 'pro', isLight: true, preview: '#ffeef8',
-            colors: { bg: '#ffeef8', sidebar: '#fff5fb', card: '#ffffff', nav: '#ffffff', border: '#fbcfe8' },
-            accent: '#db2777', accentLight: '#f472b6'
-        },
-
-        // === PURPLE (Row 7) ===
+        // === PURPLE (Row 6) - Moved up ===
         { 
             id: 'purple-dark', name: 'Amethyst', type: 'pro', isLight: false, preview: '#3b005e',
             colors: { bg: '#0d0014', sidebar: '#180026', card: '#240038', nav: '#240038', border: '#4a0072' },
@@ -5196,7 +5202,7 @@
             accent: '#9333ea', accentLight: '#c084fc'
         },
 
-        // === ORANGE (Row 8) ===
+        // === ORANGE (Row 7) ===
         { 
             id: 'orange-dark', name: 'Magma', type: 'pro', isLight: false, preview: '#331a00',
             colors: { bg: '#0f0700', sidebar: '#1f0f00', card: '#331a00', nav: '#331a00', border: '#663300' },
@@ -5208,7 +5214,7 @@
             accent: '#ea580c', accentLight: '#fb923c'
         },
 
-        // === SPECIAL (Row 9) ===
+        // === SPECIAL (Row 8) ===
         { 
             id: 'noir', name: 'Noir', type: 'pro', isLight: false, preview: '#000000',
             colors: { bg: '#000000', sidebar: '#0a0a0a', card: '#141414', nav: '#141414', border: '#333333' },
@@ -5221,7 +5227,7 @@
             accent: null 
         }
     ];
-    
+
     let blacklist = JSON.parse(localStorage.getItem(STORAGE.BLACKLIST)) || [];
     let favorites = JSON.parse(localStorage.getItem(STORAGE.FAVORITES)) || [];
     let watchLater = JSON.parse(localStorage.getItem(STORAGE.WATCH_LATER)) || [];
@@ -9700,28 +9706,29 @@
         localStorage.setItem('xch_theme_id', themeId);
         const root = document.documentElement;
         
+        // 1. Устанавливаем атрибут для CSS-селекторов
+        document.body.setAttribute('data-theme', themeId);
+
         const theme = APP_THEMES.find(t => t.id === themeId);
         if (!theme) return;
 
-        // 1. Light/Dark logic
+        // 2. Light/Dark logic
         document.body.classList.toggle('light-theme', theme.isLight);
         
-        // 2. Rainbow logic toggle
+        // 3. Rainbow logic toggle
         if (theme.isRainbow) {
             document.body.classList.add('rainbow-mode');
-            // Генерируем случайный цвет сразу при выборе
             setRandomRainbowColor();
         } else {
             document.body.classList.remove('rainbow-mode');
         }
         
-        // 3. Reset styles
+        // 4. Reset styles
         const props = ['--bg-color', '--sidebar-bg', '--card-bg', '--nav-bg', '--border', '--ios-card', '--ios-bg', '--card-gradient'];
         props.forEach(p => root.style.removeProperty(p));
         
-        // 4. Apply Custom Colors
+        // 5. Apply Custom Colors
         if (theme.colors) {
-            // Добавляем !important логикой приоритета переменных
             if (theme.colors.bg) {
                 root.style.setProperty('--bg-color', theme.colors.bg);
                 root.style.setProperty('--ios-bg', theme.colors.bg);
@@ -9738,12 +9745,11 @@
             if (theme.colors.border) root.style.setProperty('--border', theme.colors.border);
         }
 
-        // 5. Apply Accent
+        // 6. Apply Accent
         if (theme.accent) {
             root.style.setProperty('--accent', theme.accent);
             root.style.setProperty('--accent-light', theme.accentLight || theme.accent);
         } else if (!theme.isRainbow) {
-            // Если не радуга и нет акцента (Free темы) -> вызываем updateLink для цвета сайта
             updateLink();
         }
 
