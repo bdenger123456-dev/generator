@@ -3068,6 +3068,51 @@
             filter: invert(1) drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
         }
 
+        .mode-circle-btn.center-btn.ai-assist {
+            /* Адаптивный градиент темы */
+            background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 100%) !important;
+            
+            /* Тонкая белая обводка для контраста */
+            border: 2px solid rgba(255, 255, 255, 0.4) !important;
+            
+            /* Начальная тень */
+            box-shadow: 0 0 20px var(--accent), 
+                        0 0 40px var(--accent-light);
+            
+            /* Анимация пульсации */
+            animation: aiPulseGlow 2s infinite ease-in-out;
+            z-index: 10;
+        }
+
+        /* Анимация свечения (масштаб + тень) */
+        @keyframes aiPulseGlow {
+            0% {
+                box-shadow: 0 0 15px var(--accent);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 35px var(--accent), 0 0 50px var(--accent-light);
+                transform: scale(1.05); /* Легкое увеличение */
+            }
+            100% {
+                box-shadow: 0 0 15px var(--accent);
+                transform: scale(1);
+            }
+        }
+
+        /* При нажатии чуть уменьшаем, но сохраняем градиент */
+        .mode-circle-btn.center-btn.ai-assist:active {
+            transform: scale(0.95) !important;
+            animation: none; /* Пауза анимации при клике */
+        }
+
+        /* Спец. стиль для темы NOIR (Черно-белая) */
+        body[data-theme="noir"] .mode-circle-btn.center-btn.ai-assist {
+            background: #000000 !important;
+            border: 2px solid #ffffff !important;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5) !important;
+        }
+
         /* иконка для боковых кнопок (scope.png, favorite.png) */
         .side-icon-img {
             width: 32px;  /* Чуть меньше, чем центральная (45px) */
@@ -3692,19 +3737,17 @@
 
 <div id="ui-blocks-source" style="display:none;">
     
-    <!-- BLOCK: PREFERENCES -->
+   <!-- BLOCK: PREFERENCES -->
     <div id="block-prefs">
         
-        <!-- Заголовок: Предпочтения -->
+        <!-- ГРУППА 1: ОСНОВНЫЕ (Сайт + Режим) -->
         <div class="ios-header" style="margin-top: 0;" data-key="header_prefs">Preferences</div>
-
-        <!-- ЕДИНАЯ ГРУППА -->
         <div class="ios-group">
             
             <!-- 1. Выбор Сайта -->
             <div class="ios-row">
                 <span class="platform-label" data-key="site_label">Site</span>
-                <select id="platform" class="platform-select" onchange="savePlatform(this.value)">
+                <select id="platform" class="platform-select" onchange="savePlatform(this.value)" dir="rtl">
                     <option value="xh">xHamster</option>
                     <option value="ph">Pornhub</option>
                     <option value="xv">xVideos</option>
@@ -3718,13 +3761,18 @@
             <!-- 2. Выбор Режима -->
             <div class="ios-row">
                 <span class="platform-label" data-key="mode_label">Mode</span>
-                <select id="app-mode-select" class="platform-select" onchange="setAppMode(this.value)">
+                <select id="app-mode-select" class="platform-select" onchange="setAppMode(this.value)" dir="rtl">
                     <option value="explore" data-key="mode_explore">Explore</option>
                     <option value="pleasure" data-key="mode_pleasure">Pleasure</option>
                 </select>
             </div>
+        </div>
 
-            <!-- 3. Интенсивность (Range Slider) -->
+        <!-- ГРУППА 2: ФИЛЬТРЫ И НАСТРОЙКИ -->
+        <div class="ios-header" data-key="header_filters">Filters</div>
+        <div class="ios-group">
+            
+            <!-- 3. Интенсивность -->
             <div class="ios-row" style="display:block; padding: 15px 16px;">
                 <div style="font-size:16px; margin-bottom:15px;" data-key="exploration_mode">Exploration Mode</div>
                 <input type="range" min="1" max="3" value="1" class="range-slider" id="intensity-slider" oninput="updateIntensity(this.value)">
@@ -3757,7 +3805,7 @@
                 </select>
             </div>
 
-            <!-- 6. Поиск EN (для RU) -->
+            <!-- 6. Поиск EN -->
             <div id="comp-search" class="ios-row" style="display:none;">
                 <span class="toggle-text" data-key="search_en_label">Search EN</span>
                 <label class="switch">
