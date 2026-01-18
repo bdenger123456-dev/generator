@@ -3297,26 +3297,6 @@
         <!-- Подзаголовок -->
         <div class="subtitle" data-key="subtitle">Your home for adult preferences</div>
 
-        <!-- PC MODE CAPSULE -->
-        <div id="pc-mode-mount">
-            <div class="mode-capsule-wrapper" id="mode-capsule-pc">
-                <button class="mode-capsule-btn" onclick="toggleModeDropdown('pc')">
-                    <span class="current-mode-icon">🔭</span>
-                    <span class="current-mode-text">Explore</span>
-                    <span style="font-size:10px; opacity:0.5;">▼</span>
-                </button>
-                <!-- Выпадающий список -->
-                <div class="mode-dropdown">
-                    <div class="mode-item" onclick="setAppMode('explore')">
-                        <span>🔭</span> <span data-key="mode_explore">Explore</span>
-                    </div>
-                    <div class="mode-item" onclick="setAppMode('pleasure')">
-                        <span>🥰</span> <span data-key="mode_pleasure">Pleasure</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <div id="pc-settings-mount"></div>
     </div>
 
@@ -3479,23 +3459,6 @@
         <!-- TAB 2: SETTINGS -->
         <div id="tab-settings" class="tab-content">
             <div class="center-wrapper">
-                <div id="mobile-mode-mount">
-                    <div class="mode-capsule-wrapper" id="mode-capsule-mobile">
-                        <button class="mode-capsule-btn" onclick="toggleModeDropdown('mobile')">
-                            <span class="current-mode-icon">🔭</span>
-                            <span class="current-mode-text">Explore</span>
-                        </button>
-                        <!-- Выпадающий список -->
-                        <div class="mode-dropdown">
-                            <div class="mode-item" onclick="setAppMode('explore')">
-                                <span>🔭</span> <span data-key="mode_explore">Explore</span>
-                            </div>
-                            <div class="mode-item" onclick="setAppMode('pleasure')">
-                                <span>🥰</span> <span data-key="mode_pleasure">Pleasure</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <div id="mount-prefs"></div>
             </div>
         </div>
@@ -3702,6 +3665,10 @@
     
     <!-- BLOCK: PREFERENCES -->
     <div id="block-prefs">
+        
+        <!-- Заголовок блока -->
+        <div class="ios-header" style="margin-top: 0;" data-key="header_prefs">Preferences</div>
+
         <!-- Site Select -->
         <div class="capsule-btn">
             <span data-key="site_label">Site</span>
@@ -3716,7 +3683,17 @@
             </select>
         </div>
 
-        <div class="ios-header" data-key="header_prefs">Preferences</div>
+        <!-- Mode Select -->
+        <div class="capsule-btn">
+            <span data-key="mode_label">Mode</span>
+            <select id="app-mode-select" onchange="setAppMode(this.value)" dir="rtl">
+                <option value="explore" data-key="mode_explore">Explore</option>
+                <option value="pleasure" data-key="mode_pleasure">Pleasure</option>
+            </select>
+        </div>
+
+        <!-- Filters Group -->
+        <div class="ios-header" data-key="header_filters">Filters</div>
         <div class="ios-group">
             <div class="ios-row" style="display:block; padding: 15px 16px;">
                 <div style="font-size:16px; margin-bottom:15px;" data-key="exploration_mode">Exploration Mode</div>
@@ -5496,6 +5473,8 @@
             nav_settings: "Settings",
             nav_account: "Account",
             header_prefs: "Preferences",
+            header_filters: "Filters",  
+            mode_label: "Mode", 
             ori_label: "Orientation",
             ori_hetero: "Hetero",
             ori_gay: "Gay",
@@ -5904,7 +5883,9 @@
             nav_home: "Главная",
             nav_settings: "Настройки",
             nav_account: "Аккаунт",
-            header_prefs: "Настройки",
+            header_prefs: "Предпочтения",
+            header_filters: "Фильтры",
+            mode_label: "Режим",
             ori_label: "Ориентация",
             ori_hetero: "Гетеро",
             ori_gay: "Гей",
@@ -6313,6 +6294,8 @@
             nav_settings: "Ajustes",
             nav_account: "Cuenta",
             header_prefs: "Preferencias",
+            header_filters: "Filtros",
+            mode_label: "Modo",
             ori_label: "Orientación",
             ori_hetero: "Hetero",
             ori_gay: "Gay",
@@ -6706,7 +6689,9 @@
             nav_home: "Start",
             nav_settings: "Einstell.",
             nav_account: "Konto",
-            header_prefs: "Einstellungen",
+            header_prefs: "Präferenzen",
+            header_filters: "Filter",
+            mode_label: "Modus",
             ori_label: "Orientierung",
             ori_hetero: "Hetero",
             ori_gay: "Schwul",
@@ -11763,9 +11748,10 @@
         currentAppMode = mode;
         updateCapsuleUI();
         
-        // Закрываем все дропдауны
-        document.querySelectorAll('.mode-capsule-wrapper').forEach(el => el.classList.remove('open'));
-        
+        const startOverlay = document.getElementById('mode-start-overlay');
+        if (startOverlay && !startOverlay.classList.contains('hidden')) {
+        }
+
         console.log("Mode set to:", mode);
     }
 
@@ -11788,21 +11774,12 @@
     }
 
     function updateCapsuleUI() {
-        const t = langData[currentLang] || langData['en'];
-        
-        // Иконка и текст зависят от режима
-        const icon = currentAppMode === 'explore' ? '🔭' : '🥰';
-        const textKey = currentAppMode === 'explore' ? 'mode_explore' : 'mode_pleasure';
-        const text = t[textKey];
-
-        // Обновляем все капсулы (и ПК и Мобайл)
-        document.querySelectorAll('.current-mode-icon').forEach(el => el.innerText = icon);
-        document.querySelectorAll('.current-mode-text').forEach(el => el.innerText = text);
-        
-        // Подсветка активного пункта в списке
-        document.querySelectorAll('.mode-item').forEach(el => el.classList.remove('active'));
+        const select = document.getElementById('app-mode-select');
+        if (select) {
+            select.value = currentAppMode;
+        }
     }
-
+    
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.mode-capsule-wrapper')) {
             document.querySelectorAll('.mode-capsule-wrapper').forEach(el => el.classList.remove('open'));
