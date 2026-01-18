@@ -5486,6 +5486,7 @@
     let currentHistoryTab = 'swipes';
 
     let currentAppMode = 'explore';
+    let aiContextTokens = [];
     let isModeSelectActive = false; 
     
     const STORAGE = {
@@ -5800,6 +5801,7 @@
             ],
             mode_explore: "Explore",
             mode_pleasure: "Pleasure",
+            mode_ai: "AI Agent",
 
             info_header: "Information",
             hist_tab_swipes: "Swipes",
@@ -6217,6 +6219,7 @@
 
             mode_explore: "Исследование",
             mode_pleasure: "Наслаждение",
+            mode_ai: "ИИ Агент",
 
             info_header: "Информация",
             hist_tab_swipes: "Свайпы",
@@ -6626,6 +6629,7 @@
             ],
             mode_explore: "Explorar",
             mode_pleasure: "Placer",
+            mode_ai: "Agente IA",
 
             info_header: "Información",
             hist_tab_swipes: "Deslizamientos",
@@ -7027,6 +7031,7 @@
             ],
             mode_explore: "Erkunden",
             mode_pleasure: "Genießen",
+            mode_ai: "KI-Agent",
 
             info_header: "Informationen",
             hist_tab_swipes: "Swipes",
@@ -8001,31 +8006,47 @@
 
         let score = 50; 
 
-        // === РЕЖИМЫ ===
+        // === РЕЖИМ 1: PLEASURE (Только любимое) ===
         if (currentAppMode === 'pleasure') {
-            // НАСЛАЖДЕНИЕ: Максимально близкое к лайкам
-            if (favorites.includes(item.id)) score += 1000; // Огромный приоритет лайкнутым
-            
+            if (favorites.includes(item.id)) score += 1000;
             item.tags.forEach(tag => {
-                if (tagScores[tag] && tagScores[tag] > 0) {
-                    score += (tagScores[tag] * 3); // Утраиваем влияние положительных тегов
-                }
+                if (tagScores[tag] && tagScores[tag] > 0) score += (tagScores[tag] * 3);
             });
-            
-        } else {
-            // ИССЛЕДОВАНИЕ: Новое, но с учетом вкусов
-            if (favorites.includes(item.id)) score = 1; // Лайкнутое почти не показываем
-            
-            // Случайный буст для "свежести"
-            score += Math.random() * 50;
-            
+        } 
+        
+        // === РЕЖИМ 2: AI AGENT (Контекст + Вкусы) ===
+        else if (currentAppMode === 'ai') {
+            // А. Контекст текущего разговора (Самый высокий приоритет)
+            if (aiContextTokens.length > 0) {
+                const itemString = [item.name, item.slug, ...item.tags].join(" ").toLowerCase();
+                aiContextTokens.forEach(token => {
+                    if (itemString.includes(token)) score += 500;
+                });
+            }
+
+            // Б. Похожее на предыдущее (Continuity)
+            if (lastGeneratedItem) {
+                const commonTags = item.tags.filter(t => lastGeneratedItem.tags.includes(t)).length;
+                score += commonTags * 50;
+            }
+
+            // В. Личные предпочтения (Фон)
+            if (favorites.includes(item.id)) score += 200;
             item.tags.forEach(tag => {
-                // Учитываем теги, но слабее, чтобы не зацикливаться
+                if (tagScores[tag]) score += tagScores[tag];
+            });
+        }
+
+        // === РЕЖИМ 3: EXPLORE (По умолчанию) ===
+        else {
+            if (favorites.includes(item.id)) score = 1; 
+            score += Math.random() * 50;
+            item.tags.forEach(tag => {
                 if (tagScores[tag]) score += tagScores[tag]; 
             });
         }
 
-        // Фильтры ориентации 
+        // Фильтры ориентации (глобальные)
         if (currentOrientation === 'gay' && item.tags.includes('gay')) score += 50;
         if (currentOrientation === 'trans' && item.tags.some(t => ['trans', 'shemale'].includes(t))) score += 50;
         if (currentOrientation === 'lesbian' && item.tags.includes('lesbian')) score += 50;
@@ -12140,7 +12161,27 @@
 
     function updateCapsuleUI() {
         const select = document.getElementById('app-mode-select');
-        if (select) {
+        if (!select) return;
+
+        const t = langData[currentLang] || langData['en'];
+        
+        // Проверяем, есть ли уже опция AI
+        let aiOption = select.querySelector('option[value="ai"]');
+
+        if (currentAppMode === 'ai') {
+            // Если режим AI активен, но опции нет -> добавляем
+            if (!aiOption) {
+                aiOption = document.createElement('option');
+                aiOption.value = 'ai';
+                aiOption.innerText = "🤖 " + (t.mode_ai || "AI Agent");
+                select.appendChild(aiOption);
+            }
+            // Выбираем её
+            select.value = 'ai';
+        } else {
+            if (aiOption) {
+                aiOption.remove();
+            }
             select.value = currentAppMode;
         }
     }
@@ -12321,10 +12362,10 @@
             const localizedName = getLocalizedName(winner);
             
             const AI_RESPONSES = {
-                en: { harder: "Spiced it up 🔥", softer: "Something gentler ✨", mention: "You mentioned " },
-                ru: { harder: "Добавил перчинки 🔥", softer: "Что-то понежнее ✨", mention: "Ты упомянул " },
-                es: { harder: "Le puse más picante 🔥", softer: "Algo más suave ✨", mention: "Mencionaste " },
-                de: { harder: "Etwas Schärfe dazu 🔥", softer: "Etwas Sanfteres ✨", mention: "Du erwähntest " }
+                en: { harder: "Spiced it up 🔥", softer: "Something gentler ✨", mention: "You mentioned:  " },
+                ru: { harder: "Добавил перчинки 🔥", softer: "Что-то понежнее ✨", mention: "Ты упомянул:  " },
+                es: { harder: "Le puse más picante 🔥", softer: "Algo más suave ✨", mention: "Mencionaste:  " },
+                de: { harder: "Etwas Schärfe dazu 🔥", softer: "Etwas Sanfteres ✨", mention: "Du erwähntest:  " }
             };
 
             const phrases = AI_RESPONSES[currentLang] || AI_RESPONSES['en'];
@@ -12333,11 +12374,10 @@
             if (contextMode === 'harder') reasonText = phrases.harder;
             else if (contextMode === 'softer') reasonText = phrases.softer;
             else {
-                // Теперь подставится "Ты упомянул Блондинки"
                 reasonText = phrases.mention + `<span style="color:var(--accent); font-weight:700;">${localizedName}</span>`;
             }
 
-            return { item: winner, reason: reasonText };
+            return { item: winner, reason: reasonText, tokens: winner.reasons };
         }
 
         return null;
@@ -12398,8 +12438,10 @@
             const randomFail = failPhrases[Math.floor(Math.random() * failPhrases.length)];
 
             if (result) {
-                // УСПЕХ: Передаем reason в forceShowResult
-                // Важно: statusEl здесь не трогаем, он обновится внутри renderResultUI
+                // УСПЕХ
+                aiContextTokens = result.tokens || []; // Запоминаем контекст 
+                setAppMode('ai');
+
                 forceShowResult(result.item, 'ai_request', result.reason);
                 
                 // Анимация прилета
