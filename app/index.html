@@ -5624,6 +5624,15 @@
     // Глобальная переменная для текущего пула пользователя
     let userModifiersPool = JSON.parse(localStorage.getItem('xch_user_mods')) || [...DEFAULT_MODS_POOL];
 
+    const STOP_WORDS = [
+        "i", "want", "need", "show", "me", "some", "video", "porn", "please", "today", "now", "like", "love", "looking", "for",
+        "я", "хочу", "покажи", "мне", "что-то", "сегодня", "сейчас", "люблю", "нравится", "нужен", "нужна", "посоветуй",
+        "quiero", "ver", "dame", "algo", "hoy", "ahora", "gusta", "necesito",
+        "ich", "will", "möchte", "zeig", "mir", "heute", "jetzt"
+    ];
+
+    const NEGATIVES = ["no ", "not ", "non ", "не ", "без ", "кроме ", "sin ", "kein ", "ohne ", "don't "];
+
     const welcomePhrases = {
         en: ["Ready to find your genre? 😈", "Spin the wheel of lust!", "Let fate decide...", "Waiting for your command..."],
         ru: ["Готов узнать свой жанр? 😈", "Крути барабан желаний!", "Судьба решит, что тебя ждёт...", "Жду твоего нажатия..."],
@@ -12130,20 +12139,10 @@
         }
     });
 
-    const STOP_WORDS = [
-        "i", "want", "need", "show", "me", "some", "video", "porn", "please", "today", "now", "like", "love", "looking", "for",
-        "я", "хочу", "покажи", "мне", "что-то", "сегодня", "сейчас", "люблю", "нравится", "нужен", "нужна", "посоветуй",
-        "quiero", "ver", "dame", "algo", "hoy", "ahora", "gusta", "necesito",
-        "ich", "will", "möchte", "zeig", "mir", "heute", "jetzt"
-    ];
-
-    // Слова-отрицания
-    const NEGATIVES = ["no ", "not ", "non ", "не ", "без ", "кроме ", "sin ", "kein ", "ohne ", "don't "];
-
     function analyzeUserRequest(text) {
         text = text.toLowerCase();
         
-        // --- 1. ПАРСИНГ ОТРИЦАНИЙ (Negation Logic) ---
+        // --- 1. ПАРСИНГ ОТРИЦАНИЙ ---
         const NEGATIVES = ["no ", "not ", "non ", "не ", "без ", "кроме ", "sin ", "kein ", "ohne ", "don't "];
         let positiveQuery = text;
         let negativeTerms = [];
@@ -12152,15 +12151,13 @@
             if (positiveQuery.includes(neg)) {
                 const parts = positiveQuery.split(neg);
                 if (parts.length > 1) {
-                    // Берем слово после отрицания и удаляем знаки препинания
                     const blockedPart = parts[1].split(/[ ,.!]+/)[0]; 
                     if (blockedPart.length > 2) negativeTerms.push(blockedPart);
                 }
             }
         });
 
-        // --- 2. НОРМАЛИЗАЦИЯ (Alias Mapping) ---
-        // Превращаем текст в токены
+        // --- 2. НОРМАЛИЗАЦИЯ И КОНТЕКСТ ---
         let rawTokens = positiveQuery
             .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
             .split(/\s+/)
@@ -12172,44 +12169,50 @@
         rawTokens.forEach(token => {
             let found = false;
             
-            // Проверка на контекстные команды
+            // Проверка команд
             if (CONTEXT_TRIGGERS.harder.includes(token)) contextMode = 'harder';
             else if (CONTEXT_TRIGGERS.softer.includes(token)) contextMode = 'softer';
+            else if (CONTEXT_TRIGGERS.more.includes(token)) contextMode = 'more';
             
             // Проверка синонимов
             for (const [key, aliases] of Object.entries(KEYWORD_ALIASES)) {
                 if (aliases.includes(token) || key === token) {
-                    tokens.push(key); // Заменяем "сиськи" на "big-tits"
+                    tokens.push(key);
                     found = true;
                     break;
                 }
             }
-            if (!found) tokens.push(token); // Если не нашли синоним, оставляем как есть
+            if (!found) tokens.push(token);
         });
 
-        // --- 3. ИМПЛИЦИТНЫЙ КОНТЕКСТ (Память) ---
-        // Если пользователь просит "пожестче" или "еще", а токенов мало, добавляем теги прошлого предмета
-        if (contextMode && lastGeneratedItem) {
-            if (contextMode === 'harder') {
-                tokens.push(...['extreme', 'rough', 'bdsm']);
-                // Убираем софт теги
-                tokens = tokens.filter(t => !['vanilla', 'romantic', 'soft'].includes(t));
-            } else if (contextMode === 'softer') {
-                tokens.push(...['romantic', 'soft', 'vanilla']);
-                // Убираем хард теги
-                tokens = tokens.filter(t => !['extreme', 'rough', 'hardcore'].includes(t));
-            } else if (contextMode === 'more') {
-                // Добавляем теги прошлого видео
-                tokens.push(...lastGeneratedItem.tags.slice(0, 3)); 
+        // === УПРАВЛЕНИЕ НАСТРОЙКАМИ (INTENSITY) ===
+        if (contextMode === 'harder') {
+            // Если просят пожестче -> Включаем Extreme (3), если было меньше
+            if (currentIntensity < 3) {
+                updateIntensity(3); 
+                console.log("AI: Switching to Extreme Mode");
             }
+            // Добавляем теги для поиска, если их нет
+            tokens.push(...['extreme', 'rough', 'bdsm']);
+        } 
+        else if (contextMode === 'softer') {
+            // Если просят помягче -> Включаем Safe (1), если было больше
+            if (currentIntensity > 1) {
+                updateIntensity(1);
+                console.log("AI: Switching to Safe Mode");
+            }
+            tokens.push(...['romantic', 'soft', 'vanilla']);
+        }
+        else if (contextMode === 'more' && lastGeneratedItem) {
+            tokens.push(...lastGeneratedItem.tags.slice(0, 3)); 
         }
 
         if (tokens.length === 0 && !contextMode) return null;
 
-        // --- 4. SCORING SYSTEM ---
+        // --- 3. ПОИСК (SCORING SYSTEM) ---
         let candidates = data.map(item => {
             let score = 0;
-            let matchReasons = []; // Запоминаем, почему совпало
+            let matchReasons = [];
 
             const itemString = [
                 item.name, item.name_ru, item.name_es, item.name_de, 
@@ -12217,103 +12220,76 @@
             ].join(" ").toLowerCase();
 
             // A. БАН ЗА ОТРИЦАНИЯ
-            const hasNegative = negativeTerms.some(neg => {
-                // Проверяем синонимы для запрещенного слова
-                let bannedWords = [neg];
-                for (const [key, aliases] of Object.entries(KEYWORD_ALIASES)) {
-                    if (key === neg || aliases.includes(neg)) {
-                        bannedWords = [key, ...aliases];
-                        break;
-                    }
-                }
-                return bannedWords.some(bw => itemString.includes(bw));
-            });
-            
+            const hasNegative = negativeTerms.some(neg => itemString.includes(neg));
             if (hasNegative) return { item, score: -1000 };
 
-            // B. ПОДСЧЕТ ОЧКОВ
+            // === B. УМНАЯ ФИЛЬТРАЦИЯ ПО РЕЖИМУ ===
+            
+            // Если просили "Помягче" (Safe Mode) -> Жестко баним экстрим
+            if (contextMode === 'softer') {
+                if (item.tags.some(t => EXTREME_TAGS.includes(t) || SPICY_TAGS.includes(t))) {
+                    return { item, score: -1000 }; // Исключаем даже при совпадении слов
+                }
+            }
+            
+            // Если просили "Пожестче" (Extreme Mode) -> Штрафуем ваниль
+            if (contextMode === 'harder') {
+                if (item.tags.some(t => ['vanilla', 'romantic', 'soft', 'kissing'].includes(t))) {
+                    score -= 50; // Не баним, но понижаем приоритет
+                }
+                // Даем бонус за экстрим теги
+                if (item.tags.some(t => EXTREME_TAGS.includes(t) || SPICY_TAGS.includes(t))) {
+                    score += 20;
+                }
+            }
+
+            // C. ПОДСЧЕТ ОЧКОВ ПО СЛОВАМ
             tokens.forEach(token => {
-                // Точное совпадение в названии (+50)
                 if (item.name.toLowerCase().includes(token)) {
                     score += 50;
                     if (!matchReasons.includes(token)) matchReasons.push(token);
                 }
-                // Совпадение в тегах (+30)
                 else if (item.tags.includes(token)) {
                     score += 30;
                     if (!matchReasons.includes(token)) matchReasons.push(token);
                 }
             });
 
-            // C. БОНУСЫ
+            // D. БОНУСЫ
             if (score > 0) {
-                // Комбо-бонус (если совпало больше 2 критериев)
                 if (matchReasons.length >= 2) score += 20;
-
-                // Исторический бонус (если уже лайкал)
                 if (favorites.includes(item.id)) score += 10;
-
-                // Анти-повтор (если только что смотрел)
                 if (cooldownList.includes(item.id)) score -= 30; 
-                
-                // Рандом для живости
                 score += Math.random() * 5;
             }
 
             return { item, score, reasons: matchReasons };
         });
 
-        // Сортировка
         candidates.sort((a, b) => b.score - a.score);
 
-        // --- 5. ФОРМИРОВАНИЕ ОТВЕТА ---
+        // --- 4. РЕЗУЛЬТАТ ---
         if (candidates.length > 0 && candidates[0].score > 0) {
             const winner = candidates[0];
             const mainTrigger = winner.reasons[0] 
                 ? (winner.reasons[0].charAt(0).toUpperCase() + winner.reasons[0].slice(1)) 
                 : "Context";
             
-            // База фраз для ответов
             const AI_RESPONSES = {
-                en: {
-                    harder: "Spiced it up 🔥",
-                    softer: "Something gentler ✨",
-                    mention: "You mentioned "
-                },
-                ru: {
-                    harder: "Добавил перчинки 🔥",
-                    softer: "Что-то понежнее ✨",
-                    mention: "Ты упомянул "
-                },
-                es: {
-                    harder: "Le puse más picante 🔥",
-                    softer: "Algo más suave ✨",
-                    mention: "Mencionaste "
-                },
-                de: {
-                    harder: "Etwas Schärfe dazu 🔥",
-                    softer: "Etwas Sanfteres ✨",
-                    mention: "Du erwähntest "
-                }
+                en: { harder: "Spiced it up 🔥", softer: "Something gentler ✨", mention: "You mentioned " },
+                ru: { harder: "Добавил перчинки 🔥", softer: "Что-то понежнее ✨", mention: "Ты упомянул " },
+                es: { harder: "Le puse más picante 🔥", softer: "Algo más suave ✨", mention: "Mencionaste " },
+                de: { harder: "Etwas Schärfe dazu 🔥", softer: "Etwas Sanfteres ✨", mention: "Du erwähntest " }
             };
 
-            // Выбираем язык (фоллбек на EN)
             const phrases = AI_RESPONSES[currentLang] || AI_RESPONSES['en'];
-            
             let reasonText = "";
             
-            if (contextMode === 'harder') {
-                reasonText = phrases.harder;
-            } else if (contextMode === 'softer') {
-                reasonText = phrases.softer;
-            } else {
-                reasonText = phrases.mention + `<span style="color:#fff">${mainTrigger}</span>`;
-            }
+            if (contextMode === 'harder') reasonText = phrases.harder;
+            else if (contextMode === 'softer') reasonText = phrases.softer;
+            else reasonText = phrases.mention + `<span style="color:#fff">${mainTrigger}</span>`;
 
-            return { 
-                item: winner.item, 
-                reason: reasonText 
-            };
+            return { item: winner.item, reason: reasonText };
         }
 
         return null;
