@@ -5626,9 +5626,11 @@
 
     const STOP_WORDS = [
         "i", "want", "need", "show", "me", "some", "video", "porn", "please", "today", "now", "like", "love", "looking", "for",
+        "surprise", "give", "find", "search",
         "я", "хочу", "покажи", "мне", "что-то", "сегодня", "сейчас", "люблю", "нравится", "нужен", "нужна", "посоветуй",
-        "quiero", "ver", "dame", "algo", "hoy", "ahora", "gusta", "necesito",
-        "ich", "will", "möchte", "zeig", "mir", "heute", "jetzt"
+        "удиви", "дай", "найди", "поиск", "какой-нибудь", "про", "с",
+        "quiero", "ver", "dame", "algo", "hoy", "ahora", "gusta", "necesito", "sorprendeme", "busca",
+        "ich", "will", "möchte", "zeig", "mir", "heute", "jetzt", "überrasch", "suche"
     ];
 
     const NEGATIVES = ["no ", "not ", "non ", "не ", "без ", "кроме ", "sin ", "kein ", "ohne ", "don't "];
@@ -7672,6 +7674,9 @@
     };
 
     const KEYWORD_ALIASES = {
+        'redhead': ['ginger', 'firecrotch', 'рыжая', 'рыжие', 'рыжих', 'рыжими', 'pelirroja', 'rothaarige', 'red', 'рыженькая'],
+        'blonde': ['blond', 'fair', 'блондинка', 'блондинки', 'беленькая', 'rubia', 'blondine'],
+        'brunette': ['brown', 'dark hair', 'брюнетка', 'черненькая', 'темненькая', 'morena', 'brünette'],
         'anal': ['ass', 'butt', 'анал', 'жопа', 'culo', 'trasero', 'arsch', 'hintern', 'anal'],
         'milf': ['mom', 'mother', 'мамка', 'мать', 'madre', 'mama', 'mutter', 'reif'],
         'teen': ['school', 'student', 'young', '18', 'школьница', 'студентка', 'joven', 'estudiante', 'jung', 'schülerin'],
@@ -12139,6 +12144,54 @@
         }
     });
 
+    function getEditDistance(a, b) {
+        if (a.length === 0) return b.length;
+        if (b.length === 0) return a.length;
+
+        const matrix = [];
+        for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+        for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+
+        for (let i = 1; i <= b.length; i++) {
+            for (let j = 1; j <= a.length; j++) {
+                if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                    matrix[i][j] = matrix[i - 1][j - 1];
+                } else {
+                    matrix[i][j] = Math.min(
+                        matrix[i - 1][j - 1] + 1, // замена
+                        Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1) // вставка/удаление
+                    );
+                }
+            }
+        }
+        return matrix[b.length][a.length];
+    }
+
+    function isFuzzyMatch(token, targetWord) {
+        token = token.toLowerCase();
+        targetWord = targetWord.toLowerCase();
+
+        // А. Если одно содержится в другом (стандартный поиск)
+        if (targetWord.includes(token)) return true;
+
+        // Б. Проверка корня (для русского языка очень полезно)
+        // Если слова длиннее 4 букв и первые 4 буквы совпадают (рыжими - рыжие)
+        if (token.length >= 4 && targetWord.length >= 4) {
+            if (token.substring(0, 4) === targetWord.substring(0, 4)) return true;
+        }
+
+        // В. Расстояние Левенштейна (для опечаток и коротких слов)
+        // Считаем % сходства
+        const len = Math.max(token.length, targetWord.length);
+        if (len === 0) return false;
+        
+        const dist = getEditDistance(token, targetWord);
+        const similarity = 1 - (dist / len);
+
+        // Если совпадение больше 70% (0.7)
+        return similarity >= 0.7; 
+    }
+
     function analyzeUserRequest(text) {
         text = text.toLowerCase();
         
@@ -12214,50 +12267,64 @@
             let score = 0;
             let matchReasons = [];
 
-            const itemString = [
-                item.name, item.name_ru, item.name_es, item.name_de, 
-                item.slug, ...item.tags
-            ].join(" ").toLowerCase();
-
-            // A. БАН ЗА ОТРИЦАНИЯ
-            const hasNegative = negativeTerms.some(neg => itemString.includes(neg));
+            // Строка для проверки банов (тут нужен строгий поиск)
+            const fullStringForBan = [item.name, item.name_ru, item.name_es, item.slug, ...item.tags].join(" ").toLowerCase();
+            const hasNegative = negativeTerms.some(neg => fullStringForBan.includes(neg));
             if (hasNegative) return { item, score: -1000 };
 
-            // === B. УМНАЯ ФИЛЬТРАЦИЯ ПО РЕЖИМУ ===
+            // === УМНАЯ ПРОВЕРКА СОВПАДЕНИЙ ===
             
-            // Если просили "Помягче" (Safe Mode) -> Жестко баним экстрим
-            if (contextMode === 'softer') {
-                if (item.tags.some(t => EXTREME_TAGS.includes(t) || SPICY_TAGS.includes(t))) {
-                    return { item, score: -1000 }; // Исключаем даже при совпадении слов
-                }
-            }
+            // Собираем все слова, из которых состоит этот предмет, в один массив
+            // Разбиваем "Трах груди" -> ["трах", "груди"]
+            const targetWords = [];
             
-            // Если просили "Пожестче" (Extreme Mode) -> Штрафуем ваниль
-            if (contextMode === 'harder') {
-                if (item.tags.some(t => ['vanilla', 'romantic', 'soft', 'kissing'].includes(t))) {
-                    score -= 50; // Не баним, но понижаем приоритет
-                }
-                // Даем бонус за экстрим теги
-                if (item.tags.some(t => EXTREME_TAGS.includes(t) || SPICY_TAGS.includes(t))) {
-                    score += 20;
-                }
-            }
+            const addWords = (str) => {
+                if(str) str.toLowerCase().split(/[\s-]+/).forEach(w => targetWords.push(w));
+            };
+            
+            addWords(item.name);
+            addWords(item.name_ru);
+            addWords(item.name_es);
+            addWords(item.slug); // slug полезен, там английские корни
+            item.tags.forEach(t => targetWords.push(t));
 
-            // C. ПОДСЧЕТ ОЧКОВ ПО СЛОВАМ
+            // Проверяем каждый токен пользователя
             tokens.forEach(token => {
-                if (item.name.toLowerCase().includes(token)) {
-                    score += 50;
-                    if (!matchReasons.includes(token)) matchReasons.push(token);
+                let tokenMatched = false;
+
+                // 1. Проверяем SLUG целиком (самое точное)
+                if (item.slug === token) {
+                    score += 60;
+                    tokenMatched = true;
                 }
-                else if (item.tags.includes(token)) {
-                    score += 30;
-                    if (!matchReasons.includes(token)) matchReasons.push(token);
+                
+                // 2. Нечеткий поиск по всем словам предмета
+                else {
+                    // Ищем, есть ли в targetWords хоть одно слово, похожее на token
+                    const bestMatch = targetWords.find(word => isFuzzyMatch(token, word));
+                    
+                    if (bestMatch) {
+                        // Если совпало с тегом - меньше очков, если с названием - больше
+                        // (Упрощенно даем среднее, так как мы смешали массив)
+                        score += 40; 
+                        tokenMatched = true;
+                    }
+                }
+
+                if (tokenMatched && !matchReasons.includes(token)) {
+                    matchReasons.push(token);
                 }
             });
 
-            // D. БОНУСЫ
+            // === ЛОГИКА ФИЛЬТРАЦИИ И БОНУСОВ (как раньше) ===
+            if (contextMode === 'softer' && item.tags.some(t => EXTREME_TAGS.includes(t))) return { item, score: -1000 };
+            if (contextMode === 'harder') {
+                if (item.tags.some(t => ['vanilla', 'romantic'].includes(t))) score -= 50;
+                if (item.tags.some(t => EXTREME_TAGS.includes(t))) score += 20;
+            }
+
             if (score > 0) {
-                if (matchReasons.length >= 2) score += 20;
+                if (matchReasons.length >= 2) score += 20; // Комбо
                 if (favorites.includes(item.id)) score += 10;
                 if (cooldownList.includes(item.id)) score -= 30; 
                 score += Math.random() * 5;
