@@ -233,8 +233,6 @@
             filter: invert(0) !important; 
         }
 
-
-
         body {
             font-family: var(--font-main);
             background-color: var(--bg-color);
@@ -3070,6 +3068,33 @@
             filter: invert(1) drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
         }
 
+        /* иконка для боковых кнопок (scope.png, favorite.png) */
+        .side-icon-img {
+            width: 32px;  /* Чуть меньше, чем центральная (45px) */
+            height: 32px;
+            object-fit: contain;
+            pointer-events: none;
+            
+            /* Темная тема (Default): Инвертируем черный в белый + тень */
+            filter: invert(1) drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+            transition: filter 0.3s ease;
+        }
+
+        body.light-theme .side-icon-img {
+            filter: invert(0) drop-shadow(0 0 2px rgba(0, 0, 0, 0.1));
+        }
+
+        body.rainbow-mode .side-icon-img {
+            filter: invert(1) drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
+        }
+
+        body[data-theme="noir"] .side-icon-img {
+            filter: invert(1) !important;
+        }
+        body[data-theme="noir"] .mode-circle-btn:active .side-icon-img {
+            filter: invert(0) !important;
+        }
+
         .voice-icon-img {
             width: 24px; /* Чуть меньше кнопки */
             height: 24px;
@@ -3348,17 +3373,21 @@
                                 <!-- КНОПКИ РЕЖИМОВ -->
                                 <div id="mode-buttons-container" class="mode-buttons-row">
                                     
-                                    <!-- 1. Explore (Слева, поменьше) -->
-                                    <button class="mode-circle-btn side-btn explore" onclick="setAppModeAndStart('explore')">🔭</button>
+                                    <!-- 1. Explore (Scope Icon) -->
+                                    <button class="mode-circle-btn side-btn explore" onclick="setAppModeAndStart('explore')">
+                                        <img src="scope.png" class="side-icon-img" alt="Explore">
+                                    </button>
                                     
-                                    <!-- 2. AI Assistant (Центр, Большая) -->
+                                    <!-- 2. AI Assistant (AI Icon) -->
                                     <button class="mode-circle-btn center-btn ai-assist" onclick="openAssistantUI()">
                                         <img src="ai.png" class="ai-icon-img" alt="AI">
                                     </button>
                                     
-                                    <!-- 3. Pleasure (Справа, поменьше) -->
-                                    <button class="mode-circle-btn side-btn pleasure" onclick="setAppModeAndStart('pleasure')">🥰</button>
-                                
+                                    <!-- 3. Pleasure (Favorite Icon) -->
+                                    <button class="mode-circle-btn side-btn pleasure" onclick="setAppModeAndStart('pleasure')">
+                                        <img src="favorite.png" class="side-icon-img" alt="Pleasure">
+                                    </button>
+
                                 </div>
 
                                 <!-- UI АССИСТЕНТА -->
@@ -3666,35 +3695,36 @@
     <!-- BLOCK: PREFERENCES -->
     <div id="block-prefs">
         
-        <!-- Заголовок блока -->
+        <!-- Заголовок: Предпочтения -->
         <div class="ios-header" style="margin-top: 0;" data-key="header_prefs">Preferences</div>
 
-        <!-- Site Select -->
-        <div class="capsule-btn">
-            <span data-key="site_label">Site</span>
-            <select id="platform" onchange="savePlatform(this.value)" dir="rtl">
-                <option value="xh">xHamster</option>
-                <option value="ph">Pornhub</option>
-                <option value="xv">xVideos</option>
-                <option value="sb">SpankBang</option>
-                <option value="yp">YouPorn</option>
-                <option value="rt">RedTube</option>
-                <option value="google">Google Images</option>
-            </select>
-        </div>
-
-        <!-- Mode Select -->
-        <div class="capsule-btn">
-            <span data-key="mode_label">Mode</span>
-            <select id="app-mode-select" onchange="setAppMode(this.value)" dir="rtl">
-                <option value="explore" data-key="mode_explore">Explore</option>
-                <option value="pleasure" data-key="mode_pleasure">Pleasure</option>
-            </select>
-        </div>
-
-        <!-- Filters Group -->
-        <div class="ios-header" data-key="header_filters">Filters</div>
+        <!-- ЕДИНАЯ ГРУППА -->
         <div class="ios-group">
+            
+            <!-- 1. Выбор Сайта -->
+            <div class="ios-row">
+                <span class="platform-label" data-key="site_label">Site</span>
+                <select id="platform" class="platform-select" onchange="savePlatform(this.value)">
+                    <option value="xh">xHamster</option>
+                    <option value="ph">Pornhub</option>
+                    <option value="xv">xVideos</option>
+                    <option value="sb">SpankBang</option>
+                    <option value="yp">YouPorn</option>
+                    <option value="rt">RedTube</option>
+                    <option value="google">Google Images</option>
+                </select>
+            </div>
+
+            <!-- 2. Выбор Режима -->
+            <div class="ios-row">
+                <span class="platform-label" data-key="mode_label">Mode</span>
+                <select id="app-mode-select" class="platform-select" onchange="setAppMode(this.value)">
+                    <option value="explore" data-key="mode_explore">Explore</option>
+                    <option value="pleasure" data-key="mode_pleasure">Pleasure</option>
+                </select>
+            </div>
+
+            <!-- 3. Интенсивность (Range Slider) -->
             <div class="ios-row" style="display:block; padding: 15px 16px;">
                 <div style="font-size:16px; margin-bottom:15px;" data-key="exploration_mode">Exploration Mode</div>
                 <input type="range" min="1" max="3" value="1" class="range-slider" id="intensity-slider" oninput="updateIntensity(this.value)">
@@ -3705,6 +3735,7 @@
                 </div>
             </div>
 
+            <!-- 4. Ориентация -->
             <div class="ios-row">
                 <span class="platform-label" data-key="ori_label">Orientation</span>
                 <select id="orientation-select" class="platform-select" onchange="changeOrientation(this.value)">
@@ -3715,6 +3746,7 @@
                 </select>
             </div>
 
+            <!-- 5. Язык -->
             <div class="ios-row">
                 <span class="platform-label" data-key="lang_label">Language</span>
                 <select id="lang-select" class="platform-select" onchange="changeLanguage(this.value)">
@@ -3724,6 +3756,8 @@
                     <option value="de">Deutsch</option>
                 </select>
             </div>
+
+            <!-- 6. Поиск EN (для RU) -->
             <div id="comp-search" class="ios-row" style="display:none;">
                 <span class="toggle-text" data-key="search_en_label">Search EN</span>
                 <label class="switch">
@@ -3731,6 +3765,8 @@
                     <span class="slider"></span>
                 </label>
             </div>
+
+            <!-- 7. Тема -->
             <div class="ios-row clickable" onclick="openThemeModal()">
                 <span class="toggle-text" data-key="theme_label">Appearance</span>
                 <div style="display:flex; align-items:center; gap:10px;">
@@ -3738,6 +3774,8 @@
                     <span style="color:var(--text-secondary)">›</span>
                 </div>
             </div>
+
+            <!-- 8. Декор -->
             <div class="ios-row">
                 <span class="toggle-text" data-key="deco_label">Show Decorations</span>
                 <label class="switch">
@@ -8587,12 +8625,12 @@
         currentLang = val;
         localStorage.setItem(STORAGE.LANG, currentLang);
         applyLanguage();
+        randomizeModeGreeting();
         if (window.updateLastSyncUI) window.updateLastSyncUI(); 
         renderHistory();
         renderModifiers();
         updateThemeLabel();
         if(currentItem) { renderResultUI(currentItem, null); updateLink(); } 
-        else { setInitialText(); }
         updateToggleLabels();
         updateExploredCount();
     }
@@ -11779,7 +11817,7 @@
             select.value = currentAppMode;
         }
     }
-    
+
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.mode-capsule-wrapper')) {
             document.querySelectorAll('.mode-capsule-wrapper').forEach(el => el.classList.remove('open'));
