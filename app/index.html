@@ -5560,6 +5560,10 @@
     const TAG_DECAY_RATE = 0.98;
     const WRAPPED_THRESHOLD = 30;
     let data = [];
+    
+    let cryptoPollInterval = null;
+    let cryptoTimerInterval = null;
+    let currentBillingCycle = '1'; 
 
     const earlySponsors = [
         { name: "Alex M.", date: "Jan 2026" },
@@ -9950,10 +9954,6 @@
 
         document.getElementById('modal-sub-overlay').classList.add('open');
     }
-
-    let cryptoPollInterval = null;
-    let cryptoTimerInterval = null;
-    let currentBillingCycle = '1'; 
 
     function toggleCryptoGuide(show) {
         const main = document.getElementById('crypto-main-view');
