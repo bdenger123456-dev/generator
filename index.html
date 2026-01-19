@@ -5,17 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     
     <!-- === PRIMARY SEO === -->
-    <title>xFetishHub — Adult Analytics, Preference Tracker & Private Browser</title>
-    <meta name="title" content="xFetishHub — Adult Analytics, Preference Tracker & Private Browser">
+    <title>xFetishHub — FetishLM 1.0 & Private Adult Analytics</title>
+    <meta name="title" content="xFetishHub — FetishLM 1.0 & Private Adult Analytics">
     <meta name="description" content="Discover your true desires with xFetishHub. The #1 AI-powered adult preference tracker. Analyze porn statistics, explore 1000+ genres, and browse privately.">
-    <meta name="keywords" content="adult analytics, porn statistics, fetish tracker, private adult browser, porn habit tracker, fetish discovery, secure porn watching, AI adult recommendation">
+    <meta name="keywords" content="adult analytics, porn statistics, fetish tracker, private adult browser, porn habit tracker, fetish discovery, secure porn watching, AI adult recommendation, FetishLM">
     <meta name="robots" content="index, follow, max-image-preview:large">
     <meta name="theme-color" content="#050505">
 
     <!-- === SOCIAL / OPEN GRAPH === -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://www.xfetishhub.site/">
-    <meta property="og:title" content="xFetishHub — Adult Analytics & Preference Tracker">
+    <meta property="og:title" content="xFetishHub — FetishLM 1.0 & Preference Tracker">
     <meta property="og:description" content="Discover your true desires with xFetishHub. The #1 AI-powered adult preference tracker. Analyze porn statistics, explore 1000+ genres, and browse privately.">
     <meta property="og:image" content="https://www.xfetishhub.site/og-image.jpg">
     <meta property="og:image:width" content="1200">
@@ -24,7 +24,7 @@
 
     <!-- === TWITTER CARD === -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="xFetishHub — Adult Analytics & Preference Tracker">
+    <meta name="twitter:title" content="xFetishHub — FetishLM 1.0 & Preference Tracker">
     <meta name="twitter:description" content="Discover your true desires with AI. Analyze stats, explore 1000+ genres, and browse privately.">
     <meta name="twitter:image" content="https://www.xfetishhub.site/og-image.jpg">
     
@@ -58,7 +58,7 @@
       "applicationCategory": "LifestyleApplication",
       "operatingSystem": "Web, iOS, Android",
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-      "description": "xFetishHub is an advanced adult analytics tool and private browser."
+      "description": "xFetishHub is an advanced adult analytics tool and private browser powered by FetishLM."
     }
     </script>
 
@@ -117,8 +117,12 @@
         /* === DIVIDERS === */
         .section-divider { position: absolute; left: 0; width: 100%; height: var(--divider-height); z-index: 3; pointer-events: none; }
         .divider-hero-feat { top: 0; background: linear-gradient(to bottom, var(--bg-main), var(--bg-sec)); }
+        
+        /* Стандартный переход Серый -> Черный */
         .divider-gray-black { bottom: 0; background: linear-gradient(to bottom, var(--bg-sec), var(--bg-main)); }
+        /* Стандартный переход Черный -> Серый */
         .divider-black-gray { bottom: 0; background: linear-gradient(to bottom, var(--bg-main), var(--bg-sec)); }
+        
         .divider-map-foot { bottom: 0; background: linear-gradient(to bottom, var(--bg-sec), rgba(5,5,5,0)); z-index: 5; }
 
         /* HERO */
@@ -155,7 +159,7 @@
         .step-title { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 10px; }
         .step-desc { font-size: 15px; color: var(--text-sec); }
 
-        /* THE SCIENCE */
+        /* FETISHLM / SCIENCE */
         .text-block-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-top: 40px; align-items: start; }
         .text-content h3 { font-size: 24px; margin-bottom: 15px; color: #fff; }
         .text-content p { font-size: 16px; color: var(--text-sec); margin-bottom: 25px; line-height: 1.7; }
@@ -246,22 +250,48 @@
         
         .g-search-grad { background-image: linear-gradient(90deg, #FF416C, #FF4B2B); }
         .g-pleasure-grad { background-image: linear-gradient(90deg, #00b09b, #96c93d); }
-        .g-ai-grad { background-image: linear-gradient(90deg, #667eea, #764ba2); } /* New Gradient for AI */
+        .g-ai-grad { background-image: linear-gradient(90deg, #667eea, #764ba2); } /* New AI Gradient */
 
         .anim-emoji { position: absolute; top: 0; left: 50%; transform: translate(-50%, 20px); opacity: 0; font-size: 32px; pointer-events: none; z-index: 3; }
         
-        @keyframes emojiJump { 0% { transform: translate(-50%, 20px); opacity: 0; } 10% { transform: translate(-50%, -45px) scale(1.2); opacity: 1; } 40% { transform: translate(-50%, -45px) scale(1.2); opacity: 1; } 50% { transform: translate(-50%, 20px) scale(1); opacity: 0; } 100% { transform: translate(-50%, 20px); opacity: 0; } }
-        @keyframes textFade { 0% { opacity: 0; } 10% { opacity: 1; } 40% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 0; } }
+        /* Исправленная анимация прыжка (пониже) */
+        @keyframes emojiJump { 
+            0% { transform: translate(-50%, 20px); opacity: 0; } 
+            10% { transform: translate(-50%, -25px) scale(1.2); opacity: 1; } 
+            25% { transform: translate(-50%, -25px) scale(1.2); opacity: 1; } 
+            35% { transform: translate(-50%, 20px) scale(1); opacity: 0; } 
+            100% { transform: translate(-50%, 20px); opacity: 0; } 
+        }
         
-        .visible .anim-search .anim-emoji { animation: emojiJump 4s linear infinite; }
-        .visible .anim-search .grad-layer { animation: textFade 4s linear infinite; }
+        /* Исправленная анимация текста (30% времени видимости) */
+        @keyframes textFade { 
+            0% { opacity: 0; } 
+            10% { opacity: 1; } 
+            25% { opacity: 1; } 
+            35% { opacity: 0; } 
+            100% { opacity: 0; } 
+        }
         
-        .visible .anim-pleasure .anim-emoji { animation: emojiJump 4s linear infinite; animation-delay: 2s; }
-        .visible .anim-pleasure .grad-layer { animation: textFade 4s linear infinite; animation-delay: 2s; }
+        /* Тайминги для 3 элементов (6с цикл) */
+        .visible .anim-search .anim-emoji, .visible .anim-search .grad-layer { 
+            animation: emojiJump 6s linear infinite; 
+            animation-name: emojiJump; 
+        }
+        .visible .anim-search .grad-layer { animation-name: textFade; }
 
-        /* New AI Animations */
-        .visible .anim-ai .anim-emoji { animation: emojiJump 4s linear infinite; animation-delay: 4s; }
-        .visible .anim-ai .grad-layer { animation: textFade 4s linear infinite; animation-delay: 4s; }
+        .visible .anim-pleasure .anim-emoji, .visible .anim-pleasure .grad-layer { 
+            animation: emojiJump 6s linear infinite; 
+            animation-delay: 2s; 
+            animation-name: emojiJump;
+        }
+        .visible .anim-pleasure .grad-layer { animation-name: textFade; }
+
+        .visible .anim-ai .anim-emoji, .visible .anim-ai .grad-layer { 
+            animation: emojiJump 6s linear infinite; 
+            animation-delay: 4s; 
+            animation-name: emojiJump;
+        }
+        .visible .anim-ai .grad-layer { animation-name: textFade; }
 
         .anim-swipe-title { display: inline-block; transform-origin: bottom center; }
         .visible .anim-swipe-title { animation: swipeTilt 3s ease-in-out infinite; }
@@ -382,7 +412,7 @@
                                 <span class="base-text" data-i18n="f1_w2">Pleasure</span>
                                 <span class="grad-layer g-pleasure-grad" aria-hidden="true" data-i18n="f1_w2">Pleasure</span>
                             </span>
-                            &
+                            or
                             <span class="anim-word-wrap anim-ai">
                                 <span class="anim-emoji" aria-hidden="true">🗣️</span>
                                 <span class="base-text" data-i18n="f1_w3">AI Agent</span>
@@ -459,8 +489,36 @@
             <div class="section-divider divider-black-gray"></div>
         </section>
 
+        <!-- FETISHLM 1.0 (Former Science) -->
+        <section id="deep-dive" class="bg-sec">
+            <div class="container fade-in">
+                <div style="text-align: center; margin-bottom: 40px;">
+                    <h2><span class="gradient-text" data-i18n="flm_title">FetishLM 1.0</span></h2>
+                    <p style="color:var(--text-sec); font-size:18px; margin-top:10px;" data-i18n="flm_subtitle">Uncensored & Serverless</p>
+                </div>
+                
+                <div class="text-block-grid">
+                    <div class="text-content">
+                        <h3 data-i18n="sci_1_head">Better than Tube Systems</h3>
+                        <p data-i18n="sci_1_desc">Most adult websites use basic algorithms that only show you what is popular globally. FetishLM creates an echo chamber of your true desires. It functions as a <strong>personal discovery engine</strong>, tracking micro-interactions to build a complex map of your interests.</p>
+                        
+                        <h3 data-i18n="sci_2_head">Local & Private Storage</h3>
+                        <p data-i18n="sci_2_desc">Your 'interest graph' and viewing history are stored locally on your device or in an encrypted cloud container if you choose to sync. We do not sell your data. Your secrets stay on your device.</p>
+                    </div>
+                    <div class="text-content">
+                        <h3 data-i18n="sci_3_head">No Data Collection</h3>
+                        <p data-i18n="sci_3_desc">Unlike big corporations, xFetishHub is built with privacy first. We don't need your personal data to provide recommendations. The AI runs on the client-side logic, ensuring maximum anonymity.</p>
+                        
+                        <h3 data-i18n="sci_4_head">Works on Any Device</h3>
+                        <p data-i18n="sci_4_desc">Whether you are on iPhone, Android, or PC, xFetishHub works seamlessly. Install it as a PWA app directly from the browser for a full-screen experience that doesn't clutter your main history.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="section-divider divider-gray-black"></div>
+        </section>
+
         <!-- PRICING SECTION -->
-        <section id="pricing" class="bg-sec">
+        <section id="pricing" class="bg-main">
             <div class="container">
                 <div style="text-align: center; margin-bottom: 60px;" class="fade-in">
                     <h2 data-i18n="price_title">What is the price of pleasure?</h2>
@@ -507,36 +565,9 @@
                         </div>
                         <ul class="plan-features">
                             <li style="color:var(--text-main)" data-i18n="feat_lifetime_full">♾️ <b>Lifetime Access</b></li>
-                            <li style="color:var(--text-main)" data-i18n="feat_all_pro">👑 <b>All Pro Features</b></li>
+                            <li style="color:var(--text-main)" data-i18n="feat_all_beast">👑 <b>All Beast Features</b></li>
                             <li data-i18n="feat_sponsors">💎 Listed in "Sponsors"</li>
                         </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="section-divider divider-gray-black"></div>
-        </section>
-        
-        <!-- THE SCIENCE -->
-        <section id="deep-dive" class="bg-main">
-            <div class="container fade-in">
-                <div style="text-align: center; margin-bottom: 40px;">
-                    <h2><span data-i18n="sci_title">The <span class="gradient-text">Science</span> Behind Desire</span></h2>
-                </div>
-                
-                <div class="text-block-grid">
-                    <div class="text-content">
-                        <h3 data-i18n="sci_1_head">Why standard tube sites fail you</h3>
-                        <p data-i18n="sci_1_desc">Most adult websites use basic algorithms that only show you what is popular globally. They create an echo chamber. <span class="highlight">xFetishHub</span> takes a different approach. We function as a <strong>personal discovery engine</strong>. By tracking micro-interactions (what you skip, what you replay), we build a complex vector map of your interests.</p>
-                        
-                        <h3 data-i18n="sci_2_head">Hybrid Secure Storage</h3>
-                        <p data-i18n="sci_2_desc">We use a hybrid approach to security. Your "interest graph" and viewing history are stored in a secure, encrypted cloud environment to allow synchronization across your devices. However, when you use our <strong>private browser</strong> as an installed app (PWA), the viewing session history is kept separate from your main browser's logs.</p>
-                    </div>
-                    <div class="text-content">
-                        <h3 data-i18n="sci_3_head">Detailed Porn Statistics</h3>
-                        <p data-i18n="sci_3_desc">Data visualization isn't just for finance. By visualizing your consumption habits, you gain self-awareness. Our <strong>fetish tracker</strong> breaks down your history into specific genres and tags. Users often report discovering specific fetishes they were previously unaware of, simply because the data highlighted a pattern.</p>
-                        
-                        <h3 data-i18n="sci_4_head">Cross-Platform PWA</h3>
-                        <p data-i18n="sci_4_desc">You don't need to download a shady APK. xFetishHub is a Progressive Web App. This modern web technology allows you to install the app directly from the browser to your home screen. It runs in its own isolated sandbox, ensuring that your adult browsing session remains completely separate from your day-to-day phone usage.</p>
                     </div>
                 </div>
             </div>
@@ -551,15 +582,15 @@
                 </div>
                  <div class="roadmap-list fade-in">
                     <div class="roadmap-separator"><div class="separator-line line-left"></div><span data-i18n="rm_phase_1">Phase 1: Intelligence</span><div class="separator-line line-right"></div></div>
-                    <div class="roadmap-card"><div class="roadmap-row"><div class="roadmap-date" data-i18n="rm_q1">Q1 2026</div><div class="roadmap-content"><h4 data-i18n="rm_1_head">Global Intelligence</h4><p data-i18n="rm_1_desc">Anonymous global charts.</p></div><div class="roadmap-status status-progress" data-i18n="st_progress">In Progress</div></div></div>
+                    <div class="roadmap-card"><div class="roadmap-row"><div class="roadmap-date" data-i18n="rm_q1">Q1 2026</div><div class="roadmap-content"><h4 data-i18n="rm_1_head">Global Intelligence</h4><p data-i18n="rm_1_desc">Match with similar users & see global trends.</p></div><div class="roadmap-status status-progress" data-i18n="st_progress">In Progress</div></div></div>
                     
                     <div class="roadmap-separator"><div class="separator-line line-left"></div><span data-i18n="rm_phase_2">Phase 2: Connection</span><div class="separator-line line-right"></div></div>
-                    <div class="roadmap-card"><div class="roadmap-row"><div class="roadmap-date" data-i18n="rm_q2">Q2 2026</div><div class="roadmap-content"><h4 data-i18n="rm_2_head">Co-op Mode</h4><p data-i18n="rm_2_desc">Connect with a partner.</p></div><div class="roadmap-status status-planned" data-i18n="st_plan">Planned</div></div></div>
+                    <div class="roadmap-card"><div class="roadmap-row"><div class="roadmap-date" data-i18n="rm_q2">Q2 2026</div><div class="roadmap-content"><h4 data-i18n="rm_2_head">Co-op Mode</h4><p data-i18n="rm_2_desc">Connect with partner/friends to plan the evening.</p></div><div class="roadmap-status status-planned" data-i18n="st_plan">Planned</div></div></div>
                     
                     <div class="roadmap-separator"><div class="separator-line line-left"></div><span data-i18n="rm_phase_3">Phase 3: Expansion</span><div class="separator-line line-right"></div></div>
                     <div class="roadmap-card">
-                        <div class="roadmap-row"><div class="roadmap-date" data-i18n="rm_q3">Q3 2026</div><div class="roadmap-content"><h4 data-i18n="rm_3_head">5000+ Categories</h4><p data-i18n="rm_3_desc">Massive database expansion.</p></div><div class="roadmap-status status-planned" data-i18n="st_plan">Planned</div></div>
-                        <div class="roadmap-row"><div class="roadmap-date" data-i18n="rm_q3">Q3 2026</div><div class="roadmap-content"><h4 data-i18n="rm_actors_head">Actor Selector</h4><p data-i18n="rm_actors_desc">Find stars based on visuals.</p></div><div class="roadmap-status status-planned" data-i18n="st_plan">Planned</div></div>
+                        <div class="roadmap-row"><div class="roadmap-date" data-i18n="rm_q3">Q3 2026</div><div class="roadmap-content"><h4 data-i18n="rm_3_head">Database Expansion</h4><p data-i18n="rm_3_desc">Micro-fetishes in micro-niches. Miss nothing.</p></div><div class="roadmap-status status-planned" data-i18n="st_plan">Planned</div></div>
+                        <div class="roadmap-row"><div class="roadmap-date" data-i18n="rm_q3">Q3 2026</div><div class="roadmap-content"><h4 data-i18n="rm_actors_head">Actor Mode</h4><p data-i18n="rm_actors_desc">Find stars based on preferences to realize fantasies.</p></div><div class="roadmap-status status-planned" data-i18n="st_plan">Planned</div></div>
                     </div>
                 </div>
             </div>
@@ -700,19 +731,31 @@
                 f3_prefix: "Adult ", f3_target: "Statistics", f3_desc: "Learn about your favorite genres and see detailed summaries in Wrapped style 🔥",
                 f4_title: "Total Privacy", f4_desc: "Watch videos on your phone in a private browser that doesn't keep history in your main browser 🤫",
                 
+                // FetishLM
+                flm_title: "FetishLM 1.0",
+                flm_subtitle: "Uncensored & Serverless",
+                sci_1_head: "Better than Tube Systems", sci_1_desc: "Most adult websites use basic algorithms that only show you what is popular globally. FetishLM creates an echo chamber of your true desires. It functions as a <strong>personal discovery engine</strong>, tracking micro-interactions to build a complex map of your interests.",
+                sci_2_head: "Local & Private Storage", sci_2_desc: "Your 'interest graph' and viewing history are stored locally on your device or in an encrypted cloud container if you choose to sync. We do not sell your data. Your secrets stay on your device.",
+                sci_3_head: "No Data Collection", sci_3_desc: "Unlike big corporations, xFetishHub is built with privacy first. We don't need your personal data to provide recommendations. The AI runs on the client-side logic, ensuring maximum anonymity.",
+                sci_4_head: "Works on Any Device", sci_4_desc: "Whether you are on iPhone, Android, or PC, xFetishHub works seamlessly. Install it as a PWA app directly from the browser for a full-screen experience that doesn't clutter your main history.",
+
                 // Plans
                 feat_limit: "🎲 10 Generations / day", feat_wrapped_limited: "🎁 1 Fetish Wrapped / week", feat_stats_basic: "📊 Basic Statistics", feat_no_ads: "🚫 No Ads", feat_privacy_list: "🔒 Total Privacy",
                 per_mo: "/ mo", per_once: "/ once",
                 feat_unlim: "🔥 <b>Unlimited</b> Generations", feat_stats_adv: "📈 Advanced Stats & History", feat_wrapped_unlim: "✨ <b>Unlimited</b> Fetish Wrapped", feat_custom: "🎨 Deep Customization",
                 feat_all_pro: "👑 <b>All Pro Features</b>", feat_discord: "💬 <b>Discord</b> (Dev Chat)", feat_vote: "🗳️ Impact on new functionality",
                 feat_lifetime_full: "♾️ <b>Lifetime Access</b>", feat_sponsors: "💎 Listed in 'Sponsors'", badge_limited: "LIMITED OFFER", feat_lifetime: "Lifetime", limit_burn: "🔥 ALMOST GONE", limit_claimed: "claimed",
+                feat_all_beast: "👑 <b>All Beast Features</b>",
 
                 // Roadmap
                 map_title: "Future <span class='gradient-text'>Plans</span>",
-                rm_phase_1: "Phase 1: Intelligence", rm_1_head: "Global Intelligence", rm_1_desc: "Anonymous global charts.",
-                rm_phase_2: "Phase 2: Connection", rm_2_head: "Co-op Mode", rm_2_desc: "Connect with a partner.",
-                rm_phase_3: "Phase 3: Expansion", rm_3_head: "5000+ Categories", rm_3_desc: "Massive database expansion.",
-                rm_actors_head: "Actor Selector", rm_actors_desc: "Find stars based on visuals.",
+                rm_phase_1: "Phase 1: Intelligence", 
+                rm_1_head: "Global Intelligence", rm_1_desc: "Match with similar users & see global trends.",
+                rm_phase_2: "Phase 2: Connection", 
+                rm_2_head: "Co-op Mode", rm_2_desc: "Connect with partner/friends to plan the evening.",
+                rm_phase_3: "Phase 3: Expansion", 
+                rm_3_head: "Database Expansion", rm_3_desc: "Micro-fetishes in micro-niches. Miss nothing.",
+                rm_actors_head: "Actor Mode", rm_actors_desc: "Find stars based on preferences to realize fantasies.",
                 st_progress: "In Progress", st_plan: "Planned",
                 rm_q1: "Q1 2026", rm_q2: "Q2 2026", rm_q3: "Q3 2026",
 
@@ -728,12 +771,6 @@
                 step2_title: "Algorithm Learns", step2_desc: "Our machine learning model analyzes the visual patterns of your likes and dislikes. It builds a unique anonymous profile of your preferences.",
                 step3_title: "Get Statistics", step3_desc: "After a few sessions, open your Profile to see detailed charts. Maybe you will discover a completely new side of yourself.",
                 
-                sci_title: "The <span class='gradient-text'>Science</span> Behind Desire",
-                sci_1_head: "Why standard tube sites fail you", sci_1_desc: "Most adult websites use basic algorithms that only show you what is popular globally. They create an echo chamber. <span class='highlight'>xFetishHub</span> takes a different approach. We function as a <strong>personal discovery engine</strong>. By tracking micro-interactions (what you skip, what you replay), we build a complex vector map of your interests.",
-                sci_2_head: "Hybrid Secure Storage", sci_2_desc: "We use a hybrid approach to security. Your 'interest graph' and viewing history are stored in a secure, encrypted cloud environment to allow synchronization across your devices. However, when you use our <strong>private browser</strong> as an installed app (PWA), the viewing session history is kept separate from your main browser's logs.",
-                sci_3_head: "Detailed Porn Statistics", sci_3_desc: "Data visualization isn't just for finance. By visualizing your consumption habits, you gain self-awareness. Our <strong>fetish tracker</strong> breaks down your history into specific genres and tags. Users often report discovering specific fetishes they were previously unaware of, simply because the data highlighted a pattern.",
-                sci_4_head: "Cross-Platform PWA", sci_4_desc: "You don't need to download a shady APK. xFetishHub is a Progressive Web App. This modern web technology allows you to install the app directly from the browser to your home screen. It runs in its own isolated sandbox, ensuring that your adult browsing session remains completely separate from your day-to-day phone usage.",
-
                 faq_title: "Frequently Asked <span class='gradient-text'>Questions</span>",
                 q1: "Is xFetishHub completely anonymous?", a1: "Yes. We prioritize your privacy above all else. xFetishHub operates as a secure sandbox. Your viewing history and generated statistics are stored in a secure, encrypted cloud environment to allow synchronization. When used as a PWA, your session is isolated from your main browser history.",
                 q2: "How does the recommendation algorithm work?", a2: "Think of it as 'Tinder for Adult Content'. Our AI analyzes the metadata of the videos you like versus those you dislike. Over time, it builds a vector profile of your tastes to suggest new genres you might enjoy but haven't discovered yet.",
@@ -754,17 +791,29 @@
                 f3_prefix: "Взрослая ", f3_target: "статистика", f3_desc: "Узнавай о своих любимых жанрах, и смотри детальные сводки в стиле Wrapped 🔥",
                 f4_title: "Полная приватность", f4_desc: "Смотри видео на телефоне в приватном браузере, который не хранит историю в твоём браузере 🤫",
                 
+                // FetishLM
+                flm_title: "FetishLM 1.0",
+                flm_subtitle: "Без цензуры и сервера",
+                sci_1_head: "Лучше системы тьюбов", sci_1_desc: "Обычные тьюбы показывают только то, что популярно у масс. FetishLM — это <strong>персональный поисковик</strong>. Он строит векторную карту твоих интересов, основываясь на микро-реакциях, создавая эхо-камеру твоих истинных желаний.",
+                sci_2_head: "Локальная статистика", sci_2_desc: "Твой «граф интересов» и история хранятся локально на устройстве или в зашифрованном облаке (если включишь синхронизацию). Твои секреты остаются при тебе.",
+                sci_3_head: "Не собирает данные", sci_3_desc: "В отличие от корпораций, мы не продаем данные. ИИ работает на стороне клиента, обеспечивая максимальную анонимность.",
+                sci_4_head: "Работает везде", sci_4_desc: "iPhone, Android или ПК — неважно. Установи как PWA-приложение прямо из браузера для полного погружения без засорения истории основного браузера.",
+
                 feat_limit: "🎲 10 Генераций / день", feat_wrapped_limited: "🎁 1 Fetish Wrapped / неделю", feat_stats_basic: "📊 Базовая статистика", feat_no_ads: "🚫 Без рекламы", feat_privacy_list: "🔒 Полная приватность",
                 per_mo: "/ мес", per_once: "/ раз",
                 feat_unlim: "🔥 <b>Безлимитные</b> генерации", feat_stats_adv: "📈 Расширенные сводки", feat_wrapped_unlim: "✨ <b>Безлимитный</b> Wrapped", feat_custom: "🎨 Кастомизация",
                 feat_all_pro: "👑 <b>Все функции Pro</b>", feat_discord: "💬 <b>Discord</b> (Чат с девом)", feat_vote: "🗳️ Влияние на функционал",
                 feat_lifetime_full: "♾️ <b>Доступ навсегда</b>", feat_sponsors: "💎 В списке Спонсоров", badge_limited: "ОГРАНИЧЕНО", feat_lifetime: "Навсегда", limit_burn: "🔥 СКОРО РАЗБЕРУТ", limit_claimed: "забрали",
+                feat_all_beast: "👑 <b>Все функции Beast</b>",
 
                 map_title: "Планы <span class='gradient-text'>Развития</span>",
-                rm_phase_1: "Этап 1: Интеллект", rm_1_head: "Глобальный Разум", rm_1_desc: "Мировые топы жанров.",
-                rm_phase_2: "Этап 2: Связь", rm_2_head: "Совместный Режим", rm_2_desc: "Ищи совпадения с партнером.",
-                rm_phase_3: "Этап 3: Экспансия", rm_3_head: "5000+ Категорий", rm_3_desc: "Расширение базы.",
-                rm_actors_head: "Поиск Актеров", rm_actors_desc: "Поиск звезд по внешности.",
+                rm_phase_1: "Этап 1: Интеллект", 
+                rm_1_head: "Глобальный Разум", rm_1_desc: "Подбор фетишей, которые нравятся людям, похожим на вас, и глобальная статистика лучших и хайповых фетишей 🔥.",
+                rm_phase_2: "Этап 2: Связь", 
+                rm_2_head: "Совместный Режим", rm_2_desc: "Подключай партнёра или друзей к своей сессии и вместе готовьте планы на вечер 😈.",
+                rm_phase_3: "Этап 3: Экспансия", 
+                rm_3_head: "Расширение базы данных", rm_3_desc: "Каждый микрофетиш в микронише, больше не будет повода переживать, что что-то пропустишь 😏.",
+                rm_actors_head: "Режим с актёрами", rm_actors_desc: "На основе своих предпочтений находи актёров, которые смогут реализовать твои фантазии ☺️.",
                 st_progress: "В работе", st_plan: "В планах",
                 rm_q1: "Q1 2026", rm_q2: "Q2 2026", rm_q3: "Q3 2026",
 
@@ -774,15 +823,9 @@
                 seo_text: "xFetishHub — ведущий мировой <strong>трекер предпочтений</strong> и поисковая система для взрослых. Сочетая продвинутую <strong>порно-статистику</strong> с защищенным <strong>приватным браузером</strong>, мы помогаем пользователям безопасно исследовать свою сексуальность. Платформа поддерживает более 1000+ жанров, используя машинное обучение для персональных рекомендаций.",
 
                 hiw_title: "Как <span class='gradient-text'>Это Работает</span>", hiw_sub: "Найти свои скрытые интересы проще, чем кажется.",
-                step1_title: "Выбери Свой Путь", step1_desc: "Выбери режим или просто скажи ИИ, чего ты хочешь. Дальше просто свайпай: вправо — лайк, влево — пас.",
+                step1_title: "Выбери Свой Путь", step1_desc: "Выбери 'Исследование', 'Наслаждение' или просто скажи ИИ, чего ты хочешь. Дальше просто свайпай.",
                 step2_title: "Алгоритм Учится", step2_desc: "Наша модель машинного обучения анализирует паттерны твоих лайков и дизлайков. Она строит уникальный анонимный профиль предпочтений.",
                 step3_title: "Смотри Статистику", step3_desc: "После пары сессий открой профиль. Возможно, ты откроешь себя с совершенно другой стороны.",
-
-                sci_title: "<span class='gradient-text'>Наука</span> Желания",
-                sci_1_head: "Почему обычные тьюбы устарели", sci_1_desc: "Большинство сайтов показывают только то, что популярно у всех. <span class='highlight'>xFetishHub</span> работает иначе. Мы — <strong>персональный поисковик</strong>. Отслеживая микро-взаимодействия, мы строим векторную карту твоих интересов.",
-                sci_2_head: "Гибридная Защита", sci_2_desc: "Мы используем гибридный подход к безопасности. Твой «граф интересов» и история хранятся в защищенном облаке для синхронизации. Однако, при использовании PWA, сессия просмотра изолирована от истории основного браузера.",
-                sci_3_head: "Детальная Статистика", sci_3_desc: "Визуализация данных полезна не только в финансах. Видя свои привычки, ты лучше понимаешь себя. Наш <strong>трекер</strong> разбивает историю по жанрам и тегам. Пользователи часто открывают для себя новые фетиши просто благодаря статистике.",
-                sci_4_head: "Кросс-платформенное PWA", sci_4_desc: "Не нужно качать сомнительные APK. xFetishHub — это Progressive Web App. Ты можешь установить приложение прямо из браузера на домашний экран. Оно работает в изолированной «песочнице», отдельно от твоего основного браузера.",
 
                 faq_title: "Частые <span class='gradient-text'>Вопросы</span>",
                 q1: "xFetishHub полностью анонимен?", a1: "Да. Приватность — наш приоритет. История просмотров и статистика хранятся в зашифрованном облаке для синхронизации. Мы не связываем эти данные с твоей реальной личностью или аккаунтом Google. В PWA режиме история браузера не сохраняется.",
@@ -807,19 +850,31 @@
                 f3_prefix: "Estadísticas ", f3_target: "Adultas", f3_desc: "Aprende sobre tus géneros favoritos y mira resúmenes detallados al estilo Wrapped 🔥",
                 f4_title: "Privacidad Total", f4_desc: "Mira videos en tu teléfono en un navegador privado que no guarda historial en tu navegador principal 🤫",
                 
+                // FetishLM
+                flm_title: "FetishLM 1.0",
+                flm_subtitle: "Sin censura y sin servidor",
+                sci_1_head: "Mejor que los sitios tube", sci_1_desc: "La mayoría de sitios usan algoritmos básicos. FetishLM funciona como un <strong>motor de descubrimiento personal</strong>, rastreando micro-interacciones para construir un mapa complejo de tus intereses.",
+                sci_2_head: "Almacenamiento Local y Privado", sci_2_desc: "Tu 'gráfico de intereses' e historial se guardan localmente o en una nube encriptada. No vendemos tus datos. Tus secretos se quedan en tu dispositivo.",
+                sci_3_head: "Sin Recopilación de Datos", sci_3_desc: "A diferencia de las grandes corporaciones, xFetishHub está construido con privacidad primero. La IA corre en el lado del cliente.",
+                sci_4_head: "Funciona en Cualquier Dispositivo", sci_4_desc: "iPhone, Android o PC. Instálalo como PWA directamente desde el navegador para una experiencia de pantalla completa.",
+
                 // Plans
                 feat_limit: "🎲 10 Generaciones / día", feat_wrapped_limited: "🎁 1 Fetish Wrapped / semana", feat_stats_basic: "📊 Estadísticas básicas", feat_no_ads: "🚫 Sin anuncios", feat_privacy_list: "🔒 Privacidad Total",
                 per_mo: "/ mes", per_once: "/ una vez",
                 feat_unlim: "🔥 Generaciones <b>Ilimitadas</b>", feat_stats_adv: "📈 Estadísticas Avanzadas", feat_wrapped_unlim: "✨ Fetish Wrapped <b>Ilimitado</b>", feat_custom: "🎨 Personalización Profunda",
                 feat_all_pro: "👑 <b>Todo de Pro</b>", feat_discord: "💬 <b>Discord</b> (Chat Dev)", feat_vote: "🗳️ Vota funciones nuevas",
                 feat_lifetime_full: "♾️ <b>Acceso de por vida</b>", feat_sponsors: "💎 En la lista de Patrocinadores", badge_limited: "OFERTA LIMITADA", feat_lifetime: "De por vida", limit_burn: "🔥 CASI AGOTADO", limit_claimed: "reclamados",
+                feat_all_beast: "👑 <b>Todo de Beast</b>",
 
                 // Roadmap
                 map_title: "Planes <span class='gradient-text'>Futuros</span>",
-                rm_phase_1: "Fase 1: Inteligencia", rm_1_head: "Inteligencia Global", rm_1_desc: "Gráficos globales anónimos.",
-                rm_phase_2: "Fase 2: Conexión", rm_2_head: "Modo Cooperativo", rm_2_desc: "Conecta con tu pareja.",
-                rm_phase_3: "Fase 3: Expansión", rm_3_head: "5000+ Categorías", rm_3_desc: "Expansión masiva de base de datos.",
-                rm_actors_head: "Selector de Actores", rm_actors_desc: "Encuentra estrellas por su apariencia.",
+                rm_phase_1: "Fase 1: Inteligencia", 
+                rm_1_head: "Inteligencia Global", rm_1_desc: "Coincidencias con usuarios similares y tendencias globales.",
+                rm_phase_2: "Fase 2: Conexión", 
+                rm_2_head: "Modo Cooperativo", rm_2_desc: "Conecta con tu pareja/amigos para planear la noche.",
+                rm_phase_3: "Fase 3: Expansión", 
+                rm_3_head: "Expansión de Base de Datos", rm_3_desc: "Micro-fetiches en micro-nichos. No te pierdas nada.",
+                rm_actors_head: "Modo Actor", rm_actors_desc: "Encuentra estrellas basadas en preferencias para realizar fantasías.",
                 st_progress: "En Progreso", st_plan: "Planeado",
                 rm_q1: "T1 2026", rm_q2: "T2 2026", rm_q3: "T3 2026",
 
@@ -835,12 +890,6 @@
                 step2_title: "El Algoritmo Aprende", step2_desc: "Nuestro modelo de aprendizaje automático analiza los patrones visuales de tus gustos. Construye un perfil anónimo único de tus preferencias.",
                 step3_title: "Obtén Estadísticas", step3_desc: "Después de unas sesiones, abre tu Perfil para ver gráficos detallados. Quizás descubras un lado completamente nuevo de ti mismo.",
                 
-                sci_title: "La <span class='gradient-text'>Ciencia</span> del Deseo",
-                sci_1_head: "Por qué los sitios tube fallan", sci_1_desc: "La mayoría de sitios usan algoritmos básicos que solo muestran lo popular globalmente. <span class='highlight'>xFetishHub</span> es diferente. Funcionamos como un <strong>motor de descubrimiento personal</strong>. Rastreando micro-interacciones, construimos un mapa vectorial de tus intereses.",
-                sci_2_head: "Almacenamiento Híbrido", sci_2_desc: "Usamos seguridad híbrida. Tu 'gráfico de intereses' e historial se guardan en una nube encriptada para sincronización. Sin embargo, al usar nuestra <strong>PWA</strong>, la sesión de visualización se mantiene aislada de los registros de tu navegador principal.",
-                sci_3_head: "Estadísticas Detalladas", sci_3_desc: "La visualización de datos no es solo para finanzas. Al ver tus hábitos, ganas autoconciencia. Nuestro <strong>rastreador</strong> desglosa tu historial en géneros y etiquetas específicas.",
-                sci_4_head: "PWA Multiplataforma", sci_4_desc: "No necesitas descargar APKs dudosos. xFetishHub es una Progressive Web App. Puedes instalarla directamente desde el navegador a tu pantalla de inicio. Funciona en su propia 'caja de arena' aislada.",
-
                 faq_title: "Preguntas <span class='gradient-text'>Frecuentes</span>",
                 q1: "¿Es xFetishHub totalmente anónimo?", a1: "Sí. Priorizamos tu privacidad. Tu historial y estadísticas se guardan encriptados. Al usar la PWA, tu sesión está aislada del historial de tu navegador principal.",
                 q2: "¿Cómo funciona el algoritmo?", a2: "Piénsalo como un 'Tinder para Contenido Adulto'. Nuestra IA analiza los metadatos de los videos que te gustan. Con el tiempo, construye un perfil para sugerir nuevos géneros.",
@@ -864,19 +913,31 @@
                 f3_prefix: "Erotik ", f3_target: "Statistik", f3_desc: "Erfahre mehr über deine Lieblingsgenres und sieh dir detaillierte Zusammenfassungen im Wrapped-Stil an 🔥",
                 f4_title: "Totale Privatsphäre", f4_desc: "Schaue Videos auf deinem Handy in einem privaten Browser, der keinen Verlauf in deinem Hauptbrowser speichert 🤫",
                 
+                // FetishLM
+                flm_title: "FetishLM 1.0",
+                flm_subtitle: "Unzensiert & Serverlos",
+                sci_1_head: "Besser als Tube-Systeme", sci_1_desc: "FetishLM fungiert als <strong>persönliche Entdeckungsmaschine</strong>. Indem wir Mikro-Interaktionen verfolgen, erstellen wir eine komplexe Karte deiner Interessen.",
+                sci_2_head: "Lokaler & Privater Speicher", sci_2_desc: "Dein 'Interessengraph' wird lokal oder verschlüsselt gespeichert. Wir verkaufen keine Daten.",
+                sci_3_head: "Keine Datenerfassung", sci_3_desc: "xFetishHub ist 'Privacy First'. Die KI läuft clientseitig für maximale Anonymität.",
+                sci_4_head: "Funktioniert überall", sci_4_desc: "iPhone, Android oder PC. Installiere es als PWA für ein Vollbild-Erlebnis.",
+
                 // Plans
                 feat_limit: "🎲 10 Generierungen / Tag", feat_wrapped_limited: "🎁 1 Fetish Wrapped / Woche", feat_stats_basic: "📊 Basis-Statistiken", feat_no_ads: "🚫 Keine Werbung", feat_privacy_list: "🔒 Totale Privatsphäre",
                 per_mo: "/ Monat", per_once: "/ Einmalig",
                 feat_unlim: "🔥 <b>Unbegrenzte</b> Generierungen", feat_stats_adv: "📈 Erweiterte Statistik & Verlauf", feat_wrapped_unlim: "✨ <b>Unbegrenztes</b> Fetish Wrapped", feat_custom: "🎨 Tiefe Anpassung",
                 feat_all_pro: "👑 <b>Alle Pro-Funktionen</b>", feat_discord: "💬 <b>Discord</b> (Dev Chat)", feat_vote: "🗳️ Abstimmung über neue Funktionen",
                 feat_lifetime_full: "♾️ <b>Lebenslanger Zugriff</b>", feat_sponsors: "💎 In der Sponsorenliste", badge_limited: "BEGRENZTES ANGEBOT", feat_lifetime: "Lifetime", limit_burn: "🔥 FAST WEG", limit_claimed: "beansprucht",
+                feat_all_beast: "👑 <b>Alle Beast-Funktionen</b>",
 
                 // Roadmap
                 map_title: "Zukunfts <span class='gradient-text'>pläne</span>",
-                rm_phase_1: "Phase 1: Intelligenz", rm_1_head: "Globale Intelligenz", rm_1_desc: "Anonyme globale Charts.",
-                rm_phase_2: "Phase 2: Verbindung", rm_2_head: "Koop-Modus", rm_2_desc: "Verbinde dich mit einem Partner.",
-                rm_phase_3: "Phase 3: Expansion", rm_3_head: "5000+ Kategorien", rm_3_desc: "Massive Datenbankerweiterung.",
-                rm_actors_head: "Darsteller-Auswahl", rm_actors_desc: "Finde Stars basierend auf Optik.",
+                rm_phase_1: "Phase 1: Intelligenz", 
+                rm_1_head: "Globale Intelligenz", rm_1_desc: "Abgleich mit ähnlichen Nutzern & globale Trends.",
+                rm_phase_2: "Phase 2: Verbindung", 
+                rm_2_head: "Koop-Modus", rm_2_desc: "Verbinde dich mit Partnern/Freunden für den Abend.",
+                rm_phase_3: "Phase 3: Expansion", 
+                rm_3_head: "Datenbank-Erweiterung", rm_3_desc: "Mikro-Fetische in Mikro-Nischen. Verpasse nichts.",
+                rm_actors_head: "Darsteller-Modus", rm_actors_desc: "Finde Stars basierend auf Vorlieben.",
                 st_progress: "In Arbeit", st_plan: "Geplant",
                 rm_q1: "Q1 2026", rm_q2: "Q2 2026", rm_q3: "Q3 2026",
 
@@ -888,16 +949,10 @@
 
                 // Sections
                 hiw_title: "Wie <span class='gradient-text'>Es Funktioniert</span>", hiw_sub: "Deine versteckten Interessen zu entdecken ist einfacher als du denkst.",
-                step1_title: "Wähle deinen Weg", step1_desc: "Wähle 'Entdecken', 'Vergnügen' oder sage dem KI-Agenten, was du willst. Dann einfach swipen.",
+                step1_title: "Wähle deinen Weg", step1_desc: "Wähle 'Entdecken', 'Vergnügen' oder sag dem KI-Agenten, was du willst. Dann einfach swipen.",
                 step2_title: "Algorithmus Lernt", step2_desc: "Unser maschinelles Lernmodell analysiert die visuellen Muster deiner Likes und Dislikes. Es erstellt ein einzigartiges anonymes Profil deiner Vorlieben.",
                 step3_title: "Erhalte Statistiken", step3_desc: "Öffne nach ein paar Sitzungen dein Profil, um detaillierte Diagramme zu sehen. Vielleicht entdeckst du eine ganz neue Seite an dir.",
                 
-                sci_title: "Die <span class='gradient-text'>Wissenschaft</span> des Verlangens",
-                sci_1_head: "Warum Standard-Tube-Seiten versagen", sci_1_desc: "Die meisten Erotikseiten verwenden einfache Algorithmen, die nur zeigen, was global beliebt ist. <span class='highlight'>xFetishHub</span> geht einen anderen Weg. Wir fungieren als <strong>persönliche Entdeckungsmaschine</strong>. Indem wir Mikro-Interaktionen verfolgen, erstellen wir eine komplexe Vektorkarte deiner Interessen.",
-                sci_2_head: "Hybrider Sicherer Speicher", sci_2_desc: "Wir nutzen hybride Sicherheit. Dein 'Interessengraph' wird verschlüsselt in der Cloud gespeichert, um Synchronisation zu ermöglichen. Wenn du jedoch unsere <strong>PWA</strong> nutzt, bleibt der Sitzungsverlauf von deinem Hauptbrowser getrennt.",
-                sci_3_head: "Detaillierte Statistik", sci_3_desc: "Datenvisualisierung ist nicht nur für Finanzen. Indem du deine Gewohnheiten visualisierst, gewinnst du Selbsterkenntnis. Unser <strong>Tracker</strong> schlüsselt deinen Verlauf in spezifische Genres und Tags auf.",
-                sci_4_head: "Plattformübergreifende PWA", sci_4_desc: "Du musst keine zwielichtigen APKs herunterladen. xFetishHub ist eine Progressive Web App. Du kannst die App direkt aus dem Browser auf deinem Startbildschirm installieren. Sie läuft in ihrer eigenen isolierten Sandbox.",
-
                 faq_title: "Häufige <span class='gradient-text'>Fragen</span>",
                 q1: "Ist xFetishHub völlig anonym?", a1: "Ja. Deine Privatsphäre hat oberste Priorität. Verlauf und Statistiken werden verschlüsselt gespeichert. Bei Nutzung als PWA ist deine Sitzung vom Hauptbrowser-Verlauf isoliert.",
                 q2: "Wie funktioniert der Algorithmus?", a2: "Stell es dir vor wie 'Tinder für Erwachseneninhalte'. Unsere KI analysiert die Metadaten der Videos, die du magst. Mit der Zeit erstellt sie ein Profil, um neue Genres vorzuschlagen.",
