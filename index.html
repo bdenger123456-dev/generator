@@ -243,15 +243,26 @@
         .anim-word-wrap { position: relative; display: inline-block; }
         .base-text { color: #fff; position: relative; z-index: 1; }
         .grad-layer { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background-size: 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; opacity: 0; z-index: 2; }
+        
         .g-search-grad { background-image: linear-gradient(90deg, #FF416C, #FF4B2B); }
         .g-pleasure-grad { background-image: linear-gradient(90deg, #00b09b, #96c93d); }
+        .g-ai-grad { background-image: linear-gradient(90deg, #667eea, #764ba2); } /* New Gradient for AI */
+
         .anim-emoji { position: absolute; top: 0; left: 50%; transform: translate(-50%, 20px); opacity: 0; font-size: 32px; pointer-events: none; z-index: 3; }
+        
         @keyframes emojiJump { 0% { transform: translate(-50%, 20px); opacity: 0; } 10% { transform: translate(-50%, -45px) scale(1.2); opacity: 1; } 40% { transform: translate(-50%, -45px) scale(1.2); opacity: 1; } 50% { transform: translate(-50%, 20px) scale(1); opacity: 0; } 100% { transform: translate(-50%, 20px); opacity: 0; } }
         @keyframes textFade { 0% { opacity: 0; } 10% { opacity: 1; } 40% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 0; } }
+        
         .visible .anim-search .anim-emoji { animation: emojiJump 4s linear infinite; }
         .visible .anim-search .grad-layer { animation: textFade 4s linear infinite; }
+        
         .visible .anim-pleasure .anim-emoji { animation: emojiJump 4s linear infinite; animation-delay: 2s; }
         .visible .anim-pleasure .grad-layer { animation: textFade 4s linear infinite; animation-delay: 2s; }
+
+        /* New AI Animations */
+        .visible .anim-ai .anim-emoji { animation: emojiJump 4s linear infinite; animation-delay: 4s; }
+        .visible .anim-ai .grad-layer { animation: textFade 4s linear infinite; animation-delay: 4s; }
+
         .anim-swipe-title { display: inline-block; transform-origin: bottom center; }
         .visible .anim-swipe-title { animation: swipeTilt 3s ease-in-out infinite; }
         @keyframes swipeTilt { 0% { transform: rotate(0deg); } 25% { transform: rotate(-5deg); } 50% { transform: rotate(0deg); } 75% { transform: rotate(5deg); } 100% { transform: rotate(0deg); } }
@@ -365,14 +376,20 @@
                                 <span class="base-text" data-i18n="f1_w1">Search</span>
                                 <span class="grad-layer g-search-grad" aria-hidden="true" data-i18n="f1_w1">Search</span>
                             </span>
-                            &
+                            ,
                             <span class="anim-word-wrap anim-pleasure">
                                 <span class="anim-emoji" aria-hidden="true">🥰</span>
                                 <span class="base-text" data-i18n="f1_w2">Pleasure</span>
                                 <span class="grad-layer g-pleasure-grad" aria-hidden="true" data-i18n="f1_w2">Pleasure</span>
                             </span>
+                            &
+                            <span class="anim-word-wrap anim-ai">
+                                <span class="anim-emoji" aria-hidden="true">🗣️</span>
+                                <span class="base-text" data-i18n="f1_w3">AI Agent</span>
+                                <span class="grad-layer g-ai-grad" aria-hidden="true" data-i18n="f1_w3">AI Agent</span>
+                            </span>
                         </h3>
-                        <p data-i18n="f1_desc">Depending on your mood, choose what to watch: classics or something more interesting 😈</p>
+                        <p data-i18n="f1_desc">Trust us with your choice of what to watch: we will adapt to your requests and mood 😈</p>
                     </div>
                     <div class="feature-img-wrapper"><img src="feat_explore.webp" alt="Exploration Interface" loading="lazy" class="feature-img"></div>
                 </article>
@@ -425,7 +442,7 @@
                     <div class="step-card">
                         <div class="step-num">01</div>
                         <h3 class="step-title" data-i18n="step1_title">Choose Your Path</h3>
-                        <p class="step-desc" data-i18n="step1_desc">Select "Explore" to find hidden gems or "Pleasure" for recommendations based on your taste. Then simply Swipe: Right to like, Left to pass.</p>
+                        <p class="step-desc" data-i18n="step1_desc">Select 'Explore', 'Pleasure' or tell the AI Agent what you desire. Then simply Swipe.</p>
                     </div>
                     <div class="step-card">
                         <div class="step-num">02</div>
@@ -677,7 +694,8 @@
                 price_title: "What is the price of pleasure?", price_subtitle: "If you want total freedom, here are my terms:",
                 
                 // Features
-                f1_w1: "Search", f1_w2: "Pleasure", f1_desc: "Depending on your mood, choose what to watch: classics or something more interesting 😈",
+                f1_w1: "Explore", f1_w2: "Pleasure", f1_w3: "AI Agent",
+                f1_desc: "Trust us with your choice of what to watch: we will adapt to your requests and mood 😈",
                 f2_title: "Smart Cards", f2_desc: "The more you use it, the better recommendations await you 😏",
                 f3_prefix: "Adult ", f3_target: "Statistics", f3_desc: "Learn about your favorite genres and see detailed summaries in Wrapped style 🔥",
                 f4_title: "Total Privacy", f4_desc: "Watch videos on your phone in a private browser that doesn't keep history in your main browser 🤫",
@@ -706,7 +724,7 @@
 
                 // Sections
                 hiw_title: "How <span class='gradient-text'>It Works</span>", hiw_sub: "Discovering your hidden interests is simpler than you think.",
-                step1_title: "Choose Your Path", step1_desc: "Select 'Explore' to find hidden gems or 'Pleasure' for recommendations based on your taste. Then simply Swipe: Right to like, Left to pass.",
+                step1_title: "Choose Your Path", step1_desc: "Select 'Explore', 'Pleasure' or tell the AI Agent what you desire. Then simply Swipe.",
                 step2_title: "Algorithm Learns", step2_desc: "Our machine learning model analyzes the visual patterns of your likes and dislikes. It builds a unique anonymous profile of your preferences.",
                 step3_title: "Get Statistics", step3_desc: "After a few sessions, open your Profile to see detailed charts. Maybe you will discover a completely new side of yourself.",
                 
@@ -730,7 +748,8 @@
                 btn_launch: "Запустить", btn_install: "Установить на телефон",
                 feat_title: "Почему <span class='gradient-text'>xFetishHub</span>?",
                 price_title: "Какова цена удовольствия?", price_subtitle: "Если хочешь полную свободу, то вот мои условия:",
-                f1_w1: "Поиск", f1_w2: "Наслаждение", f1_desc: "По настроению выбирай что хочешь посмотреть: классику или чего поинтереснее 😈",
+                f1_w1: "Поиск", f1_w2: "Наслаждение", f1_w3: "Скажи сам",
+                f1_desc: "Доверь нам свой выбор что посмотреть: подстроимся под твои запросы и настроение 😈",
                 f2_title: "Умные карточки", f2_desc: "Чем больше ты пользуешься, тем лучше рекомендации тебя ожидают 😏",
                 f3_prefix: "Взрослая ", f3_target: "статистика", f3_desc: "Узнавай о своих любимых жанрах, и смотри детальные сводки в стиле Wrapped 🔥",
                 f4_title: "Полная приватность", f4_desc: "Смотри видео на телефоне в приватном браузере, который не хранит историю в твоём браузере 🤫",
@@ -755,7 +774,7 @@
                 seo_text: "xFetishHub — ведущий мировой <strong>трекер предпочтений</strong> и поисковая система для взрослых. Сочетая продвинутую <strong>порно-статистику</strong> с защищенным <strong>приватным браузером</strong>, мы помогаем пользователям безопасно исследовать свою сексуальность. Платформа поддерживает более 1000+ жанров, используя машинное обучение для персональных рекомендаций.",
 
                 hiw_title: "Как <span class='gradient-text'>Это Работает</span>", hiw_sub: "Найти свои скрытые интересы проще, чем кажется.",
-                step1_title: "Выбери Свой Путь", step1_desc: "Выбери 'Исследование' для поиска скрытых жемчужин или 'Наслаждение' для рекомендаций по вкусу. Дальше просто свайпай: вправо — лайк, влево — пас.",
+                step1_title: "Выбери Свой Путь", step1_desc: "Выбери режим или просто скажи ИИ, чего ты хочешь. Дальше просто свайпай: вправо — лайк, влево — пас.",
                 step2_title: "Алгоритм Учится", step2_desc: "Наша модель машинного обучения анализирует паттерны твоих лайков и дизлайков. Она строит уникальный анонимный профиль предпочтений.",
                 step3_title: "Смотри Статистику", step3_desc: "После пары сессий открой профиль. Возможно, ты откроешь себя с совершенно другой стороны.",
 
@@ -782,7 +801,8 @@
                 price_title: "¿Cuál es el precio del placer?", price_subtitle: "Si quieres libertad total, aquí están mis condiciones:",
                 
                 // Features
-                f1_w1: "Buscar", f1_w2: "Placer", f1_desc: "Según tu estado de ánimo, elige qué ver: clásicos o algo más interesante 😈",
+                f1_w1: "Explorar", f1_w2: "Placer", f1_w3: "Dilo tú",
+                f1_desc: "Confíanos tu elección: nos adaptaremos a tus peticiones y estado de ánimo 😈",
                 f2_title: "Tarjetas Inteligentes", f2_desc: "Cuanto más lo usas, mejores recomendaciones te esperan 😏",
                 f3_prefix: "Estadísticas ", f3_target: "Adultas", f3_desc: "Aprende sobre tus géneros favoritos y mira resúmenes detallados al estilo Wrapped 🔥",
                 f4_title: "Privacidad Total", f4_desc: "Mira videos en tu teléfono en un navegador privado que no guarda historial en tu navegador principal 🤫",
@@ -811,7 +831,7 @@
 
                 // Sections
                 hiw_title: "Cómo <span class='gradient-text'>Funciona</span>", hiw_sub: "Descubrir tus intereses ocultos es más simple de lo que crees.",
-                step1_title: "Elige tu Camino", step1_desc: "Selecciona 'Explorar' para encontrar joyas ocultas o 'Placer' para recomendaciones basadas en tus gustos. Luego simplemente desliza: Derecha para like, Izquierda para pasar.",
+                step1_title: "Elige tu Camino", step1_desc: "Selecciona 'Explorar', 'Placer' o dile a la IA lo que deseas. Luego simplemente desliza.",
                 step2_title: "El Algoritmo Aprende", step2_desc: "Nuestro modelo de aprendizaje automático analiza los patrones visuales de tus gustos. Construye un perfil anónimo único de tus preferencias.",
                 step3_title: "Obtén Estadísticas", step3_desc: "Después de unas sesiones, abre tu Perfil para ver gráficos detallados. Quizás descubras un lado completamente nuevo de ti mismo.",
                 
@@ -838,7 +858,8 @@
                 price_title: "Was kostet das Vergnügen?", price_subtitle: "Wenn du totale Freiheit willst, hier sind meine Bedingungen:",
                 
                 // Features
-                f1_w1: "Suche", f1_w2: "Vergnügen", f1_desc: "Wähle je nach Stimmung, was du sehen willst: Klassiker oder etwas Interessanteres 😈",
+                f1_w1: "Suche", f1_w2: "Vergnügen", f1_w3: "Sag es selbst",
+                f1_desc: "Vertraue uns deine Wahl an: Wir passen uns deinen Wünschen und deiner Stimmung an 😈",
                 f2_title: "Smart Cards", f2_desc: "Je mehr du es nutzt, desto bessere Empfehlungen erwarten dich 😏",
                 f3_prefix: "Erotik ", f3_target: "Statistik", f3_desc: "Erfahre mehr über deine Lieblingsgenres und sieh dir detaillierte Zusammenfassungen im Wrapped-Stil an 🔥",
                 f4_title: "Totale Privatsphäre", f4_desc: "Schaue Videos auf deinem Handy in einem privaten Browser, der keinen Verlauf in deinem Hauptbrowser speichert 🤫",
@@ -867,7 +888,7 @@
 
                 // Sections
                 hiw_title: "Wie <span class='gradient-text'>Es Funktioniert</span>", hiw_sub: "Deine versteckten Interessen zu entdecken ist einfacher als du denkst.",
-                step1_title: "Wähle deinen Weg", step1_desc: "Wähle 'Entdecken', um verborgene Schätze zu finden, oder 'Vergnügen' für Empfehlungen nach deinem Geschmack. Dann einfach swipen: Rechts für Like, Links für Pass.",
+                step1_title: "Wähle deinen Weg", step1_desc: "Wähle 'Entdecken', 'Vergnügen' oder sage dem KI-Agenten, was du willst. Dann einfach swipen.",
                 step2_title: "Algorithmus Lernt", step2_desc: "Unser maschinelles Lernmodell analysiert die visuellen Muster deiner Likes und Dislikes. Es erstellt ein einzigartiges anonymes Profil deiner Vorlieben.",
                 step3_title: "Erhalte Statistiken", step3_desc: "Öffne nach ein paar Sitzungen dein Profil, um detaillierte Diagramme zu sehen. Vielleicht entdeckst du eine ganz neue Seite an dir.",
                 
