@@ -949,6 +949,37 @@
         .nav-item.active .nav-icon { transform: translateY(-2px); color: var(--accent); }
         .nav-icon { font-size: 22px; margin-bottom: 2px; transition: transform 0.2s; }
 
+        .nav-icon-img {
+            height: 24px;
+            width: 24px;
+            object-fit: contain;
+            margin-bottom: 4px;
+            transition: filter 0.3s, transform 0.2s;
+            
+            filter: invert(1);
+        }
+
+        /* Светлая тема */
+        body.light-theme .nav-icon-img {
+            filter: invert(0);
+            opacity: 0.6;
+        }
+
+        /* Радужная тема: Белый с тенью */
+        body.rainbow-mode .nav-icon-img {
+            filter: invert(1) drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+        }
+
+        /* Активное состояние (светлая тема) */
+        body.light-theme .nav-item.active .nav-icon-img {
+            filter: invert(0);
+            opacity: 1;
+        }
+
+        .nav-item.active .nav-icon-img {
+            transform: scale(1.1);
+        }
+
         /* =========================================
         8. MODALS (GENERAL)
         ========================================= */
@@ -3810,13 +3841,16 @@
 
 <div class="bottom-nav">
     <div class="nav-item active" onclick="switchTab('home')" id="nav-home">
-        <span class="nav-icon">🎲</span> <span data-key="nav_home">Home</span>
+        <img src="home.png" class="nav-icon-img" alt="Home">
+        <span data-key="nav_home">Home</span>
     </div>
     <div class="nav-item" onclick="switchTab('settings')" id="nav-settings">
-        <span class="nav-icon">⚙️</span> <span data-key="nav_settings">Settings</span>
+        <img src="settings.png" class="nav-icon-img" alt="Settings">
+        <span data-key="nav_settings">Settings</span>
     </div>
     <div class="nav-item" onclick="switchTab('account')" id="nav-account">
-        <span class="nav-icon">👤</span> <span data-key="nav_account">Account</span>
+        <img src="account.png" class="nav-icon-img" alt="Account">
+        <span data-key="nav_account">Account</span>
     </div>
 </div>
 
@@ -9351,7 +9385,7 @@
             else if (currentStatsTimeframe === 'month') cutoffTime = now - 30 * oneDay;
             else if (currentStatsTimeframe === 'year') cutoffTime = now - 365 * oneDay;
             
-            // 1. АГРЕГАЦИЯ
+            // Агрегация данных
             activityLog.forEach(log => {
                 if (log.ts < cutoffTime) return;
                 const d = new Date(log.ts);
@@ -9406,12 +9440,6 @@
                 if (maxCount < 10) maxCount = 10;
                 if (maxTime < 300) maxTime = 300; 
 
-                // === ЛОКАЛИЗАЦИЯ ЕДИНИЦ (Chart) ===
-                let timeUnit = 'm'; // Default EN
-                if (currentLang === 'ru') timeUnit = 'м';
-                else if (currentLang === 'es') timeUnit = 'min';
-                else if (currentLang === 'de') timeUnit = 'min';
-
                 chartData.forEach(d => {
                     const hGen = (d.gen / maxCount) * 100;
                     const hWatch = (d.watch / maxCount) * 100;
@@ -9421,16 +9449,19 @@
 
                     html += `
                         <div class="act-col" style="min-width: 55px; margin-right: 8px;">
+                            
+                            <!-- Столбики -->
                             <div style="display:flex; align-items:flex-end; gap:2px; height:75%; width:100%; padding-bottom:5px;">
                                 <div style="flex:1; background:var(--text-secondary); height:${Math.max(2, hGen)}%; border-radius:2px 2px 0 0; opacity:0.3;"></div>
                                 <div style="flex:1; background:var(--accent); height:${Math.max(2, hWatch)}%; border-radius:2px 2px 0 0;"></div>
                                 <div style="flex:1; background:#9b59b6; height:${Math.max(2, hTime)}%; border-radius:2px 2px 0 0;"></div>
                             </div>
                             
-                            <div style="display:flex; justify-content:space-between; width:100%; font-size:9px; font-weight:700; margin-top:2px;">
-                                <span style="color:var(--text-secondary); opacity:0.6;">${d.gen}</span>
-                                <span style="color:var(--accent);">${d.watch}</span>
-                                <span style="color:#9b59b6;">${timeMin}${timeUnit}</span>
+                            <!-- Цифры -->
+                            <div style="display:flex; gap:2px; width:100%; margin-top:2px;">
+                                <div style="flex:1; text-align:center; font-size:9px; font-weight:700; color:var(--text-secondary); opacity:0.6;">${d.gen}</div>
+                                <div style="flex:1; text-align:center; font-size:9px; font-weight:700; color:var(--accent);">${d.watch}</div>
+                                <div style="flex:1; text-align:center; font-size:9px; font-weight:700; color:#9b59b6;">${timeMin}</div>
                             </div>
                             
                             <div class="chart-label-x" style="font-size:9px; margin-top:3px;">${d.label}</div>
@@ -9441,7 +9472,7 @@
 
             html += `</div></div>`; 
 
-            // === ЛОКАЛИЗАЦИЯ ЕДИНИЦ (Legend) ===
+            // Легенда
             let legendUnit = 'min';
             if (currentLang === 'ru') legendUnit = 'мин';
 
@@ -11656,22 +11687,36 @@
 
     function switchHistoryTab(tab) {
         currentHistoryTab = tab;
-        
-        const btnSwipes = document.getElementById('hist-nav-swipes');
-        const btnWatch = document.getElementById('hist-nav-watch');
-        const listSwipes = document.getElementById('hist-list-swipes');
-        const listWatch = document.getElementById('hist-list-watch');
-        document.getElementById('hist-list-wrapped').style.display = 'none';
 
+        // 1. Получаем ссылки на кнопки
+        const navs = {
+            swipes: document.getElementById('hist-nav-swipes'),
+            watch: document.getElementById('hist-nav-watch'),
+            wrapped: document.getElementById('hist-nav-wrapped')
+        };
+
+        // 2. Получаем ссылки на списки
+        const lists = {
+            swipes: document.getElementById('hist-list-swipes'),
+            watch: document.getElementById('hist-list-watch'),
+            wrapped: document.getElementById('hist-list-wrapped')
+        };
+
+        // 3. Сбрасываем активные классы и скрываем списки
+        Object.values(navs).forEach(el => { if(el) el.classList.remove('active'); });
+        Object.values(lists).forEach(el => { if(el) el.style.display = 'none'; });
+
+        // 4. Активируем нужную вкладку
+        if (navs[tab]) navs[tab].classList.add('active');
+        if (lists[tab]) lists[tab].style.display = 'block';
+
+        // 5. Рендерим содержимое
         if (tab === 'wrapped') {
-            document.getElementById('hist-list-wrapped').style.display = 'block';
-            renderWrappedArchive();
+            if(typeof renderWrappedArchive === 'function') renderWrappedArchive();
         } else if (tab === 'swipes') {
-            document.getElementById('hist-list-swipes').style.display = 'block';
-            renderSwipesHistoryList();
-        } else {
-            document.getElementById('hist-list-watch').style.display = 'block';
-            renderWatchHistoryList();
+            if(typeof renderSwipesHistoryList === 'function') renderSwipesHistoryList();
+        } else if (tab === 'watch') {
+            if(typeof renderWatchHistoryList === 'function') renderWatchHistoryList();
         }
     }
 
