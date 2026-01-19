@@ -4319,6 +4319,17 @@
                 </p>
             </div>
 
+            <div class="billing-toggle-container" style="display:flex; justify-content:center; margin-bottom: 20px;">
+                <div class="stats-nav-capsule" style="width: auto; min-width: 200px;">
+                    <div id="btn-billing-monthly" class="stats-nav-item active" onclick="switchBilling('monthly')">
+                        Monthly
+                    </div>
+                    <div id="btn-billing-yearly" class="stats-nav-item" onclick="switchBilling('yearly')">
+                        Yearly <span style="font-size:10px; color:var(--accent); margin-left:3px;">-20%</span>
+                    </div>
+                </div>
+            </div>
+
             <!-- PLANS CONTAINER (Flex on PC) -->
             <div class="plans-container">
                 
@@ -4337,7 +4348,7 @@
                 <!-- PRO CARD -->
                 <div class="plan-card pro">
                     <div class="plan-title">Pro <span style="font-size:12px; opacity:0.7">Fan</span></div>
-                    <div class="plan-price">$1.99 <span style="font-size:12px">/ mo</span></div>
+                    <div class="plan-price" id="price-pro">$2.99 <span style="font-size:12px">/ mo</span></div>
                     <ul class="plan-features">
                         <li style="color:var(--text-main)" data-key="feat_unlim">🔥 <b>Unlimited</b> Generations</li>
                         <li data-key="feat_stats_adv">📈 Advanced Stats & History</li>
@@ -4351,7 +4362,7 @@
                 <!-- BEAST CARD -->
                 <div class="plan-card beast">
                     <div class="plan-title">Beast <span style="font-size:12px; opacity:0.7">Sponsor</span></div>
-                    <div class="plan-price">$4.99 <span style="font-size:12px">/ mo</span></div>
+                    <div class="plan-price" id="price-beast">$4.99 <span style="font-size:12px">/ mo</span></div>
                     <ul class="plan-features">
                         <li style="color:var(--text-main)" data-key="feat_all_pro">👑 <b>All Pro Features</b></li>
                         <li data-key="feat_discord">💬 <b>Discord</b> (Dev Chat)</li>
@@ -9081,7 +9092,7 @@
         document.querySelectorAll('[data-key]').forEach(el => {
             const key = el.getAttribute('data-key');
             if(t[key]) {
-                if (key.startsWith('inst_') || key.startsWith('badge_') || key.startsWith('feat_') || key === 'sync_tip') {
+                if (key.startsWith('inst_') || key.startsWith('badge_') || key.startsWith('feat_') || key.startsWith('pay_') || key.startsWith('guide_') || key === 'sync_tip') {
                     el.innerHTML = t[key];
                 } else {
                     el.innerText = t[key];
@@ -9980,31 +9991,26 @@
         if (cycle === 'monthly') {
             currentBillingCycle = '1';
             
-            // Стили кнопок
-            btnMon.style.background = "var(--nav-bg)";
-            btnMon.style.color = "var(--text-main)";
-            btnYear.style.background = "transparent";
-            btnYear.style.color = "var(--text-secondary)";
+            // Переключаем классы активности (используем стили stats-nav-item)
+            btnMon.classList.add('active');
+            btnYear.classList.remove('active');
             
-            // Цены
-            pricePro.innerHTML = `$2.99 <span style="font-size:12px">/ mo</span>`;
-            priceBeast.innerHTML = `$4.99 <span style="font-size:12px">/ mo</span>`;
+            // Цены Месяц
+            if(pricePro) pricePro.innerHTML = `$2.99 <span style="font-size:12px">/ mo</span>`;
+            if(priceBeast) priceBeast.innerHTML = `$4.99 <span style="font-size:12px">/ mo</span>`;
         } 
         else {
             currentBillingCycle = '12';
             
-            // Стили кнопок
-            btnYear.style.background = "var(--nav-bg)";
-            btnYear.style.color = "var(--text-main)";
-            btnMon.style.background = "transparent";
-            btnMon.style.color = "var(--text-secondary)";
+            btnYear.classList.add('active');
+            btnMon.classList.remove('active');
             
-            // Цены (Годовые)
-            pricePro.innerHTML = `$19.99 <span style="font-size:12px">/ year</span>`;
-            priceBeast.innerHTML = `$49.99 <span style="font-size:12px">/ year</span>`;
+            // Цены Год (скидка)
+            if(pricePro) pricePro.innerHTML = `$19.99 <span style="font-size:12px">/ year</span>`;
+            if(priceBeast) priceBeast.innerHTML = `$49.99 <span style="font-size:12px">/ year</span>`;
         }
     }
-
+    
     async function openPaymentSelection(type) {
         if (!window.isUserLoggedIn) {
             openLoginModal();
