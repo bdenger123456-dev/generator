@@ -1911,6 +1911,54 @@
             font-size: 11px; font-weight: 700; color: var(--text-main);
         }
 
+        /* WRAPPED ARCHIVE (Вкладка истории) */
+        .wrapped-archive-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px; background: var(--ios-card); margin-bottom: 1px;
+            cursor: pointer; position: relative;
+        }
+        .wrapped-archive-item:active { background: var(--nav-bg); }
+        .w-badge {
+            font-size: 10px; font-weight: 800; text-transform: uppercase;
+            padding: 4px 8px; border-radius: 6px; color: #000; margin-left: 10px;
+        }
+        .w-badge.daily { background: #bdc3c7; } /* Серый */
+        .w-badge.weekly { background: #2ecc71; } /* Зеленый */
+        .w-badge.monthly { background: #f1c40f; } /* Золотой */
+        .w-badge.yearly { background: linear-gradient(45deg, #FF9900, #9B59B6); color: #fff; }
+
+        /* ФИНАЛЬНАЯ КАРТОЧКА */
+        .sum-card-new {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 24px; padding: 30px;
+            width: 90%; max-width: 360px;
+            display: flex; flex-direction: column; gap: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            position: relative; overflow: hidden;
+        }
+        .sum-logo-new { font-weight: 900; font-size: 24px; color: #fff; letter-spacing: -1px; }
+        .sum-logo-new span.grad { 
+            background: linear-gradient(180deg, #CB53F0 20%, var(--accent) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .sum-logo-new span.neutral { color: #fff; }
+
+        .sum-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .sum-stat-box { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; text-align: center; }
+        .sum-stat-val { font-size: 22px; font-weight: 800; color: #fff; }
+        .sum-stat-lbl { font-size: 10px; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-top: 4px; }
+
+        /* Значки достижений */
+        .achievement-badge {
+            width: 120px; height: 120px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 50px; margin-bottom: 20px;
+            box-shadow: 0 0 30px rgba(255,255,255,0.2);
+            border: 4px solid rgba(255,255,255,0.1);
+        }
+
         /* Финальная сводка (Summary Card) */
         .summary-card {
             background: rgba(255,255,255,0.1);
@@ -3781,17 +3829,13 @@
             <span style="cursor:pointer" onclick="closeHistoryModal(null, true)">✕</span>
         </div>
 
-        <!-- Контейнеры списков (Тело с прокруткой) -->
         <div class="modal-body" style="padding: 0; flex: 1; overflow-y: auto;">
-            <div id="hist-list-swipes" style="display:block;">
-                <!-- Сюда рендерится история генераций -->
-            </div>
-            <div id="hist-list-watch" style="display:none;">
-                <!-- Сюда рендерится история времени просмотра -->
-            </div>
+            <div id="hist-list-swipes" style="display:block;"></div>
+            <div id="hist-list-watch" style="display:none;"></div>
+            <div id="hist-list-wrapped" style="display:none;"></div> 
         </div>
 
-        <!-- Переключатель вкладок (Footer - Прижат к низу) -->
+        <!-- Footer -->
         <div style="padding: 15px 20px 20px 20px; flex-shrink: 0;">
             <div class="stats-nav-capsule" style="height: 45px;">
                 <div class="stats-nav-item active" id="hist-nav-swipes" onclick="switchHistoryTab('swipes')">
@@ -3799,6 +3843,9 @@
                 </div>
                 <div class="stats-nav-item" id="hist-nav-watch" onclick="switchHistoryTab('watch')">
                     <span data-key="hist_tab_watch">Time</span>
+                </div>
+                <div class="stats-nav-item" id="hist-nav-wrapped" onclick="switchHistoryTab('wrapped')">
+                    <span>Wrapped</span>
                 </div>
             </div>
         </div>
@@ -7490,294 +7537,90 @@
         }
     };
 
-    const wrappedPhrases = {
-        en: {
-            // SCENARIO 1: FIRST TIME EVER (The Initiation)
-            story_first: {
-                intro: [
-                    "Hey {name}... Finally decided to peek behind the curtain? 👀<br><br>I've been quietly taking notes while you were... occupied. You think your choices were random, but I see a pattern in the chaos.",
-                    "Welcome, {name}. I was waiting for you. 🕯️<br><br>You've spent quite some time exploring your desires here. It's time to stop for a moment, catch your breath, and look at your reflection in the data mirror."
-                ],
-                activity: [
-                    "You didn't hold back, did you? The algorithm is heating up just processing your data. <br><br>Let's look at the sheer volume of your curiosity.",
-                    "Finger gymnastics at its finest. You swiped, clicked, and searched with purpose. <br><br>Here is the scale of your journey so far."
-                ],
-                timing: [
-                    "Everyone has their own rhythm. Yours? It's distinct.<br><br>While the world was spinning, you carved out specific moments for yourself. We know exactly when your demons come out to play.",
-                ],
-                obsession: [
-                    "And now... the truth. <br><br>Out of hundreds of possibilities, your brain kept rewiring itself back to specific themes. These aren't just tags; they are your map.",
-                ],
-                archetype: [
-                    "So, who are you really? <br><br>We've crunched the numbers, analyzed the heatmaps, and found your digital soulmate. This is your Archetype."
-                ]
+    // --- WRAPPED DATA & TEXTS ---
+    const WRAPPED_CONFIG = {
+        badges: {
+            en: { daily: "Daily", weekly: "Weekly", monthly: "Monthly", yearly: "Yearly" },
+            ru: { daily: "За день", weekly: "Неделя", monthly: "Месяц", yearly: "Итоги года" },
+            es: { daily: "Diario", weekly: "Semanal", monthly: "Mensual", yearly: "Anual" },
+            de: { daily: "Täglich", weekly: "Wöchentlich", monthly: "Monatlich", yearly: "Jährlich" }
+        },
+        // Фразы для слайдов (Intro)
+        phrases: {
+            daily: {
+                en: ["Quick check-in? Let's see.", "Another day, another stats.", "Your daily dose of data."],
+                ru: ["Быстрая проверка? Смотрим.", "Новый день, новые цифры.", "Твоя дневная доза данных."],
+                es: ["¿Chequeo rápido? Veamos.", "Otro día, otras estadísticas.", "Tu dosis diaria de datos."],
+                de: ["Kurzer Check? Mal sehen.", "Neuer Tag, neue Daten.", "Deine tägliche Dosis."]
             },
-
-            // SCENARIO 2: REGULAR / WEEKLY (The Check-up)
-            story_regular: {
-                intro: [
-                    "Look who's back, {name}. 😏<br><br>It's been a busy week for your thumbs, hasn't it? I've collected everything you did since we last spoke. Ready to see if your tastes have evolved?",
-                    "Caught you again, {name}. ✨<br><br>Another cycle, another set of desires. You've been digging deeper this time. Let's unwrap the latest chapter of your story."
-                ],
-                activity: [
-                    "Consistency is key, and you... well, you are definitely consistent. <br><br>The numbers don't lie. You've been active. Very active.",
-                    "Your dopamine receptors must be working overtime. <br><br>We tracked every swipe and every hesitation. Here is the summary of your digital workout."
-                ],
-                timing: [
-                    "Time flies when you're having fun. <br><br>But your internal clock has a specific schedule for pleasure. Here is when the magic usually happens."
-                ],
-                obsession: [
-                    "Let's talk about what lives in your head rent-free. <br><br>You tried new things, but you always came back home to these specific categories.",
-                ],
-                archetype: [
-                    "Based on your recent behavior, your vibe has shifted... or solidified. <br><br>Here is how the algorithm sees you right now."
-                ]
+            weekly: {
+                en: ["It's been a busy week.", "Seven days of secrets.", "Your week in review."],
+                ru: ["Неделька была насыщенной.", "Семь дней секретов.", "Обзор твоей недели."],
+                es: ["Ha sido una semana ocupada.", "Siete días de secretos.", "Tu semana en revisión."],
+                de: ["Eine arbeitsreiche Woche.", "Sieben Tage voller Geheimnisse.", "Dein Wochenrückblick."]
             },
-
-            // SHARED / STATIC TEXTS
-            common: {
-                total_label: "Total Interactions",
-                top_label: "Your Heavy Rotation",
-                tags_label: "The Flavor Palette",
-                arch_label: "Your Archetype",
-                
-                arch_explorer: {
-                    name: "The Voyager 🧭",
-                    desc: "You refuse to settle. While others stick to the same old vanilla, you turn every stone. You swiped left on the ordinary to find the extraordinary. Your curiosity is your superpower."
-                },
-                arch_connoisseur: {
-                    name: "The Sommelier 🍷",
-                    desc: "You don't just watch; you curate. You skipped the trash and went straight for the gold. You know exactly what turns you on, and you don't waste time on anything else. A true tastemaker."
-                },
-                arch_wild: {
-                    name: "The Untamed 🦁",
-                    desc: "Safety limits? Never heard of them. Your stats show a hunger for intensity, adrenaline, and the extreme. While others dip their toes, you dive into the deep end. Respect."
-                },
-                arch_romantic: {
-                    name: "The Dreamer 🌹",
-                    desc: "Amidst the chaos of flesh, you sought connection. Softness, intimacy, and passion drove your choices. You proved that even here, the heart wants what it wants."
-                },
-
-                outro_free: "This story disappears in a moment. Want to keep your history and see stats daily? <br><b>Upgrade to Pro.</b>",
-                outro_paid: "Your secrets are safe with us. <br>See you next time, space cowboy. 🤠"
+            monthly: {
+                en: ["The month is over. The stats are in.", "30 days of desires.", "Let's look at the bigger picture."],
+                ru: ["Месяц позади. Данные собраны.", "30 дней твоих желаний.", "Взглянем на картину целиком."],
+                es: ["El mes ha terminado.", "30 días de deseos.", "Miremos el panorama general."],
+                de: ["Der Monat ist vorbei.", "30 Tage deiner Wünsche.", "Das große Ganze."]
+            },
+            yearly: {
+                en: ["Your year defined.", "365 days of you.", "The ultimate summary."],
+                ru: ["Твой год в цифрах.", "365 дней тебя.", "Финальный отчёт."],
+                es: ["Tu año definido.", "365 días de ti.", "El resumen definitivo."],
+                de: ["Dein Jahr definiert.", "365 Tage von dir.", "Die ultimative Zusammenfassung."]
             }
         },
-
-        ru: {
-            // СЦЕНАРИЙ 1: ПЕРВЫЙ РАЗ (Посвящение)
-            story_first: {
-                intro: [
-                    "Хей, {name}! 😏<br><br>Наконец-то решился заглянуть за кулисы? Я тихо записывал всё, пока ты был... занят. Ты думаешь, твой выбор был случайным? О нет. В этом хаосе есть четкая система.",
-                    "Добро пожаловать, {name}. Я тебя заждался. 🕯️<br><br>Ты провел немало времени, исследуя свои желания. Пришло время остановиться, выдохнуть и посмотреть на своё отражение в зеркале данных."
-                ],
-                activity: [
-                    "Ты себя явно не сдерживал, а? <br><br>Алгоритм нагрелся, просто обрабатывая твои действия. Давай взглянем на масштаб твоего любопытства в цифрах.",
-                    "Это была отличная пальчиковая гимнастика. <br><br>Ты свайпал, кликал и искал с завидным упорством. Вот как выглядит твой путь на языке сухой статистики."
-                ],
-                timing: [
-                    "У каждого свой ритм. У тебя — особенный.<br><br>Пока мир вращался своим чередом, ты выкраивал моменты для себя. Мы точно знаем, когда твои демоны выходят поиграть.",
-                ],
-                obsession: [
-                    "А теперь... момент истины. <br><br>Из сотен возможных вариантов твой мозг снова и снова возвращался к этим темам. Это не просто теги. Это карта твоего подсознания.",
-                ],
-                archetype: [
-                    "Так кто же ты на самом деле? <br><br>Мы прогнали цифры, проанализировали тепловые карты и нашли твоего цифрового двойника. Вот твой Архетип."
-                ]
+        // Достижения (Значки)
+        achievements: {
+            // Время суток
+            morning: { 
+                icon: "🌅", 
+                en: "Early Bird", ru: "Ранняя пташка", es: "Madrugador", de: "Frühaufsteher",
+                desc_en: "You start your day with pleasure.", desc_ru: "Ты начинаешь день с удовольствия.", desc_es: "Empiezas el día con placer.", desc_de: "Du beginnst den Tag mit Vergnügen."
             },
-
-            // СЦЕНАРИЙ 2: РЕГУЛЯРНЫЙ / ЕЖЕНЕДЕЛЬНЫЙ (Проверка)
-            story_regular: {
-                intro: [
-                    "С возвращением, {name}. 😏<br><br>Неделька выдалась жаркой, да? Твои пальцы потрудились на славу. Я собрал всё, что ты делал с нашей последней встречи. Готов узнать, как изменились твои вкусы?",
-                    "Снова ты, {name}. ✨<br><br>Новый цикл, новые желания. В этот раз ты копал глубже. Давай распакуем свежую главу твоей истории."
-                ],
-                activity: [
-                    "Стабильность — признак мастерства. И ты... ну, ты определенно мастер. <br><br>Цифры не врут. Ты был активен. Очень активен. Вот твой отчет о проделанной работе.",
-                    "Твои рецепторы дофамина работали сверхурочно. <br><br>Мы отследили каждый свайп и каждое колебание. Вот сводка твоей цифровой тренировки."
-                ],
-                timing: [
-                    "Время летит, когда тебе хорошо. <br><br>Но у твоих биологических часов есть четкое расписание для удовольствия. Вот когда происходит магия."
-                ],
-                obsession: [
-                    "Поговорим о том, что живет в твоей голове бесплатно. <br><br>Ты пробовал новое, экспериментировал, но в итоге всегда возвращался домой — к этим категориям.",
-                ],
-                archetype: [
-                    "Судя по твоему поведению на этой неделе, твоя аура изменилась... или стала тверже. <br><br>Вот каким алгоритм видит тебя прямо сейчас."
-                ]
+            day: { 
+                icon: "☀️", 
+                en: "Day Walker", ru: "Дневной житель", es: "Diurno", de: "Tagwanderer",
+                desc_en: "Active during business hours.", desc_ru: "Активен в рабочее время.", desc_es: "Activo en horario laboral.", desc_de: "Aktiv während der Geschäftszeiten."
             },
-
-            common: {
-                total_label: "Твоя Активность",
-                top_label: "Твоя Одержимость",
-                tags_label: "Палитра Вкусов",
-                arch_label: "Твой Архетип",
-                
-                arch_explorer: {
-                    name: "Искатель 🧭",
-                    desc: "Ты отказываешься довольствоваться малым. Пока другие смотрят одно и то же, ты переворачиваешь каждый камень. Ты свайпал влево обыденность, чтобы найти уникальность. Любопытство — твой дар."
-                },
-                arch_connoisseur: {
-                    name: "Сомелье 🍷",
-                    desc: "Ты не просто смотришь — ты дегустируешь. Ты пропускал мусор и шел сразу за золотом. Ты точно знаешь, что тебя заводит, и не тратишь время зря. Качество важнее количества."
-                },
-                arch_wild: {
-                    name: "Неукротимый 🦁",
-                    desc: "Границы безопасности? Не слышал. Твоя статистика кричит о жажде интенсивности и адреналина. Пока другие мочат ноги у берега, ты ныряешь в бездну. Мое уважение."
-                },
-                arch_romantic: {
-                    name: "Мечтатель 🌹",
-                    desc: "Среди хаоса плоти ты искал связь. Мягкость, близость и эмоции управляли твоим выбором. Ты доказал, что даже здесь сердце хочет того, чего хочет сердце."
-                },
-
-                outro_free: "Эта история исчезнет. Хочешь сохранить историю и видеть статистику каждый день? <br><b>Переходи на Pro.</b>",
-                outro_paid: "Твои секреты в безопасности с нами. <br>До встречи, ковбой. 🤠"
-            }
-        },
-
-        es: {
-            // ESCENARIO 1: PRIMERA VEZ (La Iniciación)
-            story_first: {
-                intro: [
-                    "Hola, {name}... ¿Por fin te atreves a mirar detrás del telón? 👀<br><br>He estado tomando notas en silencio mientras estabas... ocupado. Crees que tus elecciones fueron al azar, pero veo un patrón claro en el caos.",
-                    "Bienvenido, {name}. Te estaba esperando. 🕯️<br><br>Has pasado bastante tiempo explorando tus deseos aquí. Es hora de detenerse, recuperar el aliento y mirar tu reflejo en el espejo de los datos."
-                ],
-                activity: [
-                    "No te contuviste, ¿verdad? <br><br>El algoritmo se está calentando solo de procesar tus datos. Echemos un vistazo al volumen de tu curiosidad en números.",
-                    "Gimnasia de dedos en su máxima expresión. <br><br>Deslizaste, hiciste clic y buscaste con un propósito claro. Aquí está la escala de tu viaje hasta ahora."
-                ],
-                timing: [
-                    "Cada uno tiene su propio ritmo. ¿El tuyo? Es inconfundible.<br><br>Mientras el mundo giraba, tú tallabas momentos específicos para ti. Sabemos exactamente cuándo salen a jugar tus demonios.",
-                ],
-                obsession: [
-                    "Y ahora... la verdad. <br><br>De cientos de posibilidades, tu cerebro seguía reconectándose con estos temas específicos. No son solo etiquetas; son tu mapa.",
-                ],
-                archetype: [
-                    "Entonces, ¿quién eres realmente? <br><br>Hemos procesado los números, analizado los mapas de calor y encontrado tu alma gemela digital. Este es tu Arquetipo."
-                ]
+            night: { 
+                icon: "🦇", 
+                en: "Night Owl", ru: "Полуночник", es: "Nocturno", de: "Nachteule",
+                desc_en: "You thrive in the dark.", desc_ru: "Ты расцветаешь в темноте.", desc_es: "Brillas en la oscuridad.", desc_de: "Du blühst im Dunkeln auf."
             },
-
-            // ESCENARIO 2: REGULAR / SEMANAL (El Chequeo)
-            story_regular: {
-                intro: [
-                    "Mira quién ha vuelto, {name}. 😏<br><br>Ha sido una semana ocupada para tus pulgares, ¿no? He recopilado todo lo que hiciste desde que hablamos. ¿Listo para ver si tus gustos han evolucionado?",
-                    "Te atrapé de nuevo, {name}. ✨<br><br>Otro ciclo, otro conjunto de deseos. Esta vez has cavado más profundo. Vamos a desenvolver el último capítulo de tu historia."
-                ],
-                activity: [
-                    "La consistencia es clave, y tú... bueno, definitivamente eres consistente. <br><br>Los números no mienten. Has estado activo. Muy activo.",
-                    "Tus receptores de dopamina deben estar trabajando horas extras. <br><br>Rastreamos cada deslizamiento y cada duda. Aquí está el resumen de tu entrenamiento digital."
-                ],
-                timing: [
-                    "El tiempo vuela cuando te diviertes. <br><br>Pero tu reloj interno tiene un horario específico para el placer. Aquí es cuando suele ocurrir la magia."
-                ],
-                obsession: [
-                    "Hablemos de lo que vive en tu cabeza sin pagar alquiler. <br><br>Probaste cosas nuevas, pero siempre volviste a casa, a estas categorías específicas.",
-                ],
-                archetype: [
-                    "Basado en tu comportamiento reciente, tu vibra ha cambiado... o se ha solidificado. <br><br>Así es como el algoritmo te ve ahora mismo."
-                ]
+            // Тип активности
+            binger: { 
+                icon: "🍿", 
+                en: "The Binger", ru: "Зритель", es: "Espectador", de: "Zuschauer",
+                desc_en: "High watch time. You love content.", desc_ru: "Много просмотров. Ты любишь контент.", desc_es: "Mucho tiempo viendo.", desc_de: "Viel Zeit beim Zuschauen."
             },
-
-            // TEXTOS COMUNES
-            common: {
-                total_label: "Interacciones Totales",
-                top_label: "Tu Rotación Pesada",
-                tags_label: "Paleta de Sabores",
-                arch_label: "Tu Arquetipo",
-                
-                arch_explorer: {
-                    name: "El Viajero 🧭",
-                    desc: "Te niegas a conformarte. Mientras otros se quedan con lo habitual, tú levantas cada piedra. Deslizaste a la izquierda en lo ordinario para encontrar lo extraordinario. La curiosidad es tu superpoder."
-                },
-                arch_connoisseur: {
-                    name: "El Sommelier 🍷",
-                    desc: "No solo miras; seleccionas. Saltaste la basura y fuiste directo al oro. Sabes exactamente lo que te excita y no pierdes el tiempo en nada más. Un verdadero creador de tendencias."
-                },
-                arch_wild: {
-                    name: "El Indomable 🦁",
-                    desc: "¿Límites de seguridad? Nunca escuché de ellos. Tus estadísticas muestran hambre de intensidad, adrenalina y lo extremo. Mientras otros mojan los pies, tú te sumerges en lo profundo. Respeto."
-                },
-                arch_romantic: {
-                    name: "El Soñador 🌹",
-                    desc: "En medio del caos de la carne, buscaste conexión. La suavidad, la intimidad y la pasión impulsaron tus elecciones. Demostraste que incluso aquí, el corazón quiere lo que quiere."
-                },
-
-                outro_free: "Esta historia desaparecerá. ¿Quieres guardar tu historial y ver estadísticas diarias? <br><b>Pásate a Pro.</b>",
-                outro_paid: "Tus secretos están a salvo con nosotros. <br>Nos vemos la próxima, vaquero espacial. 🤠"
-            }
-        },
-
-        de: {
-            // SZENARIO 1: DAS ERSTE MAL (Die Einweihung)
-            story_first: {
-                intro: [
-                    "Hey {name}... Hast du dich endlich entschieden, hinter den Vorhang zu blicken? 👀<br><br>Ich habe leise Notizen gemacht, während du... beschäftigt warst. Du denkst, deine Wahl war zufällig? Oh nein. In diesem Chaos gibt es ein klares Muster.",
-                    "Willkommen, {name}. Ich habe auf dich gewartet. 🕯️<br><br>Du hast viel Zeit damit verbracht, deine Wünsche hier zu erforschen. Es ist Zeit, kurz innezuhalten, Luft zu holen und dein Spiegelbild im Daten-Spiegel zu betrachten."
-                ],
-                activity: [
-                    "Du hast dich nicht zurückgehalten, oder? <br><br>Der Algorithmus läuft heiß, nur um deine Daten zu verarbeiten. Lass uns das Ausmaß deiner Neugier in Zahlen betrachten.",
-                    "Fingergymnastik vom Feinsten. <br><br>Du hast gewischt, geklickt und gesucht mit einem klaren Ziel. Hier ist der Maßstab deiner bisherigen Reise."
-                ],
-                timing: [
-                    "Jeder hat seinen eigenen Rhythmus. Deiner? Er ist unverwechselbar.<br><br>Während sich die Welt weiterdrehte, hast du dir spezielle Momente für dich herausgenommen. Wir wissen genau, wann deine Dämonen zum Spielen herauskommen.",
-                ],
-                obsession: [
-                    "Und nun... die Wahrheit. <br><br>Von hunderten Möglichkeiten hat sich dein Gehirn immer wieder auf diese spezifischen Themen verschaltet. Das sind nicht nur Tags; das ist deine Landkarte.",
-                ],
-                archetype: [
-                    "Also, wer bist du wirklich? <br><br>Wir haben die Zahlen geknackt, die Heatmaps analysiert und deinen digitalen Seelenverwandten gefunden. Das ist dein Archetyp."
-                ]
+            picky: { 
+                icon: "🧐", 
+                en: "The Critic", ru: "Критик", es: "Crítico", de: "Kritiker",
+                desc_en: "Lots of swipes, few watches.", desc_ru: "Много свайпов, мало просмотров.", desc_es: "Muchos swipes, pocas vistas.", desc_de: "Viele Swipes, wenig angesehen."
             },
-
-            // SZENARIO 2: REGELMÄẞIG / WÖCHENTLICH (Der Check-up)
-            story_regular: {
-                intro: [
-                    "Sieh mal, wer wieder da ist, {name}. 😏<br><br>Es war eine geschäftige Woche für deine Daumen, nicht wahr? Ich habe alles gesammelt, was du seit unserem letzten Gespräch getan hast. Bereit zu sehen, ob sich dein Geschmack entwickelt hat?",
-                    "Wieder erwischt, {name}. ✨<br><br>Ein neuer Zyklus, neue Wünsche. Diesmal hast du tiefer gegraben. Lass uns das neueste Kapitel deiner Geschichte auspacken."
-                ],
-                activity: [
-                    "Konsistenz ist der Schlüssel, und du... nun, du bist definitiv konsistent. <br><br>Die Zahlen lügen nicht. Du warst aktiv. Sehr aktiv. Hier ist dein Leistungsbericht.",
-                    "Deine Dopamin-Rezeptoren müssen Überstunden machen. <br><br>Wir haben jeden Swipe und jedes Zögern verfolgt. Hier ist die Zusammenfassung deines digitalen Workouts."
-                ],
-                timing: [
-                    "Die Zeit verfliegt, wenn man Spaß hat. <br><br>Aber deine innere Uhr hat einen genauen Zeitplan für das Vergnügen. Hier passiert normalerweise die Magie."
-                ],
-                obsession: [
-                    "Lass uns darüber reden, was mietfrei in deinem Kopf wohnt. <br><br>Du hast Neues ausprobiert, bist aber immer wieder zu diesen spezifischen Kategorien nach Hause gekommen.",
-                ],
-                archetype: [
-                    "Basierend auf deinem jüngsten Verhalten hat sich deine Aura verändert... oder gefestigt. <br><br>So sieht dich der Algorithmus im Moment."
-                ]
+            // Стиль (На основе разнообразия тегов)
+            explorer: { 
+                icon: "🔭", 
+                en: "The Explorer", ru: "Исследователь", es: "Explorador", de: "Entdecker",
+                desc_en: "You constantly seek new genres.", desc_ru: "Ты постоянно ищешь новые жанры.", desc_es: "Buscas nuevos géneros.", desc_de: "Du suchst ständig neue Genres."
             },
-
-            // GEMEINSAME TEXTE
-            common: {
-                total_label: "Deine Gesamtinteraktionen",
-                top_label: "Deine Dauerrotation",
-                tags_label: "Die Geschmackspalette",
-                arch_label: "Dein Archetyp",
-                
-                arch_explorer: {
-                    name: "Der Entdecker 🧭",
-                    desc: "Du gibst dich nicht zufrieden. Während andere beim gewohnten Standard bleiben, drehst du jeden Stein um. Du hast das Gewöhnliche weggewischt, um das Außergewöhnliche zu finden. Neugier ist deine Superkraft."
-                },
-                arch_connoisseur: {
-                    name: "Der Sommelier 🍷",
-                    desc: "Du schaust nicht nur zu; du kuratierst. Du hast den Müll übersprungen und bist direkt zum Gold gegangen. Du weißt genau, was dich antörnt, und verschwendest keine Zeit mit anderem. Ein echter Kenner."
-                },
-                arch_wild: {
-                    name: "Der Ungezähmte 🦁",
-                    desc: "Sicherheitsgrenzen? Nie gehört. Deine Statistik schreit nach Intensität, Adrenalin und dem Extremen. Während andere nur die Zehen ins Wasser halten, tauchst du ins Tiefe. Respekt."
-                },
-                arch_romantic: {
-                    name: "Der Träumer 🌹",
-                    desc: "Im Chaos des Fleisches hast du nach Verbindung gesucht. Sanftheit, Intimität und Leidenschaft haben deine Entscheidungen geleitet. Du hast bewiesen, dass das Herz auch hier will, was es will."
-                },
-
-                outro_free: "Diese Geschichte verschwindet gleich. Willst du deinen Verlauf behalten und tägliche Statistiken sehen? <br><b>Hol dir Pro.</b>",
-                outro_paid: "Deine Geheimnisse sind bei uns sicher. <br>Bis zum nächsten Mal, Space Cowboy. 🤠"
+            hedonist: { 
+                icon: "🥰", 
+                en: "The Hedonist", ru: "Гедонист", es: "Hedonista", de: "Hedonist",
+                desc_en: "You stick to what you love.", desc_ru: "Ты верен своим любимым темам.", desc_es: "Te apegas a lo que amas.", desc_de: "Du bleibst bei dem, was du liebst."
             }
         }
     };
+
+    // Функция локализации для Wrapped
+    function getWText(key, subkey) {
+        const lang = WRAPPED_CONFIG.badges[currentLang] ? currentLang : 'en';
+        if(key === 'badge') return WRAPPED_CONFIG.badges[lang][subkey];
+        return "Text";
+    }
 
     const KEYWORD_ALIASES = {
         'redhead': ['ginger', 'firecrotch', 'рыжая', 'рыжие', 'рыжих', 'рыжими', 'pelirroja', 'rothaarige', 'red', 'рыженькая'],
@@ -8041,6 +7884,7 @@
         if (activityLog.length > 5000) activityLog = activityLog.slice(-5000);
         localStorage.setItem(STORAGE.ACTIVITY_LOG, JSON.stringify(activityLog));
         updateExploredCount();
+        markDayActive();
     }
 
     function updateExploredCount() {
@@ -9311,38 +9155,51 @@
         updateStatsLocks();
 
         // === ЛОГИКА WRAPPED / PROGRESS BAR ===
-        const wData = getWrappedData();
         const wBtn = document.getElementById('btn-wrapped-trigger');
-        const modalHeader = document.querySelector('#modal-stats-overlay .modal-header');
+    
+        // Получаем кол-во активных дней (Set)
+        const daysActive = activeDaysSet.size;
+        const isPaid = subscriptionLevel !== 'free';
         
+        // Убираем старый прогресс-бар, если есть
         const oldProgress = document.getElementById('wrapped-progress-ui');
         if (oldProgress) oldProgress.remove();
 
-        if (wData) {
-            if (wData.totalActions >= WRAPPED_THRESHOLD) {
-                if(wBtn) wBtn.style.display = 'flex';
-            } else {
-                if(wBtn) wBtn.style.display = 'none';
-                
-                const percent = Math.min(100, (wData.totalActions / WRAPPED_THRESHOLD) * 100);
-                const left = WRAPPED_THRESHOLD - wData.totalActions;
-                
-                const titleTxt = t.wrapped_lock_title; // "FETISH WRAPPED 🔒"
-                const descTxt = t.wrapped_lock_desc.replace('{n}', left); // "Make 30 more..."
-
-                const progressHTML = `
-                    <div id="wrapped-progress-ui" class="wrapped-lock-container" style="margin: 0 10px 20px 10px;">
-                        <div class="wrapped-lock-title">${titleTxt}</div>
-                        <div class="wrapped-lock-desc">${descTxt}</div>
-                        <div class="w-progress-track">
-                            <div class="w-progress-fill" style="width: ${percent}%"></div>
-                        </div>
-                        <div class="w-progress-text">${wData.totalActions} / ${WRAPPED_THRESHOLD}</div>
-                    </div>
-                `;
-                const modalBody = document.getElementById('modal-stats-body');
-                modalBody.insertAdjacentHTML('beforebegin', progressHTML);
+        // Логика: Показывать кнопку, если есть 7 дней ИЛИ если платный юзер (Daily)
+        if (daysActive >= 7 || (isPaid && daysActive >= 1)) {
+            if(wBtn) {
+                wBtn.style.display = 'flex';
+                // Если есть непросмотренные в архиве — можно добавить пульсацию/точку
+                const hasUnread = wrappedArchive.some(w => !w.viewed);
+                wBtn.innerHTML = hasUnread ? 
+                    `<span data-key="wrapped_btn">Fetish Wrapped ✨</span> <span style="color:#fff; margin-left:5px;">●</span>` : 
+                    `<span data-key="wrapped_btn">Fetish Wrapped ✨</span>`;
             }
+        } else {
+            // Логика прогресс-бара для Free (набираем 7 дней)
+            if(wBtn) wBtn.style.display = 'none';
+            
+            // Рисуем новый прогресс бар (дни вместо действий)
+            const percent = Math.min(100, (daysActive / 7) * 100);
+            const left = 7 - daysActive;
+            const titleTxt = t.wrapped_lock_title || "FETISH WRAPPED 🔒";
+            
+            // Локализация для дней
+            let daysWord = currentLang === 'ru' ? 'дней' : 'days';
+            const descTxt = (t.wrapped_lock_desc || "Activity needed: {n}").replace('{n}', `${left} ${daysWord}`);
+
+            const progressHTML = `
+                <div id="wrapped-progress-ui" class="wrapped-lock-container" style="margin: 0 10px 20px 10px;">
+                    <div class="wrapped-lock-title">${titleTxt}</div>
+                    <div class="wrapped-lock-desc">${descTxt}</div>
+                    <div class="w-progress-track">
+                        <div class="w-progress-fill" style="width: ${percent}%"></div>
+                    </div>
+                    <div class="w-progress-text">${daysActive} / 7 ${daysWord}</div>
+                </div>
+            `;
+            const modalBody = document.getElementById('modal-stats-body');
+            modalBody.insertAdjacentHTML('beforebegin', progressHTML);
         }
         // ======================================
 
@@ -11303,298 +11160,8 @@
         renderListModal('wl');
     }
 
-    function getWrappedData() {
-        const logs = activityLog; 
-        
-        let totalActions = 0;
-        let firstActionTime = Date.now();
-        let lastActionTime = 0;
-
-        const itemCounts = {};
-        const tagCounts = {};
-        const hours = new Array(24).fill(0);
-        
-        let countToday = 0;
-        const startOfDay = new Date();
-        startOfDay.setHours(0,0,0,0);
-
-        let extremeCount = 0;
-        let vanillaCount = 0;
-        let watchCount = 0;
-
-        logs.forEach(l => {
-            // Учитываем все "активные" действия
-            if (l.type === 'watch' || l.type === 'like' || l.type === 'gen' || l.type === 'dislike' || l.type === 'pass') {
-                totalActions++;
-                
-                if (l.ts < firstActionTime) firstActionTime = l.ts;
-                if (l.ts > lastActionTime) lastActionTime = l.ts;
-                if (l.ts >= startOfDay.getTime()) countToday++;
-
-                // Для статистики берем только позитивные или нейтральные (кроме дизлайков для подсчета топов)
-                if (l.type === 'watch' || l.type === 'like' || l.type === 'gen') {
-                    itemCounts[l.id] = (itemCounts[l.id] || 0) + (l.type === 'watch' ? 3 : 1);
-                    
-                    if (l.tags) {
-                        l.tags.forEach(t => {
-                            if(['universal','straight','gay','lesbian','trans','male','female','adult'].includes(t)) return;
-                            tagCounts[t] = (tagCounts[t] || 0) + 1;
-                            if (EXTREME_TAGS.includes(t)) extremeCount++;
-                            if (['vanilla', 'romantic', 'kissing', 'massage'].includes(t)) vanillaCount++;
-                        });
-                    }
-                    const h = new Date(l.ts).getHours();
-                    hours[h]++;
-                    if (l.type === 'watch') watchCount++;
-                }
-            }
-        });
-
-        // Сортировка
-        const topItems = Object.entries(itemCounts).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([id, score]) => {
-            const item = data.find(x => x.id == id);
-            return item ? { name: getLocalizedName(item), score } : null;
-        }).filter(x => x);
-
-        const topTags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([tag]) => tag.charAt(0).toUpperCase() + tag.slice(1));
-
-        // Время
-        const morning = hours.slice(5, 12).reduce((a,b)=>a+b,0);
-        const day = hours.slice(12, 20).reduce((a,b)=>a+b,0);
-        const night = hours.slice(20, 24).reduce((a,b)=>a+b,0) + hours.slice(0, 5).reduce((a,b)=>a+b,0);
-        let peakTime = 'day';
-        if (night > day && night > morning) peakTime = 'night';
-        else if (morning > day && morning > night) peakTime = 'morning';
-
-        // Архетип
-        let archetype = 'explorer';
-        const totalPositive = watchCount + extremeCount + vanillaCount; // Грубая оценка базы
-        if (watchCount / (totalActions || 1) > 0.4) archetype = 'connoisseur';
-        else if (extremeCount > vanillaCount * 1.5) archetype = 'wild';
-        else if (vanillaCount > extremeCount * 1.5) archetype = 'romantic';
-
-        // Форматирование дат
-        const opts = { day: 'numeric', month: 'short' };
-        const dateRange = `${new Date(firstActionTime).toLocaleDateString(currentLang, opts)} - ${new Date(lastActionTime).toLocaleDateString(currentLang, opts)}`;
-
-        return {
-            totalActions,
-            countToday,
-            topItems,
-            topTags,
-            peakTime,
-            archetype,
-            dateRange
-        };
-    }
-
-    function getWrappedPhrase(category, replacements = {}) {
-        // 1. Определяем язык (если нет перевода, берем EN)
-        const lang = wrappedPhrases[currentLang] ? currentLang : 'en';
-        const phrases = wrappedPhrases[lang][category];
-        
-        // 2. Берем случайную фразу
-        let phrase = phrases[Math.floor(Math.random() * phrases.length)];
-        
-        // 3. Заменяем плейсхолдеры (например, {n} на число)
-        for (const [key, value] of Object.entries(replacements)) {
-            phrase = phrase.replace(`{${key}}`, value);
-        }
-        
-        return phrase;
-    }
-
     function openWrapped() {
-        const dataStats = getWrappedData();
-        // Фоллбек на английский, если язык не поддерживается новой структурой
-        const langKey = (wrappedPhrases[currentLang] && wrappedPhrases[currentLang].story_first) ? currentLang : 'en';
-        const content = wrappedPhrases[langKey];
-        
-        // --- 1. ОПРЕДЕЛЕНИЕ СЮЖЕТА (Первый раз или нет) ---
-        const hasSeenBefore = localStorage.getItem('xch_has_seen_wrapped');
-        const storyType = hasSeenBefore ? 'story_regular' : 'story_first';
-        const story = content[storyType];
-        
-        // Помечаем, что видел
-        localStorage.setItem('xch_has_seen_wrapped', 'true');
-
-        // --- 2. ИМЯ ПОЛЬЗОВАТЕЛЯ ---
-        let userName = langKey === 'ru' ? "Путник" : "Stranger";
-        if (window.isUserLoggedIn && auth.currentUser && auth.currentUser.email) {
-            // Берем часть до @ и делаем первую букву заглавной
-            const emailName = auth.currentUser.email.split('@')[0];
-            userName = emailName.charAt(0).toUpperCase() + emailName.slice(1);
-        }
-
-        // Хелпер для случайной фразы с заменой имени
-        const getPhrase = (arr) => {
-            let txt = arr[Math.floor(Math.random() * arr.length)];
-            return txt.replace(/{name}/g, `<span style="color:var(--accent)">${userName}</span>`);
-        };
-
-        // ... (Проверка на FREE лимит остается без изменений) ...
-        if (subscriptionLevel === 'free') {
-            const lastAccess = parseInt(localStorage.getItem('xch_last_wrapped_free') || '0');
-            const now = Date.now();
-            const cooldownTime = 7 * 24 * 60 * 60 * 1000; 
-            if (now - lastAccess < cooldownTime) {
-                const daysLeft = Math.ceil((lastAccess + cooldownTime - now) / (1000 * 60 * 60 * 24));
-                alert(currentLang === 'ru' ? `Доступно раз в 7 дней. Ждать: ${daysLeft} дн.` : `Available once every 7 days. Days left: ${daysLeft}`); 
-                openSubModal();
-                return;
-            }
-            localStorage.setItem('xch_last_wrapped_free', now);
-        }
-
-        if (!dataStats || dataStats.totalActions < 5) { // Подняли порог для теста
-            alert("Not enough data to generate a story. Keep exploring!");
-            return;
-        }
-
-        const overlay = document.getElementById('wrapped-mount');
-        overlay.innerHTML = '';
-        overlay.classList.add('active');
-        
-        const slides = [];
-
-        // --- SLIDE 1: INTRO (Сюжетное) ---
-        slides.push(`
-            <div class="wrapped-slide bg-dark active-slide" style="justify-content: center; text-align: left; padding: 40px;">
-                <div class="wrapped-big-text" style="font-size:40px; margin-bottom:30px; text-align:center;">Fetish<br><span style="color:var(--accent)">Wrapped</span></div>
-                <div class="wrapped-sub-text" style="font-size:22px; line-height:1.6; font-weight:500;">
-                    ${getPhrase(story.intro)}
-                </div>
-            </div>
-        `);
-
-        // --- SLIDE 2: ACTIVITY (Сюжетное) ---
-        slides.push(`
-            <div class="wrapped-slide bg-fire">
-                <div class="wrapped-sub-text" style="opacity:0.8; margin-bottom:10px;">${content.common.total_label}</div>
-                <div class="wrapped-big-text" style="font-size:110px; line-height:1; margin: 10px 0;">${dataStats.totalActions}</div>
-                <div class="wrapped-sub-text" style="font-size:20px; line-height:1.5; max-width:340px; margin-top:20px;">
-                    ${getPhrase(story.activity)}
-                </div>
-            </div>
-        `);
-
-        // --- SLIDE 3: TIME (Сюжетное) ---
-        let timeIcon = "☀️";
-        if (dataStats.peakTime === 'night') timeIcon = "🦇";
-        if (dataStats.peakTime === 'morning') timeIcon = "🌅";
-
-        slides.push(`
-            <div class="wrapped-slide" style="background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);">
-                <div class="wrapped-big-text" style="font-size:80px; margin-bottom:10px;">${timeIcon}</div>
-                <div class="wrapped-sub-text" style="font-size:20px; line-height:1.6; max-width:340px;">
-                    ${getPhrase(story.timing)}
-                </div>
-            </div>
-        `);
-
-        // --- SLIDE 4: TOP ITEMS (Сюжетное) ---
-        let listHtml = dataStats.topItems.map((item, i) => 
-            `<div style="font-size:${22 - i*1}px; margin:12px 0; font-weight:700; opacity:0; animation: slideInRight 0.6s ease forwards ${i*0.4}s; text-align:left; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px;">
-                <span style="color:var(--accent); margin-right:10px;">#${i+1}</span> ${item.name}
-            </div>`
-        ).join('');
-
-        slides.push(`
-            <div class="wrapped-slide bg-toxic">
-                <div class="wrapped-sub-text" style="font-size:18px; margin-bottom:20px;">${getPhrase(story.obsession)}</div>
-                <div style="width:100%; max-width:320px;">${listHtml}</div>
-            </div>
-        `);
-
-        // --- SLIDE 5: ARCHETYPE (Детальное описание) ---
-        let archObj = content.common.arch_explorer;
-        let archBg = "linear-gradient(45deg, #11998e, #38ef7d)";
-
-        if (dataStats.archetype === 'connoisseur') {
-            archObj = content.common.arch_connoisseur;
-            archBg = "linear-gradient(45deg, #833ab4, #fd1d1d, #fcb045)";
-        } else if (dataStats.archetype === 'wild') {
-            archObj = content.common.arch_wild;
-            archBg = "linear-gradient(45deg, #000000, #434343)";
-        } else if (dataStats.archetype === 'romantic') {
-            archObj = content.common.arch_romantic;
-            archBg = "linear-gradient(45deg, #ff9a9e, #fecfef)";
-        }
-
-        slides.push(`
-            <div class="wrapped-slide" style="background: ${archBg}; justify-content:center;">
-                <div class="wrapped-sub-text" style="text-transform:uppercase; letter-spacing:2px; font-size:12px; margin-bottom:15px;">${getPhrase(story.archetype)}</div>
-                
-                <div class="wrapped-big-text" style="font-size:42px; margin:10px 0; border:4px solid #fff; padding:25px; line-height:1.1; background:rgba(0,0,0,0.2); backdrop-filter:blur(5px); border-radius:4px;">
-                    ${archObj.name}
-                </div>
-                
-                <div class="wrapped-sub-text" style="font-size:18px; line-height:1.6; margin-top:20px; font-weight:500; max-width:350px;">
-                    ${archObj.desc}
-                </div>
-            </div>
-        `);
-
-        // --- SLIDE 6: SUMMARY (Финал) ---
-        let sumTagsHtml = dataStats.topTags.slice(0, 3).map(tag => `<div class="sum-tag">${tag}</div>`).join('');
-        let planName = subscriptionLevel.toUpperCase();
-        let planColor = subscriptionLevel === 'free' ? '#fff' : '#9b59b6';
-        let outroText = subscriptionLevel === 'free' ? content.common.outro_free : content.common.outro_paid;
-
-        slides.push(`
-            <div class="wrapped-slide bg-dark">
-                <div class="summary-card">
-                    <div class="sum-header">
-                        <div class="sum-logo">Fetish<span style="color:var(--accent)">Hub</span></div>
-                        <div class="sum-date">${dataStats.dateRange}<br><span style="color:${planColor}">${planName}</span></div>
-                    </div>
-                    <div class="sum-row">
-                        <div>
-                            <div class="sum-label">${content.common.arch_label}</div>
-                            <div class="sum-big-val" style="font-size:22px;">${archObj.name.replace(/ .*/, '')}</div> 
-                        </div>
-                        <div style="text-align:right">
-                            <div class="sum-label">Actions</div>
-                            <div class="sum-val">${dataStats.totalActions}</div>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="sum-label">Top Interest</div>
-                        <div class="sum-val" style="color:var(--accent); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${dataStats.topItems.length > 0 ? dataStats.topItems[0].name : '-'}</div>
-                    </div>
-                    <div>
-                        <div class="sum-label">Tags</div>
-                        <div class="sum-tags">${sumTagsHtml}</div>
-                    </div>
-                </div>
-
-                <div class="wrapped-sub-text" style="font-size:14px; margin-top:20px; max-width:300px; opacity:0.8;">
-                    ${outroText}
-                </div>
-
-                <div style="margin-top:20px; display:flex; flex-direction:column; gap:10px; width:100%; align-items:center;">
-                    <button onclick="closeWrapped()" class="btn-gen" style="padding:15px 40px; background:var(--text-main); color:var(--bg-color); width:auto; border-radius:30px; font-size:14px; text-transform:uppercase; font-weight:800;">
-                        ${langData[currentLang].btn_close || "Done"}
-                    </button>
-                </div>
-            </div>
-        `);
-
-        let barsHtml = '';
-        slides.forEach((_, i) => {
-            barsHtml += `<div class="wrapped-progress-bar"><div class="wrapped-progress-fill" id="bar-${i}"></div></div>`;
-        });
-
-        overlay.innerHTML = `
-            <div class="wrapped-progress-container">${barsHtml}</div>
-            <div class="wrapped-close" onclick="closeWrapped()">✕</div>
-            <div class="wrapped-nav-area nav-left" onclick="prevSlide()"></div>
-            <div class="wrapped-nav-area nav-right" onclick="nextSlide()"></div>
-            ${slides.join('')}
-        `;
-
-        currentSlideIndex = 0;
-        startSlideTimer(slides.length, 9000); 
+        triggerWrappedBtn();
     }
 
     function startSlideTimer(total, duration = 9000) {
@@ -12094,18 +11661,16 @@
         const btnWatch = document.getElementById('hist-nav-watch');
         const listSwipes = document.getElementById('hist-list-swipes');
         const listWatch = document.getElementById('hist-list-watch');
+        document.getElementById('hist-list-wrapped').style.display = 'none';
 
-        if (tab === 'swipes') {
-            btnSwipes.classList.add('active');
-            btnWatch.classList.remove('active');
-            listSwipes.style.display = 'block';
-            listWatch.style.display = 'none';
+        if (tab === 'wrapped') {
+            document.getElementById('hist-list-wrapped').style.display = 'block';
+            renderWrappedArchive();
+        } else if (tab === 'swipes') {
+            document.getElementById('hist-list-swipes').style.display = 'block';
             renderSwipesHistoryList();
         } else {
-            btnSwipes.classList.remove('active');
-            btnWatch.classList.add('active');
-            listSwipes.style.display = 'none';
-            listWatch.style.display = 'block';
+            document.getElementById('hist-list-watch').style.display = 'block';
             renderWatchHistoryList();
         }
     }
@@ -12124,19 +11689,78 @@
             const item = data.find(x => x.id === entry.id);
             if(!item) return;
             
-            // Используем стили ios-row для красоты
+            // 1. Форматирование даты и времени
+            const dateObj = new Date(entry.timestamp);
+            const now = new Date();
+            const isToday = dateObj.toDateString() === now.toDateString();
+            
+            // Время (ЧЧ:ММ)
+            const timeStr = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            // Дата (ДД.ММ), если не сегодня
+            let dateDisplay = "";
+            if (!isToday) {
+                const day = dateObj.getDate().toString().padStart(2, '0');
+                const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+                dateDisplay = `${day}.${month}`;
+            } else {
+                dateDisplay = currentLang === 'ru' ? "Сегодня" : "Today";
+            }
+
+            // 2. Определение статуса (Иконка)
+            let statusIcon = '⚪'; // По умолчанию (пропуск)
+            let statusOpacity = '0.3'; // Для нейтрального статуса
+            let statusColor = 'var(--text-secondary)';
+
+            // Проверяем текущее состояние (Live status)
+            if (blacklist.includes(item.id)) {
+                statusIcon = '⛔'; // Дизлайк
+                statusOpacity = '1';
+                statusColor = 'var(--highlight-red)';
+            } 
+            else if (favorites.includes(item.id)) {
+                statusIcon = '💚'; // Лайк
+                statusOpacity = '1';
+                statusColor = 'var(--accent)';
+            } 
+            else if (watchLater.includes(item.id)) {
+                statusIcon = '⏰'; // WL
+                statusOpacity = '1';
+                statusColor = '#3498db';
+            } 
+            else {
+                // Проверка на просмотр (если нет в списках, но смотрел)
+                const isWatched = watchHistory.some(w => w.id === item.id);
+                if (isWatched) {
+                    statusIcon = '👁️';
+                    statusOpacity = '0.8';
+                    statusColor = 'var(--text-main)';
+                }
+            }
+
             const div = document.createElement('div');
             div.className = 'ios-row clickable';
-            div.style.padding = '12px 20px'; // Чуть больше отступ в модалке
+            div.style.padding = '10px 20px'; 
             
             const name = getLocalizedName(item);
-            
-            // Дата генерации (опционально)
-            // const dateStr = new Date(entry.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
             div.innerHTML = `
-                <div style="font-weight:500;">${name}</div>
-                <div style="color:var(--accent); font-size:18px;">↺</div>
+                <div style="display:flex; flex-direction:column; gap:3px;">
+                    <div style="font-weight:600; font-size:15px; color:var(--text-main);">${name}</div>
+                    <div style="font-size:11px; color:var(--text-secondary);">
+                        ${dateDisplay}, ${timeStr}
+                    </div>
+                </div>
+                
+                <div style="display:flex; align-items:center; gap:15px;">
+                    <!-- Иконка статуса -->
+                    <div style="font-size:16px; opacity:${statusOpacity}; color:${statusColor};" title="Status">
+                        ${statusIcon}
+                    </div>
+                    
+                    <!-- Кнопка повтора -->
+                    <div style="color:var(--accent); font-size:20px; opacity:0.8;">↺</div>
+                </div>
             `;
             
             div.onclick = () => { 
@@ -13097,6 +12721,449 @@
         input.oninput = () => overlay.classList.add('hidden');
     }
 
+    let wrappedArchive = JSON.parse(localStorage.getItem('xch_wrapped_archive')) || [];
+    let activeDaysSet = new Set(JSON.parse(localStorage.getItem('xch_active_days')) || []);
+
+    // 1. Отметка активности (Вызывать при каждом свайпе/просмотре)
+    function markDayActive() {
+        const today = new Date().toISOString().split('T')[0];
+        if (!activeDaysSet.has(today)) {
+            activeDaysSet.add(today);
+            localStorage.setItem('xch_active_days', JSON.stringify([...activeDaysSet]));
+            
+            // При новом дне проверяем, не пора ли что-то заархивировать
+            checkAutomaticArchiving();
+        }
+    }
+
+    // 2. Автоматическая проверка периодов
+    function checkAutomaticArchiving() {
+        const now = new Date();
+        const lastCheck = parseInt(localStorage.getItem('xch_last_archive_check') || '0');
+        
+        // Ограничение: проверяем не чаще раза в час
+        if (Date.now() - lastCheck < 3600000) return; 
+        localStorage.setItem('xch_last_archive_check', Date.now());
+
+        // --- A. YEARLY CHECK (Смена года) ---
+        const lastYearly = wrappedArchive.find(w => w.type === 'yearly' && w.isLatest);
+        const lastYearlyYear = lastYearly ? new Date(lastYearly.timestamp).getFullYear() : 0;
+        if (now.getFullYear() > lastYearlyYear && lastYearlyYear !== 0) {
+            // Год сменился -> генерируем за прошлый год
+            generateAndSaveWrapped('yearly');
+        }
+
+        // --- B. MONTHLY CHECK (Смена месяца) ---
+        const lastMonthly = wrappedArchive.find(w => w.type === 'monthly' && w.isLatest);
+        const lastMonthlyMonth = lastMonthly ? new Date(lastMonthly.timestamp).getMonth() : -1;
+        if (now.getMonth() !== lastMonthlyMonth && lastMonthlyMonth !== -1) {
+            // Месяц сменился -> генерируем за прошлый месяц
+            generateAndSaveWrapped('monthly');
+        }
+
+        // --- C. WEEKLY CHECK (Накопление 7 дней) ---
+        // Если накоплено 7+ дней активности, закрываем неделю
+        if (activeDaysSet.size >= 7) {
+            generateAndSaveWrapped('weekly');
+            
+            // СБРОС СЧЕТЧИКА ДНЕЙ ПОСЛЕ НЕДЕЛЬНОГО ОТЧЕТА
+            activeDaysSet.clear();
+            // Добавляем сегодняшний день обратно, так как он уже начался
+            activeDaysSet.add(now.toISOString().split('T')[0]);
+            localStorage.setItem('xch_active_days', JSON.stringify([...activeDaysSet]));
+        }
+    }
+
+    // 3. Основная функция генерации
+    function generateAndSaveWrapped(type) {
+        const now = Date.now();
+        const oneDay = 86400000;
+        let startTime = 0;
+
+        // Определение временных рамок
+        if (type === 'daily') startTime = now - oneDay;
+        else if (type === 'weekly') startTime = now - (7 * oneDay); // Последние 7 дней
+        else if (type === 'monthly') startTime = now - (30 * oneDay); // Последние 30 дней
+        else if (type === 'yearly') startTime = now - (365 * oneDay); // Последний год
+
+        // Сбор данных
+        const relevantLogs = activityLog.filter(l => l.ts >= startTime);
+        const relevantWatch = watchHistory.filter(w => w.timestamp >= startTime);
+
+        // Если данных слишком мало — не генерируем архивный отчет (кроме Daily по запросу)
+        if (relevantLogs.length < 5 && type !== 'daily') return null;
+
+        // Расчет статистики
+        const stats = calculateDeepStats(relevantLogs, relevantWatch);
+
+        // Сравнение с прошлым (Delta)
+        const duration = now - startTime;
+        const prevStartTime = startTime - duration;
+        const prevLogs = activityLog.filter(l => l.ts >= prevStartTime && l.ts < startTime);
+        const prevWatches = watchHistory.filter(w => w.timestamp >= prevStartTime && w.timestamp < startTime);
+        
+        const prevStats = calculateDeepStats(prevLogs, prevWatches);
+        
+        stats.deltaActions = stats.totalActions - prevStats.totalActions;
+        stats.deltaWatchTime = stats.totalWatchTime - prevStats.totalWatchTime;
+
+        // Создание объекта
+        const wrappedObj = {
+            id: Date.now(),
+            type: type,
+            timestamp: now,
+            rangeStr: getRangeString(startTime, now, type),
+            stats: stats,
+            viewed: false,
+            isLatest: true
+        };
+
+        // Снимаем флаг isLatest с предыдущих записей того же типа
+        wrappedArchive.forEach(w => { if(w.type === type) w.isLatest = false; });
+        
+        // Сохраняем в начало архива
+        wrappedArchive.unshift(wrappedObj);
+        localStorage.setItem('xch_wrapped_archive', JSON.stringify(wrappedArchive));
+        
+        return wrappedObj;
+    }
+
+    // 4. Глубокий анализ статистики
+    function calculateDeepStats(logs, watches) {
+        let totalActions = 0;
+        let watchCount = 0;
+        let swipeCount = 0;
+        
+        const tagCounts = {};
+        const itemCounts = {};
+        const hours = new Array(24).fill(0);
+
+        logs.forEach(l => {
+            totalActions++;
+            const h = new Date(l.ts).getHours();
+            hours[h]++;
+
+            if (l.type === 'watch') watchCount++;
+            else swipeCount++;
+
+            if (l.tags) l.tags.forEach(t => tagCounts[t] = (tagCounts[t] || 0) + 1);
+            if (l.id) itemCounts[l.id] = (itemCounts[l.id] || 0) + 1;
+        });
+
+        const totalWatchTime = watches.reduce((sum, w) => sum + w.seconds, 0);
+
+        // Топ тегов и предметов
+        const topTags = Object.entries(tagCounts)
+            .sort((a,b) => b[1]-a[1])
+            .slice(0, 5).map(x => x[0]);
+        
+        const topItems = Object.entries(itemCounts)
+            .sort((a,b) => b[1]-a[1])
+            .slice(0, 3).map(x => x[0]);
+
+        // Пиковое время
+        const morning = hours.slice(5, 12).reduce((a,b)=>a+b,0);
+        const day = hours.slice(12, 20).reduce((a,b)=>a+b,0);
+        const night = hours.slice(20, 24).reduce((a,b)=>a+b,0) + hours.slice(0, 5).reduce((a,b)=>a+b,0);
+        
+        let peakTime = 'day';
+        if (night > day && night > morning) peakTime = 'night';
+        else if (morning > day && morning > night) peakTime = 'morning';
+
+        // Определение достижения (Achievement)
+        let achievement = 'day'; // Default fallback
+        
+        // 1. По времени
+        if (peakTime === 'night') achievement = 'night';
+        else if (peakTime === 'morning') achievement = 'morning';
+        
+        // 2. По поведению (перебивает время, если ярко выражено)
+        const ratio = watchCount / (swipeCount || 1);
+        
+        if (ratio > 0.4) achievement = 'binger'; // Часто смотрит
+        else if (ratio < 0.05 && totalActions > 20) achievement = 'picky'; // Много листает
+        else {
+            // 3. По разнообразию тегов (Исследователь vs Гедонист)
+            const uniqueTags = Object.keys(tagCounts).length;
+            // Если уникальных тегов много относительно действий -> Исследователь
+            if (uniqueTags / (totalActions || 1) > 0.8) achievement = 'explorer';
+            else achievement = 'hedonist';
+        }
+
+        return {
+            totalActions, watchCount, swipeCount, totalWatchTime,
+            topTags, topItems, peakTime, achievement
+        };
+    }
+
+    // Форматирование даты
+    function getRangeString(start, end, type) {
+        if (type === 'daily') return new Date(end).toLocaleDateString();
+        
+        const d1 = new Date(start);
+        const d2 = new Date(end);
+        const m1 = d1.getMonth() + 1;
+        const m2 = d2.getMonth() + 1;
+        
+        // Формат: 19.01 - 26.01
+        const pad = (n) => n < 10 ? '0'+n : n;
+        return `${pad(d1.getDate())}.${pad(m1)} - ${pad(d2.getDate())}.${pad(m2)}`;
+    }
+
+    // 5. Кнопка запуска (Trigger)
+    function triggerWrappedBtn() {
+        const isPaid = subscriptionLevel !== 'free';
+        const now = new Date();
+
+        // 1. Проверяем наличие АРХИВНЫХ отчетов (Непросмотренных)
+        // Сортируем по иерархии: Year > Month > Week
+        const unread = wrappedArchive.filter(w => !w.viewed).sort((a,b) => {
+            const priorities = { yearly: 3, monthly: 2, weekly: 1, daily: 0 };
+            return priorities[b.type] - priorities[a.type];
+        });
+
+        if (unread.length > 0) {
+            openWrappedUI(unread[0]);
+            return;
+        }
+
+        
+        if (activeDaysSet.size >= 7) {
+            // Если накоплена неделя — форсируем закрытие недели
+            const snapshot = generateAndSaveWrapped('weekly');
+            
+            // Сброс счетчика
+            activeDaysSet.clear();
+            activeDaysSet.add(now.toISOString().split('T')[0]);
+            localStorage.setItem('xch_active_days', JSON.stringify([...activeDaysSet]));
+            
+            if (snapshot) openWrappedUI(snapshot);
+        } 
+        else if (isPaid) {
+            // Платные могут смотреть Daily в любой момент
+            const snapshot = generateAndSaveWrapped('daily');
+            if (snapshot) openWrappedUI(snapshot);
+            else alert("Not enough activity today!");
+        } 
+        else {
+            // Free user без недели
+            const daysLeft = 7 - activeDaysSet.size;
+            const msg = currentLang === 'ru' ? 
+                `Нужно еще ${daysLeft} активных дней для Weekly!` : 
+                `Need ${daysLeft} more active days for Weekly!`;
+            alert(msg);
+        }
+    }
+
+    // 6. Отрисовка UI (Слайды)
+    function openWrappedUI(dataObj) {
+        const overlay = document.getElementById('wrapped-mount');
+        overlay.innerHTML = '';
+        overlay.classList.add('active');
+        
+        const slides = [];
+        const stats = dataObj.stats;
+        const type = dataObj.type;
+        
+        // Получаем переводы
+        const lang = WRAPPED_CONFIG.badges[currentLang] ? currentLang : 'en';
+        const badgeText = WRAPPED_CONFIG.badges[lang][type];
+        
+        // Фраза интро
+        const phrases = WRAPPED_CONFIG.phrases[type] || WRAPPED_CONFIG.phrases.daily;
+        const introText = phrases[lang][Math.floor(Math.random() * phrases[lang].length)];
+
+        // --- SLIDE 1: INTRO ---
+        slides.push(`
+            <div class="wrapped-slide bg-dark active-slide">
+                <div class="w-badge ${type}" style="transform:scale(1.8); margin-bottom:25px; box-shadow:0 10px 30px rgba(0,0,0,0.5);">${badgeText}</div>
+                <div class="wrapped-big-text" style="font-size:50px;">Fetish<br><span style="color:var(--accent)">Wrapped</span></div>
+                <div class="wrapped-sub-text" style="opacity:0.8; margin-top:20px;">${dataObj.rangeStr}</div>
+                <div class="wrapped-sub-text" style="margin-top:40px; font-weight:700;">${introText}</div>
+            </div>
+        `);
+
+        // --- SLIDE 2: COMPARISON (Если это не первый отчет) ---
+        // Показываем для Daily, Weekly и остальных
+        const trendAct = stats.deltaActions >= 0 ? "+" : "";
+        const trendTime = stats.deltaWatchTime >= 0 ? "+" : "";
+        const colorAct = stats.deltaActions >= 0 ? "#2ecc71" : "#e74c3c"; // Зеленый/Красный
+        
+        slides.push(`
+            <div class="wrapped-slide bg-fire">
+                <div class="wrapped-sub-text" style="text-transform:uppercase; letter-spacing:2px; font-size:12px;">Since Last Time</div>
+                
+                <div style="margin-top:30px;">
+                    <div class="wrapped-big-text" style="font-size:70px; color:${colorAct};">${trendAct}${stats.deltaActions}</div>
+                    <div class="wrapped-sub-text">Actions</div>
+                </div>
+                
+                <div style="margin-top:40px; border-top:1px solid rgba(255,255,255,0.2); padding-top:40px;">
+                    <div class="wrapped-big-text" style="font-size:70px;">${trendTime}${Math.round(stats.deltaWatchTime/60)}m</div>
+                    <div class="wrapped-sub-text">Watch Time</div>
+                </div>
+            </div>
+        `);
+
+        // --- SLIDE 3: ACHIEVEMENT (Только для Weekly/Monthly/Yearly) ---
+        if (type !== 'daily') {
+            const achKey = stats.achievement;
+            const achData = WRAPPED_CONFIG.achievements[achKey];
+            
+            const achTitle = achData[lang];
+            const achDesc = achData['desc_' + lang];
+
+            slides.push(`
+                <div class="wrapped-slide bg-toxic">
+                    <div class="achievement-badge">${achData.icon}</div>
+                    <div class="wrapped-sub-text" style="text-transform:uppercase; color:var(--text-secondary); margin-bottom:10px;">Your Vibe</div>
+                    <div class="wrapped-big-text" style="font-size:42px; line-height:1.1; margin-bottom:20px;">${achTitle}</div>
+                    <div class="wrapped-sub-text" style="max-width:300px;">${achDesc}</div>
+                </div>
+            `);
+        }
+
+        // --- SLIDE 4: TOP TAGS ---
+        const tagListHtml = stats.topTags.map((t, i) => 
+            `<div style="font-size:${32 - i*3}px; font-weight:800; margin:10px 0; color:${i===0?'var(--accent)':'#fff'};">
+                #${i+1} ${t.toUpperCase()}
+            </div>`
+        ).join('');
+
+        slides.push(`
+            <div class="wrapped-slide" style="background:#000;">
+                <div class="wrapped-sub-text" style="margin-bottom:30px;">Your Obsessions</div>
+                ${tagListHtml}
+            </div>
+        `);
+
+        // --- SLIDE 5: FINAL CARD (New Design) ---
+        const planColor = subscriptionLevel === 'free' ? '#fff' : '#9b59b6';
+        const topGenre = stats.topTags[0] ? stats.topTags[0].toUpperCase() : '---';
+
+        slides.push(`
+            <div class="wrapped-slide bg-dark">
+                <div class="sum-card-new">
+                    <div class="sum-header" style="display:flex; justify-content:space-between; align-items:center;">
+                        <div class="sum-logo-new">
+                            <span class="neutral">x</span><span class="grad">Fetish</span><span class="neutral">Hub</span>
+                        </div>
+                        <div class="w-badge ${type}">${badgeText}</div>
+                    </div>
+                    
+                    <div style="font-size:12px; color:rgba(255,255,255,0.6); text-align:right;">
+                        ${dataObj.rangeStr}<br><span style="color:${planColor}; font-weight:700;">${subscriptionLevel.toUpperCase()}</span>
+                    </div>
+
+                    <div class="sum-grid">
+                        <div class="sum-stat-box">
+                            <div class="sum-stat-val">${stats.totalActions}</div>
+                            <div class="sum-stat-lbl">Actions</div>
+                        </div>
+                        <div class="sum-stat-box">
+                            <div class="sum-stat-val">${Math.round(stats.totalWatchTime/60)}m</div>
+                            <div class="sum-stat-lbl">Time</div>
+                        </div>
+                        <div class="sum-stat-box">
+                            <div class="sum-stat-val">${stats.swipeCount}</div>
+                            <div class="sum-stat-lbl">Swipes</div>
+                        </div>
+                        <div class="sum-stat-box">
+                            <div class="sum-stat-val" style="color:var(--accent);">${stats.watchCount}</div>
+                            <div class="sum-stat-lbl">Watches</div>
+                        </div>
+                    </div>
+
+                    <div style="text-align:center; margin-top:5px; border-top:1px solid rgba(255,255,255,0.1); padding-top:15px;">
+                        <div class="sum-stat-lbl" style="margin-bottom:5px;">Top Genre</div>
+                        <div style="font-size:24px; font-weight:900; color:var(--accent); letter-spacing:1px;">
+                            ${topGenre}
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top:30px; display:flex; gap:10px;">
+                    <button onclick="closeWrapped()" class="btn-gen" style="width:auto; padding:12px 30px; font-size:14px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);">
+                        Done
+                    </button>
+                </div>
+            </div>
+        `);
+
+        // Рендер прогресс-баров
+        let barsHtml = '';
+        slides.forEach((_, i) => barsHtml += `<div class="wrapped-progress-bar"><div class="wrapped-progress-fill" id="bar-${i}"></div></div>`);
+        
+        overlay.innerHTML = `
+            <div class="wrapped-progress-container">${barsHtml}</div>
+            <div class="wrapped-close" onclick="closeWrapped()">✕</div>
+            <div class="wrapped-nav-area nav-left" onclick="prevSlide()"></div>
+            <div class="wrapped-nav-area nav-right" onclick="nextSlide()"></div>
+            ${slides.join('')}
+        `;
+        
+        // Запуск слайдшоу
+        currentSlideIndex = 0;
+        startSlideTimer(slides.length, 6000); 
+        
+        // Отмечаем как просмотренное и сохраняем
+        dataObj.viewed = true;
+        localStorage.setItem('xch_wrapped_archive', JSON.stringify(wrappedArchive));
+        
+        // Обновляем кнопку в меню (чтобы убрать точку уведомления)
+        openStatistics(); 
+    }
+
+    // 7. Рендер списка в Истории (Archive Tab)
+    function renderWrappedArchive() {
+        const list = document.getElementById('hist-list-wrapped');
+        list.innerHTML = '';
+        
+        // Сортировка: новые сверху
+        const items = wrappedArchive.sort((a,b) => b.timestamp - a.timestamp);
+        const isPaid = subscriptionLevel !== 'free';
+
+        if (items.length === 0) {
+            list.innerHTML = `<div style="text-align:center; padding:20px; opacity:0.5;">Archive empty</div>`;
+            return;
+        }
+
+        items.forEach(w => {
+            // Скрываем Daily от бесплатных пользователей в архиве
+            if (w.type === 'daily' && !isPaid) return;
+
+            const dateObj = new Date(w.timestamp);
+            const dateStr = dateObj.toLocaleDateString();
+            
+            const lang = WRAPPED_CONFIG.badges[currentLang] ? currentLang : 'en';
+            const badgeLabel = WRAPPED_CONFIG.badges[lang][w.type];
+            
+            const div = document.createElement('div');
+            div.className = 'wrapped-archive-item';
+            div.onclick = () => {
+                closeHistoryModal(null, true); // Закрываем модалку истории
+                openWrappedUI(w); // Открываем Wrapped
+            };
+            
+            // Точка если не прочитано
+            const dot = !w.viewed ? `<span style="color:var(--accent); font-size:20px; margin-right:8px;">●</span>` : ``;
+
+            div.innerHTML = `
+                <div style="display:flex; align-items:center;">
+                    ${dot}
+                    <div style="display:flex; flex-direction:column;">
+                        <span style="font-weight:700; color:var(--text-main); font-size:15px;">${dateStr}</span>
+                        <span style="font-size:11px; color:var(--text-secondary); margin-top:2px;">${w.type === 'daily' ? 'Snapshot' : w.rangeStr}</span>
+                    </div>
+                </div>
+                <div style="display:flex; align-items:center;">
+                    <span class="w-badge ${w.type}">${badgeLabel}</span>
+                    <span style="color:var(--text-secondary); margin-left:10px;">›</span>
+                </div>
+            `;
+            list.appendChild(div);
+        });
+    }
 
 </script>
 
