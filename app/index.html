@@ -119,7 +119,7 @@
 
             --ios-bg: #ffeef8;
             --ios-card: #ffffff;
-            --ios-separator: #fbcfe8;
+            --ios-separator: #e5e7eb;
             --ios-header: #6D6D72; 
 
             --card-gradient: linear-gradient(165deg, #ffffff 0%, #ffeef8 100%);
@@ -131,6 +131,7 @@
             --highlight-green: #ffffff;
             --highlight-red: #ffffff;
             --text-secondary: #aaaaaa;
+            --ios-separator: #333333;
             --border: #333333;
         }
 
@@ -996,7 +997,14 @@
         .chart-bar-group { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; flex: 1; height: 100%; position: relative; }
         .chart-bar.secondary { background: var(--text-secondary); margin-right: 2px; }
         .bar-wrapper { display: flex; align-items: flex-end; justify-content: center; gap: 2px; height: 100%; }
-        .chart-value-y { position: absolute; top: -20px; font-size: 10px; font-weight: 700; color: var(--text-main); }
+        .chart-value-y {
+            font-size: 10px; 
+            font-weight: 700; 
+            color: var(--text-main);
+            margin-bottom: 4px; 
+            text-align: center;
+            width: 100%;
+        }
 
         .stats-tf-capsule, .stats-nav-capsule { background: var(--ios-card); border: 1px solid var(--border); border-radius: 50px; display: flex; padding: 3px; width: 100%; }
         .stats-tf-capsule { height: 36px; margin-bottom: 8px; }
@@ -1637,12 +1645,12 @@
         .pref-col {
             min-width: 17%; 
             max-width: 17%;
-            height: 100%;
+            height: 100%; 
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
             align-items: center;
-            padding: 0 4px; /* Чуть больше отступ между ними */
+            padding: 0 4px;
         }
 
         /* Колонка активности */
@@ -1674,6 +1682,7 @@
             transition: height 0.5s ease;
             min-height: 4px;
             position: relative;
+            margin: 0; 
         }
 
         /* Подписи под графиком */
@@ -3156,6 +3165,63 @@
             z-index: 10;
         }
 
+        .rolling-input-overlay {
+            position: absolute;
+            top: 0;
+            left: 15px; 
+            height: 100%;
+            width: 80%;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+            z-index: 1;
+        }
+
+        /* Скрываем подсказки, когда пользователь печатает */
+        .assistant-input:focus + .rolling-input-overlay,
+        .assistant-input:not(:placeholder-shown) ~ .rolling-input-overlay, 
+        .rolling-input-overlay.hidden {
+            opacity: 0 !important;
+        }
+
+        .assistant-input:focus ~ .rolling-input-overlay {
+            opacity: 0;
+        }
+
+        .rolling-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .rolling-item {
+            height: 50px; 
+            display: flex;
+            align-items: center;
+            color: var(--text-secondary);
+            font-size: 16px;
+            font-weight: 500;
+            white-space: nowrap;
+            font-style: italic;
+        }
+
+        /* Анимация прокрутки */
+        @keyframes scrollPrompts {
+            0%, 15% { transform: translateY(0); }
+            20%, 35% { transform: translateY(-50px); }
+            40%, 55% { transform: translateY(-100px); }
+            60%, 75% { transform: translateY(-150px); }
+            80%, 95% { transform: translateY(-200px); }
+            100% { transform: translateY(-250px); } 
+        }
+
+        .animate-scroll {
+            animation: scrollPrompts 12s cubic-bezier(0.6, 0.0, 0.4, 1.0) infinite;
+        }
+
+
         /* Анимация свечения (масштаб + тень) */
         @keyframes aiPulseGlow {
             0% {
@@ -3554,10 +3620,18 @@
                                 <div id="assistant-ui" class="assistant-ui">
                                     <div class="assistant-prompt" data-key="ai_prompt">What do you desire? 😏</div>
                                     
-                                    <div class="assistant-input-group">
-                                        <input type="text" id="ai-input" class="assistant-input" placeholder="..." autocomplete="off">
+                                    <div class="assistant-input-group" style="position: relative; overflow: hidden;">
+                                        <!-- 1. Контейнер рулетки (Абсолютно поверх фона, под инпутом) -->
+                                        <div id="ai-rolling-container" class="rolling-input-overlay">
+                                            <div class="rolling-list" id="ai-rolling-list">
+                                                <!-- Сюда JS вставит варианты -->
+                                            </div>
+                                        </div>
+
+                                        <!-- 2. Сам инпут (Прозрачный фон) -->
+                                        <input type="text" id="ai-input" class="assistant-input" style="position: relative; z-index: 2; background: transparent !important;" autocomplete="off">
                                         
-                                        <button class="btn-mic-trigger" id="btn-mic" onclick="toggleVoiceInput()">
+                                        <button class="btn-mic-trigger" id="btn-mic" onclick="toggleVoiceInput()" style="position: relative; z-index: 3;">
                                             <img src="voice.png" class="voice-icon-img" alt="Voice">
                                         </button>
                                     </div>
@@ -5641,8 +5715,6 @@
         "ähnlich wie", "verbunden mit", "bezogen auf" // DE
     ];
 
-    const NEGATIVES = ["no ", "not ", "non ", "не ", "без ", "кроме ", "sin ", "kein ", "ohne ", "don't "];
-
     const welcomePhrases = {
         en: ["Ready to find your genre? 😈", "Spin the wheel of lust!", "Let fate decide...", "Waiting for your command..."],
         ru: ["Готов узнать свой жанр? 😈", "Крути барабан желаний!", "Судьба решит, что тебя ждёт...", "Жду твоего нажатия..."],
@@ -6491,7 +6563,7 @@
             badge_lgbt: "ЛГБТ",
             badge_desc_lgbt: "🏳️‍🌈 <b>ЛГБТ+ Контент</b><br>Включает однополые отношения (Гей/Лесби) или Транс-тематику.",
             
-            badge_niche: "Ниша",
+            badge_niche: "Нишевое",
             badge_desc_niche: "🔍 <b>Специфичный фетиш</b><br>Узконаправленный интерес, фокусирующийся на определенных частях тела, предметах или сценариях.",
             
             badge_bdsm: "БДСМ",
@@ -7694,7 +7766,7 @@
         'teen': ['school', 'student', 'young', '18', 'школьница', 'студентка', 'joven', 'estudiante', 'jung', 'schülerin'],
         'group': ['orgy', 'gangbang', 'threesome', 'групповой', 'оргия', 'trio', 'orgía', 'grupo', 'orgie', 'groupsex', 'dreier'],
         'bdsm': ['rough', 'hard', 'slave', 'bondage', 'жестко', 'грубо', 'бдсм', 'duro', 'esclava', 'hart', 'fesseln', 'domina'],
-        'big-tits': ['tits', 'boobs', 'busty', 'сиськи', 'грудь', 'tetas', 'pechos', 'titten', 'große'],
+        'tits': ['big-tits', 'boobs', 'busty', 'сиськи', 'грудь', 'tetas', 'pechos', 'titten', 'große'],
         'feet': ['foot', 'toes', 'ноги', 'ступни', 'pies', 'patas', 'füße', 'fuss'],
         'lesbian': ['girl-on-girl', 'tribadism', 'лесби', 'ножницы', 'lesbiana', 'tijeras', 'lesbisch'],
         'cum': ['creampie', 'facial', 'сперма', 'кончил', 'leche', 'corrida', 'sperma', 'besamung']
@@ -9359,14 +9431,15 @@
                 const maxVal = Math.max(...sortedTags.map(x => x[1]));
                 
                 sortedTags.forEach(([tag, score]) => {
-                    const height = Math.max(5, (score / maxVal) * 100);
+                    const height = Math.max(5, (score / maxVal) * 85);
                     
                     let displayTag = tag.charAt(0).toUpperCase() + tag.slice(1);
                     if (displayTag.length > 9) displayTag = displayTag.substring(0, 7) + '..';
 
                     html += `
                         <div class="pref-col">
-                            <div style="font-size:10px; color:var(--text-main); margin-bottom:2px; font-weight:700;">${score}</div>
+                            <!-- Цифра теперь просто блок над баром -->
+                            <div class="chart-value-y">${score}</div>
                             <div class="chart-bar" style="height:${height}%;"></div>
                             <div class="chart-label-x" title="${tag}">${displayTag}</div>
                         </div>
@@ -9402,12 +9475,11 @@
             else if (currentStatsTimeframe === 'month') cutoffTime = now - 30 * oneDay;
             else if (currentStatsTimeframe === 'year') cutoffTime = now - 365 * oneDay;
             
+            // 1. АГРЕГАЦИЯ СВАЙПОВ И ПРОСМОТРОВ (Количество)
             activityLog.forEach(log => {
                 if (log.ts < cutoffTime) return;
-
                 const d = new Date(log.ts);
                 let key, label;
-
                 if (currentStatsTimeframe === 'year' || currentStatsTimeframe === 'all') {
                     key = `${d.getFullYear()}-${d.getMonth()}`;
                     label = d.toLocaleDateString(currentLang, { month: 'short' }).replace('.', '');
@@ -9415,11 +9487,32 @@
                     key = d.toISOString().split('T')[0];
                     label = d.toLocaleDateString(currentLang, { day: 'numeric', month: 'numeric' });
                 }
-
-                if (!aggregated[key]) aggregated[key] = { gen: 0, watch: 0, label: label, sort: d.getTime() };
+                if (!aggregated[key]) aggregated[key] = { gen: 0, watch: 0, time: 0, label: label, sort: d.getTime() };
                 
                 if (log.type === 'watch') aggregated[key].watch++;
                 else if (['like', 'gen', 'pass', 'dislike'].includes(log.type)) aggregated[key].gen++;
+            });
+
+            // 2. АГРЕГАЦИЯ ВРЕМЕНИ (из watchHistory)
+            // watchHistory хранит {timestamp, seconds}
+            watchHistory.forEach(entry => {
+                if (entry.timestamp < cutoffTime) return;
+                const d = new Date(entry.timestamp);
+                let key;
+                if (currentStatsTimeframe === 'year' || currentStatsTimeframe === 'all') {
+                    key = `${d.getFullYear()}-${d.getMonth()}`;
+                } else {
+                    key = d.toISOString().split('T')[0];
+                }
+                
+                // Если ключ есть (была активность), добавляем время. Если нет - создаем.
+                if (aggregated[key]) {
+                    aggregated[key].time += entry.seconds;
+                } else {
+                    // Редкий кейс: смотрел, но не свайпал в этот день (из истории открыл)
+                    const label = d.toLocaleDateString(currentLang, { day: 'numeric', month: 'numeric' });
+                    aggregated[key] = { gen: 0, watch: 0, time: entry.seconds, label: label, sort: d.getTime() };
+                }
             });
 
             const chartData = Object.values(aggregated).sort((a, b) => a.sort - b.sort);
@@ -9429,30 +9522,45 @@
             if (chartData.length === 0) {
                 html += `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-secondary);">${t.stats_no_data}</div>`;
             } else {
-                let maxVal = 0;
+                // Ищем макс значения для нормализации высоты
+                let maxCount = 0;
+                let maxTime = 0;
+                
                 chartData.forEach(d => {
-                    if (d.gen > maxVal) maxVal = d.gen;
-                    if (d.watch > maxVal) maxVal = d.watch;
+                    // Макс для свайпов/просмотров
+                    if (d.gen > maxCount) maxCount = d.gen;
+                    if (d.watch > maxCount) maxCount = d.watch;
+                    // Макс для времени
+                    if (d.time > maxTime) maxTime = d.time;
                 });
-                if (maxVal === 0) maxVal = 1;
+                if (maxCount === 0) maxCount = 1;
+                if (maxTime === 0) maxTime = 1;
 
                 chartData.forEach(d => {
-                    const hGen = Math.max(2, (d.gen / maxVal) * 80);
-                    const hWatch = Math.max(2, (d.watch / maxVal) * 80);
+                    const hGen = Math.max(2, (d.gen / maxCount) * 80);
+                    const hWatch = Math.max(2, (d.watch / maxCount) * 80);
+                    const hTime = Math.max(2, (d.time / maxTime) * 80);
+                    
+                    // Перевод секунд в минуты для отображения
+                    const timeMin = Math.round(d.time / 60);
 
-                    // Отрисовка с flex-grow (act-bar-group) для расширения
                     html += `
-                        <div class="act-col">
-                            <div class="act-bar-group">
-                                <!-- Gen Bar (Серый) - 45% ширины группы -->
-                                <div style="width:45%; background:var(--text-secondary); height:${hGen}%; border-radius:3px 3px 0 0; opacity:0.3;"></div>
-                                <!-- Watch Bar (Акцент) - 45% ширины группы -->
-                                <div style="width:45%; background:var(--accent); height:${hWatch}%; border-radius:3px 3px 0 0;"></div>
+                        <div class="act-col" style="min-width: 45px;">
+                            <div class="act-bar-group" style="gap:2px; max-width: 100%;">
+                                <!-- Gen (Серый) -->
+                                <div style="flex:1; background:var(--text-secondary); height:${hGen}%; border-radius:2px 2px 0 0; opacity:0.3;"></div>
+                                <!-- Watch (Акцент) -->
+                                <div style="flex:1; background:var(--accent); height:${hWatch}%; border-radius:2px 2px 0 0;"></div>
+                                <!-- Time (Золотой/Фиолетовый - выберите цвет) -->
+                                <div style="flex:1; background:#9b59b6; height:${hTime}%; border-radius:2px 2px 0 0;"></div>
                             </div>
                             
-                            <div class="act-values">
-                                <span style="color:var(--text-secondary); opacity:0.6;">${d.gen}</span>
-                                <span style="color:var(--accent);">${d.watch}</span>
+                            <div class="act-values" style="flex-direction:column; align-items:center; gap:0;">
+                                <div style="display:flex; gap:3px;">
+                                    <span style="color:var(--text-secondary); opacity:0.6;">${d.gen}</span>
+                                    <span style="color:var(--accent);">${d.watch}</span>
+                                </div>
+                                <span style="color:#9b59b6; font-size:8px;">${timeMin}m</span>
                             </div>
                             
                             <div class="chart-label-x" style="font-size:9px;">${d.label}</div>
@@ -9463,16 +9571,20 @@
 
             html += `</div></div>`; 
 
-            // Легенда активности (Локализованная)
+            // Легенда
             html += `
-                <div style="margin-top:15px; display:flex; justify-content:center; gap:20px; font-size:11px;">
-                    <div style="display:flex; align-items:center; gap:6px;">
-                        <div style="width:10px; height:10px; background:var(--text-secondary); opacity:0.3; border-radius:2px;"></div>
-                        <span>${t.act_actions}</span>
+                <div style="margin-top:15px; display:flex; flex-wrap:wrap; justify-content:center; gap:15px; font-size:10px;">
+                    <div style="display:flex; align-items:center; gap:4px;">
+                        <div style="width:8px; height:8px; background:var(--text-secondary); opacity:0.3; border-radius:2px;"></div>
+                        <span>${t.act_actions || "Swipes"}</span>
                     </div>
-                    <div style="display:flex; align-items:center; gap:6px;">
-                        <div style="width:10px; height:10px; background:var(--accent); border-radius:2px;"></div>
-                        <span>${t.act_watches}</span>
+                    <div style="display:flex; align-items:center; gap:4px;">
+                        <div style="width:8px; height:8px; background:var(--accent); border-radius:2px;"></div>
+                        <span>${t.act_watches || "Watches"}</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:4px;">
+                        <div style="width:8px; height:8px; background:#9b59b6; border-radius:2px;"></div>
+                        <span>Time (min)</span>
                     </div>
                 </div>
             `;
@@ -10197,7 +10309,10 @@
             }
             
             if (theme.colors.nav) root.style.setProperty('--nav-bg', theme.colors.nav);
-            if (theme.colors.border) root.style.setProperty('--border', theme.colors.border);
+            if (theme.colors.border) {
+                root.style.setProperty('--border', theme.colors.border);
+                root.style.setProperty('--ios-separator', theme.colors.border);
+            }
         }
 
         // 6. Apply Accent
@@ -12249,152 +12364,273 @@
     }
 
     function analyzeUserRequest(text) {
-        text = text.toLowerCase();
+    const rawText = text.toLowerCase();
+    
+    // --- 0. ПРЕДВАРИТЕЛЬНАЯ ОЧИСТКА ---
+    // Убираем "связанное с", "хочу" и т.д.
+    let cleanText = rawText;
+    CLEAN_PHRASES.forEach(phrase => cleanText = cleanText.split(phrase).join(" "));
+    STOP_WORDS.forEach(word => cleanText = cleanText.replace(new RegExp(`\\b${word}\\b`, 'g'), " "));
+    
+    // Сжимаем пробелы
+    cleanText = cleanText.replace(/\s+/g, " ").trim();
 
-        // --- 0. ПРЕДВАРИТЕЛЬНАЯ ОЧИСТКА ---
-        CLEAN_PHRASES.forEach(phrase => {
-            text = text.split(phrase).join(" ");
-        });
-
-        // === ПОИСК МОДИФИКАТОРОВ ===
-        let detectedMods = [];
+    // === 1. ПРОВЕРКА СПЕЦИАЛЬНЫХ КОМАНД ===
+    
+    // А. "УДИВИ МЕНЯ" (Surprise)
+    const surpriseKw = SPECIAL_COMMANDS.surprise[currentLang] || SPECIAL_COMMANDS.surprise.en;
+    if (surpriseKw.some(kw => rawText.includes(kw))) {
+        // Берем случайное из базы (но не из ЧС)
+        const randomPool = data.filter(x => !blacklist.includes(x.id));
+        const item = randomPool[Math.floor(Math.random() * randomPool.length)];
         
-        // Проходимся по всем доступным модификаторам в базе
-        modifiersData.forEach(mod => {
-            // Собираем все варианты названия модификатора (EN, RU, ES, DE)
-            const keywords = [mod.key, mod.en, mod.ru, mod.es, mod.de]
-                .filter(k => k) // убираем пустые
-                .map(k => k.toLowerCase());
-
-            // Проверяем, есть ли хоть одно слово-триггер в тексте пользователя
-            const found = text.split(/[\s,.]+/).some(userWord => {
-                return userWord.length > 2 && keywords.some(keyword => isFuzzyMatch(userWord, keyword));
-            });
-
-            if (found) {
-                detectedMods.push(mod.key);
-            }
-        });
-        // ==========================================
-
-        // --- 1. ПАРСИНГ ОТРИЦАНИЙ ---
-        const NEGATIVES = ["no ", "not ", "non ", "не ", "без ", "кроме ", "sin ", "kein ", "ohne ", "don't "];
-        let positiveQuery = text;
-        let negativeTerms = [];
-
-        NEGATIVES.forEach(neg => {
-            if (positiveQuery.includes(neg)) {
-                const parts = positiveQuery.split(neg);
-                if (parts.length > 1) {
-                    const blockedPart = parts[1].split(/[ ,.!]+/)[0]; 
-                    if (blockedPart.length > 2) negativeTerms.push(blockedPart);
-                }
-            }
-        });
-
-        // --- 2. НОРМАЛИЗАЦИЯ ---
-        let rawTokens = positiveQuery
-            .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
-            .split(/\s+/)
-            .filter(w => w.length > 2 && !STOP_WORDS.includes(w) && !negativeTerms.includes(w));
-
-        let tokens = [];
-        let contextMode = null; 
-
-        rawTokens.forEach(token => {
-            let found = false;
-            if (CONTEXT_TRIGGERS.harder.includes(token)) contextMode = 'harder';
-            else if (CONTEXT_TRIGGERS.softer.includes(token)) contextMode = 'softer';
-            else if (CONTEXT_TRIGGERS.more.includes(token)) contextMode = 'more';
-            
-            for (const [key, aliases] of Object.entries(KEYWORD_ALIASES)) {
-                if (key === token || aliases.some(alias => isFuzzyMatch(token, alias))) {
-                    tokens.push(key);
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) tokens.push(token);
-        });
-
-        if (contextMode === 'harder') {
-            if (currentIntensity < 3) updateIntensity(3);
-            tokens.push(...['extreme', 'rough', 'bdsm']);
-        } else if (contextMode === 'softer') {
-            if (currentIntensity > 1) updateIntensity(1);
-            tokens.push(...['romantic', 'soft', 'vanilla']);
-        }
-
-        // Если токенов нет, но нашли моды — тоже ок, но лучше найти категорию
-        if (tokens.length === 0 && !contextMode && detectedMods.length === 0) return null;
-
-        // --- 3. ПОИСК КАТЕГОРИИ ---
-        let candidates = data.map(item => {
-            let score = 0;
-            
-            const fullStringForBan = [item.name, item.name_ru, item.name_es, item.slug, ...item.tags].join(" ").toLowerCase();
-            const hasNegative = negativeTerms.some(neg => fullStringForBan.includes(neg));
-            if (hasNegative) return { item, score: -1000 };
-
-            const targetWords = [];
-            const addWords = (str) => { if(str) str.toLowerCase().split(/[\s-]+/).forEach(w => targetWords.push(w)); };
-            
-            addWords(item.name);
-            addWords(item.name_ru);
-            addWords(item.name_es);
-            addWords(item.slug);
-            item.tags.forEach(t => targetWords.push(t));
-
-            tokens.forEach(token => {
-                if (item.slug === token) score += 60;
-                else {
-                    const bestMatch = targetWords.find(word => isFuzzyMatch(token, word));
-                    if (bestMatch) score += 40;
-                }
-            });
-
-            if (score > 0) {
-                if (favorites.includes(item.id)) score += 10;
-                if (cooldownList.includes(item.id)) score -= 30; 
-                score += Math.random() * 5;
-            }
-
-            return { item, score };
-        });
-
-        candidates.sort((a, b) => b.score - a.score);
-
-        // --- 4. РЕЗУЛЬТАТ ---
-        if (candidates.length > 0 && candidates[0].score > 0) {
-            const winner = candidates[0].item;
-            const localizedName = getLocalizedName(winner);
-            
-            const AI_RESPONSES = {
-                en: { harder: "Spiced it up 🔥", softer: "Something gentler ✨", mention: "You mentioned:  " },
-                ru: { harder: "Добавил перчинки 🔥", softer: "Что-то понежнее ✨", mention: "Ты упомянул:  " },
-                es: { harder: "Le puse más picante 🔥", softer: "Algo más suave ✨", mention: "Mencionaste:  " },
-                de: { harder: "Etwas Schärfe dazu 🔥", softer: "Etwas Sanfteres ✨", mention: "Du erwähntest:  " }
-            };
-
-            const phrases = AI_RESPONSES[currentLang] || AI_RESPONSES['en'];
-            let reasonText = "";
-            
-            if (contextMode === 'harder') reasonText = phrases.harder;
-            else if (contextMode === 'softer') reasonText = phrases.softer;
-            else {
-                reasonText = phrases.mention + `<span style="color:var(--accent); font-weight:700;">${localizedName}</span>`;
-            }
-
-            return { 
-                item: winner, 
-                reason: reasonText, 
-                tokens: winner.reasons,
-                detectedMods: detectedMods 
-            };
-        }
-
-        return null;
+        const reasons = {
+            en: "Fate decided! 🎲",
+            ru: "Судьба решила! 🎲",
+            es: "¡El destino decidió! 🎲",
+            de: "Das Schicksal hat entschieden! 🎲"
+        };
+        return { item: item, reason: reasons[currentLang] || reasons.en, detectedMods: [] };
     }
+
+    // Б. "КАК ВЧЕРА" (Yesterday)
+    const yesterKw = SPECIAL_COMMANDS.yesterday[currentLang] || SPECIAL_COMMANDS.yesterday.en;
+    if (yesterKw.some(kw => rawText.includes(kw))) {
+        if (watchHistory.length > 0) {
+            // Берем последний просмотренный
+            const lastId = watchHistory[0].id;
+            const item = data.find(x => x.id === lastId);
+            if (item) {
+                const reasons = {
+                    en: "As you requested: Like last time ↺",
+                    ru: "Как ты и просил: Повтор прошлого ↺",
+                    es: "Como pediste: Como la última vez ↺",
+                    de: "Wie gewünscht: Wie beim letzten Mal ↺"
+                };
+                return { item: item, reason: reasons[currentLang] || reasons.en, detectedMods: [] };
+            }
+        }
+    }
+
+    // === 2. ПОИСК МОДИФИКАТОРОВ ===
+    let detectedMods = [];
+    modifiersData.forEach(mod => {
+        const keywords = [mod.key, mod.en, mod.ru, mod.es, mod.de].filter(k => k).map(k => k.toLowerCase());
+        // Ищем целые слова или части слов (fuzzy)
+        const found = cleanText.split(" ").some(userWord => {
+            return userWord.length > 2 && keywords.some(keyword => isFuzzyMatch(userWord, keyword));
+        });
+        if (found) detectedMods.push(mod.key);
+    });
+
+    // === 3. ОБРАБОТКА "СМЕСЬ X И Y" (Mix) ===
+    const foundCategories = [];
+    
+    // Хелпер для поиска категории в тексте
+    const findCatInText = (textSource) => {
+        const results = [];
+        // Проверяем каждое слово юзера на совпадение с именем категории
+        const userWords = textSource.split(" ").filter(w => w.length > 3);
+        
+        // Оптимизация: Сначала проверяем избранное
+        favorites.forEach(id => {
+            const item = data.find(x => x.id === id);
+            if (item) checkItemMatch(item, userWords, results);
+        });
+        
+        // Если мало нашли, ищем по всей базе (лимит 500 популярных, чтобы не висло)
+        if (results.length < 2) {
+            data.slice(0, 500).forEach(item => {
+                if (!favorites.includes(item.id)) checkItemMatch(item, userWords, results);
+            });
+        }
+        return results;
+    };
+
+    const checkItemMatch = (item, words, results) => {
+        if (results.some(r => r.id === item.id)) return; // Уже нашли
+        const names = [item.name, item.name_ru, item.name_es, item.name_de, item.slug].filter(n => n);
+        
+        // Проверяем совпадение
+        const match = names.some(n => {
+            return words.some(w => isFuzzyMatch(w, n.toLowerCase()));
+        });
+        
+        if (match) results.push(item);
+    };
+
+    const mixMatches = findCatInText(cleanText);
+
+    // Если нашли 2 и более категорий — делаем МИКС
+    if (mixMatches.length >= 2) {
+        const mainItem = mixMatches[0]; // Берем первый как базу
+        const secondaryItem = mixMatches[1]; // Второй как донор тегов
+        
+        // Добавляем уникальные теги второго предмета в detectedMods
+        secondaryItem.tags.forEach(t => {
+            const modMatch = modifiersData.find(m => m.key.toLowerCase() === t || m.en.toLowerCase() === t);
+            if (modMatch) detectedMods.push(modMatch.key);
+            else {
+            }
+        });
+
+        // Формируем причину
+        const n1 = getLocalizedName(mainItem);
+        const n2 = getLocalizedName(secondaryItem);
+        
+        const reasons = {
+            en: `Mix: ${n1} + ${n2} 🍸`,
+            ru: `Микс: ${n1} + ${n2} 🍸`,
+            es: `Mezcla: ${n1} + ${n2} 🍸`,
+            de: `Mix: ${n1} + ${n2} 🍸`
+        };
+
+        return { 
+            item: mainItem, 
+            reason: reasons[currentLang] || reasons.en, 
+            detectedMods: [...new Set(detectedMods)] // Убираем дубли
+        };
+    }
+
+    // === 4. ОБЫЧНЫЙ ПОИСК (С учетом отрицаний) ===
+    
+    // Парсинг отрицаний ("без анала")
+    let positiveQuery = rawText;
+    let negativeTerms = [];
+
+    NEGATIVES.forEach(neg => {
+        if (positiveQuery.includes(neg)) {
+            const parts = positiveQuery.split(neg);
+            // Берем всё, что после слова "без"
+            if (parts.length > 1) {
+                // Пытаемся взять слово или фразу после отрицания
+                const blockedPart = parts[1].trim().split(/[.,!?;]|\s+(and|и|y|und)\s+/)[0]; 
+                if (blockedPart.length > 2) {
+                    negativeTerms.push(blockedPart.trim());
+                }
+            }
+        }
+    });
+
+    // Разбиваем на токены (слова)
+    let rawTokens = positiveQuery
+        .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
+        .split(/\s+/)
+        .filter(w => w.length > 2 && !STOP_WORDS.includes(w) && !negativeTerms.some(n => w.includes(n)));
+
+    // Проверяем контекст (Жестче/Мягче)
+    let tokens = [];
+    let contextMode = null; 
+
+    rawTokens.forEach(token => {
+        let found = false;
+        if (CONTEXT_TRIGGERS.harder.includes(token)) contextMode = 'harder';
+        else if (CONTEXT_TRIGGERS.softer.includes(token)) contextMode = 'softer';
+        else if (CONTEXT_TRIGGERS.more.includes(token)) contextMode = 'more';
+        
+        // Синонимы
+        for (const [key, aliases] of Object.entries(KEYWORD_ALIASES)) {
+            if (key === token || aliases.some(alias => isFuzzyMatch(token, alias))) {
+                tokens.push(key);
+                found = true;
+                break;
+            }
+        }
+        if (!found) tokens.push(token);
+    });
+
+    // Применяем контекст интенсивности
+    if (contextMode === 'harder') {
+        if (currentIntensity < 3) updateIntensity(3);
+        tokens.push(...['extreme', 'rough', 'bdsm']);
+    } else if (contextMode === 'softer') {
+        if (currentIntensity > 1) updateIntensity(1);
+        tokens.push(...['romantic', 'soft', 'vanilla']);
+    } else if (contextMode === 'more' && lastGeneratedItem) {
+        tokens.push(...lastGeneratedItem.tags.slice(0, 2)); 
+    }
+
+    // Если ничего не нашли
+    if (tokens.length === 0 && !contextMode && detectedMods.length === 0) return null;
+
+    // СКОРИНГ (Поиск кандидатов)
+    let candidates = data.map(item => {
+        let score = 0;
+        
+        // Строка для проверки банов
+        const fullString = [item.name, item.name_ru, item.name_es, item.name_de, item.slug, ...item.tags].join(" ").toLowerCase();
+        
+        // ШТРАФ ЗА ОТРИЦАНИЯ
+        const isBanned = negativeTerms.some(neg => {
+            // Проверяем, содержится ли запрещенное слово в описании предмета
+            return isFuzzyMatch(neg, item.name.toLowerCase()) || 
+                   isFuzzyMatch(neg, (item.name_ru||"").toLowerCase()) ||
+                   item.tags.some(t => isFuzzyMatch(neg, t));
+        });
+
+        if (isBanned) return { item, score: -5000 }; // Моментальный бан
+
+        // Стандартный поиск
+        const targetWords = [];
+        const addWords = (str) => { if(str) str.toLowerCase().split(/[\s-]+/).forEach(w => targetWords.push(w)); };
+        
+        addWords(item.name);
+        addWords(item.name_ru);
+        addWords(item.name_es);
+        addWords(item.slug);
+        item.tags.forEach(t => targetWords.push(t));
+
+        tokens.forEach(token => {
+            if (item.slug === token) score += 60;
+            else {
+                const bestMatch = targetWords.find(word => isFuzzyMatch(token, word));
+                if (bestMatch) score += 40;
+            }
+        });
+
+        // Бонусы
+        if (score > 0) {
+            if (favorites.includes(item.id)) score += 10;
+            if (cooldownList.includes(item.id)) score -= 30; 
+            score += Math.random() * 5;
+        }
+
+        return { item, score };
+    });
+
+    candidates.sort((a, b) => b.score - a.score);
+
+    // Возврат победителя
+    if (candidates.length > 0 && candidates[0].score > 0) {
+        const winner = candidates[0].item;
+        const localizedName = getLocalizedName(winner);
+        
+        const AI_RESPONSES = {
+            en: { harder: "Spiced it up 🔥", softer: "Something gentler ✨", mention: "You mentioned: " },
+            ru: { harder: "Добавил перчинки 🔥", softer: "Что-то понежнее ✨", mention: "Ты упомянул: " },
+            es: { harder: "Más picante 🔥", softer: "Algo más suave ✨", mention: "Mencionaste: " },
+            de: { harder: "Etwas Schärfe 🔥", softer: "Etwas Sanftes ✨", mention: "Du sagtest: " }
+        };
+
+        const phrases = AI_RESPONSES[currentLang] || AI_RESPONSES['en'];
+        let reasonText = "";
+        
+        if (contextMode === 'harder') reasonText = phrases.harder;
+        else if (contextMode === 'softer') reasonText = phrases.softer;
+        else {
+            reasonText = phrases.mention + `<span style="color:var(--accent); font-weight:700;">${localizedName}</span>`;
+        }
+
+        return { 
+            item: winner, 
+            reason: reasonText, 
+            tokens: winner.reasons,
+            detectedMods: [...new Set(detectedMods)]
+        };
+    }
+
+    return null;
+}
 
     function getTranslation(key) {
         const t = langData[currentLang] || langData['en'];
@@ -12517,6 +12753,7 @@
     }
 
     function openAssistantUI() {
+        initAiRollingPrompts()
         // 1. Анимируем уход старых элементов (Текст и Кнопки)
         const startText = document.getElementById('mode-start-text');
         const modeBtns = document.getElementById('mode-buttons-container');
@@ -12753,6 +12990,97 @@
     function renderModifiers() {
         renderModifiersInCard();
     }
+
+    // Генерация умных подсказок
+    function getAiSuggestions() {
+        const t = langData[currentLang] || langData['en'];
+        const prompts = [];
+
+        // 1. "Как вчера" (если есть история просмотров)
+        if (watchHistory.length > 0) {
+            prompts.push(currentLang === 'ru' ? "Хочу как вчера..." : "Like yesterday...");
+        }
+
+        // 2. "Пожестче"
+        prompts.push(currentLang === 'ru' ? "Давай пожёстче..." : "Make it rougher...");
+
+        // 3. "Удиви меня"
+        prompts.push(currentLang === 'ru' ? "Удиви меня..." : "Surprise me...");
+
+        // 4. "Любимое без X" (берем 1 любимый и 1 нелюбимый)
+        if (favorites.length > 0 && blacklist.length > 0) {
+            const favItem = data.find(x => x.id === favorites[0]);
+            const banItem = data.find(x => x.id === blacklist[0]);
+            if (favItem && banItem) {
+                const fName = getLocalizedName(favItem);
+                const bName = getLocalizedName(banItem);
+                prompts.push(currentLang === 'ru' 
+                    ? `${fName}, но без ${bName}` 
+                    : `${fName} without ${bName}`);
+            }
+        }
+
+        // 5. "Смесь X и Y" (берем 2 любимых)
+        if (favorites.length >= 2) {
+            // Берем случайные 2
+            const shuffled = favorites.sort(() => 0.5 - Math.random()).slice(0, 2);
+            const item1 = data.find(x => x.id === shuffled[0]);
+            const item2 = data.find(x => x.id === shuffled[1]);
+            if (item1 && item2) {
+                const n1 = getLocalizedName(item1);
+                const n2 = getLocalizedName(item2);
+                prompts.push(currentLang === 'ru' 
+                    ? `Смесь: ${n1} и ${n2}` 
+                    : `Mix ${n1} and ${n2}`);
+            }
+        }
+
+        // 6. "Без X и Y" (берем 2 из блэклиста)
+        if (blacklist.length >= 2) {
+            const item1 = data.find(x => x.id === blacklist[0]);
+            const item2 = data.find(x => x.id === blacklist[1]);
+            if (item1 && item2) {
+                const n1 = getLocalizedName(item1);
+                const n2 = getLocalizedName(item2);
+                prompts.push(currentLang === 'ru' 
+                    ? `Только без ${n1} и ${n2}` 
+                    : `Anything but ${n1} and ${n2}`);
+            }
+        }
+
+        // Заполнитель, если пусто
+        if (prompts.length < 3) {
+            prompts.push("Anal...");
+            prompts.push("BDSM...");
+            prompts.push("Romantic...");
+        }
+
+        return prompts.slice(0, 5); // Берем топ 5
+    }
+
+    function initAiRollingPrompts() {
+        const container = document.getElementById('ai-rolling-list');
+        const input = document.getElementById('ai-input');
+        const overlay = document.getElementById('ai-rolling-container');
+        
+        if (!container) return;
+
+        const suggestions = getAiSuggestions();
+        
+        container.innerHTML = suggestions.map(s => `<div class="rolling-item">${s}</div>`).join('');
+        
+        // Пересчитываем анимацию под количество элементов
+        const count = suggestions.length;
+        container.classList.add('animate-scroll');
+        
+        // Логика скрытия при вводе
+        input.onfocus = () => overlay.classList.add('hidden');
+        input.onblur = () => {
+            if(input.value.trim() === '') overlay.classList.remove('hidden');
+        };
+        input.oninput = () => overlay.classList.add('hidden');
+    }
+
 
 </script>
 
