@@ -8211,6 +8211,12 @@
     }
 
     function forceShowResult(item, mode = 'history', customStatus = null) {
+    if (mode !== 'ai_request') {
+        activeMods.clear();
+        
+        if (currentOrientation === 'gay') activeMods.add('Gay');
+        else if (currentOrientation === 'trans') activeMods.add('Trans');
+    } 
         isGenerating = false;
         
         // 1. ОТКЛЮЧАЕМ СТАРТОВЫЙ РЕЖИМ
@@ -10654,8 +10660,10 @@
         }
 
         // 1. Модификаторы
+        activeMods.clear(); 
         if (currentOrientation === 'gay') activeMods.add('Gay');
         else if (currentOrientation === 'trans') activeMods.add('Trans');
+
         renderModifiers();
 
         // 2. Чистка UI
@@ -12446,6 +12454,8 @@
                 // УСПЕХ
                 aiContextTokens = result.tokens || [];
                 setAppMode('ai');
+
+                activeMods.clear();
 
                 // === АКТИВАЦИЯ МОДИФИКАТОРОВ ===
                 if (result.detectedMods && result.detectedMods.length > 0) {
