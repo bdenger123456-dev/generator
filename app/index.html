@@ -5018,7 +5018,8 @@
             if (docSnap.exists()) {
                 const d = docSnap.data();
 
-                const cloudMods = cloudData.modifiersPool || null;
+                const cloudMods = d.modifiersPool || null; 
+                
                 if (cloudMods && Array.isArray(cloudMods)) {
                     userModifiersPool = cloudMods;
                     localStorage.setItem('xch_user_mods', JSON.stringify(userModifiersPool));
@@ -6513,7 +6514,7 @@
             watch: "Смотреть",
             search: "Найти",
             related_header: "Вам также может понравиться:",
-            mod_manage: "Настроить теги",
+            mod_manage: "Настроить модификаторы",
             mod_title: "Модификаторы",
             mod_active_sec: "Активные (В карточке)",
             mod_inactive_sec: "Неактивные (Скрыты)",
