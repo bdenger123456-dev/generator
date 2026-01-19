@@ -4954,9 +4954,14 @@
                 <div style="font-size:50px; margin-bottom:10px;">✅</div>
                 <h3 style="color:var(--highlight-green); margin:0 0 10px 0;" data-key="pay_success_title">Payment Received!</h3>
                 <p style="font-size:13px; color:var(--text-secondary);" data-key="pay_success_desc">Subscription activated.</p>
+                
+                <!--  DISCORD (Скрыта по умолчанию) -->
+                <a id="btn-discord-join" href="#" target="_blank" class="btn-gen" style="display:none; margin-top:15px; background:#5865F2; color:#fff; text-decoration:none; align-items:center; justify-content:center; gap:8px;">
+                    <span style="font-size:20px;">💬</span> Join Discord
+                </a>
+
                 <button class="btn-gen" onclick="location.reload()" style="margin-top:15px; width:100%;" data-key="pay_reload">Reload Page</button>
             </div>
-
         </div>
     </div>
 </div>
@@ -10134,6 +10139,7 @@
 
         cryptoPollInterval = setInterval(async () => {
             try {
+                // Запрос к серверу
                 const res = await fetch(`${API_BASE_URL}/check-status/${invoiceId}`);
                 const json = await res.json();
 
@@ -10141,22 +10147,32 @@
                     clearInterval(cryptoPollInterval);
                     clearInterval(cryptoTimerInterval);
                     
-                    // УСПЕХ
+                    // Показываем экран успеха
                     document.getElementById('payment-status-box').style.display = 'none';
                     document.getElementById('payment-success-msg').style.display = 'block';
                     document.getElementById('crypto-timer').style.display = 'none';
                     
-                    // Конфетти (опционально, если подключена библиотека)
+                    // === БЕЗОПАСНАЯ ВЫДАЧА ССЫЛКИ ===
+                    // Если сервер прислал ссылку (значит, проверка на сервере прошла успешно)
+                    if (json.discordLink) {
+                        const discordBtn = document.getElementById('btn-discord-join');
+                        if (discordBtn) {
+                            discordBtn.href = json.discordLink; // Вставляем ссылку динамически
+                            discordBtn.style.display = 'flex';  // Показываем кнопку
+                        }
+                    }
                 }
+                
                 if (json.status === 'expired') {
                     clearInterval(cryptoPollInterval);
-                    alert("Time expired. Please create a new payment.");
+                    clearInterval(cryptoTimerInterval);
+                    alert("Время оплаты истекло. Создайте новый платеж.");
                     closeCryptoModal();
                 }
             } catch (e) { console.error("Poll error", e); }
-        }, 5000); // Проверяем каждые 5 сек
+        }, 5000); 
     }
-
+    
     function startCryptoTimer(expiresAt) {
         if (cryptoTimerInterval) clearInterval(cryptoTimerInterval);
         
