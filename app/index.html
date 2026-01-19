@@ -4934,7 +4934,7 @@
         btnText.innerHTML = `<span class="spinning-icon">↻</span> Syncing...`;
         
         try {
-            await loadUserData(user); // Это твоя функция слияния
+            await loadUserData(user); 
 
             // УСПЕХ
             btnText.innerHTML = successText;
@@ -12243,12 +12243,32 @@
     function analyzeUserRequest(text) {
         text = text.toLowerCase();
 
-        // --- 0. ПРЕДВАРИТЕЛЬНАЯ ОЧИСТКА ФРАЗ ---
-        // Удаляем "связанное с", чтобы оно не триггерило Bondage
+        // --- 0. ПРЕДВАРИТЕЛЬНАЯ ОЧИСТКА ---
         CLEAN_PHRASES.forEach(phrase => {
             text = text.split(phrase).join(" ");
         });
+
+        // === ПОИСК МОДИФИКАТОРОВ ===
+        let detectedMods = [];
         
+        // Проходимся по всем доступным модификаторам в базе
+        modifiersData.forEach(mod => {
+            // Собираем все варианты названия модификатора (EN, RU, ES, DE)
+            const keywords = [mod.key, mod.en, mod.ru, mod.es, mod.de]
+                .filter(k => k) // убираем пустые
+                .map(k => k.toLowerCase());
+
+            // Проверяем, есть ли хоть одно слово-триггер в тексте пользователя
+            const found = text.split(/[\s,.]+/).some(userWord => {
+                return userWord.length > 2 && keywords.some(keyword => isFuzzyMatch(userWord, keyword));
+            });
+
+            if (found) {
+                detectedMods.push(mod.key);
+            }
+        });
+        // ==========================================
+
         // --- 1. ПАРСИНГ ОТРИЦАНИЙ ---
         const NEGATIVES = ["no ", "not ", "non ", "не ", "без ", "кроме ", "sin ", "kein ", "ohne ", "don't "];
         let positiveQuery = text;
@@ -12275,12 +12295,10 @@
 
         rawTokens.forEach(token => {
             let found = false;
-            // Команды
             if (CONTEXT_TRIGGERS.harder.includes(token)) contextMode = 'harder';
             else if (CONTEXT_TRIGGERS.softer.includes(token)) contextMode = 'softer';
             else if (CONTEXT_TRIGGERS.more.includes(token)) contextMode = 'more';
             
-            // Синонимы
             for (const [key, aliases] of Object.entries(KEYWORD_ALIASES)) {
                 if (key === token || aliases.some(alias => isFuzzyMatch(token, alias))) {
                     tokens.push(key);
@@ -12291,29 +12309,25 @@
             if (!found) tokens.push(token);
         });
 
-        // Управление настройками
         if (contextMode === 'harder') {
             if (currentIntensity < 3) updateIntensity(3);
             tokens.push(...['extreme', 'rough', 'bdsm']);
         } else if (contextMode === 'softer') {
             if (currentIntensity > 1) updateIntensity(1);
             tokens.push(...['romantic', 'soft', 'vanilla']);
-        } else if (contextMode === 'more' && lastGeneratedItem) {
-            tokens.push(...lastGeneratedItem.tags.slice(0, 3)); 
         }
 
-        if (tokens.length === 0 && !contextMode) return null;
+        // Если токенов нет, но нашли моды — тоже ок, но лучше найти категорию
+        if (tokens.length === 0 && !contextMode && detectedMods.length === 0) return null;
 
-        // --- 3. ПОИСК ---
+        // --- 3. ПОИСК КАТЕГОРИИ ---
         let candidates = data.map(item => {
             let score = 0;
             
-            // Строгая проверка для банов
             const fullStringForBan = [item.name, item.name_ru, item.name_es, item.slug, ...item.tags].join(" ").toLowerCase();
             const hasNegative = negativeTerms.some(neg => fullStringForBan.includes(neg));
             if (hasNegative) return { item, score: -1000 };
 
-            // Сбор слов предмета
             const targetWords = [];
             const addWords = (str) => { if(str) str.toLowerCase().split(/[\s-]+/).forEach(w => targetWords.push(w)); };
             
@@ -12324,25 +12338,13 @@
             item.tags.forEach(t => targetWords.push(t));
 
             tokens.forEach(token => {
-                // 1. Точное совпадение SLUG (+60)
-                if (item.slug === token) {
-                    score += 60;
-                }
-                // 2. Нечеткий поиск по словам (+40)
+                if (item.slug === token) score += 60;
                 else {
                     const bestMatch = targetWords.find(word => isFuzzyMatch(token, word));
                     if (bestMatch) score += 40;
                 }
             });
 
-            // Фильтры режима
-            if (contextMode === 'softer' && item.tags.some(t => EXTREME_TAGS.includes(t))) return { item, score: -1000 };
-            if (contextMode === 'harder') {
-                if (item.tags.some(t => ['vanilla', 'romantic'].includes(t))) score -= 50;
-                if (item.tags.some(t => EXTREME_TAGS.includes(t))) score += 20;
-            }
-
-            // Бонусы
             if (score > 0) {
                 if (favorites.includes(item.id)) score += 10;
                 if (cooldownList.includes(item.id)) score -= 30; 
@@ -12357,8 +12359,6 @@
         // --- 4. РЕЗУЛЬТАТ ---
         if (candidates.length > 0 && candidates[0].score > 0) {
             const winner = candidates[0].item;
-            
-            // === БЕРЕМ ЛОКАЛИЗОВАННОЕ ИМЯ КАТЕГОРИИ ===
             const localizedName = getLocalizedName(winner);
             
             const AI_RESPONSES = {
@@ -12377,7 +12377,12 @@
                 reasonText = phrases.mention + `<span style="color:var(--accent); font-weight:700;">${localizedName}</span>`;
             }
 
-            return { item: winner, reason: reasonText, tokens: winner.reasons };
+            return { 
+                item: winner, 
+                reason: reasonText, 
+                tokens: winner.reasons,
+                detectedMods: detectedMods 
+            };
         }
 
         return null;
@@ -12439,8 +12444,29 @@
 
             if (result) {
                 // УСПЕХ
-                aiContextTokens = result.tokens || []; // Запоминаем контекст 
+                aiContextTokens = result.tokens || [];
                 setAppMode('ai');
+
+                // === АКТИВАЦИЯ МОДИФИКАТОРОВ ===
+                if (result.detectedMods && result.detectedMods.length > 0) {
+                    result.detectedMods.forEach(modKey => {
+                        // 1. Добавляем в глобальный Set активных модов
+                        activeMods.add(modKey);
+                        
+                        // 2. Если мода нет в пуле пользователя (внизу экрана), добавляем его туда временно,
+                        // чтобы пользователь видел, что включилось.
+                        if (!userModifiersPool.includes(modKey)) {
+                            // Если пул переполнен, удаляем первый, чтобы влез новый
+                            if (userModifiersPool.length >= 10) userModifiersPool.shift();
+                            userModifiersPool.push(modKey);
+                        }
+                    });
+                    
+                    // Обновляем UI списка модификаторов и сохраняем пул
+                    localStorage.setItem('xch_user_mods', JSON.stringify(userModifiersPool));
+                    renderModifiers(); 
+                }
+                // =============================================
 
                 forceShowResult(result.item, 'ai_request', result.reason);
                 
