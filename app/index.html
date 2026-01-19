@@ -6152,6 +6152,7 @@
 
             pay_header: "USDT (TRC20) Payment",
             pay_instruction: "Send the <b>EXACT amount</b> (including decimals!) via <b>Tron (TRC20)</b>.",
+            pay_fee_warn: "⚠️ Network fee is NOT included. Do not send from exchange if fee is deducted from amount!",
             pay_sum_label: "Amount to send:",
             pay_copy_addr: "Tap to Copy Address",
             pay_how_to: "Don't have crypto? How to pay",
@@ -6582,6 +6583,7 @@
 
             pay_header: "Оплата USDT (TRC20)",
             pay_instruction: "Отправьте <b>ТОЧНУЮ сумму</b> (вплоть до копеек) через сеть <b>Tron (TRC20)</b>.",
+            pay_fee_warn: "⚠️ Комиссия сети НЕ включена. Не отправляйте с биржи, если комиссия вычитается из суммы!",
             pay_sum_label: "Сумма:",
             pay_copy_addr: "Нажми, чтобы скопировать",
             pay_how_to: "Нет крипты? Как оплатить?",
@@ -7006,6 +7008,7 @@
 
             pay_header: "Pago USDT (TRC20)",
             pay_instruction: "Envía la <b>cantidad exacta</b> (incluyendo decimales) vía red <b>Tron (TRC20)</b>.",
+            pay_fee_warn: "⚠️ La comisión de la red NO está incluida. ¡No envíes desde un exchange si la comisión se deduce del monto!",
             pay_sum_label: "Monto a enviar:",
             pay_copy_addr: "Toca para copiar dirección",
             pay_how_to: "¿No tienes cripto? ¿Cómo pagar?",
@@ -7422,6 +7425,7 @@
 
             pay_header: "Zahlung USDT (TRC20)",
             pay_instruction: "Sende den <b>exakten Betrag</b> (einschließlich Dezimalstellen) über das <b>Tron (TRC20)</b> Netzwerk.",
+            pay_fee_warn: "⚠️ Netzwerkgebühr ist NICHT enthalten. Sende nicht von einer Börse, wenn die Gebühr vom Betrag abgezogen wird!",
             pay_sum_label: "Betrag:",
             pay_copy_addr: "Tippen zum Kopieren",
             pay_how_to: "Keine Krypto? Wie zahlen?",
@@ -10080,36 +10084,45 @@
     function showCryptoModal(data) {
         const modal = document.getElementById('modal-crypto-payment');
         
-        // 1. ФОРМАТИРОВАНИЕ СУММЫ
+        // Форматируем сумму
         const amountStr = parseFloat(data.amount.toFixed(6));
         
-        // 2. ОБНОВЛЕНИЕ UI
+        // Вставляем сумму
         const amountEl = document.getElementById('crypto-amount');
         amountEl.innerHTML = `${amountStr} <span style="font-size:14px">USDT</span>`;
-        
-        // Делаем сумму красной или оранжевой, чтобы привлечь внимание к точности
         amountEl.style.color = "#ff9900"; 
+
+        // --- ДОБАВЛЯЕМ ПРЕДУПРЕЖДЕНИЕ О КОМИССИИ ---
+        // Ищем (или создаем) элемент для варнинга
+        let warnEl = document.getElementById('fee-warning-box');
+        if (!warnEl) {
+            warnEl = document.createElement('div');
+            warnEl.id = 'fee-warning-box';
+            warnEl.style.cssText = "font-size:11px; color:#e74c3c; margin-top:5px; line-height:1.2; padding:0 15px; text-align:right;";
+            // Вставляем после блока суммы
+            amountEl.parentNode.parentNode.appendChild(warnEl);
+        }
+        // Получаем текст из переводов
+        const t = langData[currentLang] || langData['en'];
+        warnEl.innerHTML = t.pay_fee_warn || "⚠️ Fee not included!";
+        // -------------------------------------------
         
-        // Адрес
         document.getElementById('crypto-address').innerText = data.address;
         
-        // 3. QR КОД
-        // Генерируем QR. Некоторые кошельки поддерживают сумму в QR, но надежнее просто адрес.
         const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=10&data=${data.address}`;
         document.getElementById('crypto-qr-img').src = qrUrl;
 
-        // 4. СБРОС СОСТОЯНИЯ ОКОН
         document.getElementById('payment-status-box').style.display = 'block';
         document.getElementById('payment-success-msg').style.display = 'none';
-        
-        // Сбрасываем вид (вдруг юзер оставил открытым гайд "Как купить")
         document.getElementById('crypto-guide-view').style.display = 'none';
         document.getElementById('crypto-main-view').style.display = 'block';
         
-        // 5. ОТКРЫТИЕ
         modal.classList.add('open');
 
-        // 6. ЗАПУСК ТАЙМЕРОВ
+        // === ДЛЯ ТЕСТОВ (Выводим ID в консоль браузера) ===
+        console.log("%c[TESTING] Invoice ID:", "color: lime; font-size: 14px;", data.invoiceId);
+        console.log("Для симуляции оплаты используй ссылку (см. server.js)");
+
         startCryptoTimer(data.expiresAt);
         startCryptoPolling(data.invoiceId);
     }
@@ -10172,7 +10185,7 @@
             } catch (e) { console.error("Poll error", e); }
         }, 5000); 
     }
-    
+
     function startCryptoTimer(expiresAt) {
         if (cryptoTimerInterval) clearInterval(cryptoTimerInterval);
         
