@@ -6146,7 +6146,7 @@
             btn_cancel: "Cancel",
 
             pay_header: "USDT (TRC20) Payment",
-            pay_instruction: "Send the <b>exact amount</b> via <b>Tron (TRC20)</b> network.<br>Activation is automatic (1-2 mins).",
+            pay_instruction: "Send the <b>EXACT amount</b> (including decimals!) via <b>Tron (TRC20)</b>.",
             pay_sum_label: "Amount to send:",
             pay_copy_addr: "Tap to Copy Address",
             pay_how_to: "Don't have crypto? How to pay",
@@ -6576,7 +6576,7 @@
             btn_cancel: "Отмена",
 
             pay_header: "Оплата USDT (TRC20)",
-            pay_instruction: "Отправьте <b>точную сумму</b> через сеть <b>Tron (TRC20)</b>.<br>Активация автоматическая (1-2 мин).",
+            pay_instruction: "Отправьте <b>ТОЧНУЮ сумму</b> (вплоть до копеек) через сеть <b>Tron (TRC20)</b>.",
             pay_sum_label: "Сумма:",
             pay_copy_addr: "Нажми, чтобы скопировать",
             pay_how_to: "Нет крипты? Как оплатить?",
@@ -7000,7 +7000,7 @@
             btn_cancel: "Cancelar",
 
             pay_header: "Pago USDT (TRC20)",
-            pay_instruction: "Envía la <b>cantidad exacta</b> vía red <b>Tron (TRC20)</b>.<br>La activación es automática (1-2 min).",
+            pay_instruction: "Envía la <b>cantidad exacta</b> (incluyendo decimales) vía red <b>Tron (TRC20)</b>.",
             pay_sum_label: "Monto a enviar:",
             pay_copy_addr: "Toca para copiar dirección",
             pay_how_to: "¿No tienes cripto? ¿Cómo pagar?",
@@ -7416,7 +7416,7 @@
             btn_cancel: "Abbrechen",
 
             pay_header: "Zahlung USDT (TRC20)",
-            pay_instruction: "Sende den <b>exakten Betrag</b> über das <b>Tron (TRC20)</b> Netzwerk.<br>Aktivierung erfolgt automatisch (1-2 Min).",
+            pay_instruction: "Sende den <b>exakten Betrag</b> (einschließlich Dezimalstellen) über das <b>Tron (TRC20)</b> Netzwerk.",
             pay_sum_label: "Betrag:",
             pay_copy_addr: "Tippen zum Kopieren",
             pay_how_to: "Keine Krypto? Wie zahlen?",
@@ -10075,25 +10075,37 @@
     function showCryptoModal(data) {
         const modal = document.getElementById('modal-crypto-payment');
         
-        // 1. Заполняем данные
-        document.getElementById('crypto-amount').innerText = data.amount + " USDT";
+        // 1. ФОРМАТИРОВАНИЕ СУММЫ
+        const amountStr = parseFloat(data.amount.toFixed(6));
+        
+        // 2. ОБНОВЛЕНИЕ UI
+        const amountEl = document.getElementById('crypto-amount');
+        amountEl.innerHTML = `${amountStr} <span style="font-size:14px">USDT</span>`;
+        
+        // Делаем сумму красной или оранжевой, чтобы привлечь внимание к точности
+        amountEl.style.color = "#ff9900"; 
+        
+        // Адрес
         document.getElementById('crypto-address').innerText = data.address;
         
-        // 2. Генерируем QR (Используем API)
-        // Формат QR: просто адрес кошелька, чтобы приложение считало
-        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${data.address}`;
+        // 3. QR КОД
+        // Генерируем QR. Некоторые кошельки поддерживают сумму в QR, но надежнее просто адрес.
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=10&data=${data.address}`;
         document.getElementById('crypto-qr-img').src = qrUrl;
 
-        // 3. Сбрасываем UI
+        // 4. СБРОС СОСТОЯНИЯ ОКОН
         document.getElementById('payment-status-box').style.display = 'block';
         document.getElementById('payment-success-msg').style.display = 'none';
         
+        // Сбрасываем вид (вдруг юзер оставил открытым гайд "Как купить")
+        document.getElementById('crypto-guide-view').style.display = 'none';
+        document.getElementById('crypto-main-view').style.display = 'block';
+        
+        // 5. ОТКРЫТИЕ
         modal.classList.add('open');
 
-        // 4. Запускаем таймер (30 минут)
+        // 6. ЗАПУСК ТАЙМЕРОВ
         startCryptoTimer(data.expiresAt);
-
-        // 5. Запускаем проверку статуса
         startCryptoPolling(data.invoiceId);
     }
 
