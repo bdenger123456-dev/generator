@@ -4395,7 +4395,7 @@
                     <!-- Список фич -->
                     <ul class="plan-features">
                         <li style="color:var(--text-main)" data-key="feat_lifetime">♾️ <b>Lifetime Access</b></li>
-                        <li style="color:var(--text-main)" data-key="feat_all_pro">👑 <b>All Pro Features</b></li>
+                        <li style="color:var(--text-main)" data-key="feat_all_beast">🦁 <b>All Beast Features</b></li>
                         <li data-key="feat_sponsors">💎 Listed in "Sponsors"</li>
                         <li data-key="feat_onetime">💸 One-time payment</li>
                     </ul>
@@ -6246,6 +6246,7 @@
             btn_get_pro: "Get Pro",
 
             feat_all_pro: "👑 All Pro Features",
+            feat_all_beast: "🦁 <b>All Beast Features</b>",
             feat_sponsors: "💎 Listed in Sponsors",
             feat_discord: "💬 Discord (Dev Chat)",
             feat_vote: "🗳️ Vote on Roadmap",
@@ -6673,6 +6674,7 @@
             btn_get_pro: "Купить Pro",
 
             feat_all_pro: "👑 Всё, что есть в Pro",
+            feat_all_beast: "🦁 <b>Всё, что есть в Beast</b>",
             feat_sponsors: "💎 Имя во вкладке Спонсоры",
             feat_discord: "💬 Доступ в Discord чат",
             feat_vote: "🗳️ Влияние на развитие",
@@ -7107,6 +7109,7 @@
             btn_get_pro: "Obtener Pro",
 
             feat_all_pro: "👑 Todo lo de Pro",
+            feat_all_beast: "🦁 <b>Todo lo de Beast</b>",
             feat_sponsors: "💎 En Patrocinadores",
             feat_discord: "💬 Acceso a Discord",
             feat_vote: "🗳️ Votar Futuro",
@@ -7514,6 +7517,7 @@
             btn_get_pro: "Pro holen",
 
             feat_all_pro: "👑 Alle Pro-Funktionen",
+            feat_all_beast: "🦁 <b>Alle Beast-Funktionen</b>",
             feat_sponsors: "💎 In Sponsorenliste",
             feat_discord: "💬 Discord Zugang",
             feat_vote: "🗳️ Abstimmung",
@@ -10006,11 +10010,11 @@
             btnMon.classList.remove('active');
             
             // Цены Год (скидка)
-            if(pricePro) pricePro.innerHTML = `$19.99 <span style="font-size:12px">/ year</span>`;
+            if(pricePro) pricePro.innerHTML = `$29.99 <span style="font-size:12px">/ year</span>`;
             if(priceBeast) priceBeast.innerHTML = `$49.99 <span style="font-size:12px">/ year</span>`;
         }
     }
-    
+
     async function openPaymentSelection(type) {
         if (!window.isUserLoggedIn) {
             openLoginModal();
