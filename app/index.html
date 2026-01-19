@@ -9417,7 +9417,7 @@
         body.innerHTML = '';
         const t = langData[currentLang];
 
-        // --- ЛОГИКА 1: ПРЕДПОЧТЕНИЯ (TAGS) ---
+        // --- ЛОГИКА 1: ПРЕДПОЧТЕНИЯ (TAGS) - Оставляем как было ---
         if (currentStatsTab === 'tags') {
             const tempScores = {};
             const ignoreStats = ['universal', 'straight', 'male', 'female']; 
@@ -9428,7 +9428,7 @@
                     if (log.type === 'watch') weight = 10;
                     else if (log.type === 'like' || log.type === 'similar') weight = 5;
                     else if (log.type === 'gen' || log.type === 'pass') weight = 0;
-                    else if (log.type === 'dislike') weight = -5; // Исключаем из топа, но не убиваем совсем
+                    else if (log.type === 'dislike') weight = -5;
 
                     if (weight !== 0) {
                         log.tags.forEach(tag => {
@@ -9454,13 +9454,11 @@
                 
                 sortedTags.forEach(([tag, score]) => {
                     const height = Math.max(5, (score / maxVal) * 85);
-                    
                     let displayTag = tag.charAt(0).toUpperCase() + tag.slice(1);
                     if (displayTag.length > 9) displayTag = displayTag.substring(0, 7) + '..';
 
                     html += `
                         <div class="pref-col">
-                            <!-- Цифра теперь просто блок над баром -->
                             <div class="chart-value-y">${score}</div>
                             <div class="chart-bar" style="height:${height}%;"></div>
                             <div class="chart-label-x" title="${tag}">${displayTag}</div>
@@ -9468,10 +9466,9 @@
                     `;
                 });
             }
-            
             html += `</div></div>`;
-
-            // Легенда
+            
+            // Легенда для тегов
             html += `
                 <div style="margin-top:15px; display:flex; flex-direction:column; gap:5px; align-items:center;">
                     <div style="display:flex; gap:15px; font-size:10px; color:var(--text-secondary);">
@@ -9497,7 +9494,7 @@
             else if (currentStatsTimeframe === 'month') cutoffTime = now - 30 * oneDay;
             else if (currentStatsTimeframe === 'year') cutoffTime = now - 365 * oneDay;
             
-            // 1. АГРЕГАЦИЯ СВАЙПОВ И ПРОСМОТРОВ (Количество)
+            // 1. АГРЕГАЦИЯ
             activityLog.forEach(log => {
                 if (log.ts < cutoffTime) return;
                 const d = new Date(log.ts);
@@ -9515,8 +9512,6 @@
                 else if (['like', 'gen', 'pass', 'dislike'].includes(log.type)) aggregated[key].gen++;
             });
 
-            // 2. АГРЕГАЦИЯ ВРЕМЕНИ (из watchHistory)
-            // watchHistory хранит {timestamp, seconds}
             watchHistory.forEach(entry => {
                 if (entry.timestamp < cutoffTime) return;
                 const d = new Date(entry.timestamp);
@@ -9527,11 +9522,9 @@
                     key = d.toISOString().split('T')[0];
                 }
                 
-                // Если ключ есть (была активность), добавляем время. Если нет - создаем.
                 if (aggregated[key]) {
                     aggregated[key].time += entry.seconds;
                 } else {
-                    // Редкий кейс: смотрел, но не свайпал в этот день (из истории открыл)
                     const label = d.toLocaleDateString(currentLang, { day: 'numeric', month: 'numeric' });
                     aggregated[key] = { gen: 0, watch: 0, time: entry.seconds, label: label, sort: d.getTime() };
                 }
@@ -9539,53 +9532,51 @@
 
             const chartData = Object.values(aggregated).sort((a, b) => a.sort - b.sort);
 
-            let html = `<div class="chart-wrapper"><div class="chart-scroll-view" style="justify-content: flex-start;">`;
+            let html = `<div class="chart-wrapper"><div class="chart-scroll-view" style="justify-content: flex-start; padding-left: 5px;">`;
 
             if (chartData.length === 0) {
                 html += `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-secondary);">${t.stats_no_data}</div>`;
             } else {
-                // Ищем макс значения для нормализации высоты
                 let maxCount = 0;
                 let maxTime = 0;
                 
                 chartData.forEach(d => {
-                    // Макс для свайпов/просмотров
                     if (d.gen > maxCount) maxCount = d.gen;
                     if (d.watch > maxCount) maxCount = d.watch;
-                    // Макс для времени
                     if (d.time > maxTime) maxTime = d.time;
                 });
-                if (maxCount === 0) maxCount = 1;
-                if (maxTime === 0) maxTime = 1;
+
+                if (maxCount < 10) maxCount = 10;
+                if (maxTime < 300) maxTime = 300; 
+
+                // === ЛОКАЛИЗАЦИЯ ЕДИНИЦ (Chart) ===
+                let timeUnit = 'm'; // Default EN
+                if (currentLang === 'ru') timeUnit = 'м';
+                else if (currentLang === 'es') timeUnit = 'min';
+                else if (currentLang === 'de') timeUnit = 'min';
 
                 chartData.forEach(d => {
-                    const hGen = Math.max(2, (d.gen / maxCount) * 80);
-                    const hWatch = Math.max(2, (d.watch / maxCount) * 80);
-                    const hTime = Math.max(2, (d.time / maxTime) * 80);
+                    const hGen = (d.gen / maxCount) * 100;
+                    const hWatch = (d.watch / maxCount) * 100;
+                    const hTime = (d.time / maxTime) * 100;
                     
-                    // Перевод секунд в минуты для отображения
                     const timeMin = Math.round(d.time / 60);
 
                     html += `
-                        <div class="act-col" style="min-width: 45px;">
-                            <div class="act-bar-group" style="gap:2px; max-width: 100%;">
-                                <!-- Gen (Серый) -->
-                                <div style="flex:1; background:var(--text-secondary); height:${hGen}%; border-radius:2px 2px 0 0; opacity:0.3;"></div>
-                                <!-- Watch (Акцент) -->
-                                <div style="flex:1; background:var(--accent); height:${hWatch}%; border-radius:2px 2px 0 0;"></div>
-                                <!-- Time (Золотой/Фиолетовый - выберите цвет) -->
-                                <div style="flex:1; background:#9b59b6; height:${hTime}%; border-radius:2px 2px 0 0;"></div>
+                        <div class="act-col" style="min-width: 55px; margin-right: 8px;">
+                            <div style="display:flex; align-items:flex-end; gap:2px; height:75%; width:100%; padding-bottom:5px;">
+                                <div style="flex:1; background:var(--text-secondary); height:${Math.max(2, hGen)}%; border-radius:2px 2px 0 0; opacity:0.3;"></div>
+                                <div style="flex:1; background:var(--accent); height:${Math.max(2, hWatch)}%; border-radius:2px 2px 0 0;"></div>
+                                <div style="flex:1; background:#9b59b6; height:${Math.max(2, hTime)}%; border-radius:2px 2px 0 0;"></div>
                             </div>
                             
-                            <div class="act-values" style="flex-direction:column; align-items:center; gap:0;">
-                                <div style="display:flex; gap:3px;">
-                                    <span style="color:var(--text-secondary); opacity:0.6;">${d.gen}</span>
-                                    <span style="color:var(--accent);">${d.watch}</span>
-                                </div>
-                                <span style="color:#9b59b6; font-size:8px;">${timeMin}m</span>
+                            <div style="display:flex; justify-content:space-between; width:100%; font-size:9px; font-weight:700; margin-top:2px;">
+                                <span style="color:var(--text-secondary); opacity:0.6;">${d.gen}</span>
+                                <span style="color:var(--accent);">${d.watch}</span>
+                                <span style="color:#9b59b6;">${timeMin}${timeUnit}</span>
                             </div>
                             
-                            <div class="chart-label-x" style="font-size:9px;">${d.label}</div>
+                            <div class="chart-label-x" style="font-size:9px; margin-top:3px;">${d.label}</div>
                         </div>
                     `;
                 });
@@ -9593,7 +9584,10 @@
 
             html += `</div></div>`; 
 
-            // Легенда
+            // === ЛОКАЛИЗАЦИЯ ЕДИНИЦ (Legend) ===
+            let legendUnit = 'min';
+            if (currentLang === 'ru') legendUnit = 'мин';
+
             html += `
                 <div style="margin-top:15px; display:flex; flex-wrap:wrap; justify-content:center; gap:15px; font-size:10px;">
                     <div style="display:flex; align-items:center; gap:4px;">
@@ -9606,7 +9600,7 @@
                     </div>
                     <div style="display:flex; align-items:center; gap:4px;">
                         <div style="width:8px; height:8px; background:#9b59b6; border-radius:2px;"></div>
-                        <span>Time (min)</span>
+                        <span>Time (${legendUnit})</span>
                     </div>
                 </div>
             `;
