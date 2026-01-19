@@ -5560,7 +5560,7 @@
     const TAG_DECAY_RATE = 0.98;
     const WRAPPED_THRESHOLD = 30;
     let data = [];
-    
+
     let cryptoPollInterval = null;
     let cryptoTimerInterval = null;
     let currentBillingCycle = '1'; 
@@ -5736,6 +5736,8 @@
     let aiContextTokens = [];
     let isModeSelectActive = false; 
     
+    const API_BASE_URL = "https://www.fetishback.site"
+
     const STORAGE = {
         THEME: 'xch_theme',
         LANG: 'xch_lang',
@@ -10009,28 +10011,42 @@
             return;
         }
 
-        // Bestie всегда один, у него нет месяца/года
-        let finalPlanId = type; 
+        let finalPlanId = type;
         
-        // Если это Pro или Beast, добавляем суффикс (_1 или _12)
+        // Добавляем суффикс, если нужно
         if (type === 'pro' || type === 'beast') {
             finalPlanId = `${type}_${currentBillingCycle}`;
         }
 
-        // Блокируем кнопку...
-        const btn = document.querySelector(`.plan-btn.${type}-btn`);
+        // Ищем кнопку безопасно. Если type кривой, querySelector не упадет с ошибкой.
+        let btn = null;
+        try {
+            // Убеждаемся, что type существует и является допустимым
+            if (type && /^[a-zA-Z0-9_-]+$/.test(type)) {
+                btn = document.querySelector(`.plan-btn.${type}-btn`);
+            }
+        } catch (err) {
+            console.warn("Кнопка не найдена или селектор неверен:", type);
+        }
+
         const oldText = btn ? btn.innerText : '';
         if(btn) { btn.innerText = "Creating..."; btn.disabled = true; }
 
         try {
-            const response = await fetch('/create-payment', {
+            const response = await fetch(`${API_BASE_URL}/create-payment`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     uid: window.auth.currentUser.uid,
-                    plan: finalPlanId // Отправляем, например, 'pro_12'
+                    plan: finalPlanId
                 })
             });
+
+            if (!response.ok) {
+                // Пытаемся прочитать текст ошибки от сервера
+                const errText = await response.text();
+                throw new Error(`Server Error: ${response.status} ${errText}`);
+            }
 
             const data = await response.json();
             if (data.error) throw new Error(data.error);
@@ -10039,7 +10055,8 @@
             closeSubModal(null, true);
 
         } catch (e) {
-            alert("Error: " + e.message);
+            console.error(e);
+            alert("Ошибка соединения: " + e.message);
         } finally {
             if(btn) { btn.innerText = oldText; btn.disabled = false; }
         }
@@ -10095,7 +10112,7 @@
 
         cryptoPollInterval = setInterval(async () => {
             try {
-                const res = await fetch(`/check-status/${invoiceId}`);
+                const res = await fetch(`${API_BASE_URL}/check-status/${invoiceId}`);
                 const json = await res.json();
 
                 if (json.status === 'paid' || json.status === 'processed') {
