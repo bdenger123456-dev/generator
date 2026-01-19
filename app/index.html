@@ -5715,6 +5715,28 @@
         "ähnlich wie", "verbunden mit", "bezogen auf" // DE
     ];
 
+    const NEGATIVES = [
+        "no ", "without ", "not ", "except ", // EN
+        "без ", "не ", "кроме ", // RU
+        "sin ", "no ", "excepto ", // ES
+        "ohne ", "kein ", "außer " // DE
+    ];
+
+    const SPECIAL_COMMANDS = {
+        surprise: {
+            en: ["surprise", "random", "lucky"],
+            ru: ["удиви", "случайно", "рандом", "что угодно"],
+            es: ["sorprende", "aleatorio", "suerte"],
+            de: ["überrasch", "zufall", "glück"]
+        },
+        yesterday: {
+            en: ["yesterday", "last time", "again"],
+            ru: ["вчера", "прошлый раз", "повтори", "как раньше"],
+            es: ["ayer", "ultima vez", "otra vez"],
+            de: ["gestern", "letztes mal", "wieder"]
+        }
+    };
+
     const welcomePhrases = {
         en: ["Ready to find your genre? 😈", "Spin the wheel of lust!", "Let fate decide...", "Waiting for your command..."],
         ru: ["Готов узнать свой жанр? 😈", "Крути барабан желаний!", "Судьба решит, что тебя ждёт...", "Жду твоего нажатия..."],
