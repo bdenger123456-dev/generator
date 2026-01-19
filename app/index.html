@@ -12412,29 +12412,26 @@
         
         const thinkTxt = document.getElementById('ai-thinking-text');
         
-        // 2. АНИМАЦИЯ МЫШЛЕНИЯ (Микровариативность)
+        // 2. АНИМАЦИЯ МЫШЛЕНИЯ
         const steps = THINKING_STEPS[currentLang] || THINKING_STEPS['en'];
         let stepIndex = 0;
-        
-        // Сразу ставим первую фразу
         thinkTxt.innerText = steps[0];
 
         const thinkInterval = setInterval(() => {
             stepIndex = (stepIndex + 1) % steps.length;
             thinkTxt.innerText = steps[stepIndex];
-        }, 450); // Каждые 450мс меняем фразу
+        }, 450);
 
-        // 3. ОБРАБОТКА (Имитация задержки 1.8 сек)
+        // 3. ОБРАБОТКА
         setTimeout(() => {
-            clearInterval(thinkInterval); // Останавливаем анимацию
+            clearInterval(thinkInterval);
             
             const result = analyzeUserRequest(text); 
             
-            // Скрываем оверлей
             const overlay = document.getElementById('mode-start-overlay');
             overlay.classList.add('hidden'); 
             
-            // Сброс UI (с задержкой)
+            // Сброс UI
             setTimeout(() => {
                 document.getElementById('thinking-ui').style.display = 'none';
                 document.getElementById('ai-input').value = '';
@@ -12455,32 +12452,51 @@
                 aiContextTokens = result.tokens || [];
                 setAppMode('ai');
 
+                // === СБРОС ПРЕДЫДУЩИХ МОДОВ ===
                 activeMods.clear();
+                // ====================================
 
-                // === АКТИВАЦИЯ МОДИФИКАТОРОВ ===
+                // === УМНОЕ ДОБАВЛЕНИЕ МОДОВ ===
                 if (result.detectedMods && result.detectedMods.length > 0) {
+                    
+                    // Подготовка данных для проверки дубликатов
+                    const winnerTags = result.item.tags.map(t => t.toLowerCase()); // Теги категории
+                    const winnerName = result.item.name.toLowerCase(); // Имя (EN)
+                    const winnerNameRu = (result.item.name_ru || "").toLowerCase(); // Имя (RU)
+                    const winnerSlug = result.item.slug.toLowerCase();
+
                     result.detectedMods.forEach(modKey => {
-                        // 1. Добавляем в глобальный Set активных модов
-                        activeMods.add(modKey);
-                        
-                        // 2. Если мода нет в пуле пользователя (внизу экрана), добавляем его туда временно,
-                        // чтобы пользователь видел, что включилось.
-                        if (!userModifiersPool.includes(modKey)) {
-                            // Если пул переполнен, удаляем первый, чтобы влез новый
-                            if (userModifiersPool.length >= 10) userModifiersPool.shift();
-                            userModifiersPool.push(modKey);
+                        const tagToCheck = modKey.toLowerCase();
+
+                        // ПРОВЕРКА: Если модификатор уже есть в категории — НЕ добавляем его
+                        // 1. Есть ли такой тег у категории? (trans -> trans)
+                        const hasTag = winnerTags.includes(tagToCheck);
+                        // 2. Есть ли это слово в названии? (Shemale Fucks Shemale -> trans нет, но по тегу поймали выше)
+                        const inName = winnerName.includes(tagToCheck) || winnerNameRu.includes(tagToCheck);
+                        // 3. Есть ли в слаге?
+                        const inSlug = winnerSlug.includes(tagToCheck);
+
+                        // Добавляем ТОЛЬКО если модификатор приносит что-то новое
+                        if (!hasTag && !inName && !inSlug) {
+                            activeMods.add(modKey);
+
+                            // Добавляем в пул пользователя (визуально вниз)
+                            if (!userModifiersPool.includes(modKey)) {
+                                if (userModifiersPool.length >= 10) userModifiersPool.shift();
+                                userModifiersPool.push(modKey);
+                            }
                         }
                     });
                     
-                    // Обновляем UI списка модификаторов и сохраняем пул
+                    // Сохраняем пул и обновляем UI
                     localStorage.setItem('xch_user_mods', JSON.stringify(userModifiersPool));
                     renderModifiers(); 
                 }
-                // =============================================
+                // ===============================================
 
                 forceShowResult(result.item, 'ai_request', result.reason);
                 
-                // Анимация прилета
+                // Анимация
                 const wrapper = document.getElementById('card-anim-wrapper');
                 if(wrapper) {
                     wrapper.classList.remove('anim-fly-left', 'anim-fly-right');
