@@ -71,6 +71,54 @@
     </script>
     
     <style>
+        /* === LOADER === */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 999999; /* Поверх всего */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #12000b; /* Дефолтный темный фон */
+            transition: opacity 0.5s ease, visibility 0.5s;
+        }
+
+        #loading-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loader-logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 20px;
+            /* Анимация пульсации */
+            animation: breathe 2s infinite ease-in-out;
+        }
+
+        .loader-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            opacity: 0.8;
+            max-width: 80%;
+        }
+
+        @keyframes breathe {
+            0% { transform: scale(0.95); opacity: 0.7; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.7; }
+        }
+
         /* =========================================
         1. VARIABLES & RESET & THEMES
         ========================================= */
@@ -4103,6 +4151,59 @@
     </style>
 </head>
 <body>
+
+<!-- EKRAN ZAGRUZKI -->
+<div id="loading-overlay">
+    <img src="icon_light.png" class="loader-logo" alt="Loading...">
+    <div class="loader-text" id="loader-phrase">Loading preferences...</div>
+</div>
+
+<!-- МГНОВЕННОЕ ПРИМЕНЕНИЕ ФОНА-->
+<script>
+    (function() {
+        const themeId = localStorage.getItem('xch_theme_id') || 'dark';
+        const overlay = document.getElementById('loading-overlay');
+        
+        // Быстрая карта цветов (должна совпадать с вашими темами)
+        const colors = {
+            'dark': '#12000b',
+            'light': '#ffeef8',
+            'blue-dark': '#020c1b',
+            'blue-light': '#dbeafe',
+            'green-dark': '#020a02',
+            'green-light': '#dcfce7',
+            'red-dark': '#0d0000',
+            'red-light': '#ffe4e6',
+            'gold-dark': '#0a0900',
+            'gold-light': '#fef3c7',
+            'noir': '#000000',
+            'rainbow': '#12000b'
+        };
+
+        // Красим оверлей сразу же
+        if (colors[themeId]) {
+            overlay.style.backgroundColor = colors[themeId];
+        }
+        
+        // Меняем цвет текста для светлых тем
+        if (themeId.includes('light')) {
+            document.getElementById('loader-phrase').style.color = '#555';
+            // Если логотип icon_light.png белый, инвертируем его для светлой темы
+            document.querySelector('.loader-logo').style.filter = 'invert(1)';
+        }
+
+        // Рандомные фразы загрузки
+        const phrases = [
+            "Preparing your experience...",
+            "Loading pleasure...",
+            "Applying personal settings...",
+            "Fetching categories...",
+            "Warming up engine...",
+            "Analysing tastes..."
+        ];
+        document.getElementById('loader-phrase').innerText = phrases[Math.floor(Math.random() * phrases.length)];
+    })();
+</script>
 
 <div class="top-gradient-mask"></div>
 
@@ -8534,7 +8635,7 @@
         { id: 'trans', key: 'tag_trans' }
     ];
 
-    window.onload = () => {
+    window.onload = async () => {
         initLanguage();
         initTheme();
         initIntensity();
@@ -8577,6 +8678,16 @@
         
         // Принудительно ставим класс для мобильной шапки
         document.body.classList.add('tab-home-active');
+
+        setTimeout(() => {
+            const overlay = document.getElementById('loading-overlay');
+            if (overlay) {
+                overlay.classList.add('hidden');
+                // Удаляем из DOM через полсекунды (после анимации)
+                setTimeout(() => overlay.style.display = 'none', 500);
+            }
+        }, 800);
+
     };
 
     async function loadData() {
@@ -8643,6 +8754,9 @@
         window.addEventListener('resize', checkLayout);
         
         document.body.classList.add('tab-home-active');
+        setTimeout(() => {
+            document.getElementById('loading-overlay').classList.add('hidden');
+        }, 500); 
     }
 
     window.onload = loadData;
