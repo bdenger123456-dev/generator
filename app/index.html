@@ -2134,14 +2134,18 @@
 
         /* ФИНАЛЬНАЯ КАРТОЧКА */
         .sum-card-new {
-            background: rgba(20, 20, 20, 0.8);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            background: rgba(20, 20, 20, 0.95); 
             border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 24px; padding: 30px;
-            width: 90%; max-width: 360px;
-            display: flex; flex-direction: column; gap: 20px;
+            border-radius: 24px; 
+            padding: 25px;
+            width: 90%; 
+            max-width: 360px;
+            display: flex; 
+            flex-direction: column; 
+            gap: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-            position: relative; overflow: hidden;
+            position: relative; 
+            overflow: hidden;
         }
         .sum-logo-new { font-weight: 900; font-size: 24px; color: #fff; letter-spacing: -1px; }
         .sum-logo-new span.grad { 
@@ -2187,9 +2191,91 @@
             to { opacity: 1; transform: translateY(0); }
         }
         .sum-header {
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.2);
-            padding-bottom: 15px; margin-bottom: 5px;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding-bottom: 15px; 
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            margin-bottom: 5px;
+        }
+        .sum-header-left {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Логотип: Картинка + Текст */
+        .sum-logo-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .sum-logo-img {
+            height: 32px; 
+            width: auto;
+            object-fit: contain;
+        }
+
+        .sum-logo-text { 
+            font-weight: 900; 
+            font-size: 20px; 
+            color: #fff; 
+            letter-spacing: -0.5px;
+            line-height: 1;
+        }
+
+        /* Цветные буквы (если не нуар) */
+        .sum-logo-text span.grad { 
+            background: linear-gradient(180deg, #CB53F0 20%, var(--accent) 100%);
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Нуарная тема: всё белое */
+        body[data-theme="noir"] .sum-logo-text span.grad {
+            background: #fff;
+            -webkit-background-clip: unset;
+            -webkit-text-fill-color: #fff;
+        }
+
+        /* Подпись "Узнай себя" */
+        .sum-caption {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.5);
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-left: 2px; /* Чуть подвинуть под текст */
+        }
+
+        /* QR Код */
+        .sum-qr-box {
+            background: #fff;
+            padding: 4px;
+            border-radius: 8px;
+            width: 64px;
+            height: 64px;
+            flex-shrink: 0; /* Чтобы не сжимался */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sum-qr-img {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Бейджик периода в карточке */
+        .sum-meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            margin-top: -10px; 
         }
         .sum-logo { font-weight: 900; font-size: 18px; color: #fff; }
         .sum-date { font-size: 10px; color: rgba(255,255,255,0.6); text-transform: uppercase; text-align: right; }
@@ -10883,20 +10969,38 @@
         if(label) label.innerText = theme.name;
     }
 
+    function updateGlobalLogos(themeId) {
+        // Если тема 'noir', используем logo_noir.png, иначе обычный logo.png
+        const isNoir = (themeId === 'noir');
+        const newSrc = isNoir ? 'logo_noir.png' : 'logo.png';
+
+        // 1. Основные логотипы (Сайдбар, Мобильная шапка, Age Gate)
+        document.querySelectorAll('.logo-img').forEach(img => {
+            img.src = newSrc;
+        });
+
+        // 2. Логотип в модальном окне установки 
+        const installLogo = document.querySelector('#modal-install-overlay img');
+        // Проверяем, что это именно логотип (на случай если там QR код)
+        if (installLogo && installLogo.src.includes('logo')) {
+            installLogo.src = newSrc;
+        }
+    }
+
     function applyTheme(themeId) {
         localStorage.setItem('xch_theme_id', themeId);
         const root = document.documentElement;
         
-        // 1. Устанавливаем атрибут для CSS-селекторов
+        // 1. Устанавливаем атрибут
         document.body.setAttribute('data-theme', themeId);
+
+        updateGlobalLogos(themeId); 
 
         const theme = APP_THEMES.find(t => t.id === themeId);
         if (!theme) return;
-
-        // 2. Light/Dark logic
+        
         document.body.classList.toggle('light-theme', theme.isLight);
         
-        // 3. Rainbow logic toggle
         if (theme.isRainbow) {
             document.body.classList.add('rainbow-mode');
             setRandomRainbowColor();
@@ -10904,24 +11008,20 @@
             document.body.classList.remove('rainbow-mode');
         }
         
-        // 4. Reset styles
         const props = ['--bg-color', '--sidebar-bg', '--card-bg', '--nav-bg', '--border', '--ios-card', '--ios-bg', '--card-gradient'];
         props.forEach(p => root.style.removeProperty(p));
         
-        // 5. Apply Custom Colors
         if (theme.colors) {
             if (theme.colors.bg) {
                 root.style.setProperty('--bg-color', theme.colors.bg);
                 root.style.setProperty('--ios-bg', theme.colors.bg);
             }
             if (theme.colors.sidebar) root.style.setProperty('--sidebar-bg', theme.colors.sidebar);
-            
             if (theme.colors.card) {
                 root.style.setProperty('--card-bg', theme.colors.card);
                 root.style.setProperty('--ios-card', theme.colors.card);
                 root.style.setProperty('--card-gradient', `linear-gradient(165deg, ${theme.colors.card}, ${theme.colors.bg})`);
             }
-            
             if (theme.colors.nav) root.style.setProperty('--nav-bg', theme.colors.nav);
             if (theme.colors.border) {
                 root.style.setProperty('--border', theme.colors.border);
@@ -10929,7 +11029,6 @@
             }
         }
 
-        // 6. Apply Accent
         if (theme.accent) {
             root.style.setProperty('--accent', theme.accent);
             root.style.setProperty('--accent-light', theme.accentLight || theme.accent);
@@ -13707,7 +13806,7 @@
         }
     }
 
-    // 6. Отрисовка UI (Слайды) - ФИНАЛЬНАЯ ВЕРСИЯ
+    // 6. Отрисовка UI (Слайды)
     function openWrappedUI(dataObj) {
         const overlay = document.getElementById('wrapped-mount');
         overlay.innerHTML = '';
@@ -13717,104 +13816,52 @@
         const stats = dataObj.stats;
         const type = dataObj.type;
         
-        // --- СЛОВАРЬ ---
-        const W_TEXT = {
-            en: {
-                title: "Fetish<br><span style='color:var(--accent)'>Wrapped</span>",
-                since: "Since Last Time",
-                act: "Total Interactions",
-                watch: "Watch Time",
-                vibe: "Your Vibe",
-                obsess: "Your Obsessions",
-                evol: "Taste Evolution",
-                evol_sub: "Vs Previous Period",
-                sum_swipes: "Swipes (L/R)",
-                sum_likes: "Likes",
-                sum_dis: "Dislikes",
-                sum_watch: "Videos Watched",
-                top_genre: "Top Genre",
-                btn_done: "Done",
-                badge_new: "NEW",
-                badge_up: "UP",
-                badge_down: "DOWN"
-            },
-            ru: {
-                title: "Итоги<br><span style='color:var(--accent)'>Фетишей</span>",
-                since: "С прошлого раза",
-                act: "Всего действий",
-                watch: "Время просмотра",
-                vibe: "Твой Вайб",
-                obsess: "Твои Одержимости",
-                evol: "Эволюция Вкусов",
-                evol_sub: "Сравнение с прошлым",
-                sum_swipes: "Свайпы",
-                sum_likes: "Лайки",
-                sum_dis: "Дизлайки",
-                sum_watch: "Видео просмотрено",
-                top_genre: "Топ Жанр",
-                btn_done: "Готово",
-                badge_new: "NEW",
-                badge_up: "UP",
-                badge_down: "DOWN"
-            },
-            es: {
-                title: "Resumen<br><span style='color:var(--accent)'>Fetichista</span>",
-                since: "Desde la última vez",
-                act: "Interacciones",
-                watch: "Tiempo visto",
-                vibe: "Tu Vibra",
-                obsess: "Tus Obsesiones",
-                evol: "Evolución",
-                evol_sub: "Vs periodo anterior",
-                sum_swipes: "Deslizar",
-                sum_likes: "Me gusta",
-                sum_dis: "No me gusta",
-                sum_watch: "Videos vistos",
-                top_genre: "Top Género",
-                btn_done: "Listo",
-                badge_new: "NUEVO",
-                badge_up: "SUBIÓ",
-                badge_down: "BAJÓ"
-            },
-            de: {
-                title: "Fetisch<br><span style='color:var(--accent)'>Rückblick</span>",
-                since: "Seit dem letzten Mal",
-                act: "Interaktionen",
-                watch: "Zeit",
-                vibe: "Deine Stimmung",
-                obsess: "Deine Obsessionen",
-                evol: "Entwicklung",
-                evol_sub: "Vs letztes Mal",
-                sum_swipes: "Swipes",
-                sum_likes: "Likes",
-                sum_dis: "Dislikes",
-                sum_watch: "Angeschaut",
-                top_genre: "Top Genre",
-                btn_done: "Fertig",
-                badge_new: "NEU",
-                badge_up: "HOCH",
-                badge_down: "RUNTER"
-            }
-        };
-
-        const langKey = W_TEXT[currentLang] ? currentLang : 'en';
-        const txt = W_TEXT[langKey];
-        const badgeText = WRAPPED_CONFIG.badges[langKey][type] || type.toUpperCase();
+        // --- 1. ТЕКСТЫ И ПЕРЕВОДЫ ---
+        // Определяем текущий язык (fallback на en)
+        const langKey = ['en','ru','es','de'].includes(currentLang) ? currentLang : 'en';
         
+        // Внутренний словарь для Wrapped
+        const TXT = {
+            title: {en:"Fetish<br><span style='color:var(--accent)'>Wrapped</span>", ru:"Итоги<br><span style='color:var(--accent)'>Фетишей</span>", es:"Resumen<br><span style='color:var(--accent)'>Fetichista</span>", de:"Fetisch<br><span style='color:var(--accent)'>Rückblick</span>"},
+            since: {en:"Since Last Time", ru:"С прошлого раза", es:"Desde la última vez", de:"Seit dem letzten Mal"},
+            act: {en:"Interactions", ru:"Действий", es:"Interacciones", de:"Interaktionen"},
+            watch: {en:"Watch Time", ru:"Время просмотра", es:"Tiempo visto", de:"Zeit"},
+            vibe: {en:"Your Vibe", ru:"Твой Вайб", es:"Tu Vibra", de:"Deine Stimmung"},
+            evol: {en:"Taste Evolution", ru:"Эволюция Вкусов", es:"Evolución", de:"Entwicklung"},
+            evol_sub: {en:"Vs Previous Period", ru:"Сравнение с прошлым", es:"Vs periodo anterior", de:"Vs letztes Mal"},
+            obsess: {en:"Your Obsessions", ru:"Твои Одержимости", es:"Tus Obsesiones", de:"Deine Obsessionen"},
+            sum_watch: {en:"Videos Watched", ru:"Видео просмотрено", es:"Videos vistos", de:"Angeschaut"},
+            sum_likes: {en:"Likes", ru:"Лайки", es:"Me gusta", de:"Likes"},
+            sum_dis: {en:"Dislikes", ru:"Дизлайки", es:"No me gusta", de:"Dislikes"},
+            top_genre: {en:"Top Genre", ru:"Топ Жанр", es:"Top Género", de:"Top Genre"},
+            btn_done: {en:"Done", ru:"Готово", es:"Listo", de:"Fertig"},
+            caption: {en:"Discover yourself", ru:"Узнай себя", es:"Descúbrete", de:"Entdecke dich"}, 
+            badge_new: {en:"NEW", ru:"NEW", es:"NUEVO", de:"NEU"},
+            badge_up: {en:"UP", ru:"UP", es:"SUBIÓ", de:"HOCH"},
+            badge_down: {en:"DOWN", ru:"DOWN", es:"BAJÓ", de:"RUNTER"}
+        };
+        
+        // Функция-хелпер для получения текста
+        const t = (k) => (TXT[k] && TXT[k][langKey]) ? TXT[k][langKey] : (TXT[k] ? TXT[k].en : "");
+
+        const badgeText = WRAPPED_CONFIG.badges[langKey][type] || type.toUpperCase();
         const phrases = WRAPPED_CONFIG.phrases[type] || WRAPPED_CONFIG.phrases.daily;
         const introText = phrases[langKey][Math.floor(Math.random() * phrases[langKey].length)];
 
-        // --- SLIDE 1: INTRO ---
+        // QR код (Ссылка на главную страницу)
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=0&data=${encodeURIComponent(window.location.origin)}`;
+
+        // --- СЛАЙД 1: ВСТУПЛЕНИЕ ---
         slides.push(`
             <div class="wrapped-slide bg-dark active-slide">
                 <div class="w-badge ${type}" style="transform:scale(1.5); margin-bottom:30px; box-shadow:0 10px 30px rgba(0,0,0,0.5);">${badgeText}</div>
-                <div class="wrapped-big-text" style="font-size:46px;">${txt.title}</div>
+                <div class="wrapped-big-text" style="font-size:46px;">${t('title')}</div>
                 <div class="wrapped-sub-text" style="opacity:0.8; margin-top:20px; font-family:monospace;">${dataObj.rangeStr}</div>
                 <div class="wrapped-sub-text" style="margin-top:40px; font-weight:700; max-width:80%;">${introText}</div>
             </div>
         `);
 
-        // --- SLIDE 2: COMPARISON ---
+        // --- СЛАЙД 2: СРАВНЕНИЕ (Исправлена верстка) ---
         if (type !== 'daily' || Math.abs(stats.deltaActions) > 0) {
             const trendAct = stats.deltaActions >= 0 ? "+" : "";
             const trendTime = stats.deltaWatchTime >= 0 ? "+" : "";
@@ -13822,40 +13869,39 @@
             
             slides.push(`
                 <div class="wrapped-slide bg-fire">
-                    <div class="wrapped-sub-text" style="text-transform:uppercase; letter-spacing:2px; font-size:12px; margin-bottom:40px;">${txt.since}</div>
+                    <div class="wrapped-sub-text" style="text-transform:uppercase; letter-spacing:2px; font-size:12px; margin-bottom:40px;">${t('since')}</div>
                     
-                    <div style="margin-bottom:50px; text-align:center;">
-                        <div class="wrapped-big-text" style="font-size:70px; color:${colorAct}; margin-bottom:5px;">${trendAct}${stats.deltaActions}</div>
-                        <div class="wrapped-sub-text" style="font-weight:700;">${txt.act}</div>
+                    <div style="margin-bottom:50px; text-align:center; width:100%;">
+                        <div class="wrapped-big-text" style="font-size:70px; color:${colorAct}; margin-bottom:5px; text-align:center;">${trendAct}${stats.deltaActions}</div>
+                        <div class="wrapped-sub-text" style="font-weight:700; text-align:center;">${t('act')}</div>
                     </div>
                     
-                    <!-- FIX: Выравнивание по центру, flex column -->
                     <div style="border-top:1px solid rgba(255,255,255,0.2); padding-top:40px; width:80%; display:flex; flex-direction:column; align-items:center;">
-                        <div class="wrapped-big-text" style="font-size:70px; margin-bottom:5px;">${trendTime}${Math.round(stats.deltaWatchTime/60)}m</div>
-                        <div class="wrapped-sub-text" style="font-weight:700;">${txt.watch}</div>
+                        <div class="wrapped-big-text" style="font-size:70px; margin-bottom:5px; text-align:center;">${trendTime}${Math.round(stats.deltaWatchTime/60)}m</div>
+                        <div class="wrapped-sub-text" style="font-weight:700; text-align:center;">${t('watch')}</div>
                     </div>
                 </div>
             `);
         }
 
-        // --- SLIDE 3: EVOLUTION (Сравнение Топ тегов) ---
+        // --- СЛАЙД 3: ЭВОЛЮЦИЯ (Список изменений в топе) ---
         let hasEvolutionSlide = false;
-
         if (stats.prevTopTags && stats.prevTopTags.length > 0) {
             let evolutionHtml = '';
-            
             stats.topTags.slice(0, 5).forEach((tag, i) => {
                 const prevIndex = stats.prevTopTags.indexOf(tag);
                 let statusBadge = '';
                 
+                // Логика бейджиков изменений
                 if (prevIndex === -1) {
-                    statusBadge = `<span style="font-size:10px; background:#2ecc71; color:#000; padding:2px 6px; border-radius:4px; font-weight:800; margin-left:10px;">${txt.badge_new}</span>`;
+                    statusBadge = `<span style="font-size:10px; background:#2ecc71; color:#000; padding:2px 6px; border-radius:4px; margin-left:10px; font-weight:800;">${t('badge_new')}</span>`;
                 } else if (prevIndex > i) {
-                    statusBadge = `<span style="font-size:10px; background:#f1c40f; color:#000; padding:2px 6px; border-radius:4px; font-weight:800; margin-left:10px;">${txt.badge_up}</span>`;
+                    statusBadge = `<span style="font-size:10px; background:#f1c40f; color:#000; padding:2px 6px; border-radius:4px; margin-left:10px; font-weight:800;">${t('badge_up')}</span>`;
                 } else if (prevIndex < i) {
-                    statusBadge = `<span style="font-size:10px; background:rgba(255,255,255,0.2); color:#fff; padding:2px 6px; border-radius:4px; font-weight:800; margin-left:10px;">${txt.badge_down}</span>`;
+                    statusBadge = `<span style="font-size:10px; background:rgba(255,255,255,0.2); color:#fff; padding:2px 6px; border-radius:4px; margin-left:10px; font-weight:800;">${t('badge_down')}</span>`;
                 }
 
+                // Перевод тега
                 let displayTag = tag.toUpperCase();
                 const modMatch = modifiersData.find(m => m.key.toLowerCase() === tag.toLowerCase());
                 if (modMatch && modMatch[langKey]) displayTag = modMatch[langKey].toUpperCase();
@@ -13870,29 +13916,29 @@
 
             slides.push(`
                 <div class="wrapped-slide" style="background:linear-gradient(45deg, #1cb5e0 0%, #000851 100%);">
-                    <div class="wrapped-sub-text" style="text-transform:uppercase; margin-bottom:10px;">${txt.evol}</div>
-                    <div class="wrapped-sub-text" style="font-size:12px; opacity:0.6; margin-bottom:30px;">${txt.evol_sub}</div>
+                    <div class="wrapped-sub-text" style="text-transform:uppercase; margin-bottom:10px;">${t('evol')}</div>
+                    <div class="wrapped-sub-text" style="font-size:12px; opacity:0.6; margin-bottom:30px;">${t('evol_sub')}</div>
                     <div>${evolutionHtml}</div>
                 </div>
             `);
             hasEvolutionSlide = true;
         }
 
-        // --- SLIDE 4: ACHIEVEMENT ---
+        // --- СЛАЙД 4: ДОСТИЖЕНИЕ (Если не Daily) ---
         if (type !== 'daily') {
             const achKey = stats.achievement;
             const achData = WRAPPED_CONFIG.achievements[achKey];
             slides.push(`
                 <div class="wrapped-slide bg-toxic">
                     <div class="achievement-badge">${achData.icon}</div>
-                    <div class="wrapped-sub-text" style="text-transform:uppercase; color:rgba(0,0,0,0.6); margin-bottom:10px; font-weight:800;">${txt.vibe}</div>
+                    <div class="wrapped-sub-text" style="text-transform:uppercase; color:rgba(0,0,0,0.6); margin-bottom:10px; font-weight:800;">${t('vibe')}</div>
                     <div class="wrapped-big-text" style="font-size:42px; line-height:1.1; margin-bottom:20px; color:#000; text-shadow:none;">${achData[langKey]}</div>
                     <div class="wrapped-sub-text" style="max-width:300px; color:#000; font-weight:500;">${achData['desc_' + langKey]}</div>
                 </div>
             `);
         }
 
-        // --- SLIDE 5: OBSESSIONS ---
+        // --- СЛАЙД 5: ОДЕРЖИМОСТИ (Если нет эволюции) ---
         if (!hasEvolutionSlide) {
             const translatedTagsHtml = stats.topTags.slice(0, 5).map((t, i) => {
                 let displayTag = t.toUpperCase();
@@ -13903,68 +13949,83 @@
 
             slides.push(`
                 <div class="wrapped-slide" style="background:#111;">
-                    <div class="wrapped-sub-text" style="margin-bottom:40px; color:var(--text-secondary);">${txt.obsess}</div>
+                    <div class="wrapped-sub-text" style="margin-bottom:40px; color:var(--text-secondary);">${t('obsess')}</div>
                     ${translatedTagsHtml}
                 </div>
             `);
         }
 
-        // --- SLIDE 6: FINAL SUMMARY ---
+        // --- СЛАЙД 6: ФИНАЛ  ---
         const planColor = subscriptionLevel === 'free' ? '#fff' : '#9b59b6';
         let topGenre = stats.topTags[0] ? stats.topTags[0].toUpperCase() : '---';
         const genreMatch = modifiersData.find(m => m.key.toLowerCase() === topGenre.toLowerCase());
         if (genreMatch && genreMatch[langKey]) topGenre = genreMatch[langKey].toUpperCase();
 
-        // ID для карточки, чтобы сфоткать именно её
+        // Добавляем финальный слайд
         slides.push(`
             <div class="wrapped-slide bg-dark">
                 <div class="sum-card-new" id="wrapped-summary-card">
-                    <div class="sum-header" style="display:flex; justify-content:space-between; align-items:center;">
-                        <div class="sum-logo-new">
-                            <span class="neutral">x</span><span class="grad">Fetish</span><span class="neutral">Hub</span>
-                        </div>
-                        <div class="w-badge ${type}">${badgeText}</div>
-                    </div>
                     
-                    <div style="font-size:12px; color:rgba(255,255,255,0.6); text-align:right;">
-                        ${dataObj.rangeStr}<br><span style="color:${planColor}; font-weight:700;">${subscriptionLevel.toUpperCase()}</span>
+                    <!-- ШАПКА КАРТОЧКИ: ЛОГО + ПОДПИСЬ + QR -->
+                    <div class="sum-header">
+                        <div class="sum-header-left">
+                            <div class="sum-logo-row">
+                                <img src="logo.png" class="sum-logo-img">
+                                <div class="sum-logo-text">x<span class="grad">Fetish</span>Hub</div>
+                            </div>
+                            <div class="sum-caption">${t('caption')}</div>
+                        </div>
+                        <div class="sum-qr-box">
+                            <img src="${qrUrl}" class="sum-qr-img">
+                        </div>
                     </div>
 
+                    <!-- МЕТА ДАННЫЕ (Дата + Бейдж типа) -->
+                    <div class="sum-meta-row">
+                        <span>${dataObj.rangeStr}</span>
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <span class="w-badge ${type}" style="font-size:9px;">${badgeText}</span>
+                            <span style="color:${planColor}; font-weight:700;">${subscriptionLevel.toUpperCase()}</span>
+                        </div>
+                    </div>
+
+                    <!-- СЕТКА СТАТИСТИКИ -->
                     <div class="sum-grid" style="grid-template-columns: 1fr 1fr;">
                         <div class="sum-stat-box">
                             <div class="sum-stat-val">${stats.watchCount}</div>
-                            <div class="sum-stat-lbl">${txt.sum_watch}</div>
+                            <div class="sum-stat-lbl">${t('sum_watch')}</div>
                         </div>
                         <div class="sum-stat-box">
                             <div class="sum-stat-val">${Math.round(stats.totalWatchTime/60)}m</div>
-                            <div class="sum-stat-lbl">${txt.watch}</div>
+                            <div class="sum-stat-lbl">${t('watch')}</div>
                         </div>
                         <div class="sum-stat-box">
                             <div class="sum-stat-val" style="color:#2ecc71;">${stats.likeCount}</div>
-                            <div class="sum-stat-lbl">${txt.sum_likes}</div>
+                            <div class="sum-stat-lbl">${t('sum_likes')}</div>
                         </div>
                         <div class="sum-stat-box">
                             <div class="sum-stat-val" style="color:#e74c3c;">${stats.dislikeCount}</div>
-                            <div class="sum-stat-lbl">${txt.sum_dis}</div>
+                            <div class="sum-stat-lbl">${t('sum_dis')}</div>
                         </div>
                     </div>
 
+                    <!-- ТОП ЖАНР -->
                     <div style="text-align:center; margin-top:5px; border-top:1px solid rgba(255,255,255,0.1); padding-top:15px;">
-                        <div class="sum-stat-lbl" style="margin-bottom:5px;">${txt.top_genre}</div>
+                        <div class="sum-stat-lbl" style="margin-bottom:5px;">${t('top_genre')}</div>
                         <div style="font-size:24px; font-weight:900; color:var(--accent); letter-spacing:1px;">
                             ${topGenre}
                         </div>
                     </div>
                 </div>
 
-                <!-- КНОПКИ ДЕЙСТВИЙ -->
+                <!-- КНОПКИ ДЕЙСТВИЙ (Внизу, вне карточки) -->
                 <div style="margin-top:30px; display:flex; gap:15px; align-items:center;">
-                    <!-- Кнопка ГОТОВО -->
+                    <!-- Кнопка "Готово" -->
                     <button onclick="closeWrapped()" class="btn-gen" style="width:auto; padding:12px 40px; font-size:16px; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); backdrop-filter:blur(10px);">
-                        ${txt.btn_done}
+                        ${t('btn_done')}
                     </button>
                     
-                    <!-- Кнопка SHARE (Круглая) -->
+                    <!-- Круглая кнопка Share -->
                     <div class="btn-round-share" onclick="shareWrappedCard()">
                         <img src="share.png" alt="Share">
                     </div>
@@ -13972,7 +14033,7 @@
             </div>
         `);
 
-        // Рендер
+        // --- РЕНДЕР СЛАЙДЕРА ---
         let barsHtml = '';
         slides.forEach((_, i) => barsHtml += `<div class="wrapped-progress-bar"><div class="wrapped-progress-fill" id="bar-${i}"></div></div>`);
         
@@ -13984,32 +14045,28 @@
             ${slides.join('')}
         `;
         
+        // Логика перехода к последнему слайду, если уже смотрели
         if (dataObj.viewed) {
             currentSlideIndex = slides.length - 1;
-            setTimeout(() => {
-                for (let i = 0; i < slides.length; i++) {
-                    const bar = document.getElementById('bar-' + i);
-                    if(bar) bar.style.width = '100%';
-                }
-            }, 50);
+            setTimeout(() => { for (let i = 0; i < slides.length; i++) { const bar = document.getElementById('bar-' + i); if(bar) bar.style.width = '100%'; } }, 50);
         } else {
             currentSlideIndex = 0;
         }
-
+        
+        // Запуск таймера
         startSlideTimerNew(slides.length, 6000); 
         
-        const handlePause = (e) => { e.preventDefault(); overlay.classList.add('paused'); window.isWrappedPaused = true; };
-        const handleResume = (e) => { e.preventDefault(); overlay.classList.remove('paused'); window.isWrappedPaused = false; };
+        // Обработчики паузы/возобновления при удержании
+        const handlePause = (e) => { if(e.cancelable) e.preventDefault(); overlay.classList.add('paused'); window.isWrappedPaused = true; };
+        const handleResume = (e) => { if(e.cancelable) e.preventDefault(); overlay.classList.remove('paused'); window.isWrappedPaused = false; };
+        overlay.addEventListener('mousedown', handlePause); overlay.addEventListener('touchstart', handlePause);
+        overlay.addEventListener('mouseup', handleResume); overlay.addEventListener('touchend', handleResume); overlay.addEventListener('mouseleave', handleResume);
 
-        overlay.addEventListener('mousedown', handlePause);
-        overlay.addEventListener('touchstart', handlePause);
-        overlay.addEventListener('mouseup', handleResume);
-        overlay.addEventListener('touchend', handleResume);
-        overlay.addEventListener('mouseleave', handleResume);
-
+        // Сохранение статуса "просмотрено"
         dataObj.viewed = true;
         localStorage.setItem('xch_wrapped_archive', JSON.stringify(wrappedArchive));
-        openStatistics();
+        
+        openStatistics(); 
         overlay.classList.add('active');
     }
 
@@ -14143,29 +14200,25 @@
 
     // 1. ШЕРИНГ WRAPPED (Круглая кнопка)
     function shareWrappedCard() {
+        // Берем карточку по ID
         const card = document.getElementById('wrapped-summary-card');
         if(!card) return;
 
-        // 1. Создаем и внедряем хедер внутрь карточки
-        const header = createScreenshotHeader();
-        card.insertBefore(header, card.firstChild);
+        // Включаем вибрацию (для ощущения нажатия)
+        if(navigator.vibrate) navigator.vibrate(50);
 
-        // 2. Делаем скриншот
+        // Просто делаем снимок, фон прозрачный (у карточки свой border-radius и тень)
         html2canvas(card, {
-            backgroundColor: null, // Прозрачный фон (карточка имеет свой)
-            scale: 2 // Хорошее качество
+            backgroundColor: null,
+            scale: 2 // Высокое качество
         }).then(canvas => {
-            // 3. Убираем хедер
-            header.remove();
-
-            // 4. Скачиваем
             const link = document.createElement('a');
             link.download = `fetish-wrapped-${Date.now()}.png`;
             link.href = canvas.toDataURL();
             link.click();
         }).catch(e => {
-            console.error(e);
-            header.remove();
+            console.error("Screenshot error:", e);
+            alert("Could not save image.");
         });
     }
 
