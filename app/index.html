@@ -1633,26 +1633,6 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Элементы сводки */
-        .wrapped-progress-container {
-            position: absolute; 
-            top: 15px; /* Чуть ниже, чтобы не прилипал к краю экрана */
-            left: 0; 
-            width: 100%;
-            padding: 0 15px; 
-            display: flex; 
-            gap: 4px; 
-            z-index: 100; /* Подняли Z-index */
-            pointer-events: none; /* Чтобы не мешал кликам */
-        }
-        .wrapped-progress-bar {
-            height: 3px; 
-            flex: 1; 
-            background: rgba(255,255,255,0.2);
-            border-radius: 2px; 
-            overflow: hidden;
-        }
-
         .wrapped-big-text {
             font-size: clamp(40px, 10vw, 80px);
             font-weight: 900; line-height: 1; margin-bottom: 20px;
@@ -1684,14 +1664,6 @@
         @keyframes fillBarAnim {
             from { width: 0%; }
             to { width: 100%; }
-        }
-
-        .wrapped-progress-fill {
-            height: 100%;
-            background: #fff;
-            width: 0%;
-            box-shadow: 0 0 5px rgba(255,255,255,0.5);
-            transition: none; 
         }
 
         /* Класс для запуска анимации */
@@ -1750,6 +1722,103 @@
             color: var(--text-secondary);
             margin-top: 4px;
             letter-spacing: 1px;
+        }
+
+        /* --- Кнопка Share в Wrapped (Круглая) --- */
+        .btn-round-share {
+            width: 50px; 
+            height: 50px; 
+            border-radius: 50%; 
+            background: rgba(255,255,255,0.15); 
+            border: 1px solid rgba(255,255,255,0.3);
+            backdrop-filter: blur(10px);
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .btn-round-share:active {
+            transform: scale(0.95);
+            background: rgba(255,255,255,0.3);
+        }
+        .btn-round-share img {
+            width: 24px; 
+            height: 24px; 
+            filter: invert(1); /* Белая иконка */
+        }
+
+        /* --- QR Header для скриншотов --- */
+        /* Этот блок скрыт в UI, но появляется на картинке */
+        .screenshot-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding-bottom: 15px;
+            background: transparent;
+        }
+
+        .screenshot-logo-area {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .screenshot-logo {
+            font-size: 28px;
+            font-weight: 900;
+            color: #fff;
+            line-height: 1;
+        }
+        .screenshot-logo span {
+            color: #ff00cc;
+        }
+
+        .screenshot-caption {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #ccc;
+            letter-spacing: 2px;
+            margin-top: 5px;
+            font-weight: 600;
+        }
+
+        .screenshot-qr {
+            background: #fff;
+            padding: 5px;
+            border-radius: 10px;
+            height: 70px;
+            width: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wrapped-progress-container {
+            position: absolute; 
+            top: 15px; 
+            left: 0; 
+            width: 100%;
+            padding: 0 15px; 
+            display: flex; 
+            gap: 4px; 
+            z-index: 9999; /* Поверх всего */
+            pointer-events: none; 
+        }
+        .wrapped-progress-bar {
+            height: 3px; 
+            flex: 1; 
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px; 
+            overflow: hidden;
+        }
+        .wrapped-progress-fill {
+            height: 100%;
+            background: #fff;
+            width: 0%;
+            box-shadow: 0 0 8px rgba(255,255,255,0.8);
         }
 
         /* === STATS UPDATE === */
@@ -9511,51 +9580,65 @@
 
         updateStatsLocks();
 
-        // === ЛОГИКА WRAPPED / PROGRESS BAR ===
+        // === КНОПКА WRAPPED ===
         const wBtn = document.getElementById('btn-wrapped-trigger');
-
-        // Получаем кол-во активных дней (Set)
         const daysActive = activeDaysSet.size;
         const isPaid = subscriptionLevel !== 'free';
         
-        // Убираем старый прогресс-бар, если есть
+        // Удаляем старый прогресс-бар (лок), если он есть
         const oldProgress = document.getElementById('wrapped-progress-ui');
         if (oldProgress) oldProgress.remove();
 
-        // Логика: Показывать кнопку, если есть 7 дней ИЛИ если платный юзер (Daily)
+        // Показываем кнопку, если доступно (7 дней или платный Daily)
         if (daysActive >= 7 || (isPaid && daysActive >= 1)) {
             if(wBtn) {
                 wBtn.style.display = 'flex';
                 
-                // Проверяем наличие новых отчетов
-                const hasUnread = wrappedArchive.some(w => !w.viewed);
-                
-                // Текст кнопки
-                const btnText = t.wrapped_btn || "Fetish Wrapped ✨";
-                
-                // HTML с бейджиком справа
-                if (hasUnread) {
-                    // Добавляем бейджик NEW и делаем Flex container для кнопки
-                    wBtn.innerHTML = `
-                        <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
-                            <span>${btnText}</span>
-                            <span style="background:#fff; color:#000; font-size:10px; font-weight:800; padding:2px 6px; border-radius:6px; margin-left:10px; box-shadow:0 2px 5px rgba(0,0,0,0.2);">NEW</span>
-                        </div>
-                    `;
+                // 1. Ищем самый свежий непросмотренный отчет
+                // Приоритет: Год > Месяц > Неделя > День
+                const unreadItems = wrappedArchive.filter(w => !w.viewed).sort((a,b) => {
+                    const p = { yearly: 4, monthly: 3, weekly: 2, daily: 1 };
+                    return p[b.type] - p[a.type];
+                });
+
+                // 2. Определяем текст бейджа
+                let badgeText = "";
+                let isNew = false;
+
+                if (unreadItems.length > 0) {
+                    // Если есть новое - берем его тип
+                    const type = unreadItems[0].type; // 'weekly', 'daily' etc.
+                    badgeText = WRAPPED_CONFIG.badges[currentLang][type] || type.toUpperCase();
+                    isNew = true;
                 } else {
-                    wBtn.innerHTML = `<span>${btnText}</span>`;
+                    // Если все просмотрено - просто пишем 'Archive' или последний доступный
+                    badgeText = "ARCHIVE"; 
                 }
+
+                const btnTitle = t.wrapped_btn || "Fetish Wrapped ✨";
+                const newDot = isNew ? `<span style="color:#fff; margin-right:4px;">●</span>` : ``;
+
+                // HTML кнопки (Flex: Текст слева, Бейдж справа)
+                wBtn.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                        <span>${btnTitle}</span>
+                        <div style="display:flex; align-items:center;">
+                            ${newDot}
+                            <span style="background:rgba(255,255,255,0.2); color:#fff; font-size:10px; font-weight:800; padding:3px 8px; border-radius:6px; text-transform:uppercase;">
+                                ${badgeText}
+                            </span>
+                        </div>
+                    </div>
+                `;
             }
         } else {
             // Логика прогресс-бара для Free (набираем 7 дней)
             if(wBtn) wBtn.style.display = 'none';
             
-            // Рисуем новый прогресс бар (дни вместо действий)
             const percent = Math.min(100, (daysActive / 7) * 100);
             const left = 7 - daysActive;
             const titleTxt = t.wrapped_lock_title || "FETISH WRAPPED 🔒";
             
-            // Локализация для дней
             let daysWord = currentLang === 'ru' ? 'дней' : 'days';
             const descTxt = (t.wrapped_lock_desc || "Activity needed: {n}").replace('{n}', `${left} ${daysWord}`);
 
@@ -9570,9 +9653,8 @@
                 </div>
             `;
             const modalBody = document.getElementById('modal-stats-body');
-            modalBody.insertAdjacentHTML('beforebegin', progressHTML);
+            if(modalBody) modalBody.insertAdjacentHTML('beforebegin', progressHTML);
         }
-        // ======================================
 
         const modal = document.getElementById('modal-stats-overlay');
         if (modal) {
@@ -13833,9 +13915,10 @@
         const genreMatch = modifiersData.find(m => m.key.toLowerCase() === topGenre.toLowerCase());
         if (genreMatch && genreMatch[langKey]) topGenre = genreMatch[langKey].toUpperCase();
 
+        // ID для карточки, чтобы сфоткать именно её
         slides.push(`
             <div class="wrapped-slide bg-dark">
-                <div class="sum-card-new">
+                <div class="sum-card-new" id="wrapped-summary-card">
                     <div class="sum-header" style="display:flex; justify-content:space-between; align-items:center;">
                         <div class="sum-logo-new">
                             <span class="neutral">x</span><span class="grad">Fetish</span><span class="neutral">Hub</span>
@@ -13874,15 +13957,22 @@
                     </div>
                 </div>
 
-                <div style="margin-top:30px; display:flex; gap:10px;">
+                <!-- КНОПКИ ДЕЙСТВИЙ -->
+                <div style="margin-top:30px; display:flex; gap:15px; align-items:center;">
+                    <!-- Кнопка ГОТОВО -->
                     <button onclick="closeWrapped()" class="btn-gen" style="width:auto; padding:12px 40px; font-size:16px; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); backdrop-filter:blur(10px);">
                         ${txt.btn_done}
                     </button>
+                    
+                    <!-- Кнопка SHARE (Круглая) -->
+                    <div class="btn-round-share" onclick="shareWrappedCard()">
+                        <img src="share.png" alt="Share">
+                    </div>
                 </div>
             </div>
         `);
 
-        // Рендер прогресс-бара
+        // Рендер
         let barsHtml = '';
         slides.forEach((_, i) => barsHtml += `<div class="wrapped-progress-bar"><div class="wrapped-progress-fill" id="bar-${i}"></div></div>`);
         
@@ -13919,7 +14009,8 @@
 
         dataObj.viewed = true;
         localStorage.setItem('xch_wrapped_archive', JSON.stringify(wrappedArchive));
-        openStatistics(); 
+        openStatistics();
+        overlay.classList.add('active');
     }
 
     // ТАЙМЕР (С поддержкой паузы)
@@ -14022,6 +14113,90 @@
                 </div>
             `;
             list.appendChild(div);
+        });
+    }
+
+    // Генератор QR URL
+    function getQrUrl(url) {
+        return `https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=5&data=${encodeURIComponent(url)}`;
+    }
+
+    // Создание HTML хедера (лого + подпись + QR)
+    function createScreenshotHeader() {
+        const t = langData[currentLang] || langData['en'];
+        const caption = t.share_caption || "Discover yourself";
+        const qrUrl = getQrUrl(window.location.origin); // Ссылка на главную
+
+        const header = document.createElement('div');
+        header.className = 'screenshot-header';
+        header.innerHTML = `
+            <div class="screenshot-logo-area">
+                <div class="screenshot-logo">x<span>Fetish</span>Hub</div>
+                <div class="screenshot-caption">${caption}</div>
+            </div>
+            <div class="screenshot-qr">
+                <img src="${qrUrl}" style="width:100%; height:100%; display:block;">
+            </div>
+        `;
+        return header;
+    }
+
+    // 1. ШЕРИНГ WRAPPED (Круглая кнопка)
+    function shareWrappedCard() {
+        const card = document.getElementById('wrapped-summary-card');
+        if(!card) return;
+
+        // 1. Создаем и внедряем хедер внутрь карточки
+        const header = createScreenshotHeader();
+        card.insertBefore(header, card.firstChild);
+
+        // 2. Делаем скриншот
+        html2canvas(card, {
+            backgroundColor: null, // Прозрачный фон (карточка имеет свой)
+            scale: 2 // Хорошее качество
+        }).then(canvas => {
+            // 3. Убираем хедер
+            header.remove();
+
+            // 4. Скачиваем
+            const link = document.createElement('a');
+            link.download = `fetish-wrapped-${Date.now()}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }).catch(e => {
+            console.error(e);
+            header.remove();
+        });
+    }
+
+    // 2. ШЕРИНГ ОБЩЕЙ СТАТИСТИКИ (Кнопка в окне статистики)
+    function shareStats() {
+        const modalBody = document.getElementById('modal-stats-body');
+        if(!modalBody) return;
+        
+        // 1. Создаем хедер
+        const header = createScreenshotHeader();
+        // Немного меняем стиль для этого окна (чтобы не прилипал)
+        header.style.marginBottom = "30px";
+        
+        // Вставляем
+        modalBody.insertBefore(header, modalBody.firstChild);
+
+        // Получаем цвет фона из CSS переменной
+        const bg = getComputedStyle(document.body).getPropertyValue('--sidebar-bg');
+
+        html2canvas(modalBody, {
+            backgroundColor: bg,
+            scale: 2
+        }).then(canvas => {
+            header.remove();
+            const link = document.createElement('a');
+            link.download = 'my-stats.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }).catch(e => {
+            header.remove();
+            console.error(e);
         });
     }
 
