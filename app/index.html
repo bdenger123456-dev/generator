@@ -854,6 +854,46 @@
         .fade-hidden { opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease; display: none; }
         .fade-visible { opacity: 1; transform: translateY(0); display: flex; }
 
+        /* --- ИКОНКИ ИНТЕНСИВНОСТИ --- */
+        .intensity-selector-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 25px; /* Отступы по бокам для иконок */
+            margin-top: 5px;
+        }
+
+        .intensity-btn {
+            width: 45px;  /* Размер иконки */
+            height: 45px;
+            object-fit: contain;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            
+            /* Неактивное состояние: серое и полупрозрачное */
+            filter: grayscale(100%);
+            opacity: 0.3; 
+        }
+
+        /* Активное состояние: цветное, яркое, чуть увеличено */
+        .intensity-btn.active {
+            filter: grayscale(0%);
+            opacity: 1;
+            transform: scale(1.15);
+        }
+
+        /* --- ОБНОВЛЕНИЕ ДЛЯ СТАТУСА ПОДПИСКИ --- */
+        #settings-plan-status {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text-secondary);
+        }
+        /* Цвет для PRO/BEAST */
+        #settings-plan-status.premium {
+            color: var(--accent) !important;
+            font-weight: 800;
+        }
+
         /* =========================================
         6. IOS SETTINGS & COMPONENTS
         ========================================= */
@@ -867,7 +907,7 @@
         }
         .ios-row {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 12px 16px; background: var(--ios-card); min-height: 48px; position: relative;
+            padding: 10px 12px; background: var(--ios-card); min-height: 44px; position: relative;
         }
         .ios-row:not(:last-child)::after {
             content: ""; 
@@ -3693,6 +3733,178 @@
         }
 
         /* =========================================
+        ИКОНКИ НАСТРОЕК И СТРЕЛКИ
+        ========================================= */
+
+        /* Стили для иконок слева (png) */
+        .settings-icon {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            margin-right: 12px; /* Отступ от иконки до текста */
+            flex-shrink: 0;
+            
+            /* По умолчанию (Темная тема): Инвертируем черные PNG в белые */
+            filter: invert(1);
+            opacity: 0.9;
+            transition: filter 0.3s, opacity 0.3s;
+        }
+
+        /* Светлая тема: Оставляем черными (как в оригинале) */
+        body.light-theme .settings-icon {
+            filter: invert(0);
+            opacity: 0.65;
+        }
+
+        /* Радужная тема: Белые с тенью */
+        body.rainbow-mode .settings-icon {
+            filter: invert(1) drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+            opacity: 1;
+        }
+
+        /* Обертка для левой части (Иконка + Текст), чтобы они стояли в ряд */
+        .ios-row-left {
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        /* --- CSS СТРЕЛКА (Вместо эмодзи ›) --- */
+        .chevron {
+            width: 8px;
+            height: 8px;
+            border-top: 2px solid var(--text-secondary);
+            border-right: 2px solid var(--text-secondary);
+            transform: rotate(45deg);
+            margin-left: 8px;
+            opacity: 0.6;
+        }
+
+        /* Стрелка вниз (для выпадающих списков, если нужно) */
+        .chevron-down {
+            width: 8px;
+            height: 8px;
+            border-bottom: 2px solid var(--text-secondary);
+            border-right: 2px solid var(--text-secondary);
+            transform: rotate(45deg);
+            margin-left: 8px;
+            opacity: 0.6;
+            margin-bottom: 3px;
+        }
+
+        /* Убираем старые эмодзи в тексте, если они где-то остались в HTML */
+        .ios-row span {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .slider-container {
+            width: 100%;
+            padding: 0 5px;
+            position: relative;
+        }
+
+        /* --- САМ СЛАЙДЕР (INPUT RANGE) --- */
+       #intensity-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 5px;
+            outline: none;
+            cursor: pointer;
+            /* Фон по умолчанию (серый), цвет будет меняться через JS */
+            background: var(--border); 
+        }
+
+
+        /* Бегунок (Thumb) */
+        #intensity-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #ffffff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: -1px; /* Выравнивание */
+        }
+
+        #intensity-slider::-webkit-slider-thumb:active {
+            transform: scale(1.1);
+        }
+
+        /* --- ИКОНКИ ПОД СЛАЙДЕРОМ --- */
+        .intensity-labels-icons {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 2px; /* Выравниваем под краями слайдера */
+        }
+
+        .int-icon-box {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .int-icon-wrapper {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .int-icon-wrapper:active {
+            transform: scale(0.9);
+        }
+
+        .int-icon {
+            width: 20px; 
+            height: 20px;
+            object-fit: contain;
+            transition: all 0.3s ease;
+            
+            filter: invert(1);
+            opacity: 0.3;
+        }
+
+        body.light-theme .int-icon {
+            filter: invert(0);
+            opacity: 0.3;
+        }
+
+        /* --- ЦВЕТА ДЛЯ АКТИВНЫХ ИКОНОК --- */
+
+        /* 1. SAFE (Зеленый #2ecc71) */
+        .int-icon.active-safe {
+            filter: invert(68%) sepia(61%) saturate(452%) hue-rotate(97deg) brightness(89%) contrast(85%) !important;
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
+        /* 2. SPICY (Оранжевый #f39c12) */
+        .int-icon.active-spicy {
+            filter: invert(77%) sepia(33%) saturate(5427%) hue-rotate(357deg) brightness(101%) contrast(90%) !important;
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
+        /* 3. EXTREME (Красный #e74c3c) */
+        .int-icon.active-extreme {
+            filter: invert(43%) sepia(97%) saturate(1874%) hue-rotate(338deg) brightness(96%) contrast(89%) !important;
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
+        /* =========================================
         18. MEDIA QUERIES (ADAPTATION)
         ========================================= */
 
@@ -4327,13 +4539,15 @@
    <!-- BLOCK: PREFERENCES -->
     <div id="block-prefs">
         
-        <!-- ГРУППА 1: ОСНОВНЫЕ (Сайт + Режим) -->
         <div class="ios-header" style="margin-top: 0;" data-key="header_prefs">Preferences</div>
         <div class="ios-group">
             
-            <!-- 1. Выбор Сайта -->
+            <!-- 1. Site -->
             <div class="ios-row">
-                <span class="platform-label" data-key="site_label">Site</span>
+                <div class="ios-row-left">
+                    <img src="site.png" class="settings-icon" alt="Site">
+                    <span class="platform-label" data-key="site_label">Site</span>
+                </div>
                 <select id="platform" class="platform-select" onchange="savePlatform(this.value)" dir="rtl">
                     <option value="xh">xHamster</option>
                     <option value="ph">Pornhub</option>
@@ -4345,9 +4559,12 @@
                 </select>
             </div>
 
-            <!-- 2. Выбор Режима -->
+            <!-- 2. Mode -->
             <div class="ios-row">
-                <span class="platform-label" data-key="mode_label">Mode</span>
+                <div class="ios-row-left">
+                    <img src="modes.png" class="settings-icon" alt="Mode">
+                    <span class="platform-label" data-key="mode_label">Mode</span>
+                </div>
                 <select id="app-mode-select" class="platform-select" onchange="setAppMode(this.value)" dir="rtl">
                     <option value="explore" data-key="mode_explore">Explore</option>
                     <option value="pleasure" data-key="mode_pleasure">Pleasure</option>
@@ -4355,24 +4572,45 @@
             </div>
         </div>
 
-        <!-- ГРУППА 2: ФИЛЬТРЫ И НАСТРОЙКИ -->
         <div class="ios-header" data-key="header_filters">Filters</div>
         <div class="ios-group">
             
-            <!-- 3. Интенсивность -->
-            <div class="ios-row" style="display:block; padding: 15px 16px;">
-                <div style="font-size:16px; margin-bottom:15px;" data-key="exploration_mode">Exploration Mode</div>
-                <input type="range" min="1" max="3" value="1" class="range-slider" id="intensity-slider" oninput="updateIntensity(this.value)">
-                <div class="intensity-labels">
-                    <span class="intensity-label active" id="lbl-1" data-val="1">Safe</span>
-                    <span class="intensity-label" id="lbl-2" data-val="2">Spicy</span>
-                    <span class="intensity-label" id="lbl-3" data-val="3">Extreme</span>
+            <!-- 3. INTENSITY (Слайдер + Маленькие иконки) -->
+            <div style="padding: 12px 16px;">
+                <!-- Заголовок -->
+                <div class="ios-row-left" style="margin-bottom: 10px;">
+                    <img src="safety.png" class="settings-icon" alt="Safety">
+                    <div style="font-size:16px;" data-key="exploration_mode">Intensity</div>
+                </div>
+                
+                <!-- Слайдер -->
+                <div class="slider-container" style="margin-bottom: 8px;">
+                    <input type="range" min="1" max="3" value="1" step="1" id="intensity-slider" oninput="updateIntensity(this.value)">
+                </div>
+
+                <!-- Иконки (Маленькие, под подсечками слайдера) -->
+                <div class="intensity-labels-icons">
+                    <!-- Safe (1) -->
+                    <div class="int-icon-box" onclick="updateIntensity(1)">
+                        <img src="safe.png" id="icon-int-1" class="int-icon">
+                    </div>
+                    <!-- Spicy (2) -->
+                    <div class="int-icon-box" onclick="updateIntensity(2)">
+                        <img src="spicy.png" id="icon-int-2" class="int-icon">
+                    </div>
+                    <!-- Extreme (3) -->
+                    <div class="int-icon-box" onclick="updateIntensity(3)">
+                        <img src="extreme.png" id="icon-int-3" class="int-icon">
+                    </div>
                 </div>
             </div>
 
-            <!-- 4. Ориентация -->
+            <!-- 4. Orientation -->
             <div class="ios-row">
-                <span class="platform-label" data-key="ori_label">Orientation</span>
+                <div class="ios-row-left">
+                    <img src="orientation.png" class="settings-icon" alt="Orientation">
+                    <span class="platform-label" data-key="ori_label">Orientation</span>
+                </div>
                 <select id="orientation-select" class="platform-select" onchange="changeOrientation(this.value)">
                     <option value="hetero" data-key="ori_hetero">Hetero</option>
                     <option value="gay" data-key="ori_gay">Gay</option>
@@ -4381,9 +4619,12 @@
                 </select>
             </div>
 
-            <!-- 5. Язык -->
+            <!-- 5. Language -->
             <div class="ios-row">
-                <span class="platform-label" data-key="lang_label">Language</span>
+                <div class="ios-row-left">
+                    <img src="language.png" class="settings-icon" alt="Lang">
+                    <span class="platform-label" data-key="lang_label">Language</span>
+                </div>
                 <select id="lang-select" class="platform-select" onchange="changeLanguage(this.value)">
                     <option value="en">English</option>
                     <option value="ru">Русский</option>
@@ -4392,36 +4633,45 @@
                 </select>
             </div>
 
-            <!-- 6. Поиск EN -->
+            <!-- 6. Search EN -->
             <div id="comp-search" class="ios-row" style="display:none;">
-                <span class="toggle-text" data-key="search_en_label">Search EN</span>
+                <div class="ios-row-left">
+                    <img src="en_search.png" class="settings-icon" alt="Search EN">
+                    <span class="toggle-text" data-key="search_en_label">Search EN</span>
+                </div>
                 <label class="switch">
                     <input type="checkbox" id="force-en" checked onchange="updateLink()">
                     <span class="slider"></span>
                 </label>
             </div>
 
-            <!-- 7. Тема -->
+            <!-- 7. Theme -->
             <div class="ios-row clickable" onclick="openThemeModal()">
-                <span class="toggle-text" data-key="theme_label">Appearance</span>
+                <div class="ios-row-left">
+                    <img src="appearance.png" class="settings-icon" alt="Theme">
+                    <span class="toggle-text" data-key="theme_label">Appearance</span>
+                </div>
                 <div style="display:flex; align-items:center; gap:10px;">
                     <span id="current-theme-name" style="color:var(--text-secondary); font-size:15px;">Dark</span>
-                    <span style="color:var(--text-secondary)">›</span>
+                    <div class="chevron"></div>
                 </div>
             </div>
 
-            <!-- 8. Управление модификаторами -->
+            <!-- 8. Modifiers -->
             <div class="ios-row clickable" onclick="openModifiersSettings()">
-                <span class="toggle-text" data-key="mod_manage">Manage Modifiers</span>
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <span style="font-size:18px;">🏷️</span>
-                    <span style="color:var(--text-secondary)">›</span>
+                <div class="ios-row-left">
+                    <img src="modifiers.png" class="settings-icon" alt="Mods">
+                    <span class="toggle-text" data-key="mod_manage">Manage Modifiers</span>
                 </div>
+                <div class="chevron"></div>
             </div>
 
-            <!-- 9. Декор -->
+            <!-- 9. Deco -->
             <div class="ios-row">
-                <span class="toggle-text" data-key="deco_label">Show Decorations</span>
+                <div class="ios-row-left">
+                    <img src="deco.png" class="settings-icon" alt="Deco">
+                    <span class="toggle-text" data-key="deco_label">Show Decorations</span>
+                </div>
                 <label class="switch">
                     <input type="checkbox" id="deco-toggle" checked onchange="toggleDecoIcons(this.checked)">
                     <span class="slider"></span>
@@ -4432,169 +4682,175 @@
 
     <!-- BLOCK: ACCOUNT -->
     <div id="block-account">
-        <!-- ЗАГОЛОВОК С ДАТОЙ -->
         <div class="ios-header" style="display:flex; justify-content:space-between; align-items:baseline; padding-right: 16px;">
             <span data-key="nav_account">Account</span>
             <span id="last-sync-date" style="font-size:11px; color:var(--text-secondary); text-transform:none; font-weight:400; opacity:0.8; display:none;"></span>
         </div>
         
-        <!-- ОСНОВНАЯ ГРУППА (УПРАВЛЕНИЕ) -->
         <div class="ios-group">
             
             <!-- 1. ВХОД -->
             <div class="ios-row clickable" onclick="window.handleLoginClick()" style="padding: 12px 16px;">
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <span id="login-status-icon" style="font-size:20px; width:24px; text-align:center;">☁️</span>
+                <div class="ios-row-left">
+                    <img src="user_account.png" class="settings-icon" alt="User">
                     <span id="login-btn-text" style="font-weight:600; font-size:17px; color:var(--text-main);" data-key="login_text">Sync Data</span>
                 </div>
-                <span style="color:var(--text-secondary)">›</span>
+                <div class="chevron"></div>
             </div>
 
-            <!-- 2. ПОДПИСКА -->
+            <!-- 2. ПОДПИСКА (Новый вид) -->
             <div class="ios-row clickable" onclick="openSubModal()" style="padding: 12px 16px;">
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <span style="font-size:20px; width:24px; text-align:center;">⭐</span>
-                    <div style="display:flex; flex-direction:column;">
-                        <span id="current-plan-name" style="font-weight:600; font-size:17px; color:var(--text-main);">FREE</span>
-                        <span style="font-size:11px; color:var(--text-secondary);" data-key="lbl_current_plan">Current Plan</span>
-                    </div>
+                <div class="ios-row-left">
+                    <img src="plan.png" class="settings-icon" alt="Plan">
+                    <span style="font-size:17px;" data-key="lbl_subscription">Subscription</span>
                 </div>
                 <div style="display:flex; align-items:center; gap:10px;">
-                    <span id="upgrade-badge" style="font-size:11px; font-weight:700; background:rgba(255,153,0,0.15); color:var(--accent); padding:4px 8px; border-radius:6px; text-transform:uppercase;">UPGRADE</span>
-                    <span style="color:var(--text-secondary)">›</span>
+                    <!-- Сюда JS будет писать статус: FREE / PRO -->
+                    <span id="settings-plan-status">FREE</span>
+                    <div class="chevron"></div>
                 </div>
             </div>
 
             <!-- 3. СПИСКИ -->
             <div class="ios-row clickable" onclick="openFavoritesCatalog()">
-                <span data-key="favorites_catalog">Liked</span>
+                <div class="ios-row-left">
+                    <img src="liked.png" class="settings-icon" alt="Liked">
+                    <span data-key="favorites_catalog">Liked</span>
+                </div>
                 <span class="badge" id="count-fav" style="color:var(--text-secondary); font-size:17px;">0</span>
             </div>
             <div class="ios-row clickable" onclick="openBlacklistCatalog()">
-                <span data-key="blacklist_catalog">Disliked</span>
+                <div class="ios-row-left">
+                    <img src="disliked.png" class="settings-icon" alt="Disliked">
+                    <span data-key="blacklist_catalog">Disliked</span>
+                </div>
                 <span class="badge" id="count-ban" style="color:var(--text-secondary); font-size:17px;">0</span>
             </div>
             <div class="ios-row clickable" onclick="openWatchLaterCatalog()">
-                <span data-key="watch_later">Watch Later</span>
+                <div class="ios-row-left">
+                    <img src="watched-later.png" class="settings-icon" alt="WL">
+                    <span data-key="watch_later">Watch Later</span>
+                </div>
                 <span class="badge" id="count-wl" style="color:var(--text-secondary); font-size:17px;">0</span>
             </div>
+            
             <!-- 4. СБРОС -->
-            <div class="ios-row clickable" onclick="resetAppHistory()" style="color: var(--highlight-red);">
-                <span data-key="btn_reset">Reset Data</span>
-                <span>✕</span>
-            </div>
-            <!-- ADMIN BUTTON (Hidden by default) -->
-            <div id="btn-admin-trigger" class="ios-row clickable" onclick="openAdminModal()" style="display:none; color: #ff0000;">
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <span style="font-size:20px;">⚡</span>
-                    <span style="font-weight:700;">Admin Panel</span>
+            <div class="ios-row clickable" onclick="resetAppHistory()">
+                <div class="ios-row-left">
+                    <img src="reset_data.png" class="settings-icon" style="filter: invert(35%) sepia(93%) saturate(7472%) hue-rotate(356deg) brightness(91%) contrast(115%); opacity:1;" alt="Reset">
+                    <span data-key="btn_reset" style="color: var(--highlight-red);">Reset Data</span>
                 </div>
-                <span style="color:var(--text-secondary)">›</span>
+            </div>
+            
+            <div id="btn-admin-trigger" class="ios-row clickable" onclick="openAdminModal()" style="display:none;">
+                <div class="ios-row-left">
+                    <img src="admin.png" class="settings-icon" style="filter:none;" alt="Admin">
+                    <span style="font-weight:700; color:#ff0000;">Admin Panel</span>
+                </div>
+                <div class="chevron"></div>
             </div>
         </div>
 
-        <!-- ИНФОРМАЦИЯ -->
         <div class="ios-header" data-key="info_header">Information</div>
         <div class="ios-group">
-            
-            <!-- Статистика -->
             <div class="ios-row clickable" onclick="openStatistics()">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <span style="font-size:18px;">📊</span>
+                <div class="ios-row-left">
+                    <img src="stats.png" class="settings-icon" alt="Stats">
                     <span data-key="btn_open_stats">Statistics</span>
                 </div>
-                <span style="color:var(--text-secondary)">›</span>
+                <div class="chevron"></div>
             </div>
-
-            <!-- История (Кнопка открытия модалки) -->
             <div class="ios-row clickable" onclick="openHistoryModal()">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <span style="font-size:18px;">📜</span>
+                <div class="ios-row-left">
+                    <img src="history.png" class="settings-icon" alt="History">
                     <span data-key="history_title">History</span>
                 </div>
-                <span style="color:var(--text-secondary)">›</span>
+                <div class="chevron"></div>
             </div>
-
-            <!-- Дорожная карта -->
             <div class="ios-row clickable" onclick="openRoadmap()">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <span style="font-size:18px;">🚀</span>
+                <div class="ios-row-left">
+                    <img src="roadmap.png" class="settings-icon" alt="Roadmap">
                     <span data-key="btn_roadmap">Roadmap</span>
                 </div>
-                <span style="color:var(--text-secondary)">›</span>
+                <div class="chevron"></div>
             </div>
-
-            <!-- Explored Counter -->
              <div class="ios-row">
-                <span data-key="explored_label">Explored</span>
+                <div class="ios-row-left">
+                    <img src="explored.png" class="settings-icon" alt="Explored">
+                    <span data-key="explored_label">Explored</span>
+                </div>
                 <span style="color:var(--text-secondary); font-size:16px;" id="explored-count">0 / 0</span>
             </div>
         </div>
     </div>
 
-    <!-- BLOCK: EXTRAS & HISTORY -->
+    <!-- BLOCK: EXTRAS -->
     <div id="block-extras">
-        
-        <!-- Заголовок группы -->
         <div class="ios-header" data-key="header_extras">Extras</div>
-        
-        <!-- ГРУППА ССЫЛОК -->
         <div class="ios-group">
-            
-            <!-- 1. Reddit -->
             <div class="ios-row clickable" onclick="window.open('https://reddit.com/r/xfetishhub', '_blank')">
-                <span>Reddit</span>
-                <span style="color:var(--text-secondary)">↗</span>
-            </div>
-
-            <!-- 2. Report Issue -->
-            <div class="ios-row clickable" onclick="window.open('https://tally.so/r/Y50280', '_blank')">
-                <span data-key="report_issue">Report Issue</span>
-                <span style="color:var(--text-secondary)">↗</span>
-            </div>
-
-            <div id="row-install-app" class="ios-row clickable" onclick="openQRModal()">
-                <span data-key="btn_install_phone">Install on Phone</span>
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <span style="font-size:20px;">📱</span>
-                    <span style="color:var(--text-secondary)">›</span>
+                <div class="ios-row-left">
+                    <img src="reddit.png" class="settings-icon" alt="Reddit">
+                    <span>Reddit</span>
                 </div>
+                <div style="font-size:18px; color:var(--text-secondary); line-height: 0;">↗</div>
             </div>
-
-            <!-- 3. О ПРОЕКТЕ -->
+            <div class="ios-row clickable" onclick="window.open('https://tally.so/r/Y50280', '_blank')">
+                <div class="ios-row-left">
+                    <img src="report.png" class="settings-icon" alt="Report">
+                    <span data-key="report_issue">Report Issue</span>
+                </div>
+                <div style="font-size:18px; color:var(--text-secondary); line-height: 0;">↗</div>
+            </div>
+            <div id="row-install-app" class="ios-row clickable" onclick="openQRModal()">
+                <div class="ios-row-left">
+                    <img src="install.png" class="settings-icon" alt="Install">
+                    <span data-key="btn_install_phone">Install on Phone</span>
+                </div>
+                <div class="chevron"></div>
+            </div>
             <div class="ios-row clickable" onclick="window.openAbout()">
-                <span data-key="lbl_about">About Project</span>
-                <span style="color:var(--text-secondary)">›</span>
+                <div class="ios-row-left">
+                    <img src="about.png" class="settings-icon" alt="About">
+                    <span data-key="lbl_about">About Project</span>
+                </div>
+                <div class="chevron"></div>
             </div>
-
-            <!-- 4. Terms of Use -->
             <div class="ios-row clickable" onclick="window.openLegal('terms')">
-                <span data-key="doc_terms">Terms of Use</span>
-                <span style="color:var(--text-secondary)">›</span>
+                <div class="ios-row-left">
+                    <img src="terms.png" class="settings-icon" alt="Terms">
+                    <span data-key="doc_terms">Terms of Use</span>
+                </div>
+                <div class="chevron"></div>
             </div>
-
-            <!-- 5. Privacy Policy -->
             <div class="ios-row clickable" onclick="window.openLegal('privacy')">
-                <span data-key="doc_privacy">Privacy Policy</span>
-                <span style="color:var(--text-secondary)">›</span>
+                <div class="ios-row-left">
+                    <img src="privacy.png" class="settings-icon" alt="Privacy">
+                    <span data-key="doc_privacy">Privacy Policy</span>
+                </div>
+                <div class="chevron"></div>
             </div>
-
-            <!-- 6. Refund Policy -->
             <div class="ios-row clickable" onclick="window.openLegal('refund')">
-                <span data-key="doc_refund">Refund Policy</span>
-                <span style="color:var(--text-secondary)">›</span>
+                <div class="ios-row-left">
+                    <img src="refund.png" class="settings-icon" alt="Refund">
+                    <span data-key="doc_refund">Refund Policy</span>
+                </div>
+                <div class="chevron"></div>
             </div>
-                <div class="ios-row clickable" onclick="openSponsorsModal()">
-                <span data-key="btn_early_sponsors">Early Sponsors 💎</span>
-                <span style="color:var(--text-secondary)">›</span>
+            <div class="ios-row clickable" onclick="openSponsorsModal()">
+                <div class="ios-row-left">
+                    <img src="sponsors.png" class="settings-icon" alt="Sponsors">
+                    <span data-key="btn_early_sponsors">Early Sponsors</span>
+                </div>
+                <div class="chevron"></div>
             </div>
         </div>
     </div>
+    
     <div id="block-history" style="margin-top:20px;">
         <div class="ios-header" data-key="history_title">History</div>
         <div class="ios-group" id="history-list"></div>
     </div>
-
 </div>
 
 <!-- SUBSCRIPTION MODAL -->
@@ -4633,7 +4889,7 @@
                     <div class="plan-title">Free</div>
                     <div class="plan-price">$0</div>
                     <ul class="plan-features">
-                        <li data-key="feat_limit">🎲 10 Generations / day</li>
+                        <li id="free-limit-row">🎲 15 Generations / day</li>
                         <li data-key="feat_wrapped_limited">🎁 1 Fetish Wrapped / week</li>
                         <li data-key="feat_stats_basic">📊 Basic Statistics</li>
                     </ul>
@@ -5513,7 +5769,6 @@
     // === СЛУШАТЕЛЬ АВТОРИЗАЦИИ (Главная точка входа) ===
     onAuthStateChanged(auth, async (user) => {
         const btnText = document.getElementById('login-btn-text');
-        const btnIcon = document.getElementById('login-status-icon');
         
         // Получаем текущие переводы
         const currentLang = localStorage.getItem('xch_lang') || 'en';
@@ -5524,24 +5779,19 @@
             window.isUserLoggedIn = true;
             console.log("Authorized:", user.email);
             
-            // 1. Обновляем интерфейс кнопки (Личный кабинет + Email)
+            // 1. Обновляем текст кнопки
             if(btnText) {
                 const activeText = t.personal_account || "Personal Account";
-                const shortEmail = user.email.split('@')[0]; // Берем часть до @
-                btnText.innerHTML = `${activeText} <span style="font-size:12px; opacity:0.6; font-weight:400; margin-left:6px;">${shortEmail}</span>`;
-            }
-            
-            // Иконка человека
-            if(btnIcon) {
-                btnIcon.innerText = "👤"; 
-                btnIcon.style.color = "var(--accent)";
+                const shortEmail = user.email.split('@')[0];
+                // Просто текст и email серым цветом
+                btnText.innerHTML = `${activeText} <span style="font-size:13px; color:var(--text-secondary); font-weight:400; margin-left:6px;">${shortEmail}</span>`;
             }
 
             // 2. Обновляем дату синхронизации и грузим данные
             if (window.updateLastSyncUI) window.updateLastSyncUI();
             await loadUserData(user); 
 
-            // 3. Проверка промокода в URL (если перешли по ссылке)
+            // 3. Проверка промокода в URL
             const urlParams = new URLSearchParams(window.location.search);
             const code = urlParams.get('code');
             if (code) {
@@ -5551,23 +5801,19 @@
             // === ПОЛЬЗОВАТЕЛЬ ВЫШЕЛ ===
             window.isUserLoggedIn = false;
             
-            // Возвращаем исходный вид кнопки
+            // Возвращаем исходный текст
             if(btnText) btnText.innerText = t.login_text || "Sync / Login";
-            if(btnIcon) {
-                btnIcon.innerText = "☁️"; // Иконка облака
-                btnIcon.style.color = "var(--text-secondary)";
-            }
             
             if (window.updateLastSyncUI) window.updateLastSyncUI();
         }
 
+        // Кнопка админа
         if (user && user.uid === ADMIN_UID) {
-            // Показываем кнопку в меню аккаунта
             const btn = document.getElementById('btn-admin-trigger');
             if(btn) btn.style.display = 'flex';
         }
     });
-
+    
     // 2. Генерация промокода
     window.adminGenerateCode = async function() {
         const user = auth.currentUser;
@@ -6420,7 +6666,7 @@
             btn_get_bestie: "Get Forever",
 
             // --- Sponsors ---
-            btn_early_sponsors: "Early Sponsors 💎",
+            btn_early_sponsors: "Early Sponsors",
             sponsors_title: "Wall of Fame",
             sponsors_desc: "These legends supported xFetishHub at the very beginning by purchasing the Bestie plan. Forever grateful! 💙",
 
@@ -6543,6 +6789,9 @@
             btn_current: "Current Plan",
             feat_wrapped_limited: "🎁 1 Fetish Wrapped / week",
             feat_wrapped_unlim: "✨ <b>Unlimited</b> Fetish Wrapped",
+
+            lbl_subscription: "Subscription",
+            limit_text_full: "🎲 15 Generations / day (left: {n}/15)",
 
             feat_unlim: "🔥 Unlimited Generations",
             feat_stats_adv: "📈 Advanced Stats & History",
@@ -6853,7 +7102,7 @@
             btn_get_bestie: "Купить навсегда",
 
             // --- Sponsors ---
-            btn_early_sponsors: "Ранние спонсоры 💎",
+            btn_early_sponsors: "Ранние спонсоры",
             sponsors_title: "Зал Славы",
             sponsors_desc: "Эти легенды поддержали xFetishHub в самом начале, купив тариф Bestie. Бесконечно благодарен! 💙",
 
@@ -6974,6 +7223,9 @@
             btn_current: "Текущий план",
             feat_wrapped_limited: "🎁 1 Fetish Wrapped / неделю",
             feat_wrapped_unlim: "✨ <b>Безлимитный</b> Wrapped",
+
+            lbl_subscription: "Подписка",
+            limit_text_full: "🎲 15 Генераций / день (осталось: {n}/15)",
 
             feat_unlim: "🔥 Безлимитные генерации",
             feat_stats_adv: "📈 Расширенные сводки",
@@ -7280,7 +7532,7 @@
             btn_get_bestie: "Obtener para siempre",
 
             // --- Sponsors ---
-            btn_early_sponsors: "Patrocinadores 💎",
+            btn_early_sponsors: "Patrocinadores",
             sponsors_title: "Muro de la Fama",
             sponsors_desc: "Estas leyendas apoyaron xFetishHub al principio comprando el plan Bestie. ¡Eternamente agradecido! 💙",
 
@@ -7412,6 +7664,9 @@
 
             feat_wrapped_limited: "🎁 1 Fetish Wrapped / semana",
             feat_wrapped_unlim: "✨ Fetish Wrapped <b>Ilimitado</b>",
+
+            lbl_subscription: "Suscripción",
+            limit_text_full: "🎲 15 Generaciones / día (quedan: {n}/15)",
 
             feat_unlim: "🔥 Generaciones Ilimitadas",
             feat_stats_adv: "📈 Estadísticas Avanzadas",
@@ -7699,7 +7954,7 @@
             btn_get_bestie: "Für immer holen",
 
             // --- Sponsors ---
-            btn_early_sponsors: "Frühe Sponsoren 💎",
+            btn_early_sponsors: "Frühe Sponsoren",
             sponsors_title: "Ruhmeshalle",
             sponsors_desc: "Diese Legenden haben xFetishHub von Anfang an mit dem Bestie-Plan unterstützt. Ewig dankbar! 💙",
 
@@ -7823,6 +8078,9 @@
             btn_current: "Aktueller Plan",
             feat_wrapped_limited: "🎁 1 Fetish Wrapped / Woche",
             feat_wrapped_unlim: "✨ <b>Unbegrenztes</b> Wrapped",
+
+            lbl_subscription: "Abonnement",
+            limit_text_full: "🎲 15 Generationen / Tag (übrig: {n}/15)",
 
             feat_unlim: "🔥 Unbegrenzte Generationen",
             feat_stats_adv: "📈 Erweiterte Statistik",
@@ -9268,20 +9526,62 @@
     }
 
     function initIntensity() {
-        const saved = localStorage.getItem(STORAGE.INTENSITY);
-        if(saved) currentIntensity = parseInt(saved);
-        document.getElementById('intensity-slider').value = currentIntensity;
-        updateIntensity(currentIntensity);
-    }
+            const saved = localStorage.getItem(STORAGE.INTENSITY);
+            currentIntensity = saved ? parseInt(saved) : 1;
+            
+            // Синхронизируем позицию ползунка (на случай, если HTML сбросился)
+            const slider = document.getElementById('intensity-slider');
+            if (slider) slider.value = currentIntensity;
+
+            updateIntensity(currentIntensity);
+        }
     
     function updateIntensity(val) {
         currentIntensity = parseInt(val);
         localStorage.setItem(STORAGE.INTENSITY, currentIntensity);
-        document.querySelectorAll('.intensity-label').forEach(el => el.classList.remove('active'));
-        const activeLabel = document.getElementById('lbl-' + currentIntensity);
-        if(activeLabel) activeLabel.classList.add('active');
-    }
+        
+        const slider = document.getElementById('intensity-slider');
+        const icon1 = document.getElementById('icon-int-1');
+        const icon2 = document.getElementById('icon-int-2');
+        const icon3 = document.getElementById('icon-int-3');
 
+        if (!slider || !icon1) return;
+
+        slider.value = currentIntensity;
+
+        // Сброс иконок (возврат к базовому классу из CSS)
+        icon1.className = 'int-icon';
+        icon2.className = 'int-icon';
+        icon3.className = 'int-icon';
+
+        // Цвета для слайдера
+        const gray = 'var(--border)'; // Цвет пустой полоски
+        const orange = '#f39c12';
+        const red = '#e74c3c';
+
+        // ЛОГИКА ЗАЛИВКИ СЛАЙДЕРА
+        if (currentIntensity === 1) {
+            // SAFE: Весь слайдер серый (как обычно, начало пути)
+            // Или можно сделать чуть зеленым в начале, но "как обычно" значит пустой трек.
+            slider.style.background = gray;
+            
+            // Красим только иконку
+            icon1.classList.add('active-safe');
+        } 
+        else if (currentIntensity === 2) {
+            // SPICY: Слева направо до 50% Оранжевый, дальше Серый
+            slider.style.background = `linear-gradient(to right, ${orange} 0%, ${orange} 50%, ${gray} 50%, ${gray} 100%)`;
+            
+            icon2.classList.add('active-spicy');
+        } 
+        else if (currentIntensity === 3) {
+            // EXTREME: Полностью Красный
+            slider.style.background = red;
+            
+            icon3.classList.add('active-extreme');
+        }
+    }
+    
     function initIdleSlot() {
         const reel = document.getElementById('slot-reel');
         if (!reel) return;
@@ -10768,111 +11068,170 @@
     }
 
     function updateSubscriptionUI() {
-        const nameEl = document.getElementById('current-plan-name');
-        const badgeEl = document.getElementById('upgrade-badge'); 
-        const btnFree = document.querySelector('.plan-card:nth-child(1) .plan-btn'); 
+        // 1. ЭЛЕМЕНТЫ ИНТЕРФЕЙСА
         
-        if (!nameEl) return;
+        // Строка в Настройках (справа)
+        const settingsStatus = document.getElementById('settings-plan-status');
+        
+        // Строка в Модальном окне (в карточке Free)
+        const freeLimitRow = document.getElementById('free-limit-row');
+        
+        // Кнопки в модальном окне
+        const btnFree = document.querySelector('.plan-card:nth-child(1) .plan-btn'); 
+        const btnPro = document.querySelector('.plan-card.pro .plan-btn');
+        const btnBeast = document.querySelector('.plan-card.beast .plan-btn');
+        const btnBestie = document.querySelector('.plan-card.bestie .plan-btn'); // Если есть Bestie
 
-        // Обновляем переменную уровня подписки из памяти (на случай, если она изменилась без перезагрузки)
+        // Данные
         subscriptionLevel = localStorage.getItem('xch_sub_level') || 'free';
-
         const t = langData[currentLang] || langData['en'];
 
-        // Сброс стилей
-        nameEl.style.textShadow = 'none';
-        nameEl.style.fontWeight = '900';
+        // 2. ОБНОВЛЕНИЕ СТРОКИ В НАСТРОЙКАХ (Справа от иконки)
+        if (settingsStatus) {
+            settingsStatus.classList.remove('premium'); // Сброс цвета
+            settingsStatus.style.opacity = "1";
 
-        // --- ПРОВЕРКА BESTIE ---
-        if (subscriptionLevel === 'bestie') {
-            nameEl.innerText = "BESTIE";
-            nameEl.style.color = "#00d2ff"; 
-            nameEl.style.textShadow = "0 0 15px rgba(0, 210, 255, 0.4)";
-            
-            if(badgeEl) badgeEl.style.display = 'none';
-            
-            // Кнопка Free в модальном окне становится "You deserve better"
-            if(btnFree) {
-                btnFree.innerText = t.btn_lower_tier || "You deserve better";
-                btnFree.classList.add('current');
-                btnFree.disabled = true;
+            if (subscriptionLevel === 'bestie') {
+                settingsStatus.innerText = "BESTIE";
+                settingsStatus.classList.add('premium'); // Делаем цветным
+            } else if (subscriptionLevel === 'beast') {
+                settingsStatus.innerText = "BEAST";
+                settingsStatus.classList.add('premium');
+            } else if (subscriptionLevel === 'pro') {
+                settingsStatus.innerText = "PRO";
+                settingsStatus.classList.add('premium');
+            } else {
+                settingsStatus.innerText = "FREE";
+                settingsStatus.style.opacity = "0.7"; // Чуть тусклее для Free
             }
-        
-        } else if (subscriptionLevel === 'beast') {
-            nameEl.innerText = "BEAST";
-            nameEl.style.color = "#9b59b6"; 
-            
-            if(badgeEl) badgeEl.style.display = 'none';
-            if(btnFree) {
-                btnFree.innerText = t.btn_lower_tier;
-                btnFree.classList.add('current');
-                btnFree.disabled = true;
-            }
+        }
 
-        } else if (subscriptionLevel === 'pro') {
-            nameEl.innerText = "PRO";
-            nameEl.style.color = "#ff9900"; 
-            
-            if(badgeEl) badgeEl.style.display = 'none';
-            if(btnFree) {
-                btnFree.innerText = t.btn_lower_tier;
-                btnFree.classList.add('current');
-                btnFree.disabled = true;
-            }
+        // 3. РАСЧЕТ ЛИМИТОВ (Для счетчика)
+        const count = parseInt(localStorage.getItem('xch_limit_count') || '0');
+        const startTime = parseInt(localStorage.getItem('xch_limit_start') || '0');
+        const now = Date.now();
+        const oneDay = 24 * 60 * 60 * 1000;
 
-        } else {
-            // --- FREE ---
-            const count = parseInt(localStorage.getItem('xch_limit_count') || '0');
-            const startTime = parseInt(localStorage.getItem('xch_limit_start') || '0');
-            const now = Date.now();
-            const oneDay = 24 * 60 * 60 * 1000;
+        let displayCount = count;
+        // Если сутки прошли с момента начала отсчета - сбрасываем визуально в 0
+        if (startTime > 0 && (now - startTime > oneDay)) {
+            displayCount = 0;
+        }
+        const remaining = Math.max(0, DAILY_LIMIT - displayCount);
 
-            let displayCount = count;
-            if (startTime > 0 && (now - startTime > oneDay)) {
-                displayCount = 0;
-            }
-            const remaining = Math.max(0, DAILY_LIMIT - displayCount);
-
-            nameEl.innerHTML = `FREE <span style="font-size:14px; opacity:0.6; font-weight:600; margin-left:5px; color:var(--text-secondary);">${remaining}/${DAILY_LIMIT}</span>`;
-            nameEl.style.color = "var(--text-main)";
-            nameEl.style.fontWeight = "600";
-            
-            if(badgeEl) {
-                badgeEl.style.display = 'inline-block';
-                badgeEl.innerText = t.btn_upgrade_short || "Upgrade ⇧"; 
-            }
-
-            // Логика кнопки Free (таймер)
-            if (btnFree) {
-                btnFree.disabled = true;
-                btnFree.classList.remove('current'); // Сброс класса current, чтобы стили таймера сработали
+        // 4. ОБНОВЛЕНИЕ ТЕКСТА В МОДАЛЬНОМ ОКНЕ (Карточка Free)
+        if (freeLimitRow) {
+            if (subscriptionLevel === 'free') {
+                // Берем шаблон из langData (добавьте limit_text_full в переводы!)
+                // Пример: "🎲 15 Gen... (left: {n}/15)"
+                let text = t.limit_text_full || `🎲 ${DAILY_LIMIT} Generations / day (left: {n}/${DAILY_LIMIT})`;
+                text = text.replace('{n}', remaining);
                 
-                if (startTime > 0 && displayCount > 0) {
-                    const resetDate = new Date(startTime + oneDay);
-                    const dateStr = resetDate.toLocaleString(currentLang, { 
-                        day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
-                    });
-                    
-                    btnFree.innerText = `${t.limit_reset} ${dateStr}`;
-                    
-                    if (remaining === 0) {
-                        btnFree.style.color = "var(--highlight-red)";
-                        btnFree.style.border = "1px solid var(--highlight-red)";
-                        btnFree.style.background = "rgba(231, 76, 60, 0.1)";
-                        btnFree.style.opacity = "1";
-                    } else {
-                        btnFree.style.color = "var(--text-secondary)";
-                        btnFree.style.border = "1px solid var(--border)";
-                        btnFree.style.background = "var(--nav-bg)";
-                    }
+                freeLimitRow.innerHTML = text;
+
+                // Красим в красный, если 0
+                if (remaining === 0) {
+                    freeLimitRow.style.color = "var(--highlight-red)";
+                    freeLimitRow.style.fontWeight = "700";
                 } else {
-                    btnFree.innerText = t.btn_current;
-                    btnFree.classList.add('current');
-                    btnFree.style.color = ""; 
-                    btnFree.style.background = "";
-                    btnFree.style.border = "";
+                    freeLimitRow.style.color = "";
+                    freeLimitRow.style.fontWeight = "";
                 }
+            } else {
+                // Если у юзера Премиум — пишем в карточке Free, что лимит снят или просто дефолтный текст
+                freeLimitRow.innerHTML = t.feat_limit || `🎲 ${DAILY_LIMIT} Generations / day`;
+                freeLimitRow.style.color = ""; 
             }
+        }
+
+        // 5. ЛОГИКА КНОПОК В МОДАЛЬНОМ ОКНЕ
+        // Тексты для кнопок
+        const tCurrent = t.btn_current || "Current Plan";
+        const tExtend = currentLang === 'ru' ? "Продлить" : "Extend"; 
+        const tUpgrade = currentLang === 'ru' ? "Улучшить" : "Upgrade";
+        const tLower = t.btn_lower_tier || "Included";
+        
+        const tPro = t.btn_get_pro || "Get Pro";
+        const tBeast = t.btn_get_beast || "Unleash Beast";
+        const tBestie = t.btn_get_bestie || "Get Forever"; 
+
+        // Хелпер настройки одной кнопки
+        const configureBtn = (btn, state, buyText, planType) => {
+            if (!btn) return;
+            
+            // Сброс классов и событий
+            btn.onclick = null;
+            btn.classList.remove('current', 'pro-btn', 'beast-btn', 'bestie-btn');
+            btn.disabled = false;
+            btn.style.opacity = "1";
+
+            if (state === 'current') {
+                // Текущий план
+                if (planType === 'bestie') {
+                    // Bestie нельзя продлить, он вечный
+                    btn.disabled = true;
+                    btn.classList.add('current');
+                    btn.innerText = "Purchased";
+                } else {
+                    // Pro/Beast можно продлить
+                    // Восстанавливаем цветные классы для красоты
+                    if (btn.closest('.pro')) btn.classList.add('pro-btn');
+                    if (btn.closest('.beast')) btn.classList.add('beast-btn');
+                    
+                    btn.innerText = tExtend; // "Продлить"
+                    btn.onclick = () => openPaymentSelection(planType);
+                }
+            } 
+            else if (state === 'lower') {
+                // План ниже текущего
+                btn.disabled = true;
+                btn.classList.add('current');
+                btn.innerText = tLower; // "Включено" или "Вам доступно"
+                btn.style.opacity = "0.6";
+            } 
+            else { 
+                // state === 'buy' или 'upgrade'
+                // Восстанавливаем цвета кнопок
+                if (btn.closest('.pro')) btn.classList.add('pro-btn');
+                if (btn.closest('.beast')) btn.classList.add('beast-btn');
+                if (btn.closest('.bestie')) btn.classList.add('bestie-btn');
+                
+                btn.innerText = state === 'upgrade' ? tUpgrade : buyText;
+                btn.onclick = () => openPaymentSelection(planType);
+            }
+        };
+
+        // Применяем логику в зависимости от уровня
+        if (subscriptionLevel === 'bestie') {
+            configureBtn(btnFree, 'lower', null, null);
+            configureBtn(btnPro, 'lower', null, null);
+            configureBtn(btnBeast, 'lower', null, null);
+            configureBtn(btnBestie, 'current', null, 'bestie');
+        }
+        else if (subscriptionLevel === 'beast') {
+            configureBtn(btnFree, 'lower', null, null);
+            configureBtn(btnPro, 'lower', null, null);
+            configureBtn(btnBeast, 'current', null, 'beast');
+            configureBtn(btnBestie, 'upgrade', tBestie, 'bestie');
+        } 
+        else if (subscriptionLevel === 'pro') {
+            configureBtn(btnFree, 'lower', null, null);
+            configureBtn(btnPro, 'current', null, 'pro');
+            configureBtn(btnBeast, 'upgrade', tBeast, 'beast');
+            configureBtn(btnBestie, 'upgrade', tBestie, 'bestie');
+        } 
+        else {
+            // Free
+            configureBtn(btnFree, 'current', null, null);
+            if(btnFree) { 
+                btnFree.disabled = true; 
+                btnFree.innerText = tCurrent; 
+                btnFree.classList.add('current');
+            }
+
+            configureBtn(btnPro, 'buy', tPro, 'pro');
+            configureBtn(btnBeast, 'buy', tBeast, 'beast');
+            configureBtn(btnBestie, 'buy', tBestie, 'bestie');
         }
     }
 
