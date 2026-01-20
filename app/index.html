@@ -74,49 +74,59 @@
         /* === LOADER === */
         #loading-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 999999; /* Поверх всего */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background-color: #12000b; /* Дефолтный темный фон */
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 999999;
+            display: flex; flex-direction: column; 
+            align-items: center; justify-content: center;
+            background-color: #12000b;
             transition: opacity 0.5s ease, visibility 0.5s;
         }
 
         #loading-overlay.hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
+            opacity: 0; visibility: hidden; pointer-events: none;
         }
 
         .loader-logo {
-            width: 80px;
-            height: 80px;
+            width: 70px; height: 70px;
             object-fit: contain;
-            margin-bottom: 20px;
-            /* Анимация пульсации */
-            animation: breathe 2s infinite ease-in-out;
+            margin-bottom: 25px;
+            opacity: 0.9;
+            animation: breathe 2.5s infinite ease-in-out;
         }
 
         .loader-text {
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 13px; font-weight: 700;
             color: var(--text-secondary);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             text-align: center;
-            opacity: 0.8;
-            max-width: 80%;
+            min-height: 20px; /* Чтобы текст не прыгал */
+            margin-bottom: 15px;
+            opacity: 0.7;
+        }
+
+        /* Прогресс бар */
+        .loader-progress-container {
+            width: 200px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .loader-progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--accent, #ff00cc); /* Использует цвет темы или дефолтный розовый */
+            border-radius: 4px;
+            transition: width 0.2s ease-out;
+            box-shadow: 0 0 10px var(--accent, #ff00cc);
         }
 
         @keyframes breathe {
-            0% { transform: scale(0.95); opacity: 0.7; }
+            0%, 100% { transform: scale(0.95); opacity: 0.6; }
             50% { transform: scale(1.05); opacity: 1; }
-            100% { transform: scale(0.95); opacity: 0.7; }
         }
 
         /* =========================================
@@ -4155,53 +4165,95 @@
 <!-- EKRAN ZAGRUZKI -->
 <div id="loading-overlay">
     <img src="icon_light.png" class="loader-logo" alt="Loading...">
-    <div class="loader-text" id="loader-phrase">Loading preferences...</div>
+    <div class="loader-text" id="loader-phrase">INITIALIZING...</div>
+    
+    <div class="loader-progress-container">
+        <div class="loader-progress-fill" id="loader-bar"></div>
+    </div>
 </div>
 
-<!-- МГНОВЕННОЕ ПРИМЕНЕНИЕ ФОНА-->
 <script>
     (function() {
+        // 1. МГНОВЕННАЯ УСТАНОВКА ЦВЕТА ФОНА (Чтобы не мигало)
         const themeId = localStorage.getItem('xch_theme_id') || 'dark';
         const overlay = document.getElementById('loading-overlay');
-        
-        // Быстрая карта цветов (должна совпадать с вашими темами)
-        const colors = {
-            'dark': '#12000b',
-            'light': '#ffeef8',
-            'blue-dark': '#020c1b',
-            'blue-light': '#dbeafe',
-            'green-dark': '#020a02',
-            'green-light': '#dcfce7',
-            'red-dark': '#0d0000',
-            'red-light': '#ffe4e6',
-            'gold-dark': '#0a0900',
-            'gold-light': '#fef3c7',
-            'noir': '#000000',
-            'rainbow': '#12000b'
+        const fill = document.getElementById('loader-bar');
+        const logo = document.querySelector('.loader-logo');
+        const text = document.getElementById('loader-phrase');
+
+        // Карта цветов фона
+        const bgColors = {
+            'dark': '#12000b', 'light': '#ffeef8',
+            'blue-dark': '#020c1b', 'blue-light': '#dbeafe',
+            'green-dark': '#020a02', 'green-light': '#dcfce7',
+            'red-dark': '#0d0000', 'red-light': '#ffe4e6',
+            'gold-dark': '#0a0900', 'gold-light': '#fef3c7',
+            'noir': '#000000', 'rainbow': '#12000b'
+        };
+        // Карта акцентов (для бара)
+        const accentColors = {
+            'dark': '#ff00cc', 'light': '#db2777',
+            'blue-dark': '#64ffda', 'blue-light': '#2563eb',
+            'green-dark': '#2ecc71', 'green-light': '#16a34a',
+            'red-dark': '#e74c3c', 'red-light': '#e11d48',
+            'gold-dark': '#f1c40f', 'gold-light': '#d97706',
+            'noir': '#ffffff', 'rainbow': '#ff00cc'
         };
 
-        // Красим оверлей сразу же
-        if (colors[themeId]) {
-            overlay.style.backgroundColor = colors[themeId];
-        }
-        
-        // Меняем цвет текста для светлых тем
+        if (bgColors[themeId]) overlay.style.backgroundColor = bgColors[themeId];
+        if (accentColors[themeId]) fill.style.background = accentColors[themeId];
+
+        // Адаптация под светлую тему
         if (themeId.includes('light')) {
-            document.getElementById('loader-phrase').style.color = '#555';
-            // Если логотип icon_light.png белый, инвертируем его для светлой темы
-            document.querySelector('.loader-logo').style.filter = 'invert(1)';
+            text.style.color = '#555';
+            logo.style.filter = 'invert(1)';
+            document.querySelector('.loader-progress-container').style.background = 'rgba(0,0,0,0.1)';
         }
 
-        // Рандомные фразы загрузки
+        // 2. СПИСОК ФРАЗ (Англ + немного юмора/техно)
         const phrases = [
-            "Preparing your experience...",
+            "Warming up engines...",
+            "Decrypting desires...",
             "Loading pleasure...",
-            "Applying personal settings...",
-            "Fetching categories...",
-            "Warming up engine...",
-            "Analysing tastes..."
+            "Scanning for kinks...",
+            "Preparing visuals...",
+            "Calibrating algorithms...",
+            "Checking compatibility...",
+            "Connecting to the hub...",
+            "Fetching spicy data...",
+            "Analyzing preferences...",
+            "Unlocking categories...",
+            "Setting the mood...",
+            "Almost there...",
+            "Optimizing experience..."
         ];
-        document.getElementById('loader-phrase').innerText = phrases[Math.floor(Math.random() * phrases.length)];
+
+        // 3. АНИМАЦИЯ ФРАЗ
+        let phraseIndex = Math.floor(Math.random() * phrases.length);
+        text.innerText = phrases[phraseIndex]; // Первая фраза сразу
+
+        const phraseInterval = setInterval(() => {
+            phraseIndex = (phraseIndex + 1) % phrases.length;
+            text.innerText = phrases[phraseIndex];
+        }, 800); // Меняем каждые 800мс
+
+        // 4. СИМУЛЯЦИЯ ПРОГРЕСС БАРА
+        let progress = 0;
+        const progressInterval = setInterval(() => {
+            // Быстро до 30%, медленнее до 70%, очень медленно до 90%
+            let increment = 0;
+            if (progress < 30) increment = Math.random() * 5;
+            else if (progress < 70) increment = Math.random() * 2;
+            else if (progress < 90) increment = Math.random() * 0.5;
+            
+            progress += increment;
+            if (progress > 90) progress = 90; // Ждем полной загрузки страницы
+            
+            fill.style.width = progress + '%';
+        }, 100);
+
+        // Сохраняем ID интервалов в window, чтобы остановить их при полной загрузке
+        window.loaderIntervals = { phrase: phraseInterval, progress: progressInterval };
     })();
 </script>
 
@@ -8679,15 +8731,26 @@
         // Принудительно ставим класс для мобильной шапки
         document.body.classList.add('tab-home-active');
 
+       // 1. Добиваем прогресс бар до 100%
+        const bar = document.getElementById('loader-bar');
+        const text = document.getElementById('loader-phrase');
+        if (bar) bar.style.width = '100%';
+        if (text) text.innerText = "Ready.";
+
+        // 2. Очищаем интервалы (чтобы фразы перестали мигать)
+        if (window.loaderIntervals) {
+            clearInterval(window.loaderIntervals.phrase);
+            clearInterval(window.loaderIntervals.progress);
+        }
+
+        // 3. Скрываем оверлей с небольшой задержкой (чтобы увидеть 100%)
         setTimeout(() => {
             const overlay = document.getElementById('loading-overlay');
             if (overlay) {
                 overlay.classList.add('hidden');
-                // Удаляем из DOM через полсекунды (после анимации)
                 setTimeout(() => overlay.style.display = 'none', 500);
             }
-        }, 800);
-
+        }, 600);
     };
 
     async function loadData() {
