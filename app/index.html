@@ -568,14 +568,28 @@
             background: linear-gradient(to top, var(--bg-color) 40%, transparent 100%);
         }
 
+        .stagger-item {
+            opacity: 0; /* Скрыто по умолчанию */
+            animation: fadeInUpSmooth 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            animation-play-state: paused; /* На паузе, пока не уберем блокирующий класс */
+        }
+
+        /* 2. Класс, который держит анимацию на паузе и скрывает контент */
+        .card-content-hidden .stagger-item {
+            opacity: 0 !important;
+            animation: none !important;
+            transform: translateY(20px);
+        }
+
+        /* 3. Анимация самой карточки (Прыжок) */
         @keyframes cardPopIn {
             0% { 
                 opacity: 0;
-                transform: scale(0.8) translateY(30px);
+                transform: scale(0.9) translateY(40px);
             }
-            60% {
+            50% {
                 opacity: 1;
-                transform: scale(1.02) translateY(-5px); /* Легкий перелет */
+                transform: scale(1.02) translateY(-5px);
             }
             100% { 
                 opacity: 1;
@@ -587,10 +601,9 @@
             animation: cardPopIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
         }
 
-        /* Скрываем элементы карточки до начала анимации */
-        .card-content-hidden .stagger-item {
-            opacity: 0;
-            animation: none !important;
+        /* 4. Когда убираем класс скрытия, запускаем анимацию */
+        .card:not(.card-content-hidden) .stagger-item {
+            animation-play-state: running;
         }
 
         /* =========================================
@@ -1368,12 +1381,6 @@
                 transform: translateY(0);
                 filter: blur(0);
             }
-        }
-
-        /* Базовый класс для элементов, которые должны появляться плавно */
-        .stagger-item {
-            opacity: 0; /* Скрыты по умолчанию */
-            animation: fadeInUpSmooth 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
 
         /* Задержки (Очередь появления) */
@@ -4319,7 +4326,7 @@
                 <div id="card-anchor" style="position: relative; width: 100%; display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: visible;">
                     
                     <!-- ОБЁРТКА (Wrapper) -->
-                    <div id="card-anim-wrapper" style="position: relative; width: 100%; display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: visible; z-index: 10;">
+                    <div id="card-anim-wrapper" style="opacity: 0; position: relative; width: 100%; display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: visible; z-index: 10;"></div>
                         
                         <!-- 1. ФРАЗА СЮДА -->
                         <div class="status-text-combined stagger-item delay-5" id="status-text"></div>
@@ -4330,7 +4337,7 @@
 
 
                         <!-- КАРТОЧКА -->
-                        <div class="card" id="card-block">
+                        <div class="card card-content-hidden" id="card-block"></div>
 
                             <div id="card-notch" class="card-notch">
                                 <span id="card-notch-text">STATUS</span>
@@ -8851,37 +8858,38 @@
         // Задержка перед исчезновением экрана (600мс)
         setTimeout(() => {
             const overlay = document.getElementById('loading-overlay');
-            
-            if (overlay) {
-                // 1. Лоадер исчезает
-                overlay.classList.add('hidden');
-                setTimeout(() => overlay.style.display = 'none', 500);
-                
-                // 2. ЗАПУСК АНИМАЦИИ КАРТОЧКИ (через 100мс после начала исчезновения лоадера)
-                setTimeout(() => {
-                    const wrapper = document.getElementById('card-anim-wrapper');
-                    const cardBlock = document.getElementById('card-block');
-                    
-                    if (wrapper) {
-                        wrapper.style.opacity = '1'; // Показываем обертку
-                        wrapper.classList.add('anim-initial-pop'); // Карточка выпрыгивает
-                    }
+            const wrapper = document.getElementById('card-anim-wrapper');
+            const cardBlock = document.getElementById('card-block');
 
-                    // 3. ЗАПУСК ВНУТРЕННИХ ЭЛЕМЕНТОВ (Stagger)
-                    if (cardBlock) {
-                        // Убираем класс скрытия, чтобы сработали CSS animation-delay (stagger-item)
+            // 1. Убираем экран загрузки
+            if (overlay) {
+                overlay.classList.add('hidden'); // Плавное исчезновение
+                setTimeout(() => overlay.style.display = 'none', 500);
+            }
+
+            // 2. ЗАПУСКАЕМ АНИМАЦИЮ (Через 100мс после начала исчезновения лоадера)
+            setTimeout(() => {
+                if (wrapper && cardBlock) {
+                    // А. Карточка "Выпрыгивает"
+                    wrapper.style.opacity = '1'; 
+                    wrapper.classList.add('anim-initial-pop');
+
+                    // Б. Запускаем каскадную анимацию элементов внутри (убираем блокирующий класс)
+                    // Небольшая задержка, чтобы карточка уже начала появляться
+                    setTimeout(() => {
                         cardBlock.classList.remove('card-content-hidden');
                         
-                        // Перезапускаем анимации stagger-item вручную для надежности
-                        const elements = cardBlock.querySelectorAll('.stagger-item');
-                        elements.forEach(el => {
+                        // Перезапускаем анимацию элементов принудительно (fix для некоторых браузеров)
+                        const items = cardBlock.querySelectorAll('.stagger-item');
+                        items.forEach(el => {
                             el.style.animation = 'none';
                             el.offsetHeight; /* trigger reflow */
                             el.style.animation = ''; 
                         });
-                    }
-                }, 100);
-            }
+                    }, 150);
+                }
+            }, 100);
+
         }, 600);
     };
 
