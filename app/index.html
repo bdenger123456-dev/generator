@@ -3878,7 +3878,21 @@
 
         body.light-theme .int-icon {
             filter: invert(0);
-            opacity: 0.3;
+            opacity: 0.8;
+        }
+
+        body[data-theme="noir"] .int-icon.active-safe,
+        body[data-theme="noir"] .int-icon.active-spicy,
+        body[data-theme="noir"] .int-icon.active-extreme {
+            filter: invert(1) !important;
+            opacity: 1;
+            transform: scale(1.15);
+        }
+
+        /* --- ИКОНКА СБРОСА (КРАСНАЯ) --- */
+        .settings-icon.red-icon {
+            filter: invert(36%) sepia(83%) saturate(1963%) hue-rotate(339deg) brightness(96%) contrast(87%) !important;
+            opacity: 1 !important;
         }
 
         /* --- ЦВЕТА ДЛЯ АКТИВНЫХ ИКОНОК --- */
@@ -4734,17 +4748,20 @@
                 <span class="badge" id="count-wl" style="color:var(--text-secondary); font-size:17px;">0</span>
             </div>
             
-            <!-- 4. СБРОС -->
+            <!-- 4. СБРОС (Всё красное) -->
             <div class="ios-row clickable" onclick="resetAppHistory()">
                 <div class="ios-row-left">
-                    <img src="reset_data.png" class="settings-icon" style="filter: invert(35%) sepia(93%) saturate(7472%) hue-rotate(356deg) brightness(91%) contrast(115%); opacity:1;" alt="Reset">
-                    <span data-key="btn_reset" style="color: var(--highlight-red);">Reset Data</span>
+                    <!-- Добавлен класс red-icon -->
+                    <img src="reset_data.png" class="settings-icon red-icon" alt="Reset">
+                    <!-- Явный стиль цвета для текста -->
+                    <span data-key="btn_reset" style="color: var(--highlight-red); font-weight: 600;">Reset Data</span>
                 </div>
             </div>
-            
+
+            <!-- ADMIN BUTTON (Без лишних стилей) -->
             <div id="btn-admin-trigger" class="ios-row clickable" onclick="openAdminModal()" style="display:none;">
                 <div class="ios-row-left">
-                    <img src="admin.png" class="settings-icon" style="filter:none;" alt="Admin">
+                    <img src="admin.png" class="settings-icon" alt="Admin">
                     <span style="font-weight:700; color:#ff0000;">Admin Panel</span>
                 </div>
                 <div class="chevron"></div>
@@ -9549,39 +9566,39 @@
 
         slider.value = currentIntensity;
 
-        // Сброс иконок (возврат к базовому классу из CSS)
+        // Сброс иконок
         icon1.className = 'int-icon';
         icon2.className = 'int-icon';
         icon3.className = 'int-icon';
 
-        // Цвета для слайдера
-        const gray = 'var(--border)'; // Цвет пустой полоски
-        const orange = '#f39c12';
-        const red = '#e74c3c';
+        // Проверка темы НУАР
+        const isNoir = document.body.getAttribute('data-theme') === 'noir';
 
-        // ЛОГИКА ЗАЛИВКИ СЛАЙДЕРА
+        // Цвета (Обычные vs Нуар)
+        const colorBg = 'var(--border)'; // Цвет пустой части
+        
+        // В Нуаре заполнение белое, в обычной - цветное
+        const colorSafe = isNoir ? colorBg : colorBg; // Safe всегда как фон (или можно чуть подсветить)
+        const colorSpicy = isNoir ? '#ffffff' : '#f39c12'; // Белый или Оранжевый
+        const colorExtreme = isNoir ? '#ffffff' : '#e74c3c'; // Белый или Красный
+
         if (currentIntensity === 1) {
-            // SAFE: Весь слайдер серый (как обычно, начало пути)
-            // Или можно сделать чуть зеленым в начале, но "как обычно" значит пустой трек.
-            slider.style.background = gray;
-            
-            // Красим только иконку
+            // SAFE: Слайдер пустой (или дефолтный)
+            slider.style.background = colorBg;
             icon1.classList.add('active-safe');
         } 
         else if (currentIntensity === 2) {
-            // SPICY: Слева направо до 50% Оранжевый, дальше Серый
-            slider.style.background = `linear-gradient(to right, ${orange} 0%, ${orange} 50%, ${gray} 50%, ${gray} 100%)`;
-            
+            // SPICY: Половина закрашена
+            slider.style.background = `linear-gradient(to right, ${colorSpicy} 0%, ${colorSpicy} 50%, ${colorBg} 50%, ${colorBg} 100%)`;
             icon2.classList.add('active-spicy');
         } 
         else if (currentIntensity === 3) {
-            // EXTREME: Полностью Красный
-            slider.style.background = red;
-            
+            // EXTREME: Полностью закрашен
+            slider.style.background = colorExtreme;
             icon3.classList.add('active-extreme');
         }
     }
-    
+
     function initIdleSlot() {
         const reel = document.getElementById('slot-reel');
         if (!reel) return;
