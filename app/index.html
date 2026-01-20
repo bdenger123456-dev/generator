@@ -3994,18 +3994,8 @@
 
 <!-- AGE GATE OVERLAY -->
 <div id="age-gate" class="modal-overlay" style="z-index: 20000; background: var(--bg-color);">
-    
-    <!-- ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА -->
-    <div style="position: absolute; top: calc(20px + env(safe-area-inset-top)); right: 20px; z-index: 20005;">
-        <select onchange="changeLanguage(this.value)" style="background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border); padding: 8px; border-radius: 12px; font-size: 14px; outline: none; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
-            <option value="en">English</option>
-            <option value="ru">Русский</option>
-            <option value="es">Español</option>
-            <option value="de">Deutsch</option>
-        </select>
-    </div>
-
     <div class="center-wrapper" style="text-align:center; padding:20px;">
+        
         <!-- Логотип -->
         <div class="logo">
             <img src="logo.png" alt="X" class="logo-img">
@@ -4018,9 +4008,39 @@
             This website contains age-restricted materials. Are you 18 years or older?
         </p>
         
-        <div style="display:flex; gap:15px; width:100%; max-width:300px; justify-content:center;">
-            <button class="btn-gen secondary" onclick="blockAccess()" data-key="age_no">No, Exit</button>
-            <button class="btn-gen" onclick="passAgeGate()" style="background:var(--accent); color:#000;" data-key="age_yes">Yes, I am 18+</button>
+        <!-- КНОПКИ И ЯЗЫК В ОДНОМ БЛОКЕ -->
+        <div style="display:flex; flex-wrap: wrap; gap:10px; width:100%; max-width:320px; justify-content:center; align-items: center;">
+            
+            <!-- Язык  -->
+            <div style="position: relative;">
+                <select onchange="changeLanguage(this.value)" style="
+                    appearance: none; -webkit-appearance: none;
+                    background: transparent;
+                    color: var(--text-secondary);
+                    border: 1px solid var(--border);
+                    border-radius: 20px;
+                    padding: 12px 30px 12px 15px; /* Место под стрелочку */
+                    font-size: 14px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    height: 100%;
+                    min-width: 80px;
+                    text-align: center;
+                ">
+                    <option value="en">EN</option>
+                    <option value="ru">RU</option>
+                    <option value="es">ES</option>
+                    <option value="de">DE</option>
+                </select>
+                <!-- Кастомная стрелочка -->
+                <span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); pointer-events: none; font-size: 10px;">▼</span>
+            </div>
+
+            <!-- Кнопка НЕТ -->
+            <button class="btn-gen secondary" onclick="blockAccess()" data-key="age_no" style="flex: 1; min-width: 80px; padding: 12px;">No</button>
+            
+            <!-- Кнопка ДА -->
+            <button class="btn-gen" onclick="passAgeGate()" style="background:var(--accent); color:#000; flex: 1.5; padding: 12px;" data-key="age_yes">Yes, 18+</button>
         </div>
     </div>
 </div>
@@ -5753,7 +5773,7 @@
         }
     });
 
-    const DAILY_LIMIT = 10;
+    const DAILY_LIMIT = 15;
     let currentItem = null;
     let lastGeneratedItem = null; 
     let hasInteractedWithCurrent = false;
@@ -6277,7 +6297,7 @@
             sub_intro: "xFetishHub is a one-of-a-kind project that helps you discover and analyze your adult preferences in one cozy, ad-free place. By subscribing, you ensure the project's survival, and in return, I'll give you significantly more features:",
             
             // Plans Features
-            feat_limit: "🎲 10 Generations / day",
+            feat_limit: "🎲 15 Generations / day",
             feat_stats_basic: "📊 Basic Statistics",
             feat_filters: "✔️ Standard Filters",
             btn_current: "Current Plan",
@@ -6706,7 +6726,7 @@
             sub_intro: "xFetishHub — это единственный в своём роде проект, который помогает тебе узнать и проанализировать твои взрослые предпочтения в одном уютном месте без рекламы. Если оплатишь подписку, то проект и дальше сможет существовать, а взамен я тебе дам ощутимо больше возможностей:",
             
             // Планы
-            feat_limit: "🎲 10 Генераций / день",
+            feat_limit: "🎲 15 Генераций / день",
             feat_stats_basic: "📊 Базовая статистика",
             feat_filters: "✔️ Стандартные фильтры",
             btn_current: "Текущий план",
@@ -7141,7 +7161,7 @@
             sub_title: "Acceso Premium",
             sub_intro: "xFetishHub es un proyecto único en su tipo que te ayuda a descubrir y analizar tus preferencias adultas en un lugar acogedor y sin publicidad. Al suscribirte aseguras la supervivencia del proyecto, y a cambio te daré muchas más funciones:",
             
-            feat_limit: "🎲 10 Generaciones / día",
+            feat_limit: "🎲 15 Generaciones / día",
             feat_stats_basic: "📊 Estadísticas Básicas",
             feat_filters: "✔️ Filtros Estándar",
             btn_current: "Plan Actual",
@@ -7551,7 +7571,7 @@
             sub_title: "Premium Zugang",
             sub_intro: "xFetishHub ist ein einzigartiges Projekt, das dir hilft, deine Vorlieben an einem gemütlichen, werbefreien Ort zu entdecken und zu analysieren. Mit einem Abo sicherst du den Fortbestand des Projekts, und im Gegenzug biete ich dir deutlich mehr Funktionen:",
             
-            feat_limit: "🎲 10 Generationen / Tag",
+            feat_limit: "🎲 15 Generationen / Tag",
             feat_stats_basic: "📊 Basis-Statistik",
             feat_filters: "✔️ Standardfilter",
             btn_current: "Aktueller Plan",
@@ -9802,141 +9822,119 @@
 
     function processOnboardingText() {
         const inputField = document.getElementById('onb-input');
-        let text = inputField.value.toLowerCase();
+        // Очищаем от лишних пробелов и знаков препинания
+        let text = inputField.value.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, " ");
         
         if (!text.trim()) return;
 
-        // ВАЖНО: Мы НЕ очищаем onbFoundLikes и onbFoundDislikes здесь,
-        // чтобы можно было добавлять теги в несколько заходов.
-        
         const container = document.getElementById('onb-tags-container');
-        // Но визуально контейнер очистим, чтобы перерисовать всё (старое + новое) в правильном порядке
         container.innerHTML = ''; 
         document.getElementById('onb-results').style.display = 'flex';
 
-        // 1. ТРИГГЕРЫ
+        // 1. ТРИГГЕРЫ НАСТРОЕНИЯ
         const triggers = {
-            negative: [
-                "hate", "dislike", "no ", "don't like", " not ", "except", // EN
-                "ненавижу", "не люблю", "без ", "кроме", "фу", "не хочу", "не нрав", // RU
-                "odio", "no me gusta", "sin ", "no quiero", // ES
-                "hasse", "mag nicht", "ohne ", "kein " // DE
-            ],
-            positive: [
-                "like", "love", "want", "prefer", "enjoy", // EN
-                "люблю", "хочу", "нравится", "обожаю", "давай", // RU
-                "amo", "quiero", "me gusta", "prefiero", // ES
-                "mag", "liebe", "will", "möchte" // DE
-            ],
-            // Разделители, которые сбрасывают контекст (но запятая не всегда сбрасывает, она продолжает)
-            reset: [".", "!", "?", "\n"] 
+            negative: ["hate", "dislike", "no ", "don't", "except", "ненавижу", "не люблю", "без ", "кроме", "фу", "не хочу", "не нрав", "odio", "no me gusta", "sin ", "hasse", "ohne", "kein"],
+            positive: ["like", "love", "want", "prefer", "enjoy", "люблю", "хочу", "нравится", "обожаю", "давай", "amo", "quiero", "me gusta", "mag", "liebe", "will"]
         };
 
-        // 2. НАХОДИМ ВСЕ КАТЕГОРИИ В ТЕКСТЕ
-        let matches = [];
+        // Временные сеты для избежания дубликатов в рамках одного запуска
+        let foundLikes = new Set();
+        let foundDislikes = new Set();
+        let totalCount = 0;
+        const MAX_TOTAL_RESULTS = 10;
 
-        data.forEach(item => {
-            // Собираем ключевые слова
-            const keywords = [
-                item.name, item.name_ru, item.name_es, item.name_de, item.slug, 
-                ...(item.tags || [])
-            ].filter(k => k && k.length > 2).map(k => k.toLowerCase());
+        // Разбиваем ввод на слова (токены)
+        const tokens = text.split(/\s+/).filter(w => w.length > 2);
 
-            // Ищем вхождение
-            for (let kw of keywords) {
-                // Ищем слово целиком или как часть фразы
-                const idx = text.indexOf(kw);
-                if (idx !== -1) {
-                    // Проверяем, не нашли ли мы это же слово раньше (дубликаты синонимов)
-                    if (!matches.some(m => m.item.id === item.id)) {
-                        matches.push({ item: item, index: idx, word: kw });
-                    }
-                    break; 
-                }
-            }
-        });
+        // --- ЛОГИКА ПОИСКА ПО СЛОВАМ ---
+        tokens.forEach((token, index) => {
+            // Если лимит превышен, прекращаем поиск
+            if (totalCount >= MAX_TOTAL_RESULTS) return;
 
-        // Сортируем по появлению в тексте (слева направо)
-        matches.sort((a, b) => a.index - b.index);
-
-        // 3. АНАЛИЗ
-        matches.forEach(match => {
-            // Берем текст ОТ НАЧАЛА до текущего слова
-            const textBefore = text.substring(0, match.index);
+            // 1. Определяем настроение для текущего слова
+            // Смотрим на предыдущие 2 слова, нет ли там триггера
+            let mood = 'like';
+            const contextStr = tokens.slice(Math.max(0, index - 2), index + 1).join(" ");
             
-            let lastPosIndex = -1;
-            let lastNegIndex = -1;
-            let lastResetIndex = -1;
-
-            // Ищем последний позитивный триггер
-            triggers.positive.forEach(t => {
-                const idx = textBefore.lastIndexOf(t);
-                if (idx > lastPosIndex) lastPosIndex = idx;
-            });
-
-            // Ищем последний негативный триггер
-            triggers.negative.forEach(t => {
-                const idx = textBefore.lastIndexOf(t);
-                if (idx > lastNegIndex) lastNegIndex = idx;
-            });
-
-            // Ищем последний сброс (точку)
-            triggers.reset.forEach(t => {
-                const idx = textBefore.lastIndexOf(t);
-                if (idx > lastResetIndex) lastResetIndex = idx;
-            });
-
-            // ЛОГИКА ОПРЕДЕЛЕНИЯ:
-            // 1. Если точка была ПОЗЖЕ всех триггеров -> сброс к "Нравится" (по умолчанию)
-            if (lastResetIndex > lastPosIndex && lastResetIndex > lastNegIndex) {
-                lastPosIndex = -1; 
-                lastNegIndex = -1; 
-            }
-
-            let mood = 'like'; // По умолчанию
-
-            // Если негативный триггер ближе к слову, чем позитивный
-            if (lastNegIndex > lastPosIndex) {
+            if (triggers.negative.some(neg => contextStr.includes(neg))) {
                 mood = 'dislike';
-            } 
-            // СОХРАНЕНИЕ
-            const id = match.item.id;
-
-            // Удаляем из противоположного списка, если он там был (передумал)
-            if (mood === 'like') {
-                if (onbFoundDislikes.includes(id)) {
-                    onbFoundDislikes = onbFoundDislikes.filter(x => x !== id);
-                }
-                if (!onbFoundLikes.includes(id)) {
-                    onbFoundLikes.push(id);
-                }
-            } else {
-                if (onbFoundLikes.includes(id)) {
-                    onbFoundLikes = onbFoundLikes.filter(x => x !== id);
-                }
-                if (!onbFoundDislikes.includes(id)) {
-                    onbFoundDislikes.push(id);
-                }
             }
+
+            // 2. Поиск кандидатов для ЭТОГО слова
+            let candidates = [];
+
+            // Проверяем все предметы в базе
+            data.forEach(item => {
+                let matchScore = 0;
+
+                // А. Проверка названия (Точное совпадение = высокий балл)
+                const names = [item.name, item.name_ru, item.name_es, item.name_de, item.slug].filter(n => n);
+                if (names.some(n => n.toLowerCase() === token)) matchScore = 100; // Точное совпадение
+                else if (names.some(n => isFuzzyMatch(token, n))) matchScore = 50; // Нечеткое совпадение названия
+
+                // Б. Проверка алиасов (Пышки -> BBW)
+                if (matchScore === 0) {
+                    for (const [key, aliases] of Object.entries(KEYWORD_ALIASES)) {
+                        // Если токен похож на алиас (например "пышек" ~ "пышки")
+                        if (key === token || aliases.some(alias => isFuzzyMatch(token, alias))) {
+                            // И если этот предмет содержит этот ключевой тег или слово в названии
+                            if (item.tags.includes(key) || names.some(n => n.toLowerCase().includes(key))) {
+                                matchScore = 40; 
+                            }
+                        }
+                    }
+                }
+
+                // В. Проверка тегов (низкий приоритет, чтобы "Anal" не выводил всё подряд)
+                if (matchScore === 0 && item.tags.includes(token)) {
+                    matchScore = 20;
+                }
+
+                if (matchScore > 0) {
+                    candidates.push({ item: item, score: matchScore });
+                }
+            });
+
+            // 3. Сортировка и Лимит для слова
+            // Берем только топ-2 результата для этого слова
+            candidates.sort((a, b) => b.score - a.score);
+            const topMatches = candidates.slice(0, 2);
+
+            // 4. Добавление в результаты
+            topMatches.forEach(match => {
+                if (totalCount >= MAX_TOTAL_RESULTS) return;
+
+                const id = match.item.id;
+                
+                // Проверка на дубликаты (чтобы не добавить то, что уже есть в глобальных массивах)
+                if (onbFoundLikes.includes(id) || onbFoundDislikes.includes(id) || foundLikes.has(id) || foundDislikes.has(id)) return;
+
+                if (mood === 'like') {
+                    onbFoundLikes.push(id);
+                    foundLikes.add(id);
+                } else {
+                    onbFoundDislikes.push(id);
+                    foundDislikes.add(id);
+                }
+                totalCount++;
+            });
         });
 
-        // 4. ПЕРЕРИСОВКА ВСЕХ ТЕГОВ (Из массивов)
-        // Сначала лайки
+        // --- РЕНДЕР ---
         onbFoundLikes.forEach(id => {
             const item = data.find(x => x.id === id);
             if(item) renderOnbTag(item, container, 'like');
         });
-        // Потом дизлайки
+        
         onbFoundDislikes.forEach(id => {
             const item = data.find(x => x.id === id);
             if(item) renderOnbTag(item, container, 'dislike');
         });
 
         if (onbFoundLikes.length === 0 && onbFoundDislikes.length === 0) {
-             container.innerHTML = '<span class="onb-error" style="color:var(--text-secondary); font-size:13px; width:100%; text-align:center; padding:10px;">Ничего не найдено. Попробуй проще.</span>';
+             container.innerHTML = '<span class="onb-error" style="color:var(--text-secondary); font-size:13px; width:100%; text-align:center; padding:10px;">Nothing found. Try simpler words.</span>';
         }
         
-        // Очищаем поле ввода, но оставляем результаты
         inputField.value = "";
     }
 
