@@ -3994,18 +3994,18 @@
 
 <!-- AGE GATE OVERLAY -->
 <div id="age-gate" class="modal-overlay" style="z-index: 20000; background: var(--bg-color);">
-    <div class="center-wrapper" style="text-align:center; padding:20px;">
-        
-        <!-- ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА (Новое) -->
-        <div style="position: absolute; top: 20px; right: 20px;">
-            <select onchange="changeLanguage(this.value)" style="background: transparent; color: var(--text-secondary); border: 1px solid var(--border); padding: 5px; border-radius: 8px; font-size: 12px;">
-                <option value="en">English</option>
-                <option value="ru">Русский</option>
-                <option value="es">Español</option>
-                <option value="de">Deutsch</option>
-            </select>
-        </div>
+    
+    <!-- ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА -->
+    <div style="position: absolute; top: calc(20px + env(safe-area-inset-top)); right: 20px; z-index: 20005;">
+        <select onchange="changeLanguage(this.value)" style="background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border); padding: 8px; border-radius: 12px; font-size: 14px; outline: none; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+            <option value="en">English</option>
+            <option value="ru">Русский</option>
+            <option value="es">Español</option>
+            <option value="de">Deutsch</option>
+        </select>
+    </div>
 
+    <div class="center-wrapper" style="text-align:center; padding:20px;">
         <!-- Логотип -->
         <div class="logo">
             <img src="logo.png" alt="X" class="logo-img">
@@ -10013,11 +10013,6 @@
         
         localStorage.setItem('xch_onboarding_done', 'true');
         document.getElementById('onboarding-overlay').classList.remove('open');
-        
-        // Визуальная обратная связь
-        if (changed) {
-            alert(currentLang === 'ru' ? "Предпочтения сохранены!" : "Preferences saved!");
-        }
     }
 
     function resetAppHistory() {
