@@ -1447,6 +1447,33 @@
             }
         }
 
+        /* Зеленый тег (Лайк) */
+        .onb-tag.like {
+            background: rgba(46, 204, 113, 0.2); 
+            color: #2ecc71; 
+            border: 1px solid #2ecc71;
+        }
+
+        /* Красный тег (Дизлайк) */
+        .onb-tag.dislike {
+            background: rgba(231, 76, 60, 0.2); 
+            color: #e74c3c; 
+            border: 1px solid #e74c3c;
+        }
+
+        /* Общий стиль */
+        .onb-tag {
+            padding: 6px 12px; 
+            border-radius: 20px; 
+            font-size: 13px; 
+            font-weight: 700; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            animation: popIn 0.3s ease;
+            cursor: default;
+        }
+
         #tab-settings #mobile-mode-mount {
             margin-top: 0 !important;
             margin-bottom: 20px !important;
@@ -5576,6 +5603,8 @@
     const TAG_DECAY_RATE = 0.98;
     const WRAPPED_THRESHOLD = 30;
     let data = [];
+    let onbFoundLikes = [];    
+    let onbFoundDislikes = [];
 
     let cryptoPollInterval = null;
     let cryptoTimerInterval = null;
@@ -6388,7 +6417,6 @@
             age_yes: "Yes, I am 18+",
             age_no: "No, Exit",
             age_block_msg: "This website is only for users over 18 years of age.",
-            onb_placeholder: "e.g. I like milf, anal and big tits...",
 
             // Окно установки
             install_title: "Install App",
@@ -6409,7 +6437,8 @@
             inst_and_btn: "Install App / Add to Home",
 
             onb_title: "Quick Setup",
-            onb_desc: "Describe your tastes in one sentence (e.g. 'I love milf, anal and stockings'). We will auto-detect categories.",
+            onb_desc: "Write what you like or dislike so we can get straight to what you love 😈.",
+            onb_placeholder: "e.g. I love blowjob and anal, but hate foot fetish and outdoor...",
             onb_btn_check: "Find Categories",
             onb_found: "We found:",
             onb_btn_confirm: "Add to Favorites",
@@ -6819,7 +6848,6 @@
             age_no: "Нет, выйти",
             age_block_msg: "Этот сайт предназначен только для пользователей старше 18 лет.",
 
-            onb_placeholder: "например: люблю милф, анал и большую грудь...",
         
             install_title: "Установить приложение",
             install_desc: "Установи приложение для полного экрана. Плюс, смотри видео во встроенном браузере, чтобы не засорять историю основного браузера!",
@@ -6840,7 +6868,8 @@
 
 
             onb_title: "Быстрая настройка",
-            onb_desc: "Опиши свои вкусы одним предложением (напр. 'Люблю милф, анал и чулки'). Мы автоматически подберем категории.",
+            onb_desc: "Напиши, что тебе нравится или не нравится, чтобы мы сразу могли приступить к тому, что ты любишь 😈.",
+            onb_placeholder: "Например: люблю минет и анал, но ненавижу фут-фетиш и улицу...",
             onb_btn_check: "Найти категории",
             onb_found: "Мы нашли:",
             onb_btn_confirm: "Добавить в избранное",
@@ -7237,7 +7266,6 @@
             age_yes: "Sí, tengo 18+",
             age_no: "No, Salir",
             age_block_msg: "Este sitio web es solo para usuarios mayores de 18 años.",
-            onb_placeholder: "ej. me gustan maduras, anal y pechos grandes...",
         
             install_title: "Instalar App",
             install_desc: "Instala la app para pantalla completa. ¡Además, mira videos en el navegador integrado para mantener limpio tu historial principal!",
@@ -7257,7 +7285,8 @@
             inst_and_btn: "Instalar Aplicación",
 
             onb_title: "Configuración rápida",
-            onb_desc: "Describe tus gustos en una frase. Detectaremos las categorías automáticamente.",
+            onb_desc: "Escribe lo que te gusta o no te gusta para que podamos ir directo a lo que amas 😈.",
+            onb_placeholder: "ej. amo mamada y anal, pero odio fetiche de pies y exterior...",
             onb_btn_check: "Buscar Categorías",
             onb_found: "Encontramos:",
             onb_btn_confirm: "Añadir a Favoritos",
@@ -7651,7 +7680,6 @@
             age_yes: "Ja, ich bin 18+",
             age_no: "Nein, Verlassen",
             age_block_msg: "Diese Website ist nur für Nutzer über 18 Jahre bestimmt.",
-            onb_placeholder: "z.B. ich mag Milf, Anal und große Brüste...",
         
             install_title: "App installieren",
             install_desc: "Installiere die App für Vollbild. Plus: Schaue Videos im integrierten Browser, um deinen Hauptverlauf sauber zu halten!",
@@ -7671,7 +7699,8 @@
             inst_and_btn: "App installieren",
 
             onb_title: "Schnelleinrichtung",
-            onb_desc: "Beschreibe deine Vorlieben in einem Satz. Wir finden die Kategorien automatisch.",
+            onb_desc: "Schreib, was du magst oder nicht magst, damit wir direkt zu dem kommen, was du liebst 😈.",
+            onb_placeholder: "z.B. Ich liebe Blowjob und Anal, hasse aber Fußfetisch und Outdoor...",
             onb_btn_check: "Kategorien suchen",
             onb_found: "Wir haben gefunden:",
             onb_btn_confirm: "Zu Favoriten",
@@ -9755,101 +9784,205 @@
 
     function processOnboardingText() {
         const inputField = document.getElementById('onb-input');
-        const rawInput = inputField.value.toLowerCase();
+        let text = inputField.value.toLowerCase();
         
-        // Очищаем ввод от знаков препинания и добавляем пробелы по краям для поиска целых слов
-        // Например: "hello, anal!" -> " hello anal "
-        const cleanInput = " " + rawInput.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, " ") + " ";
+        if (!text.trim()) return;
 
-        if (!rawInput.trim()) return;
-
+        // Очищаем списки
+        onbFoundLikes = [];
+        onbFoundDislikes = [];
         const container = document.getElementById('onb-tags-container');
-        const resultsBlock = document.getElementById('onb-results');
-        
-        // Убираем сообщение об ошибке, если оно было
-        const existingError = container.querySelector('.onb-error');
-        if(existingError) existingError.remove();
+        container.innerHTML = '';
+        document.getElementById('onb-results').style.display = 'flex';
 
-        const foundItems = [];
-
-        // Вспомогательная функция для разбиения строки на ключевые слова
-        const getKeywords = (str) => {
-            if (!str) return [];
-            // Разбиваем по пробелам, слэшам, дефисам
-            return str.toLowerCase().split(/[\s\/,\-]+/)
-                      .filter(w => w.length > 2); // Игнорируем слова короче 3 букв (в, на, in, at)
+        // 1. СЛОВА-ТРИГГЕРЫ (Переключатели настроения)
+        // Если парсер встречает эти слова, он меняет режим
+        const triggers = {
+            negative: [
+                "hate", "dislike", "no ", "without", "don't like", "not", "except", // EN
+                "ненавижу", "не люблю", "без", "кроме", "фу", "не хочу", // RU
+                "odio", "no me gusta", "sin", "no quiero", // ES
+                "hasse", "mag nicht", "ohne", "kein" // DE
+            ],
+            positive: [
+                "like", "love", "want", "prefer", "enjoy", // EN
+                "люблю", "хочу", "нравится", "обожаю", // RU
+                "amo", "quiero", "me gusta", "prefiero", // ES
+                "mag", "liebe", "will", "möchte" // DE
+            ],
+            // "but" (но) часто переключает контекст на противоположный, 
+            // но мы будем считать его сбросом или проверкой следующего слова
+            separator: [",", ".", "!", "?", " but ", " and ", " но ", " а ", " и ", " y ", " pero ", " und ", " aber "] 
         };
 
+        // 2. ПОИСК ВСЕХ УПОМИНАНИЙ КАТЕГОРИЙ
+        // Мы находим все категории в тексте и запоминаем их позицию (индекс)
+        let matches = [];
+
         data.forEach(item => {
-            // Если этот тег уже добавлен в список, пропускаем его
-            if (onboardingSelectedIds.includes(item.id)) return;
-
-            // Собираем все ключевые слова для этого фетиша из всех языков
+            // Собираем ключевые слова для категории
             const keywords = [
-                ...getKeywords(item.name),
-                ...getKeywords(item.name_ru),
-                ...getKeywords(item.name_es),
-                ...getKeywords(item.name_de),
-                ...getKeywords(item.slug) // slug часто содержит полезные слова (step-mom -> step, mom)
-            ];
+                item.name, 
+                item.name_ru, 
+                item.name_es, 
+                item.name_de, 
+                item.slug,
+                ...(item.tags || [])
+            ].filter(k => k && k.length > 2).map(k => k.toLowerCase());
 
-            // Проверяем: есть ли хотя бы одно ключевое слово фетиша в тексте пользователя?
-            // Ищем с пробелами по краям, чтобы "anal" не нашлось внутри "analyst" (хотя тут это редкость, но надежнее)
-            const isMatch = keywords.some(word => cleanInput.includes(" " + word + " "));
+            // Ищем первое вхождение любого ключевого слова в тексте
+            let bestIndex = -1;
+            
+            // Используем "умный" поиск (как в isFuzzyMatch, но упрощенно для скорости)
+            // Ищем точное совпадение слова
+            for (let kw of keywords) {
+                // Добавляем пробелы, чтобы найти целое слово, или ищем в начале/конце строки
+                const regex = new RegExp(`(^|[^a-zа-яё0-9])${kw}([^a-zа-яё0-9]|$)`, 'iu');
+                const match = text.match(regex);
+                
+                if (match) {
+                    bestIndex = match.index + match[1].length; // Корректируем индекс на начало слова
+                    break; 
+                }
+            }
 
-            if (isMatch) {
-                foundItems.push(item);
+            if (bestIndex !== -1) {
+                matches.push({ item: item, index: bestIndex });
             }
         });
 
-        if (foundItems.length > 0) {
-            foundItems.forEach(item => {
-                onboardingSelectedIds.push(item.id);
-                renderOnbTag(item, container);
+        // Сортируем найденное по порядку появления в тексте
+        matches.sort((a, b) => a.index - b.index);
+
+        // 3. АНАЛИЗ КОНТЕКСТА (SENTIMENT ANALYSIS)
+        // Проходим по тексту слева направо и меняем "текущее настроение"
+        
+        let currentMood = 'like'; // По умолчанию считаем, что юзер пишет о том, что любит
+
+        // Позиция последнего найденного триггера
+        let lastTriggerIndex = -1;
+
+        matches.forEach(matchObj => {
+            const itemStart = matchObj.index;
+            
+            // Ищем триггеры МЕЖДУ предыдущим совпадением (или началом) и текущим словом
+            const textSegment = text.substring(lastTriggerIndex + 1, itemStart);
+            
+            // Проверяем, есть ли негативные триггеры в этом отрезке
+            // Ищем самый ПОСЛЕДНИЙ триггер перед словом
+            let foundNeg = -1;
+            let foundPos = -1;
+
+            triggers.negative.forEach(t => {
+                const idx = textSegment.lastIndexOf(t);
+                if (idx > foundNeg) foundNeg = idx;
             });
-            // Показываем блок результатов
-            resultsBlock.style.display = 'flex';
-            // Очищаем поле ввода для следующей фразы
-            inputField.value = "";
-            inputField.placeholder = "... anything else?"; // Подсказка
-        } else {
-            // Если ничего не нашли И список пуст (первый ввод)
-            if (onboardingSelectedIds.length === 0) {
-                resultsBlock.style.display = 'flex';
-                container.innerHTML = '<span class="onb-error" style="color:var(--highlight-red); font-size:13px; width:100%; text-align:center; padding:10px;">No matches found. Try simpler words (e.g. "anal", "feet").</span>';
+
+            triggers.positive.forEach(t => {
+                const idx = textSegment.lastIndexOf(t);
+                if (idx > foundPos) foundPos = idx;
+            });
+
+            // Кто победил (кто ближе к слову)?
+            if (foundNeg > -1 && foundNeg > foundPos) {
+                currentMood = 'dislike';
+            } else if (foundPos > -1 && foundPos > foundNeg) {
+                currentMood = 'like';
             }
+            // Если триггеров нет, настроение остается прежним (напр. "анал, грудь" -> оба лайк)
+
+            // Сохраняем результат
+            if (currentMood === 'like') {
+                if (!onbFoundLikes.includes(matchObj.item.id) && !onbFoundDislikes.includes(matchObj.item.id)) {
+                    onbFoundLikes.push(matchObj.item.id);
+                    renderOnbTag(matchObj.item, container, 'like');
+                }
+            } else {
+                if (!onbFoundDislikes.includes(matchObj.item.id) && !onbFoundLikes.includes(matchObj.item.id)) {
+                    onbFoundDislikes.push(matchObj.item.id);
+                    renderOnbTag(matchObj.item, container, 'dislike');
+                }
+            }
+            
+            // Обновляем позицию для следующего поиска триггеров
+            lastTriggerIndex = itemStart;
+        });
+
+        // Если ничего не нашли
+        if (onbFoundLikes.length === 0 && onbFoundDislikes.length === 0) {
+             container.innerHTML = '<span class="onb-error" style="color:var(--text-secondary); font-size:13px; width:100%; text-align:center; padding:10px;">No categories recognized. Try simpler words.</span>';
         }
+        
+        // Очищаем поле
+        inputField.value = "";
     }
 
-    function renderOnbTag(item, container) {
+    function renderOnbTag(item, container, type) {
         const name = getLocalizedName(item);
         const div = document.createElement('div');
-        div.className = 'onb-tag';
+        
+        // Добавляем класс типа (like/dislike)
+        div.className = `onb-tag ${type}`;
+        
+        // Добавляем иконку
+        const icon = type === 'like' ? '💚' : '⛔';
+        
         div.innerHTML = `
-            ${name}
-            <span class="onb-tag-remove" onclick="removeOnbTag(${item.id}, this)">✕</span>
+            ${icon} ${name}
+            <span class="onb-tag-remove" style="cursor:pointer; opacity:0.6; margin-left:5px;" onclick="removeOnbTag(${item.id}, '${type}', this)">✕</span>
         `;
         container.appendChild(div);
     }
 
-    function removeOnbTag(id, el) {
-        onboardingSelectedIds = onboardingSelectedIds.filter(x => x !== id);
+    function removeOnbTag(id, type, el) {
+        if (type === 'like') {
+            onbFoundLikes = onbFoundLikes.filter(x => x !== id);
+        } else {
+            onbFoundDislikes = onbFoundDislikes.filter(x => x !== id);
+        }
         el.parentElement.remove();
     }
 
     function finishOnboarding() {
-        if (onboardingSelectedIds.length > 0) {
-            onboardingSelectedIds.forEach(id => {
+        let changed = false;
+
+        // 1. Сохраняем ЛАЙКИ
+        if (onbFoundLikes.length > 0) {
+            onbFoundLikes.forEach(id => {
                 if (!favorites.includes(id)) {
                     favorites.push(id);
+                    // Убираем из ЧС, если там был
+                    blacklist = blacklist.filter(x => x !== id);
+                    
                     const item = data.find(x => x.id === id);
                     if (item) {
                         adjustTagScores(item, 5);
-                        // Запись в лог для статистики
                         logActivity('like', item.id, item.tags);
                     }
                 }
             });
+            changed = true;
+        }
+
+        // 2. Сохраняем ДИЗЛАЙКИ (ЧС)
+        if (onbFoundDislikes.length > 0) {
+            onbFoundDislikes.forEach(id => {
+                if (!blacklist.includes(id)) {
+                    blacklist.push(id);
+                    // Убираем из Избранного, если там был
+                    favorites = favorites.filter(x => x !== id);
+                    
+                    const item = data.find(x => x.id === id);
+                    if (item) {
+                        adjustTagScores(item, -10); // Сильно понижаем вес
+                        logActivity('dislike', item.id, item.tags);
+                    }
+                }
+            });
+            changed = true;
+        }
+        
+        if (changed) {
             saveLists();
             updateCounts();
             if (window.syncToCloud) window.syncToCloud();
@@ -9857,6 +9990,11 @@
         
         localStorage.setItem('xch_onboarding_done', 'true');
         document.getElementById('onboarding-overlay').classList.remove('open');
+        
+        // Визуальная обратная связь
+        if (changed) {
+            alert(currentLang === 'ru' ? "Предпочтения сохранены!" : "Preferences saved!");
+        }
     }
 
     function resetAppHistory() {
