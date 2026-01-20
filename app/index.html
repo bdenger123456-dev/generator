@@ -568,6 +568,31 @@
             background: linear-gradient(to top, var(--bg-color) 40%, transparent 100%);
         }
 
+        @keyframes cardPopIn {
+            0% { 
+                opacity: 0;
+                transform: scale(0.8) translateY(30px);
+            }
+            60% {
+                opacity: 1;
+                transform: scale(1.02) translateY(-5px); /* Легкий перелет */
+            }
+            100% { 
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .anim-initial-pop {
+            animation: cardPopIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+        }
+
+        /* Скрываем элементы карточки до начала анимации */
+        .card-content-hidden .stagger-item {
+            opacity: 0;
+            animation: none !important;
+        }
+
         /* =========================================
         4. GENERATOR CARD & SLOT MACHINE
         ========================================= */
@@ -6642,13 +6667,89 @@
     };
 
     const welcomePhrases = {
-        en: ["Ready to find your genre? 😈", "Spin the wheel of lust!", "Let fate decide...", "Waiting for your command..."],
-        ru: ["Готов узнать свой жанр? 😈", "Крути барабан желаний!", "Судьба решит, что тебя ждёт...", "Жду твоего нажатия..."],
-        es: ["¿Listo para tu género? 😈", "¡Gira la rueda del deseo!", "Deja que el destino decida...", "Esperando tu orden..."],
-        de: ["Bereit für dein Genre? 😈", "Dreh das Rad der Lust!", "Lass das Schicksal entscheiden...", "Warte auf deinen Befehl..."]
+        en: [
+            "Thought you wouldn't come back 😁",
+            "You come here often, don't you? 😏",
+            "Let's skip the foreplay 🌚",
+            "Ready to sin? 😈",
+            "I missed you... barely.",
+            "Back for more? I knew it.",
+            "Your incognito tab missed you.",
+            "Let's find something dirty.",
+            "Bored or horny? Let's fix both.",
+            "Don't tell anyone you're here 🤫"
+        ],
+        ru: [
+            "Думал, ты больше не вернёшься 😁",
+            "Как-то ты часто здесь появляешься 😏",
+            "Давай без прелюдий 🌚",
+            "Твой режим инкогнито скучал по мне.",
+            "Снова здесь? Я так и знал.",
+            "Скучно или одиноко? Сейчас исправим.",
+            "Только никому не говори, что ты здесь 🤫",
+            "Готов согрешить? 😈",
+            "Ищем что-то новенькое или как обычно?",
+            "Надеюсь, ты в наушниках..."
+        ],
+        es: [
+            "Pensé que no volverías 😁",
+            "Vienes muy seguido por aquí 😏",
+            "Saltemos los juegos previos 🌚",
+            "¿Listo para pecar? 😈",
+            "Tu modo incógnito te extrañaba.",
+            "¿De nuevo aquí? Lo sabía.",
+            "No le digas a nadie que estás aquí 🤫",
+            "¿Aburrido o caliente? Arreglemos eso.",
+            "Busquemos algo sucio.",
+            "Espero que tengas audífonos..."
+        ],
+        de: [
+            "Dachte, du kommst nicht zurück 😁",
+            "Du bist aber oft hier 😏",
+            "Lass uns das Vorspiel überspringen 🌚",
+            "Bereit zu sündigen? 😈",
+            "Dein Inkognito-Tab hat dich vermisst.",
+            "Schon wieder hier? Wusste ich es doch.",
+            "Erzähl niemandem, dass du hier bist 🤫",
+            "Langeweile oder Lust? Lösen wir beides.",
+            "Lass uns etwas Schmutziges finden.",
+            "Hoffentlich hast du Kopfhörer auf..."
+        ]
     };
 
-    // === Фразы для напоминания о Watch Later ===
+    const firstTimePhrase = {
+        en: "Glad to see more people here 😏",
+        ru: "Рад видеть ещё людей здесь 😏",
+        es: "Me alegra ver más gente aquí 😏",
+        de: "Schön, mehr Leute hier zu sehen 😏"
+    };
+
+    function setWelcomeMessage() {
+        const statusEl = document.getElementById('status-text');
+        if(!statusEl) return;
+        
+        // Проверяем первый вход через LocalStorage
+        const isReturningUser = localStorage.getItem('xch_has_visited');
+        
+        let text = "";
+        
+        if (!isReturningUser) {
+            // ПЕРВЫЙ ВХОД
+            text = firstTimePhrase[currentLang] || firstTimePhrase.en;
+            // Запоминаем пользователя
+            localStorage.setItem('xch_has_visited', 'true');
+        } else {
+            // ПОВТОРНЫЙ ВХОД
+            const phrases = welcomePhrases[currentLang] || welcomePhrases.en;
+            text = phrases[Math.floor(Math.random() * phrases.length)];
+        }
+
+        // Устанавливаем текст и цвет
+        statusEl.innerText = text;
+        statusEl.style.color = "var(--accent)"; 
+        statusEl.style.fontWeight = "700";
+    }
+
     const wlReminderPhrases = {
         en: [
             "Seems like you wanted to watch this... 👀",
@@ -6680,7 +6781,6 @@
         ]
     };
 
-    // === Фразы для напоминания о ЛЮБИМОМ (Favorites) ===
     const favReminderPhrases = {
         en: [
             "Let's remember this gem? 💎",
@@ -6712,7 +6812,6 @@
         ]
     };
 
-    // === Фразы для ВТОРОГО ШАНСА (Blacklist) ===
     const banReminderPhrases = {
         en: [
             "Maybe give it another shot? 🤔",
@@ -8700,6 +8799,14 @@
         // 2. Инициализация систем
         initAgeGate();
         initSwipeCards();
+
+        const wrapper = document.getElementById('card-anim-wrapper');
+            if (wrapper) {
+                wrapper.style.opacity = '0'; // Скрываем всю обертку
+                
+                const cardBlock = document.getElementById('card-block');
+                if(cardBlock) cardBlock.classList.add('card-content-hidden');
+            }
         
         // 3. Установка платформы
         const savedPlatform = localStorage.getItem('xch_platform');
@@ -8731,24 +8838,49 @@
         // Принудительно ставим класс для мобильной шапки
         document.body.classList.add('tab-home-active');
 
-       // 1. Добиваем прогресс бар до 100%
-        const bar = document.getElementById('loader-bar');
+       const bar = document.getElementById('loader-bar');
         const text = document.getElementById('loader-phrase');
         if (bar) bar.style.width = '100%';
         if (text) text.innerText = "Ready.";
 
-        // 2. Очищаем интервалы (чтобы фразы перестали мигать)
         if (window.loaderIntervals) {
             clearInterval(window.loaderIntervals.phrase);
             clearInterval(window.loaderIntervals.progress);
         }
 
-        // 3. Скрываем оверлей с небольшой задержкой (чтобы увидеть 100%)
+        // Задержка перед исчезновением экрана (600мс)
         setTimeout(() => {
             const overlay = document.getElementById('loading-overlay');
+            
             if (overlay) {
+                // 1. Лоадер исчезает
                 overlay.classList.add('hidden');
                 setTimeout(() => overlay.style.display = 'none', 500);
+                
+                // 2. ЗАПУСК АНИМАЦИИ КАРТОЧКИ (через 100мс после начала исчезновения лоадера)
+                setTimeout(() => {
+                    const wrapper = document.getElementById('card-anim-wrapper');
+                    const cardBlock = document.getElementById('card-block');
+                    
+                    if (wrapper) {
+                        wrapper.style.opacity = '1'; // Показываем обертку
+                        wrapper.classList.add('anim-initial-pop'); // Карточка выпрыгивает
+                    }
+
+                    // 3. ЗАПУСК ВНУТРЕННИХ ЭЛЕМЕНТОВ (Stagger)
+                    if (cardBlock) {
+                        // Убираем класс скрытия, чтобы сработали CSS animation-delay (stagger-item)
+                        cardBlock.classList.remove('card-content-hidden');
+                        
+                        // Перезапускаем анимации stagger-item вручную для надежности
+                        const elements = cardBlock.querySelectorAll('.stagger-item');
+                        elements.forEach(el => {
+                            el.style.animation = 'none';
+                            el.offsetHeight; /* trigger reflow */
+                            el.style.animation = ''; 
+                        });
+                    }
+                }, 100);
             }
         }, 600);
     };
