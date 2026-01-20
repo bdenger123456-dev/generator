@@ -2229,15 +2229,20 @@
         /* Цветные буквы (если не нуар) */
         .sum-logo-text span.grad { 
             background: linear-gradient(180deg, #CB53F0 20%, var(--accent) 100%);
-            -webkit-background-clip: text; 
+            -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
+            color: transparent; /* Важно для некоторых браузеров */
+            display: inline-block; /* Чтобы градиент не ломался */
         }
 
         /* Нуарная тема: всё белое */
         body[data-theme="noir"] .sum-logo-text span.grad {
-            background: #fff;
-            -webkit-background-clip: unset;
-            -webkit-text-fill-color: #fff;
+            background: none !important;
+            -webkit-background-clip: border-box !important;
+            background-clip: border-box !important;
+            -webkit-text-fill-color: #ffffff !important;
+            color: #ffffff !important;
         }
 
         /* Подпись "Узнай себя" */
@@ -13817,10 +13822,8 @@
         const type = dataObj.type;
         
         // --- 1. ТЕКСТЫ И ПЕРЕВОДЫ ---
-        // Определяем текущий язык (fallback на en)
         const langKey = ['en','ru','es','de'].includes(currentLang) ? currentLang : 'en';
         
-        // Внутренний словарь для Wrapped
         const TXT = {
             title: {en:"Fetish<br><span style='color:var(--accent)'>Wrapped</span>", ru:"Итоги<br><span style='color:var(--accent)'>Фетишей</span>", es:"Resumen<br><span style='color:var(--accent)'>Fetichista</span>", de:"Fetisch<br><span style='color:var(--accent)'>Rückblick</span>"},
             since: {en:"Since Last Time", ru:"С прошлого раза", es:"Desde la última vez", de:"Seit dem letzten Mal"},
@@ -13841,14 +13844,12 @@
             badge_down: {en:"DOWN", ru:"DOWN", es:"BAJÓ", de:"RUNTER"}
         };
         
-        // Функция-хелпер для получения текста
         const t = (k) => (TXT[k] && TXT[k][langKey]) ? TXT[k][langKey] : (TXT[k] ? TXT[k].en : "");
 
         const badgeText = WRAPPED_CONFIG.badges[langKey][type] || type.toUpperCase();
         const phrases = WRAPPED_CONFIG.phrases[type] || WRAPPED_CONFIG.phrases.daily;
         const introText = phrases[langKey][Math.floor(Math.random() * phrases[langKey].length)];
 
-        // QR код (Ссылка на главную страницу)
         const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=0&data=${encodeURIComponent(window.location.origin)}`;
 
         // --- СЛАЙД 1: ВСТУПЛЕНИЕ ---
@@ -13861,7 +13862,7 @@
             </div>
         `);
 
-        // --- СЛАЙД 2: СРАВНЕНИЕ (Исправлена верстка) ---
+        // --- СЛАЙД 2: СРАВНЕНИЕ (ИСПРАВЛЕНО ВЫРАВНИВАНИЕ) ---
         if (type !== 'daily' || Math.abs(stats.deltaActions) > 0) {
             const trendAct = stats.deltaActions >= 0 ? "+" : "";
             const trendTime = stats.deltaWatchTime >= 0 ? "+" : "";
@@ -13871,11 +13872,13 @@
                 <div class="wrapped-slide bg-fire">
                     <div class="wrapped-sub-text" style="text-transform:uppercase; letter-spacing:2px; font-size:12px; margin-bottom:40px;">${t('since')}</div>
                     
-                    <div style="margin-bottom:50px; text-align:center; width:100%;">
+                    <!-- FIX: Добавлен display: flex и выравнивание для верхнего блока -->
+                    <div style="margin-bottom:50px; width:100%; display:flex; flex-direction:column; align-items:center;">
                         <div class="wrapped-big-text" style="font-size:70px; color:${colorAct}; margin-bottom:5px; text-align:center;">${trendAct}${stats.deltaActions}</div>
                         <div class="wrapped-sub-text" style="font-weight:700; text-align:center;">${t('act')}</div>
                     </div>
                     
+                    <!-- FIX: Добавлен display: flex и выравнивание для нижнего блока -->
                     <div style="border-top:1px solid rgba(255,255,255,0.2); padding-top:40px; width:80%; display:flex; flex-direction:column; align-items:center;">
                         <div class="wrapped-big-text" style="font-size:70px; margin-bottom:5px; text-align:center;">${trendTime}${Math.round(stats.deltaWatchTime/60)}m</div>
                         <div class="wrapped-sub-text" style="font-weight:700; text-align:center;">${t('watch')}</div>
@@ -13884,34 +13887,22 @@
             `);
         }
 
-        // --- СЛАЙД 3: ЭВОЛЮЦИЯ (Список изменений в топе) ---
+        // --- СЛАЙД 3: ЭВОЛЮЦИЯ ---
         let hasEvolutionSlide = false;
         if (stats.prevTopTags && stats.prevTopTags.length > 0) {
             let evolutionHtml = '';
             stats.topTags.slice(0, 5).forEach((tag, i) => {
                 const prevIndex = stats.prevTopTags.indexOf(tag);
                 let statusBadge = '';
-                
-                // Логика бейджиков изменений
-                if (prevIndex === -1) {
-                    statusBadge = `<span style="font-size:10px; background:#2ecc71; color:#000; padding:2px 6px; border-radius:4px; margin-left:10px; font-weight:800;">${t('badge_new')}</span>`;
-                } else if (prevIndex > i) {
-                    statusBadge = `<span style="font-size:10px; background:#f1c40f; color:#000; padding:2px 6px; border-radius:4px; margin-left:10px; font-weight:800;">${t('badge_up')}</span>`;
-                } else if (prevIndex < i) {
-                    statusBadge = `<span style="font-size:10px; background:rgba(255,255,255,0.2); color:#fff; padding:2px 6px; border-radius:4px; margin-left:10px; font-weight:800;">${t('badge_down')}</span>`;
-                }
+                if (prevIndex === -1) statusBadge = `<span style="font-size:10px; background:#2ecc71; color:#000; padding:2px 6px; border-radius:4px; margin-left:10px; font-weight:800;">${t('badge_new')}</span>`;
+                else if (prevIndex > i) statusBadge = `<span style="font-size:10px; background:#f1c40f; color:#000; padding:2px 6px; border-radius:4px; margin-left:10px; font-weight:800;">${t('badge_up')}</span>`;
+                else if (prevIndex < i) statusBadge = `<span style="font-size:10px; background:rgba(255,255,255,0.2); color:#fff; padding:2px 6px; border-radius:4px; margin-left:10px; font-weight:800;">${t('badge_down')}</span>`;
 
-                // Перевод тега
                 let displayTag = tag.toUpperCase();
                 const modMatch = modifiersData.find(m => m.key.toLowerCase() === tag.toLowerCase());
                 if (modMatch && modMatch[langKey]) displayTag = modMatch[langKey].toUpperCase();
 
-                evolutionHtml += `
-                    <div style="display:flex; align-items:center; justify-content:center; margin-bottom:15px;">
-                        <span style="font-size:24px; font-weight:800;">${i+1}. ${displayTag}</span>
-                        ${statusBadge}
-                    </div>
-                `;
+                evolutionHtml += `<div style="display:flex; align-items:center; justify-content:center; margin-bottom:15px;"><span style="font-size:24px; font-weight:800;">${i+1}. ${displayTag}</span>${statusBadge}</div>`;
             });
 
             slides.push(`
@@ -13924,7 +13915,7 @@
             hasEvolutionSlide = true;
         }
 
-        // --- СЛАЙД 4: ДОСТИЖЕНИЕ (Если не Daily) ---
+        // --- СЛАЙД 4: ДОСТИЖЕНИЕ ---
         if (type !== 'daily') {
             const achKey = stats.achievement;
             const achData = WRAPPED_CONFIG.achievements[achKey];
@@ -13938,7 +13929,7 @@
             `);
         }
 
-        // --- СЛАЙД 5: ОДЕРЖИМОСТИ (Если нет эволюции) ---
+        // --- СЛАЙД 5: ОДЕРЖИМОСТИ ---
         if (!hasEvolutionSlide) {
             const translatedTagsHtml = stats.topTags.slice(0, 5).map((t, i) => {
                 let displayTag = t.toUpperCase();
@@ -13955,22 +13946,23 @@
             `);
         }
 
-        // --- СЛАЙД 6: ФИНАЛ  ---
+        // --- СЛАЙД 6: ФИНАЛ ---
         const planColor = subscriptionLevel === 'free' ? '#fff' : '#9b59b6';
         let topGenre = stats.topTags[0] ? stats.topTags[0].toUpperCase() : '---';
         const genreMatch = modifiersData.find(m => m.key.toLowerCase() === topGenre.toLowerCase());
         if (genreMatch && genreMatch[langKey]) topGenre = genreMatch[langKey].toUpperCase();
 
-        // Добавляем финальный слайд
+        // Для финального слайда используем стандартное лого
+        const logoSrc = 'logo.png';
+
         slides.push(`
             <div class="wrapped-slide bg-dark">
                 <div class="sum-card-new" id="wrapped-summary-card">
                     
-                    <!-- ШАПКА КАРТОЧКИ: ЛОГО + ПОДПИСЬ + QR -->
                     <div class="sum-header">
                         <div class="sum-header-left">
                             <div class="sum-logo-row">
-                                <img src="logo.png" class="sum-logo-img">
+                                <img src="${logoSrc}" class="sum-logo-img">
                                 <div class="sum-logo-text">x<span class="grad">Fetish</span>Hub</div>
                             </div>
                             <div class="sum-caption">${t('caption')}</div>
@@ -13980,7 +13972,6 @@
                         </div>
                     </div>
 
-                    <!-- МЕТА ДАННЫЕ (Дата + Бейдж типа) -->
                     <div class="sum-meta-row">
                         <span>${dataObj.rangeStr}</span>
                         <div style="display:flex; align-items:center; gap:6px;">
@@ -13989,7 +13980,6 @@
                         </div>
                     </div>
 
-                    <!-- СЕТКА СТАТИСТИКИ -->
                     <div class="sum-grid" style="grid-template-columns: 1fr 1fr;">
                         <div class="sum-stat-box">
                             <div class="sum-stat-val">${stats.watchCount}</div>
@@ -14009,7 +13999,6 @@
                         </div>
                     </div>
 
-                    <!-- ТОП ЖАНР -->
                     <div style="text-align:center; margin-top:5px; border-top:1px solid rgba(255,255,255,0.1); padding-top:15px;">
                         <div class="sum-stat-lbl" style="margin-bottom:5px;">${t('top_genre')}</div>
                         <div style="font-size:24px; font-weight:900; color:var(--accent); letter-spacing:1px;">
@@ -14018,14 +14007,12 @@
                     </div>
                 </div>
 
-                <!-- КНОПКИ ДЕЙСТВИЙ (Внизу, вне карточки) -->
-                <div style="margin-top:30px; display:flex; gap:15px; align-items:center;">
-                    <!-- Кнопка "Готово" -->
+                <!-- ИСПРАВЛЕННЫЕ КНОПКИ (Кликабельные на мобильных) -->
+                <div style="margin-top:30px; display:flex; gap:15px; align-items:center; z-index: 1000;">
                     <button onclick="closeWrapped()" class="btn-gen" style="width:auto; padding:12px 40px; font-size:16px; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); backdrop-filter:blur(10px);">
                         ${t('btn_done')}
                     </button>
                     
-                    <!-- Круглая кнопка Share -->
                     <div class="btn-round-share" onclick="shareWrappedCard()">
                         <img src="share.png" alt="Share">
                     </div>
@@ -14033,7 +14020,7 @@
             </div>
         `);
 
-        // --- РЕНДЕР СЛАЙДЕРА ---
+        // Рендер
         let barsHtml = '';
         slides.forEach((_, i) => barsHtml += `<div class="wrapped-progress-bar"><div class="wrapped-progress-fill" id="bar-${i}"></div></div>`);
         
@@ -14045,7 +14032,6 @@
             ${slides.join('')}
         `;
         
-        // Логика перехода к последнему слайду, если уже смотрели
         if (dataObj.viewed) {
             currentSlideIndex = slides.length - 1;
             setTimeout(() => { for (let i = 0; i < slides.length; i++) { const bar = document.getElementById('bar-' + i); if(bar) bar.style.width = '100%'; } }, 50);
@@ -14053,19 +14039,44 @@
             currentSlideIndex = 0;
         }
         
-        // Запуск таймера
         startSlideTimerNew(slides.length, 6000); 
         
-        // Обработчики паузы/возобновления при удержании
-        const handlePause = (e) => { if(e.cancelable) e.preventDefault(); overlay.classList.add('paused'); window.isWrappedPaused = true; };
-        const handleResume = (e) => { if(e.cancelable) e.preventDefault(); overlay.classList.remove('paused'); window.isWrappedPaused = false; };
-        overlay.addEventListener('mousedown', handlePause); overlay.addEventListener('touchstart', handlePause);
-        overlay.addEventListener('mouseup', handleResume); overlay.addEventListener('touchend', handleResume); overlay.addEventListener('mouseleave', handleResume);
+        // --- 3. ИСПРАВЛЕННЫЕ ОБРАБОТЧИКИ СОБЫТИЙ (ПАУЗА И КЛИКИ) ---
+        
+        // Функция проверки, кликнули ли мы по интерактивному элементу
+        const isInteractive = (e) => {
+            return e.target.closest('button') || 
+                e.target.closest('.wrapped-close') || 
+                e.target.closest('.btn-round-share') ||
+                e.target.closest('.wrapped-nav-area');
+        };
 
-        // Сохранение статуса "просмотрено"
+        const handlePause = (e) => { 
+            // Не ставим паузу, если кликаем по кнопкам (чтобы сработал onclick)
+            if (isInteractive(e)) return;
+            
+            if(e.cancelable) e.preventDefault(); 
+            overlay.classList.add('paused'); 
+            window.isWrappedPaused = true; 
+        };
+
+        const handleResume = (e) => { 
+            if (isInteractive(e)) return;
+
+            if(e.cancelable) e.preventDefault(); 
+            overlay.classList.remove('paused'); 
+            window.isWrappedPaused = false; 
+        };
+
+        overlay.addEventListener('mousedown', handlePause);
+        overlay.addEventListener('touchstart', handlePause, {passive: false}); // passive: false важно для preventDefault
+        
+        overlay.addEventListener('mouseup', handleResume);
+        overlay.addEventListener('touchend', handleResume, {passive: false});
+        overlay.addEventListener('mouseleave', handleResume);
+
         dataObj.viewed = true;
         localStorage.setItem('xch_wrapped_archive', JSON.stringify(wrappedArchive));
-        
         openStatistics(); 
         overlay.classList.add('active');
     }
