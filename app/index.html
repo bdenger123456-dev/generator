@@ -9905,21 +9905,19 @@
     function openSubModal() {
         // 1. Находим кнопки
         const btnFree = document.querySelector('.plan-card:nth-child(1) .plan-btn'); 
-        
-        // Лучше искать по классам, чтобы порядок в HTML не влиял
         const btnPro = document.querySelector('.plan-card.pro .plan-btn');
         const btnBeast = document.querySelector('.plan-card.beast .plan-btn');
         const btnBestie = document.querySelector('.plan-card.bestie .plan-btn');
 
-        // 2. Получаем текущие переводы
+        // 2. Получаем переводы
         const t = langData[currentLang] || langData['en'];
 
         const tCurrent = t.btn_current || "Current Plan";
-        const tLower = t.btn_lower_tier || "You deserve better";
+        const tExtend = currentLang === 'ru' ? "Продлить" : "Extend"; // Текст для продления
+        const tUpgrade = currentLang === 'ru' ? "Улучшить" : "Upgrade"; // Текст для апгрейда
         
         const tPro = t.btn_get_pro || "Get Pro";
         const tBeast = t.btn_get_beast || "Unleash Beast";
-        
         const tBestie = t.btn_get_bestie || "Get Forever"; 
 
         // Helper: Настройка кнопки
@@ -9927,52 +9925,63 @@
             if (!btn) return; 
             btn.onclick = null;
             btn.classList.remove('current', 'pro-btn', 'beast-btn', 'bestie-btn');
+            btn.disabled = false; // По умолчанию активна
             
             if (state === 'current') {
-                btn.disabled = true;
-                btn.classList.add('current');
-                btn.innerText = tCurrent;
+                // ТЕПЕРЬ ТЕКУЩИЙ ПЛАН МОЖНО ПРОДЛИТЬ
+                // (Кроме Bestie, он навсегда)
+                if (planType === 'bestie') {
+                    btn.disabled = true;
+                    btn.classList.add('current');
+                    btn.innerText = "Purchased";
+                } else {
+                    // Это Pro или Beast — даем продлить
+                    if (btn.closest('.pro')) btn.classList.add('pro-btn');
+                    if (btn.closest('.beast')) btn.classList.add('beast-btn');
+                    btn.innerText = tExtend; // "Extend"
+                    btn.onclick = () => openPaymentSelection(planType);
+                }
             } 
             else if (state === 'lower') {
                 btn.disabled = true;
                 btn.classList.add('current'); 
-                btn.innerText = tLower;       
+                btn.innerText = "Included"; // Или галочка       
             } 
-            else { // 'buy'
-                btn.disabled = false;
-                
-                // Возвращаем цвета
+            else { // 'buy' или 'upgrade'
                 if (btn.closest('.pro')) btn.classList.add('pro-btn');
                 if (btn.closest('.beast')) btn.classList.add('beast-btn');
                 if (btn.closest('.bestie')) btn.classList.add('bestie-btn');
                 
-                btn.innerText = buyText;
+                // Если это апгрейд, пишем Upgrade, иначе стандартный текст
+                btn.innerText = state === 'upgrade' ? tUpgrade : buyText;
                 btn.onclick = () => openPaymentSelection(planType);
             }
         };
 
-        // ЛОГИКА ОТОБРАЖЕНИЯ (Кто что видит)
+        // ЛОГИКА ОТОБРАЖЕНИЯ
         if (subscriptionLevel === 'bestie') {
             configureBtn(btnFree, 'lower', null, null);
             configureBtn(btnPro, 'lower', null, null);
             configureBtn(btnBeast, 'lower', null, null);
-            configureBtn(btnBestie, 'current', null, null);
+            configureBtn(btnBestie, 'current', null, 'bestie');
         }
         else if (subscriptionLevel === 'beast') {
             configureBtn(btnFree, 'lower', null, null);
             configureBtn(btnPro, 'lower', null, null);
-            configureBtn(btnBeast, 'current', null, null);
-            configureBtn(btnBestie, 'buy', tBestie, 'bestie'); 
+            configureBtn(btnBeast, 'current', null, 'beast'); // Можно продлить
+            configureBtn(btnBestie, 'upgrade', tBestie, 'bestie'); 
         } 
         else if (subscriptionLevel === 'pro') {
             configureBtn(btnFree, 'lower', null, null);
-            configureBtn(btnPro, 'current', null, null);
-            configureBtn(btnBeast, 'buy', tBeast, 'beast');
-            configureBtn(btnBestie, 'buy', tBestie, 'bestie');
+            configureBtn(btnPro, 'current', null, 'pro'); // Можно продлить
+            configureBtn(btnBeast, 'upgrade', tBeast, 'beast'); // Апгрейд
+            configureBtn(btnBestie, 'upgrade', tBestie, 'bestie');
         } 
         else {
             // Free user
             configureBtn(btnFree, 'current', null, null);
+            if(btnFree) { btnFree.disabled = true; btnFree.innerText = tCurrent; }
+
             configureBtn(btnPro, 'buy', tPro, 'pro');
             configureBtn(btnBeast, 'buy', tBeast, 'beast');
             configureBtn(btnBestie, 'buy', tBestie, 'bestie');
@@ -10118,10 +10127,6 @@
         document.getElementById('crypto-main-view').style.display = 'block';
         
         modal.classList.add('open');
-
-        // === ДЛЯ ТЕСТОВ (Выводим ID в консоль браузера) ===
-        console.log("%c[TESTING] Invoice ID:", "color: lime; font-size: 14px;", data.invoiceId);
-        console.log("Для симуляции оплаты используй ссылку (см. server.js)");
 
         startCryptoTimer(data.expiresAt);
         startCryptoPolling(data.invoiceId);
