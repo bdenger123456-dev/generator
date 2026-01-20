@@ -1635,12 +1635,22 @@
 
         /* Элементы сводки */
         .wrapped-progress-container {
-            position: absolute; top: 10px; left: 0; width: 100%;
-            padding: 0 10px; display: flex; gap: 5px; z-index: 20;
+            position: absolute; 
+            top: 15px; /* Чуть ниже, чтобы не прилипал к краю экрана */
+            left: 0; 
+            width: 100%;
+            padding: 0 15px; 
+            display: flex; 
+            gap: 4px; 
+            z-index: 100; /* Подняли Z-index */
+            pointer-events: none; /* Чтобы не мешал кликам */
         }
         .wrapped-progress-bar {
-            height: 4px; flex: 1; background: rgba(255,255,255,0.3);
-            border-radius: 2px; overflow: hidden;
+            height: 3px; 
+            flex: 1; 
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px; 
+            overflow: hidden;
         }
 
         .wrapped-big-text {
@@ -1677,8 +1687,11 @@
         }
 
         .wrapped-progress-fill {
+            height: 100%;
+            background: #fff;
             width: 0%;
-            transition: none !important; 
+            box-shadow: 0 0 5px rgba(255,255,255,0.5);
+            transition: none; 
         }
 
         /* Класс для запуска анимации */
@@ -1691,12 +1704,52 @@
             animation-play-state: paused !important;
         }
 
-        /* Улучшенная финальная карточка */
+        /*  финальная карточка */
         .sum-row.detail-row {
             font-size: 11px; 
             color: var(--text-secondary);
             padding: 2px 0;
             border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        #share-header-overlay {
+            display: none; 
+            width: 100%;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 15px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .share-qr-box {
+            background: #fff;
+            padding: 5px;
+            border-radius: 8px;
+            height: 60px;
+            width: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .share-logo-text {
+            font-weight: 900;
+            font-size: 24px;
+            color: #fff;
+            line-height: 1;
+        }
+        .share-logo-text span {
+            background: linear-gradient(180deg, #CB53F0 20%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .share-caption {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            letter-spacing: 1px;
         }
 
         /* === STATS UPDATE === */
@@ -6162,6 +6215,8 @@
             expl_hist: "From Archives 📜",
             deco_label: "Show Decorations",
 
+            share_caption: "Discover yourself",
+
             mode_greeting_hint: [
                 "Explore 🔭, Enjoy 🥰, or a Wish ✨?",
                 "Trust the dice 🔭, your history 🥰, or AI ✨?",
@@ -6594,6 +6649,8 @@
             expl_hist: "Из архивов 📜",
             deco_label: "Показывать декор",
 
+            share_caption: "Узнай себя",
+
             mode_greeting_hint: [
                 "Поиск 🔭, Любимое 🥰 или Желание ✨?",
                 "Доверься случаю 🔭, опыту 🥰 или Магии ✨?",
@@ -7021,6 +7078,8 @@
             expl_hist: "De los archivos 📜",
             deco_label: "Mostrar decoración",
 
+            share_caption: "Descúbrete",
+
             mode_greeting_hint: [
                 "¿Explorar 🔭, Disfrutar 🥰 o una Fantasía ✨?",
                 "¿Confiar en el azar 🔭, tu historia 🥰 o la Magia ✨?",
@@ -7437,6 +7496,8 @@
             expl_undo: "Meinung geändert? 😏",
             expl_hist: "Aus dem Archiv 📜",
             deco_label: "Dekoration anzeigen",
+
+            share_caption: "Entdecke dich selbst",
 
             mode_greeting_hint: [
                 "Erkunden 🔭, Genießen 🥰 oder ein Wunsch ✨?",
@@ -9452,7 +9513,7 @@
 
         // === ЛОГИКА WRAPPED / PROGRESS BAR ===
         const wBtn = document.getElementById('btn-wrapped-trigger');
-    
+
         // Получаем кол-во активных дней (Set)
         const daysActive = activeDaysSet.size;
         const isPaid = subscriptionLevel !== 'free';
@@ -9465,11 +9526,25 @@
         if (daysActive >= 7 || (isPaid && daysActive >= 1)) {
             if(wBtn) {
                 wBtn.style.display = 'flex';
-                // Если есть непросмотренные в архиве — можно добавить пульсацию/точку
+                
+                // Проверяем наличие новых отчетов
                 const hasUnread = wrappedArchive.some(w => !w.viewed);
-                wBtn.innerHTML = hasUnread ? 
-                    `<span data-key="wrapped_btn">Fetish Wrapped ✨</span> <span style="color:#fff; margin-left:5px;">●</span>` : 
-                    `<span data-key="wrapped_btn">Fetish Wrapped ✨</span>`;
+                
+                // Текст кнопки
+                const btnText = t.wrapped_btn || "Fetish Wrapped ✨";
+                
+                // HTML с бейджиком справа
+                if (hasUnread) {
+                    // Добавляем бейджик NEW и делаем Flex container для кнопки
+                    wBtn.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                            <span>${btnText}</span>
+                            <span style="background:#fff; color:#000; font-size:10px; font-weight:800; padding:2px 6px; border-radius:6px; margin-left:10px; box-shadow:0 2px 5px rgba(0,0,0,0.2);">NEW</span>
+                        </div>
+                    `;
+                } else {
+                    wBtn.innerHTML = `<span>${btnText}</span>`;
+                }
             }
         } else {
             // Логика прогресс-бара для Free (набираем 7 дней)
@@ -9762,13 +9837,46 @@
         const modalBody = document.getElementById('modal-stats-body');
         if(!modalBody) return;
         
+        // 1. Создаем Хедер с QR кодом для картинки
+        // Генерируем QR с текущим доменом
+        const currentUrl = window.location.origin;
+        const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=5&data=${encodeURIComponent(currentUrl)}`;
+        
+        const t = langData[currentLang] || langData['en'];
+        const caption = t.share_caption || "Discover yourself";
+
+        const header = document.createElement('div');
+        header.id = 'share-header-overlay';
+        header.style.display = 'flex'; // Показываем специально для скриншота
+        
+        header.innerHTML = `
+            <div style="display:flex; flex-direction:column;">
+                <div class="share-logo-text">x<span>Fetish</span>Hub</div>
+                <div class="share-caption">${caption}</div>
+            </div>
+            <div class="share-qr-box">
+                <img src="${qrApi}" style="width:100%; height:100%; display:block;">
+            </div>
+        `;
+
+        // 2. Вставляем в начало modalBody
+        modalBody.insertBefore(header, modalBody.firstChild);
+
+        // 3. Делаем скриншот
         html2canvas(modalBody, {
-            backgroundColor: getComputedStyle(document.body).getPropertyValue('--sidebar-bg') 
+            backgroundColor: getComputedStyle(document.body).getPropertyValue('--sidebar-bg'),
+            scale: 2 // Высокое качество
         }).then(canvas => {
+            // 4. Удаляем хедер сразу после генерации
+            header.remove();
+
             const link = document.createElement('a');
-            link.download = 'my-stats.png';
+            link.download = 'xfetishhub-stats.png';
             link.href = canvas.toDataURL();
             link.click();
+        }).catch(err => {
+            console.error("Screenshot error:", err);
+            header.remove(); // Убираем в случае ошибки
         });
     }
 
@@ -13624,7 +13732,7 @@
             </div>
         `);
 
-        // --- SLIDE 2: COMPARISON (Если есть изменения) ---
+        // --- SLIDE 2: COMPARISON ---
         if (type !== 'daily' || Math.abs(stats.deltaActions) > 0) {
             const trendAct = stats.deltaActions >= 0 ? "+" : "";
             const trendTime = stats.deltaWatchTime >= 0 ? "+" : "";
@@ -13634,12 +13742,13 @@
                 <div class="wrapped-slide bg-fire">
                     <div class="wrapped-sub-text" style="text-transform:uppercase; letter-spacing:2px; font-size:12px; margin-bottom:40px;">${txt.since}</div>
                     
-                    <div style="margin-bottom:50px;">
+                    <div style="margin-bottom:50px; text-align:center;">
                         <div class="wrapped-big-text" style="font-size:70px; color:${colorAct}; margin-bottom:5px;">${trendAct}${stats.deltaActions}</div>
                         <div class="wrapped-sub-text" style="font-weight:700;">${txt.act}</div>
                     </div>
                     
-                    <div style="border-top:1px solid rgba(255,255,255,0.2); padding-top:40px; width:80%;">
+                    <!-- FIX: Выравнивание по центру, flex column -->
+                    <div style="border-top:1px solid rgba(255,255,255,0.2); padding-top:40px; width:80%; display:flex; flex-direction:column; align-items:center;">
                         <div class="wrapped-big-text" style="font-size:70px; margin-bottom:5px;">${trendTime}${Math.round(stats.deltaWatchTime/60)}m</div>
                         <div class="wrapped-sub-text" style="font-weight:700;">${txt.watch}</div>
                     </div>
@@ -13648,11 +13757,11 @@
         }
 
         // --- SLIDE 3: EVOLUTION (Сравнение Топ тегов) ---
-        // Показываем, если есть прошлые данные
+        let hasEvolutionSlide = false;
+
         if (stats.prevTopTags && stats.prevTopTags.length > 0) {
             let evolutionHtml = '';
             
-            // Берем топ 5 текущих и смотрим, где они были раньше
             stats.topTags.slice(0, 5).forEach((tag, i) => {
                 const prevIndex = stats.prevTopTags.indexOf(tag);
                 let statusBadge = '';
@@ -13665,7 +13774,6 @@
                     statusBadge = `<span style="font-size:10px; background:rgba(255,255,255,0.2); color:#fff; padding:2px 6px; border-radius:4px; font-weight:800; margin-left:10px;">${txt.badge_down}</span>`;
                 }
 
-                // Перевод тега
                 let displayTag = tag.toUpperCase();
                 const modMatch = modifiersData.find(m => m.key.toLowerCase() === tag.toLowerCase());
                 if (modMatch && modMatch[langKey]) displayTag = modMatch[langKey].toUpperCase();
@@ -13685,6 +13793,7 @@
                     <div>${evolutionHtml}</div>
                 </div>
             `);
+            hasEvolutionSlide = true;
         }
 
         // --- SLIDE 4: ACHIEVEMENT ---
@@ -13702,19 +13811,21 @@
         }
 
         // --- SLIDE 5: OBSESSIONS ---
-        const translatedTagsHtml = stats.topTags.slice(0, 5).map((t, i) => {
-            let displayTag = t.toUpperCase();
-            const modMatch = modifiersData.find(m => m.key.toLowerCase() === t.toLowerCase());
-            if (modMatch && modMatch[langKey]) displayTag = modMatch[langKey].toUpperCase();
-            return `<div style="font-size:${36 - i*4}px; font-weight:800; margin:10px 0; color:${i===0?'var(--accent)':'#fff'}; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">#${i+1} ${displayTag}</div>`;
-        }).join('');
+        if (!hasEvolutionSlide) {
+            const translatedTagsHtml = stats.topTags.slice(0, 5).map((t, i) => {
+                let displayTag = t.toUpperCase();
+                const modMatch = modifiersData.find(m => m.key.toLowerCase() === t.toLowerCase());
+                if (modMatch && modMatch[langKey]) displayTag = modMatch[langKey].toUpperCase();
+                return `<div style="font-size:${36 - i*4}px; font-weight:800; margin:10px 0; color:${i===0?'var(--accent)':'#fff'}; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">#${i+1} ${displayTag}</div>`;
+            }).join('');
 
-        slides.push(`
-            <div class="wrapped-slide" style="background:#111;">
-                <div class="wrapped-sub-text" style="margin-bottom:40px; color:var(--text-secondary);">${txt.obsess}</div>
-                ${translatedTagsHtml}
-            </div>
-        `);
+            slides.push(`
+                <div class="wrapped-slide" style="background:#111;">
+                    <div class="wrapped-sub-text" style="margin-bottom:40px; color:var(--text-secondary);">${txt.obsess}</div>
+                    ${translatedTagsHtml}
+                </div>
+            `);
+        }
 
         // --- SLIDE 6: FINAL SUMMARY ---
         const planColor = subscriptionLevel === 'free' ? '#fff' : '#9b59b6';
@@ -13771,7 +13882,7 @@
             </div>
         `);
 
-        // Рендер
+        // Рендер прогресс-бара
         let barsHtml = '';
         slides.forEach((_, i) => barsHtml += `<div class="wrapped-progress-bar"><div class="wrapped-progress-fill" id="bar-${i}"></div></div>`);
         
@@ -13783,11 +13894,8 @@
             ${slides.join('')}
         `;
         
-        // === ЛОГИКА ОТКРЫТИЯ ===
         if (dataObj.viewed) {
-            // Если уже смотрели - сразу на последний слайд
             currentSlideIndex = slides.length - 1;
-            // Все предыдущие бары заполнены
             setTimeout(() => {
                 for (let i = 0; i < slides.length; i++) {
                     const bar = document.getElementById('bar-' + i);
@@ -13798,30 +13906,17 @@
             currentSlideIndex = 0;
         }
 
-        // Запуск
         startSlideTimerNew(slides.length, 6000); 
         
-        // === ЛОГИКА ПАУЗЫ ===
-        const handlePause = (e) => {
-            e.preventDefault();
-            overlay.classList.add('paused');
-            window.isWrappedPaused = true;
-        };
-        const handleResume = (e) => {
-            e.preventDefault();
-            overlay.classList.remove('paused');
-            window.isWrappedPaused = false;
-        };
+        const handlePause = (e) => { e.preventDefault(); overlay.classList.add('paused'); window.isWrappedPaused = true; };
+        const handleResume = (e) => { e.preventDefault(); overlay.classList.remove('paused'); window.isWrappedPaused = false; };
 
-        // Мышь и Тач
         overlay.addEventListener('mousedown', handlePause);
         overlay.addEventListener('touchstart', handlePause);
-        
         overlay.addEventListener('mouseup', handleResume);
         overlay.addEventListener('touchend', handleResume);
         overlay.addEventListener('mouseleave', handleResume);
 
-        // Отмечаем как просмотренное
         dataObj.viewed = true;
         localStorage.setItem('xch_wrapped_archive', JSON.stringify(wrappedArchive));
         openStatistics(); 
