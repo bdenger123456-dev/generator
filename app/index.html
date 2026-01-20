@@ -1642,10 +1642,6 @@
             height: 4px; flex: 1; background: rgba(255,255,255,0.3);
             border-radius: 2px; overflow: hidden;
         }
-        .wrapped-progress-fill {
-            height: 100%; background: #fff; width: 0%;
-            transition: width 0.1s linear;
-        }
 
         .wrapped-big-text {
             font-size: clamp(40px, 10vw, 80px);
@@ -1672,6 +1668,35 @@
         .wrapped-close {
             position: absolute; top: 20px; right: 20px;
             font-size: 24px; color: rgba(255,255,255,0.5); z-index: 30; cursor: pointer;
+        }
+
+        /* Анимация заполнения бара */
+        @keyframes fillBarAnim {
+            from { width: 0%; }
+            to { width: 100%; }
+        }
+
+        .wrapped-progress-fill {
+            width: 0%;
+            transition: none !important; 
+        }
+
+        /* Класс для запуска анимации */
+        .wrapped-progress-fill.animating {
+            animation: fillBarAnim linear forwards;
+        }
+
+        /* Класс для паузы (добавляется JS-ом при удержании) */
+        .wrapped-overlay.paused .wrapped-progress-fill {
+            animation-play-state: paused !important;
+        }
+
+        /* Улучшенная финальная карточка */
+        .sum-row.detail-row {
+            font-size: 11px; 
+            color: var(--text-secondary);
+            padding: 2px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
         /* === STATS UPDATE === */
@@ -13320,23 +13345,19 @@
         const oneDay = 86400000;
         let startTime = 0;
 
-        // Определение временных рамок
         if (type === 'daily') startTime = now - oneDay;
-        else if (type === 'weekly') startTime = now - (7 * oneDay); // Последние 7 дней
-        else if (type === 'monthly') startTime = now - (30 * oneDay); // Последние 30 дней
-        else if (type === 'yearly') startTime = now - (365 * oneDay); // Последний год
+        else if (type === 'weekly') startTime = now - (7 * oneDay);
+        else if (type === 'monthly') startTime = now - (30 * oneDay);
+        else if (type === 'yearly') startTime = now - (365 * oneDay);
 
-        // Сбор данных
         const relevantLogs = activityLog.filter(l => l.ts >= startTime);
         const relevantWatch = watchHistory.filter(w => w.timestamp >= startTime);
 
-        // Если данных слишком мало — не генерируем архивный отчет (кроме Daily по запросу)
         if (relevantLogs.length < 5 && type !== 'daily') return null;
 
-        // Расчет статистики
         const stats = calculateDeepStats(relevantLogs, relevantWatch);
 
-        // Сравнение с прошлым (Delta)
+        // Сравнение с прошлым
         const duration = now - startTime;
         const prevStartTime = startTime - duration;
         const prevLogs = activityLog.filter(l => l.ts >= prevStartTime && l.ts < startTime);
@@ -13346,8 +13367,10 @@
         
         stats.deltaActions = stats.totalActions - prevStats.totalActions;
         stats.deltaWatchTime = stats.totalWatchTime - prevStats.totalWatchTime;
+        
+        // Сохраняем топы прошлого периода для слайда сравнения
+        stats.prevTopTags = prevStats.topTags || [];
 
-        // Создание объекта
         const wrappedObj = {
             id: Date.now(),
             type: type,
@@ -13358,10 +13381,7 @@
             isLatest: true
         };
 
-        // Снимаем флаг isLatest с предыдущих записей того же типа
         wrappedArchive.forEach(w => { if(w.type === type) w.isLatest = false; });
-        
-        // Сохраняем в начало архива
         wrappedArchive.unshift(wrappedObj);
         localStorage.setItem('xch_wrapped_archive', JSON.stringify(wrappedArchive));
         
@@ -13373,6 +13393,8 @@
         let totalActions = 0;
         let watchCount = 0;
         let swipeCount = 0;
+        let likeCount = 0;     // NEW
+        let dislikeCount = 0;  // NEW
         
         const tagCounts = {};
         const itemCounts = {};
@@ -13386,17 +13408,22 @@
             if (l.type === 'watch') watchCount++;
             else swipeCount++;
 
+            // Подсчет конкретных действий
+            if (l.type === 'like') likeCount++;
+            else if (l.type === 'dislike' || l.type === 'pass') dislikeCount++;
+
             if (l.tags) l.tags.forEach(t => tagCounts[t] = (tagCounts[t] || 0) + 1);
             if (l.id) itemCounts[l.id] = (itemCounts[l.id] || 0) + 1;
         });
 
         const totalWatchTime = watches.reduce((sum, w) => sum + w.seconds, 0);
 
-        // Топ тегов и предметов
+        // Топ тегов (берем топ 10 для сравнения)
         const topTags = Object.entries(tagCounts)
             .sort((a,b) => b[1]-a[1])
-            .slice(0, 5).map(x => x[0]);
+            .slice(0, 10).map(x => x[0]);
         
+        // Топ предметов
         const topItems = Object.entries(itemCounts)
             .sort((a,b) => b[1]-a[1])
             .slice(0, 3).map(x => x[0]);
@@ -13410,28 +13437,23 @@
         if (night > day && night > morning) peakTime = 'night';
         else if (morning > day && morning > night) peakTime = 'morning';
 
-        // Определение достижения (Achievement)
-        let achievement = 'day'; // Default fallback
-        
-        // 1. По времени
+        // Достижение
+        let achievement = 'day';
         if (peakTime === 'night') achievement = 'night';
         else if (peakTime === 'morning') achievement = 'morning';
         
-        // 2. По поведению (перебивает время, если ярко выражено)
         const ratio = watchCount / (swipeCount || 1);
-        
-        if (ratio > 0.4) achievement = 'binger'; // Часто смотрит
-        else if (ratio < 0.05 && totalActions > 20) achievement = 'picky'; // Много листает
+        if (ratio > 0.4) achievement = 'binger';
+        else if (ratio < 0.05 && totalActions > 20) achievement = 'picky';
         else {
-            // 3. По разнообразию тегов (Исследователь vs Гедонист)
             const uniqueTags = Object.keys(tagCounts).length;
-            // Если уникальных тегов много относительно действий -> Исследователь
             if (uniqueTags / (totalActions || 1) > 0.8) achievement = 'explorer';
             else achievement = 'hedonist';
         }
 
         return {
             totalActions, watchCount, swipeCount, totalWatchTime,
+            likeCount, dislikeCount, // NEW
             topTags, topItems, peakTime, achievement
         };
     }
@@ -13495,7 +13517,7 @@
         }
     }
 
-    // 6. Отрисовка UI (Слайды)
+    // 6. Отрисовка UI (Слайды) - ФИНАЛЬНАЯ ВЕРСИЯ
     function openWrappedUI(dataObj) {
         const overlay = document.getElementById('wrapped-mount');
         overlay.innerHTML = '';
@@ -13505,81 +13527,200 @@
         const stats = dataObj.stats;
         const type = dataObj.type;
         
-        // Получаем переводы
-        const lang = WRAPPED_CONFIG.badges[currentLang] ? currentLang : 'en';
-        const badgeText = WRAPPED_CONFIG.badges[lang][type];
+        // --- СЛОВАРЬ ---
+        const W_TEXT = {
+            en: {
+                title: "Fetish<br><span style='color:var(--accent)'>Wrapped</span>",
+                since: "Since Last Time",
+                act: "Total Interactions",
+                watch: "Watch Time",
+                vibe: "Your Vibe",
+                obsess: "Your Obsessions",
+                evol: "Taste Evolution",
+                evol_sub: "Vs Previous Period",
+                sum_swipes: "Swipes (L/R)",
+                sum_likes: "Likes",
+                sum_dis: "Dislikes",
+                sum_watch: "Videos Watched",
+                top_genre: "Top Genre",
+                btn_done: "Done",
+                badge_new: "NEW",
+                badge_up: "UP",
+                badge_down: "DOWN"
+            },
+            ru: {
+                title: "Итоги<br><span style='color:var(--accent)'>Фетишей</span>",
+                since: "С прошлого раза",
+                act: "Всего действий",
+                watch: "Время просмотра",
+                vibe: "Твой Вайб",
+                obsess: "Твои Одержимости",
+                evol: "Эволюция Вкусов",
+                evol_sub: "Сравнение с прошлым",
+                sum_swipes: "Свайпы",
+                sum_likes: "Лайки",
+                sum_dis: "Дизлайки",
+                sum_watch: "Видео просмотрено",
+                top_genre: "Топ Жанр",
+                btn_done: "Готово",
+                badge_new: "NEW",
+                badge_up: "UP",
+                badge_down: "DOWN"
+            },
+            es: {
+                title: "Resumen<br><span style='color:var(--accent)'>Fetichista</span>",
+                since: "Desde la última vez",
+                act: "Interacciones",
+                watch: "Tiempo visto",
+                vibe: "Tu Vibra",
+                obsess: "Tus Obsesiones",
+                evol: "Evolución",
+                evol_sub: "Vs periodo anterior",
+                sum_swipes: "Deslizar",
+                sum_likes: "Me gusta",
+                sum_dis: "No me gusta",
+                sum_watch: "Videos vistos",
+                top_genre: "Top Género",
+                btn_done: "Listo",
+                badge_new: "NUEVO",
+                badge_up: "SUBIÓ",
+                badge_down: "BAJÓ"
+            },
+            de: {
+                title: "Fetisch<br><span style='color:var(--accent)'>Rückblick</span>",
+                since: "Seit dem letzten Mal",
+                act: "Interaktionen",
+                watch: "Zeit",
+                vibe: "Deine Stimmung",
+                obsess: "Deine Obsessionen",
+                evol: "Entwicklung",
+                evol_sub: "Vs letztes Mal",
+                sum_swipes: "Swipes",
+                sum_likes: "Likes",
+                sum_dis: "Dislikes",
+                sum_watch: "Angeschaut",
+                top_genre: "Top Genre",
+                btn_done: "Fertig",
+                badge_new: "NEU",
+                badge_up: "HOCH",
+                badge_down: "RUNTER"
+            }
+        };
+
+        const langKey = W_TEXT[currentLang] ? currentLang : 'en';
+        const txt = W_TEXT[langKey];
+        const badgeText = WRAPPED_CONFIG.badges[langKey][type] || type.toUpperCase();
         
-        // Фраза интро
         const phrases = WRAPPED_CONFIG.phrases[type] || WRAPPED_CONFIG.phrases.daily;
-        const introText = phrases[lang][Math.floor(Math.random() * phrases[lang].length)];
+        const introText = phrases[langKey][Math.floor(Math.random() * phrases[langKey].length)];
 
         // --- SLIDE 1: INTRO ---
         slides.push(`
             <div class="wrapped-slide bg-dark active-slide">
-                <div class="w-badge ${type}" style="transform:scale(1.8); margin-bottom:25px; box-shadow:0 10px 30px rgba(0,0,0,0.5);">${badgeText}</div>
-                <div class="wrapped-big-text" style="font-size:50px;">Fetish<br><span style="color:var(--accent)">Wrapped</span></div>
-                <div class="wrapped-sub-text" style="opacity:0.8; margin-top:20px;">${dataObj.rangeStr}</div>
-                <div class="wrapped-sub-text" style="margin-top:40px; font-weight:700;">${introText}</div>
+                <div class="w-badge ${type}" style="transform:scale(1.5); margin-bottom:30px; box-shadow:0 10px 30px rgba(0,0,0,0.5);">${badgeText}</div>
+                <div class="wrapped-big-text" style="font-size:46px;">${txt.title}</div>
+                <div class="wrapped-sub-text" style="opacity:0.8; margin-top:20px; font-family:monospace;">${dataObj.rangeStr}</div>
+                <div class="wrapped-sub-text" style="margin-top:40px; font-weight:700; max-width:80%;">${introText}</div>
             </div>
         `);
 
-        // --- SLIDE 2: COMPARISON (Если это не первый отчет) ---
-        // Показываем для Daily, Weekly и остальных
-        const trendAct = stats.deltaActions >= 0 ? "+" : "";
-        const trendTime = stats.deltaWatchTime >= 0 ? "+" : "";
-        const colorAct = stats.deltaActions >= 0 ? "#2ecc71" : "#e74c3c"; // Зеленый/Красный
-        
-        slides.push(`
-            <div class="wrapped-slide bg-fire">
-                <div class="wrapped-sub-text" style="text-transform:uppercase; letter-spacing:2px; font-size:12px;">Since Last Time</div>
-                
-                <div style="margin-top:30px;">
-                    <div class="wrapped-big-text" style="font-size:70px; color:${colorAct};">${trendAct}${stats.deltaActions}</div>
-                    <div class="wrapped-sub-text">Actions</div>
-                </div>
-                
-                <div style="margin-top:40px; border-top:1px solid rgba(255,255,255,0.2); padding-top:40px;">
-                    <div class="wrapped-big-text" style="font-size:70px;">${trendTime}${Math.round(stats.deltaWatchTime/60)}m</div>
-                    <div class="wrapped-sub-text">Watch Time</div>
-                </div>
-            </div>
-        `);
-
-        // --- SLIDE 3: ACHIEVEMENT (Только для Weekly/Monthly/Yearly) ---
-        if (type !== 'daily') {
-            const achKey = stats.achievement;
-            const achData = WRAPPED_CONFIG.achievements[achKey];
+        // --- SLIDE 2: COMPARISON (Если есть изменения) ---
+        if (type !== 'daily' || Math.abs(stats.deltaActions) > 0) {
+            const trendAct = stats.deltaActions >= 0 ? "+" : "";
+            const trendTime = stats.deltaWatchTime >= 0 ? "+" : "";
+            const colorAct = stats.deltaActions >= 0 ? "#2ecc71" : "#e74c3c"; 
             
-            const achTitle = achData[lang];
-            const achDesc = achData['desc_' + lang];
-
             slides.push(`
-                <div class="wrapped-slide bg-toxic">
-                    <div class="achievement-badge">${achData.icon}</div>
-                    <div class="wrapped-sub-text" style="text-transform:uppercase; color:var(--text-secondary); margin-bottom:10px;">Your Vibe</div>
-                    <div class="wrapped-big-text" style="font-size:42px; line-height:1.1; margin-bottom:20px;">${achTitle}</div>
-                    <div class="wrapped-sub-text" style="max-width:300px;">${achDesc}</div>
+                <div class="wrapped-slide bg-fire">
+                    <div class="wrapped-sub-text" style="text-transform:uppercase; letter-spacing:2px; font-size:12px; margin-bottom:40px;">${txt.since}</div>
+                    
+                    <div style="margin-bottom:50px;">
+                        <div class="wrapped-big-text" style="font-size:70px; color:${colorAct}; margin-bottom:5px;">${trendAct}${stats.deltaActions}</div>
+                        <div class="wrapped-sub-text" style="font-weight:700;">${txt.act}</div>
+                    </div>
+                    
+                    <div style="border-top:1px solid rgba(255,255,255,0.2); padding-top:40px; width:80%;">
+                        <div class="wrapped-big-text" style="font-size:70px; margin-bottom:5px;">${trendTime}${Math.round(stats.deltaWatchTime/60)}m</div>
+                        <div class="wrapped-sub-text" style="font-weight:700;">${txt.watch}</div>
+                    </div>
                 </div>
             `);
         }
 
-        // --- SLIDE 4: TOP TAGS ---
-        const tagListHtml = stats.topTags.map((t, i) => 
-            `<div style="font-size:${32 - i*3}px; font-weight:800; margin:10px 0; color:${i===0?'var(--accent)':'#fff'};">
-                #${i+1} ${t.toUpperCase()}
-            </div>`
-        ).join('');
+        // --- SLIDE 3: EVOLUTION (Сравнение Топ тегов) ---
+        // Показываем, если есть прошлые данные
+        if (stats.prevTopTags && stats.prevTopTags.length > 0) {
+            let evolutionHtml = '';
+            
+            // Берем топ 5 текущих и смотрим, где они были раньше
+            stats.topTags.slice(0, 5).forEach((tag, i) => {
+                const prevIndex = stats.prevTopTags.indexOf(tag);
+                let statusBadge = '';
+                
+                if (prevIndex === -1) {
+                    statusBadge = `<span style="font-size:10px; background:#2ecc71; color:#000; padding:2px 6px; border-radius:4px; font-weight:800; margin-left:10px;">${txt.badge_new}</span>`;
+                } else if (prevIndex > i) {
+                    statusBadge = `<span style="font-size:10px; background:#f1c40f; color:#000; padding:2px 6px; border-radius:4px; font-weight:800; margin-left:10px;">${txt.badge_up}</span>`;
+                } else if (prevIndex < i) {
+                    statusBadge = `<span style="font-size:10px; background:rgba(255,255,255,0.2); color:#fff; padding:2px 6px; border-radius:4px; font-weight:800; margin-left:10px;">${txt.badge_down}</span>`;
+                }
+
+                // Перевод тега
+                let displayTag = tag.toUpperCase();
+                const modMatch = modifiersData.find(m => m.key.toLowerCase() === tag.toLowerCase());
+                if (modMatch && modMatch[langKey]) displayTag = modMatch[langKey].toUpperCase();
+
+                evolutionHtml += `
+                    <div style="display:flex; align-items:center; justify-content:center; margin-bottom:15px;">
+                        <span style="font-size:24px; font-weight:800;">${i+1}. ${displayTag}</span>
+                        ${statusBadge}
+                    </div>
+                `;
+            });
+
+            slides.push(`
+                <div class="wrapped-slide" style="background:linear-gradient(45deg, #1cb5e0 0%, #000851 100%);">
+                    <div class="wrapped-sub-text" style="text-transform:uppercase; margin-bottom:10px;">${txt.evol}</div>
+                    <div class="wrapped-sub-text" style="font-size:12px; opacity:0.6; margin-bottom:30px;">${txt.evol_sub}</div>
+                    <div>${evolutionHtml}</div>
+                </div>
+            `);
+        }
+
+        // --- SLIDE 4: ACHIEVEMENT ---
+        if (type !== 'daily') {
+            const achKey = stats.achievement;
+            const achData = WRAPPED_CONFIG.achievements[achKey];
+            slides.push(`
+                <div class="wrapped-slide bg-toxic">
+                    <div class="achievement-badge">${achData.icon}</div>
+                    <div class="wrapped-sub-text" style="text-transform:uppercase; color:rgba(0,0,0,0.6); margin-bottom:10px; font-weight:800;">${txt.vibe}</div>
+                    <div class="wrapped-big-text" style="font-size:42px; line-height:1.1; margin-bottom:20px; color:#000; text-shadow:none;">${achData[langKey]}</div>
+                    <div class="wrapped-sub-text" style="max-width:300px; color:#000; font-weight:500;">${achData['desc_' + langKey]}</div>
+                </div>
+            `);
+        }
+
+        // --- SLIDE 5: OBSESSIONS ---
+        const translatedTagsHtml = stats.topTags.slice(0, 5).map((t, i) => {
+            let displayTag = t.toUpperCase();
+            const modMatch = modifiersData.find(m => m.key.toLowerCase() === t.toLowerCase());
+            if (modMatch && modMatch[langKey]) displayTag = modMatch[langKey].toUpperCase();
+            return `<div style="font-size:${36 - i*4}px; font-weight:800; margin:10px 0; color:${i===0?'var(--accent)':'#fff'}; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">#${i+1} ${displayTag}</div>`;
+        }).join('');
 
         slides.push(`
-            <div class="wrapped-slide" style="background:#000;">
-                <div class="wrapped-sub-text" style="margin-bottom:30px;">Your Obsessions</div>
-                ${tagListHtml}
+            <div class="wrapped-slide" style="background:#111;">
+                <div class="wrapped-sub-text" style="margin-bottom:40px; color:var(--text-secondary);">${txt.obsess}</div>
+                ${translatedTagsHtml}
             </div>
         `);
 
-        // --- SLIDE 5: FINAL CARD (New Design) ---
+        // --- SLIDE 6: FINAL SUMMARY ---
         const planColor = subscriptionLevel === 'free' ? '#fff' : '#9b59b6';
-        const topGenre = stats.topTags[0] ? stats.topTags[0].toUpperCase() : '---';
+        let topGenre = stats.topTags[0] ? stats.topTags[0].toUpperCase() : '---';
+        const genreMatch = modifiersData.find(m => m.key.toLowerCase() === topGenre.toLowerCase());
+        if (genreMatch && genreMatch[langKey]) topGenre = genreMatch[langKey].toUpperCase();
 
         slides.push(`
             <div class="wrapped-slide bg-dark">
@@ -13595,27 +13736,27 @@
                         ${dataObj.rangeStr}<br><span style="color:${planColor}; font-weight:700;">${subscriptionLevel.toUpperCase()}</span>
                     </div>
 
-                    <div class="sum-grid">
+                    <div class="sum-grid" style="grid-template-columns: 1fr 1fr;">
                         <div class="sum-stat-box">
-                            <div class="sum-stat-val">${stats.totalActions}</div>
-                            <div class="sum-stat-lbl">Actions</div>
+                            <div class="sum-stat-val">${stats.watchCount}</div>
+                            <div class="sum-stat-lbl">${txt.sum_watch}</div>
                         </div>
                         <div class="sum-stat-box">
                             <div class="sum-stat-val">${Math.round(stats.totalWatchTime/60)}m</div>
-                            <div class="sum-stat-lbl">Time</div>
+                            <div class="sum-stat-lbl">${txt.watch}</div>
                         </div>
                         <div class="sum-stat-box">
-                            <div class="sum-stat-val">${stats.swipeCount}</div>
-                            <div class="sum-stat-lbl">Swipes</div>
+                            <div class="sum-stat-val" style="color:#2ecc71;">${stats.likeCount}</div>
+                            <div class="sum-stat-lbl">${txt.sum_likes}</div>
                         </div>
                         <div class="sum-stat-box">
-                            <div class="sum-stat-val" style="color:var(--accent);">${stats.watchCount}</div>
-                            <div class="sum-stat-lbl">Watches</div>
+                            <div class="sum-stat-val" style="color:#e74c3c;">${stats.dislikeCount}</div>
+                            <div class="sum-stat-lbl">${txt.sum_dis}</div>
                         </div>
                     </div>
 
                     <div style="text-align:center; margin-top:5px; border-top:1px solid rgba(255,255,255,0.1); padding-top:15px;">
-                        <div class="sum-stat-lbl" style="margin-bottom:5px;">Top Genre</div>
+                        <div class="sum-stat-lbl" style="margin-bottom:5px;">${txt.top_genre}</div>
                         <div style="font-size:24px; font-weight:900; color:var(--accent); letter-spacing:1px;">
                             ${topGenre}
                         </div>
@@ -13623,14 +13764,14 @@
                 </div>
 
                 <div style="margin-top:30px; display:flex; gap:10px;">
-                    <button onclick="closeWrapped()" class="btn-gen" style="width:auto; padding:12px 30px; font-size:14px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);">
-                        Done
+                    <button onclick="closeWrapped()" class="btn-gen" style="width:auto; padding:12px 40px; font-size:16px; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); backdrop-filter:blur(10px);">
+                        ${txt.btn_done}
                     </button>
                 </div>
             </div>
         `);
 
-        // Рендер прогресс-баров
+        // Рендер
         let barsHtml = '';
         slides.forEach((_, i) => barsHtml += `<div class="wrapped-progress-bar"><div class="wrapped-progress-fill" id="bar-${i}"></div></div>`);
         
@@ -13642,18 +13783,102 @@
             ${slides.join('')}
         `;
         
-        // Запуск слайдшоу
-        currentSlideIndex = 0;
-        startSlideTimer(slides.length, 6000); 
+        // === ЛОГИКА ОТКРЫТИЯ ===
+        if (dataObj.viewed) {
+            // Если уже смотрели - сразу на последний слайд
+            currentSlideIndex = slides.length - 1;
+            // Все предыдущие бары заполнены
+            setTimeout(() => {
+                for (let i = 0; i < slides.length; i++) {
+                    const bar = document.getElementById('bar-' + i);
+                    if(bar) bar.style.width = '100%';
+                }
+            }, 50);
+        } else {
+            currentSlideIndex = 0;
+        }
+
+        // Запуск
+        startSlideTimerNew(slides.length, 6000); 
         
-        // Отмечаем как просмотренное и сохраняем
+        // === ЛОГИКА ПАУЗЫ ===
+        const handlePause = (e) => {
+            e.preventDefault();
+            overlay.classList.add('paused');
+            window.isWrappedPaused = true;
+        };
+        const handleResume = (e) => {
+            e.preventDefault();
+            overlay.classList.remove('paused');
+            window.isWrappedPaused = false;
+        };
+
+        // Мышь и Тач
+        overlay.addEventListener('mousedown', handlePause);
+        overlay.addEventListener('touchstart', handlePause);
+        
+        overlay.addEventListener('mouseup', handleResume);
+        overlay.addEventListener('touchend', handleResume);
+        overlay.addEventListener('mouseleave', handleResume);
+
+        // Отмечаем как просмотренное
         dataObj.viewed = true;
         localStorage.setItem('xch_wrapped_archive', JSON.stringify(wrappedArchive));
-        
-        // Обновляем кнопку в меню (чтобы убрать точку уведомления)
         openStatistics(); 
     }
 
+    // ТАЙМЕР (С поддержкой паузы)
+    function startSlideTimerNew(total, duration = 6000) {
+        clearInterval(slideInterval);
+        
+        const show = (idx) => {
+            document.querySelectorAll('.wrapped-slide').forEach(el => el.classList.remove('active-slide'));
+            document.querySelectorAll('.wrapped-slide')[idx].classList.add('active-slide');
+            
+            // Бары
+            for(let i=0; i<total; i++) {
+                const bar = document.getElementById('bar-'+i);
+                bar.classList.remove('animating'); // Сброс
+                bar.style.width = (i < idx) ? '100%' : '0%';
+                
+                if (i === idx) {
+                    // Трюк с reflow для перезапуска анимации
+                    void bar.offsetWidth; 
+                    bar.style.animationDuration = `${duration}ms`;
+                    bar.classList.add('animating');
+                }
+            }
+        };
+
+        show(currentSlideIndex);
+
+        // Используем интервал для проверки паузы
+        let elapsed = 0;
+        const step = 100;
+        window.isWrappedPaused = false;
+
+        slideInterval = setInterval(() => {
+            // Если на последнем слайде - таймер не нужен
+            if (currentSlideIndex >= total - 1) {
+                clearInterval(slideInterval);
+                return;
+            }
+
+            if (!window.isWrappedPaused) {
+                elapsed += step;
+                if (elapsed >= duration) {
+                    elapsed = 0;
+                    currentSlideIndex++;
+                    if (currentSlideIndex < total) {
+                        show(currentSlideIndex);
+                    } else {
+                        clearInterval(slideInterval);
+                    }
+                }
+            }
+        }, step);
+    }
+    
     // 7. Рендер списка в Истории (Archive Tab)
     function renderWrappedArchive() {
         const list = document.getElementById('hist-list-wrapped');
