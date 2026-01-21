@@ -1106,23 +1106,95 @@
         /* =========================================
         8. MODALS (GENERAL)
         ========================================= */
-        .modal-overlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: var(--modal-bg); z-index: 20000 !important; /* Above everything */
-            display: none; justify-content: center; align-items: center; 
+        .modal-overlay {
+            /* Фиксация позиции и слоя */
+            position: fixed !important;
+            top: 0 !important; left: 0 !important;
+            width: 100% !important; height: 100% !important;
+            z-index: 20000 !important;
+            
+            /* Фон и блюр */
+            background: rgba(0, 0, 0, 0.6) !important;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            
+            /* Flex для позиционирования окна */
+            display: flex !important;
+            flex-direction: column !important;
+            
+            /* СКРЫТО ПО УМОЛЧАНИЮ (Анимация через opacity) */
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+            transition: opacity 0.3s ease, visibility 0.3s !important;
         }
-        .modal-overlay.open { display: flex; }
-        .modal { 
-            background: var(--sidebar-bg); width: 90%; max-width: 500px; max-height: 80%; 
-            border-radius: 20px; border: 1px solid var(--border); 
-            display: flex; flex-direction: column; overflow: hidden; 
+
+        /* СОСТОЯНИЕ "ОТКРЫТО" - ЭТОТ КЛАСС ДОБАВЛЯЕТ JS */
+        .modal-overlay.open {
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
         }
-        .modal-header { 
-            padding: 20px; border-bottom: 1px solid var(--border); 
-            display: flex; justify-content: space-between; font-weight: 800; font-size: 18px; 
+
+        /* 2. САМО ОКНО (MODAL) */
+        .modal {
+            /* Сброс старых размеров и отступов */
+            margin: 0 !important;
+            max-width: none !important;
+            max-height: none !important;
+            position: relative !important;
+            
+            /* Фон и тени */
+            background: var(--sidebar-bg) !important;
+            border: 1px solid var(--border) !important;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            overflow: hidden !important;
+            
+            /* Плавная анимация появления */
+            transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1) !important;
         }
-        .modal-body { 
-            padding: 10px; overflow-y: auto; 
+
+        /* 3. ШАПКА (HEADER) */
+        .modal-header {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important; /* Заголовок по центру */
+            min-height: 60px !important;
+            padding: 15px 20px !important;
+            border-bottom: none !important;     /* Убираем разделитель */
+            position: relative !important;
+            
+            font-size: 18px !important;
+            font-weight: 800 !important;
+            color: var(--text-main) !important;
+            text-transform: uppercase !important;
+        }
+
+        /* Кнопка закрытия (Крестик) - Всегда справа */
+        .modal-header > span:last-child {
+            position: absolute !important;
+            right: 15px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            
+            width: 32px !important; height: 32px !important;
+            border-radius: 50% !important;
+            background: rgba(128, 128, 128, 0.15) !important;
+            color: var(--text-secondary) !important;
+            
+            align-items: center !important; justify-content: center !important;
+            font-size: 16px !important; cursor: pointer !important;
+            z-index: 10 !important;
+        }
+
+        /* 4. ТЕЛО (BODY) */
+        .modal-body {
+            flex: 1 !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            padding: 0 20px 30px 20px !important;
         }
 
         #sub-status-btn {
@@ -1130,6 +1202,85 @@
             border: 1px solid var(--border);
             transition: background 0.3s, border-color 0.3s;
         }
+
+       @media (min-width: 769px) {
+            .modal-overlay {
+                justify-content: center !important;
+                align-items: center !important;
+            }
+
+            .modal {
+                width: 550px !important;       /* Фиксированная ширина */
+                max-width: 90% !important;
+                height: auto !important;
+                max-height: 85vh !important;   /* Не на весь экран */
+                
+                border-radius: 24px !important;
+                
+                /* Анимация: Легкое увеличение */
+                transform: scale(0.95) !important;
+            }
+
+            .modal-overlay.open .modal {
+                transform: scale(1) !important;
+            }
+        }
+
+        /* --- МОБИЛЬНАЯ ВЕРСИЯ (Узкий экран) --- */
+        @media (max-width: 768px) {
+            .modal-overlay {
+                justify-content: flex-end !important; /* Прижать к низу */
+                align-items: center !important;
+            }
+
+            .modal {
+                width: 100% !important;
+                height: auto !important;
+                max-height: 85vh !important; /* Шторка не на весь экран */
+                min-height: 300px !important;
+                
+                /* Скругление только сверху */
+                border-radius: 28px 28px 0 0 !important;
+                border-bottom: none !important;
+                border-left: none !important;
+                border-right: none !important;
+                
+                /* Учет "челки" iPhone снизу */
+                padding-bottom: env(safe-area-inset-bottom) !important;
+                
+                /* Анимация: Выезд снизу */
+                transform: translateY(100%) !important;
+            }
+
+            .modal-overlay.open .modal {
+                transform: translateY(0) !important;
+            }
+
+            /* "Ручка" шторки (серая полоска) */
+            .modal-header::before {
+                content: '';
+                position: absolute;
+                top: 8px; left: 50%;
+                transform: translateX(-50%);
+                width: 40px; height: 4px;
+                background: rgba(128, 128, 128, 0.3);
+                border-radius: 10px;
+                pointer-events: none;
+            }
+            
+            /* Сдвигаем заголовок чуть ниже из-за ручки */
+            .modal-header {
+                padding-top: 25px !important;
+            }
+        }
+
+        #modal-stats-body {
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: flex-start !important; 
+            min-height: 0 !important;
+        }
+
 
         /* Catalog Search */
         .modal-search-box { width: 100%; margin-bottom: 15px; position: relative; }
@@ -1170,9 +1321,22 @@
         10. SUBSCRIPTION MODAL (RESPONSIVE)
         ========================================= */
         .plan-card {
-            background: var(--ios-card); border: 1px solid var(--border); border-radius: 20px;
-            padding: 20px; margin-bottom: 15px; position: relative; overflow: hidden;
-            display: flex; flex-direction: column;
+            flex: 1 !important;
+            min-width: 0 !important; 
+            background: var(--ios-card) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 20px !important;
+            padding: 20px !important;
+            margin: 0 !important; 
+        }
+        .plan-card {
+            position: relative !important; 
+            overflow: hidden !important;  
+            display: flex !important;
+            flex-direction: column !important;
+            background: var(--ios-card) !important;
+            border: 1px solid var(--border) !important;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important;
         }
         .plan-card.pro { border-color: #ff9900; box-shadow: 0 0 20px rgba(255, 153, 0, 0.1); }
         .plan-card.beast { border-color: #9b59b6; background: linear-gradient(135deg, rgba(155, 89, 182, 0.1), transparent); box-shadow: 0 0 20px rgba(155, 89, 182, 0.15); }
@@ -1192,7 +1356,12 @@
         .plan-btn.beast-btn { background: #9b59b6; color: #fff; box-shadow: 0 4px 15px rgba(155, 89, 182, 0.3); }
 
         /* Mobile Default Layout for Plans */
-        .plans-container { display: flex; flex-direction: column; gap: 15px; }
+        .plans-container {
+            display: flex !important;
+            flex-direction: column !important; 
+            gap: 15px !important;
+            padding-bottom: 20px !important;
+        }
         #modal-sub-overlay .modal { width: 90%; max-width: 400px; max-height: 90vh; }
 
         /* =========================================
@@ -1947,13 +2116,10 @@
         /* === STATS UPDATE === */
         /* Контейнер графика */
         .chart-wrapper {
-            position: relative;
-            width: 100%;
-            height: 180px; 
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            margin-bottom: 10px;
+            flex-shrink: 0 !important;
+            height: 220px !important; /* Фиксированная высота */
+            margin-bottom: 20px !important;
+            width: 100% !important;
         }
 
         /* Скролл-контейнер для предпочтений */
@@ -2557,17 +2723,17 @@
 
         /* ROADMAP STYLES */
         .roadmap-container {
-            display: flex;
-            flex-direction: column;
-            gap: 0; /* Убираем gap, так как линия рисуется внутри элемента */
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 0 !important;
+            padding-bottom: 20px;
         }
 
         .roadmap-item {
-            display: flex;
-            gap: 15px;
-            position: relative;
-            /* Убираем нижний отступ у последнего, у остальных оставляем место для линии */
-            padding-bottom: 20px;
+            display: flex !important;
+            gap: 15px !important;
+            padding-bottom: 0 !important; 
+            position: relative !important;
         }
 
         .roadmap-item:last-child {
@@ -2576,11 +2742,11 @@
 
         /* Колонка с иконкой и линией */
         .rm-visual-col {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 40px; /* Фиксированная ширина */
-            flex-shrink: 0;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            width: 40px !important;
+            flex-shrink: 0 !important;
         }
 
         /* Иконка */
@@ -2600,13 +2766,18 @@
 
         /* Линия-соединитель */
         .rm-line {
-            width: 2px;
-            background: var(--border);
-            flex-grow: 1; /* Растягивается на всю оставшуюся высоту */
-            margin-top: 5px; /* Отступ от иконки */
-            margin-bottom: -15px; /* Залезает на следующий элемент, соединяясь */
-            min-height: 20px;
+            width: 2px !important;
+            background: var(--border) !important;
+            flex-grow: 1 !important;
+            min-height: 20px !important;
+            margin-top: -5px !important;
+            margin-bottom: -5px !important;
         }
+
+        .roadmap-item:last-child .rm-line {
+            display: none !important;
+        }
+
 
         /* Контент */
         .rm-content {
@@ -2615,10 +2786,10 @@
             border-radius: 16px;
             padding: 15px;
             flex: 1;
-            /* Центрирование контента относительно иконки */
             display: flex;
             flex-direction: column;
             justify-content: center;
+            padding-bottom: 25px !important;
         }
 
         .rm-title {
@@ -3075,6 +3246,40 @@
             font-weight: 800;
             padding: 4px 10px;
             border-bottom-left-radius: 12px;
+        }
+
+        .modal-header-actions {
+            position: absolute !important;
+            right: 15px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important; /* Отступ между кнопками */
+        }
+
+        /* Общий стиль для круглых кнопок (Крестик и Поделиться) */
+        .icon-btn-round {
+            width: 32px !important;
+            height: 32px !important;
+            border-radius: 50% !important;
+            background: rgba(128, 128, 128, 0.15) !important;
+            color: var(--text-secondary) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 16px !important;
+            cursor: pointer !important;
+            transition: background 0.2s !important;
+        }
+
+        .icon-btn-round:hover {
+            background: var(--nav-bg) !important;
+            color: var(--text-main) !important;
+        }
+
+        .modal-header > span:last-child {
+            display: none !important; 
         }
 
         /* Стили для счетчика (Scarcity Bar) */
@@ -4001,6 +4206,43 @@
             transform: scale(1.2);
         }
 
+        #hist-list-swipes .ios-row, 
+        #hist-list-watch .ios-row,
+        #hist-list-wrapped .wrapped-archive-item {
+            border-radius: 16px !important;
+            margin-bottom: 8px !important; /* Отступ между карточками */
+            border: 1px solid var(--border) !important; /* Легкая обводка для красоты */
+        }
+
+        /* Убираем линию-разделитель, так как теперь у нас отдельные карточки */
+        #hist-list-swipes .ios-row::after,
+        #hist-list-watch .ios-row::after {
+            display: none !important;
+        }
+
+        /* 2. РОАДМАП (Выравнивание и отступы) */
+        .roadmap-item {
+            align-items: center !important; /* Иконки по центру вертикально */
+            margin-bottom: 25px !important; /* Отступ между пунктами */
+        }
+
+        .rm-content {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 6px !important; /* Отступ между Заголовком и Описанием */
+            padding-bottom: 0 !important; /* Убираем лишний отступ снизу */
+        }
+
+        .rm-line {
+            display: none !important;
+        }
+
+        /* 3. ЗАЛ СЛАВЫ (Отступы) */
+        #sponsors-list {
+            margin-right: 15px !important; /* Добавляем отступ справа */
+            width: auto !important;
+        }
+
         /* =========================================
         18. MEDIA QUERIES (ADAPTATION)
         ========================================= */
@@ -4096,13 +4338,29 @@
             .t-circle-btn.medium { width: 70px !important; height: 70px !important; font-size: 30px !important; }
             
             /* 9. Модальные окна */
-            #modal-sub-overlay .modal { max-width: 900px !important; width: 95%; }
+            #modal-sub-overlay .modal {
+                width: 950px !important;
+                max-width: 95% !important;
+            }
             .plans-container { flex-direction: row; align-items: stretch; justify-content: center; }
             .plan-card { flex: 1; }
         }
 
         #hist-list-swipes, #hist-list-watch {
             padding-bottom: 20px;
+        }
+
+        .stats-tf-capsule, 
+        .stats-nav-capsule {
+            flex-shrink: 0 !important;
+            width: 100% !important;
+        }
+
+        @media (min-width: 769px) {
+            .plans-container {
+                flex-direction: row !important;
+                align-items: stretch !important;
+            }
         }
 
         /* =========================================
@@ -4184,6 +4442,7 @@
         }
 
     </style>
+
 </head>
 <body>
 
@@ -4523,111 +4782,100 @@
     </div>
 </div>
 
-<!-- Modal History -->
+<!-- HISTORY MODAL -->
 <div class="modal-overlay" id="modal-history-overlay" onclick="closeHistoryModal(event)">
-    <div class="modal" style="background:var(--sidebar-bg); max-height:85vh; display:flex; flex-direction:column;">
-        
+    <div class="modal">
         <div class="modal-header">
             <span data-key="history_title">History</span>
-            <span style="cursor:pointer" onclick="closeHistoryModal(null, true)">✕</span>
+            <span onclick="closeHistoryModal(null, true)">✕</span>
         </div>
-
-        <div class="modal-body" style="padding: 0; flex: 1; overflow-y: auto;">
+        <div class="modal-body">
             <div id="hist-list-swipes" style="display:block;"></div>
             <div id="hist-list-watch" style="display:none;"></div>
-            <div id="hist-list-wrapped" style="display:none;"></div> 
-        </div>
-
-        <!-- Footer -->
-        <div style="padding: 15px 20px 20px 20px; flex-shrink: 0;">
-            <div class="stats-nav-capsule" style="height: 45px;">
-                <div class="stats-nav-item active" id="hist-nav-swipes" onclick="switchHistoryTab('swipes')">
-                    <span data-key="hist_tab_swipes">Swipes</span>
-                </div>
-                <div class="stats-nav-item" id="hist-nav-watch" onclick="switchHistoryTab('watch')">
-                    <span data-key="hist_tab_watch">Time</span>
-                </div>
-                <div class="stats-nav-item" id="hist-nav-wrapped" onclick="switchHistoryTab('wrapped')">
-                    <span>Wrapped</span>
+            <div id="hist-list-wrapped" style="display:none;"></div>
+            
+            <!-- Footer Controls (Moved to bottom of body content) -->
+            <div style="margin-top: 20px;">
+                <div class="stats-nav-capsule">
+                    <div class="stats-nav-item active" id="hist-nav-swipes" onclick="switchHistoryTab('swipes')">
+                        <span data-key="hist_tab_swipes">Swipes</span>
+                    </div>
+                    <div class="stats-nav-item" id="hist-nav-watch" onclick="switchHistoryTab('watch')">
+                        <span data-key="hist_tab_watch">Time</span>
+                    </div>
+                    <div class="stats-nav-item" id="hist-nav-wrapped" onclick="switchHistoryTab('wrapped')">
+                        <span>Wrapped</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Modal Favorites -->
+<!-- FAVORITES (LIKED) MODAL -->
 <div class="modal-overlay" id="modal-overlay" onclick="closeList(event)">
-    <div class="modal" style="max-height: 85vh; display: flex; flex-direction: column;"> 
+    <div class="modal">
         <div class="modal-header">
             <span data-key="favorites_catalog">Liked</span>
-            <span style="cursor:pointer" onclick="closeList(null, true)">✕</span>
+            <span onclick="closeList(null, true)">✕</span>
         </div>
-        <div class="modal-body" id="modal-catalog-body" style="overflow-y: auto; flex: 1; padding: 15px;">
+        <div class="modal-body" id="modal-catalog-body">
+            <!-- JS inserts content here -->
         </div>
     </div>
 </div>
 
-<!-- Modal Blacklist -->
+<!-- BLACKLIST (DISLIKED) MODAL -->
 <div class="modal-overlay" id="modal-blacklist-overlay" onclick="closeBlacklist(event)">
-    <div class="modal" style="max-height: 85vh; display: flex; flex-direction: column;">
+    <div class="modal">
         <div class="modal-header">
             <span data-key="blacklist_catalog">Disliked</span>
-            <span style="cursor:pointer" onclick="closeBlacklist(null, true)">✕</span>
+            <span onclick="closeBlacklist(null, true)">✕</span>
         </div>
-        <div class="modal-body" id="modal-blacklist-body" style="overflow-y: auto; flex: 1; padding: 15px;">
+        <div class="modal-body" id="modal-blacklist-body">
+            <!-- JS inserts content here -->
         </div>
     </div>
 </div>
 
-<!-- Modal Stats -->
+<!-- STATISTICS MODAL -->
 <div class="modal-overlay" id="modal-stats-overlay" onclick="closeStats(event)">
-    <div class="modal" style="background:var(--sidebar-bg); max-height:85vh; display:flex; flex-direction:column;">
-        
-        <!-- HEADER -->
-        <div class="modal-header" style="flex-direction:column; gap:10px; align-items:flex-start; padding-bottom: 10px; border-bottom:none; flex-shrink: 0;">
-            <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
-                <span data-key="btn_stats" style="font-size:20px;">Statistics</span>
-                
-                <!-- Кнопки справа -->
-                <div style="display:flex; align-items:center; gap:20px;">
-                    <div onclick="shareStats()" style="cursor:pointer; padding:5px; display:flex; align-items:center; justify-content:center;">
-                        <span style="font-size: 24px;">⤤</span>
-                    </div>
-                    <div onclick="closeStats(null, true)" style="cursor:pointer; padding:5px; display:flex; align-items:center; justify-content:center;">
-                        <span style="font-size: 26px; font-weight:400; opacity:0.7;">✕</span>
-                    </div>
-                </div>
-            </div>
+    <div class="modal">
+        <div class="modal-header">
+            <!-- Заголовок по центру -->
+            <span data-key="btn_stats">Statistics</span>
             
-            <!-- Кнопка WRAPPED -->
-            <button id="btn-wrapped-trigger" onclick="openWrapped()" 
-                style="display:none; width:100%; background: linear-gradient(45deg, #FF9900, #9B59B6); border:none; padding:12px; border-radius:14px; color:#fff; font-weight:800; font-size:15px; text-transform:uppercase; cursor:pointer; justify-content:center; align-items:center; letter-spacing:1px; box-shadow: 0 4px 15px rgba(155, 89, 182, 0.4);">
+            <!-- Кнопки справа (Поделиться + Закрыть) -->
+            <div class="modal-header-actions">
+                <div class="icon-btn-round" onclick="shareStats()" title="Share">⤤</div>
+                <div class="icon-btn-round" onclick="closeStats(null, true)">✕</div>
+            </div>
+        </div>
+
+        <div class="modal-body">
+            <!-- Wrapped Button -->
+            <button id="btn-wrapped-trigger" onclick="openWrapped()" class="btn-gen" style="width:100%; padding:12px; margin-bottom:15px; font-size:14px; background: linear-gradient(45deg, #FF9900, #9B59B6); color:#fff; display:none; border:none; border-radius:16px; font-weight:800; text-transform:uppercase; letter-spacing:1px; box-shadow: 0 4px 15px rgba(155, 89, 182, 0.4);">
                 <span data-key="wrapped_btn">Fetish Wrapped ✨</span>
             </button>
-        </div>
 
-        <!-- BODY: График (Скроллится если нужно) -->
-        <div class="modal-body" id="modal-stats-body" style="padding: 0 20px; flex: 1; overflow-y: auto; min-height: 280px; display:flex; flex-direction:column; justify-content:center;">
-            <!-- Сюда JS рисует график -->
-        </div>
+            <!-- Chart Container -->
+            <div id="modal-stats-body" style="min-height: 250px;"></div>
 
-        <!-- FOOTER: Элементы управления (Прижаты к низу) -->
-        <div style="padding: 15px 20px 20px 20px; flex-shrink: 0;">
-            <!-- Переключатель Периода (Week/Month/Year) -->
-            <div class="stats-tf-capsule" style="margin-bottom: 10px;">
-                <div class="stats-tf-item active" id="tf-week" onclick="switchTimeframe('week')">Week</div>
-                <div class="stats-tf-item" id="tf-month" onclick="switchTimeframe('month')">Month</div>
-                <div class="stats-tf-item" id="tf-year" onclick="switchTimeframe('year')">Year</div>
-                <div class="stats-tf-item" id="tf-all" onclick="switchTimeframe('all')">All</div>
-            </div>
-
-            <!-- Переключатель Типа (Preferences/Activity) -->
-            <div class="stats-nav-capsule" style="height: 45px; margin-bottom: 0;">
-                <div class="stats-nav-item active" id="stat-nav-tags" onclick="switchStatsTab('tags')">
-                    <span data-key="stats_prefs">Preferences</span>
+            <!-- Footer Controls -->
+            <div style="margin-top: 20px;">
+                <div class="stats-tf-capsule">
+                    <div class="stats-tf-item active" id="tf-week" onclick="switchTimeframe('week')">Week</div>
+                    <div class="stats-tf-item" id="tf-month" onclick="switchTimeframe('month')">Month</div>
+                    <div class="stats-tf-item" id="tf-year" onclick="switchTimeframe('year')">Year</div>
+                    <div class="stats-tf-item" id="tf-all" onclick="switchTimeframe('all')">All</div>
                 </div>
-                <div class="stats-nav-item" id="stat-nav-activity" onclick="switchStatsTab('activity')">
-                    <span data-key="stats_activity">Activity</span>
+                <div class="stats-nav-capsule" style="margin-top: 8px;">
+                    <div class="stats-nav-item active" id="stat-nav-tags" onclick="switchStatsTab('tags')">
+                        <span data-key="stats_prefs">Preferences</span>
+                    </div>
+                    <div class="stats-nav-item" id="stat-nav-activity" onclick="switchStatsTab('activity')">
+                        <span data-key="stats_activity">Activity</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -4695,32 +4943,36 @@
     </div>
 </div>
 
-<!-- ONBOARDING OVERLAY -->
-<div id="onboarding-overlay" class="modal-overlay" style="z-index: 19000;">
-    <div class="modal" style="max-width: 400px;">
+<!-- ONBOARDING PREFERENCES -->
+<div id="onboarding-overlay" class="modal-overlay">
+    <div class="modal">
         <div class="modal-header">
-            <span data-key="onb_title">Preferences</span>
+            <span data-key="onb_title">Quick Setup</span>
+            <!-- Без кнопки закрытия, так как это обязательный шаг, но есть Skip внизу -->
         </div>
-        <div class="modal-body" style="padding:20px; display:flex; flex-direction:column; gap:15px;">
-            <p style="color:var(--text-secondary); font-size:14px; text-align:center;" data-key="onb_desc">
-                Tell us what you like in one sentence, and we will set up the feed for you.
+        
+        <div class="modal-body">
+            <p style="color:var(--text-secondary); font-size:14px; text-align:center; margin-bottom: 20px;" data-key="onb_desc">
+                Tell us what you like in one sentence.
             </p>
             
             <textarea id="onb-input" rows="3" 
-                style="width:100%; background:var(--bg-color); border:1px solid var(--border); border-radius:12px; padding:10px; color:var(--text-main); font-size:16px; resize:none;"
-                placeholder="e.g. I like milf, anal and big tits..."></textarea>
+                style="width:100%; background:var(--bg-color); border:1px solid var(--border); border-radius:12px; padding:12px; color:var(--text-main); font-size:16px; resize:none;"
+                placeholder="e.g. I like milf..."></textarea>
             
-            <button class="btn-gen" onclick="processOnboardingText()" data-key="onb_btn_check" style="padding:12px; font-size:14px;">Check</button>
+            <button class="btn-gen" onclick="processOnboardingText()" data-key="onb_btn_check" style="margin-top:15px; padding:12px; font-size:14px;">
+                Check
+            </button>
 
-            <!-- Результаты поиска -->
-            <div id="onb-results" style="display:none; flex-direction:column; gap:10px; margin-top:10px; border-top:1px solid var(--border); padding-top:15px;">
+            <!-- Results area -->
+            <div id="onb-results" style="display:none; flex-direction:column; gap:10px; margin-top:20px; border-top:1px solid var(--border); padding-top:15px;">
                 <div style="font-size:12px; color:var(--text-secondary); text-transform:uppercase; text-align:center;" data-key="onb_found">Found:</div>
                 <div id="onb-tags-container" style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;"></div>
                 <button class="btn-watch" onclick="finishOnboarding()" data-key="onb_btn_confirm" style="margin-top:10px;">Confirm & Start</button>
             </div>
             
-            <div style="text-align:center; margin-top:5px;">
-                <span style="font-size:12px; color:var(--text-secondary); text-decoration:underline; cursor:pointer;" onclick="skipOnboarding()" data-key="onb_skip">Skip</span>
+            <div style="text-align:center; margin-top:15px;">
+                <span style="font-size:13px; color:var(--text-secondary); text-decoration:underline; cursor:pointer;" onclick="skipOnboarding()" data-key="onb_skip">Skip setup</span>
             </div>
         </div>
     </div>
@@ -5070,21 +5322,22 @@
 
 <!-- SUBSCRIPTION MODAL -->
 <div class="modal-overlay" id="modal-sub-overlay" onclick="closeSubModal(event)">
-    <div class="modal" style="background:var(--bg-color); max-height:95vh;">
-        <div class="modal-header" style="border:none; padding-bottom:0;">
+    <div class="modal">
+        <div class="modal-header">
             <span data-key="sub_title">Premium Access</span>
-            <span style="cursor:pointer" onclick="closeSubModal(null, true)">✕</span>
+            <div class="modal-header-actions">
+                <div class="icon-btn-round" onclick="closeSubModal(null, true)">✕</div>
+            </div>
         </div>
         
-        <div class="modal-body" style="padding:0 20px 30px 20px; display:block; overflow-y:auto;">
-            
-            <!-- Intro Text -->
-            <div style="text-align:center; margin-bottom:25px; margin-top:10px;">
-                <p style="font-size:14px; color:var(--text-secondary); line-height:1.5;" data-key="sub_intro">
-                    xFetishHub is an ad-free project developed by one enthusiast. It gives a unique experience for free, but your support helps it grow.
+        <div class="modal-body">
+            <div style="text-align:center; margin-bottom:20px; margin-top:5px;">
+                <p style="font-size:13px; color:var(--text-secondary); line-height:1.4;" data-key="sub_intro">
+                    xFetishHub is an ad-free project. Your subscription ensures its survival.
                 </p>
             </div>
 
+            <!-- Toggle -->
             <div class="billing-toggle-container" style="display:flex; justify-content:center; margin-bottom: 20px;">
                 <div class="stats-nav-capsule" style="width: auto; min-width: 200px;">
                     <div id="btn-billing-monthly" class="stats-nav-item active" onclick="switchBilling('monthly')">
@@ -5096,13 +5349,13 @@
                 </div>
             </div>
 
-            <!-- PLANS CONTAINER (Flex on PC) -->
+            <!-- PLANS GRID -->
             <div class="plans-container">
                 
-                <!-- FREE CARD -->
+                <!-- 1. FREE -->
                 <div class="plan-card">
-                    <div class="plan-title">Free</div>
-                    <div class="plan-price">$0</div>
+                    <div class="plan-title" style="font-size:20px; font-weight:800; margin-bottom:5px;">Free</div>
+                    <div class="plan-price" style="font-size:18px; font-weight:700; margin-bottom:15px;">$0</div>
                     <ul class="plan-features">
                         <li id="free-limit-row">🎲 15 Generations / day</li>
                         <li data-key="feat_wrapped_limited">🎁 1 Fetish Wrapped / week</li>
@@ -5111,63 +5364,53 @@
                     <button class="plan-btn current" disabled data-key="btn_current">Current Plan</button>
                 </div>
 
-                <!-- PRO CARD -->
-                <div class="plan-card pro">
-                    <div class="plan-title">Pro <span style="font-size:12px; opacity:0.7">Fan</span></div>
-                    <div class="plan-price" id="price-pro">$2.99 <span style="font-size:12px">/ mo</span></div>
+                <!-- 2. PRO -->
+                <div class="plan-card pro" style="border-color:#ff9900;">
+                    <div class="plan-title" style="font-size:20px; font-weight:800; margin-bottom:5px; color:#ff9900;">Pro</div>
+                    <div class="plan-price" id="price-pro" style="font-size:18px; font-weight:700; margin-bottom:15px;">$2.99 <span style="font-size:12px">/ mo</span></div>
                     <ul class="plan-features">
-                        <li style="color:var(--text-main)" data-key="feat_unlim">🔥 <b>Unlimited</b> Generations</li>
-                        <li data-key="feat_stats_adv">📈 Advanced Stats & History</li>
-                        <li data-key="feat_wrapped_unlim">✨ <b>Unlimited</b> Fetish Wrapped</li>
+                        <li style="color:var(--text-main)" data-key="feat_unlim">🔥 <b>Unlimited</b> Gens</li>
+                        <li data-key="feat_stats_adv">📈 Advanced Stats</li>
+                        <li data-key="feat_wrapped_unlim">✨ <b>Unlimited</b> Wrapped</li>
                         <li data-key="feat_custom">🎨 Deep Customization</li>
-                        <li data-key="feat_early">🚀 Early Access features</li>
                     </ul>
-                    <button class="plan-btn pro-btn" onclick="openPaymentSelection('pro')" data-key="btn_get_pro">Get Pro</button>
+                    <button class="plan-btn pro-btn" onclick="openPaymentSelection('pro')" data-key="btn_get_pro" style="background:#ff9900; color:#000;">Get Pro</button>
                 </div>
 
-                <!-- BEAST CARD -->
-                <div class="plan-card beast">
-                    <div class="plan-title">Beast <span style="font-size:12px; opacity:0.7">Sponsor</span></div>
-                    <div class="plan-price" id="price-beast">$4.99 <span style="font-size:12px">/ mo</span></div>
+                <!-- 3. BEAST -->
+                <div class="plan-card beast" style="border-color:#9b59b6;">
+                    <div class="plan-title" style="font-size:20px; font-weight:800; margin-bottom:5px; color:#9b59b6;">Beast</div>
+                    <div class="plan-price" id="price-beast" style="font-size:18px; font-weight:700; margin-bottom:15px;">$4.99 <span style="font-size:12px">/ mo</span></div>
                     <ul class="plan-features">
                         <li style="color:var(--text-main)" data-key="feat_all_pro">👑 <b>All Pro Features</b></li>
                         <li data-key="feat_discord">💬 <b>Discord</b> (Dev Chat)</li>
                         <li data-key="feat_vote">🗳️ Vote on Roadmap</li>
                     </ul>
-                    <button class="plan-btn beast-btn" onclick="openPaymentSelection('beast')" data-key="btn_get_beast">Unleash Beast</button>
+                    <button class="plan-btn beast-btn" onclick="openPaymentSelection('beast')" data-key="btn_get_beast" style="background:#9b59b6; color:#fff;">Unleash Beast</button>
                 </div>
-                <!-- BESTIE CARD (LIFETIME) -->
-                <div class="plan-card bestie">
-                    <!-- Бейдж сверху -->
-                    <div class="bestie-badge" data-key="badge_limited">LIMITED OFFER</div>
+
+                <!-- 4. BESTIE  -->
+                <div class="plan-card bestie" style="border: 2px solid #00d2ff; background: linear-gradient(165deg, rgba(0, 210, 255, 0.1), transparent); position: relative;">
+                    <div class="bestie-badge" style="background:#00d2ff; color:#000; font-size:10px; font-weight:800; padding:4px 8px; position:absolute; top:0; right:0; border-radius:0 0 0 10px; z-index:5;" data-key="badge_limited">LIMITED</div>
                     
-                    <!-- Заголовок -->
-                    <div class="plan-title">Bestie <span style="font-size:12px; opacity:0.7; -webkit-text-fill-color: initial; color:var(--text-secondary);" data-key="plan_bestie_sub">Lifetime</span></div>
+                    <div class="plan-title" style="font-size:20px; font-weight:800; margin-bottom:5px; color:#00d2ff;">Bestie</div>
+                    <div class="plan-price" style="font-size:18px; font-weight:700; margin-bottom:15px;">$49.99 <span style="font-size:12px">/ once</span></div>
                     
-                    <!-- Цена -->
-                    <div class="plan-price">$49.99 <span style="font-size:12px" data-key="plan_bestie_price">/ once</span></div>
-                    
-                    <!-- Счётчик -->
-                    <div class="limit-container">
-                        <div class="limit-labels">
-                            <span style="font-weight:700; color:#ff6b6b;" data-key="limit_burn">🔥 ALMOST GONE</span>
-                            <span style="font-weight:700; color:#fff;">48 / 50 <span data-key="limit_claimed">claimed</span></span>
+                    <div class="limit-container" style="background:rgba(0,0,0,0.2); padding:8px; border-radius:8px; margin-bottom:10px;">
+                        <div class="limit-labels" style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:4px;">
+                            <span style="color:#ff6b6b; font-weight:700;" data-key="limit_burn">🔥 ALMOST GONE</span>
+                            <span style="color:#fff;">48 / 50</span>
                         </div>
-                        <div class="limit-track">
-                            <div class="limit-fill"></div>
-                        </div>
+                        <div style="width:100%; height:4px; background:rgba(255,255,255,0.1); border-radius:2px;"><div style="width:96%; height:100%; background:#00d2ff;"></div></div>
                     </div>
 
-                    <!-- Список фич -->
                     <ul class="plan-features">
                         <li style="color:var(--text-main)" data-key="feat_lifetime">♾️ <b>Lifetime Access</b></li>
-                        <li style="color:var(--text-main)" data-key="feat_all_beast">🦁 <b>All Beast Features</b></li>
-                        <li data-key="feat_sponsors">💎 Listed in "Sponsors"</li>
-                        <li data-key="feat_onetime">💸 One-time payment</li>
+                        <li data-key="feat_sponsors">💎 In Sponsors List</li>
                     </ul>
-                    
-                    <button class="plan-btn bestie-btn" onclick="openPaymentSelection('bestie')" data-key="btn_get_bestie">Get Forever</button>
+                    <button class="plan-btn bestie-btn" onclick="openPaymentSelection('bestie')" data-key="btn_get_bestie" style="background:linear-gradient(90deg, #00d2ff, #3a7bd5); color:#fff;">Get Forever</button>
                 </div>
+
             </div>
         </div>
     </div>
@@ -5178,274 +5421,254 @@
     <div class="modal">
         <div class="modal-header">
             <span data-key="theme_title">Choose Theme</span>
-            <span style="cursor:pointer" onclick="closeThemeModal(null, true)">✕</span>
+            <span onclick="closeThemeModal(null, true)">✕</span>
         </div>
-        <div class="modal-body" style="padding: 20px;">
-            
+        
+        <div class="modal-body">
             <div class="ios-header" style="margin-left:0; margin-top:0;" data-key="theme_basic">Basic</div>
-            <div class="theme-grid" id="theme-list-basic"></div>
+            <div class="theme-grid" id="theme-list-basic">
+                <!-- JS inserts themes here -->
+            </div>
 
-            <div class="ios-header" style="margin-left:0;" data-key="theme_premium">Premium (Pro)</div>
-            <div class="theme-grid" id="theme-list-premium"></div>
-
+            <div class="ios-header" style="margin-left:0;" data-key="theme_premium">Premium</div>
+            <div class="theme-grid" id="theme-list-premium">
+                <!-- JS inserts themes here -->
+            </div>
         </div>
     </div>
 </div>
 
 <!-- MODIFIERS SETTINGS MODAL -->
 <div class="modal-overlay" id="modal-mods-overlay" onclick="closeModifiersSettings(event)">
-    <div class="modal" style="max-width: 450px;">
+    <div class="modal">
         <div class="modal-header">
             <span data-key="mod_title">Modifiers</span>
-            <span id="mods-counter" style="font-size:14px; color:var(--text-secondary); margin-left:auto; margin-right:15px;">0/10</span>
-            <span style="cursor:pointer" onclick="closeModifiersSettings(null, true)">✕</span>
+            <!-- Счетчик в углу заголовка -->
+            <span id="mods-counter" style="position: absolute; right: 50px; font-size:12px; color:var(--text-secondary); background:var(--ios-card); padding:2px 8px; border-radius:10px;">0/10</span>
+            <span onclick="closeModifiersSettings(null, true)">✕</span>
         </div>
-        <div class="modal-body" style="padding: 20px;">
-            
+        
+        <div class="modal-body">
             <!-- ACTIVE -->
             <div style="font-size:12px; text-transform:uppercase; color:var(--text-secondary); margin-bottom:10px; font-weight:700;" data-key="mod_active_sec">
-                Active (In Card)
+                Active
             </div>
             <div id="mods-list-active" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:25px; min-height:50px;">
-                <!-- JS вставит кнопки сюда -->
+                <!-- JS content -->
             </div>
 
             <div style="height:1px; background:var(--border); margin-bottom:20px;"></div>
 
             <!-- INACTIVE -->
             <div style="font-size:12px; text-transform:uppercase; color:var(--text-secondary); margin-bottom:10px; font-weight:700;" data-key="mod_inactive_sec">
-                Inactive (Hidden)
+                Inactive
             </div>
             <div id="mods-list-inactive" style="display:flex; flex-wrap:wrap; gap:8px;">
-                <!-- JS вставит кнопки сюда -->
+                <!-- JS content -->
             </div>
-
         </div>
     </div>
 </div>
 
 <!-- LEGAL MODAL -->
-<div class="modal-overlay" id="modal-legal-overlay" onclick="window.closeLegal(event)">
-    <div class="modal" style="max-width: 600px; max-height: 85vh; display: flex; flex-direction: column;">
+<div class="modal-overlay" id="modal-legal-overlay" onclick="closeLegal(event)">
+    <div class="modal">
         <div class="modal-header">
             <span id="legal-modal-title">Document</span>
-            <span style="cursor:pointer" onclick="window.closeLegal(null, true)">✕</span>
+            <span onclick="closeLegal(null, true)">✕</span>
         </div>
         
-        <!-- Контент с прокруткой -->
-        <div class="modal-body" style="padding: 20px; overflow-y: auto; font-size: 13px; line-height: 1.6; color: var(--text-secondary);">
-            <div id="legal-modal-content"></div>
+        <div class="modal-body">
+            <div id="legal-modal-content" style="font-size: 14px; line-height: 1.6; color: var(--text-secondary);">
+                <!-- JS Content -->
+            </div>
         </div>
         
         <div style="padding: 15px; border-top: 1px solid var(--border); text-align: center;">
-            <button class="btn-gen" onclick="window.closeLegal(null, true)" data-key="btn_close" style="padding: 10px 30px; font-size: 14px; width: auto;">Close</button>
+            <button class="btn-gen" onclick="closeLegal(null, true)" data-key="btn_close" style="padding: 10px 30px; font-size: 14px; width: auto;">Close</button>
         </div>
     </div>
 </div>
 
 <!-- ADMIN MODAL -->
-<div class="modal-overlay" id="modal-admin-overlay" onclick="closeAdminModal(event)" style="z-index: 25000;">
-    <div class="modal" style="max-width: 450px; background: var(--sidebar-bg);">
-        
-        <div class="modal-header" style="border-bottom: 1px solid var(--border);">
-            <div style="display:flex; align-items:center; gap:10px; color:#ff0000;">
-                <span>👑</span>
-                <span>Admin Control</span>
-            </div>
-            <span style="cursor:pointer; opacity:0.7;" onclick="closeAdminModal(null, true)">✕</span>
+<div class="modal-overlay" id="modal-admin-overlay" onclick="closeAdminModal(event)">
+    <div class="modal">
+        <div class="modal-header">
+            <span style="color:#e74c3c;">Admin Control</span> 
+            <span onclick="closeAdminModal(null, true)">✕</span>
         </div>
 
-        <div class="modal-body" style="padding: 20px;">
+        <div class="modal-body">
             
-            <!-- Генератор кодов -->
+            <!-- Generate Code -->
             <div class="ios-group" style="padding:15px; margin-bottom: 20px;">
-                <div style="font-weight:700; margin-bottom:10px; font-size:13px; text-transform:uppercase; color:var(--text-secondary);">Generate Promo Code</div>
+                <div style="font-weight:700; margin-bottom:10px; font-size:12px; text-transform:uppercase; color:var(--text-secondary);">Promo Generator</div>
                 <div style="display:flex; gap:10px; margin-bottom:10px;">
                     <select id="admin-code-type" class="promo-input" style="flex:1;">
                         <option value="pro">Pro</option>
                         <option value="beast">Beast</option>
                         <option value="bestie">Bestie</option>
                     </select>
-                    <input type="number" id="admin-code-days" class="promo-input" style="width:80px;" value="30" placeholder="Days">
+                    <input type="number" id="admin-code-days" class="promo-input" style="width:80px;" value="30">
                 </div>
-                <button class="btn-gen" onclick="adminGenerateCode()" style="padding:12px; font-size:14px; background:var(--card-bg);">Create Code</button>
-                <div id="admin-code-result" style="margin-top:15px; font-family:monospace; font-size:18px; color:#2ecc71; user-select:all; text-align:center; font-weight:800; min-height:20px;"></div>
+                <button class="btn-gen secondary" onclick="adminGenerateCode()" style="padding:10px; font-size:14px;">Create Code</button>
+                <div id="admin-code-result" style="margin-top:15px; font-family:monospace; font-size:16px; color:#2ecc71; text-align:center; font-weight:800; min-height:20px;"></div>
             </div>
 
-            <!-- Подарок подписки (Поиск по Email) -->
-            <div class="ios-group" style="padding:15px; margin-bottom: 20px;">
-                <div style="font-weight:700; margin-bottom:10px; font-size:13px; text-transform:uppercase; color:var(--text-secondary);">Gift Sub (By Email)</div>
+            <!-- Gift Sub -->
+            <div class="ios-group" style="padding:15px;">
+                <div style="font-weight:700; margin-bottom:10px; font-size:12px; text-transform:uppercase; color:var(--text-secondary);">Gift via Email</div>
                 <input type="text" id="admin-gift-email" class="promo-input" placeholder="User Email..." style="margin-bottom:10px;">
                 
                 <div style="display:flex; gap:10px; margin-bottom:10px;">
                     <select id="admin-gift-type" class="promo-input" style="flex:1;">
                         <option value="pro">Pro</option>
                         <option value="beast">Beast</option>
-                        <option value="bestie">Bestie</option>
                     </select>
                     <input type="number" id="admin-gift-days" class="promo-input" style="width:80px;" value="30">
                 </div>
                 
-                <button class="btn-gen" onclick="adminGiftSub()" style="padding:12px; font-size:14px; background:var(--accent); color:#000;">Activate Sub</button>
-            </div>
-
-            <!-- Сброс подписки (Reset to Free) -->
-            <div class="ios-group" style="padding:15px; border: 1px solid rgba(231, 76, 60, 0.3);">
-                <div style="font-weight:700; margin-bottom:10px; color:var(--highlight-red); font-size:13px; text-transform:uppercase;">Reset Subscription ⚠️</div>
-                <input type="text" id="admin-reset-email" class="promo-input" placeholder="User Email to reset..." style="margin-bottom:10px;">
-                
-                <button class="btn-gen" onclick="adminResetSub()" style="padding:12px; font-size:14px; background:rgba(231, 76, 60, 0.15); border:1px solid var(--highlight-red); color:var(--highlight-red);">
-                    Set to FREE
-                </button>
+                <button class="btn-gen" onclick="adminGiftSub()" style="padding:10px; font-size:14px; background:var(--accent); color:#000;">Activate</button>
             </div>
 
         </div>
     </div>
 </div>
 
-<!-- ABOUT AUTHOR MODAL -->
-<div class="modal-overlay" id="modal-about-overlay" onclick="window.closeAbout(event)" style="z-index: 21000;">
-    <div class="modal" style="max-width: 450px;">
+<!-- ABOUT MODAL -->
+<div class="modal-overlay" id="modal-about-overlay" onclick="closeAbout(event)">
+    <div class="modal">
         <div class="modal-header">
             <span id="about-modal-title">About</span>
-            <span style="cursor:pointer" onclick="window.closeAbout(null, true)">✕</span>
+            <span onclick="closeAbout(null, true)">✕</span>
         </div>
-        <div class="modal-body" style="padding: 20px; font-size: 15px; line-height: 1.6; color: var(--text-main);">
-            
-            <p style="margin-bottom: 15px; font-weight: 700;" id="about-intro">
-            </p>
-            
-            <p style="color: var(--text-secondary); margin-bottom: 25px;" id="about-desc">
-            </p>
+        
+        <div class="modal-body">
+            <p style="margin-bottom: 15px; font-weight: 700; color: var(--text-main);" id="about-intro"></p>
+            <p style="color: var(--text-secondary); margin-bottom: 25px; line-height: 1.6;" id="about-desc"></p>
 
-            <div style="background: var(--ios-card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:13px; font-weight:600; color:var(--text-secondary);">Email:</span>
-                <a href="mailto:bdengerr@gmail.com" style="color:var(--accent); font-weight:700; text-decoration:none; font-size:15px;">bdengerr@gmail.com</a>
+            <div class="ios-group">
+                <div class="ios-row">
+                    <span style="color:var(--text-secondary);">Email</span>
+                    <a href="mailto:bdengerr@gmail.com" style="color:var(--accent); font-weight:600;">bdengerr@gmail.com</a>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <!-- INSTALL APP MODAL -->
-<div id="modal-install-overlay" class="modal-overlay" style="z-index: 19500;">
-    <div class="modal" style="max-width: 400px; padding: 20px;">
-        <div style="text-align:center; margin-bottom:20px;">
-            <img src="logo.png" style="width:60px; height:60px; border-radius:15px; margin-bottom:15px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-            <h2 style="margin:0 0 10px 0; font-size:20px;" data-key="install_title">Install App</h2>
-            
-            <p style="font-size:14px; color:var(--text-secondary); line-height:1.5;" data-key="install_desc">
-                Install our app for a full-screen experience. Plus, watch videos in the built-in browser to keep your main browser history clean!
-            </p>
-        </div>
-
-        <!-- Кнопки выбора платформы -->
-        <div class="ios-group" style="margin-bottom:15px;">
-            <!-- iOS -->
-            <div class="ios-row clickable" onclick="toggleInstallInstruct('ios')">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <span style="font-size:20px;">🍎</span>
-                    <span style="font-weight:600;">iPhone (Safari)</span>
-                </div>
-                <span>▼</span>
-            </div>
-            <!-- Инструкция iOS (Скрыта) -->
-            <div id="instruct-ios" style="display:none; padding:15px; background:var(--bg-color); font-size:13px; color:var(--text-secondary); line-height:1.6;">
-                1. <span data-key="inst_ios_1">Tap the <b>Share</b> button</span> <span style="font-size:16px">⎋</span><br>
-                2. <span data-key="inst_ios_2">Scroll down and tap</span> <br>
-                <span style="display:inline-block; background:var(--ios-separator); padding:4px 8px; border-radius:6px; margin:4px 0; color:var(--text-main); font-weight:600;">➕ <span data-key="inst_ios_btn">Add to Home Screen</span></span><br>
-                3. <span data-key="inst_ios_3">Tap <b>Add</b> in the top right.</span>
-            </div>
-
-            <!-- Android -->
-            <div class="ios-row clickable" onclick="toggleInstallInstruct('android')">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <span style="font-size:20px;">🤖</span>
-                    <span style="font-weight:600;">Android (Chrome)</span>
-                </div>
-                <span>▼</span>
-            </div>
-            <!-- Инструкция Android (Скрыта) -->
-            <div id="instruct-android" style="display:none; padding:15px; background:var(--bg-color); font-size:13px; color:var(--text-secondary); line-height:1.6;">
-                1. <span data-key="inst_and_1">Tap the <b>Menu</b> button (3 dots)</span> <span style="font-size:16px">⋮</span><br>
-                2. <span data-key="inst_and_2">Select</span> <br>
-                <span style="display:inline-block; background:var(--ios-separator); padding:4px 8px; border-radius:6px; margin:4px 0; color:var(--text-main); font-weight:600;">⬇ <span data-key="inst_and_btn">Install App</span></span>
-            </div>
-        </div>
-
-        <button class="btn-gen" onclick="skipInstall()" data-key="install_continue" style="padding:15px; font-size:14px; background:transparent; border:1px solid var(--border); color:var(--text-secondary);">Continue in Browser</button>
-    </div>
-</div>
-
-<!-- LOGIN EXPLANATION MODAL -->
-<div class="modal-overlay" id="modal-login-overlay" onclick="closeLoginModal(event)" style="z-index: 23000;">
-    <div class="modal" style="max-width: 380px; padding: 25px;">
-        
-        <div style="text-align:center; margin-bottom: 20px;">
-            <div style="font-size:40px; margin-bottom:10px;">☁️</div>
-            <h2 style="margin:0; font-size:22px;" data-key="auth_title">Sync & Backup</h2>
-        </div>
-
-        <ul class="auth-benefits">
-            <li>
-                <div class="auth-icon">🔄</div>
-                <span data-key="auth_p1">Store history and preferences across all devices</span>
-            </li>
-            <li>
-                <div class="auth-icon">⭐</div>
-                <span data-key="auth_p2">Activate Pro / Beast status</span>
-            </li>
-            <li>
-                <div class="auth-icon">🔒</div>
-                <span data-key="auth_p3">Anonymous storage on Google servers</span>
-            </li>
-        </ul>
-
-        <button class="btn-google" onclick="performGoogleLogin()">
-            <img src="google_logo.svg.png" width="20" height="20" style="object-fit: contain;">
-            <span data-key="btn_google_signin">Continue with Google</span>
-        </button>
-
-        <div class="auth-note" data-key="auth_security_note">
-            Developer has no access to data. Don't worry about your history safety 😏
+<div class="modal-overlay" id="modal-install-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <span data-key="install_title">Install App</span>
         </div>
         
-        <div style="text-align:center; margin-top:15px;">
-            <span style="color:var(--text-secondary); font-size:13px; cursor:pointer;" onclick="closeLoginModal(null, true)" data-key="btn_cancel">Cancel</span>
-        </div>
-    </div>
-</div>
-
-<!-- SYNC INFO & LOGOUT MODAL -->
-<div class="modal-overlay" id="modal-sync-info-overlay" onclick="closeSyncInfoModal(event)" style="z-index: 23000;">
-    <div class="modal" style="max-width: 400px; padding: 0; background: var(--sidebar-bg); overflow: hidden;">
-        
-        <!-- Header -->
-        <div class="modal-header" style="border-bottom: 1px solid var(--border); padding: 15px 20px;">
-            <div style="display:flex; align-items:center; gap:10px;">
-                <span style="font-size:24px;">☁️</span>
-                <span data-key="sync_title">Cloud Storage</span>
-            </div>
-            <span style="cursor:pointer; opacity:0.6;" onclick="closeSyncInfoModal(null, true)">✕</span>
-        </div>
-
-        <!-- Body -->
-        <div class="modal-body" style="padding: 20px;">
-            
-            <div style="text-align:center; margin-bottom:20px; color:var(--text-secondary); font-size:13px;">
-                <span id="sync-email-display" style="color:var(--text-main); font-weight:700;">...</span>
+        <div class="modal-body">
+            <div style="text-align:center; margin-bottom:20px;">
+                <img src="logo.png" style="width:60px; height:60px; border-radius:15px; margin-bottom:15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
                 
-                <!-- Блок подписки -->
+                <p style="font-size:14px; color:var(--text-secondary); line-height:1.5;" data-key="install_desc">
+                    Install our app for a full-screen experience and private browsing history.
+                </p>
+            </div>
+
+            <!-- Platform Select -->
+            <div class="ios-group" style="margin-bottom:15px;">
+                <!-- iOS -->
+                <div class="ios-row clickable" onclick="toggleInstallInstruct('ios')">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span style="font-size:20px;">🍎</span>
+                        <span style="font-weight:600;">iPhone (Safari)</span>
+                    </div>
+                    <span>▼</span>
+                </div>
+                <div id="instruct-ios" style="display:none; padding:15px; background:var(--bg-color); font-size:13px; color:var(--text-secondary); line-height:1.6;">
+                    1. <span data-key="inst_ios_1">Tap Share</span> <br>
+                    2. <span data-key="inst_ios_2">Scroll down and tap</span> <br>
+                    <span style="font-weight:700; color:var(--text-main);">➕ <span data-key="inst_ios_btn">Add to Home Screen</span></span>
+                </div>
+
+                <!-- Android -->
+                <div class="ios-row clickable" onclick="toggleInstallInstruct('android')">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span style="font-size:20px;">🤖</span>
+                        <span style="font-weight:600;">Android (Chrome)</span>
+                    </div>
+                    <span>▼</span>
+                </div>
+                <div id="instruct-android" style="display:none; padding:15px; background:var(--bg-color); font-size:13px; color:var(--text-secondary); line-height:1.6;">
+                    1. <span data-key="inst_and_1">Tap Menu (3 dots)</span> <br>
+                    2. <span data-key="inst_and_2">Select</span> <br>
+                    <span style="font-weight:700; color:var(--text-main);">⬇ <span data-key="inst_and_btn">Install App</span></span>
+                </div>
+            </div>
+
+            <button class="btn-gen secondary" onclick="skipInstall()" data-key="install_continue" style="padding:15px; font-size:14px;">
+                Continue in Browser
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- LOGIN (AUTH) MODAL -->
+<div class="modal-overlay" id="modal-login-overlay" onclick="closeLoginModal(event)">
+    <div class="modal" style="max-width: 380px;">
+        <div class="modal-header">
+            <span data-key="auth_title">Sync & Backup</span>
+            <span onclick="closeLoginModal(null, true)">✕</span>
+        </div>
+        
+        <div class="modal-body">
+            <div style="text-align:center; margin-bottom: 20px;">
+                <div style="font-size:40px; margin-bottom:10px;">☁️</div>
+            </div>
+
+            <ul class="auth-benefits">
+                <li>
+                    <div class="auth-icon">🔄</div>
+                    <span data-key="auth_p1">Sync history across devices</span>
+                </li>
+                <li>
+                    <div class="auth-icon">⭐</div>
+                    <span data-key="auth_p2">Activate Premium status</span>
+                </li>
+                <li>
+                    <div class="auth-icon">🔒</div>
+                    <span data-key="auth_p3">Anonymous secure storage</span>
+                </li>
+            </ul>
+
+            <button class="btn-google" onclick="performGoogleLogin()">
+                <img src="google_logo.svg.png" width="20" height="20" style="object-fit: contain;">
+                <span data-key="btn_google_signin">Continue with Google</span>
+            </button>
+
+            <div class="auth-note" data-key="auth_security_note">
+                We respect your privacy. No data leaks.
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SYNC INFO MODAL -->
+<div class="modal-overlay" id="modal-sync-info-overlay" onclick="closeSyncInfoModal(event)">
+    <div class="modal">
+        <div class="modal-header">
+            <span data-key="sync_title">Cloud Storage</span>
+            <span onclick="closeSyncInfoModal(null, true)">✕</span>
+        </div>
+        <div class="modal-body">
+            <div style="text-align:center; margin-bottom:20px; color:var(--text-secondary); font-size:13px;">
+                <span id="sync-email-display" style="color:var(--text-main); font-weight:700; font-size:16px;">...</span>
                 <div id="sync-plan-box" style="margin-top: 8px; display: inline-flex; align-items: center; gap: 8px; background: var(--ios-card); border: 1px solid var(--border); padding: 4px 10px; border-radius: 20px;">
-                    <span id="sync-plan-badge" style="font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">FREE</span>
+                    <span id="sync-plan-badge" style="font-weight: 800; font-size: 11px;">FREE</span>
                     <span id="sync-plan-expiry" style="font-size: 11px; color: var(--text-secondary); display: none;">...</span>
                 </div>
-
-                <br>
-                <!-- ДОБАВИЛ data-key -->
+                <br><br>
                 <span data-key="sync_desc">Data stored safely on Google servers</span>
             </div>
 
-            <!-- Stats Grid -->
             <div class="sync-stats-grid">
                 <div class="sync-stat-item">
                     <span class="sync-stat-val" id="cloud-fav-count">...</span>
@@ -5466,199 +5689,158 @@
             </div>
 
             <div style="background:rgba(255,153,0,0.1); border:1px solid rgba(255,153,0,0.3); padding:10px; border-radius:12px; margin-bottom:20px; font-size:12px; color:var(--text-secondary); text-align:center;">
-                <!-- ДОБАВИЛ data-key -->
-                <span data-key="sync_tip">Click "Synchronize" to merge Cloud data with this device.</span>
+                <span data-key="sync_tip">Click "Synchronize" to merge Cloud data.</span>
             </div>
 
-            <!-- Actions -->
             <div style="display:flex; flex-direction:column; gap:10px;">
-                <button class="btn-gen" onclick="performManualSync()" id="btn-manual-sync" style="padding:15px; font-size:15px; background:var(--accent); color:#000; border:none;">
-                    <!-- ДОБАВИЛ data-key -->
-                    <span id="sync-btn-text" data-key="btn_sync">🔄 Synchronize Device</span>
+                <button class="btn-gen" onclick="performManualSync()" id="btn-manual-sync" style="background:var(--accent); color:#000;">
+                    <span id="sync-btn-text" data-key="btn_sync">Synchronize Device</span>
                 </button>
-
-                <button class="btn-gen" onclick="window.logout()" style="padding:15px; font-size:15px; background:transparent; border:1px solid var(--highlight-red); color:var(--highlight-red);">
+                <button class="btn-gen secondary" onclick="window.logout()" style="border-color:var(--highlight-red); color:var(--highlight-red);">
                     <span data-key="logout_text">Log Out</span>
                 </button>
             </div>
-
         </div>
     </div>
 </div>
 
 <!-- ROADMAP MODAL -->
 <div class="modal-overlay" id="modal-roadmap-overlay" onclick="closeRoadmap(event)">
-    <div class="modal" style="max-width: 500px; max-height: 90vh;">
-        
-        <div class="modal-header" style="border-bottom:none; padding-bottom:0;">
+    <div class="modal">
+        <div class="modal-header">
             <span data-key="roadmap_title">Future Plans</span>
-            <span style="cursor:pointer" onclick="closeRoadmap(null, true)">✕</span>
+            <span onclick="closeRoadmap(null, true)">✕</span>
         </div>
 
-        <div class="modal-body" style="padding: 20px;">
-            
-            <p style="font-size:14px; color:var(--text-secondary); line-height:1.5; margin-bottom:25px; text-align:center;" data-key="roadmap_desc">
-                With your active support, xFetishHub will evolve into the ultimate platform. Here is what we are building:
+        <div class="modal-body">
+            <p style="font-size:13px; color:var(--text-secondary); line-height:1.5; margin-bottom:25px; text-align:center;" data-key="roadmap_desc">
+                With your support, xFetishHub will evolve. Here is what we are building:
             </p>
 
-            <!-- Контейнер с обновленной структурой -->
             <div class="roadmap-container">
                 
-                <!-- Item 1 -->
+                <!-- 1. Global Intelligence -->
                 <div class="roadmap-item">
                     <div class="rm-visual-col">
-                        <div class="rm-icon-box" style="color: #9b59b6; background: rgba(155, 89, 182, 0.15);">🌐</div>
+                        <div class="rm-icon-box" style="width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#9b59b6; background:rgba(155, 89, 182, 0.15); border:1px solid rgba(155, 89, 182, 0.3); z-index:2;">🌐</div>
                         <div class="rm-line"></div>
                     </div>
                     <div class="rm-content">
-                        <div class="rm-title" data-key="rm_global_title">Global Intelligence</div>
-                        <div class="rm-desc" data-key="rm_global_desc">
-                            Aggregation of anonymous data from all users to create the smartest recommendation engine.
+                        <div class="rm-title" style="font-weight:700; margin-bottom:5px; font-size:15px;" data-key="rm_global_title">Global Intelligence</div>
+                        <div class="rm-desc" style="font-size:13px; color:var(--text-secondary); line-height:1.4;" data-key="rm_global_desc">
+                            Aggregation of anonymous data. Global 'Most Loved' charts.
                         </div>
                     </div>
                 </div>
 
-                <!-- Item 2 -->
+                <!-- 2. Co-op Mode -->
                 <div class="roadmap-item">
                     <div class="rm-visual-col">
-                        <div class="rm-icon-box" style="color: #2ecc71; background: rgba(46, 204, 113, 0.15);">🤝</div>
+                        <div class="rm-icon-box" style="width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#2ecc71; background:rgba(46, 204, 113, 0.15); border:1px solid rgba(46, 204, 113, 0.3); z-index:2;">🤝</div>
                         <div class="rm-line"></div>
                     </div>
                     <div class="rm-content">
-                        <div class="rm-title" data-key="rm_coop_title">Co-op Mode</div>
-                        <div class="rm-desc" data-key="rm_coop_desc">
-                            Invite a partner or friend to a session. They will see what genres you roll in real-time.
+                        <div class="rm-title" style="font-weight:700; margin-bottom:5px; font-size:15px;" data-key="rm_coop_title">Co-op Mode</div>
+                        <div class="rm-desc" style="font-size:13px; color:var(--text-secondary); line-height:1.4;" data-key="rm_coop_desc">
+                            Invite a partner. See results in real-time. Perfect for distant couples.
                         </div>
                     </div>
                 </div>
 
-                <!-- Item 3 -->
+                <!-- 3. More Categories -->
                 <div class="roadmap-item">
                     <div class="rm-visual-col">
-                        <div class="rm-icon-box" style="color: #ff9900; background: rgba(255, 153, 0, 0.15);">📚</div>
+                        <div class="rm-icon-box" style="width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#ff9900; background:rgba(255, 153, 0, 0.15); border:1px solid rgba(255, 153, 0, 0.3); z-index:2;">📚</div>
                         <div class="rm-line"></div>
                     </div>
                     <div class="rm-content">
-                        <div class="rm-title" data-key="rm_content_title">5000+ Categories</div>
-                        <div class="rm-desc" data-key="rm_content_desc">
-                            Massive database expansion. Every specific micro-fetish and niche genre will be indexed.
+                        <div class="rm-title" style="font-weight:700; margin-bottom:5px; font-size:15px;" data-key="rm_content_title">5000+ Categories</div>
+                        <div class="rm-desc" style="font-size:13px; color:var(--text-secondary); line-height:1.4;" data-key="rm_content_desc">
+                            Massive database expansion. Every micro-fetish indexed.
                         </div>
                     </div>
                 </div>
 
-                <!-- Item 4 (Последний - без линии) -->
+                <!-- 4. Actor Selector -->
                 <div class="roadmap-item">
                     <div class="rm-visual-col">
-                        <div class="rm-icon-box" style="color: #3498db; background: rgba(52, 152, 219, 0.15);">⭐</div>
-                        <!-- Линии нет -->
+                        <div class="rm-icon-box" style="width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#3498db; background:rgba(52, 152, 219, 0.15); border:1px solid rgba(52, 152, 219, 0.3); z-index:2;">⭐</div>
+                        <!-- No line for last item -->
                     </div>
                     <div class="rm-content">
-                        <div class="rm-title" data-key="rm_actors_title">Actor Selector</div>
-                        <div class="rm-desc" data-key="rm_actors_desc">
-                            A dedicated mode to find pornstars and models based on your visual preferences.
+                        <div class="rm-title" style="font-weight:700; margin-bottom:5px; font-size:15px;" data-key="rm_actors_title">Actor Selector</div>
+                        <div class="rm-desc" style="font-size:13px; color:var(--text-secondary); line-height:1.4;" data-key="rm_actors_desc">
+                            Find pornstars based on visual preferences and body types.
                         </div>
                     </div>
                 </div>
 
             </div>
 
-            <!-- Закрывает Roadmap -> Открывает Sub -->
-            <div style="margin-top:20px; text-align:center;">
-                <button class="btn-gen" onclick="closeRoadmap(null, true); openSubModal();" style="padding:15px; font-size:14px; background:var(--nav-bg); border:1px solid var(--accent); color:var(--text-main);">
+            <div style="margin-top:10px; text-align:center;">
+                <button class="btn-gen secondary" onclick="closeRoadmap(null, true); openSubModal();" style="border-color:var(--accent); color:var(--text-main);">
                     <span data-key="rm_support_btn">Support Development 🚀</span>
                 </button>
             </div>
-
         </div>
     </div>
 </div>
 
-<!-- QR CODE MODAL (FOR PC) -->
+<!-- QR CODE MODAL -->
 <div class="modal-overlay" id="modal-qr-overlay" onclick="closeQRModal(event)">
-    <div class="modal" style="max-width: 450px;">
+    <div class="modal">
         <div class="modal-header">
             <span data-key="qr_title">Scan to Install</span>
-            <span style="cursor:pointer" onclick="closeQRModal(null, true)">✕</span>
+            <span onclick="closeQRModal(null, true)">✕</span>
         </div>
-        <div class="modal-body" style="padding: 25px; text-align: center;">
-            
-            <!-- QR Image -->
+        
+        <div class="modal-body" style="text-align: center;">
             <div style="background: white; padding: 15px; border-radius: 20px; display: inline-block; margin-bottom: 20px;">
                 <img id="qr-code-img" src="" alt="QR Code" style="width: 200px; height: 200px; display: block;">
             </div>
 
-            <p style="font-size:14px; color:var(--text-secondary); margin-bottom:25px; line-height: 1.5;" data-key="qr_desc">
-                Scan this QR code with your phone camera to open the site, then follow the instructions below:
+            <p style="font-size:14px; color:var(--text-secondary); line-height: 1.5;" data-key="qr_desc">
+                Scan with your phone camera.
             </p>
-
-            <!-- Instructions (Static List) -->
-            <div class="ios-group" style="text-align: left;">
-                <!-- iOS -->
-                <div class="ios-row" style="display:block; padding: 12px 16px;">
-                    <div style="font-weight:700; color:var(--text-main); margin-bottom:5px; display:flex; align-items:center; gap:8px;">
-                        <span style="font-size:18px;">🍎</span> iOS (Safari)
-                    </div>
-                    <div style="font-size:12px; color:var(--text-secondary); line-height:1.4;">
-                        1. <span data-key="inst_ios_1">Tap Share</span> <span style="font-size:14px">⎋</span><br>
-                        2. <span data-key="inst_ios_2">Scroll & Tap</span> <b><span data-key="inst_ios_btn">Add to Home Screen</span></b>
-                    </div>
-                </div>
-                <!-- Android -->
-                <div class="ios-row" style="display:block; padding: 12px 16px;">
-                    <div style="font-weight:700; color:var(--text-main); margin-bottom:5px; display:flex; align-items:center; gap:8px;">
-                        <span style="font-size:18px;">🤖</span> Android (Chrome)
-                    </div>
-                    <div style="font-size:12px; color:var(--text-secondary); line-height:1.4;">
-                        1. <span data-key="inst_and_1">Tap Menu</span> <span style="font-size:14px">⋮</span><br>
-                        2. <span data-key="inst_and_btn">Install App</span>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </div>
 </div>
 
 <!-- SPONSORS MODAL -->
 <div class="modal-overlay" id="modal-sponsors-overlay" onclick="closeSponsorsModal(event)">
-    <div class="modal" style="max-width: 400px; max-height: 80vh;">
+    <div class="modal">
         <div class="modal-header">
-            <!-- ЗАГОЛОВОК -->
             <span data-key="sponsors_title">Early Sponsors</span>
-            <span style="cursor:pointer" onclick="closeSponsorsModal(null, true)">✕</span>
+            <span onclick="closeSponsorsModal(null, true)">✕</span>
         </div>
-        
-        <div class="modal-body" style="padding: 0;">
-            <!-- ОПИСАНИЕ -->
-            <div style="padding: 20px 20px 10px 20px; text-align: center; color: var(--text-secondary); font-size: 13px; line-height: 1.5;" data-key="sponsors_desc">
-                These legends supported xFetishHub at the very beginning by purchasing the Bestie plan. <br>Forever grateful! 💙
+        <div class="modal-body">
+            <div style="text-align: center; color: var(--text-secondary); font-size: 13px; margin-bottom: 15px;" data-key="sponsors_desc">
+                Legends who supported xFetishHub early.
             </div>
-
-            <div class="ios-group" style="margin: 10px 15px 20px 15px;" id="sponsors-list">
+            <div class="ios-group" id="sponsors-list">
             </div>
         </div>
     </div>
 </div>
 
 <!-- CRYPTO PAYMENT MODAL -->
-<div class="modal-overlay" id="modal-crypto-payment" style="z-index: 24000;">
-    <div class="modal" style="max-width: 400px; text-align: center; background: var(--sidebar-bg);">
+<div class="modal-overlay" id="modal-crypto-payment">
+    <div class="modal" style="text-align: center;">
         
-        <!-- HEADER -->
         <div class="modal-header">
-            <span data-key="pay_header">USDT (TRC20) Payment</span>
-            <span style="cursor:pointer" onclick="closeCryptoModal()">✕</span>
+            <span data-key="pay_header">USDT Payment</span>
+            <span onclick="closeCryptoModal()">✕</span>
         </div>
 
-        <div class="modal-body" style="padding: 20px;">
+        <div class="modal-body">
             
-            <!-- MAIN VIEW -->
+            <!-- MAIN VIEW: QR & Address -->
             <div id="crypto-main-view">
                 <p style="font-size:13px; color:var(--text-secondary); margin-bottom:15px; line-height:1.4;" data-key="pay_instruction">
-                    Send the <b>exact amount</b> via <b>Tron (TRC20)</b> network.<br>Activation is automatic (1-2 mins).
+                    Send the <b>exact amount</b> via <b>Tron (TRC20)</b> network.<br>Activation is automatic.
                 </p>
                 
-                <!-- QR Code -->
+                <!-- QR Code Box -->
                 <div style="margin-bottom:20px; background:white; padding:10px; display:inline-block; border-radius:15px; box-shadow: 0 5px 20px rgba(0,0,0,0.3);">
                     <img id="crypto-qr-img" src="" style="width:180px; height:180px; display:block;">
                 </div>
@@ -5671,7 +5853,7 @@
                     </div>
                 </div>
 
-                <!-- Address -->
+                <!-- Address Copy -->
                 <div class="ios-group" style="margin-bottom:15px;">
                     <div class="ios-row clickable" onclick="copyCryptoAddress()" style="display:block; padding:15px; text-align:center;">
                         <div style="font-size:11px; color:var(--text-secondary); text-transform:uppercase; margin-bottom:5px;" data-key="pay_copy_addr">Tap to Copy Address</div>
@@ -5679,55 +5861,54 @@
                     </div>
                 </div>
 
-                <!-- How to buy link -->
+                <!-- Toggle Guide Link -->
                 <div style="margin-bottom:20px;">
                     <span style="font-size:12px; color:var(--accent); text-decoration:underline; cursor:pointer;" onclick="toggleCryptoGuide(true)" data-key="pay_how_to">Don't have crypto? How to pay</span>
                 </div>
 
-                <!-- Status Loader -->
+                <!-- Loading Spinner -->
                 <div id="payment-status-box">
                     <div class="thinking-spinner" style="width:24px; height:24px; border-width:3px; margin:0 auto 10px auto;"></div>
                     <div style="font-size:13px; font-weight:600; color:var(--text-secondary); animation: pulse 2s infinite;" data-key="pay_waiting">Waiting for payment...</div>
                 </div>
                 
-                <!-- Timer -->
                 <div id="crypto-timer" style="margin-top:10px; font-size:11px; color:var(--text-secondary); opacity:0.5;">--:--</div>
             </div>
 
-            <!-- GUIDE VIEW (Скрыто по умолчанию) -->
+            <!-- GUIDE VIEW (Hidden by default) -->
             <div id="crypto-guide-view" style="display:none; text-align:left;">
                 <div style="font-weight:700; font-size:16px; margin-bottom:15px; text-align:center;" data-key="guide_title">How to pay with Crypto</div>
                 
                 <div style="font-size:13px; line-height:1.6; color:var(--text-secondary);">
                     <p style="margin-bottom:10px;">
-                        <b style="color:var(--text-main)">1. Telegram Wallet (Easiest):</b><br>
-                        Open <a href="https://t.me/wallet" target="_blank" style="color:var(--accent)">@wallet</a> in Telegram. Buy USDT with your bank card (P2P Market). Then click "Send" → "External Wallet" → paste our address.
+                        <b style="color:var(--text-main)">1. Telegram Wallet:</b><br>
+                        Open <a href="https://t.me/wallet" target="_blank" style="color:var(--accent)">@wallet</a>. Buy USDT via P2P (Bank Card). Click "Send" → "External Wallet" → paste address.
                     </p>
                     <p style="margin-bottom:10px;">
                         <b style="color:var(--text-main)">2. Trust Wallet / TronLink:</b><br>
-                        Download the app. Click "Buy", select USDT (TRC20) and pay with card. Then send to our address.
+                        Download app. Buy USDT (TRC20) with card. Send to our address.
                     </p>
                     <p style="margin-bottom:10px; font-size:12px; opacity:0.8;">
-                        ⚠️ <span data-key="guide_warning">Important: Select <b>TRON (TRC20)</b> network when sending.</span>
+                        ⚠️ <span data-key="guide_warning">Important: Select <b>TRON (TRC20)</b> network.</span>
                     </p>
                 </div>
 
                 <button class="btn-gen secondary" onclick="toggleCryptoGuide(false)" style="margin-top:15px; width:100%; padding:10px;" data-key="btn_back">Back to Payment</button>
             </div>
 
-            <!-- Success View -->
+            <!-- SUCCESS VIEW (Hidden by default) -->
             <div id="payment-success-msg" style="display:none; margin-top:20px; animation: popIn 0.5s ease;">
                 <div style="font-size:50px; margin-bottom:10px;">✅</div>
                 <h3 style="color:var(--highlight-green); margin:0 0 10px 0;" data-key="pay_success_title">Payment Received!</h3>
                 <p style="font-size:13px; color:var(--text-secondary);" data-key="pay_success_desc">Subscription activated.</p>
                 
-                <!--  DISCORD (Скрыта по умолчанию) -->
                 <a id="btn-discord-join" href="#" target="_blank" class="btn-gen" style="display:none; margin-top:15px; background:#5865F2; color:#fff; text-decoration:none; align-items:center; justify-content:center; gap:8px;">
                     <span style="font-size:20px;">💬</span> Join Discord
                 </a>
 
                 <button class="btn-gen" onclick="location.reload()" style="margin-top:15px; width:100%;" data-key="pay_reload">Reload Page</button>
             </div>
+
         </div>
     </div>
 </div>
@@ -13223,7 +13404,8 @@
 
     function closeHistoryModal(e, force) {
         if (force || e.target.id === 'modal-history-overlay') {
-            document.getElementById('modal-history-overlay').classList.remove('open');
+            const modal = document.getElementById('modal-history-overlay');
+            modal.classList.remove('open');
         }
     }
 
@@ -14991,6 +15173,17 @@
             console.error(e);
         });
     }
+
+    // Закрытие всех модалок по ESC
+    document.addEventListener('keydown', function(event) {
+        if (event.key === "Escape") {
+            // Находим все открытые оверлеи
+            const openModals = document.querySelectorAll('.modal-overlay.open');
+            openModals.forEach(modal => {
+                modal.classList.remove('open');
+            });
+        }
+    });
 
 </script>
 
