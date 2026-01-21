@@ -9018,14 +9018,12 @@
     function adjustTagScoresByTags(tags, delta) {
         if (!tags) return;
         
-        // 1. Time Decay: Уменьшаем вес ВСЕХ тегов перед обновлением текущих
-        // Это гарантирует, что свежие лайки важнее старых
+        // Time Decay
         for (let key in tagScores) {
             if (tagScores[key] > 0) tagScores[key] *= TAG_DECAY_RATE;
         }
 
-        // 2. Обновляем текущие теги
-        const ignore = ['universal', 'straight', 'male', 'female', 'adult', 'video'];
+        const ignore = ['general', 'specific', 'straight', 'male', 'female', 'adult', 'video', 'hd', 'kinky', 'fetish'];
         
         tags.forEach(tag => {
             if (ignore.includes(tag)) return;
@@ -9035,8 +9033,7 @@
             // Добавляем вес
             tagScores[tag] += delta;
 
-            // 3. Кэппинг (Ограничение): Не даем весу улететь в космос
-            // Максимум 100, Минимум -100
+            // Кэппинг
             if (tagScores[tag] > 100) tagScores[tag] = 100;
             if (tagScores[tag] < -100) tagScores[tag] = -100;
         });
@@ -9051,59 +9048,93 @@
     }
 
     function calculateItemWeight(item) {
-        // Базовые проверки
+        // 1. Базовые проверки (ЧС и Кулдаун)
         if (blacklist.includes(item.id)) return 0;
         if (cooldownList.includes(item.id)) return 0.1;
 
         let score = 50; 
+        
+        // Определяем тип контента
+        const isGeneral = item.tags.includes('general');
+        const isSpecific = item.tags.includes('specific');
 
-        // === РЕЖИМ 1: PLEASURE (Только любимое) ===
+        // Считаем общее количество действий пользователя (лайки + дизлайки)
+        const totalInteractions = favorites.length + blacklist.length;
+
+        // === ЛОГИКА ВОРОНКИ ===
+
+        if (isGeneral) {
+            // Базовый буст для общих категорий
+            score += 100; 
+
+            // Если пользователь новичок (< 30 действий), сильно пушим General,
+            // чтобы быстрее понять его вкусы
+            if (totalInteractions < 30) {
+                score += 200;
+            }
+        }
+
+        // Считаем совпадения по тегам из истории
+        let historyScore = 0;
+        let knownTagsCount = 0;
+
+        item.tags.forEach(tag => {
+            // Игнорируем технические теги при подсчете очков
+            if (['general', 'specific'].includes(tag)) return;
+
+            if (tagScores[tag]) {
+                historyScore += tagScores[tag];
+                if (tagScores[tag] > 5) knownTagsCount++; // Тег, который пользователю точно нравится
+            }
+        });
+
+        score += historyScore;
+
+        // ЛОГИКА SPECIFIC:
+        // Если это специфичный фетиш, но мы НЕ знаем, нравятся ли пользователю входящие в него теги,
+        // мы занижаем вероятность. (Например, не показывать "Fisting", если мы не знаем, нравится ли "Anal")
+        if (isSpecific) {
+            if (knownTagsCount === 0) {
+                // Если нет ни одного "любимого" тега внутри этого Specific -> штрафуем
+                score -= 150;
+            } else {
+                // Если есть совпадения, Specific получает бонус, так как это точное попадание
+                score += 50;
+            }
+        }
+
+        // === РЕЖИМЫ ===
         if (currentAppMode === 'pleasure') {
             if (favorites.includes(item.id)) score += 1000;
-            item.tags.forEach(tag => {
-                if (tagScores[tag] && tagScores[tag] > 0) score += (tagScores[tag] * 3);
-            });
+            // В режиме удовольствия Specific ценится выше, если он совпадает со вкусами
+            if (isSpecific && knownTagsCount > 0) score += 200; 
+            score += (historyScore * 2); // Усиливаем влияние истории
         } 
-        
-        // === РЕЖИМ 2: AI AGENT (Контекст + Вкусы) ===
         else if (currentAppMode === 'ai') {
-            // А. Контекст текущего разговора (Самый высокий приоритет)
+            // Логика AI контекста 
             if (aiContextTokens.length > 0) {
                 const itemString = [item.name, item.slug, ...item.tags].join(" ").toLowerCase();
                 aiContextTokens.forEach(token => {
                     if (itemString.includes(token)) score += 500;
                 });
             }
-
-            // Б. Похожее на предыдущее (Continuity)
-            if (lastGeneratedItem) {
-                const commonTags = item.tags.filter(t => lastGeneratedItem.tags.includes(t)).length;
-                score += commonTags * 50;
-            }
-
-            // В. Личные предпочтения (Фон)
             if (favorites.includes(item.id)) score += 200;
-            item.tags.forEach(tag => {
-                if (tagScores[tag]) score += tagScores[tag];
-            });
+            score += historyScore;
         }
-
-        // === РЕЖИМ 3: EXPLORE (По умолчанию) ===
         else {
-            if (favorites.includes(item.id)) score = 1; 
-            score += Math.random() * 50;
-            item.tags.forEach(tag => {
-                if (tagScores[tag]) score += tagScores[tag]; 
-            });
+            // Режим Explore (по умолчанию)
+            if (favorites.includes(item.id)) score = 1; // Убираем уже лайкнутое
+            score += Math.random() * 50; // Немного рандома
         }
 
-        // Фильтры ориентации (глобальные)
-        if (currentOrientation === 'gay' && item.tags.includes('gay')) score += 50;
-        if (currentOrientation === 'trans' && item.tags.some(t => ['trans', 'shemale'].includes(t))) score += 50;
-        if (currentOrientation === 'lesbian' && item.tags.includes('lesbian')) score += 50;
+        // === ОРИЕНТАЦИЯ ===
+        if (currentOrientation === 'gay' && item.tags.includes('gay')) score += 100;
+        if (currentOrientation === 'trans' && item.tags.some(t => ['trans', 'shemale', 'crossdresser'].includes(t))) score += 100;
+        if (currentOrientation === 'lesbian' && item.tags.includes('lesbian')) score += 100;
         
-        if (currentOrientation === 'gay' && item.tags.includes('straight')) score -= 100;
-        if (currentOrientation === 'hetero' && (item.tags.includes('gay') || item.tags.includes('shemale'))) score -= 100;
+        // Жесткий штраф за несовпадение ориентации
+        if (currentOrientation === 'gay' && item.tags.includes('straight')) score -= 5000;
+        if (currentOrientation === 'hetero' && (item.tags.includes('gay') || item.tags.includes('shemale'))) score -= 5000;
 
         return Math.max(1, score);
     }
@@ -9480,8 +9511,8 @@
             score += textMatches * 5;
 
             // Б. Теги (Вес: 10 за редкие, 0 за мусорные)
-            // Расширенный список мусорных тегов, которые не делают предметы "похожими"
             const trashTags = [
+                'general', 'specific',
                 'universal', 'straight', 'gay', 'lesbian', 'bi', 'male', 'female', 'adult', 
                 'roleplay', 'video', 'hd', 'soft', 'hardcore', 'fetish', 'kinky', 'fantasy',
                 'body-part', 'action', 'hair'
@@ -9623,59 +9654,51 @@
     }
 
     function filterData() {
-        const SAFETY_NET = ['straight', 'universal', 'vanilla'];
+        // Обновленный список безопасных тегов
+        const SAFETY_NET = ['straight', 'general', 'vanilla']; 
         const recentIds = historyData.slice(0, 50).map(entry => entry.id);
 
         let candidates = data.filter(item => {
-            // 1. Черный список и История
+            // 1. Черный список и История (без изменений)
             if (blacklist.includes(item.id)) return false;
             if (recentIds.includes(item.id)) return false;
 
-            // 2. Интенсивность (Safe/Spicy)
+            // 2. Интенсивность (без изменений)
             if (currentIntensity === 1) {
-                // В Safe убираем экстрим и спайси
                 if (item.tags.some(t => EXTREME_TAGS.includes(t) || SPICY_TAGS.includes(t))) return false;
             }
             if (currentIntensity === 2) {
-                // В Spicy убираем только экстрим
                 if (item.tags.some(t => EXTREME_TAGS.includes(t))) return false;
             }
 
-            // === 3. ФИЛЬТРАЦИЯ ПО ОРИЕНТАЦИИ ===
-            
-            // Определяем, к каким группам относится фетиш
+            // 3. Ориентация (без изменений)
             const isGay = item.tags.includes('gay');
             const isTrans = item.tags.some(t => ['trans', 'shemale', 'futanari', 'crossdresser'].includes(t));
             const isLesbian = item.tags.includes('lesbian');
             const isStraight = item.tags.includes('straight');
             const isBi = item.tags.includes('bi');
             
-            // Группа "ЛГБТ" для Гетеро-фильтра
             const isLgbtForHetero = isGay || isTrans || isBi; 
 
             if (currentOrientation === 'hetero') {
-                // "Скрывать все ЛГБТ, кроме лесби"
-                // Если есть гей/транс/би теги - скрываем.
                 if (isLgbtForHetero && !isLesbian) return false;
             }
             else if (currentOrientation === 'gay') {
-                // "Скрывать straight, кроме тех, где есть gay"
-                // То есть чистое гетеро скрываем. Гетеро + Гей (Би) - оставляем.
                 if (isStraight && !isGay) return false;
             }
             else if (currentOrientation === 'trans') {
-                // "Как с гей, только для транс"
-                // Скрываем straight, если нет транс-тегов
                 if (isStraight && !isTrans) return false;
             }
-            // 'pan' - показывает всё, фильтров нет.
 
             return true;
         });
 
-        // Fallback: Если фильтры слишком жесткие (почти невозможная ситуация с новой логикой, но оставим)
+        // Fallback: Если фильтры слишком жесткие, возвращаем хотя бы General контент
         if (candidates.length < 3) {
-            candidates = data.filter(item => !blacklist.includes(item.id));
+            candidates = data.filter(item => 
+                !blacklist.includes(item.id) && 
+                item.tags.includes('general') // Показываем только General в случае нехватки
+            );
         }
         
         return candidates;
@@ -10464,10 +10487,10 @@
         body.innerHTML = '';
         const t = langData[currentLang];
 
-        // --- ЛОГИКА 1: ПРЕДПОЧТЕНИЯ (TAGS) - Оставляем как было ---
+        // --- ЛОГИКА 1: ПРЕДПОЧТЕНИЯ (TAGS) ---
         if (currentStatsTab === 'tags') {
             const tempScores = {};
-            const ignoreStats = ['universal', 'straight', 'male', 'female']; 
+            const ignoreStats = ['general', 'specific', 'straight', 'male', 'female', 'adult'];
             
             activityLog.forEach(log => {
                 if (log.tags) {
