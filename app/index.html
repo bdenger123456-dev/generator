@@ -4236,74 +4236,68 @@
         /* --- INTENSITY TOAST POPUP --- */
         #intensity-toast {
             position: absolute;
-            /* Позиция над слайдером */
-            top: -45px; 
+            top: 55px; 
             left: 50%;
-            transform: translateX(-50%) scale(0.5); /* Начальное состояние */
+            transform: translateX(-50%);
             
-            padding: 6px 16px;
-            border-radius: 20px;
+            width: 100%;
+            text-align: center;
             
-            font-size: 13px;
+            /* Типографика (Маленький и аккуратный) */
+            font-size: 11px; 
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 1px;
-            white-space: nowrap;
             
-            opacity: 0; /* Скрыт */
-            pointer-events: none; /* Чтобы не мешал кликать */
+            background: transparent !important;
+            box-shadow: none !important;
+            border: none !important;
+            backdrop-filter: none !important;
+            
+            opacity: 0;
+            pointer-events: none;
             z-index: 20;
-            
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.2);
-            backdrop-filter: blur(5px);
+            white-space: nowrap;
         }
 
-        /* Стили для уровней */
+        /* Цвета и свечение (Neon Text) */
         .toast-safe {
-            background: linear-gradient(135deg, #2ecc71, #27ae60);
-            color: #fff;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            color: #2ecc71; /* Зеленый */
+            text-shadow: 0 0 15px rgba(46, 204, 113, 0.6), 0 0 30px rgba(46, 204, 113, 0.2);
         }
 
         .toast-spicy {
-            background: linear-gradient(135deg, #f1c40f, #e67e22);
-            color: #fff;
-            box-shadow: 0 5px 20px rgba(243, 156, 18, 0.4) !important;
+            color: #f1c40f; /* Желто-оранжевый */
+            text-shadow: 0 0 15px rgba(241, 196, 15, 0.6), 0 0 30px rgba(241, 196, 15, 0.2);
         }
 
         .toast-extreme {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            color: #fff;
-            box-shadow: 0 0 25px rgba(231, 76, 60, 0.6) !important;
-            border: 1px solid #ff9999 !important;
+            color: #ff004c; /* Агрессивный красный */
+            text-shadow: 0 0 15px rgba(255, 0, 76, 0.8), 0 0 40px rgba(255, 0, 76, 0.4);
         }
 
-        /* Анимация появления и исчезновения */
-        @keyframes popToast {
+        /* Новая анимация: Появление снизу-вверх и растворение */
+        @keyframes floatTextUp {
             0% {
                 opacity: 0;
-                transform: translateX(-50%) translateY(10px) scale(0.8);
+                transform: translateX(-50%) translateY(5px) scale(0.9);
             }
-            15% {
+            20% {
                 opacity: 1;
-                transform: translateX(-50%) translateY(0) scale(1.1); /* Пружинит вверх */
+                transform: translateX(-50%) translateY(0) scale(1);
             }
-            25% {
-                transform: translateX(-50%) translateY(0) scale(1); /* Встает на место */
-            }
-            85% {
+            80% {
                 opacity: 1;
                 transform: translateX(-50%) translateY(0) scale(1);
             }
             100% {
                 opacity: 0;
-                transform: translateX(-50%) translateY(-15px) scale(0.9); /* Улетает вверх */
+                transform: translateX(-50%) translateY(-10px) scale(1);
             }
         }
 
         .anim-toast {
-            animation: popToast 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+            animation: floatTextUp 1.0s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
 
 
@@ -7682,6 +7676,8 @@
             expl_hist: "From Archives 📜",
             deco_label: "Show Decorations",
 
+            panic_active_phrases: ["Nothing suspicious here 😇", "Just a hobby", "Pure innocence", "Productivity boost 📈", "Stay hydrated 💧"],
+
             val_safe: "Safe & Chill",
             val_spicy: "Spicy 🔥",
             val_extreme: "EXTREME 💀",
@@ -7870,6 +7866,15 @@
             tip_bug_title: "Report a Problem",
             tip_bug_desc: "Help improve the project",
             tip_bug_text: "This project is built by one person and launched recently, so bugs are inevitable. Your feedback is crucial!<br><br>To help, please go to the <b>Extras</b> section and click <b>'Report Issue'</b>.<br>Fill out the form describing what went wrong. I read every report and fix bugs ASAP!",
+
+            tip_panic_title: "How not to get caught",
+            tip_panic_desc: "Stealth mode secrets",
+            tip_panic_text: "The app features a <b>Panic Mode</b>. Activate it by <b>Double Tapping</b> anywhere (or using hotkeys on PC).<br><br>It switches to a neutral interface where nothing embarrassing is visible.<br>To exit: click the main 'Start' button or use the same activation gesture.",
+
+            tip_layout_title: "Overlapping phrases",
+            tip_layout_desc: "Fixing layout bugs",
+            tip_layout_text: "Due to PWA specifics on some mobile devices, the card might move too high, causing phrases to overlap with the logo capsule.<br><br><b>The Fix:</b><br>Simply rotate your phone to <b>landscape</b> mode and back to <b>portrait</b>. The layout will reset and look perfect again.",
+
 
             // --- 2. Generator (Main Tab) ---
             generate: "Random Genre",
@@ -8168,6 +8173,8 @@
             expl_hist: "Из архивов 📜",
             deco_label: "Показывать декор",
 
+            panic_active_phrases: ["Ничего подозрительного 😇", "Просто хобби", "Сама невинность", "Минутка продуктивности 📈", "Пейте воду 💧"],
+
             val_safe: "Спокойно",
             val_spicy: "С перчинкой 🔥",
             val_extreme: "ЭКСТРИМ 💀",
@@ -8354,6 +8361,15 @@
             tip_bug_title: "Сообщить о проблеме",
             tip_bug_desc: "Помоги улучшить проект",
             tip_bug_text: "Сайт создан недавно одним человеком, поэтому ошибки неизбежны. Твоя помощь очень важна!<br><br>Зайди в блок <b>«Дополнительно»</b> -> <b>«Сообщить о проблеме»</b>.<br>Опиши, что именно не так. Я реагирую на отзывы и исправляю баги максимально быстро.",
+
+            tip_panic_title: "Как не спалиться",
+            tip_panic_desc: "Секретный режим",
+            tip_panic_text: "На сайте есть режим паники. Активируй его <b>двумя тапами</b> по экрану (или клавишами на ПК).<br><br>Он включает нейтральный интерфейс, где не видно ничего, что может поставить в неловкое положение.<br>Выйти можно нажатием на кнопку действия или тем же способом, как вошли.",
+
+            tip_layout_title: "Перекрывающиеся фразы",
+            tip_layout_desc: "Исправление верстки",
+            tip_layout_text: "Из-за особенностей PWA иногда карточка на мобильных может уходить слишком вверх, и фразы перекрываются капсулой с логотипом.<br><br><b>Решение:</b><br>Смени ориентацию телефона на <b>горизонтальную</b> и верни её в <b>вертикальную</b>. Проблема решится, и всё встанет на места.",
+
 
             // --- 2. Генератор ---
             generate: "Случайный жанр",
@@ -8650,6 +8666,8 @@
             expl_hist: "De los archivos 📜",
             deco_label: "Mostrar decoración",
 
+            panic_active_phrases: ["Nada sospechoso aquí 😇", "Solo un hobby", "Pura inocencia", "Productividad 📈", "Bebe agua 💧"],
+
             val_safe: "Tranquilo",
             val_spicy: "Picante 🔥",
             val_extreme: "EXTREMO 💀",
@@ -8841,6 +8859,15 @@
             tip_bug_desc: "Ayuda a mejorar",
             tip_bug_text: "Un solo desarrollador creó esto. Los errores pasan.<br><br>Usa el botón <b>'Reportar Problema'</b> en Extras. ¡Leo y arreglo todo!",
 
+            tip_panic_title: "Cómo no ser descubierto",
+            tip_panic_desc: "Modo sigilo",
+            tip_panic_text: "La app tiene un <b>Modo Pánico</b>. Actívalo con <b>Doble Toque</b> (o teclas en PC).<br><br>Cambia a una interfaz neutral sin contenido comprometedor.<br>Para salir: pulsa el botón principal o usa el mismo gesto.",
+
+            tip_layout_title: "Frases superpuestas",
+            tip_layout_desc: "Arreglar diseño",
+            tip_layout_text: "Debido a la PWA, a veces la tarjeta sube demasiado y el logo tapa el texto.<br><br><b>Solución:</b><br>Gira el teléfono a <b>horizontal</b> y vuelve a <b>vertical</b>. El diseño se arreglará automáticamente.",
+
+            
             // --- Generator ---
             generate: "Género Aleatorio",
             generate_again: "Otro Género",
@@ -9123,6 +9150,8 @@
             expl_hist: "Aus dem Archiv 📜",
             deco_label: "Dekoration anzeigen",
 
+            panic_active_phrases: ["Nichts Verdächtiges 😇", "Nur ein Hobby", "Reine Unschuld", "Produktivität 📈", "Wasser trinken 💧"],
+
             val_safe: "Sicher",
             val_spicy: "Würzig 🔥",
             val_extreme: "EXTREM 💀",
@@ -9312,6 +9341,14 @@
             tip_bug_title: "Problem melden",
             tip_bug_desc: "Hilf uns",
             tip_bug_text: "Ein Entwickler, neues Projekt. Fehler passieren.<br><br>Nutze <b>'Problem melden'</b> im Extras-Menü. Ich reagiere schnell!",
+
+            tip_panic_title: "Nicht erwischt werden",
+            tip_panic_desc: "Stealth-Modus",
+            tip_panic_text: "Die App hat einen <b>Panikmodus</b>. Aktiviere ihn durch <b>Doppeltippen</b> (oder Tasten am PC).<br><br>Er zeigt eine neutrale Oberfläche ohne peinliche Inhalte.<br>Beenden: Klicke auf den Hauptbutton oder nutze die gleiche Geste.",
+
+            tip_layout_title: "Überlappende Sätze",
+            tip_layout_desc: "Layout korrigieren",
+            tip_layout_text: "Wegen PWA-Eigenheiten rutscht die Karte manchmal zu hoch und Text wird verdeckt.<br><br><b>Lösung:</b><br>Drehe das Handy ins <b>Querformat</b> und zurück ins <b>Hochformat</b>. Das Layout wird korrigiert.",
 
             // --- Generator ---
             generate: "Zufallsgenre",
@@ -9567,44 +9604,55 @@
     };
 
     const tipsData = [
-        { 
-            id: 'ads', 
-            icon: '🛡️', 
-            titleKey: 'tip_ads_title', 
-            descKey: 'tip_ads_desc', 
-            textKey: 'tip_ads_text',
-            // Синий градиент
-            gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' 
-        },
-        { 
-            id: 'video', 
-            icon: '▶️', 
-            titleKey: 'tip_video_title', 
-            descKey: 'tip_video_desc', 
-            textKey: 'tip_video_text',
-            // Розово-фиолетовый
-            gradient: 'linear-gradient(135deg, #ec4899 0%, #be185d 100%)'
-        },
-        { 
-            id: 'pay', 
-            icon: '💸', 
-            titleKey: 'tip_pay_title', 
-            descKey: 'tip_pay_desc', 
-            textKey: 'tip_pay_text',
-            // Изумрудный
-            gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-        },
-        { 
-            id: 'bug', 
-            icon: '🐛', 
-            titleKey: 'tip_bug_title', 
-            descKey: 'tip_bug_desc', 
-            textKey: 'tip_bug_text',
-            // Оранжевый
-            gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
-        }
-    ];
-
+    { 
+        id: 'ads', 
+        icon: '🛡️', 
+        titleKey: 'tip_ads_title', 
+        descKey: 'tip_ads_desc', 
+        textKey: 'tip_ads_text',
+        gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' // Синий
+    },
+    { 
+        id: 'video', 
+        icon: '▶️', 
+        titleKey: 'tip_video_title', 
+        descKey: 'tip_video_desc', 
+        textKey: 'tip_video_text',
+        gradient: 'linear-gradient(135deg, #ec4899 0%, #be185d 100%)' // Розовый
+    },
+    { 
+        id: 'pay', 
+        icon: '💸', 
+        titleKey: 'tip_pay_title', 
+        descKey: 'tip_pay_desc', 
+        textKey: 'tip_pay_text',
+        gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' // Изумрудный
+    },
+    { 
+        id: 'bug', 
+        icon: '🐛', 
+        titleKey: 'tip_bug_title', 
+        descKey: 'tip_bug_desc', 
+        textKey: 'tip_bug_text',
+        gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' // Оранжевый
+    },
+    { 
+        id: 'panic', 
+        icon: '🚨', 
+        titleKey: 'tip_panic_title', 
+        descKey: 'tip_panic_desc', 
+        textKey: 'tip_panic_text',
+        gradient: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)' // Красный
+    },
+    { 
+        id: 'layout', 
+        icon: '📱', 
+        titleKey: 'tip_layout_title', 
+        descKey: 'tip_layout_desc', 
+        textKey: 'tip_layout_text',
+        gradient: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)' // Фиолетовый
+    }
+];
     // --- WRAPPED DATA & TEXTS ---
     const WRAPPED_CONFIG = {
         badges: {
@@ -10222,8 +10270,14 @@
         const t = langData[currentLang];
         let reason = null;
 
+        if (mode === 'panic') {
+            // Берем нейтральные фразы
+            const phrases = t.panic_active_phrases || ["Nothing to see here 😇"];
+            return phrases[Math.floor(Math.random() * phrases.length)];
+        }
+
         // 1. Напоминание посмотреть/повторить/одуматься
-        if (mode === 'wl_reminder') {
+        else if (mode === 'wl_reminder') {
             const phrases = wlReminderPhrases[currentLang] || wlReminderPhrases['en'];
             return phrases[Math.floor(Math.random() * phrases.length)];
         }
@@ -13818,18 +13872,24 @@
             statusEl.style.display = 'flex'; 
             statusEl.classList.remove('hidden-initial'); 
             
-            // ПРИОРИТЕТ 1: Если передан customReason (от ИИ), используем его
             if (customReason) {
-                // innerHTML, чтобы работали теги цвета внутри фразы
                 statusEl.innerHTML = customReason;
                 statusEl.style.color = "var(--accent)";
             } 
-            // ПРИОРИТЕТ 2: Обычная логика
             else {
                 const explanation = getExplanationText(mode);
+                
                 if (explanation) {
                     statusEl.innerText = explanation;
-                    statusEl.style.color = "var(--accent)";
+                    
+                    if (mode === 'panic') {
+                        // В панике цвет нейтральный или зеленый
+                        statusEl.style.color = "var(--text-main)"; 
+                    } else {
+                        // В обычном режиме - акцентный
+                        statusEl.style.color = "var(--accent)";
+                    }
+                    
                 } else {
                     const comments = resultComments[currentLang];
                     statusEl.innerText = comments[Math.floor(Math.random() * comments.length)];
@@ -16751,7 +16811,7 @@
             container.appendChild(card);
         });
     }
-    
+
     function showTipDetail(tip) {
         const t = langData[currentLang] || langData['en'];
         
