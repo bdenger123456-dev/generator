@@ -2035,6 +2035,32 @@
             filter: invert(1) drop-shadow(0 0 2px rgba(255,255,255,0.8));
         }
 
+        /* Контейнер для генерации скриншота (скрыт от глаз, но виден для скрипта) */
+        #export-stats-container {
+            position: fixed;
+            top: 0;
+            left: -9999px; /* Убираем за пределы экрана */
+            z-index: -1;
+            width: 360px; /* Фиксированная ширина как у Wrapped */
+            /* Используем стили Wrapped карточки */
+            background: var(--ios-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: none;
+        }
+
+        /* Принудительные стили для графика внутри скриншота, чтобы он влез */
+        #export-stats-container .chart-container, 
+        #export-stats-container .chart-wrapper {
+            height: 180px !important; 
+            border: none !important;
+            margin: 0 !important;
+        }
+
         /* --- Кнопка Share в Wrapped (Круглая) --- */
         .btn-round-share {
             width: 50px; 
@@ -2132,6 +2158,104 @@
             background: #fff;
             width: 0%;
             box-shadow: 0 0 8px rgba(255,255,255,0.8);
+        }
+
+        /* --- ДИЗАЙН СТАТИСТИКИ (CARD UI) --- */
+        .stats-card-ui {
+            background: var(--ios-card); /* Или темный фон как в Wrapped */
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Адаптация заголовка внутри карточки */
+        .stats-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+            margin-bottom: 5px;
+        }
+
+        .stats-meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        /* QR код внутри статистики */
+        .stats-qr-box {
+            background: #fff;
+            padding: 4px;
+            border-radius: 8px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* --- СТИЛИ ДЛЯ ЛЕГЕНДЫ (В интерфейсе) --- */
+        .stats-legend-row {
+            margin-top: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            font-size: 10px;
+            color: var(--text-secondary);
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .legend-dot {
+            width: 8px; 
+            height: 8px; 
+            border-radius: 2px;
+        }
+
+        /* --- СТИЛЬ ДЛЯ ЭКСПОРТА (СКРИНШОТА) --- */
+        /* Это то, как будет выглядеть картинка */
+        #export-stats-card {
+            position: fixed;
+            left: -9999px; /* Скрываем за экраном */
+            top: 0;
+            z-index: -9999;
+            
+            width: 375px; /* Фиксированная ширина как у мобильника */
+            background: var(--sidebar-bg); /* Темный фон */
+            border: 1px solid var(--border);
+            border-radius: 24px; /* Закругления */
+            padding: 30px; /* Отступы внутри */
+            
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            font-family: var(--font-main);
+        }
+
+        /* Логотип в экспорте */
+        .export-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(128,128,128,0.2);
+            padding-bottom: 20px;
         }
 
         /* === STATS UPDATE === */
@@ -4315,6 +4439,82 @@
             100% { border-color: var(--accent); }
         }
 
+        /* --- НОВЫЙ СТИЛЬ EXPLORED BAR --- */
+        .explored-row {
+            padding: 12px 16px;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important; /* Центрируем по вертикали бар и иконку */
+            min-height: 50px;
+            border-bottom: 1px solid rgba(128,128,128,0.1);
+        }
+
+        .explored-left {
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        /* Правая часть: Бар + Цифры */
+        .explored-right {
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            width: 140px; /* Фиксированная ширина */
+            position: relative;
+        }
+
+        /* Трек бара */
+        .explored-track {
+            width: 100%;
+            height: 8px; /* Чуть толще для красоты */
+            background: var(--nav-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 4px; /* Отступ до цифр */
+        }
+
+        /* Заливка */
+        .explored-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent), #9b59b6);
+            border-radius: 10px;
+            transition: width 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            box-shadow: 0 0 10px var(--accent); /* Легкое свечение */
+        }
+
+        /* Контейнер для цифр под баром */
+        .explored-nums-container {
+            position: relative;
+            width: 100%;
+            height: 14px; /* Высота под шрифт */
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        /* Бегущая цифра (Текущее) */
+        #ex-current {
+            position: absolute;
+            top: 0;
+            left: 0; /* Будет меняться через JS */
+            transform: translateX(-50%); /* Центрируем относительно конца полоски */
+            transition: left 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            color: var(--text-main); /* Ярче */
+            white-space: nowrap;
+        }
+
+        /* Статичная цифра (Всего) */
+        #ex-total-label {
+            position: absolute;
+            top: 0;
+            right: 0;
+            opacity: 0.6;
+        }
+
         /* =========================================
         18. MEDIA QUERIES (ADAPTATION)
         ========================================= */
@@ -4784,7 +4984,7 @@
                                     </button>
                                     
                                     <!-- WATCH -->
-                                    <a href="#" target="_blank" class="t-circle-btn large watch" id="btn-t-watch" onclick="handleOutboundClick()">
+                                    <a href="#" target="_blank" class="t-circle-btn large watch" id="btn-t-watch" onclick="handleOutboundClick(event)">
                                         <img src="watch.png" class="action-icon-img" alt="Watch">
                                     </a>
                                     
@@ -5301,12 +5501,29 @@
                 </div>
                 <div class="chevron"></div>
             </div>
-             <div class="ios-row">
-                <div class="ios-row-left">
+            <!-- ИССЛЕДОВАНО -->
+            <div class="explored-row">
+                <!-- Левая часть: Иконка и Текст -->
+                <div class="explored-left">
                     <img src="explored.png" class="settings-icon" alt="Explored">
                     <span data-key="explored_label">Explored</span>
                 </div>
-                <span style="color:var(--text-secondary); font-size:16px;" id="explored-count">0 / 0</span>
+                
+                <!-- Правая часть -->
+                <div class="explored-right">
+                    <!-- 1. Прогресс-бар -->
+                    <div class="explored-track">
+                        <div class="explored-fill" id="ex-fill"></div>
+                    </div>
+                    
+                    <!-- 2. Цифры (Бегущая и Статичная) -->
+                    <div class="explored-nums-container">
+                        <!-- Бегущее число (left будет меняться) -->
+                        <span id="ex-current">0</span>
+                        <!-- Статичный конец -->
+                        <span id="ex-total-label">/ <span id="ex-total">0</span></span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -6024,6 +6241,36 @@
     </div>
 </div>
 
+<!-- VPN & ADS WARNING MODAL -->
+<div class="modal-overlay" id="modal-vpn-overlay">
+    <div class="modal" style="max-width: 400px; text-align: center;">
+        <div class="modal-header">
+            <span style="color:var(--accent);">⚠️ <span data-key="vpn_title">Notice</span></span>
+        </div>
+        
+        <div class="modal-body">
+            <!-- Часть 1: Общее предупреждение -->
+            <p style="font-size:14px; color:var(--text-main); margin-bottom:15px; line-height:1.5;" data-key="vpn_text_1">
+                Must warn you...
+            </p>
+
+            <!-- Часть 2: Только для PWA (скрыто по умолчанию) -->
+            <div id="vpn-pwa-text" style="display:none; background:rgba(255,255,255,0.05); padding:10px; border-radius:12px; margin-bottom:15px; font-size:13px; color:var(--text-secondary); border:1px dashed var(--border);">
+                <span data-key="vpn_text_pwa">PWA Hint...</span>
+            </div>
+
+            <!-- Часть 3: ВПН -->
+            <p style="font-size:15px; font-weight:700; color:var(--accent); margin-bottom:25px;" data-key="vpn_text_2">
+                Don't forget VPN!
+            </p>
+
+            <button class="btn-gen" id="btn-vpn-go" style="width:100%; padding:14px; font-size:16px;">
+                <span data-key="vpn_btn">Let's go</span>
+            </button>
+        </div>
+    </div>
+</div>
+
 <div id="wrapped-mount" class="wrapped-overlay"></div>
 
 <!-- FIREBASE INTEGRATION -->
@@ -6637,6 +6884,8 @@
     let isRecordingKey = false; // Флаг записи клавиши
 
     let wrappedTimerInterval = null;
+
+    let pendingOutboundUrl = '';
 
     const earlySponsors = [
         { name: "Alex M.", date: "Jan 2026" },
@@ -7366,7 +7615,13 @@
 
             // Post-Panic Phrases
             post_panic_phrases: ["Hope you didn't get caught 😁", "That was close...", "Safe now 😮‍💨", "Back to business 😏"],
-            
+
+            vpn_title: "Just a heads up",
+            vpn_text_1: "Must warn you: you are leaving for an 18+ site with adult content and ads. Just in case 😊.",
+            vpn_text_pwa: "If the video doesn't play, try restarting it, or open it in a regular browser as a last resort.",
+            vpn_text_2: "And don't forget VPN! Enjoy watching 😏",
+            vpn_btn: "Let's go",
+
             // --- 2. Generator (Main Tab) ---
             generate: "Random Genre",
             generate_again: "Different Genre",
@@ -7819,6 +8074,12 @@
 
             // Post-Panic Phrases
             post_panic_phrases: ["Надеюсь, не спалился 😁", "Пронесло...", "Фух, вроде чисто 😮‍💨", "Возвращаемся к делу 😏"],
+
+            vpn_title: "Предупреждение",
+            vpn_text_1: "Должен предупредить: ты переходишь на 18+ сайт, где сам понимаешь какой контент, к тому же есть реклама. Это на всякий случай 😊.",
+            vpn_text_pwa: "И если у тебя вдруг не запускается видео, то попробуй перезапустить его, либо на крайний случай открой его в браузере.",
+            vpn_text_2: "И про ВПН не забудь! Приятного просмотра 😏",
+            vpn_btn: "Пошли",
 
             // --- 2. Генератор ---
             generate: "Случайный жанр",
@@ -8275,6 +8536,12 @@
             // Post-Panic Phrases
             post_panic_phrases: ["Espero que no te hayan pillado 😁", "Estuvo cerca...", "A salvo 😮‍💨", "De vuelta al negocio 😏"],
 
+            vpn_title: "Aviso",
+            vpn_text_1: "Debo advertirte: vas a un sitio +18 con contenido adulto y anuncios. Por si acaso 😊.",
+            vpn_text_pwa: "Si el video no se reproduce, intenta reiniciarlo o ábrelo en el navegador.",
+            vpn_text_2: "¡Y no olvides la VPN! Disfruta 😏",
+            vpn_btn: "Vamos",
+
             // --- Generator ---
             generate: "Género Aleatorio",
             generate_again: "Otro Género",
@@ -8715,6 +8982,12 @@
 
             // Post-Panic Phrases
             post_panic_phrases: ["Hoffentlich wurdest du nicht erwischt 😁", "Das war knapp...", "Jetzt sicher 😮‍💨", "Zurück zum Geschäft 😏"],
+
+            vpn_title: "Hinweis",
+            vpn_text_1: "Muss dich warnen: Du gehst auf eine 18+ Seite mit Werbung. Nur für den Fall 😊.",
+            vpn_text_pwa: "Falls das Video nicht läuft, starte es neu oder öffne es im Browser.",
+            vpn_text_2: "VPN nicht vergessen! Viel Spaß 😏",
+            vpn_btn: "Los geht's",
 
             // --- Generator ---
             generate: "Zufallsgenre",
@@ -9377,17 +9650,41 @@
     }
 
     function updateExploredCount() {
-        const total = data.length;
+        const total = (typeof data !== 'undefined') ? data.length : 0;
         
-        // Берем уникальные ID из полного лога активности, а не из короткой истории
-        const uniqueExplored = new Set(activityLog.map(h => h.id)).size;
+        // Считаем уникальные ID из лога
+        const uniqueExplored = (window.activityLog) ? new Set(window.activityLog.map(h => h.id)).size : 0;
         
-        const t = langData[currentLang];
-        // Используем локализованную строку
-        if (t && t.explored_txt) {
-            const text = t.explored_txt.replace('{n}', uniqueExplored).replace('{t}', total);
-            const el = document.getElementById('explored-count');
-            if(el) el.innerText = text;
+        // Считаем процент
+        let percent = 0;
+        if (total > 0) {
+            percent = (uniqueExplored / total) * 100;
+        }
+        // Ограничиваем от 0 до 100
+        percent = Math.min(100, Math.max(0, percent));
+
+        // Элементы
+        const currentEl = document.getElementById('ex-current');
+        const totalEl = document.getElementById('ex-total');
+        const fillEl = document.getElementById('ex-fill');
+        
+        // 1. Обновляем текст
+        if (currentEl) currentEl.innerText = uniqueExplored;
+        if (totalEl) totalEl.innerText = total;
+
+        // 2. Анимация
+        if (fillEl && currentEl) {
+            setTimeout(() => {
+                // Двигаем бар
+                fillEl.style.width = `${percent}%`;
+                
+                // Двигаем цифру. 
+                let labelPos = percent;
+                if (labelPos < 5) labelPos = 5; 
+                if (labelPos > 90) labelPos = 90; // Чтобы не наехать на правую цифру
+
+                currentEl.style.left = `${labelPos}%`;
+            }, 100);
         }
     }
 
@@ -10003,11 +10300,25 @@
         return combined;
     }
 
-    function handleOutboundClick() {
+    function handleOutboundClick(e) {
         if (isPanicMode) {
-            // Если мы в панике -> выключаем её
+            if(e) e.preventDefault();
             togglePanicMode();
             return;
+        }
+
+        // Проверяем, показывали ли мы предупреждение раньше
+        const hasWarned = localStorage.getItem('xch_vpn_warned');
+        
+        if (!hasWarned) {
+            if (e) e.preventDefault(); // Останавливаем переход
+            
+            // Получаем ссылку, куда юзер хотел пойти
+            const btn = document.getElementById('btn-t-watch');
+            pendingOutboundUrl = btn ? btn.href : '#';
+            
+            openVpnModal(); // Открываем модалку
+            return; // Прерываем выполнение, пока юзер не нажмет кнопку в модалке
         }
 
         if(!currentItem) return;
@@ -10022,6 +10333,41 @@
             hasWatchedCurrentItem = true;
             hasInteractedWithCurrent = true;
         }
+    }
+
+    function openVpnModal() {
+        const modal = document.getElementById('modal-vpn-overlay');
+        const pwaText = document.getElementById('vpn-pwa-text');
+        const btn = document.getElementById('btn-vpn-go');
+
+        // Проверка PWA и Мобильного устройства
+        const isMobile = window.innerWidth < 768;
+        const isPWA = (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone === true);
+
+        // Показываем текст про перезапуск видео ТОЛЬКО если это PWA на мобильном
+        if (isMobile && isPWA) {
+            pwaText.style.display = 'block';
+        } else {
+            pwaText.style.display = 'none';
+        }
+
+        // Навешиваем событие на кнопку "Пошли"
+        btn.onclick = () => {
+            // 1. Запоминаем, что предупреждение показано
+            localStorage.setItem('xch_vpn_warned', 'true');
+            
+            // 2. Закрываем окно
+            modal.classList.remove('open');
+            
+            // 3. Открываем ссылку
+            if (pendingOutboundUrl && pendingOutboundUrl !== '#') {
+                window.open(pendingOutboundUrl, '_blank');
+                
+                handleOutboundClick(null); 
+            }
+        };
+
+        modal.classList.add('open');
     }
 
     function addToHistory(item) {
@@ -10982,22 +11328,21 @@
         body.innerHTML = '';
         const t = langData[currentLang];
 
-        // --- ЛОГИКА 1: ПРЕДПОЧТЕНИЯ (TAGS) ---
+        // --- ВАРИАНТ А: ТЕГИ ---
         if (currentStatsTab === 'tags') {
             const tempScores = {};
-            const ignoreStats = ['general', 'specific', 'straight', 'male', 'female', 'adult'];
+            const IGNORED_TAGS = ['general', 'specific', 'straight', 'male', 'female', 'adult', 'video', 'hd'];
             
             activityLog.forEach(log => {
                 if (log.tags) {
                     let weight = 0;
                     if (log.type === 'watch') weight = 10;
                     else if (log.type === 'like' || log.type === 'similar') weight = 5;
-                    else if (log.type === 'gen' || log.type === 'pass') weight = 0;
                     else if (log.type === 'dislike') weight = -5;
 
                     if (weight !== 0) {
                         log.tags.forEach(tag => {
-                            if(!ignoreStats.includes(tag)) {
+                            if(!IGNORED_TAGS.includes(tag)) {
                                 tempScores[tag] = (tempScores[tag] || 0) + weight;
                             }
                         });
@@ -11008,17 +11353,16 @@
             const sortedTags = Object.entries(tempScores)
                 .sort((a, b) => b[1] - a[1])
                 .filter(x => x[1] > 0)
-                .slice(0, 20); 
+                .slice(0, 15); 
             
-            let html = `<div class="chart-wrapper"><div class="chart-scroll-view">`;
+            let html = `<div class="chart-wrapper"><div class="chart-scroll-view" id="chart-source-el">`;
 
             if(sortedTags.length === 0) {
                 html += `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-secondary);">${t.stats_no_data}</div>`;
             } else {
                 const maxVal = Math.max(...sortedTags.map(x => x[1]));
-                
                 sortedTags.forEach(([tag, score]) => {
-                    const height = Math.max(5, (score / maxVal) * 85);
+                    const height = Math.max(10, (score / maxVal) * 85);
                     let displayTag = tag.charAt(0).toUpperCase() + tag.slice(1);
                     if (displayTag.length > 9) displayTag = displayTag.substring(0, 7) + '..';
 
@@ -11033,33 +11377,29 @@
             }
             html += `</div></div>`;
             
-            // Легенда для тегов
+            // === ЛЕГЕНДА (Только для UI) ===
             html += `
-                <div style="margin-top:15px; display:flex; flex-direction:column; gap:5px; align-items:center;">
-                    <div style="display:flex; gap:15px; font-size:10px; color:var(--text-secondary);">
-                        <div style="display:flex; align-items:center; gap:4px;"><span style="color:var(--accent)">●</span> ${t.legend_watch}</div>
-                        <div style="display:flex; align-items:center; gap:4px;"><span style="color:var(--text-main)">●</span> ${t.legend_like}</div>
-                    </div>
-                    <div style="display:flex; gap:15px; font-size:10px; color:var(--text-secondary);">
-                        <div style="display:flex; align-items:center; gap:4px;"><span style="color:var(--highlight-red)">●</span> ${t.legend_dislike}</div>
-                    </div>
+                <div class="stats-legend-row">
+                    <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div> ${t.legend_watch}</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:var(--text-main)"></div> ${t.legend_like}</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:var(--highlight-red)"></div> ${t.legend_dislike}</div>
                 </div>
             `;
+            
             body.innerHTML = html;
         } 
         
-        // --- ЛОГИКА 2: АКТИВНОСТЬ (ACTIVITY) ---
+        // --- ВАРИАНТ Б: АКТИВНОСТЬ ---
         else {
             const aggregated = {};
-            const now = Date.now();
-            const oneDay = 24 * 60 * 60 * 1000;
-            
+            const nowTime = Date.now();
+            const oneDay = 86400000;
             let cutoffTime = 0;
-            if (currentStatsTimeframe === 'week') cutoffTime = now - 7 * oneDay;
-            else if (currentStatsTimeframe === 'month') cutoffTime = now - 30 * oneDay;
-            else if (currentStatsTimeframe === 'year') cutoffTime = now - 365 * oneDay;
             
-            // Агрегация данных
+            if (currentStatsTimeframe === 'week') cutoffTime = nowTime - 7 * oneDay;
+            else if (currentStatsTimeframe === 'month') cutoffTime = nowTime - 30 * oneDay;
+            else if (currentStatsTimeframe === 'year') cutoffTime = nowTime - 365 * oneDay;
+            
             activityLog.forEach(log => {
                 if (log.ts < cutoffTime) return;
                 const d = new Date(log.ts);
@@ -11072,148 +11412,169 @@
                     label = d.toLocaleDateString(currentLang, { day: 'numeric', month: 'numeric' });
                 }
                 if (!aggregated[key]) aggregated[key] = { gen: 0, watch: 0, time: 0, label: label, sort: d.getTime() };
-                
                 if (log.type === 'watch') aggregated[key].watch++;
                 else if (['like', 'gen', 'pass', 'dislike'].includes(log.type)) aggregated[key].gen++;
             });
 
+            // Добавляем время просмотра
             watchHistory.forEach(entry => {
                 if (entry.timestamp < cutoffTime) return;
                 const d = new Date(entry.timestamp);
-                let key;
-                if (currentStatsTimeframe === 'year' || currentStatsTimeframe === 'all') {
-                    key = `${d.getFullYear()}-${d.getMonth()}`;
-                } else {
-                    key = d.toISOString().split('T')[0];
-                }
+                let key = (currentStatsTimeframe === 'year' || currentStatsTimeframe === 'all') 
+                    ? `${d.getFullYear()}-${d.getMonth()}` 
+                    : d.toISOString().split('T')[0];
                 
-                if (aggregated[key]) {
-                    aggregated[key].time += entry.seconds;
-                } else {
+                if (aggregated[key]) aggregated[key].time += entry.seconds;
+                else {
                     const label = d.toLocaleDateString(currentLang, { day: 'numeric', month: 'numeric' });
                     aggregated[key] = { gen: 0, watch: 0, time: entry.seconds, label: label, sort: d.getTime() };
                 }
             });
 
             const chartData = Object.values(aggregated).sort((a, b) => a.sort - b.sort);
-
-            let html = `<div class="chart-wrapper"><div class="chart-scroll-view" style="justify-content: flex-start; padding-left: 5px;">`;
+            let html = `<div class="chart-wrapper"><div class="chart-scroll-view" id="chart-source-el" style="justify-content: flex-start; padding-left: 5px;">`;
 
             if (chartData.length === 0) {
                 html += `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-secondary);">${t.stats_no_data}</div>`;
             } else {
-                let maxCount = 0;
-                let maxTime = 0;
-                
+                let maxCount = 0, maxTime = 0;
                 chartData.forEach(d => {
                     if (d.gen > maxCount) maxCount = d.gen;
                     if (d.watch > maxCount) maxCount = d.watch;
                     if (d.time > maxTime) maxTime = d.time;
                 });
-
-                if (maxCount < 10) maxCount = 10;
-                if (maxTime < 300) maxTime = 300; 
+                if (maxCount < 5) maxCount = 5;
+                if (maxTime < 300) maxTime = 300;
 
                 chartData.forEach(d => {
                     const hGen = (d.gen / maxCount) * 100;
                     const hWatch = (d.watch / maxCount) * 100;
                     const hTime = (d.time / maxTime) * 100;
-                    
                     const timeMin = Math.round(d.time / 60);
 
                     html += `
-                        <div class="act-col" style="min-width: 55px; margin-right: 8px;">
-                            
-                            <!-- Столбики -->
+                        <div class="act-col" style="min-width: 40px; margin-right: 5px;">
                             <div style="display:flex; align-items:flex-end; gap:2px; height:75%; width:100%; padding-bottom:5px;">
-                                <div style="flex:1; background:var(--text-secondary); height:${Math.max(2, hGen)}%; border-radius:2px 2px 0 0; opacity:0.3;"></div>
-                                <div style="flex:1; background:var(--accent); height:${Math.max(2, hWatch)}%; border-radius:2px 2px 0 0;"></div>
-                                <div style="flex:1; background:#9b59b6; height:${Math.max(2, hTime)}%; border-radius:2px 2px 0 0;"></div>
+                                <div style="flex:1; background:var(--text-secondary); height:${Math.max(5, hGen)}%; border-radius:2px 2px 0 0; opacity:0.3;"></div>
+                                <div style="flex:1; background:var(--accent); height:${Math.max(5, hWatch)}%; border-radius:2px 2px 0 0;"></div>
+                                <div style="flex:1; background:#9b59b6; height:${Math.max(5, hTime)}%; border-radius:2px 2px 0 0;"></div>
                             </div>
-                            
-                            <!-- Цифры -->
-                            <div style="display:flex; gap:2px; width:100%; margin-top:2px;">
-                                <div style="flex:1; text-align:center; font-size:9px; font-weight:700; color:var(--text-secondary); opacity:0.6;">${d.gen}</div>
-                                <div style="flex:1; text-align:center; font-size:9px; font-weight:700; color:var(--accent);">${d.watch}</div>
-                                <div style="flex:1; text-align:center; font-size:9px; font-weight:700; color:#9b59b6;">${timeMin}</div>
-                            </div>
-                            
-                            <div class="chart-label-x" style="font-size:9px; margin-top:3px;">${d.label}</div>
+                            <div style="font-size:8px; text-align:center; color:#9b59b6; font-weight:700;">${timeMin}</div>
+                            <div class="chart-label-x" style="font-size:9px;">${d.label}</div>
                         </div>
                     `;
                 });
             }
+            html += `</div></div>`;
 
-            html += `</div></div>`; 
-
-            // Легенда
-            let legendUnit = 'min';
-            if (currentLang === 'ru') legendUnit = 'мин';
-
+            // === ЛЕГЕНДА (Только для UI) ===
+            let legendUnit = currentLang === 'ru' ? 'мин' : 'min';
             html += `
-                <div style="margin-top:15px; display:flex; flex-wrap:wrap; justify-content:center; gap:15px; font-size:10px;">
-                    <div style="display:flex; align-items:center; gap:4px;">
-                        <div style="width:8px; height:8px; background:var(--text-secondary); opacity:0.3; border-radius:2px;"></div>
-                        <span>${t.act_actions || "Swipes"}</span>
-                    </div>
-                    <div style="display:flex; align-items:center; gap:4px;">
-                        <div style="width:8px; height:8px; background:var(--accent); border-radius:2px;"></div>
-                        <span>${t.act_watches || "Watches"}</span>
-                    </div>
-                    <div style="display:flex; align-items:center; gap:4px;">
-                        <div style="width:8px; height:8px; background:#9b59b6; border-radius:2px;"></div>
-                        <span>Time (${legendUnit})</span>
-                    </div>
+                <div class="stats-legend-row">
+                    <div class="legend-item"><div class="legend-dot" style="background:var(--text-secondary); opacity:0.3;"></div> ${t.act_actions}</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div> ${t.act_watches}</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#9b59b6"></div> Time (${legendUnit})</div>
                 </div>
             `;
+
             body.innerHTML = html;
         }
     }
 
     function shareStats() {
-        const modalBody = document.getElementById('modal-stats-body');
-        if(!modalBody) return;
-        
-        // 1. Создаем Хедер с QR кодом для картинки
-        // Генерируем QR с текущим доменом
-        const currentUrl = window.location.origin;
-        const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=5&data=${encodeURIComponent(currentUrl)}`;
-        
-        const t = langData[currentLang] || langData['en'];
-        const caption = t.share_caption || "Discover yourself";
+        if(navigator.vibrate) navigator.vibrate(50);
 
-        const header = document.createElement('div');
-        header.id = 'share-header-overlay';
-        header.style.display = 'flex'; // Показываем специально для скриншота
+        // 1. СОБИРАЕМ ДАННЫЕ (Даты, Тексты)
+        const t = langData[currentLang] || langData['en'];
+        const logoSrc = (localStorage.getItem('xch_theme_id') === 'noir') ? 'logo_noir.png' : 'logo.png';
+        const slogan = t.share_caption || "Discover yourself";
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=0&data=${encodeURIComponent(window.location.origin)}`;
         
-        header.innerHTML = `
-            <div style="display:flex; flex-direction:column;">
-                <div class="share-logo-text">x<span>Fetish</span>Hub</div>
-                <div class="share-caption">${caption}</div>
+        // Дата
+        const now = new Date();
+        const pad = (n) => n < 10 ? '0'+n : n;
+        const formatDate = (d) => `${pad(d.getDate())}.${pad(d.getMonth()+1)}`;
+        let rangeStr = "";
+        
+        if (currentStatsTimeframe === 'all') rangeStr = "ALL TIME";
+        else {
+            let days = 7;
+            if (currentStatsTimeframe === 'month') days = 30;
+            if (currentStatsTimeframe === 'year') days = 365;
+            rangeStr = `${formatDate(new Date(now.getTime() - (days * 86400000)))} - ${formatDate(now)}`;
+        }
+
+        // 2. БЕРЕМ ГРАФИК ИЗ DOM (Клонируем текущий вид)
+        // Мы ищем элемент с ID 'chart-source-el', который мы добавили в renderStatsContent
+        const chartSource = document.getElementById('chart-source-el');
+        if(!chartSource) return;
+        
+        const chartClone = chartSource.cloneNode(true);
+        // Стили для графика внутри картинки
+        chartClone.style.overflow = 'visible'; 
+        chartClone.style.width = '100%';
+        chartClone.style.height = '100%';
+        chartClone.style.justifyContent = 'center';
+
+        // 3. СОЗДАЕМ СКРЫТЫЙ КОНТЕЙНЕР (Карточка Wrapped стиля)
+        const exportContainer = document.createElement('div');
+        exportContainer.id = 'export-stats-card'; // Стили для этого ID прописаны в CSS
+        
+        // ВАЖНО: Цвет "Fetish" задаем жестко color: var(--accent), без градиента
+        const headerHTML = `
+            <div class="export-header">
+                <div style="display:flex; flex-direction:column;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <img src="${logoSrc}" style="height:32px;">
+                        <div style="font-size:24px; font-weight:900; color:var(--text-main); line-height:1;">
+                            x<span style="color:var(--accent); background:none; -webkit-text-fill-color:initial;">Fetish</span>Hub
+                        </div>
+                    </div>
+                    <div style="font-size:10px; text-transform:uppercase; color:var(--text-secondary); margin-left:42px; letter-spacing:1.5px; margin-top:4px;">${slogan}</div>
+                </div>
+                <div style="background:#fff; padding:4px; border-radius:8px; width:54px; height:54px; display:flex; align-items:center; justify-content:center;">
+                    <img src="${qrUrl}" style="width:100%; height:100%; display:block;">
+                </div>
             </div>
-            <div class="share-qr-box">
-                <img src="${qrApi}" style="width:100%; height:100%; display:block;">
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:-5px;">
+                <span style="font-size:12px; color:var(--text-secondary); font-weight:700;">${rangeStr}</span>
+                <span style="font-size:12px; color:var(--accent); font-weight:800; text-transform:uppercase;">
+                    ${currentStatsTab === 'tags' ? t.stats_prefs : t.stats_activity}
+                </span>
+            </div>
+            
+            <div class="chart-wrapper" style="height:220px; border:none; margin:0; padding:0; display:flex; align-items:flex-end;">
+                <!-- Chart injected here -->
             </div>
         `;
 
-        // 2. Вставляем в начало modalBody
-        modalBody.insertBefore(header, modalBody.firstChild);
+        exportContainer.innerHTML = headerHTML;
+        
+        // Вставляем клон графика в плейсхолдер
+        exportContainer.querySelector('.chart-wrapper').appendChild(chartClone);
+        
+        // Добавляем в body (он будет за экраном благодаря CSS)
+        document.body.appendChild(exportContainer);
 
-        // 3. Делаем скриншот
-        html2canvas(modalBody, {
-            backgroundColor: getComputedStyle(document.body).getPropertyValue('--sidebar-bg'),
-            scale: 2 // Высокое качество
+        // 4. ДЕЛАЕМ СКРИНШОТ
+        html2canvas(exportContainer, {
+            backgroundColor: null, // Прозрачный фон
+            scale: 2, // Высокое качество
+            useCORS: true,
+            allowTaint: true
         }).then(canvas => {
-            // 4. Удаляем хедер сразу после генерации
-            header.remove();
+            // Удаляем временный элемент
+            document.body.removeChild(exportContainer);
 
             const link = document.createElement('a');
-            link.download = 'xfetishhub-stats.png';
+            link.download = `xfetish-stats-${Date.now()}.png`;
             link.href = canvas.toDataURL();
             link.click();
-        }).catch(err => {
-            console.error("Screenshot error:", err);
-            header.remove(); // Убираем в случае ошибки
+        }).catch(e => {
+            console.error(e);
+            if(document.body.contains(exportContainer)) document.body.removeChild(exportContainer);
+            alert("Error creating image");
         });
     }
 
@@ -15498,42 +15859,6 @@
             if (gradSpan && originalStyle) gradSpan.setAttribute('style', originalStyle);
             console.error("Screenshot error:", e);
             alert("Could not save image.");
-        });
-    }
-
-    // 2. ШЕРИНГ ОБЩЕЙ СТАТИСТИКИ (Кнопка в окне статистики)
-    function shareStats() {
-        const modalBody = document.getElementById('modal-stats-body');
-        if(!modalBody) return;
-        
-        // Создаем хедер
-        const header = createScreenshotHeader();
-        header.style.marginBottom = "30px";
-        modalBody.insertBefore(header, modalBody.firstChild);
-
-        // --- Убираем градиент у логотипа в хедере ---
-        const logoSpan = header.querySelector('.screenshot-logo span');
-        if (logoSpan) {
-            logoSpan.style.color = getComputedStyle(document.body).getPropertyValue('--accent');
-        }
-
-        const bg = getComputedStyle(document.body).getPropertyValue('--sidebar-bg');
-
-        // --- useCORS для QR ---
-        html2canvas(modalBody, {
-            backgroundColor: bg,
-            scale: 2,
-            useCORS: true, 
-            allowTaint: true
-        }).then(canvas => {
-            header.remove();
-            const link = document.createElement('a');
-            link.download = 'my-stats.png';
-            link.href = canvas.toDataURL();
-            link.click();
-        }).catch(e => {
-            header.remove();
-            console.error(e);
         });
     }
 
