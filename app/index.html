@@ -5221,6 +5221,13 @@
                 </div>
                 <div class="chevron"></div>
             </div>
+            <div class="ios-row clickable" onclick="openPanicSettings()">
+                <div class="ios-row-left">
+                    <img src="sos.png" class="settings-icon" alt="SOS">
+                    <span data-key="panic_btn">Emergency Mode</span>
+                </div>
+                <div class="chevron"></div>
+            </div>
              <div class="ios-row">
                 <div class="ios-row-left">
                     <img src="explored.png" class="settings-icon" alt="Explored">
@@ -5909,6 +5916,37 @@
                 <button class="btn-gen" onclick="location.reload()" style="margin-top:15px; width:100%;" data-key="pay_reload">Reload Page</button>
             </div>
 
+        </div>
+    </div>
+</div>
+
+<!-- PANIC SETTINGS MODAL -->
+<div class="modal-overlay" id="modal-panic-settings" onclick="closePanicSettings(event)">
+    <div class="modal">
+        <div class="modal-header">
+            <span data-key="panic_title">Emergency Mode</span>
+            <span onclick="closePanicSettings(null, true)">✕</span>
+        </div>
+        
+        <div class="modal-body">
+            <div style="text-align:center; margin-bottom:20px;">
+                <img src="sos.png" style="width:60px; height:60px; margin-bottom:15px; filter: invert(1);">
+                <p style="font-size:14px; color:var(--text-secondary); line-height:1.5;" data-key="panic_desc">
+                    Enable a stealth mode to quickly hide content. Trigger it by <b>Double Tapping</b> anywhere or pressing <b>Spacebar twice</b>.
+                </p>
+            </div>
+
+            <div class="ios-group">
+                <div class="ios-row">
+                    <div class="ios-row-left">
+                        <span data-key="panic_enable">Enable Trigger</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="panic-toggle-input" onchange="togglePanicSetting(this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -7229,7 +7267,25 @@
                 "I didn't quite catch that, so here is something safe:"
             ],
 
+            panic_btn: "Emergency Mode",
+            panic_title: "Emergency Mode",
+            panic_desc: "Enable a stealth mode to quickly hide content. Trigger it by <b>Double Tapping</b> anywhere or pressing <b>ESC twice</b>.",
+            panic_enable: "Enable Trigger",
+            
+            // Safe Mode UI
+            safe_subtitle: "Your home for favorite hobbies",
+            safe_btn_start: "Start Hobby",
+            safe_status: "Time to relax 😌",
+            
+            // Settings Masquerade
+            safe_label_site: "Time",
+            safe_label_ori: "Location",
+            safe_label_int: "Difficulty",
+            safe_opt_morn: "Morning", safe_opt_day: "Day", safe_opt_eve: "Evening",
+            safe_opt_home: "Home", safe_opt_work: "Work", safe_opt_park: "Park",
 
+            // Post-Panic Phrases
+            post_panic_phrases: ["Hope you didn't get caught 😁", "That was close...", "Safe now 😮‍💨", "Back to business 😏"],
             
             // --- 2. Generator (Main Tab) ---
             generate: "Random Genre",
@@ -7664,6 +7720,25 @@
                 "В базе такого нет, но как насчет этого?"
             ],
 
+            panic_btn: "Экстренный режим",
+            panic_title: "Экстренный режим",
+            panic_desc: "Скрытый режим для быстрой маскировки контента. Активируется <b>Двойным тапом</b> по экрану или <b>Двойным ESC</b>.",
+            panic_enable: "Включить триггер",
+            
+            // Safe Mode UI
+            safe_subtitle: "Твой дом для любимых хобби",
+            safe_btn_start: "Начать",
+            safe_status: "Время расслабиться 😌",
+            
+            // Settings Masquerade
+            safe_label_site: "Время",
+            safe_label_ori: "Место",
+            safe_label_int: "Сложность",
+            safe_opt_morn: "Утро", safe_opt_day: "День", safe_opt_eve: "Вечер",
+            safe_opt_home: "Дом", safe_opt_work: "Работа", safe_opt_park: "Парк",
+
+            // Post-Panic Phrases
+            post_panic_phrases: ["Надеюсь, не спалился 😁", "Пронесло...", "Фух, вроде чисто 😮‍💨", "Возвращаемся к делу 😏"],
 
             // --- 2. Генератор ---
             generate: "Случайный жанр",
@@ -8100,6 +8175,26 @@
             hist_empty: "Historial vacío",
             limit_reset: "Reinicio:",
 
+            panic_btn: "Modo Emergencia",
+            panic_title: "Modo Emergencia",
+            panic_desc: "Modo sigiloso para ocultar contenido. Actívalo con <b>Doble Toque</b> o <b>Doble ESC</b>.",
+            panic_enable: "Activar atajo",
+            
+            // Safe Mode UI
+            safe_subtitle: "Tu hogar para pasatiempos favoritos",
+            safe_btn_start: "Comenzar",
+            safe_status: "Hora de relajarse 😌",
+            
+            // Settings Masquerade
+            safe_label_site: "Hora",
+            safe_label_ori: "Ubicación",
+            safe_label_int: "Dificultad",
+            safe_opt_morn: "Mañana", safe_opt_day: "Día", safe_opt_eve: "Noche",
+            safe_opt_home: "Casa", safe_opt_work: "Trabajo", safe_opt_park: "Parque",
+
+            // Post-Panic Phrases
+            post_panic_phrases: ["Espero que no te hayan pillado 😁", "Estuvo cerca...", "A salvo 😮‍💨", "De vuelta al negocio 😏"],
+
             // --- Generator ---
             generate: "Género Aleatorio",
             generate_again: "Otro Género",
@@ -8520,6 +8615,26 @@
             btn_pass: "Andere",
             btn_like: "Ähnlich",
             btn_upgrade_short: "Upgrade ⇧",
+
+            panic_btn: "Notfallmodus",
+            panic_title: "Notfallmodus",
+            panic_desc: "Stealth-Modus zum Verstecken. Aktivierung durch <b>Doppeltippen</b> oder <b>Doppel-ESC</b>.",
+            panic_enable: "Auslöser aktivieren",
+            
+            // Safe Mode UI
+            safe_subtitle: "Dein Zuhause für Lieblingshobbys",
+            safe_btn_start: "Starten",
+            safe_status: "Zeit zum Entspannen 😌",
+            
+            // Settings Masquerade
+            safe_label_site: "Zeit",
+            safe_label_ori: "Ort",
+            safe_label_int: "Schwierigkeit",
+            safe_opt_morn: "Morgen", safe_opt_day: "Tag", safe_opt_eve: "Abend",
+            safe_opt_home: "Zuhause", safe_opt_work: "Arbeit", safe_opt_park: "Park",
+
+            // Post-Panic Phrases
+            post_panic_phrases: ["Hoffentlich wurdest du nicht erwischt 😁", "Das war knapp...", "Jetzt sicher 😮‍💨", "Zurück zum Geschäft 😏"],
 
             // --- Generator ---
             generate: "Zufallsgenre",
@@ -15185,112 +15300,87 @@
         }
     });
 
-    // =========================================
+   // =========================================
     // PANIC MODE (EMERGENCY SWITCH)
     // =========================================
 
     let isPanicMode = false;
     let lastTapTime = 0;
-    let lastSpaceTime = 0;
+    let lastEscTime = 0;
+
+    // Настройка: Включен ли триггер (по умолчанию true)
+    let isPanicEnabled = localStorage.getItem('xch_panic_enabled') !== 'false';
+
+    // Инициализация тумблера при загрузке
+    document.addEventListener("DOMContentLoaded", () => {
+        const toggle = document.getElementById('panic-toggle-input');
+        if (toggle) toggle.checked = isPanicEnabled;
+    });
 
     // Хранилище состояний (чтобы вернуть всё как было)
     let savedSettingsState = {
-        platformHTML: '',
-        platformVal: '',
-        oriHTML: '',
-        oriVal: '',
-        decoSrc: '',
-        oriIconSrc: '',
+        platformHTML: '', platformVal: '', 
+        oriHTML: '', oriVal: '', 
+        decoSrc: '', oriIconSrc: '', 
         themeId: ''
     };
-    
-    // Безопасные тексты
-    const SAFE_DATA = {
-        subtitles: {
-            en: "Your home for favorite hobbies",
-            ru: "Твой дом для любимых хобби",
-            es: "Tu hogar para pasatiempos favoritos",
-            de: "Dein Zuhause für Lieblingshobbys"
-        },
-        btn_start: {
-            en: "Start Hobby",
-            ru: "Начать",
-            es: "Comenzar",
-            de: "Starten"
-        },
-        labels: {
-            site: { en: "Time", ru: "Время", es: "Hora", de: "Zeit" },
-            ori: { en: "Location", ru: "Место", es: "Ubicación", de: "Ort" },
-            intensity: { en: "Difficulty", ru: "Сложность", es: "Dificultad", de: "Schwierigkeit" }
-        },
-        options: {
-            time: [
-                { val: 'morn', en: "Morning", ru: "Утро", es: "Mañana", de: "Morgen" },
-                { val: 'day', en: "Day", ru: "День", es: "Día", de: "Tag" },
-                { val: 'eve', en: "Evening", ru: "Вечер", es: "Noche", de: "Abend" }
-            ],
-            loc: [
-                { val: 'home', en: "Home", ru: "Дом", es: "Casa", de: "Zuhause" },
-                { val: 'work', en: "Work", ru: "Работа", es: "Trabajo", de: "Arbeit" },
-                { val: 'park', en: "Park", ru: "Парк", es: "Parque", de: "Park" }
-            ]
-        }
-    };
 
+    // Задания для безопасного режима
     const SAFE_TASKS = [
-        {
-            en: { name: "Wash Dishes", desc: "The sink is full. It's time to be a hero and clean those plates.", tags: ["Cleaning", "Kitchen", "Water"] },
-            ru: { name: "Помыть посуду", desc: "Раковина полна. Пришло время стать героем и отмыть эти тарелки.", tags: ["Уборка", "Кухня", "Вода"] },
-            es: { name: "Lavar los platos", desc: "El fregadero está lleno. Es hora de limpiar esos platos.", tags: ["Limpieza", "Cocina", "Agua"] },
-            de: { name: "Geschirr spülen", desc: "Die Spüle ist voll. Zeit, diese Teller zu reinigen.", tags: ["Reinigung", "Küche", "Wasser"] }
-        },
-        {
-            en: { name: "Pet the Cat", desc: "Find a cat. Pet the cat. Listen to the purr. Relax.", tags: ["Animals", "Relax", "Soft"] },
-            ru: { name: "Погладить кота", desc: "Найди кота. Погладь кота. Слушай мурчание. Расслабься.", tags: ["Животные", "Релакс", "Мягко"] },
-            es: { name: "Acariciar al gato", desc: "Encuentra un gato. Acarícialo. Escucha el ronroneo.", tags: ["Animales", "Relax", "Suave"] },
-            de: { name: "Katze streicheln", desc: "Finde eine Katze. Streichle sie. Hör das Schnurren.", tags: ["Tiere", "Entspannung", "Weich"] }
-        },
-        {
-            en: { name: "Drink Water", desc: "Stay hydrated. Your body needs H2O to function properly.", tags: ["Health", "Liquid", "Life"] },
-            ru: { name: "Выпить воды", desc: "Поддерживай водный баланс. Твоему телу нужен H2O.", tags: ["Здоровье", "Жидкость", "Жизнь"] },
-            es: { name: "Beber agua", desc: "Mantente hidratado. Tu cuerpo necesita H2O.", tags: ["Salud", "Líquido", "Vida"] },
-            de: { name: "Wasser trinken", desc: "Bleib hydriert. Dein Körper braucht H2O.", tags: ["Gesundheit", "Flüssigkeit", "Leben"] }
-        },
-        {
-            en: { name: "Read a Book", desc: "Expand your mind. Pick up that book you bought 3 years ago.", tags: ["Education", "Quiet", "Paper"] },
-            ru: { name: "Почитать книгу", desc: "Развивай разум. Возьми ту книгу, которую купил 3 года назад.", tags: ["Обучение", "Тишина", "Бумага"] },
-            es: { name: "Leer un libro", desc: "Expande tu mente. Toma ese libro que compraste hace años.", tags: ["Educación", "Silencio", "Papel"] },
-            de: { name: "Buch lesen", desc: "Erweitere deinen Geist. Nimm das Buch, das du gekauft hast.", tags: ["Bildung", "Ruhe", "Papier"] }
-        },
-        {
-            en: { name: "Go for a Walk", desc: "Touch some grass. Breathing fresh air is highly recommended.", tags: ["Outdoor", "Sport", "Nature"] },
-            ru: { name: "Сходить погулять", desc: "Потрогай траву. Свежий воздух крайне рекомендован.", tags: ["Улица", "Спорт", "Природа"] },
-            es: { name: "Ir a caminar", desc: "Toca el pasto. Respirar aire fresco es muy recomendable.", tags: ["Exterior", "Deporte", "Naturaleza"] },
-            de: { name: "Spazieren gehen", desc: "Berühre Gras. Frische Luft ist sehr zu empfehlen.", tags: ["Draußen", "Sport", "Natur"] }
-        }
+        { en: { name: "Wash Dishes", desc: "The sink is full. It's time to be a hero and clean those plates.", tags: ["Cleaning", "Kitchen", "Water"] }, ru: { name: "Помыть посуду", desc: "Раковина полна. Пришло время стать героем и отмыть эти тарелки.", tags: ["Уборка", "Кухня", "Вода"] }, es: { name: "Lavar los platos", desc: "El fregadero está lleno.", tags: ["Limpieza", "Cocina"] }, de: { name: "Geschirr spülen", desc: "Die Spüle ist voll.", tags: ["Reinigung", "Küche"] } },
+        { en: { name: "Pet the Cat", desc: "Find a cat. Pet the cat. Listen to the purr. Relax.", tags: ["Animals", "Relax", "Soft"] }, ru: { name: "Погладить кота", desc: "Найди кота. Погладь кота. Слушай мурчание. Расслабься.", tags: ["Животные", "Релакс", "Мягко"] }, es: { name: "Acariciar al gato", desc: "Encuentra un gato.", tags: ["Animales", "Relax"] }, de: { name: "Katze streicheln", desc: "Finde eine Katze.", tags: ["Tiere", "Entspannung"] } },
+        { en: { name: "Drink Water", desc: "Stay hydrated. Your body needs H2O to function properly.", tags: ["Health", "Liquid", "Life"] }, ru: { name: "Выпить воды", desc: "Поддерживай водный баланс. Твоему телу нужен H2O.", tags: ["Здоровье", "Жидкость", "Жизнь"] }, es: { name: "Beber agua", desc: "Mantente hidratado.", tags: ["Salud", "Vida"] }, de: { name: "Wasser trinken", desc: "Bleib hydriert.", tags: ["Gesundheit", "Leben"] } },
+        { en: { name: "Read a Book", desc: "Expand your mind. Pick up that book you bought 3 years ago.", tags: ["Education", "Quiet", "Paper"] }, ru: { name: "Почитать книгу", desc: "Развивай разум. Возьми ту книгу, которую купил 3 года назад.", tags: ["Обучение", "Тишина", "Бумага"] }, es: { name: "Leer un libro", desc: "Expande tu mente.", tags: ["Educación", "Silencio"] }, de: { name: "Buch lesen", desc: "Erweitere deinen Geist.", tags: ["Bildung", "Ruhe"] } },
+        { en: { name: "Go for a Walk", desc: "Touch some grass. Breathing fresh air is highly recommended.", tags: ["Outdoor", "Sport", "Nature"] }, ru: { name: "Сходить погулять", desc: "Потрогай траву. Свежий воздух крайне рекомендован.", tags: ["Улица", "Спорт", "Природа"] }, es: { name: "Ir a caminar", desc: "Toca el pasto.", tags: ["Exterior", "Deporte"] }, de: { name: "Spazieren gehen", desc: "Berühre Gras.", tags: ["Draußen", "Sport"] } }
     ];
 
-    function togglePanicMode() {
-        isPanicMode = !isPanicMode;
+    // --- ФУНКЦИИ УПРАВЛЕНИЯ НАСТРОЙКАМИ ---
+
+    function openPanicSettings() {
+        const t = langData[currentLang] || langData['en'];
         
-        // Основные элементы
+        document.querySelector('[data-key="panic_title"]').innerText = t.panic_title;
+        document.querySelector('[data-key="panic_desc"]').innerHTML = t.panic_desc;
+        document.querySelector('[data-key="panic_enable"]').innerText = t.panic_enable;
+        
+        document.getElementById('modal-panic-settings').classList.add('open');
+    }
+
+    function closePanicSettings(e, force) {
+        if (force || e.target.id === 'modal-panic-settings') {
+            document.getElementById('modal-panic-settings').classList.remove('open');
+        }
+    }
+
+    function togglePanicSetting(isChecked) {
+        isPanicEnabled = isChecked;
+        localStorage.setItem('xch_panic_enabled', isChecked);
+    }
+
+    // --- ЛОГИКА ПЕРЕКЛЮЧЕНИЯ ---
+
+    function togglePanicMode() {
+        if (!isPanicEnabled && !isPanicMode) return;
+
+        isPanicMode = !isPanicMode;
+        const t = langData[currentLang] || langData['en'];
+        
         const logoTextDivs = document.querySelectorAll('.logo');
         const decoIcons = document.querySelectorAll('.deco-icon');
         const subtitles = document.querySelectorAll('.subtitle');
         const startBtnContainer = document.getElementById('start-btn-container');
         
-        // Элементы настроек
+        // Настройки
         const labelSite = document.querySelector('[data-key="site_label"]');
         const selectSite = document.getElementById('platform');
         const labelOri = document.querySelector('[data-key="ori_label"]');
         const selectOri = document.getElementById('orientation-select');
         const labelInt = document.querySelector('[data-key="exploration_mode"]');
         
-        // Иконки
         const settingsDecoIcon = document.querySelector('.ios-row img[src*="deco.png"], .ios-row img[src*="funny_deco.png"]');
         const settingsOriIcon = document.querySelector('.ios-row img[src*="orientation.png"], .ios-row img[src*="place_icon.png"]');
 
-        const lang = ['en', 'ru', 'es', 'de'].includes(currentLang) ? currentLang : 'en';
+        const langKey = ['en', 'ru', 'es', 'de'].includes(currentLang) ? currentLang : 'en';
 
         // Элементы для скрытия
         const unsafeElements = [
@@ -15305,130 +15395,86 @@
             // === 🚨 ВКЛЮЧЕНИЕ РЕЖИМА 🚨 ===
             console.log("⚠️ PANIC MODE ACTIVATED");
 
-            // 1. СОХРАНЯЕМ И МЕНЯЕМ ТЕМУ
-            // Сохраняем текущую тему в переменную
+            // 1. Смена Темы (Лес)
             savedSettingsState.themeId = localStorage.getItem('xch_theme_id') || 'dark';
-            
-            // Определяем, светлая тема или темная, чтобы включить подходящий "Лес"
             const isLight = document.body.classList.contains('light-theme');
             applyTheme(isLight ? 'green-light' : 'green-dark');
 
-            // 2. Скрываем декорации
+            // 2. Скрываем декор
             decoIcons.forEach(el => el.style.display = 'none');
 
-            // 3. Меняем Логотип
+            // 3. Логотип FunnyHub (Зеленый градиент)
             logoTextDivs.forEach(div => {
-                div.innerHTML = `
-                    <img src="funny_icon.png" class="logo-img" style="height:45px; margin-right:5px;">
-                    <span style="
-                        background: linear-gradient(180deg, #2ecc71 20%, #27ae60 100%);
-                        -webkit-background-clip: text;
-                        background-clip: text;
-                        -webkit-text-fill-color: transparent;
-                        color: transparent;
-                        display: inline-block;
-                    ">Funny</span>Hub
-                `;
+                div.innerHTML = `<img src="funny_icon.png" class="logo-img" style="height:45px; margin-right:5px;"><span style="background: linear-gradient(180deg, #2ecc71 20%, #27ae60 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; display: inline-block;">Funny</span>Hub`;
             });
 
-            // 4. Меняем Подзаголовок
-            subtitles.forEach(el => el.innerText = SAFE_DATA.subtitles[lang]);
+            // 4. Подзаголовок из LangData
+            subtitles.forEach(el => el.innerText = t.safe_subtitle);
 
-            // 5. Скрываем опасные элементы
+            // 5. Скрываем опасное
             unsafeElements.forEach(el => {
-                if(el) {
-                    el.classList.add('panic-hidden'); 
-                    el.style.setProperty('display', 'none', 'important');
-                }
+                if(el) { el.classList.add('panic-hidden'); el.style.setProperty('display', 'none', 'important'); }
             });
 
-            // 6. Подменяем кнопку "Старт"
+            // 6. Кнопка "Начать"
             if (startBtnContainer) {
                 startBtnContainer.classList.remove('hidden-initial');
                 startBtnContainer.style.display = 'flex';
-                startBtnContainer.innerHTML = `
-                    <button class="btn-start-capsule" onclick="togglePanicMode()" 
-                        style="background: linear-gradient(to right, #2ecc71, #27ae60); box-shadow: 0 10px 40px -5px #2ecc71;">
-                        <img src="start.png" style="width:20px; height:20px; margin-right:8px; filter: brightness(0) invert(1);"> ${SAFE_DATA.btn_start[lang]}
-                    </button>
-                `;
+                startBtnContainer.innerHTML = `<button class="btn-start-capsule" onclick="togglePanicMode()" style="background: linear-gradient(to right, #2ecc71, #27ae60); box-shadow: 0 10px 40px -5px #2ecc71;"><img src="start.png" style="width:20px; height:20px; margin-right:8px; filter: brightness(0) invert(1);"> ${t.safe_btn_start}</button>`;
             }
 
-            // 7. Подменяем контент карточки
-            const task = SAFE_TASKS[Math.floor(Math.random() * SAFE_TASKS.length)][lang];
+            // 7. Контент карточки
+            const task = SAFE_TASKS[Math.floor(Math.random() * SAFE_TASKS.length)][langKey];
             const reel = document.getElementById('slot-reel');
             const desc = document.getElementById('result-desc');
             const related = document.getElementById('related-tags');
             const relatedBlock = document.getElementById('related-block');
 
             if(reel) reel.innerHTML = `<div class="slot-item" style="color:var(--text-main); font-size: 32px;">${task.name}</div>`;
-            if(desc) {
-                desc.innerText = task.desc;
-                desc.style.display = 'block';
-            }
+            if(desc) { desc.innerText = task.desc; desc.style.display = 'block'; }
             if(related) {
                 related.innerHTML = '';
                 task.tags.forEach(tag => {
-                    const btn = document.createElement('div');
-                    btn.className = 'related-item-btn';
-                    btn.innerText = tag;
-                    related.appendChild(btn);
+                    const btn = document.createElement('div'); btn.className = 'related-item-btn'; btn.innerText = tag; related.appendChild(btn);
                 });
             }
             if(relatedBlock) {
-                relatedBlock.classList.remove('hidden-initial');
-                relatedBlock.style.display = 'flex';
+                relatedBlock.classList.remove('hidden-initial'); relatedBlock.style.display = 'flex';
                 const title = relatedBlock.querySelector('.related-title');
-                if(title) title.innerText = (lang === 'ru') ? "Похожие хобби:" : "Similar hobbies:";
+                if(title) title.innerText = (langKey === 'ru') ? "Похожие хобби:" : "Similar hobbies:";
             }
             const statusEl = document.getElementById('status-text');
-            if(statusEl) {
-                statusEl.innerHTML = (lang === 'ru') ? "Время расслабиться 😌" : "Time to relax 😌";
-                statusEl.style.color = "#2ecc71";
-            }
+            if(statusEl) { statusEl.innerHTML = t.safe_status; statusEl.style.color = "#2ecc71"; }
 
-            // === 8. ПОДМЕНА НАСТРОЕК ===
-            
-            // Сохраняем настройки
-            savedSettingsState.platformHTML = selectSite.innerHTML;
-            savedSettingsState.platformVal = selectSite.value;
-            savedSettingsState.oriHTML = selectOri.innerHTML;
-            savedSettingsState.oriVal = selectOri.value;
-            
-            if(settingsDecoIcon) {
-                savedSettingsState.decoSrc = settingsDecoIcon.src; 
-                settingsDecoIcon.src = 'funny_deco.png'; 
-            }
-            if(settingsOriIcon) {
-                savedSettingsState.oriIconSrc = settingsOriIcon.src; 
-                settingsOriIcon.src = 'place_icon.png';
-            }
+            // 8. Маскировка настроек
+            savedSettingsState.platformHTML = selectSite.innerHTML; savedSettingsState.platformVal = selectSite.value;
+            savedSettingsState.oriHTML = selectOri.innerHTML; savedSettingsState.oriVal = selectOri.value;
+            if(settingsDecoIcon) { savedSettingsState.decoSrc = settingsDecoIcon.src; settingsDecoIcon.src = 'funny_deco.png'; }
+            if(settingsOriIcon) { savedSettingsState.oriIconSrc = settingsOriIcon.src; settingsOriIcon.src = 'place_icon.png'; }
 
-            // Меняем Лейблы
-            if(labelSite) labelSite.innerText = SAFE_DATA.labels.site[lang];
-            if(labelOri) labelOri.innerText = SAFE_DATA.labels.ori[lang];
-            if(labelInt) labelInt.innerText = SAFE_DATA.labels.intensity[lang];
+            if(labelSite) labelSite.innerText = t.safe_label_site;
+            if(labelOri) labelOri.innerText = t.safe_label_ori;
+            if(labelInt) labelInt.innerText = t.safe_label_int;
 
-            // Меняем Select "Сайт" -> "Время"
-            selectSite.innerHTML = SAFE_DATA.options.time.map(opt => `<option value="${opt.val}">${opt[lang]}</option>`).join('');
+            // Опции времени
+            const timeOpts = [
+                {val:'morn', txt:t.safe_opt_morn}, {val:'day', txt:t.safe_opt_day}, {val:'eve', txt:t.safe_opt_eve}
+            ];
+            selectSite.innerHTML = timeOpts.map(o => `<option value="${o.val}">${o.txt}</option>`).join('');
             
-            // Меняем Select "Ориентация" -> "Место"
-            selectOri.innerHTML = SAFE_DATA.options.loc.map(opt => `<option value="${opt.val}">${opt[lang]}</option>`).join('');
+            // Опции места
+            const locOpts = [
+                {val:'home', txt:t.safe_opt_home}, {val:'work', txt:t.safe_opt_work}, {val:'park', txt:t.safe_opt_park}
+            ];
+            selectOri.innerHTML = locOpts.map(o => `<option value="${o.val}">${o.txt}</option>`).join('');
 
         } else {
             // === ✅ ВЫКЛЮЧЕНИЕ РЕЖИМА ===
             console.log("✅ PANIC MODE DEACTIVATED");
 
-            // 1. ВОЗВРАЩАЕМ ТЕМУ
-            // Проверяем, есть ли сохраненная тема, и возвращаем её
-            if (savedSettingsState.themeId) {
-                applyTheme(savedSettingsState.themeId);
-            }
-
-            // 2. Возвращаем декорации
+            if (savedSettingsState.themeId) applyTheme(savedSettingsState.themeId);
             decoIcons.forEach(el => el.style.display = '');
 
-            // 3. Возвращаем Логотип
             const isNoir = document.body.getAttribute('data-theme') === 'noir';
             const iconSrc = isNoir ? 'logo_noir.png' : 'logo.png';
             logoTextDivs.forEach(div => {
@@ -15436,74 +15482,69 @@
                 div.onclick = resetToHome; 
             });
 
-            // 4. Возвращаем подзаголовок
-            const t = langData[currentLang] || langData['en'];
             subtitles.forEach(el => el.innerText = t.subtitle);
 
-            // 5. Восстанавливаем кнопку "Start"
             if (startBtnContainer) {
-                startBtnContainer.innerHTML = `
-                    <button class="btn-start-capsule" onclick="startNewSession()">
-                        🔥 <span data-key="btn_start">${t.btn_start}</span>
-                    </button>
-                `;
+                startBtnContainer.innerHTML = `<button class="btn-start-capsule" onclick="startNewSession()">🔥 <span data-key="btn_start">${t.btn_start}</span></button>`;
             }
 
-            // 6. Возвращаем скрытые элементы
-            unsafeElements.forEach(el => {
-                if(el) {
-                    el.classList.remove('panic-hidden');
-                    el.style.display = ''; 
-                }
-            });
+            unsafeElements.forEach(el => { if(el) { el.classList.remove('panic-hidden'); el.style.display = ''; } });
 
-            // 7. ВОЗВРАЩАЕМ НАСТРОЙКИ
+            // Restore Settings
             if(labelSite) labelSite.innerText = t.site_label;
             if(labelOri) labelOri.innerText = t.ori_label;
             if(labelInt) labelInt.innerText = t.exploration_mode;
 
-            if(selectSite) {
-                selectSite.innerHTML = savedSettingsState.platformHTML;
-                selectSite.value = savedSettingsState.platformVal;
-            }
-            if(selectOri) {
-                selectOri.innerHTML = savedSettingsState.oriHTML;
-                selectOri.value = savedSettingsState.oriVal;
-            }
-            
+            if(selectSite) { selectSite.innerHTML = savedSettingsState.platformHTML; selectSite.value = savedSettingsState.platformVal; }
+            if(selectOri) { selectOri.innerHTML = savedSettingsState.oriHTML; selectOri.value = savedSettingsState.oriVal; }
             if(settingsDecoIcon && savedSettingsState.decoSrc) settingsDecoIcon.src = savedSettingsState.decoSrc;
             if(settingsOriIcon && savedSettingsState.oriIconSrc) settingsOriIcon.src = savedSettingsState.oriIconSrc;
 
-            // 8. Возвращаем контент
+            // === ФРАЗА ВОЗВРАТА ===
+            const phrases = t.post_panic_phrases || ["That was close..."];
+            const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+
             if (currentItem) {
-                renderResultUI(currentItem, 'history');
+                // Передаем фразу как customReason
+                renderResultUI(currentItem, 'history', randomPhrase);
             } else {
                 resetToHome();
+                // Для стартового экрана ставим фразу вручную
+                setTimeout(() => {
+                    const statusEl = document.getElementById('status-text');
+                    if(statusEl) {
+                        statusEl.innerText = randomPhrase;
+                        statusEl.style.color = "var(--text-secondary)";
+                        statusEl.style.opacity = "1";
+                    }
+                }, 400);
             }
         }
     }
 
     // --- ОБРАБОТЧИКИ СОБЫТИЙ ---
 
-    // A. Двойной Пробел
+    // A. Клавиатура (Двойной ESC)
     document.addEventListener('keydown', (e) => {
+        // Игнорируем ввод текста
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
-        if (e.code === 'Space') {
+        if (e.code === 'Escape') {
             const now = new Date().getTime();
-            if (now - lastSpaceTime < 400) {
+            // Если между нажатиями меньше 400мс
+            if (now - lastEscTime < 400) {
                 e.preventDefault(); 
                 togglePanicMode();
-                lastSpaceTime = 0; 
+                lastEscTime = 0; 
             } else {
-                lastSpaceTime = now;
+                lastEscTime = now;
             }
         }
     });
 
     // B. Двойной Тап
     document.addEventListener('touchend', (e) => {
-        // Игнорируем кнопки
+        // Игнорируем интерактивные элементы
         if (e.target.closest('button') || e.target.closest('.t-circle-btn') || e.target.closest('.ios-row') || e.target.closest('.plan-btn')) {
             return;
         }
@@ -15517,6 +15558,7 @@
             lastTapTime = now;
         }
     });
+
 </script>
 
 <!-- SEO CONTEXT BLOCK -->
