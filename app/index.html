@@ -4233,6 +4233,80 @@
             align-items: center;
         }
 
+        /* --- INTENSITY TOAST POPUP --- */
+        #intensity-toast {
+            position: absolute;
+            /* Позиция над слайдером */
+            top: -45px; 
+            left: 50%;
+            transform: translateX(-50%) scale(0.5); /* Начальное состояние */
+            
+            padding: 6px 16px;
+            border-radius: 20px;
+            
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            
+            opacity: 0; /* Скрыт */
+            pointer-events: none; /* Чтобы не мешал кликать */
+            z-index: 20;
+            
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(5px);
+        }
+
+        /* Стили для уровней */
+        .toast-safe {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .toast-spicy {
+            background: linear-gradient(135deg, #f1c40f, #e67e22);
+            color: #fff;
+            box-shadow: 0 5px 20px rgba(243, 156, 18, 0.4) !important;
+        }
+
+        .toast-extreme {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: #fff;
+            box-shadow: 0 0 25px rgba(231, 76, 60, 0.6) !important;
+            border: 1px solid #ff9999 !important;
+        }
+
+        /* Анимация появления и исчезновения */
+        @keyframes popToast {
+            0% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(10px) scale(0.8);
+            }
+            15% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0) scale(1.1); /* Пружинит вверх */
+            }
+            25% {
+                transform: translateX(-50%) translateY(0) scale(1); /* Встает на место */
+            }
+            85% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-15px) scale(0.9); /* Улетает вверх */
+            }
+        }
+
+        .anim-toast {
+            animation: popToast 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+
         .slider-container {
             width: 100%;
             padding: 0 5px;
@@ -4513,6 +4587,103 @@
             top: 0;
             right: 0;
             opacity: 0.6;
+        }
+
+        /* --- СТИЛИ ДЛЯ ПОЛЕЗНОСТЕЙ (TIPS) --- */
+
+        /* Сетка: 2 колонки */
+        .tips-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 2 колонки */
+            gap: 12px;
+            padding-bottom: 20px;
+        }
+
+        /* Карточка-контейнер */
+        .tip-card {
+            display: flex;
+            flex-direction: column;
+            border-radius: 20px;
+            overflow: hidden; /* Чтобы шапка не вылезала */
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            aspect-ratio: 0.8; /* Чуть вытянутый прямоугольник (близко к 4:3 вертикально) */
+            cursor: pointer;
+            transition: transform 0.2s;
+            background: var(--ios-card); /* Подложка */
+        }
+
+        .tip-card:active {
+            transform: scale(0.96);
+        }
+
+        /* 1/3 Сверху: Цветная шапка */
+        .tip-card-header {
+            height: 35%; /* Треть высоты */
+            width: 100%;
+            /* Фон задается через JS (градиент) */
+        }
+
+        /* 2/3 Снизу: Нейтральное стекло */
+        .tip-card-body {
+            height: 65%;
+            width: 100%;
+            position: relative; /* Для позиционирования иконки */
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            
+            /* Стеклянный нейтральный фон */
+            background: var(--ios-card); 
+            background-image: linear-gradient(to bottom, rgba(255,255,255,0.05), transparent);
+        }
+
+        /* Иконка (Эмодзи) */
+        .tip-card-icon {
+            position: absolute;
+            top: -22px; /* Поднимаем вверх, чтобы села на границу */
+            left: 12px; /* Слева */
+            font-size: 36px; /* Крупный размер */
+            line-height: 1;
+            z-index: 2;
+            /* Тень для контраста на фоне границы */
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+        }
+
+        /* Заголовок */
+        .tip-card-title {
+            margin-top: 18px; /* Отступ сверху, чтобы не наехать на иконку */
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.2;
+            margin-bottom: 6px;
+        }
+
+        /* Описание */
+        .tip-card-desc {
+            font-size: 10px;
+            color: var(--text-secondary);
+            line-height: 1.35;
+            font-weight: 500;
+            
+            /* Обрезаем лишнее */
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Текст заголовка "Стань гуру" (маленький и серый) */
+        .tips-guru-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 600;
+            opacity: 0.7;
         }
 
         /* =========================================
@@ -5302,6 +5473,9 @@
                 
                 <!-- Слайдер -->
                 <div class="slider-container" style="margin-bottom: 8px;">
+                    <!-- Всплывашка (Скрыта по умолчанию) -->
+                    <div id="intensity-toast"></div> 
+                    
                     <input type="range" min="1" max="3" value="1" step="1" id="intensity-slider" oninput="updateIntensity(this.value)">
                 </div>
 
@@ -5473,6 +5647,15 @@
 
         <div class="ios-header" data-key="info_header">Information</div>
         <div class="ios-group">
+            
+            <!-- 1. ПОЛЕЗНОСТИ -->
+            <div class="ios-row clickable" onclick="openTipsModal()">
+                <div class="ios-row-left">
+                    <img src="book.png" class="settings-icon" alt="Tips" style="margin-right: 12px;">
+                    <span data-key="tips_btn">Tips & Tricks</span>
+                </div>
+                <div class="chevron"></div>
+            </div>
             <div class="ios-row clickable" onclick="openStatistics()">
                 <div class="ios-row-left">
                     <img src="stats.png" class="settings-icon" alt="Stats">
@@ -6267,6 +6450,47 @@
             <button class="btn-gen" id="btn-vpn-go" style="width:100%; padding:14px; font-size:16px;">
                 <span data-key="vpn_btn">Let's go</span>
             </button>
+        </div>
+    </div>
+</div>
+
+<!-- TIPS MODAL -->
+<div class="modal-overlay" id="modal-tips-overlay" onclick="closeTipsModal(event)">
+    <div class="modal">
+        <div class="modal-header">
+            <span data-key="tips_title">Knowledge Base</span>
+            <span onclick="closeTipsModal(null, true)">✕</span>
+        </div>
+        
+        <div class="modal-body" style="padding: 0 20px 30px 20px;">
+            
+            <!-- VIEW 1: СПИСОК КАРТОЧЕК -->
+            <div id="tips-view-list">
+                <!-- Маленький серый заголовок -->
+                <div class="tips-guru-text" data-key="tips_guru_title">
+                    Become a Guru 😈
+                </div>
+
+                <!-- Сетка карточек -->
+                <div class="tips-grid" id="tips-list-container">
+                    <!-- JS сгенерирует здесь карточки -->
+                </div>
+            </div>
+
+            <!-- VIEW 2: ДЕТАЛИ (ОСТАВЛЯЕМ ТЕМ ЖЕ, НО НЕМНОГО УЛУЧШИМ) -->
+            <div id="tips-view-detail" style="display:none; animation: fadeIn 0.3s ease;">
+                <div style="background:var(--ios-card); padding:20px; border-radius:24px; border:1px solid var(--border);">
+                    <div id="tip-detail-icon" style="font-size:50px; text-align:center; margin-bottom:15px;"></div>
+                    <h3 id="tip-detail-title" style="text-align:center; margin-bottom:20px; color:var(--text-main); font-size:20px;"></h3>
+                    
+                    <div id="tip-detail-content" style="font-size:14px; line-height:1.6; color:var(--text-secondary); margin-bottom:20px;"></div>
+                </div>
+
+                <button class="btn-gen" onclick="backToTipsList()" style="width:100%; padding:14px; margin-top:20px; border-radius:50px;">
+                    <span data-key="btn_got_it">Got it</span>
+                </button>
+            </div>
+
         </div>
     </div>
 </div>
@@ -7458,6 +7682,10 @@
             expl_hist: "From Archives 📜",
             deco_label: "Show Decorations",
 
+            val_safe: "Safe & Chill",
+            val_spicy: "Spicy 🔥",
+            val_extreme: "EXTREME 💀",
+
             share_caption: "Discover yourself",
 
             mode_greeting_hint: [
@@ -7621,6 +7849,27 @@
             vpn_text_pwa: "If the video doesn't play, try restarting it, or open it in a regular browser as a last resort.",
             vpn_text_2: "And don't forget VPN! Enjoy watching 😏",
             vpn_btn: "Let's go",
+
+            tips_btn: "Useful Tips",
+            tips_title: "Knowledge Base",
+            tips_guru_title: "Become a Watching Guru 😈",
+            btn_got_it: "Got it",
+
+            tip_ads_title: "How to remove ads",
+            tip_ads_desc: "Tricks for clean viewing in App",
+            tip_ads_text: "There are NO ads in xFetishHub itself. However, when you click 'Watch', you go to 18+ sites which have ads.<br><br><b>Lifehack for App (PWA):</b><br>If you use the installed app on iPhone/Android, it uses your system browser engine (Safari/Chrome).<br>1. Install an Ad-Blocker (e.g., AdGuard) in Safari or Chrome.<br>2. Enable it in browser settings.<br>3. It will automatically work inside xFetishHub App!",
+
+            tip_video_title: "Video won't play?",
+            tip_video_desc: "Black screen or loading issues",
+            tip_video_text: "Due to PWA (Progressive Web App) technology limitations on some devices, external video players might sometimes fail to load or show a black screen.<br><br><b>Solution:</b><br>1. Try refreshing the page.<br>2. If that doesn't help, open xFetishHub in a regular browser instead of the App.",
+
+            tip_pay_title: "How to pay?",
+            tip_pay_desc: "Why crypto & how to use it",
+            tip_pay_text: "Currently, we only accept Cryptocurrency (USDT). Why? Because traditional payment systems (Stripe, Apple Pay) block adult-oriented projects.<br><br><b>New to Crypto? It's easy:</b><br>1. Open <b>@wallet</b> in Telegram.<br>2. Verify your account.<br>3. Buy USDT via P2P (Bank Card).<br>4. Send USDT to our address using TRC20 network.",
+
+            tip_bug_title: "Report a Problem",
+            tip_bug_desc: "Help improve the project",
+            tip_bug_text: "This project is built by one person and launched recently, so bugs are inevitable. Your feedback is crucial!<br><br>To help, please go to the <b>Extras</b> section and click <b>'Report Issue'</b>.<br>Fill out the form describing what went wrong. I read every report and fix bugs ASAP!",
 
             // --- 2. Generator (Main Tab) ---
             generate: "Random Genre",
@@ -7919,6 +8168,10 @@
             expl_hist: "Из архивов 📜",
             deco_label: "Показывать декор",
 
+            val_safe: "Спокойно",
+            val_spicy: "С перчинкой 🔥",
+            val_extreme: "ЭКСТРИМ 💀",
+
             share_caption: "Узнай себя",
 
             mode_greeting_hint: [
@@ -8080,6 +8333,27 @@
             vpn_text_pwa: "И если у тебя вдруг не запускается видео, то попробуй перезапустить его, либо на крайний случай открой его в браузере.",
             vpn_text_2: "И про ВПН не забудь! Приятного просмотра 😏",
             vpn_btn: "Пошли",
+
+            tips_btn: "Полезности",
+            tips_title: "База знаний",
+            tips_guru_title: "Стань гуру просмотра 😈",
+            btn_got_it: "Понятно",
+
+            tip_ads_title: "Как убрать рекламу",
+            tip_ads_desc: "Секрет чистого просмотра в приложении",
+            tip_ads_text: "В самом xFetishHub рекламы НЕТ. Но при переходе на сайты 18+ она появится — это неизбежно.<br><br><b>Лайфхак для Приложения (PWA):</b><br>Если ты смотришь через установленное приложение:<br>1. Скачай Ад-блокер (например, AdGuard) для Safari или Chrome.<br>2. Включи его в настройках браузера.<br>3. Он автоматически заработает внутри приложения xFetishHub!",
+
+            tip_video_title: "Не грузит видео?",
+            tip_video_desc: "Черный экран или ошибки",
+            tip_video_text: "Из-за особенностей технологии PWA (веб-приложение), на некоторых устройствах плееры сторонних сайтов могут не запускаться с первого раза.<br><br><b>Решение:</b><br>1. Попробуй перезагрузить страницу.<br>2. Если не помогает — открой сайт в обычном браузере, а не в приложении.",
+
+            tip_pay_title: "Как оплатить?",
+            tip_pay_desc: "Почему крипта и как ей платить",
+            tip_pay_text: "Сейчас доступна только оплата в криптовалюте (USDT). Из-за тематики сайта (18+) трудно договориться с банками и Apple/Google Pay.<br><br><b>Ни разу не платил криптой?</b><br>1. Открой <b>@wallet</b> в Telegram.<br>2. Купи USDT через P2P (с карты).<br>3. Нажми Отправить -> Внешний кошелек -> Вставь наш адрес (сеть TRC20).",
+
+            tip_bug_title: "Сообщить о проблеме",
+            tip_bug_desc: "Помоги улучшить проект",
+            tip_bug_text: "Сайт создан недавно одним человеком, поэтому ошибки неизбежны. Твоя помощь очень важна!<br><br>Зайди в блок <b>«Дополнительно»</b> -> <b>«Сообщить о проблеме»</b>.<br>Опиши, что именно не так. Я реагирую на отзывы и исправляю баги максимально быстро.",
 
             // --- 2. Генератор ---
             generate: "Случайный жанр",
@@ -8376,6 +8650,10 @@
             expl_hist: "De los archivos 📜",
             deco_label: "Mostrar decoración",
 
+            val_safe: "Tranquilo",
+            val_spicy: "Picante 🔥",
+            val_extreme: "EXTREMO 💀",
+
             share_caption: "Descúbrete",
 
             mode_greeting_hint: [
@@ -8541,6 +8819,27 @@
             vpn_text_pwa: "Si el video no se reproduce, intenta reiniciarlo o ábrelo en el navegador.",
             vpn_text_2: "¡Y no olvides la VPN! Disfruta 😏",
             vpn_btn: "Vamos",
+
+            tips_btn: "Consejos Útiles",
+            tips_title: "Base de Conocimiento",
+            tips_guru_title: "Sé un Gurú del Video 😈",
+            btn_got_it: "Entendido",
+
+            tip_ads_title: "Cómo quitar anuncios",
+            tip_ads_desc: "Trucos para la App",
+            tip_ads_text: "NO hay anuncios en xFetishHub. Pero los sitios externos sí tienen.<br><br><b>Truco para la App (PWA):</b><br>Instala un bloqueador de anuncios (ej. AdGuard) en Safari/Chrome. ¡Funcionará automáticamente dentro de nuestra App!",
+
+            tip_video_title: "¿No carga el video?",
+            tip_video_desc: "Pantalla negra o errores",
+            tip_video_text: "Debido a la tecnología PWA, a veces los videos no cargan en la App.<br><br><b>Solución:</b><br>1. Recarga la página.<br>2. Si falla, abre el sitio en el navegador normal.",
+
+            tip_pay_title: "¿Cómo pagar?",
+            tip_pay_desc: "Cripto y cómo usarlo",
+            tip_pay_text: "Solo aceptamos Cripto (USDT) debido a las restricciones de contenido adulto.<br><br><b>¿Nuevo en Cripto?</b><br>1. Abre <b>@wallet</b> en Telegram.<br>2. Compra USDT vía P2P.<br>3. Envía a nuestra dirección (red TRC20).",
+
+            tip_bug_title: "Reportar Problema",
+            tip_bug_desc: "Ayuda a mejorar",
+            tip_bug_text: "Un solo desarrollador creó esto. Los errores pasan.<br><br>Usa el botón <b>'Reportar Problema'</b> en Extras. ¡Leo y arreglo todo!",
 
             // --- Generator ---
             generate: "Género Aleatorio",
@@ -8824,6 +9123,10 @@
             expl_hist: "Aus dem Archiv 📜",
             deco_label: "Dekoration anzeigen",
 
+            val_safe: "Sicher",
+            val_spicy: "Würzig 🔥",
+            val_extreme: "EXTREM 💀",
+
             share_caption: "Entdecke dich selbst",
 
             mode_greeting_hint: [
@@ -8988,6 +9291,27 @@
             vpn_text_pwa: "Falls das Video nicht läuft, starte es neu oder öffne es im Browser.",
             vpn_text_2: "VPN nicht vergessen! Viel Spaß 😏",
             vpn_btn: "Los geht's",
+
+            tips_btn: "Nützliche Tipps",
+            tips_title: "Wissensdatenbank",
+            tips_guru_title: "Werde ein Video-Guru 😈",
+            btn_got_it: "Verstanden",
+
+            tip_ads_title: "Werbung entfernen",
+            tip_ads_desc: "Tricks für die App",
+            tip_ads_text: "xFetishHub selbst hat KEINE Werbung. Externe Seiten schon.<br><br><b>Tipp für die App (PWA):</b><br>Installiere einen Ad-Blocker (z.B. AdGuard) in Safari/Chrome. Er funktioniert automatisch auch in der App!",
+
+            tip_video_title: "Video läuft nicht?",
+            tip_video_desc: "Schwarzer Bildschirm",
+            tip_video_text: "Wegen der PWA-Technologie laden Videos in der App manchmal nicht.<br><br><b>Lösung:</b><br>1. Seite neu laden.<br>2. Im normalen Browser öffnen.",
+
+            tip_pay_title: "Wie bezahlen?",
+            tip_pay_desc: "Warum Krypto & Anleitung",
+            tip_pay_text: "Wir akzeptieren nur Krypto (USDT) wegen der Erwachsenen-Inhalte.<br><br><b>Neu bei Krypto?</b><br>1. Öffne <b>@wallet</b> in Telegram.<br>2. Kaufe USDT via P2P.<br>3. Sende an unsere Adresse (Netzwerk TRC20).",
+
+            tip_bug_title: "Problem melden",
+            tip_bug_desc: "Hilf uns",
+            tip_bug_text: "Ein Entwickler, neues Projekt. Fehler passieren.<br><br>Nutze <b>'Problem melden'</b> im Extras-Menü. Ich reagiere schnell!",
 
             // --- Generator ---
             generate: "Zufallsgenre",
@@ -9241,6 +9565,45 @@
             `
         }
     };
+
+    const tipsData = [
+        { 
+            id: 'ads', 
+            icon: '🛡️', 
+            titleKey: 'tip_ads_title', 
+            descKey: 'tip_ads_desc', 
+            textKey: 'tip_ads_text',
+            // Синий градиент
+            gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' 
+        },
+        { 
+            id: 'video', 
+            icon: '▶️', 
+            titleKey: 'tip_video_title', 
+            descKey: 'tip_video_desc', 
+            textKey: 'tip_video_text',
+            // Розово-фиолетовый
+            gradient: 'linear-gradient(135deg, #ec4899 0%, #be185d 100%)'
+        },
+        { 
+            id: 'pay', 
+            icon: '💸', 
+            titleKey: 'tip_pay_title', 
+            descKey: 'tip_pay_desc', 
+            textKey: 'tip_pay_text',
+            // Изумрудный
+            gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+        },
+        { 
+            id: 'bug', 
+            icon: '🐛', 
+            titleKey: 'tip_bug_title', 
+            descKey: 'tip_bug_desc', 
+            textKey: 'tip_bug_text',
+            // Оранжевый
+            gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
+        }
+    ];
 
     // --- WRAPPED DATA & TEXTS ---
     const WRAPPED_CONFIG = {
@@ -10679,6 +11042,8 @@
         localStorage.setItem(STORAGE.INTENSITY, currentIntensity);
         
         const slider = document.getElementById('intensity-slider');
+        const toast = document.getElementById('intensity-toast');
+        
         const icon1 = document.getElementById('icon-int-1');
         const icon2 = document.getElementById('icon-int-2');
         const icon3 = document.getElementById('icon-int-3');
@@ -10694,29 +11059,59 @@
 
         // Проверка темы НУАР
         const isNoir = document.body.getAttribute('data-theme') === 'noir';
+        const colorBg = 'var(--border)'; 
+        const colorSpicy = isNoir ? '#ffffff' : '#f39c12'; 
+        const colorExtreme = isNoir ? '#ffffff' : '#e74c3c'; 
 
-        // Цвета (Обычные vs Нуар)
-        const colorBg = 'var(--border)'; // Цвет пустой части
-        
-        // В Нуаре заполнение белое, в обычной - цветное
-        const colorSafe = isNoir ? colorBg : colorBg; // Safe всегда как фон (или можно чуть подсветить)
-        const colorSpicy = isNoir ? '#ffffff' : '#f39c12'; // Белый или Оранжевый
-        const colorExtreme = isNoir ? '#ffffff' : '#e74c3c'; // Белый или Красный
+        // Переводы
+        const t = langData[currentLang] || langData['en'];
 
+        // Логика визуализации (Иконки + Слайдер + Тост)
         if (currentIntensity === 1) {
-            // SAFE: Слайдер пустой (или дефолтный)
+            // SAFE
             slider.style.background = colorBg;
             icon1.classList.add('active-safe');
+            
+            // Настройка Тоста
+            if(toast) {
+                toast.innerText = t.val_safe || "Safe";
+                toast.className = 'toast-safe'; // Применяем стиль
+            }
         } 
         else if (currentIntensity === 2) {
-            // SPICY: Половина закрашена
+            // SPICY
             slider.style.background = `linear-gradient(to right, ${colorSpicy} 0%, ${colorSpicy} 50%, ${colorBg} 50%, ${colorBg} 100%)`;
             icon2.classList.add('active-spicy');
+            
+            if(toast) {
+                toast.innerText = t.val_spicy || "Spicy";
+                toast.className = 'toast-spicy';
+            }
         } 
         else if (currentIntensity === 3) {
-            // EXTREME: Полностью закрашен
+            // EXTREME
             slider.style.background = colorExtreme;
             icon3.classList.add('active-extreme');
+            
+            if(toast) {
+                toast.innerText = t.val_extreme || "Extreme";
+                toast.className = 'toast-extreme';
+            }
+        }
+
+        // ЗАПУСК АНИМАЦИИ
+        if (toast) {
+            // 1. Удаляем класс анимации (сброс)
+            toast.classList.remove('anim-toast');
+            
+            // 2. Магический трюк для перезапуска CSS анимации (Reflow)
+            void toast.offsetWidth; 
+            
+            // 3. Добавляем класс снова
+            toast.classList.add('anim-toast');
+            
+            // Вибрация для тактильного отклика
+            if(navigator.vibrate) navigator.vibrate(15);
         }
     }
 
@@ -16310,6 +16705,70 @@
             lastTapTime = now;
         }
     });
+
+    function openTipsModal() {
+        renderTipsList();
+        // Показываем список, скрываем детали
+        document.getElementById('tips-view-list').style.display = 'block';
+        document.getElementById('tips-view-detail').style.display = 'none';
+        
+        document.getElementById('modal-tips-overlay').classList.add('open');
+    }
+
+    function closeTipsModal(e, force) {
+        if (force || e.target.id === 'modal-tips-overlay') {
+            document.getElementById('modal-tips-overlay').classList.remove('open');
+        }
+    }
+
+    function renderTipsList() {
+        const container = document.getElementById('tips-list-container');
+        container.innerHTML = '';
+        const t = langData[currentLang] || langData['en'];
+
+        tipsData.forEach(tip => {
+            const card = document.createElement('div');
+            card.className = 'tip-card';
+            
+            card.onclick = () => showTipDetail(tip);
+
+            // Вставляем HTML: Шапка + Тело (с иконкой и текстом внутри)
+            card.innerHTML = `
+                <!-- 1/3 Шапка с цветом -->
+                <div class="tip-card-header" style="background: ${tip.gradient};"></div>
+                
+                <!-- 2/3 Тело -->
+                <div class="tip-card-body">
+                    <!-- Иконка на пересечении -->
+                    <div class="tip-card-icon">${tip.icon}</div>
+                    
+                    <!-- Текст -->
+                    <div class="tip-card-title">${t[tip.titleKey]}</div>
+                    <div class="tip-card-desc">${t[tip.descKey]}</div>
+                </div>
+            `;
+            
+            container.appendChild(card);
+        });
+    }
+    
+    function showTipDetail(tip) {
+        const t = langData[currentLang] || langData['en'];
+        
+        // Заполняем контент
+        document.getElementById('tip-detail-icon').innerText = tip.icon;
+        document.getElementById('tip-detail-title').innerText = t[tip.titleKey];
+        document.getElementById('tip-detail-content').innerHTML = t[tip.textKey]; // innerHTML для поддержки <br> и <b>
+
+        // Переключаем вид (Свайп-эффект через display)
+        document.getElementById('tips-view-list').style.display = 'none';
+        document.getElementById('tips-view-detail').style.display = 'block';
+    }
+
+    function backToTipsList() {
+        document.getElementById('tips-view-detail').style.display = 'none';
+        document.getElementById('tips-view-list').style.display = 'block';
+    }
 
 </script>
 
