@@ -11989,9 +11989,12 @@
     function shareStats() {
         if(navigator.vibrate) navigator.vibrate(50);
 
-        // 1. СОБИРАЕМ ДАННЫЕ (Даты, Тексты)
+        // 1. СОБИРАЕМ ДАННЫЕ
         const t = langData[currentLang] || langData['en'];
-        const logoSrc = (localStorage.getItem('xch_theme_id') === 'noir') ? 'logo_noir.png' : 'logo.png';
+        // Получаем правильное лого темы для скриншота
+        const themeId = localStorage.getItem('xch_theme_id') || 'dark';
+        const logoSrc = getThemeLogoSrc(themeId); 
+        
         const slogan = t.share_caption || "Discover yourself";
         const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=0&data=${encodeURIComponent(window.location.origin)}`;
         
@@ -12009,23 +12012,66 @@
             rangeStr = `${formatDate(new Date(now.getTime() - (days * 86400000)))} - ${formatDate(now)}`;
         }
 
-        // 2. БЕРЕМ ГРАФИК ИЗ DOM (Клонируем текущий вид)
-        // Мы ищем элемент с ID 'chart-source-el', который мы добавили в renderStatsContent
-        const chartSource = document.getElementById('chart-source-el');
-        if(!chartSource) return;
+        // 2. ГЕНЕРИРУЕМ ТОП-5 ТЕГОВ ЗАНОВО (ЧТОБЫ НЕ БЫЛО СКРОЛЛА И ЛИШНИХ КОЛОНОК)
+        // Рассчитываем веса (копия логики из renderStatsContent)
+        const tempScores = {};
+        const IGNORED_TAGS = ['general', 'specific', 'straight', 'male', 'female', 'adult', 'video', 'hd'];
         
-        const chartClone = chartSource.cloneNode(true);
-        // Стили для графика внутри картинки
-        chartClone.style.overflow = 'visible'; 
-        chartClone.style.width = '100%';
-        chartClone.style.height = '100%';
-        chartClone.style.justifyContent = 'center';
+        activityLog.forEach(log => {
+            if (log.tags) {
+                let weight = 0;
+                if (log.type === 'watch') weight = 10;
+                else if (log.type === 'like' || log.type === 'similar') weight = 5;
+                else if (log.type === 'dislike') weight = -5;
 
-        // 3. СОЗДАЕМ СКРЫТЫЙ КОНТЕЙНЕР (Карточка Wrapped стиля)
-        const exportContainer = document.createElement('div');
-        exportContainer.id = 'export-stats-card'; // Стили для этого ID прописаны в CSS
+                if (weight !== 0) {
+                    log.tags.forEach(tag => {
+                        if(!IGNORED_TAGS.includes(tag)) {
+                            tempScores[tag] = (tempScores[tag] || 0) + weight;
+                        }
+                    });
+                }
+            }
+        });
+
+        // Берем ТОЛЬКО ТОП-5
+        const sortedTags = Object.entries(tempScores)
+            .sort((a, b) => b[1] - a[1])
+            .filter(x => x[1] > 0)
+            .slice(0, 5); 
+
+        // Генерируем HTML для графика (Без скролла, фиксированный Flex)
+        let chartHtml = '';
         
-        // ВАЖНО: Цвет "Fetish" задаем жестко color: var(--accent), без градиента
+        if(sortedTags.length === 0) {
+            chartHtml = `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-secondary);">${t.stats_no_data}</div>`;
+        } else {
+            const maxVal = Math.max(...sortedTags.map(x => x[1]));
+            // Контейнер с justify-content: space-between или space-around для красивого распределения 5 колонок
+            chartHtml = `<div style="display:flex; width:100%; height:100%; align-items:flex-end; justify-content: space-between; padding: 0 10px;">`;
+            
+            sortedTags.forEach(([tag, score]) => {
+                const height = Math.max(10, (score / maxVal) * 85);
+                let displayTag = tag.charAt(0).toUpperCase() + tag.slice(1);
+                // Обрезаем длинные названия
+                if (displayTag.length > 8) displayTag = displayTag.substring(0, 6) + '..';
+
+                // Используем flex:1 для равномерной ширины
+                chartHtml += `
+                    <div class="pref-col" style="flex:1; max-width:18%; display:flex; flex-direction:column; align-items:center; justify-content:flex-end;">
+                        <div class="chart-value-y" style="margin-bottom:4px; font-weight:800; font-size:12px; color:#fff;">${score}</div>
+                        <div class="chart-bar" style="height:${height}%; width:100%; border-radius: 6px 6px 0 0; background:var(--accent); min-height:4px;"></div>
+                        <div class="chart-label-x" style="margin-top:6px; font-size:11px; font-weight:600; color:var(--text-secondary);">${displayTag}</div>
+                    </div>
+                `;
+            });
+            chartHtml += `</div>`;
+        }
+
+        // 3. СОЗДАЕМ СКРЫТЫЙ КОНТЕЙНЕР (Карточка)
+        const exportContainer = document.createElement('div');
+        exportContainer.id = 'export-stats-card'; // Использует CSS стили
+        
         const headerHTML = `
             <div class="export-header">
                 <div style="display:flex; flex-direction:column;">
@@ -12045,33 +12091,26 @@
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:-5px;">
                 <span style="font-size:12px; color:var(--text-secondary); font-weight:700;">${rangeStr}</span>
                 <span style="font-size:12px; color:var(--accent); font-weight:800; text-transform:uppercase;">
-                    ${currentStatsTab === 'tags' ? t.stats_prefs : t.stats_activity}
+                    TOP 5 ${t.stats_prefs}
                 </span>
             </div>
             
             <div class="chart-wrapper" style="height:220px; border:none; margin:0; padding:0; display:flex; align-items:flex-end;">
-                <!-- Chart injected here -->
+                ${chartHtml}
             </div>
         `;
 
         exportContainer.innerHTML = headerHTML;
-        
-        // Вставляем клон графика в плейсхолдер
-        exportContainer.querySelector('.chart-wrapper').appendChild(chartClone);
-        
-        // Добавляем в body (он будет за экраном благодаря CSS)
         document.body.appendChild(exportContainer);
 
         // 4. ДЕЛАЕМ СКРИНШОТ
         html2canvas(exportContainer, {
-            backgroundColor: null, // Прозрачный фон
-            scale: 2, // Высокое качество
+            backgroundColor: null,
+            scale: 2,
             useCORS: true,
             allowTaint: true
         }).then(canvas => {
-            // Удаляем временный элемент
             document.body.removeChild(exportContainer);
-
             const link = document.createElement('a');
             link.download = `xfetish-stats-${Date.now()}.png`;
             link.href = canvas.toDataURL();
@@ -13097,7 +13136,7 @@
             'red-light': 'vampire_icon.png',
             
             // Нуар
-            'noir': 'logo_noir.png'
+            'noir': 'noir_icon.png'
         };
 
         // Если темы нет в списке (например, 'dark' или 'light'), возвращаем дефолт
@@ -13255,9 +13294,14 @@
         const leftBaseRot = -20;
         const rightBaseRot = 15;
 
-        // --- 1. START ---
+        // --- 1. START (Начало касания) ---
         card.addEventListener('touchstart', (e) => {
-            // Игнорируем клики по кнопкам внутри карточки
+            // 1. ИГНОРИРУЕМ СКРОЛЛРУЕМЫЕ ЭЛЕМЕНТЫ
+            if (e.target.closest('.related-tags') || e.target.closest('#related-tags')) {
+                return;
+            }
+
+            // 2. Игнорируем другие интерактивные элементы
             if (e.target.closest('button') || 
                 e.target.closest('.related-item-btn') || 
                 e.target.closest('.capsule-trigger') || 
@@ -13265,7 +13309,7 @@
             
             if (isGenerating) return;
 
-            // ПРОВЕРКА ЛИМИТА (Без списания, только алерт)
+            // ПРОВЕРКА ЛИМИТА
             if (typeof checkGenerationLimit === 'function' && !checkGenerationLimit(true)) return;
 
             startX = e.touches[0].clientX;
@@ -13274,7 +13318,7 @@
             currentY = startY;
             isDragging = true;
             
-            // Отключаем плавность для мгновенной реакции на палец
+            // Отключаем плавность для мгновенной реакции
             card.style.transition = 'none';
             if (statusText) statusText.style.transition = 'none';
             if (overlay) overlay.style.transition = 'none';
@@ -16131,8 +16175,8 @@
         const genreMatch = modifiersData.find(m => m.key.toLowerCase() === topGenre.toLowerCase());
         if (genreMatch && genreMatch[langKey]) topGenre = genreMatch[langKey].toUpperCase();
 
-        // Для финального слайда используем стандартное лого
-        const logoSrc = 'logo.png';
+        const currentThemeId = localStorage.getItem('xch_theme_id') || 'dark';
+        const logoSrc = getThemeLogoSrc(currentThemeId);
 
         slides.push(`
             <div class="wrapped-slide bg-dark">
@@ -16265,33 +16309,50 @@
         clearInterval(slideInterval);
         
         const show = (idx) => {
+            // Переключаем слайды
             document.querySelectorAll('.wrapped-slide').forEach(el => el.classList.remove('active-slide'));
             document.querySelectorAll('.wrapped-slide')[idx].classList.add('active-slide');
             
-            // Бары
+            // Обновляем прогресс-бары
             for(let i=0; i<total; i++) {
                 const bar = document.getElementById('bar-'+i);
-                bar.classList.remove('animating'); // Сброс
-                bar.style.width = (i < idx) ? '100%' : '0%';
-                
-                if (i === idx) {
-                    // Трюк с reflow для перезапуска анимации
+                if (!bar) continue;
+
+                // СБРОС ВСЕХ АНИМАЦИЙ И ПЕРЕХОДОВ
+                bar.classList.remove('animating');
+                bar.style.transition = 'none'; // Важно! Убираем плавность для мгновенного переключения состояний
+                bar.style.animationDuration = '0ms';
+
+                if (i < idx) { 
+                    // ПРОШЛЫЕ СЛАЙДЫ: Полностью закрашены
+                    bar.style.width = '100%'; 
+                }
+                else if (i > idx) { 
+                    // БУДУЩИЕ СЛАЙДЫ: Пустые
+                    bar.style.width = '0%'; 
+                }
+                else {
+                    // ТЕКУЩИЙ СЛАЙД: Сначала 0, потом анимация
+                    bar.style.width = '0%';
+                    
+                    // Трюк с reflow для перезапуска CSS-анимации
                     void bar.offsetWidth; 
+                    
                     bar.style.animationDuration = `${duration}ms`;
-                    bar.classList.add('animating');
+                    bar.classList.add('animating'); // CSS класс сделает остальное
                 }
             }
         };
 
+        // Показываем текущий слайд сразу
         show(currentSlideIndex);
 
-        // Используем интервал для проверки паузы
+        // Таймер
         let elapsed = 0;
         const step = 100;
         window.isWrappedPaused = false;
 
         slideInterval = setInterval(() => {
-            // Если на последнем слайде - таймер не нужен
             if (currentSlideIndex >= total - 1) {
                 clearInterval(slideInterval);
                 return;
@@ -16311,7 +16372,7 @@
             }
         }, step);
     }
-    
+
     // 7. Рендер списка в Истории (Archive Tab)
     function renderWrappedArchive() {
         const list = document.getElementById('hist-list-wrapped');
@@ -16868,18 +16929,37 @@
         }
     });
 
-    // B. Двойной Тап
+    // B. Двойной Тап по карточке (для мобильных)
     document.addEventListener('touchend', (e) => {
-        // Игнорируем интерактивные элементы
-        if (e.target.closest('button') || e.target.closest('.t-circle-btn') || e.target.closest('.ios-row') || e.target.closest('.plan-btn')) {
+        const now = new Date().getTime();
+        const timeDiff = now - lastTapTime;
+
+        // 1. Находим саму карточку
+        const card = document.getElementById('card-block');
+
+        // 2. ПРОВЕРКА: Если клик НЕ внутри карточки -> выходим
+        if (!card || !card.contains(e.target)) {
+            // Если тапнули мимо карточки, просто обновляем время (чтобы не сработало, 
+            // если первый тап был по карте, а второй мимо)
+            lastTapTime = 0; 
             return;
         }
 
-        const now = new Date().getTime();
-        if (now - lastTapTime < 400) {
-            e.preventDefault(); 
+        // 3. Игнорируем интерактивные элементы ВНУТРИ карточки
+        if (e.target.closest('button') || 
+            e.target.closest('.t-circle-btn') || 
+            e.target.closest('.related-item-btn') ||
+            e.target.closest('.btn-start-capsule') ||
+            e.target.closest('.mode-circle-btn')) {
+            lastTapTime = 0;
+            return;
+        }
+
+        // 4. Логика активации (Двойной тап < 400мс)
+        if (timeDiff < 400 && timeDiff > 0) {
+            e.preventDefault(); // Предотвращаем зум или выделение
             togglePanicMode();
-            lastTapTime = 0; 
+            lastTapTime = 0; // Сброс
         } else {
             lastTapTime = now;
         }
