@@ -8175,7 +8175,7 @@
 
             panic_active_phrases: ["Ничего подозрительного 😇", "Просто хобби", "Сама невинность", "Минутка продуктивности 📈", "Пейте воду 💧"],
 
-            val_safe: "Спокойно",
+            val_safe: "Безопасно",
             val_spicy: "С перчинкой 🔥",
             val_extreme: "ЭКСТРИМ 💀",
 
@@ -13011,80 +13011,82 @@
         if(label) label.innerText = theme.name;
     }
 
-    function updateGlobalLogos(themeId) {
-        // --- 1. ЛОГОТИПЫ ВНУТРИ САЙТА (Картинки) ---
-        const isNoir = (themeId === 'noir');
-        const logoSrc = isNoir ? 'logo_noir.png' : 'logo.png';
-
-        // Обновляем лого в сайдбаре, шапке и Age Gate
-        document.querySelectorAll('.logo-img').forEach(img => {
-            img.src = logoSrc;
-        });
-
-        // Обновляем лого в окне установки
-        const installLogo = document.querySelector('#modal-install-overlay img');
-        if (installLogo && installLogo.src.includes('logo')) {
-            installLogo.src = logoSrc;
-        }
-
-        // --- 2. ФАВИКОНКИ (Иконка вкладки браузера) ---
-        
-        // Карта соответствия тем и иконок
-        const iconMap = {
-            // Фиолетовая (Amethyst)
+    function getThemeLogoSrc(themeId) {
+        const logoMap = {
+            // Фиолетовая
             'purple-dark': 'amethyst_icon.png',
             'purple-light': 'amethyst_icon.png',
             
-            // Зеленая (Forest/Mint)
+            // Зеленая
             'green-dark': 'forest_icon.png',
             'green-light': 'forest_icon.png',
             
-            // Золотая (Luxury/Sand)
+            // Золотая
             'gold-dark': 'gold_icon.png',
             'gold-light': 'gold_icon.png',
             
-            // Оранжевая (Magma/Peach)
+            // Оранжевая
             'orange-dark': 'magma_icon.png',
             'orange-light': 'magma_icon.png',
-
-            // Синяя (Midnight/Sky)
-            'blue-dark': 'midnight_icon.png',
+            
+            // Синяя
+            'blue-dark': 'midnight_icon.png', 
             'blue-light': 'midnight_icon.png',
-
+            
             // Радужная
             'rainbow': 'rainbow_icon.png',
             
-            // Красная (Vampire/Rose)
+            // Красная
             'red-dark': 'vampire_icon.png',
             'red-light': 'vampire_icon.png',
             
-            // Нуар 
+            // Нуар
             'noir': 'logo_noir.png'
         };
 
-        // Дефолтная иконка (для Dark/Light тем)
-        const defaultIcon = 'logo_icon.png';
-        
-        // Выбираем новую иконку
-        const newIconHref = iconMap[themeId] || defaultIcon;
+        // Если темы нет в списке (например, 'dark' или 'light'), возвращаем дефолт
+        return logoMap[themeId] || 'logo.png';
+    }
 
-        // Обновляем <link rel="icon">
+    function updateGlobalLogos(themeId) {
+        // Получаем правильную картинку через новую функцию
+        const newSrc = getThemeLogoSrc(themeId);
+
+        // --- 1. ОБНОВЛЕНИЕ ЛОГОТИПОВ ВНУТРИ САЙТА ---
+        document.querySelectorAll('.logo-img').forEach(img => {
+            img.src = newSrc;
+        });
+        
+        // Лого в окне установки приложения
+        const installLogo = document.querySelector('#modal-install-overlay img');
+        if (installLogo && installLogo.src.includes('logo')) {
+            installLogo.src = newSrc;
+        }
+        
+        // Лого в финальной карточке Wrapped 
+        const wrappedLogo = document.querySelector('.sum-logo-img');
+        if (wrappedLogo) {
+            wrappedLogo.src = newSrc;
+        }
+
+        // --- 2. ОБНОВЛЕНИЕ ФАВИКОНОК ---
+        const faviconSrc = (themeId === 'dark' || themeId === 'light') ? 'logo_icon.png' : newSrc;
+
         let linkIcon = document.querySelector("link[rel~='icon']");
         if (!linkIcon) {
             linkIcon = document.createElement('link');
             linkIcon.rel = 'icon';
             document.head.appendChild(linkIcon);
         }
-        linkIcon.href = newIconHref;
+        linkIcon.href = faviconSrc;
 
-        // Обновляем <link rel="apple-touch-icon"> (для iOS)
         let linkApple = document.querySelector("link[rel~='apple-touch-icon']");
         if (!linkApple) {
             linkApple = document.createElement('link');
             linkApple.rel = 'apple-touch-icon';
             document.head.appendChild(linkApple);
         }
-        linkApple.href = newIconHref;
+        linkApple.href = faviconSrc;
     }
 
     function applyTheme(themeId) {
@@ -16600,22 +16602,25 @@
             // === ✅ ВЫКЛЮЧЕНИЕ ПАНИКИ (ВОЗВРАТ) ===
             console.log("✅ PANIC MODE DEACTIVATED");
 
-            // 1. ВОЗВРАТ ТЕМЫ (Ключевой момент)
-            // Берем сохраненный ID. Если его нет — ставим 'dark' как безопасный дефолт.
+            // 1. ВОЗВРАТ ТЕМЫ
+            // Берем сохраненный ID темы
             const themeToRestore = savedSettingsState.themeId || 'dark';
+            
+            // Применяем тему
             applyTheme(themeToRestore);
             
-            // Если пользователь бесплатный, а тема почему-то восстановилась премиумная (хак/баг), 
-            // принудительно сбрасываем на 'dark'
+            // Если пользователь бесплатный, а тема почему-то восстановилась премиумная, сбрасываем
             const restoredThemeObj = APP_THEMES.find(th => th.id === themeToRestore);
             if (subscriptionLevel === 'free' && restoredThemeObj && restoredThemeObj.type === 'pro') {
                 applyTheme('dark');
             }
 
+            // Возвращаем декорации
             decoIcons.forEach(el => el.style.display = '');
 
-            const isNoir = document.body.getAttribute('data-theme') === 'noir';
-            const iconSrc = isNoir ? 'logo_noir.png' : 'logo.png';
+            const iconSrc = getThemeLogoSrc(themeToRestore);
+
+            // И вставляем эту картинку в HTML
             logoTextDivs.forEach(div => {
                 div.innerHTML = `<img src="${iconSrc}" alt="X" class="logo-img">x<span>Fetish</span>Hub`;
             });
