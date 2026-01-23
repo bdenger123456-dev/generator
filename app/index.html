@@ -6445,7 +6445,7 @@
             <!-- MAIN VIEW: QR & Address -->
             <div id="crypto-main-view">
                 <p style="font-size:13px; color:var(--text-secondary); margin-bottom:15px; line-height:1.4;" data-key="pay_instruction">
-                    Send the <b>exact amount</b> via <b>Tron (TRC20)</b> network.<br>Activation is automatic.
+                    Send the <b>EXACT amount</b> (including decimals!) via <b>Tron (TRC20)</b>.
                 </p>
                 
                 <!-- QR Code Box -->
@@ -6453,18 +6453,15 @@
                     <img id="crypto-qr-img" src="" style="width:180px; height:180px; display:block;">
                 </div>
 
-                <!-- Amount -->
+                <!-- Amount (Clickable Copy) -->
                 <div class="ios-group" style="margin-bottom:10px;">
-                    <!-- Добавлен класс clickable и onclick -->
                     <div class="ios-row clickable" onclick="copyCryptoAmount()" style="display:flex; justify-content:space-between; align-items:center; padding:15px;">
                         <div style="display:flex; align-items:center;">
                             <span style="color:var(--text-secondary); font-size:13px;" data-key="pay_sum_label">Amount to send:</span>
-                            <!-- Подсказка (появляется при клике или просто висит) -->
                             <span id="amount-copy-hint" style="font-size:10px; color:var(--accent); margin-left:8px; opacity:0; transition:opacity 0.3s;">COPIED!</span>
                         </div>
-                        <!-- Сюда будет вставляться сумма -->
                         <span id="crypto-amount" style="font-weight:800; font-size:18px; color:var(--accent); display:flex; align-items:center; gap:6px;">
-                            0.00 USDT
+                            0.00 USDT <span style="font-size:14px; opacity:0.6;">📋</span>
                         </span>
                     </div>
                 </div>
@@ -6478,8 +6475,8 @@
                 </div>
 
                 <!-- Toggle Guide Link -->
-                <div style="margin-bottom:20px;">
-                    <span style="font-size:12px; color:var(--accent); text-decoration:underline; cursor:pointer;" onclick="toggleCryptoGuide(true)" data-key="pay_how_to">Don't have crypto? How to pay</span>
+                <div style="margin-bottom:10px;">
+                    <span style="font-size:12px; color:var(--accent); text-decoration:underline; cursor:pointer;" onclick="toggleCryptoView('guide')" data-key="pay_how_to">Don't have crypto? How to pay</span>
                 </div>
 
                 <!-- Loading Spinner -->
@@ -6487,41 +6484,61 @@
                     <div class="thinking-spinner" style="width:24px; height:24px; border-width:3px; margin:0 auto 10px auto;"></div>
                     <div style="font-size:13px; font-weight:600; color:var(--text-secondary); animation: pulse 2s infinite;" data-key="pay_waiting">Waiting for payment...</div>
                 </div>
-                
                 <div id="crypto-timer" style="margin-top:10px; font-size:11px; color:var(--text-secondary); opacity:0.5;">--:--</div>
+
+                <!-- КНОПКА "НЕ ЗАСЧИТАЛСЯ ПЛАТЕЖ?" -->
+                <div style="margin-top:20px; padding-top:10px; border-top:1px solid var(--border);">
+                    <span style="font-size:11px; color:var(--text-secondary); text-decoration:underline; cursor:pointer; opacity:0.7;" onclick="toggleCryptoView('problem')" data-key="pay_problem_link">Payment not credited?</span>
+                </div>
             </div>
 
-            <!-- GUIDE VIEW (Hidden by default) -->
+            <!-- GUIDE VIEW -->
             <div id="crypto-guide-view" style="display:none; text-align:left;">
                 <div style="font-weight:700; font-size:16px; margin-bottom:15px; text-align:center;" data-key="guide_title">How to pay with Crypto</div>
                 
                 <div style="font-size:13px; line-height:1.6; color:var(--text-secondary);">
-                    <p style="margin-bottom:10px;">
-                        <b style="color:var(--text-main)">1. Telegram Wallet:</b><br>
-                        Open <a href="https://t.me/wallet" target="_blank" style="color:var(--accent)">@wallet</a>. Buy USDT via P2P (Bank Card). Click "Send" → "External Wallet" → paste address.
-                    </p>
-                    <p style="margin-bottom:10px;">
-                        <b style="color:var(--text-main)">2. Trust Wallet / TronLink:</b><br>
-                        Download app. Buy USDT (TRC20) with card. Send to our address.
-                    </p>
+                    <p style="margin-bottom:10px;" data-key="guide_step_1"></p>
+                    <p style="margin-bottom:10px;" data-key="guide_step_2"></p>
                     <p style="margin-bottom:10px; font-size:12px; opacity:0.8;">
                         ⚠️ <span data-key="guide_warning">Important: Select <b>TRON (TRC20)</b> network.</span>
                     </p>
                 </div>
 
-                <button class="btn-gen secondary" onclick="toggleCryptoGuide(false)" style="margin-top:15px; width:100%; padding:10px;" data-key="btn_back">Back to Payment</button>
+                <button class="btn-gen secondary" onclick="toggleCryptoView('main')" style="margin-top:15px; width:100%; padding:10px;" data-key="btn_back">Back</button>
             </div>
 
-            <!-- SUCCESS VIEW (Hidden by default) -->
+            <!-- PROBLEM VIEW -->
+            <div id="crypto-problem-view" style="display:none; text-align:left; animation: fadeIn 0.3s ease;">
+                <div style="font-weight:700; font-size:16px; margin-bottom:15px; text-align:center; color:var(--highlight-red);" data-key="pay_problem_title">Where is my subscription?</div>
+                
+                <div style="font-size:13px; line-height:1.5; color:var(--text-secondary);">
+                    <p style="margin-bottom:15px;" data-key="pay_prob_desc">If status didn't update in 10 mins:</p>
+                    
+                    <ul style="padding-left:20px; margin-bottom:20px; list-style-type: disc;">
+                        <li style="margin-bottom:8px;" data-key="pay_prob_reason_1">Wrong Amount</li>
+                        <li style="margin-bottom:8px;" data-key="pay_prob_reason_2">Network Fee deducted</li>
+                        <li style="margin-bottom:8px;" data-key="pay_prob_reason_3">Wrong Network</li>
+                    </ul>
+
+                    <p style="background:rgba(255,255,255,0.05); padding:10px; border-radius:10px; border:1px dashed var(--border);" data-key="pay_prob_solution">
+                        Don't worry! Send TxID to support.
+                    </p>
+                </div>
+
+                <!-- Ссылка на Tally форму -->
+                <button class="btn-gen" onclick="window.open('https://tally.so/r/Y50280', '_blank')" style="margin-top:20px; width:100%; padding:12px; background:var(--text-main); color:var(--bg-color);" data-key="btn_contact_support">Contact Support</button>
+
+                <button class="btn-gen secondary" onclick="toggleCryptoView('main')" style="margin-top:10px; width:100%; padding:10px;" data-key="btn_back">Back</button>
+            </div>
+
+            <!-- SUCCESS VIEW -->
             <div id="payment-success-msg" style="display:none; margin-top:20px; animation: popIn 0.5s ease;">
                 <div style="font-size:50px; margin-bottom:10px;">✅</div>
                 <h3 style="color:var(--highlight-green); margin:0 0 10px 0;" data-key="pay_success_title">Payment Received!</h3>
                 <p style="font-size:13px; color:var(--text-secondary);" data-key="pay_success_desc">Subscription activated.</p>
-                
                 <a id="btn-discord-join" href="#" target="_blank" class="btn-gen" style="display:none; margin-top:15px; background:#5865F2; color:#fff; text-decoration:none; align-items:center; justify-content:center; gap:8px;">
                     <span style="font-size:20px;">💬</span> Join Discord
                 </a>
-
                 <button class="btn-gen" onclick="location.reload()" style="margin-top:15px; width:100%;" data-key="pay_reload">Reload Page</button>
             </div>
 
@@ -7872,6 +7889,19 @@
             guide_warning: "Important: Select <b>TRON (TRC20)</b> network when sending.",
             btn_back: "Back",
 
+            pay_problem_link: "Payment not credited?",
+            pay_problem_title: "Where is my subscription?",
+            pay_prob_desc: "If you sent money but the status hasn't changed within 10 minutes, here are common reasons:",
+            pay_prob_reason_1: "<b>Wrong Amount:</b> You sent slightly less or more than required.",
+            pay_prob_reason_2: "<b>Network Fee:</b> The exchange deducted the fee from the amount sent.",
+            pay_prob_reason_3: "<b>Wrong Network:</b> You used BEP20 instead of TRC20.",
+            pay_prob_solution: "Don't worry! Your money is safe. Send us your <b>TxID (Transaction Hash)</b> via support form, and we will activate it manually.",
+            btn_contact_support: "Contact Support",
+            
+            // ПЕРЕВОДЫ ДЛЯ ГАЙДА (Guide View)
+            guide_step_1: "<b>1. Telegram Wallet:</b><br>Open <a href='https://t.me/wallet' target='_blank' style='color:var(--accent)'>@wallet</a>. Buy USDT via P2P (Bank Card). Click 'Send' → 'External Wallet' → paste address.",
+            guide_step_2: "<b>2. Trust Wallet / TronLink:</b><br>Download app. Buy USDT (TRC20) with card. Send to our address.",
+
             info_header: "Information",
             lbl_support_email: "Support Email",
             doc_terms: "Terms of Use",
@@ -8365,6 +8395,18 @@
             guide_warning: "Важно: При отправке выбирайте сеть <b>TRON (TRC20)</b>.",
             btn_back: "Назад к оплате",
 
+            pay_problem_link: "Не засчитался платёж?",
+            pay_problem_title: "Где моя подписка?",
+            pay_prob_desc: "Если вы отправили деньги, но статус не изменился в течение 10 минут, вот частые причины:",
+            pay_prob_reason_1: "<b>Неверная сумма:</b> Отправлено чуть меньше или больше требуемого.",
+            pay_prob_reason_2: "<b>Комиссия:</b> Биржа вычла комиссию из суммы перевода.",
+            pay_prob_reason_3: "<b>Не та сеть:</b> Выбрали BEP20 или ERC20 вместо TRC20.",
+            pay_prob_solution: "Не волнуйтесь! Деньги не пропали. Пришлите нам <b>TxID (Хеш транзакции)</b> в поддержку, и мы активируем вручную.",
+            btn_contact_support: "Написать в поддержку",
+
+            guide_step_1: "<b>1. Telegram Wallet:</b><br>Откройте <a href='https://t.me/wallet' target='_blank' style='color:var(--accent)'>@wallet</a>. Купите USDT через P2P (с карты). Нажмите «Отправить» → «Внешний кошелек» → вставьте адрес.",
+            guide_step_2: "<b>2. Trust Wallet / TronLink:</b><br>Скачайте приложение. Купите USDT (TRC20) с карты. Отправьте на наш адрес.",
+
             info_header: "Информация",
             lbl_support_email: "Почта поддержки",
             doc_terms: "Польз. соглашение",
@@ -8853,6 +8895,18 @@
             guide_warning: "Importante: Selecciona la red <b>TRON (TRC20)</b> al enviar.",
             btn_back: "Volver",
 
+            pay_problem_link: "¿Pago no acreditado?",
+            pay_problem_title: "¿Dónde está mi suscripción?",
+            pay_prob_desc: "Si enviaste dinero pero el estado no cambió en 10 minutos:",
+            pay_prob_reason_1: "<b>Monto incorrecto:</b> Enviaste un poco menos o más.",
+            pay_prob_reason_2: "<b>Comisión:</b> El exchange descontó la comisión del total.",
+            pay_prob_reason_3: "<b>Red incorrecta:</b> Usaste BEP20 en lugar de TRC20.",
+            pay_prob_solution: "¡Tranquilo! Envíanos tu <b>TxID (Hash)</b> y lo activaremos manualmente.",
+            btn_contact_support: "Contactar Soporte",
+
+            guide_step_1: "<b>1. Telegram Wallet:</b><br>Abre <a href='https://t.me/wallet' target='_blank' style='color:var(--accent)'>@wallet</a>. Compra USDT vía P2P. Toca 'Enviar' → 'Wallet Externa' → pega la dirección.",
+            guide_step_2: "<b>2. Trust Wallet / TronLink:</b><br>Descarga la app. Compra USDT (TRC20). Envía a nuestra dirección.",
+
             info_header: "Información",
             lbl_support_email: "Correo de soporte",
             doc_terms: "Términos de Uso",
@@ -9333,6 +9387,18 @@
             guide_title: "Wie man mit Krypto zahlt",
             guide_warning: "Wichtig: Wähle das <b>TRON (TRC20)</b> Netzwerk.",
             btn_back: "Zurück",
+
+            pay_problem_link: "Zahlung nicht erhalten?",
+            pay_problem_title: "Wo ist mein Abo?",
+            pay_prob_desc: "Wenn sich der Status nach 10 Minuten nicht ändert:",
+            pay_prob_reason_1: "<b>Falscher Betrag:</b> Du hast etwas zu wenig/viel gesendet.",
+            pay_prob_reason_2: "<b>Gebühr:</b> Die Börse hat die Gebühr abgezogen.",
+            pay_prob_reason_3: "<b>Falsches Netz:</b> BEP20 statt TRC20 verwendet.",
+            pay_prob_solution: "Keine Sorge! Sende uns deinen <b>TxID (Hash)</b> und wir aktivieren es manuell.",
+            btn_contact_support: "Support kontaktieren",
+
+            guide_step_1: "<b>1. Telegram Wallet:</b><br>Öffne <a href='https://t.me/wallet' target='_blank' style='color:var(--accent)'>@wallet</a>. Kaufe USDT per P2P. Klicke 'Senden' → 'Externe Wallet'.",
+            guide_step_2: "<b>2. Trust Wallet / TronLink:</b><br>Lade die App. Kaufe USDT (TRC20). Sende an unsere Adresse.",
 
             info_header: "Informationen",
             lbl_support_email: "Support-E-Mail",
@@ -12641,15 +12707,27 @@
         document.getElementById('modal-sub-overlay').classList.add('open');
     }
 
-    function toggleCryptoGuide(show) {
+    function toggleCryptoView(viewName) {
         const main = document.getElementById('crypto-main-view');
         const guide = document.getElementById('crypto-guide-view');
-        
-        if (show) {
-            main.style.display = 'none';
+        const problem = document.getElementById('crypto-problem-view');
+        const success = document.getElementById('payment-success-msg');
+
+        // Скрываем всё сначала
+        main.style.display = 'none';
+        guide.style.display = 'none';
+        problem.style.display = 'none';
+        success.style.display = 'none';
+
+        // Показываем нужное
+        if (viewName === 'guide') {
             guide.style.display = 'block';
+        } else if (viewName === 'problem') {
+            problem.style.display = 'block';
+        } else if (viewName === 'success') {
+            success.style.display = 'block';
         } else {
-            guide.style.display = 'none';
+            // Default 'main'
             main.style.display = 'block';
         }
     }
@@ -12777,8 +12855,7 @@
 
         document.getElementById('payment-status-box').style.display = 'block';
         document.getElementById('payment-success-msg').style.display = 'none';
-        document.getElementById('crypto-guide-view').style.display = 'none';
-        document.getElementById('crypto-main-view').style.display = 'block';
+        toggleCryptoView('main');
         
         modal.classList.add('open');
 
