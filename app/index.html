@@ -12863,11 +12863,16 @@
         startCryptoPolling(data.invoiceId);
     }
 
-    function closeCryptoModal() {
-        document.getElementById('modal-crypto-payment').classList.remove('open');
-        if (cryptoPollInterval) clearInterval(cryptoPollInterval);
-        if (cryptoTimerInterval) clearInterval(cryptoTimerInterval);
-    }
+    window.closeCryptoModal = function(e, force) {
+        if (force || (e && e.target.id === 'modal-crypto-payment')) {
+            const modal = document.getElementById('modal-crypto-payment');
+            if (modal) modal.classList.remove('open');
+            
+            // Очистка таймеров
+            if (cryptoPollInterval) clearInterval(cryptoPollInterval);
+            if (cryptoTimerInterval) clearInterval(cryptoTimerInterval);
+        }
+    };
 
     function copyCryptoAddress() {
         const text = document.getElementById('crypto-address').innerText;
