@@ -6432,12 +6432,12 @@
 </div>
 
 <!-- CRYPTO PAYMENT MODAL -->
-<div class="modal-overlay" id="modal-crypto-payment">
+<div class="modal-overlay" id="modal-crypto-payment" onclick="closeCryptoModal(event)">
     <div class="modal" style="text-align: center;">
         
         <div class="modal-header">
             <span data-key="pay_header">USDT Payment</span>
-            <span onclick="closeCryptoModal()">✕</span>
+            <span onclick="closeCryptoModal(null, true)">✕</span>
         </div>
 
         <div class="modal-body">
@@ -6455,9 +6455,17 @@
 
                 <!-- Amount -->
                 <div class="ios-group" style="margin-bottom:10px;">
-                    <div class="ios-row" style="display:flex; justify-content:space-between; padding:15px;">
-                        <span style="color:var(--text-secondary); font-size:13px;" data-key="pay_sum_label">Amount to send:</span>
-                        <span id="crypto-amount" style="font-weight:800; font-size:18px; color:var(--accent);">0.00 USDT</span>
+                    <!-- Добавлен класс clickable и onclick -->
+                    <div class="ios-row clickable" onclick="copyCryptoAmount()" style="display:flex; justify-content:space-between; align-items:center; padding:15px;">
+                        <div style="display:flex; align-items:center;">
+                            <span style="color:var(--text-secondary); font-size:13px;" data-key="pay_sum_label">Amount to send:</span>
+                            <!-- Подсказка (появляется при клике или просто висит) -->
+                            <span id="amount-copy-hint" style="font-size:10px; color:var(--accent); margin-left:8px; opacity:0; transition:opacity 0.3s;">COPIED!</span>
+                        </div>
+                        <!-- Сюда будет вставляться сумма -->
+                        <span id="crypto-amount" style="font-weight:800; font-size:18px; color:var(--accent); display:flex; align-items:center; gap:6px;">
+                            0.00 USDT
+                        </span>
                     </div>
                 </div>
 
@@ -12736,25 +12744,28 @@
     function showCryptoModal(data) {
         const modal = document.getElementById('modal-crypto-payment');
         
-        // Форматируем сумму
+        // Форматируем сумму (оставляем 6 знаков после запятой, если они есть)
+        // parseFloat уберет лишние нули на конце (например, 5.000000 -> 5)
         const amountStr = parseFloat(data.amount.toFixed(6));
         
         // Вставляем сумму
         const amountEl = document.getElementById('crypto-amount');
-        amountEl.innerHTML = `${amountStr} <span style="font-size:14px">USDT</span>`;
+        
+        // СОХРАНЯЕМ ЧИСТОЕ ЗНАЧЕНИЕ ДЛЯ КОПИРОВАНИЯ В АТРИБУТ
+        amountEl.setAttribute('data-val', amountStr);
+        
+        // Добавляем иконку копирования визуально
+        amountEl.innerHTML = `${amountStr} <span style="font-size:14px">USDT</span> <span style="font-size:14px; opacity:0.6;">📋</span>`;
         amountEl.style.color = "#ff9900"; 
 
         // --- ДОБАВЛЯЕМ ПРЕДУПРЕЖДЕНИЕ О КОМИССИИ ---
-        // Ищем (или создаем) элемент для варнинга
         let warnEl = document.getElementById('fee-warning-box');
         if (!warnEl) {
             warnEl = document.createElement('div');
             warnEl.id = 'fee-warning-box';
             warnEl.style.cssText = "font-size:11px; color:#e74c3c; margin-top:5px; line-height:1.2; padding:0 15px; text-align:right;";
-            // Вставляем после блока суммы
             amountEl.parentNode.parentNode.appendChild(warnEl);
         }
-        // Получаем текст из переводов
         const t = langData[currentLang] || langData['en'];
         warnEl.innerHTML = t.pay_fee_warn || "⚠️ Fee not included!";
         // -------------------------------------------
@@ -12792,6 +12803,43 @@
             
             // Можно вибрацию добавить на мобильных
             if(navigator.vibrate) navigator.vibrate(50);
+        });
+    }
+
+    function copyCryptoAmount() {
+        const el = document.getElementById('crypto-amount');
+        // Берем чистое число из атрибута, который мы установили в showCryptoModal
+        const val = el.getAttribute('data-val'); 
+        
+        if (!val) return;
+
+        navigator.clipboard.writeText(val).then(() => {
+            // 1. Вибрация (для мобильных)
+            if(navigator.vibrate) navigator.vibrate(50);
+
+            // 2. Визуальный эффект на тексте суммы
+            const originalHTML = el.innerHTML;
+            const originalColor = el.style.color;
+            
+            el.style.color = "var(--highlight-green)"; // Зеленый цвет при успехе
+            el.style.transform = "scale(1.05)";
+            el.style.transition = "all 0.2s";
+
+            // 3. Показываем подсказку "COPIED!"
+            const hint = document.getElementById('amount-copy-hint');
+            if (hint) {
+                hint.style.opacity = '1';
+            }
+
+            // Возврат в исходное состояние через 1 сек
+            setTimeout(() => {
+                el.style.color = originalColor;
+                el.style.transform = "scale(1)";
+                if (hint) hint.style.opacity = '0';
+            }, 1000);
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
+            alert("Copy failed manually select text.");
         });
     }
 
