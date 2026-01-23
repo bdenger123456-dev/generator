@@ -13012,21 +13012,79 @@
     }
 
     function updateGlobalLogos(themeId) {
-        // Если тема 'noir', используем logo_noir.png, иначе обычный logo.png
+        // --- 1. ЛОГОТИПЫ ВНУТРИ САЙТА (Картинки) ---
         const isNoir = (themeId === 'noir');
-        const newSrc = isNoir ? 'logo_noir.png' : 'logo.png';
+        const logoSrc = isNoir ? 'logo_noir.png' : 'logo.png';
 
-        // 1. Основные логотипы (Сайдбар, Мобильная шапка, Age Gate)
+        // Обновляем лого в сайдбаре, шапке и Age Gate
         document.querySelectorAll('.logo-img').forEach(img => {
-            img.src = newSrc;
+            img.src = logoSrc;
         });
 
-        // 2. Логотип в модальном окне установки 
+        // Обновляем лого в окне установки
         const installLogo = document.querySelector('#modal-install-overlay img');
-        // Проверяем, что это именно логотип (на случай если там QR код)
         if (installLogo && installLogo.src.includes('logo')) {
-            installLogo.src = newSrc;
+            installLogo.src = logoSrc;
         }
+
+        // --- 2. ФАВИКОНКИ (Иконка вкладки браузера) ---
+        
+        // Карта соответствия тем и иконок
+        const iconMap = {
+            // Фиолетовая (Amethyst)
+            'purple-dark': 'amethyst_icon.png',
+            'purple-light': 'amethyst_icon.png',
+            
+            // Зеленая (Forest/Mint)
+            'green-dark': 'forest_icon.png',
+            'green-light': 'forest_icon.png',
+            
+            // Золотая (Luxury/Sand)
+            'gold-dark': 'gold_icon.png',
+            'gold-light': 'gold_icon.png',
+            
+            // Оранжевая (Magma/Peach)
+            'orange-dark': 'magma_icon.png',
+            'orange-light': 'magma_icon.png',
+
+            // Синяя (Midnight/Sky)
+            'blue-dark': 'midnight_icon.png',
+            'blue-light': 'midnight_icon.png',
+
+            // Радужная
+            'rainbow': 'rainbow_icon.png',
+            
+            // Красная (Vampire/Rose)
+            'red-dark': 'vampire_icon.png',
+            'red-light': 'vampire_icon.png',
+            
+            // Нуар 
+            'noir': 'logo_noir.png'
+        };
+
+        // Дефолтная иконка (для Dark/Light тем)
+        const defaultIcon = 'logo_icon.png';
+        
+        // Выбираем новую иконку
+        const newIconHref = iconMap[themeId] || defaultIcon;
+
+        // Обновляем <link rel="icon">
+        let linkIcon = document.querySelector("link[rel~='icon']");
+        if (!linkIcon) {
+            linkIcon = document.createElement('link');
+            linkIcon.rel = 'icon';
+            document.head.appendChild(linkIcon);
+        }
+        linkIcon.href = newIconHref;
+
+        // Обновляем <link rel="apple-touch-icon"> (для iOS)
+        let linkApple = document.querySelector("link[rel~='apple-touch-icon']");
+        if (!linkApple) {
+            linkApple = document.createElement('link');
+            linkApple.rel = 'apple-touch-icon';
+            document.head.appendChild(linkApple);
+        }
+        linkApple.href = newIconHref;
     }
 
     function applyTheme(themeId) {
