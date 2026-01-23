@@ -4236,14 +4236,11 @@
         /* --- INTENSITY TOAST POPUP --- */
         #intensity-toast {
             position: absolute;
-            top: 55px; 
-            left: 50%;
-            transform: translateX(-50%);
+            top: 55px; /* Отступ сверху */
+            left: 0;
+            width: 100%; /* Занимает всю ширину контейнера */
+            padding: 0 5px; /* Небольшие отступы по бокам */
             
-            width: 100%;
-            text-align: center;
-            
-            /* Типографика (Маленький и аккуратный) */
             font-size: 11px; 
             font-weight: 800;
             text-transform: uppercase;
@@ -4252,12 +4249,12 @@
             background: transparent !important;
             box-shadow: none !important;
             border: none !important;
-            backdrop-filter: none !important;
             
-            opacity: 0;
+            opacity: 0; /* Скрыто по умолчанию */
             pointer-events: none;
             z-index: 20;
             white-space: nowrap;
+            
         }
 
         /* Цвета и свечение (Neon Text) */
@@ -4277,27 +4274,27 @@
         }
 
         /* Новая анимация: Появление снизу-вверх и растворение */
-        @keyframes floatTextUp {
+        @keyframes floatUpSimple {
             0% {
                 opacity: 0;
-                transform: translateX(-50%) translateY(5px) scale(0.9);
+                transform: translateY(5px) scale(0.9); /* Чуть ниже и меньше */
             }
             20% {
                 opacity: 1;
-                transform: translateX(-50%) translateY(0) scale(1);
+                transform: translateY(0) scale(1);     /* Нормальная позиция */
             }
             80% {
                 opacity: 1;
-                transform: translateX(-50%) translateY(0) scale(1);
+                transform: translateY(0) scale(1);     /* Пауза */
             }
             100% {
                 opacity: 0;
-                transform: translateX(-50%) translateY(-10px) scale(1);
+                transform: translateY(-10px) scale(1); /* Улетает вверх */
             }
         }
 
         .anim-toast {
-            animation: floatTextUp 1.0s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            animation: floatUpSimple 1.0s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
 
 
@@ -5847,20 +5844,21 @@
                 <div style="font-size:18px; color:var(--text-secondary); line-height: 0;">↗</div>
             </div>
 
+            <!-- About -->
+            <div class="ios-row clickable" onclick="window.open('https://www.xfetishhub.site', '_blank')">
+                <div class="ios-row-left">
+                    <img src="about.png" class="settings-icon" alt="About">
+                    <span data-key="lbl_about">About Project</span>
+                </div>
+                <!-- Меняем шеврон на стрелочку вверх-вправо, как у внешних ссылок -->
+                <div style="font-size:18px; color:var(--text-secondary); line-height: 0;">↗</div>
+            </div>
+
             <!-- Install App -->
             <div id="row-install-app" class="ios-row clickable" onclick="openQRModal()">
                 <div class="ios-row-left">
                     <img src="install.png" class="settings-icon" alt="Install">
                     <span data-key="btn_install_phone">Install on Phone</span>
-                </div>
-                <div class="chevron"></div>
-            </div>
-
-            <!-- About -->
-            <div class="ios-row clickable" onclick="window.openAbout()">
-                <div class="ios-row-left">
-                    <img src="about.png" class="settings-icon" alt="About">
-                    <span data-key="lbl_about">About Project</span>
                 </div>
                 <div class="chevron"></div>
             </div>
@@ -6116,28 +6114,6 @@
                 <button class="btn-gen" onclick="adminGiftSub()" style="padding:10px; font-size:14px; background:var(--accent); color:#000;">Activate</button>
             </div>
 
-        </div>
-    </div>
-</div>
-
-<!-- ABOUT MODAL -->
-<div class="modal-overlay" id="modal-about-overlay" onclick="closeAbout(event)">
-    <div class="modal">
-        <div class="modal-header">
-            <span id="about-modal-title">About</span>
-            <span onclick="closeAbout(null, true)">✕</span>
-        </div>
-        
-        <div class="modal-body">
-            <p style="margin-bottom: 15px; font-weight: 700; color: var(--text-main);" id="about-intro"></p>
-            <p style="color: var(--text-secondary); margin-bottom: 25px; line-height: 1.6;" id="about-desc"></p>
-
-            <div class="ios-group">
-                <div class="ios-row">
-                    <span style="color:var(--text-secondary);">Email</span>
-                    <a href="mailto:bdengerr@gmail.com" style="color:var(--accent); font-weight:600;">bdengerr@gmail.com</a>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -8190,9 +8166,6 @@
             onb_skip: "Skip setup",
 
             lbl_about: "About Project",
-            about_title: "Developer",
-            about_intro: "I am Nikolai M., 23 years old, student.",
-            about_desc: "The project's mission is to allow users to discover all adult genres through a smart recommendation system, as well as provide an opportunity to analyze their tastes for self-discovery.",
             
             terms_text: `
                 <h3>1. Acceptance of Terms</h3>
@@ -8687,10 +8660,7 @@
             onb_skip: "Пропустить",
 
             lbl_about: "О проекте",
-            about_title: "Разработчик",
-            about_intro: "Я — Николай М., 23 года, студент.",
-            about_desc: "Миссия проекта — позволить пользователям узнать про все жанры для взрослых путём умной системы рекомендаций, а также дать возможность проанализировать свои вкусы для самопознания.",
-
+            
             terms_text: `
                 <h3>1. Принятие условий</h3>
                 <p>Используя сервис xFetishHub, вы подтверждаете, что вам исполнилось 18 лет (или больше, в зависимости от законов вашей страны), и вы соглашаетесь с данными условиями. Если вы не согласны, пожалуйста, покиньте сайт.</p>
@@ -9171,10 +9141,7 @@
             onb_skip: "Saltar configuración",
 
             lbl_about: "Sobre el proyecto",
-            about_title: "Desarrollador",
-            about_intro: "Soy Nikolai M., 23 años, estudiante.",
-            about_desc: "La misión del proyecto es permitir a los usuarios conocer todos los géneros para adultos a través de un sistema inteligente, y analizar sus gustos para el autoconocimiento.",
-
+            
             terms_text: `
                 <h3>1. Aceptación de los Términos</h3>
                 <p>Al acceder y utilizar xFetishHub, confirma que tiene al menos 18 años de edad (o la mayoría de edad en su jurisdicción) y acepta estar sujeto a estos términos. Si no está de acuerdo, debe abandonar el servicio inmediatamente.</p>
@@ -9651,10 +9618,7 @@
             onb_skip: "Überspringen",
 
             lbl_about: "Über das Projekt",
-            about_title: "Entwickler",
-            about_intro: "Ich bin Nikolai M., 23 Jahre alt, Student.",
-            about_desc: "Die Mission des Projekts ist es, Benutzern durch ein intelligentes System alle Erwachsenengenres näherzubringen und ihre Vorlieben zur Selbstfindung zu analysieren.",
-
+            
             terms_text: `
                 <h3>1. Annahme der Bedingungen</h3>
                 <p>Durch den Zugriff auf xFetishHub bestätigen Sie, dass Sie mindestens 18 Jahre alt sind (oder das gesetzliche Mindestalter in Ihrer Gerichtsbarkeit erreicht haben) und stimmen diesen Bedingungen zu. Wenn Sie nicht zustimmen, müssen Sie den Dienst sofort verlassen.</p>
@@ -9931,34 +9895,6 @@
     window.closeLegal = function(e, force) {
         if (force || e.target.id === 'modal-legal-overlay') {
             const modal = document.getElementById('modal-legal-overlay');
-            if(modal) {
-                modal.classList.remove('open');
-                modal.style.display = 'none';
-            }
-        }
-    };
-
-    window.openAbout = function() {
-        const t = langData[currentLang] || langData['en'];
-
-        const titleEl = document.getElementById('about-modal-title');
-        const introEl = document.getElementById('about-intro');
-        const descEl = document.getElementById('about-desc');
-
-        if (titleEl) titleEl.innerText = t.about_title; 
-        if (introEl) introEl.innerText = t.about_intro;
-        if (descEl) descEl.innerText = t.about_desc;
-
-        const modal = document.getElementById('modal-about-overlay');
-        if (modal) {
-            modal.classList.add('open');
-            modal.style.display = 'flex';
-        }
-    };
-    
-    window.closeAbout = function(e, force) {
-        if (force || e.target.id === 'modal-about-overlay') {
-            const modal = document.getElementById('modal-about-overlay');
             if(modal) {
                 modal.classList.remove('open');
                 modal.style.display = 'none';
@@ -11222,60 +11158,69 @@
         icon2.className = 'int-icon';
         icon3.className = 'int-icon';
 
-        // Проверка темы НУАР
+        // Цвета для ползунка
         const isNoir = document.body.getAttribute('data-theme') === 'noir';
         const colorBg = 'var(--border)'; 
         const colorSpicy = isNoir ? '#ffffff' : '#f39c12'; 
         const colorExtreme = isNoir ? '#ffffff' : '#e74c3c'; 
 
-        // Переводы
         const t = langData[currentLang] || langData['en'];
 
-        // Логика визуализации (Иконки + Слайдер + Тост)
+        // Сбрасываем анимацию перед изменением
+        if (toast) {
+            toast.classList.remove('anim-toast');
+            // Сброс стилей выравнивания
+            toast.style.textAlign = ''; 
+        }
+
+        // --- ЛОГИКА ВЫРАВНИВАНИЯ ---
         if (currentIntensity === 1) {
-            // SAFE
+            // SAFE (Слева)
             slider.style.background = colorBg;
             icon1.classList.add('active-safe');
             
-            // Настройка Тоста
             if(toast) {
                 toast.innerText = t.val_safe || "Safe";
-                toast.className = 'toast-safe'; // Применяем стиль
+                toast.className = 'toast-safe';
+                toast.style.textAlign = 'left'; // Строго влево
+                // Небольшой отступ слева, чтобы не прилипало к краю
+                toast.style.paddingLeft = '5px'; 
+                toast.style.paddingRight = '0';
             }
         } 
         else if (currentIntensity === 2) {
-            // SPICY
+            // SPICY (Центр)
             slider.style.background = `linear-gradient(to right, ${colorSpicy} 0%, ${colorSpicy} 50%, ${colorBg} 50%, ${colorBg} 100%)`;
             icon2.classList.add('active-spicy');
             
             if(toast) {
                 toast.innerText = t.val_spicy || "Spicy";
                 toast.className = 'toast-spicy';
+                toast.style.textAlign = 'center'; // Строго по центру
+                toast.style.padding = '0';
             }
         } 
         else if (currentIntensity === 3) {
-            // EXTREME
+            // EXTREME (Справа)
             slider.style.background = colorExtreme;
             icon3.classList.add('active-extreme');
             
             if(toast) {
                 toast.innerText = t.val_extreme || "Extreme";
                 toast.className = 'toast-extreme';
+                toast.style.textAlign = 'right'; // Строго вправо
+                // Небольшой отступ справа
+                toast.style.paddingRight = '5px';
+                toast.style.paddingLeft = '0';
             }
         }
 
-        // ЗАПУСК АНИМАЦИИ
+        // ЗАПУСК НОВОЙ АНИМАЦИИ
         if (toast) {
-            // 1. Удаляем класс анимации (сброс)
-            toast.classList.remove('anim-toast');
-            
-            // 2. Магический трюк для перезапуска CSS анимации (Reflow)
+            // Магический трюк для перезапуска (Reflow)
             void toast.offsetWidth; 
-            
-            // 3. Добавляем класс снова
             toast.classList.add('anim-toast');
             
-            // Вибрация для тактильного отклика
             if(navigator.vibrate) navigator.vibrate(15);
         }
     }
