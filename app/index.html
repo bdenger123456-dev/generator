@@ -9806,6 +9806,91 @@
         }
     };
 
+    // === КОНФИГУРАЦИЯ ПСИХОТИПОВ ===
+    const PSYCHO_TYPES = {
+        // 1. По доминирующей оси (10 шт)
+        'bdsm': {
+            en: "The Kink Master", ru: "Мастер Кинка", es: "Amo del Kink", de: "Kink-Meister",
+            desc_en: "Control and sensation are your currency.", desc_ru: "Контроль и ощущения — твоя валюта."
+        },
+        'roleplay': {
+            en: "The Shapeshifter", ru: "Перевертыш", es: "Camaleón", de: "Gestaltwandler",
+            desc_en: "You can be anyone for the sake of pleasure.", desc_ru: "Ты можешь быть кем угодно ради удовольствия."
+        },
+        'humiliation': {
+            en: "The Devotee", ru: "Поклонник", es: "Devoto", de: "Der Hingebungsvolle",
+            desc_en: "You find strength in surrender.", desc_ru: "Ты находишь силу в капитуляции."
+        },
+        'public': {
+            en: "The Exhibitionist", ru: "Эксгибиционист", es: "Exhibicionista", de: "Exhibitionist",
+            desc_en: "The world is your stage.", desc_ru: "Весь мир — твоя сцена."
+        },
+        'clothing': {
+            en: "The Fetishista", ru: "Фетишиста", es: "Fetichista", de: "Fetischista",
+            desc_en: "Material matters more than flesh.", desc_ru: "Материал важнее, чем плоть."
+        },
+        'sensory': {
+            en: "The Sensorium", ru: "Сенсорик", es: "Sensorial", de: "Sensoriker",
+            desc_en: "Feeling is believing.", desc_ru: "Чувствовать — значит верить."
+        },
+        'psychological': {
+            en: "The Psychonaut", ru: "Психонавт", es: "Psiconauta", de: "Psychonaut",
+            desc_en: "It's all in the mind.", desc_ru: "Всё происходит в голове."
+        },
+        'taboo': {
+            en: "The Deviant", ru: "Девиант", es: "Desviado", de: "Abweichler",
+            desc_en: "Rules are meant to be broken.", desc_ru: "Правила созданы, чтобы их нарушать."
+        },
+        'group': {
+            en: "The Party Animal", ru: "Тусовщик", es: "Fiestero", de: "Partylöwe",
+            desc_en: "The more, the merrier.", desc_ru: "Чем больше, тем веселее."
+        },
+        'body-part': {
+            en: "The Anatomist", ru: "Анатом", es: "Anatomista", de: "Anatom",
+            desc_en: "You appreciate the specific details.", desc_ru: "Ты ценишь конкретные детали."
+        },
+
+        // 2. Комбинации (10 шт)
+        'dark_lord': { // BDSM + Taboo/Humiliation
+            en: "The Dark Lord", ru: "Темный Лорд", es: "Señor Oscuro", de: "Dunkler Lord",
+            desc_en: "You explore the deepest shadows.", desc_ru: "Ты исследуешь самые глубокие тени."
+        },
+        'performer': { // Public + Roleplay
+            en: "The Performer", ru: "Артист", es: "Artista", de: "Performer",
+            desc_en: "Life is a performance.", desc_ru: "Жизнь — это представление."
+        },
+        'worshipper': { // Body-part + Clothing
+            en: "The Idolater", ru: "Идолопоклонник", es: "Idólatra", de: "Götzendiener",
+            desc_en: "Specific forms deserve worship.", desc_ru: "Формы заслуживают поклонения."
+        },
+        'brainwasher': { // Psychological + Humiliation
+            en: "The Manipulator", ru: "Манипулятор", es: "Manipulador", de: "Manipulator",
+            desc_en: "You play with souls, not bodies.", desc_ru: "Ты играешь с душами, а не телами."
+        },
+        'risk_taker': { // Public + Taboo
+            en: "Adrenaline Junkie", ru: "Адреналинщик", es: "Adicto a Adrenalina", de: "Adrenalin-Junkie",
+            desc_en: "Danger is the best spice.", desc_ru: "Опасность — лучшая приправа."
+        },
+        'orgy_master': { // Group + BDSM/Public
+            en: "The Caligula", ru: "Калигула", es: "Calígula", de: "Caligula",
+            desc_en: "Chaos and pleasure intertwined.", desc_ru: "Хаос и удовольствие переплетены."
+        },
+        'immersionist': { // Roleplay + Sensory
+            en: "The Immersionist", ru: "Иммерсив", es: "Inmersivo", de: "Immersionist",
+            desc_en: "Deep dive into alternate realities.", desc_ru: "Глубокое погружение в иную реальность."
+        },
+        'collector': { // Разнообразие (много разных)
+            en: "The Collector", ru: "Коллекционер", es: "Coleccionista", de: "Sammler",
+            desc_en: "You want to try everything once.", desc_ru: "Ты хочешь попробовать всё."
+        },
+        
+        // 3. Дефолтные
+        'vanilla': {
+            en: "The Classic", ru: "Классик", es: "Clásico", de: "Klassiker",
+            desc_en: "Simplicity is the ultimate sophistication.", desc_ru: "Простота — высшая форма утонченности."
+        }
+    };
+
     // 10 психологических осей
     const PSYCHO_AXES = [
         'bdsm', 'roleplay', 'humiliation', 'public', 'clothing', 
@@ -16012,6 +16097,38 @@
         };
     }
 
+    function calculatePsychotype(psychoCounts) {
+        // Превращаем объект в массив [ключ, значение] и сортируем
+        const sorted = Object.entries(psychoCounts).sort((a, b) => b[1] - a[1]);
+        
+        const top1 = sorted[0];
+        const top2 = sorted[1];
+        
+        // 1. Если активности почти нет
+        if (top1[1] < 2) return 'vanilla';
+
+        // 2. Проверка на "Коллекционера" (если топ-3 близки друг к другу и высоки)
+        const top3 = sorted[2];
+        if (top3 && top3[1] > 5 && (top1[1] - top3[1] < 3)) return 'collector';
+
+        const k1 = top1[0];
+        const k2 = top2[0];
+
+        // 3. Комбинации (приоритет)
+        const has = (key) => (k1 === key || (k2 === key && top2[1] > top1[1] * 0.6)); // Второй тег должен быть значимым
+
+        if (has('bdsm') && (has('taboo') || has('humiliation'))) return 'dark_lord';
+        if (has('public') && has('roleplay')) return 'performer';
+        if (has('body-part') && has('clothing')) return 'worshipper';
+        if (has('psychological') && has('humiliation')) return 'brainwasher';
+        if (has('public') && has('taboo')) return 'risk_taker';
+        if (has('group') && (has('bdsm') || has('public'))) return 'orgy_master';
+        if (has('roleplay') && has('sensory')) return 'immersionist';
+
+        // 4. Если комбинаций нет, возвращаем доминирующую ось
+        return k1; // Вернет 'bdsm', 'roleplay' и т.д.
+    }
+
     // Форматирование даты
     function getRangeString(start, end, type) {
         if (type === 'daily') return new Date(end).toLocaleDateString();
@@ -16072,29 +16189,27 @@
     }
 
     function createRadarChartSVG(currentData, prevData) {
-        const size = 300;
+        const size = 340; // Увеличили размер холста
         const center = size / 2;
-        const radius = 100; // Радиус графика
-        const levels = 3;   // Количество кругов сетки
+        const radius = 100; // Радиус остался тем же, чтобы было место для текста
+        const levels = 3;
 
-        // 1. Нормализация данных (чтобы график был красивым, даже если значений мало)
         let maxVal = 0;
         PSYCHO_AXES.forEach(key => {
             maxVal = Math.max(maxVal, currentData[key] || 0, prevData ? (prevData[key] || 0) : 0);
         });
-        // Если данных нет, ставим 1, чтобы не делить на 0
-        if (maxVal === 0) maxVal = 10; 
+        if (maxVal === 0) maxVal = 5; // Дефолт, чтобы график не был точкой
 
-        // Функция перевода значения в координаты X,Y
         const getCoords = (value, index) => {
-            const angle = (Math.PI * 2 * index) / 10 - (Math.PI / 2); // -90deg start at top
-            const r = (value / maxVal) * radius;
+            const angle = (Math.PI * 2 * index) / 10 - (Math.PI / 2);
+            // Ограничиваем радиус, чтобы график не вылезал за пределы
+            const r = (Math.min(value, maxVal) / maxVal) * radius;
             const x = center + r * Math.cos(angle);
             const y = center + r * Math.sin(angle);
             return [x, y];
         };
 
-        // 2. Рисуем сетку (паутину)
+        // Сетка
         let gridSVG = '';
         for (let i = 1; i <= levels; i++) {
             let levelPoints = [];
@@ -16108,40 +16223,38 @@
             gridSVG += `<polygon points="${levelPoints.join(' ')}" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>`;
         }
 
-        // 3. Рисуем оси и подписи
+        // Оси и Текст
         let axesSVG = '';
         let labelsSVG = '';
-        
-        // Выбираем язык
         const langKey = ['en','ru','es','de'].includes(currentLang) ? currentLang : 'en';
 
         PSYCHO_AXES.forEach((key, i) => {
             const angle = (Math.PI * 2 * i) / 10 - (Math.PI / 2);
-            // Координаты конца оси
             const x = center + radius * Math.cos(angle);
             const y = center + radius * Math.sin(angle);
             
-            // Линия оси
             axesSVG += `<line x1="${center}" y1="${center}" x2="${x}" y2="${y}" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>`;
 
-            // Координаты текста (чуть дальше радиуса)
+            // Текст подальше от края (radius + 20)
             const labelR = radius + 25; 
             const lx = center + labelR * Math.cos(angle);
             const ly = center + labelR * Math.sin(angle);
             
-            // Перевод
             const labelText = PSYCHO_LABELS[key][langKey].toUpperCase();
             
-            // Выравнивание текста
+            // Умное выравнивание
             let anchor = 'middle';
-            if (i === 0 || i === 5) anchor = 'middle'; // Верх и низ
-            else if (i > 0 && i < 5) anchor = 'start'; // Справа
-            else anchor = 'end'; // Слева
+            let dominantBaseline = 'middle';
+            
+            if (i === 0) { anchor = 'middle'; dominantBaseline = 'auto'; } // Верх
+            else if (i === 5) { anchor = 'middle'; dominantBaseline = 'hanging'; } // Низ
+            else if (i > 0 && i < 5) { anchor = 'start'; } // Справа
+            else { anchor = 'end'; } // Слева
 
-            labelsSVG += `<text x="${lx}" y="${ly + 4}" text-anchor="${anchor}" fill="rgba(255,255,255,0.6)" font-size="9" font-family="sans-serif" font-weight="600">${labelText}</text>`;
+            labelsSVG += `<text x="${lx}" y="${ly}" text-anchor="${anchor}" dominant-baseline="${dominantBaseline}" fill="#ffffff" font-size="10" font-family="sans-serif" font-weight="700" style="text-shadow:0 1px 3px rgba(0,0,0,0.8);">${labelText}</text>`;
         });
 
-        // 4. Полигон ПРОШЛОГО периода (Серый)
+        // Данные
         let prevPoints = [];
         if (prevData) {
             PSYCHO_AXES.forEach((key, i) => {
@@ -16151,19 +16264,18 @@
             });
         }
         const prevPoly = prevPoints.length > 0 
-            ? `<polygon points="${prevPoints.join(' ')}" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.3)" stroke-width="1" stroke-dasharray="4"/>` 
+            ? `<polygon points="${prevPoints.join(' ')}" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1" stroke-dasharray="4"/>` 
             : '';
 
-        // 5. Полигон ТЕКУЩЕГО периода (Акцентный цвет)
         let currPoints = [];
         PSYCHO_AXES.forEach((key, i) => {
             const val = currentData[key] || 0;
             const [x, y] = getCoords(val, i);
             currPoints.push(`${x},${y}`);
         });
-        const currPoly = `<polygon points="${currPoints.join(' ')}" fill="var(--accent)" fill-opacity="0.4" stroke="var(--accent)" stroke-width="2"/>`;
+        // Заливка цветом темы
+        const currPoly = `<polygon points="${currPoints.join(' ')}" fill="var(--accent)" fill-opacity="0.5" stroke="var(--accent)" stroke-width="2"/>`;
         
-        // Точки на углах
         let dotsSVG = '';
         currPoints.forEach(p => {
             const [px, py] = p.split(',');
@@ -16192,26 +16304,34 @@
         const stats = dataObj.stats;
         const type = dataObj.type;
         
-        // --- 1. ТЕКСТЫ И ПЕРЕВОДЫ ---
+        // Определяем язык
         const langKey = ['en','ru','es','de'].includes(currentLang) ? currentLang : 'en';
         
+        // --- 1. ПЕРЕВОДЫ ---
         const TXT = {
             title: {en:"Fetish<br><span style='color:var(--accent)'>Wrapped</span>", ru:"Итоги<br><span style='color:var(--accent)'>Фетишей</span>", es:"Resumen<br><span style='color:var(--accent)'>Fetichista</span>", de:"Fetisch<br><span style='color:var(--accent)'>Rückblick</span>"},
             since: {en:"Since Last Time", ru:"С прошлого раза", es:"Desde la última vez", de:"Seit dem letzten Mal"},
-            
             act: {en:"Swipes", ru:"Свайпов", es:"Deslizamientos", de:"Swipes"},
-            
             watch: {en:"Watch Time", ru:"Время просмотра", es:"Tiempo visto", de:"Zeit"},
             vibe: {en:"Your Vibe", ru:"Твой Вайб", es:"Tu Vibra", de:"Deine Stimmung"},
             evol: {en:"Taste Evolution", ru:"Эволюция Вкусов", es:"Evolución", de:"Entwicklung"},
             evol_sub: {en:"Vs Previous Period", ru:"Сравнение с прошлым", es:"Vs periodo anterior", de:"Vs letztes Mal"},
             obsess: {en:"Your Obsessions", ru:"Твои Одержимости", es:"Tus Obsesiones", de:"Deine Obsessionen"},
+            
+            // Финальная карточка
             sum_watch: {en:"Videos Watched", ru:"Видео просмотрено", es:"Videos vistos", de:"Angeschaut"},
-            sum_likes: {en:"Likes", ru:"Лайки", es:"Me gusta", de:"Likes"},
-            sum_dis: {en:"Dislikes", ru:"Дизлайки", es:"No me gusta", de:"Dislikes"},
+            sum_time: {en:"Total Time", ru:"Общее время", es:"Tiempo Total", de:"Gesamtzeit"},
+            sum_psycho: {en:"YOUR PSYCHOTYPE", ru:"ТВОЙ ПСИХОТИП", es:"TU PSICOTIPO", de:"DEIN PSYCHOTYP"},
             top_genre: {en:"Top Genre", ru:"Топ Жанр", es:"Top Género", de:"Top Genre"},
+            
             btn_done: {en:"Done", ru:"Готово", es:"Listo", de:"Fertig"},
-            caption: {en:"Discover yourself", ru:"Узнай себя", es:"Descúbrete", de:"Entdecke dich"}, 
+            caption: {en:"Discover yourself", ru:"Узнай себя", es:"Descúbrete", de:"Entdecke dich"},
+            
+            // Слайд диаграммы
+            radar_title: {en: "Your Psycho-Profile", ru: "Твой психо-портрет", es: "Tu Psico-Perfil", de: "Dein Psycho-Profil"},
+            radar_curr: {en: "Current", ru: "Сейчас", es: "Ahora", de: "Aktuell"},
+            radar_prev: {en: "Previous", ru: "Прошлое", es: "Anterior", de: "Vorher"},
+
             badge_new: {en:"NEW", ru:"NEW", es:"NUEVO", de:"NEU"},
             badge_up: {en:"UP", ru:"UP", es:"SUBIÓ", de:"HOCH"},
             badge_down: {en:"DOWN", ru:"DOWN", es:"BAJÓ", de:"RUNTER"}
@@ -16222,7 +16342,6 @@
         const badgeText = WRAPPED_CONFIG.badges[langKey][type] || type.toUpperCase();
         const phrases = WRAPPED_CONFIG.phrases[type] || WRAPPED_CONFIG.phrases.daily;
         const introText = phrases[langKey][Math.floor(Math.random() * phrases[langKey].length)];
-
         const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=0&data=${encodeURIComponent(window.location.origin)}`;
 
         // --- СЛАЙД 1: ВСТУПЛЕНИЕ ---
@@ -16235,7 +16354,7 @@
             </div>
         `);
 
-        // --- СЛАЙД 2: СРАВНЕНИЕ (ИСПРАВЛЕНО ВЫРАВНИВАНИЕ) ---
+        // --- СЛАЙД 2: СРАВНЕНИЕ ---
         if (type !== 'daily' || Math.abs(stats.deltaActions) > 0) {
             const trendAct = stats.deltaActions >= 0 ? "+" : "";
             const trendTime = stats.deltaWatchTime >= 0 ? "+" : "";
@@ -16244,14 +16363,10 @@
             slides.push(`
                 <div class="wrapped-slide bg-fire">
                     <div class="wrapped-sub-text" style="text-transform:uppercase; letter-spacing:2px; font-size:12px; margin-bottom:40px;">${t('since')}</div>
-                    
-                    <!-- FIX: Добавлен display: flex и выравнивание для верхнего блока -->
                     <div style="margin-bottom:50px; width:100%; display:flex; flex-direction:column; align-items:center;">
                         <div class="wrapped-big-text" style="font-size:70px; color:${colorAct}; margin-bottom:5px; text-align:center;">${trendAct}${stats.deltaActions}</div>
                         <div class="wrapped-sub-text" style="font-weight:700; text-align:center;">${t('act')}</div>
                     </div>
-                    
-                    <!-- FIX: Добавлен display: flex и выравнивание для нижнего блока -->
                     <div style="border-top:1px solid rgba(255,255,255,0.2); padding-top:40px; width:80%; display:flex; flex-direction:column; align-items:center;">
                         <div class="wrapped-big-text" style="font-size:70px; margin-bottom:5px; text-align:center;">${trendTime}${Math.round(stats.deltaWatchTime/60)}m</div>
                         <div class="wrapped-sub-text" style="font-weight:700; text-align:center;">${t('watch')}</div>
@@ -16288,53 +16403,33 @@
             hasEvolutionSlide = true;
         }
 
-        // === 4 СЛАЙД: ПСИХОЛОГИЧЕСКИЙ ПОРТРЕТ (RADAR CHART) ===
-        const radarTitle = {
-            en: "Your Psycho-Profile", ru: "Твой психо-портрет", 
-            es: "Tu Psico-Perfil", de: "Dein Psycho-Profil"
-        };
-        const radarLegendCurr = { en: "Current", ru: "Сейчас", es: "Ahora", de: "Aktuell" };
-        const radarLegendPrev = { en: "Previous", ru: "Прошлое", es: "Anterior", de: "Vorher" };
-
-        const prevPsycho = stats.prevPsychoCounts || {}; // Будет пусто, если нет истории
+        // === СЛАЙД 4: ПСИХОЛОГИЧЕСКИЙ ПОРТРЕТ (ДИАГРАММА) ===
+        const prevPsycho = stats.prevPsychoCounts || {}; 
         const radarSVG = createRadarChartSVG(stats.psychoCounts, prevPsycho);
 
         slides.push(`
             <div class="wrapped-slide" style="background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);">
-                <div class="wrapped-sub-text" style="text-transform:uppercase; margin-bottom:20px; font-weight:800; letter-spacing:1px;">${t(radarTitle)}</div>
+                <div class="wrapped-sub-text" style="text-transform:uppercase; margin-bottom:20px; font-weight:800; letter-spacing:1px;">${t('radar_title')}</div>
                 
-                <div style="width:300px; height:300px; margin-bottom:30px; position:relative;">
+                <div style="width:340px; height:340px; margin-bottom:20px; position:relative;">
                     ${radarSVG}
                 </div>
 
+                <!-- Легенда -->
                 <div style="display:flex; gap:20px; font-size:12px; font-weight:600;">
                     <div style="display:flex; align-items:center; gap:6px;">
                         <div style="width:10px; height:10px; background:var(--accent); border-radius:50%;"></div>
-                        <span style="color:var(--text-main)">${t(radarLegendCurr)}</span>
+                        <span style="color:var(--text-main)">${t('radar_curr')}</span>
                     </div>
                     <div style="display:flex; align-items:center; gap:6px;">
                         <div style="width:10px; height:10px; background:rgba(255,255,255,0.3); border:1px dashed #fff; border-radius:50%;"></div>
-                        <span style="color:var(--text-secondary)">${t(radarLegendPrev)}</span>
+                        <span style="color:var(--text-secondary)">${t('radar_prev')}</span>
                     </div>
                 </div>
             </div>
         `);
 
-        // --- СЛАЙД 4: ДОСТИЖЕНИЕ ---
-        if (type !== 'daily') {
-            const achKey = stats.achievement;
-            const achData = WRAPPED_CONFIG.achievements[achKey];
-            slides.push(`
-                <div class="wrapped-slide bg-toxic">
-                    <div class="achievement-badge">${achData.icon}</div>
-                    <div class="wrapped-sub-text" style="text-transform:uppercase; color:rgba(0,0,0,0.6); margin-bottom:10px; font-weight:800;">${t('vibe')}</div>
-                    <div class="wrapped-big-text" style="font-size:42px; line-height:1.1; margin-bottom:20px; color:#000; text-shadow:none;">${achData[langKey]}</div>
-                    <div class="wrapped-sub-text" style="max-width:300px; color:#000; font-weight:500;">${achData['desc_' + langKey]}</div>
-                </div>
-            `);
-        }
-
-        // --- СЛАЙД 5: ОДЕРЖИМОСТИ ---
+        // --- СЛАЙД 5: ОДЕРЖИМОСТИ (Если эволюции не было) ---
         if (!hasEvolutionSlide) {
             const translatedTagsHtml = stats.topTags.slice(0, 5).map((t, i) => {
                 let displayTag = t.toUpperCase();
@@ -16351,12 +16446,21 @@
             `);
         }
 
-        // --- СЛАЙД 6: ФИНАЛ ---
+        // === СЛАЙД 6: ФИНАЛ (ОБНОВЛЕННЫЙ) ===
         const planColor = subscriptionLevel === 'free' ? '#fff' : '#9b59b6';
+        
+        // Определяем Топ Жанр
         let topGenre = stats.topTags[0] ? stats.topTags[0].toUpperCase() : '---';
         const genreMatch = modifiersData.find(m => m.key.toLowerCase() === topGenre.toLowerCase());
         if (genreMatch && genreMatch[langKey]) topGenre = genreMatch[langKey].toUpperCase();
 
+        // Определяем Психотип
+        const psychoKey = calculatePsychotype(stats.psychoCounts);
+        const psychoData = PSYCHO_TYPES[psychoKey] || PSYCHO_TYPES['vanilla'];
+        const psychoName = psychoData[langKey].toUpperCase();
+        const psychoDesc = psychoData['desc_' + langKey];
+
+        // Логотип
         const currentThemeId = localStorage.getItem('xch_theme_id') || 'dark';
         const logoSrc = getThemeLogoSrc(currentThemeId);
 
@@ -16385,22 +16489,26 @@
                         </div>
                     </div>
 
-                    <div class="sum-grid" style="grid-template-columns: 1fr 1fr;">
+                    <div class="sum-grid" style="grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <!-- Ряд 1: Видео и Время -->
                         <div class="sum-stat-box">
                             <div class="sum-stat-val">${stats.watchCount}</div>
                             <div class="sum-stat-lbl">${t('sum_watch')}</div>
                         </div>
                         <div class="sum-stat-box">
                             <div class="sum-stat-val">${Math.round(stats.totalWatchTime/60)}m</div>
-                            <div class="sum-stat-lbl">${t('watch')}</div>
+                            <div class="sum-stat-lbl">${t('sum_time')}</div>
                         </div>
-                        <div class="sum-stat-box">
-                            <div class="sum-stat-val" style="color:#2ecc71;">${stats.likeCount}</div>
-                            <div class="sum-stat-lbl">${t('sum_likes')}</div>
-                        </div>
-                        <div class="sum-stat-box">
-                            <div class="sum-stat-val" style="color:#e74c3c;">${stats.dislikeCount}</div>
-                            <div class="sum-stat-lbl">${t('sum_dis')}</div>
+
+                        <!-- Ряд 2: ПСИХОТИП (На всю ширину, заменяет лайки/дизлайки) -->
+                        <div class="sum-stat-box" style="grid-column: 1 / -1; background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05)); border: 1px solid var(--accent); padding: 15px 10px;">
+                            <div class="sum-stat-lbl" style="color:var(--accent); font-weight:800; letter-spacing:1px; margin-bottom:5px;">${t('sum_psycho')}</div>
+                            <div style="font-size:22px; font-weight:900; color:#fff; text-transform:uppercase; line-height:1.1;">
+                                ${psychoName}
+                            </div>
+                            <div style="font-size:10px; color:rgba(255,255,255,0.6); margin-top:5px; font-style:italic;">
+                                "${psychoDesc}"
+                            </div>
                         </div>
                     </div>
 
@@ -16412,12 +16520,11 @@
                     </div>
                 </div>
 
-                <!-- ИСПРАВЛЕННЫЕ КНОПКИ (Кликабельные на мобильных) -->
+                <!-- Кнопки под карточкой -->
                 <div style="margin-top:30px; display:flex; gap:15px; align-items:center; z-index: 1000;">
                     <button onclick="closeWrapped()" class="btn-gen" style="width:auto; padding:12px 40px; font-size:16px; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); backdrop-filter:blur(10px);">
                         ${t('btn_done')}
                     </button>
-                    
                     <div class="btn-round-share" onclick="shareWrappedCard()">
                         <img src="share.png" alt="Share">
                     </div>
@@ -16425,7 +16532,7 @@
             </div>
         `);
 
-        // Рендер
+        // Рендер прогресс-баров
         let barsHtml = '';
         slides.forEach((_, i) => barsHtml += `<div class="wrapped-progress-bar"><div class="wrapped-progress-fill" id="bar-${i}"></div></div>`);
         
@@ -16437,18 +16544,23 @@
             ${slides.join('')}
         `;
         
+        // Логика переключения
         if (dataObj.viewed) {
             currentSlideIndex = slides.length - 1;
-            setTimeout(() => { for (let i = 0; i < slides.length; i++) { const bar = document.getElementById('bar-' + i); if(bar) bar.style.width = '100%'; } }, 50);
+            // Если уже смотрели, сразу закрашиваем все бары
+            setTimeout(() => { 
+                for (let i = 0; i < slides.length; i++) { 
+                    const bar = document.getElementById('bar-' + i); 
+                    if(bar) { bar.style.width = '100%'; bar.style.transition = 'none'; }
+                } 
+            }, 50);
         } else {
             currentSlideIndex = 0;
         }
         
         startSlideTimerNew(slides.length, 6000); 
         
-        // --- 3. ИСПРАВЛЕННЫЕ ОБРАБОТЧИКИ СОБЫТИЙ (ПАУЗА И КЛИКИ) ---
-        
-        // Функция проверки, кликнули ли мы по интерактивному элементу
+        // Обработчики событий (пауза и клики)
         const isInteractive = (e) => {
             return e.target.closest('button') || 
                 e.target.closest('.wrapped-close') || 
@@ -16457,9 +16569,7 @@
         };
 
         const handlePause = (e) => { 
-            // Не ставим паузу, если кликаем по кнопкам (чтобы сработал onclick)
             if (isInteractive(e)) return;
-            
             if(e.cancelable) e.preventDefault(); 
             overlay.classList.add('paused'); 
             window.isWrappedPaused = true; 
@@ -16467,15 +16577,13 @@
 
         const handleResume = (e) => { 
             if (isInteractive(e)) return;
-
             if(e.cancelable) e.preventDefault(); 
             overlay.classList.remove('paused'); 
             window.isWrappedPaused = false; 
         };
 
         overlay.addEventListener('mousedown', handlePause);
-        overlay.addEventListener('touchstart', handlePause, {passive: false}); // passive: false важно для preventDefault
-        
+        overlay.addEventListener('touchstart', handlePause, {passive: false});
         overlay.addEventListener('mouseup', handleResume);
         overlay.addEventListener('touchend', handleResume, {passive: false});
         overlay.addEventListener('mouseleave', handleResume);
