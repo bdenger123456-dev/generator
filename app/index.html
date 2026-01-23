@@ -4681,6 +4681,94 @@
         }
 
         /* =========================================
+        DYNAMIC LOGO GRADIENTS PER THEME
+        ========================================= */
+
+        /* Общий селектор для логотипа в меню и в карточке Wrapped */
+        .logo span, 
+        .sum-logo-text span.grad {
+            -webkit-background-clip: text !important;
+            background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            background-size: 100% !important;
+        }
+
+        /* --- 1. BLUE (Midnight / Sky) --- */
+        /* От голубого (Cyan) к глубокому синему */
+        body[data-theme="blue-dark"] .logo span,
+        body[data-theme="blue-light"] .logo span,
+        body[data-theme="blue-dark"] .sum-logo-text span.grad,
+        body[data-theme="blue-light"] .sum-logo-text span.grad {
+            background: linear-gradient(180deg, #64ffda 0%, #2563eb 100%) !important;
+        }
+
+        /* --- 2. GREEN (Forest / Mint) --- */
+        /* От светло-салатового к насыщенному зеленому */
+        body[data-theme="green-dark"] .logo span,
+        body[data-theme="green-light"] .logo span,
+        body[data-theme="green-dark"] .sum-logo-text span.grad,
+        body[data-theme="green-light"] .sum-logo-text span.grad {
+            background: linear-gradient(180deg, #86efac 0%, #16a34a 100%) !important;
+        }
+
+        /* --- 3. RED (Vampire / Rose) --- */
+        /* От розово-красного к кровавому */
+        body[data-theme="red-dark"] .logo span,
+        body[data-theme="red-light"] .logo span,
+        body[data-theme="red-dark"] .sum-logo-text span.grad,
+        body[data-theme="red-light"] .sum-logo-text span.grad {
+            background: linear-gradient(180deg, #fb7185 0%, #e11d48 100%) !important;
+        }
+
+        /* --- 4. GOLD (Luxury / Sand) --- */
+        /* От ярко-желтого к золотому/оранжевому */
+        body[data-theme="gold-dark"] .logo span,
+        body[data-theme="gold-light"] .logo span,
+        body[data-theme="gold-dark"] .sum-logo-text span.grad,
+        body[data-theme="gold-light"] .sum-logo-text span.grad {
+            background: linear-gradient(180deg, #facc15 0%, #d97706 100%) !important;
+        }
+
+        /* --- 5. PURPLE (Amethyst / Lavender) --- */
+        /* От сиреневого к фиолетовому */
+        body[data-theme="purple-dark"] .logo span,
+        body[data-theme="purple-light"] .logo span,
+        body[data-theme="purple-dark"] .sum-logo-text span.grad,
+        body[data-theme="purple-light"] .sum-logo-text span.grad {
+            background: linear-gradient(180deg, #e9d5ff 0%, #9333ea 100%) !important;
+        }
+
+        /* --- 6. ORANGE (Magma / Peach) --- */
+        /* От светло-оранжевого к огненному */
+        body[data-theme="orange-dark"] .logo span,
+        body[data-theme="orange-light"] .logo span,
+        body[data-theme="orange-dark"] .sum-logo-text span.grad,
+        body[data-theme="orange-light"] .sum-logo-text span.grad {
+            background: linear-gradient(180deg, #fb923c 0%, #ea580c 100%) !important;
+        }
+
+        /* --- 7. NOIR (Черно-белая) --- */
+        /* Белый градиент в серый */
+        body[data-theme="noir"] .logo span,
+        body[data-theme="noir"] .sum-logo-text span.grad {
+            background: linear-gradient(180deg, #ffffff 0%, #888888 100%) !important;
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
+        }
+
+        /* --- 8. RAINBOW (Радуга) --- */
+        /* Анимированная радуга */
+        body[data-theme="rainbow"] .logo span,
+        body[data-theme="rainbow"] .sum-logo-text span.grad {
+            background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000) !important;
+            background-size: 200% auto !important;
+            animation: rainbowText 3s linear infinite;
+        }
+
+        @keyframes rainbowText {
+            to { background-position: 200% center; }
+        }
+
+        /* =========================================
         18. MEDIA QUERIES (ADAPTATION)
         ========================================= */
 
