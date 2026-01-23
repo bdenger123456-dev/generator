@@ -4236,25 +4236,33 @@
         /* --- INTENSITY TOAST POPUP --- */
         #intensity-toast {
             position: absolute;
-            top: 55px; /* Отступ сверху */
+            top: 45px;
             left: 0;
-            width: 100%; /* Занимает всю ширину контейнера */
-            padding: 0 5px; /* Небольшие отступы по бокам */
+            width: 100%; 
+            padding: 0 5px;
             
             font-size: 11px; 
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 1px;
             
-            background: transparent !important;
-            box-shadow: none !important;
-            border: none !important;
-            
-            opacity: 0; /* Скрыто по умолчанию */
             pointer-events: none;
-            z-index: 20;
+            opacity: 0;
             white-space: nowrap;
+            z-index: 20;
             
+            transition: opacity 0.2s; 
+        }
+
+        .custom-separator {
+            height: 1px;
+            background-color: var(--ios-separator);
+            margin-left: 16px; 
+            margin-right: 16px; 
+            transform: scaleY(0.5); 
+            display: block;
+            margin-top: 0;    
+            margin-bottom: 0;
         }
 
         /* Цвета и свечение (Neon Text) */
@@ -4297,27 +4305,17 @@
             animation: floatUpSimple 1.0s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
 
-
-        .slider-container {
-            width: 100%;
-            padding: 0 5px;
-            position: relative;
-        }
-
-        /* --- САМ СЛАЙДЕР (INPUT RANGE) --- */
-       #intensity-slider {
+        #intensity-slider {
             -webkit-appearance: none;
             width: 100%;
             height: 6px;
             border-radius: 5px;
             outline: none;
             cursor: pointer;
-            /* Фон по умолчанию (серый), цвет будет меняться через JS */
-            background: var(--border); 
+            background: var(--border);
+            display: block;
         }
 
-
-        /* Бегунок (Thumb) */
         #intensity-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
@@ -4327,21 +4325,34 @@
             background: #ffffff;
             box-shadow: 0 2px 5px rgba(0,0,0,0.3);
             cursor: pointer;
-            transition: transform 0.2s;
-            margin-top: -1px; /* Выравнивание */
+            margin-top: -1px;
         }
 
-        #intensity-slider::-webkit-slider-thumb:active {
-            transform: scale(1.1);
+        .slider-container {
+            width: 100%;
+            padding: 0 5px;
+            position: relative;
+            margin-bottom: 8px;
         }
 
-        /* --- ИКОНКИ ПОД СЛАЙДЕРОМ --- */
+        .slider-narrow-wrapper {
+            width: 85%;
+            /* Минимальный отступ снизу (15px), чтобы текст не наезжал на разделитель, но и не висел в пустоте */
+            margin: 5px auto 15px auto !important; 
+            position: relative;
+            overflow: visible; /* Текст может выходить за границы (для длинных слов) */
+            padding: 0 !important; /* Убираем внутренние отступы */
+            height: auto !important; /* Высота по содержимому */
+        }
+
+        /* Иконки под слайдером */
         .intensity-labels-icons {
             display: flex;
             justify-content: space-between;
-            padding: 0 2px; /* Выравниваем под краями слайдера */
+            padding: 0 2px;
         }
 
+        /* Боксы иконок */
         .int-icon-box {
             width: 30px;
             height: 30px;
@@ -4786,6 +4797,39 @@
 
         @keyframes rainbowText {
             to { background-position: 200% center; }
+        }
+
+        /* === НОВЫЙ БЛОК ИНТЕНСИВНОСТИ === */
+        .intensity-wrapper {
+            background: var(--nav-bg); /* Цвет фона как у активных элементов */
+            border-radius: 20px;       /* Закругленные края */
+            padding: 15px 10px;        /* Внутренние отступы */
+            margin: 10px 12px 12px 12px; /* Отступы от краев группы */
+            border: 1px solid var(--border);
+        }
+
+        .intensity-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            gap: 5px;
+        }
+
+        .intensity-title {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-main);
+            letter-spacing: 1px;
+        }
+
+        /* Ограничитель ширины для слайдера и иконок */
+        .intensity-controls-inner {
+            width: 80%;       /* Слайдер стал меньше (уже) */
+            margin: 0 auto;   /* Центрирование */
+            position: relative;
         }
 
         /* =========================================
@@ -5565,7 +5609,7 @@
         <div class="ios-header" data-key="header_filters">Filters</div>
         <div class="ios-group">
             
-            <!-- 3. INTENSITY (Слайдер + Маленькие иконки) -->
+            <!-- 3. INTENSITY -->
             <div style="padding: 12px 16px;">
                 <!-- Заголовок -->
                 <div class="ios-row-left" style="margin-bottom: 10px;">
@@ -5575,13 +5619,13 @@
                 
                 <!-- Слайдер -->
                 <div class="slider-container" style="margin-bottom: 8px;">
-                    <!-- Всплывашка (Скрыта по умолчанию) -->
+                    <!-- Тост (всплывашка) -->
                     <div id="intensity-toast"></div> 
                     
                     <input type="range" min="1" max="3" value="1" step="1" id="intensity-slider" oninput="updateIntensity(this.value)">
                 </div>
 
-                <!-- Иконки (Маленькие, под подсечками слайдера) -->
+                <!-- Иконки -->
                 <div class="intensity-labels-icons">
                     <!-- Safe (1) -->
                     <div class="int-icon-box" onclick="updateIntensity(1)">
@@ -5597,6 +5641,9 @@
                     </div>
                 </div>
             </div>
+
+            <!-- РАЗДЕЛИТЕЛЬ -->
+            <div class="custom-separator"></div>
 
             <!-- 4. Orientation -->
             <div class="ios-row">
@@ -7383,84 +7430,44 @@
         { id: 'dark', name: 'Dark (Cyber)', type: 'free', isLight: false, preview: '#ff00cc', accent: null },
         { id: 'light', name: 'Light (Sakura)', type: 'free', isLight: true, preview: '#ffeef8', accent: null },
         
-        // === BLUE (Row 2) ===
+        // === PREMIUM ===
+        { 
+            id: 'noir', name: 'Noir', type: 'pro', isLight: false, preview: '#000000',
+            colors: { bg: '#000000', sidebar: '#0a0a0a', card: '#141414', nav: '#141414', border: '#333333' },
+            accent: '#ffffff', accentLight: '#cccccc'
+        },
         { 
             id: 'blue-dark', name: 'Midnight', type: 'pro', isLight: false, preview: '#0a192f',
             colors: { bg: '#020c1b', sidebar: '#0a192f', card: '#112240', nav: '#112240', border: '#233554' },
             accent: '#64ffda', accentLight: '#94ffea'
         },
         { 
-            id: 'blue-light', name: 'Sky', type: 'pro', isLight: true, preview: '#cce4ff',
-            colors: { bg: '#dbeafe', sidebar: '#f0f9ff', card: '#ffffff', nav: '#ffffff', border: '#bfdbfe' },
-            accent: '#2563eb', accentLight: '#60a5fa' 
-        },
-
-        // === GREEN (Row 3) ===
-        { 
             id: 'green-dark', name: 'Forest', type: 'pro', isLight: false, preview: '#051405',
             colors: { bg: '#020a02', sidebar: '#051405', card: '#0f290f', nav: '#0f290f', border: '#1a401a' },
             accent: '#2ecc71', accentLight: '#58d68d'
         },
-        { 
-            id: 'green-light', name: 'Mint', type: 'pro', isLight: true, preview: '#dcfce7',
-            colors: { bg: '#dcfce7', sidebar: '#f0fdf4', card: '#ffffff', nav: '#ffffff', border: '#86efac' },
-            accent: '#16a34a', accentLight: '#4ade80'
-        },
-
-        // === RED (Row 4) ===
         { 
             id: 'red-dark', name: 'Vampire', type: 'pro', isLight: false, preview: '#1a0000',
             colors: { bg: '#0d0000', sidebar: '#1a0000', card: '#330000', nav: '#330000', border: '#4d0000' },
             accent: '#e74c3c', accentLight: '#ff6b6b'
         },
         { 
-            id: 'red-light', name: 'Rose', type: 'pro', isLight: true, preview: '#ffe4e6',
-            colors: { bg: '#ffe4e6', sidebar: '#fff1f2', card: '#ffffff', nav: '#ffffff', border: '#fecdd3' },
-            accent: '#e11d48', accentLight: '#fb7185'
-        },
-
-        // === GOLD / ORANGE (Row 5) ===
-        { 
             id: 'gold-dark', name: 'Luxury', type: 'pro', isLight: false, preview: '#141100',
             colors: { bg: '#0a0900', sidebar: '#141100', card: '#292200', nav: '#292200', border: '#4d4000' },
             accent: '#f1c40f', accentLight: '#f4d03f'
         },
-        { 
-            id: 'gold-light', name: 'Sand', type: 'pro', isLight: true, preview: '#fef3c7',
-            colors: { bg: '#fef3c7', sidebar: '#fffbeb', card: '#ffffff', nav: '#ffffff', border: '#fde68a' },
-            accent: '#d97706', accentLight: '#fbbf24'
-        },
-
-        // === PURPLE (Row 6) - Moved up ===
         { 
             id: 'purple-dark', name: 'Amethyst', type: 'pro', isLight: false, preview: '#3b005e',
             colors: { bg: '#0d0014', sidebar: '#180026', card: '#240038', nav: '#240038', border: '#4a0072' },
             accent: '#9d00ff', accentLight: '#c466ff'
         },
         { 
-            id: 'purple-light', name: 'Lavender', type: 'pro', isLight: true, preview: '#f3e8ff',
-            colors: { bg: '#f3e8ff', sidebar: '#faf5ff', card: '#ffffff', nav: '#ffffff', border: '#d8b4fe' },
-            accent: '#9333ea', accentLight: '#c084fc'
-        },
-
-        // === ORANGE (Row 7) ===
-        { 
             id: 'orange-dark', name: 'Magma', type: 'pro', isLight: false, preview: '#331a00',
             colors: { bg: '#0f0700', sidebar: '#1f0f00', card: '#331a00', nav: '#331a00', border: '#663300' },
             accent: '#ff6600', accentLight: '#ff9933'
         },
-        { 
-            id: 'orange-light', name: 'Peach', type: 'pro', isLight: true, preview: '#fff7ed',
-            colors: { bg: '#fff7ed', sidebar: '#fffaf5', card: '#ffffff', nav: '#ffffff', border: '#fed7aa' },
-            accent: '#ea580c', accentLight: '#fb923c'
-        },
 
-        // === SPECIAL (Row 8) ===
-        { 
-            id: 'noir', name: 'Noir', type: 'pro', isLight: false, preview: '#000000',
-            colors: { bg: '#000000', sidebar: '#0a0a0a', card: '#141414', nav: '#141414', border: '#333333' },
-            accent: '#ffffff', accentLight: '#cccccc'
-        },
+        // === SPECIAL ===
         { 
             id: 'rainbow', name: 'Rainbow', type: 'pro', isLight: false, 
             preview: 'linear-gradient(135deg, #ff0000, #ffff00, #0000ff)',
@@ -11263,7 +11270,7 @@
         icon2.className = 'int-icon';
         icon3.className = 'int-icon';
 
-        // Цвета для ползунка
+        // Цвета
         const isNoir = document.body.getAttribute('data-theme') === 'noir';
         const colorBg = 'var(--border)'; 
         const colorSpicy = isNoir ? '#ffffff' : '#f39c12'; 
@@ -11271,61 +11278,59 @@
 
         const t = langData[currentLang] || langData['en'];
 
-        // Сбрасываем анимацию перед изменением
+        // Сброс анимации
         if (toast) {
             toast.classList.remove('anim-toast');
-            // Сброс стилей выравнивания
-            toast.style.textAlign = ''; 
+            // Сброс трансформаций (важно после экспериментов)
+            toast.style.transform = ''; 
+            toast.style.left = '0';
+            toast.style.width = '100%';
         }
 
-        // --- ЛОГИКА ВЫРАВНИВАНИЯ ---
+        // --- ЛОГИКА ВЫРАВНИВАНИЯ (Text Align) ---
         if (currentIntensity === 1) {
-            // SAFE (Слева)
+            // SAFE
             slider.style.background = colorBg;
             icon1.classList.add('active-safe');
             
             if(toast) {
                 toast.innerText = t.val_safe || "Safe";
                 toast.className = 'toast-safe';
-                toast.style.textAlign = 'left'; // Строго влево
-                // Небольшой отступ слева, чтобы не прилипало к краю
-                toast.style.paddingLeft = '5px'; 
+                toast.style.textAlign = 'left';
+                toast.style.paddingLeft = '5px';
                 toast.style.paddingRight = '0';
             }
         } 
         else if (currentIntensity === 2) {
-            // SPICY (Центр)
+            // SPICY
             slider.style.background = `linear-gradient(to right, ${colorSpicy} 0%, ${colorSpicy} 50%, ${colorBg} 50%, ${colorBg} 100%)`;
             icon2.classList.add('active-spicy');
             
             if(toast) {
                 toast.innerText = t.val_spicy || "Spicy";
                 toast.className = 'toast-spicy';
-                toast.style.textAlign = 'center'; // Строго по центру
+                toast.style.textAlign = 'center';
                 toast.style.padding = '0';
             }
         } 
         else if (currentIntensity === 3) {
-            // EXTREME (Справа)
+            // EXTREME
             slider.style.background = colorExtreme;
             icon3.classList.add('active-extreme');
             
             if(toast) {
                 toast.innerText = t.val_extreme || "Extreme";
                 toast.className = 'toast-extreme';
-                toast.style.textAlign = 'right'; // Строго вправо
-                // Небольшой отступ справа
+                toast.style.textAlign = 'right';
                 toast.style.paddingRight = '5px';
                 toast.style.paddingLeft = '0';
             }
         }
 
-        // ЗАПУСК НОВОЙ АНИМАЦИИ
+        // Запуск анимации
         if (toast) {
-            // Магический трюк для перезапуска (Reflow)
             void toast.offsetWidth; 
             toast.classList.add('anim-toast');
-            
             if(navigator.vibrate) navigator.vibrate(15);
         }
     }
