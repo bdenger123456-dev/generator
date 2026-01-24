@@ -15212,46 +15212,53 @@
         
         const t = langData[currentLang] || langData['en'];
         let finalPhrase = "";
-        let foundTag = null;
+        let foundName = null;
 
-        // 1. Пытаемся найти любимый тег из статистики (вес > 10)
-        // Исключаем технические теги
-        const ignoreTags = ['general', 'specific', 'straight', 'male', 'female', 'adult', 'video', 'hd', 'kinky', 'fetish'];
+        // 1. Находим любимые теги пользователя (вес > 10)
+        const ignoreTags = ['general', 'specific', 'straight', 'male', 'female', 'adult', 'video', 'hd', 'kinky', 'fetish', 'fantasy', 'action', 'body-part'];
         
         const topTags = Object.entries(tagScores)
             .filter(([tag, score]) => score > 10 && !ignoreTags.includes(tag))
-            .sort((a, b) => b[1] - a[1]) // Сортируем от большего к меньшему
-            .slice(0, 3) // Берем топ-3
+            .sort((a, b) => b[1] - a[1]) // Сортируем: от самых любимых
+            .slice(0, 5) // Берем топ-5 тегов
             .map(x => x[0]);
 
-        if (topTags.length > 0) {
-            // Берем случайный тег из топ-3, чтобы не было скучно
-            const rawTag = topTags[Math.floor(Math.random() * topTags.length)];
+        // Проверяем, загружена ли база данных и есть ли любимые теги
+        if (typeof data !== 'undefined' && topTags.length > 0) {
             
-            // Пытаемся перевести тег
-            const langKey = ['en','ru','es','de'].includes(currentLang) ? currentLang : 'en';
-            
-            // Сначала ищем в modifiersData (там есть переводы)
-            const modMatch = modifiersData.find(m => m.key.toLowerCase() === rawTag.toLowerCase());
-            
-            if (modMatch && modMatch[langKey]) {
-                foundTag = modMatch[langKey];
-            } else {
-                // Если нет в модах, просто делаем с большой буквы
-                foundTag = rawTag.charAt(0).toUpperCase() + rawTag.slice(1);
+            // Выбираем один случайный тег из топа 
+            const randomTag = topTags[Math.floor(Math.random() * topTags.length)];
+
+            // 2. Ищем в базе КОНКРЕТНЫЕ ФЕТИШИ, содержащие этот тег
+            const candidates = data.filter(item => 
+                item.tags.includes(randomTag) && 
+                !blacklist.includes(item.id)
+            );
+
+            if (candidates.length > 0) {
+                // 3. Берем случайный фетиш из найденных
+                const winnerItem = candidates[Math.floor(Math.random() * candidates.length)];
+                
+                // 4. Получаем его локализованное имя
+                const langKey = ['en','ru','es','de'].includes(currentLang) ? currentLang : 'en';
+                
+                if (langKey === 'ru' && winnerItem.name_ru) foundName = winnerItem.name_ru;
+                else if (langKey === 'es' && winnerItem.name_es) foundName = winnerItem.name_es;
+                else if (langKey === 'de' && winnerItem.name_de) foundName = winnerItem.name_de;
+                else foundName = winnerItem.name;
             }
         }
 
-        // 2. Выбираем шаблон
-        // Если нашли тег и есть динамические шаблоны -> используем их
-        if (foundTag && t.mode_greeting_dynamic && t.mode_greeting_dynamic.length > 0) {
+        // 3. Формируем фразу
+        if (foundName && t.mode_greeting_dynamic && t.mode_greeting_dynamic.length > 0) {
             const templates = t.mode_greeting_dynamic;
             const template = templates[Math.floor(Math.random() * templates.length)];
             
-            finalPhrase = template.replace('{tag}', `<span style="color:var(--accent);">${foundTag}</span>`);
+            // Подставляем имя фетиша
+            finalPhrase = template.replace('{tag}', `<span style="color:var(--accent);">${foundName}</span>`);
         } 
         else {
-            // ФОЛЛБЭК: Если истории нет (новичок) или нет шаблонов
+            // ФОЛЛБЭК: Если нет истории или данных, показываем стандартные фразы
             const phrases = Array.isArray(t.mode_greeting_hint) 
                 ? t.mode_greeting_hint 
                 : [t.mode_greeting_hint];
