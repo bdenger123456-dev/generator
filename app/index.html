@@ -7809,6 +7809,11 @@
                 "Something new 🔭, familiar 🥰, or specific ✨?",
                 "Roll the dice 🔭, replay hits 🥰, or describe a fantasy ✨?"
             ],
+            mode_greeting_dynamic: [
+                "In the mood for <b>{tag}</b> 🥰 or something new 🔭? Or type your wish ✨, I won't disappoint 😏",
+                "Back to <b>{tag}</b> 🥰, or trusting chance 🔭? You can also tell me exactly what you want ✨",
+                "Missing <b>{tag}</b> 🥰? We can repeat, or explore 🔭. Or just ask the me ✨"
+            ],
             mode_explore: "Explore",
             mode_pleasure: "Pleasure",
             mode_ai: "AI Agent",
@@ -8316,6 +8321,11 @@
                 "Что-то новое 🔭, знакомое 🥰 или конкретная фантазия ✨?",
                 "Рискнем 🔭, повторим 🥰 или загадаешь сам ✨?"
             ],
+            mode_greeting_dynamic: [
+                "Настроен на <b>{tag}</b> 🥰 или ищешь новое 🔭? Либо пиши что конкретно ✨, не разочарую 😏",
+                "Вернемся к <b>{tag}</b> 🥰 или рискнем 🔭? Можешь просто описать фантазию ✨",
+                "Соскучился по <b>{tag}</b> 🥰? Можем повторить, или крути рулетку 🔭. А лучше спроси меня ✨"
+            ],
 
             mode_explore: "Исследование",
             mode_pleasure: "Наслаждение",
@@ -8817,6 +8827,12 @@
                 "¿Confiar en el azar 🔭, tu historia 🥰 o la Magia ✨?",
                 "¿Algo nuevo 🔭, familiar 🥰 o específico ✨?"
             ],
+            mode_greeting_dynamic: [
+                "¿Con ganas de <b>{tag}</b> 🥰 o algo nuevo 🔭? O escribe tu deseo ✨, no te decepcionaré 😏",
+                "¿Volvemos a <b>{tag}</b> 🥰 o probamos suerte 🔭? También puedes decírmelo ✨",
+                "¿Extrañas <b>{tag}</b> 🥰? Repitamos o exploremos 🔭. O pregúntale a la IA ✨"
+            ],
+
             mode_explore: "Explorar",
             mode_pleasure: "Placer",
             mode_ai: "Agente IA",
@@ -9309,6 +9325,11 @@
                 "Erkunden 🔭, Genießen 🥰 oder ein Wunsch ✨?",
                 "Zufall 🔭, Geschichte 🥰 oder Magie ✨?",
                 "Etwas Neues 🔭, Bekanntes 🥰 oder Spezifisches ✨?"
+            ],
+            mode_greeting_dynamic: [
+                "Lust auf <b>{tag}</b> 🥰 oder etwas Neues 🔭? Oder schreib deinen Wunsch ✨, ich enttäusche nicht 😏",
+                "Zurück zu <b>{tag}</b> 🥰 oder Zufall 🔭? Du kannst mir auch sagen, was du willst ✨",
+                "Vermisst du <b>{tag}</b> 🥰? Wir können wiederholen oder erkunden 🔭. Oder frag die KI ✨"
             ],
             mode_explore: "Erkunden",
             mode_pleasure: "Genießen",
@@ -15190,11 +15211,55 @@
         if (!el) return;
         
         const t = langData[currentLang] || langData['en'];
-        const phrases = Array.isArray(t.mode_greeting_hint) 
-            ? t.mode_greeting_hint 
-            : [t.mode_greeting_hint];
+        let finalPhrase = "";
+        let foundTag = null;
+
+        // 1. Пытаемся найти любимый тег из статистики (вес > 10)
+        // Исключаем технические теги
+        const ignoreTags = ['general', 'specific', 'straight', 'male', 'female', 'adult', 'video', 'hd', 'kinky', 'fetish'];
+        
+        const topTags = Object.entries(tagScores)
+            .filter(([tag, score]) => score > 10 && !ignoreTags.includes(tag))
+            .sort((a, b) => b[1] - a[1]) // Сортируем от большего к меньшему
+            .slice(0, 3) // Берем топ-3
+            .map(x => x[0]);
+
+        if (topTags.length > 0) {
+            // Берем случайный тег из топ-3, чтобы не было скучно
+            const rawTag = topTags[Math.floor(Math.random() * topTags.length)];
             
-        el.innerText = phrases[Math.floor(Math.random() * phrases.length)];
+            // Пытаемся перевести тег
+            const langKey = ['en','ru','es','de'].includes(currentLang) ? currentLang : 'en';
+            
+            // Сначала ищем в modifiersData (там есть переводы)
+            const modMatch = modifiersData.find(m => m.key.toLowerCase() === rawTag.toLowerCase());
+            
+            if (modMatch && modMatch[langKey]) {
+                foundTag = modMatch[langKey];
+            } else {
+                // Если нет в модах, просто делаем с большой буквы
+                foundTag = rawTag.charAt(0).toUpperCase() + rawTag.slice(1);
+            }
+        }
+
+        // 2. Выбираем шаблон
+        // Если нашли тег и есть динамические шаблоны -> используем их
+        if (foundTag && t.mode_greeting_dynamic && t.mode_greeting_dynamic.length > 0) {
+            const templates = t.mode_greeting_dynamic;
+            const template = templates[Math.floor(Math.random() * templates.length)];
+            
+            finalPhrase = template.replace('{tag}', `<span style="color:var(--accent);">${foundTag}</span>`);
+        } 
+        else {
+            // ФОЛЛБЭК: Если истории нет (новичок) или нет шаблонов
+            const phrases = Array.isArray(t.mode_greeting_hint) 
+                ? t.mode_greeting_hint 
+                : [t.mode_greeting_hint];
+                
+            finalPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+        }
+            
+        el.innerHTML = finalPhrase;
     }
 
     function toggleModeDropdown(type) {
