@@ -3639,15 +3639,17 @@
         }
 
         .mode-greeting-text {
-            font-size: clamp(28px, 6vw, 42px) !important; 
-            font-weight: 900 !important;
-            line-height: 1.1 !important;
+            font-size: clamp(24px, 5vw, 36px) !important; 
+            font-weight: 800 !important;
+            line-height: 1.2 !important; 
             text-align: center;
             color: var(--text-main);
             
             margin-top: auto; 
             margin-bottom: auto;
-            max-width: 90%;
+            max-width: 95%; 
+            
+            transition: opacity 0.3s ease;
         }
 
         .mode-buttons-circle-row {
@@ -7810,9 +7812,9 @@
                 "Roll the dice 🔭, replay hits 🥰, or describe a fantasy ✨?"
             ],
             mode_greeting_dynamic: [
-                "In the mood for <b>{tag}</b> 🥰 or something new 🔭? Or type your wish ✨, I won't disappoint 😏",
-                "Back to <b>{tag}</b> 🥰, or trusting chance 🔭? You can also tell me exactly what you want ✨",
-                "Missing <b>{tag}</b> 🥰? We can repeat, or explore 🔭. Or just ask the me ✨"
+                "In the mood for<br><b>{tag}</b> 🥰<br>or something new 🔭?<br><span style='font-size:0.65em; opacity:0.8; display:block; margin-top:8px;'>Or type your wish ✨, I won't disappoint 😏</span>",
+                "Back to<br><b>{tag}</b> 🥰<br>or trusting chance 🔭?<br><span style='font-size:0.65em; opacity:0.8; display:block; margin-top:8px;'>You can also tell me exactly what you want ✨</span>",
+                "Missing<br><b>{tag}</b> 🥰?<br>We can repeat or explore 🔭<br><span style='font-size:0.65em; opacity:0.8; display:block; margin-top:8px;'>Or just ask me ✨</span>"
             ],
             mode_explore: "Explore",
             mode_pleasure: "Pleasure",
@@ -8322,9 +8324,9 @@
                 "Рискнем 🔭, повторим 🥰 или загадаешь сам ✨?"
             ],
             mode_greeting_dynamic: [
-                "Настроен на <b>{tag}</b> 🥰 или ищешь новое 🔭? Либо пиши что конкретно ✨, не разочарую 😏",
-                "Вернемся к <b>{tag}</b> 🥰 или рискнем 🔭? Можешь просто описать фантазию ✨",
-                "Соскучился по <b>{tag}</b> 🥰? Можем повторить, или крути рулетку 🔭. А лучше спроси меня ✨"
+                "Настроен на<br><b>{tag}</b> 🥰<br>или ищешь новое 🔭?<br><span style='font-size:0.65em; opacity:0.8; display:block; margin-top:8px;'>Либо пиши что конкретно ✨, не разочарую 😏</span>",
+                "Вернемся к<br><b>{tag}</b> 🥰<br>или рискнем 🔭?<br><span style='font-size:0.65em; opacity:0.8; display:block; margin-top:8px;'>Можешь просто описать фантазию ✨</span>",
+                "Соскучился по<br><b>{tag}</b> 🥰?<br>Повторим или крути рулетку 🔭<br><span style='font-size:0.65em; opacity:0.8; display:block; margin-top:8px;'>А лучше спроси меня ✨</span>"
             ],
 
             mode_explore: "Исследование",
@@ -8828,9 +8830,9 @@
                 "¿Algo nuevo 🔭, familiar 🥰 o específico ✨?"
             ],
             mode_greeting_dynamic: [
-                "¿Con ganas de <b>{tag}</b> 🥰 o algo nuevo 🔭? O escribe tu deseo ✨, no te decepcionaré 😏",
-                "¿Volvemos a <b>{tag}</b> 🥰 o probamos suerte 🔭? También puedes decírmelo ✨",
-                "¿Extrañas <b>{tag}</b> 🥰? Repitamos o exploremos 🔭. O pregúntale a la IA ✨"
+                "¿Con ganas de<br><b>{tag}</b> 🥰<br>o algo nuevo 🔭?<br><span style='font-size:0.65em; opacity:0.8; display:block; margin-top:8px;'>O escribe tu deseo ✨, no te decepcionaré 😏</span>",
+                "¿Volvemos a<br><b>{tag}</b> 🥰<br>o probamos suerte 🔭?<br><span style='font-size:0.65em; opacity:0.8; display:block; margin-top:8px;'>También puedes decírmelo ✨</span>",
+                "¿Extrañas<br><b>{tag}</b> 🥰?<br>Repitamos o exploremos 🔭<br><span style='font-size:0.65em; opacity:0.8; display:block; margin-top:8px;'>O pregúntale a la IA ✨</span>"
             ],
 
             mode_explore: "Explorar",
@@ -9327,9 +9329,9 @@
                 "Etwas Neues 🔭, Bekanntes 🥰 oder Spezifisches ✨?"
             ],
             mode_greeting_dynamic: [
-                "Lust auf <b>{tag}</b> 🥰 oder etwas Neues 🔭? Oder schreib deinen Wunsch ✨, ich enttäusche nicht 😏",
-                "Zurück zu <b>{tag}</b> 🥰 oder Zufall 🔭? Du kannst mir auch sagen, was du willst ✨",
-                "Vermisst du <b>{tag}</b> 🥰? Wir können wiederholen oder erkunden 🔭. Oder frag die KI ✨"
+                "Lust auf<br><b>{tag}</b> 🥰<br>oder etwas Neues 🔭?<br><span style='font-size:0.65em; opacity:0.8; display:block; margin-top:8px;'>Oder schreib deinen Wunsch ✨, ich enttäusche nicht 😏</span>",
+                "Zurück zu<br><b>{tag}</b> 🥰<br>oder Zufall 🔭?<br><span style='font-size:0.65em; opacity:0.8; display:block; margin-top:8px;'>Du kannst mir auch sagen, was du willst ✨</span>",
+                "Vermisst du<br><b>{tag}</b> 🥰?<br>Wiederholen oder erkunden 🔭<br><span style='font-size:0.65em; opacity:0.8; display:block; margin-top:8px;'>Oder frag die KI ✨</span>"
             ],
             mode_explore: "Erkunden",
             mode_pleasure: "Genießen",
