@@ -5093,10 +5093,10 @@
 
             .sidebar {
                 /* 1. РАЗМЕРЫ И ОТСТУПЫ (Парящий эффект) */
-                height: calc(100vh - 16px) !important; /* Отступ сверху и снизу по 20px */
-                margin-top: 8px !important;
-                margin-left: 8px !important;
-                margin-bottom: 8px !important;
+                height: calc(100vh - 20px) !important;
+                margin-top: 10px !important;
+                margin-left: 10px !important;
+                margin-bottom: 10px !important;
                 margin-right: 0 !important; /* Справа не нужен отступ, там контент */
                 
                 border-radius: 22px !important;
@@ -5148,27 +5148,39 @@
         }
 
         @media (max-width: 768px) {
-            /* Скрываем заголовки блоков */
-            #block-prefs .ios-header,
-            #block-account .ios-header,
-            #block-extras .ios-header,
-            #block-history .ios-header {
+    
+            /* 1. СКРЫВАЕМ ЗАГОЛОВКИ БЛОКОВ */
+            .ios-header {
                 display: none !important;
             }
 
-            /* Делаем блоки шире (меньше отступы от краев экрана) */
-            .ios-group {
-                margin-left: 8px !important;  /* Было больше */
-                margin-right: 8px !important; /* Было больше */
-                width: auto !important;       /* Растягиваем */
-                margin-top: 0 !important;
-                margin-bottom: 15px !important;
+            /* 2. УБИРАЕМ ВНУТРЕННИЕ ОТСТУПЫ У КОНТЕЙНЕРОВ */
+            /* Это позволяет блокам растягиваться почти на всю ширину */
+            #tab-settings, 
+            #tab-account,
+            #tab-settings .center-wrapper, 
+            #tab-account .center-wrapper {
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
             }
 
-            /* Убираем верхний отступ у первого блока, чтобы он не висел дырой */
+            /* 3. НАСТРАИВАЕМ САМИ БЛОКИ */
+            .ios-group {
+                /* Маленькие отступы от краев (10px) */
+                margin-left: 10px !important; 
+                margin-right: 10px !important;
+                width: auto !important;
+                
+                margin-top: 0 !important;
+                margin-bottom: 15px !important; /* Расстояние между блоками */
+            }
+
+            /* 4. ОТСТУП СВЕРХУ ДЛЯ ПЕРВОГО БЛОКА */
             #block-prefs .ios-group:first-child,
             #block-account .ios-group:first-child {
-                margin-top: 10px !important;
+                margin-top: 15px !important;
             }
         }
 
