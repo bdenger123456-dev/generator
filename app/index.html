@@ -4698,6 +4698,21 @@
             filter: invert(0) sepia(1) saturate(5) hue-rotate(80deg);
         }
 
+        .ex-date {
+            font-size: 9px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        /* Показываем дату только если выполнено */
+        .ex-card.completed .ex-date {
+            opacity: 1;
+            color: #2ecc71; /* Зеленый цвет */
+        }
+
         /* --- СТИЛИ ДЛЯ ПОЛЕЗНОСТЕЙ (TIPS) --- */
 
         /* Сетка: 2 колонки */
@@ -7566,7 +7581,7 @@
         // 12. Тело и Внешность
         { 
             id: 'body', 
-            iconTag: 'body', 
+            iconTag: 'body-part', 
             tags: ['body-type', 'body-part', 'bbw', 'skinny', 'muscle', 'face', 'hair', 'tattoo', 'piercing', 'chubby', 'fat', 'hairy', 'redhead', 'blonde', 'brunette', 'milf', 'teen'] 
         },
         // 13. Игрушки и Машины
@@ -7596,6 +7611,10 @@
     ];
 
     let watchStartTime = 0; // Время ухода с сайта
+
+    let permanentExplored = new Set(JSON.parse(localStorage.getItem('xch_permanent_explored')) || []);
+
+    let achievementDates = JSON.parse(localStorage.getItem('xch_achievement_dates')) || {};
 
     // Слушатель возвращения на вкладку
     document.addEventListener("visibilitychange", () => {
@@ -8003,6 +8022,7 @@
             expl_hist: "From Archives 📜",
             deco_label: "Show Decorations",
 
+            unlocked_on: "Unlocked:",
             explored_subtitle: "Here are the achievements you need to get 'Platinum' 😈",
             cat_general: "General & Basic",
             cat_solo: "Solo & Hands",
@@ -8532,6 +8552,7 @@
             expl_hist: "Из архивов 📜",
             deco_label: "Показывать декор",
 
+            unlocked_on: "Получено:",
             explored_subtitle: "Вот тебе ачивки, которые нужно получить для достижения «Платины» 😈",
             cat_general: "База",
             cat_solo: "Соло и Руки",
@@ -9057,6 +9078,7 @@
             expl_hist: "De los archivos 📜",
             deco_label: "Mostrar decoración",
 
+            unlocked_on: "Desbloqueado:",
             explored_subtitle: "Aquí están los logros que necesitas para obtener el 'Platino' 😈",
             cat_general: "General",
             cat_solo: "Solo y Manos",
@@ -9574,6 +9596,7 @@
             expl_hist: "Aus dem Archiv 📜",
             deco_label: "Dekoration anzeigen",
 
+            unlocked_on: "Freigeschaltet:",
             explored_subtitle: "Hier sind die Erfolge, die du für 'Platin' brauchst 😈",
             cat_general: "Allgemein",
             cat_solo: "Solo & Hände",
@@ -10560,6 +10583,12 @@
         // Верстка
         checkLayout(); 
         window.addEventListener('resize', checkLayout);
+
+        if (permanentExplored.size === 0 && activityLog.length > 0) {
+            // Миграция: Заполняем вечную память из существующего лога
+            activityLog.forEach(log => permanentExplored.add(log.id));
+            localStorage.setItem('xch_permanent_explored', JSON.stringify([...permanentExplored]));
+        }
         
         document.body.classList.add('tab-home-active');
         setTimeout(() => {
@@ -10581,24 +10610,33 @@
 
     function logActivity(type, itemId, tags) {
         const logEntry = {
-            type: type, // 'gen', 'watch', 'like', 'dislike'
+            type: type,
             id: itemId,
             tags: tags || [],
             ts: Date.now()
         };
+        
+        // 1. Старый лог (последние 5000 действий)
         activityLog.push(logEntry);
         if (activityLog.length > 5000) activityLog = activityLog.slice(-5000);
         localStorage.setItem(STORAGE.ACTIVITY_LOG, JSON.stringify(activityLog));
-        updateExploredCount();
+        
+        // 2. ВЕЧНАЯ ПАМЯТЬ (Только ID, никогда не удаляем)
+        if (!permanentExplored.has(itemId)) {
+            permanentExplored.add(itemId);
+            // Преобразуем Set в Array для сохранения
+            localStorage.setItem('xch_permanent_explored', JSON.stringify([...permanentExplored]));
+            updateExploredCount(); // Обновляем цифры на кнопке
+        }
+        
         markDayActive();
     }
 
     // 1. Обновленная функция подсчета (только цифры на кнопке)
     function updateExploredCount() {
         const total = (typeof data !== 'undefined') ? data.length : 0;
-        
-        // Считаем уникальные ID из лога (уже открытые)
-        const uniqueExplored = (window.activityLog) ? new Set(window.activityLog.map(h => h.id)).size : 0;
+        // Считаем размер вечного сета
+        const uniqueExplored = permanentExplored.size;
         
         const displayEl = document.getElementById('ex-total-display');
         if (displayEl) {
@@ -10613,16 +10651,15 @@
         
         const t = langData[currentLang] || langData['en'];
         
-        // Обновляем подзаголовок
         const subTitleEl = document.querySelector('#modal-explored-overlay .modal-subtitle');
         if (subTitleEl) {
             subTitleEl.innerText = t.explored_subtitle || "Here are the achievements you need to get 'Platinum' 😈";
         }
 
-        const exploredIds = new Set(window.activityLog.map(log => log.id));
+        const exploredIds = permanentExplored; 
 
         EXPLORED_GROUPS.forEach(group => {
-            // 1. Ищем все видео, содержащие теги группы
+            // 1. Ищем все видео группы
             const groupItems = data.filter(item => 
                 item.tags.some(tag => group.tags.includes(tag))
             );
@@ -10630,14 +10667,29 @@
             const totalCount = groupItems.length;
             if (totalCount === 0) return;
 
-            // 2. Считаем открытые
+            // 2. Считаем прогресс
             const exploredCount = groupItems.filter(item => exploredIds.has(item.id)).length;
-            
-            // 3. Процент
             const percent = Math.round((exploredCount / totalCount) * 100);
             const isCompleted = (percent === 100);
 
-            // 4. Иконка (безопасный выбор)
+            // 3. ЛОГИКА ДАТЫ
+            let dateText = "";
+            
+            if (isCompleted) {
+                // Если уже есть дата в памяти - берем её
+                if (achievementDates[group.id]) {
+                    dateText = achievementDates[group.id];
+                } else {
+                    // Если нет - значит открыли только что. Сохраняем текущую дату.
+                    const now = new Date();
+                    dateText = now.toLocaleDateString(); // Формат: 26.01.2026
+                    
+                    achievementDates[group.id] = dateText;
+                    localStorage.setItem('xch_achievement_dates', JSON.stringify(achievementDates));
+                }
+            }
+
+            // 4. Иконка
             let iconSrc = 'logo_icon.png';
             if (TAG_ICONS[group.iconTag] && TAG_ICONS[group.iconTag][0]) {
                 iconSrc = TAG_ICONS[group.iconTag][0];
@@ -10647,8 +10699,10 @@
 
             // 5. Название
             const displayTitle = t['cat_' + group.id] || group.id.toUpperCase();
+            // Текст "Открыто: [Дата]"
+            const unlockedLabel = t.unlocked_on || "Unlocked:"; 
 
-            // 6. Карточка
+            // 6. Карточка HTML
             const card = document.createElement('div');
             card.className = `ex-card ${isCompleted ? 'completed' : ''}`;
             
@@ -10662,6 +10716,11 @@
                 
                 <div class="ex-card-stats">
                     ${exploredCount} / ${totalCount} (${percent}%)
+                </div>
+                
+                <!-- БЛОК С ДАТОЙ -->
+                <div class="ex-date">
+                    ${isCompleted ? `🏆 ${unlockedLabel} ${dateText}` : ''}
                 </div>
             `;
             
