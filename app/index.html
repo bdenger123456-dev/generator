@@ -10557,6 +10557,7 @@
         initAgeGate();
         initSwipeCards();
         initModes();
+        updateNavIcons('home');
         
         // Установка платформы
         const savedPlatform = localStorage.getItem('xch_platform');
@@ -11928,10 +11929,26 @@
         document.getElementById('nav-' + tab).classList.add('active');
 
         // === Управление классами body для мобильной шапки ===
-        // Удаляем все классы активных табов
         document.body.classList.remove('tab-home-active', 'tab-settings-active', 'tab-account-active');
-        // Добавляем текущий
         document.body.classList.add('tab-' + tab + '-active');
+
+        // ОБНОВЛЕНИЕ ИКОНОК (FILL / OUTLINE)
+        updateNavIcons(tab);
+    }
+
+    function updateNavIcons(activeTab) {
+        const tabs = ['home', 'settings', 'account'];
+        
+        tabs.forEach(t => {
+            // Находим картинку внутри кнопки навигации
+            const img = document.querySelector(`#nav-${t} .nav-icon-img`);
+            if (img) {
+                // Если таб активен — ставим _fill, иначе _outline
+                const suffix = (t === activeTab) ? '_fill' : '_outline';
+                // Меняем src. Убедитесь, что файлы с такими именами существуют!
+                img.src = `${t}${suffix}.png`;
+            }
+        });
     }
 
     function initTheme() {
@@ -15205,6 +15222,12 @@
     }
 
     function resetToHome() {
+        
+        const homeTab = document.getElementById('tab-home');
+        if (!homeTab || !homeTab.classList.contains('active')) {
+            return; 
+        }
+
         // Если идет генерация — не прерываем
         if (isGenerating) return;
 
