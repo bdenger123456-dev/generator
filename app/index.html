@@ -6739,15 +6739,17 @@
 <!-- EXPLORED CATEGORIES MODAL -->
 <div class="modal-overlay" id="modal-explored-overlay" onclick="closeExploredModal(event)">
     <div class="modal">
-        <div class="modal-header">
-            <span data-key="explored_label">Explored Categories</span>
+        <div class="modal-header" style="border-bottom: none; padding-bottom: 5px;">
+            <span data-key="explored_label">Explored</span>
             <span onclick="closeExploredModal(null, true)">✕</span>
         </div>
         
-        <div class="modal-body" style="padding: 15px;">
-            <!-- Сетка карточек -->
+        <div class="modal-subtitle" data-key="explored_subtitle" style="text-align: center; color: var(--text-secondary); font-size: 13px; padding: 0 20px 15px 20px; border-bottom: 1px solid var(--border); margin-bottom: 15px; line-height: 1.4;">
+            Here are the achievements you need to get "Platinum" 😈
+        </div>
+        
+        <div class="modal-body" style="padding: 0 15px 20px 15px;">
             <div id="explored-grid" class="explored-grid">
-                <!-- JS сгенерирует карточки здесь -->
             </div>
         </div>
     </div>
@@ -7486,10 +7488,28 @@
         'kissing': ['romantic1.png']
     };
 
-    // 2. Нейтральные иконки
     const NEUTRAL_DECOS = [
         'deco1.png', 'deco2.png', 'deco3.png', 'deco4.png', 'deco5.png',
         'deco6.png', 'deco7.png', 'deco8.png', 'deco9.png', 'deco10.png', 'deco11.png'
+    ];
+
+    const EXPLORED_GROUPS = [
+        { id: 'anal', label: 'Anal & Ass', iconTag: 'anal', tags: ['anal', 'ass', 'booty', 'big-ass'] },
+        { id: 'breasts', label: 'Breasts', iconTag: 'big-tits', tags: ['big-tits', 'boobs', 'breasts', 'tit-fucking'] },
+        { id: 'oral', label: 'Oral', iconTag: 'oral', tags: ['oral', 'blowjob', 'deepthroat', 'licking'] },
+        { id: 'hardcore', label: 'Hardcore & BDSM', iconTag: 'bdsm', tags: ['bdsm', 'bondage', 'rough', 'submission', 'domination', 'hardcore', 'extreme'] },
+        { id: 'cum', label: 'Cum & Creampie', iconTag: 'cum', tags: ['cum', 'creampie', 'cumshot', 'facial'] },
+        { id: 'group', label: 'Group & Orgy', iconTag: 'group', tags: ['group', 'threesome', 'gangbang', 'orgy'] },
+        { id: 'milf', label: 'MILF & Mature', iconTag: 'milf', tags: ['milf', 'mature', 'mom'] },
+        { id: 'teen', label: 'Young & Student', iconTag: 'schoolgirl', tags: ['teen', 'student', 'schoolgirl', 'young'] },
+        { id: 'lesbian', label: 'Lesbian', iconTag: 'lesbian', tags: ['lesbian', 'tribadism', 'scissoring'] },
+        { id: 'feet', label: 'Feet', iconTag: 'feet', tags: ['feet', 'foot-fetish', 'foot-worship'] },
+        { id: 'solo', label: 'Solo', iconTag: 'solo', tags: ['solo', 'masturbation', 'fingering'] },
+        { id: 'roleplay', label: 'Roleplay', iconTag: 'roleplay', tags: ['roleplay', 'uniform', 'nurse', 'teacher', 'maid'] },
+        { id: 'public', label: 'Public & Risky', iconTag: 'public', tags: ['public', 'outdoor', 'risky'] },
+        { id: 'toys', label: 'Toys', iconTag: 'toys', tags: ['toys', 'dildo', 'vibrator'] },
+        { id: 'trans', label: 'Trans', iconTag: 'trans', tags: ['trans', 'shemale', 'ladyboy'] },
+        { id: 'legs', label: 'Legs & Stockings', iconTag: 'stockings', tags: ['legs', 'stockings', 'pantyhose', 'high-heels'] }
     ];
 
     let watchStartTime = 0; // Время ухода с сайта
@@ -7900,6 +7920,24 @@
             expl_hist: "From Archives 📜",
             deco_label: "Show Decorations",
 
+            explored_subtitle: "Here are the achievements you need to get 'Platinum' 😈",
+            cat_anal: "Anal & Ass",
+            cat_breasts: "Breasts",
+            cat_oral: "Oral",
+            cat_hardcore: "Hardcore & BDSM",
+            cat_cum: "Cum & Creampie",
+            cat_group: "Group & Orgy",
+            cat_milf: "MILF & Mature",
+            cat_teen: "Young & Student",
+            cat_lesbian: "Lesbian",
+            cat_feet: "Feet",
+            cat_solo: "Solo",
+            cat_roleplay: "Roleplay",
+            cat_public: "Public & Risky",
+            cat_toys: "Toys",
+            cat_trans: "Trans",
+            cat_legs: "Legs & Stockings",
+
             panic_active_phrases: ["Nothing suspicious here 😇", "Just a hobby", "Pure innocence", "Productivity boost 📈", "Stay hydrated 💧"],
 
             val_safe: "Safe & Chill",
@@ -7937,7 +7975,6 @@
             wrapped_lock_title: "FETISH WRAPPED 🔒",
             wrapped_lock_desc: "Make {n} more moves to unlock your personal summary",
             
-            // НОВЫЕ ТЕМЫ
             "theme_pink-dark": "Cyber",
             "theme_pink-light": "Sakura",
             "theme_purple-dark": "Amethyst",
@@ -8411,6 +8448,24 @@
             expl_undo: "Передумал? 😏",
             expl_hist: "Из архивов 📜",
             deco_label: "Показывать декор",
+
+            explored_subtitle: "Вот тебе ачивки, которые нужно получить для достижения «Платины» 😈",
+            cat_anal: "Анал и Попа",
+            cat_breasts: "Грудь",
+            cat_oral: "Оральный",
+            cat_hardcore: "Хардкор и БДСМ",
+            cat_cum: "Окончание и Сперма",
+            cat_group: "Групповое",
+            cat_milf: "M.I.L.F. и Зрелые",
+            cat_teen: "Молодые",
+            cat_lesbian: "Лесби",
+            cat_feet: "Фут-фетиш",
+            cat_solo: "Соло",
+            cat_roleplay: "Ролевые игры",
+            cat_public: "Публичное и Риск",
+            cat_toys: "Игрушки",
+            cat_trans: "Транс",
+            cat_legs: "Ножки и Чулки",
 
             panic_active_phrases: ["Ничего подозрительного 😇", "Просто хобби", "Сама невинность", "Минутка продуктивности 📈", "Пейте воду 💧"],
 
@@ -8919,6 +8974,24 @@
             expl_hist: "De los archivos 📜",
             deco_label: "Mostrar decoración",
 
+            explored_subtitle: "Aquí están los logros que necesitas para obtener el 'Platino' 😈",
+            cat_anal: "Anal y Trasero",
+            cat_breasts: "Pechos",
+            cat_oral: "Oral",
+            cat_hardcore: "Hardcore y BDSM",
+            cat_cum: "Corrida y Creampie",
+            cat_group: "Grupo y Orgía",
+            cat_milf: "MILF y Maduras",
+            cat_teen: "Jóvenes",
+            cat_lesbian: "Lesbianas",
+            cat_feet: "Pies",
+            cat_solo: "Solo",
+            cat_roleplay: "Juegos de Rol",
+            cat_public: "Público y Arriesgado",
+            cat_toys: "Juguetes",
+            cat_trans: "Trans",
+            cat_legs: "Piernas y Medias",
+
             panic_active_phrases: ["Nada sospechoso aquí 😇", "Solo un hobby", "Pura inocencia", "Productividad 📈", "Bebe agua 💧"],
 
             val_safe: "Tranquilo",
@@ -9417,6 +9490,24 @@
             expl_undo: "Meinung geändert? 😏",
             expl_hist: "Aus dem Archiv 📜",
             deco_label: "Dekoration anzeigen",
+
+            explored_subtitle: "Hier sind die Erfolge, die du für 'Platin' brauchst 😈",
+            cat_anal: "Anal & Hintern",
+            cat_breasts: "Brüste",
+            cat_oral: "Oral",
+            cat_hardcore: "Hardcore & BDSM",
+            cat_cum: "Sperma & Creampie",
+            cat_group: "Gruppe & Orgie",
+            cat_milf: "MILF & Reif",
+            cat_teen: "Jung & Student",
+            cat_lesbian: "Lesbisch",
+            cat_feet: "Füße",
+            cat_solo: "Solo",
+            cat_roleplay: "Rollenspiel",
+            cat_public: "Öffentlich & Riskant",
+            cat_toys: "Spielzeug",
+            cat_trans: "Trans",
+            cat_legs: "Beine & Strümpfe",
 
             panic_active_phrases: ["Nichts Verdächtiges 😇", "Nur ein Hobby", "Reine Unschuld", "Produktivität 📈", "Wasser trinken 💧"],
 
@@ -10437,38 +10528,43 @@
         const grid = document.getElementById('explored-grid');
         grid.innerHTML = '';
         
-        // Получаем список категорий из TAG_ICONS (ключи объекта)
-        const categories = Object.keys(TAG_ICONS);
+        // Получаем текущий объект переводов
+        const t = langData[currentLang] || langData['en'];
         
-        // Собираем ID всех просмотренных предметов
+        // Обновляем подзаголовок в HTML
+        const subTitleEl = document.querySelector('#modal-explored-overlay .modal-subtitle');
+        if (subTitleEl) {
+            subTitleEl.innerText = t.explored_subtitle || "Unlock Platinum 😈";
+        }
+
         const exploredIds = new Set(window.activityLog.map(log => log.id));
 
-        categories.forEach(catKey => {
-            // А. Считаем общее кол-во видео с этим тегом в базе
-            const totalItems = data.filter(item => item.tags.includes(catKey));
-            const totalCount = totalItems.length;
-            
-            if (totalCount === 0) return; // Пропускаем пустые категории
+        EXPLORED_GROUPS.forEach(group => {
+            const groupItems = data.filter(item => 
+                item.tags.some(tag => group.tags.includes(tag))
+            );
+            const totalCount = groupItems.length;
+            if (totalCount === 0) return;
 
-            // Б. Считаем, сколько из них открыто пользователем
-            const exploredCount = totalItems.filter(item => exploredIds.has(item.id)).length;
-            
-            // В. Процент
+            // 2. Считаем прогресс
+            const exploredCount = groupItems.filter(item => exploredIds.has(item.id)).length;
             const percent = Math.round((exploredCount / totalCount) * 100);
             const isCompleted = (percent === 100);
 
-            // Г. Выбираем иконку (первую из массива)
-            const iconSrc = TAG_ICONS[catKey][0] || 'logo_icon.png';
-            
-            // Д. Локализуем название (Первая буква заглавная)
-            let displayTitle = catKey.charAt(0).toUpperCase() + catKey.slice(1);
+            // 3. Иконка
+            const iconSrc = (TAG_ICONS[group.iconTag] && TAG_ICONS[group.iconTag][0]) 
+                            ? TAG_ICONS[group.iconTag][0] 
+                            : 'logo_icon.png';
 
-            // Е. Создаем карточку
+            // 4. Локализация названия (Берем из langData по ключу cat_ID)
+            const displayTitle = t['cat_' + group.id] || group.id.toUpperCase();
+
+            // 5. Создаем карточку
             const card = document.createElement('div');
             card.className = `ex-card ${isCompleted ? 'completed' : ''}`;
             
             card.innerHTML = `
-                <img src="${iconSrc}" class="ex-card-icon" alt="${catKey}">
+                <img src="${iconSrc}" class="ex-card-icon" alt="${group.id}">
                 <div class="ex-card-title">${displayTitle}</div>
                 
                 <div class="ex-progress-track">
@@ -10480,11 +10576,10 @@
                 </div>
             `;
             
-            // Добавляем клик для быстрого перехода к генерации этого тега (как бонус)
+            // Клик ищет по главному тегу
             card.onclick = () => {
                 closeExploredModal(null, true);
-                // Если есть функция поиска по тегу, можно вызвать её:
-                if (typeof searchByTag === 'function') searchByTag(catKey);
+                if (typeof searchByTag === 'function') searchByTag(group.iconTag);
             };
 
             grid.appendChild(card);
