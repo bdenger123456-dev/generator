@@ -2473,6 +2473,22 @@
             margin-bottom: 20px;
         }
 
+        .sync-stat-item.full-width {
+            grid-column: span 2; 
+            width: 100%;        
+            flex-direction: column;
+            align-items: flex-start; 
+            padding: 15px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+            background: var(--ios-card);
+        }
+
+        .sync-stat-item.full-width:active {
+            background: var(--nav-bg);
+            transform: scale(0.98);
+        }
+
         .sync-stat-item {
             background: var(--ios-card);
             border: 1px solid var(--border);
@@ -4256,17 +4272,6 @@
             transition: opacity 0.2s; 
         }
 
-        .custom-separator {
-            height: 1px;
-            background-color: var(--ios-separator);
-            margin-left: 48px; 
-            margin-right: 16px; 
-            transform: scaleY(0.5); 
-            display: block;
-            margin-top: 0;    
-            margin-bottom: 0;
-        }
-
         /* Цвета и свечение (Neon Text) */
         .toast-safe {
             color: #2ecc71; /* Зеленый */
@@ -4964,6 +4969,8 @@
             }
         }
 
+
+
         /* DESKTOP / TABLET (> 768px) */
         @media (min-width: 769px) {
             
@@ -5086,24 +5093,23 @@
 
             .sidebar {
                 /* 1. РАЗМЕРЫ И ОТСТУПЫ (Парящий эффект) */
-                height: calc(100vh - 40px) !important; /* Отступ сверху и снизу по 20px */
-                margin-top: 20px !important;
-                margin-left: 20px !important;
-                margin-bottom: 20px !important;
+                height: calc(100vh - 16px) !important; /* Отступ сверху и снизу по 20px */
+                margin-top: 8px !important;
+                margin-left: 8px !important;
+                margin-bottom: 8px !important;
                 margin-right: 0 !important; /* Справа не нужен отступ, там контент */
                 
-                border-radius: 24px !important; /* Сильные закругления */
+                border-radius: 22px !important;
+
+                padding: 10px !important;
                 
                 /* 2. ЭФФЕКТ СТЕКЛА (Glassmorphism) */
-                /* Полупрозрачный черный фон */
                 background: rgba(28, 28, 30, 0.65) !important; 
                 
-                /* Блюр заднего фона (Самое важное для macOS стиля) */
                 backdrop-filter: blur(25px) saturate(180%) !important;
                 -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
                 
                 /* 3. ГРАНИЦЫ И ТЕНИ */
-                /* Тонкая светлая обводка (Inset) для объема */
                 border: 1px solid rgba(255, 255, 255, 0.1) !important;
                 border-right: 1px solid rgba(255, 255, 255, 0.1) !important; /* Перебиваем старый border-right */
                 
@@ -5135,8 +5141,90 @@
             
             /* Корректируем логотип, чтобы он красиво смотрелся в стекле */
             .sidebar .logo {
-                margin-top: 10px;
-                margin-bottom: 5px;
+                margin-top: 10px !important; 
+                margin-bottom: 10px !important;
+                min-height: 40px;            
+            }
+        }
+
+        @media (max-width: 768px) {
+            /* Скрываем заголовки блоков */
+            #block-prefs .ios-header,
+            #block-account .ios-header,
+            #block-extras .ios-header,
+            #block-history .ios-header {
+                display: none !important;
+            }
+
+            /* Делаем блоки шире (меньше отступы от краев экрана) */
+            .ios-group {
+                margin-left: 8px !important;  /* Было больше */
+                margin-right: 8px !important; /* Было больше */
+                width: auto !important;       /* Растягиваем */
+                margin-top: 0 !important;
+                margin-bottom: 15px !important;
+            }
+
+            /* Убираем верхний отступ у первого блока, чтобы он не висел дырой */
+            #block-prefs .ios-group:first-child,
+            #block-account .ios-group:first-child {
+                margin-top: 10px !important;
+            }
+        }
+
+        /* --- 2. ПК ВЕРСИЯ (Стиль macOS Finder) --- */
+        @media (min-width: 769px) {
+            
+            /* Возвращаем заголовки (делаем их маленькими и аккуратными) */
+            .ios-header {
+                display: flex !important;
+                font-size: 11px !important;
+                font-weight: 700 !important;
+                color: var(--text-secondary) !important;
+                margin: 15px 0 5px 12px !important; /* Отступы как в списках */
+                text-transform: uppercase;
+                opacity: 0.7;
+            }
+
+            /* УБИРАЕМ СТИЛЬ КАРТОЧКИ У БЛОКОВ (Прозрачный фон, без границ) */
+            .ios-group {
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: visible !important; /* Чтобы ховер не обрезался */
+            }
+
+            /* СТИЛИЗУЕМ СТРОКИ (КНОПКИ) */
+            .ios-row {
+                background: transparent !important; /* Прозрачный фон */
+                border-radius: 8px !important;      /* Скругление при наведении */
+                margin: 0 5px 2px 5px !important;   /* Небольшой зазор между кнопками */
+                padding: 8px 10px !important;       /* Компактные отступы внутри */
+                min-height: 36px !important;        /* Чуть компактнее по высоте */
+                border: none !important;            /* Убираем границы */
+            }
+
+            /* Убираем линии-разделители между кнопками */
+            .ios-row::after {
+                display: none !important;
+            }
+
+            /* Эффект наведения (Светлая подсветка как в macOS) */
+            .ios-row.clickable:hover {
+                background: rgba(255, 255, 255, 0.1) !important;
+            }
+            
+            /* Для светлой темы на ПК */
+            body.light-theme .ios-row.clickable:hover {
+                background: rgba(0, 0, 0, 0.05) !important;
+            }
+
+            /* Убираем шевроны (стрелочки) на ПК, для чистоты */
+            .chevron {
+                opacity: 0.3;
             }
         }
 
@@ -5854,19 +5942,6 @@
                 <div class="chevron"></div>
             </div>
 
-            <!-- 2. ПОДПИСКА (Новый вид) -->
-            <div class="ios-row clickable" onclick="openSubModal()" style="padding: 12px 16px;">
-                <div class="ios-row-left">
-                    <img src="plan.png" class="settings-icon" alt="Plan">
-                    <span style="font-size:17px;" data-key="lbl_subscription">Subscription</span>
-                </div>
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <!-- Сюда JS будет писать статус: FREE / PRO -->
-                    <span id="settings-plan-status">FREE</span>
-                    <div class="chevron"></div>
-                </div>
-            </div>
-
             <!-- 3. СПИСКИ -->
             <div class="ios-row clickable" onclick="openFavoritesCatalog()">
                 <div class="ios-row-left">
@@ -6390,12 +6465,22 @@
                     <span class="sync-stat-label" data-key="watch_later">Watch Later</span>
                 </div>
                 <div class="sync-stat-item">
-                    <span class="sync-stat-val" id="cloud-hist-count">...</span>
-                    <span class="sync-stat-label" data-key="history_title">History</span>
+                    <span class="sync-stat-val" id="cloud-explored-count">...</span>
+                    <span class="sync-stat-label" data-key="explored_label">Explored</span>
                 </div>
                 <div class="sync-stat-item">
                     <span class="sync-stat-val" id="cloud-ban-count">...</span>
                     <span class="sync-stat-label" data-key="blacklist_catalog">Disliked</span>
+                </div>
+            </div>
+
+            <div id="sync-sub-card" class="sync-stat-item full-width clickable" onclick="closeSyncInfoModal(null, true); openSubModal();" style="margin-bottom: 20px; border: 1px solid var(--accent);">
+                <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                    <span class="sync-stat-label" style="font-size: 13px;" data-key="lbl_subscription">SUBSCRIPTION</span>
+                    <span id="sync-sub-value" style="font-weight:900; font-size:18px; color:var(--accent);">FREE</span>
+                </div>
+                <div id="sync-sub-desc" style="font-size:11px; color:var(--text-secondary); margin-top:6px; width:100%; text-align:left;">
+                    Tap to upgrade
                 </div>
             </div>
 
@@ -6905,17 +6990,21 @@
         document.getElementById('modal-sync-info-overlay').classList.add('open');
         document.getElementById('sync-email-display').innerText = user.email;
 
-        const badge = document.getElementById('sync-plan-badge');
-        const expiryText = document.getElementById('sync-plan-expiry');
-        badge.innerText = "LOADING...";
-        badge.style.color = "var(--text-secondary)";
-        expiryText.style.display = "none";
+        // Ссылки на элементы нового блока подписки
+        const subValue = document.getElementById('sync-sub-value');
+        const subDesc = document.getElementById('sync-sub-desc');
+        const subCard = document.getElementById('sync-sub-card');
 
-        // Получаем текущие переводы
+        // Временно ставим загрузку
+        subValue.innerText = "LOADING...";
+        subDesc.innerText = "...";
+
         const t = langData[currentLang] || langData['en'];
 
-        ['cloud-fav-count', 'cloud-wl-count', 'cloud-hist-count', 'cloud-ban-count'].forEach(id => {
-            document.getElementById(id).innerText = "...";
+        // Сброс статистики
+        ['cloud-fav-count', 'cloud-wl-count', 'cloud-explored-count', 'cloud-ban-count'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.innerText = "...";
         });
 
         try {
@@ -6925,54 +7014,71 @@
             if (docSnap.exists()) {
                 const d = docSnap.data();
 
+                // Модификаторы
                 const cloudMods = d.modifiersPool || null; 
-                
                 if (cloudMods && Array.isArray(cloudMods)) {
                     userModifiersPool = cloudMods;
                     localStorage.setItem('xch_user_mods', JSON.stringify(userModifiersPool));
                 }
                 
-                // === ПОДПИСКА ===
+                // === ЗАПОЛНЕНИЕ БЛОКА ПОДПИСКИ ===
                 const plan = d.subscription || 'free';
-                badge.innerText = plan.toUpperCase();
+                subValue.innerText = plan.toUpperCase();
                 
-                if (plan === 'pro') badge.style.color = '#ff9900';
-                else if (plan === 'beast') badge.style.color = '#9b59b6';
-                else badge.style.color = 'var(--text-main)';
+                // Цвет текста
+                if (plan === 'pro') { subValue.style.color = '#ff9900'; subCard.style.borderColor = '#ff9900'; }
+                else if (plan === 'beast') { subValue.style.color = '#9b59b6'; subCard.style.borderColor = '#9b59b6'; }
+                else if (plan === 'bestie') { subValue.style.color = '#00d2ff'; subCard.style.borderColor = '#00d2ff'; }
+                else { subValue.style.color = 'var(--text-main)'; subCard.style.borderColor = 'var(--border)'; }
 
-                if (plan !== 'free' && d.expiresAt) {
+                // Дата окончания
+                if (plan !== 'free' && plan !== 'bestie' && d.expiresAt) {
                     const dateObj = d.expiresAt.toDate(); 
                     const dateStr = dateObj.toLocaleDateString();
                     const daysLeft = Math.ceil((dateObj - new Date()) / (1000 * 60 * 60 * 24));
                     
                     if (daysLeft > 0) {
-                        // ИСПОЛЬЗУЕМ ПЕРЕВОДЫ
-                        expiryText.innerText = `${t.sub_exp} ${dateStr} (${daysLeft}${t.time_d})`;
-                        expiryText.style.display = "inline";
+                        subDesc.innerHTML = `${t.sub_exp || "Expires:"} <b>${dateStr}</b> (${daysLeft}${t.time_d || "d"})`;
+                        subDesc.style.color = "var(--text-secondary)";
                     } else {
-                        expiryText.innerText = t.sub_expired; // "Истекла"
-                        expiryText.style.display = "inline";
-                        expiryText.style.color = "var(--highlight-red)";
+                        subDesc.innerText = t.sub_expired || "Expired"; 
+                        subDesc.style.color = "var(--highlight-red)";
                     }
+                } else if (plan === 'bestie') {
+                    subDesc.innerText = "Lifetime Access ♾️";
+                    subDesc.style.color = "var(--accent)";
+                } else {
+                    // Free
+                    subDesc.innerText = (currentLang === 'ru' ? "Нажми, чтобы улучшить" : "Tap to upgrade");
+                    subDesc.style.color = "var(--text-secondary)";
                 }
-                // ================
 
+                // Статистика
                 document.getElementById('cloud-fav-count').innerText = d.favorites ? d.favorites.length : 0;
                 document.getElementById('cloud-wl-count').innerText = d.watchLater ? d.watchLater.length : 0;
-                document.getElementById('cloud-hist-count').innerText = d.history ? d.history.length : 0;
                 document.getElementById('cloud-ban-count').innerText = d.blacklist ? d.blacklist.length : 0;
+                
+                let exCount = d.exploredCount || 0;
+                if (exCount === 0 && d.activityLog) {
+                    const unique = new Set(d.activityLog.map(i => i.id));
+                    exCount = unique.size;
+                }
+                document.getElementById('cloud-explored-count').innerText = exCount;
+
             } else {
-                badge.innerText = "FREE";
-                ['cloud-fav-count', 'cloud-wl-count', 'cloud-hist-count', 'cloud-ban-count'].forEach(id => {
-                    document.getElementById(id).innerText = "0";
+                subValue.innerText = "FREE";
+                subDesc.innerText = (currentLang === 'ru' ? "Нажми, чтобы улучшить" : "Tap to upgrade");
+                ['cloud-fav-count', 'cloud-wl-count', 'cloud-explored-count', 'cloud-ban-count'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.innerText = "0";
                 });
             }
         } catch (e) {
             console.error("Error fetching sync stats:", e);
-            badge.innerText = "ERROR";
+            subValue.innerText = "ERROR";
         }
     };
-
+    
     window.closeSyncInfoModal = function(e, force) {
         if (force || e.target.id === 'modal-sync-info-overlay') {
             document.getElementById('modal-sync-info-overlay').classList.remove('open');
@@ -7055,6 +7161,7 @@
             window.isUserLoggedIn = false;
             
             // Возвращаем исходный текст
+            const btnText = document.getElementById('login-btn-text');
             if(btnText) btnText.innerText = t.login_text || "Sync / Login";
             
             if (window.updateLastSyncUI) window.updateLastSyncUI();
@@ -7335,7 +7442,8 @@
                 subscription: localStorage.getItem('xch_sub_level') || 'free', 
                 email: user.email,
                 lastUpdated: serverTimestamp(),
-                modifiersPool: userModifiersPool || []
+                modifiersPool: userModifiersPool || [],
+                exploredCount: permanentExplored.size 
             };
 
             try {
@@ -13534,170 +13642,98 @@
     }
 
     function updateSubscriptionUI() {
-        // 1. ЭЛЕМЕНТЫ ИНТЕРФЕЙСА
-        
-        // Строка в Настройках (справа)
-        const settingsStatus = document.getElementById('settings-plan-status');
-        
-        // Строка в Модальном окне (в карточке Free)
-        const freeLimitRow = document.getElementById('free-limit-row');
-        
-        // Кнопки в модальном окне
-        const btnFree = document.querySelector('.plan-card:nth-child(1) .plan-btn'); 
-        const btnPro = document.querySelector('.plan-card.pro .plan-btn');
-        const btnBeast = document.querySelector('.plan-card.beast .plan-btn');
-        const btnBestie = document.querySelector('.plan-card.bestie .plan-btn'); // Если есть Bestie
-
         // Данные
         subscriptionLevel = localStorage.getItem('xch_sub_level') || 'free';
         const t = langData[currentLang] || langData['en'];
 
-        // 2. ОБНОВЛЕНИЕ СТРОКИ В НАСТРОЙКАХ (Справа от иконки)
-        if (settingsStatus) {
-            settingsStatus.classList.remove('premium'); // Сброс цвета
-            settingsStatus.style.opacity = "1";
+        // --- ОБНОВЛЕНИЕ КНОПКИ В С АЙДБАРЕ ---
+        const loginBtnText = document.getElementById('login-btn-text');
+        
+        if (loginBtnText) {
+            if (window.isUserLoggedIn) {
+                // Если залогинен: "Account • PRO"
+                const planLabel = subscriptionLevel.toUpperCase();
+                // Цвет для плана
+                let colorStyle = 'color:var(--text-secondary);';
+                if (subscriptionLevel === 'pro') colorStyle = 'color:#ff9900; font-weight:800;';
+                if (subscriptionLevel === 'beast') colorStyle = 'color:#9b59b6; font-weight:800;';
+                if (subscriptionLevel === 'bestie') colorStyle = 'color:#00d2ff; font-weight:800;';
 
-            if (subscriptionLevel === 'bestie') {
-                settingsStatus.innerText = "BESTIE";
-                settingsStatus.classList.add('premium'); // Делаем цветным
-            } else if (subscriptionLevel === 'beast') {
-                settingsStatus.innerText = "BEAST";
-                settingsStatus.classList.add('premium');
-            } else if (subscriptionLevel === 'pro') {
-                settingsStatus.innerText = "PRO";
-                settingsStatus.classList.add('premium');
+                const accText = t.personal_account || "Personal Account";
+                loginBtnText.innerHTML = `${accText} <span style="font-size:13px; margin-left:6px; ${colorStyle}">• ${planLabel}</span>`;
             } else {
-                settingsStatus.innerText = "FREE";
-                settingsStatus.style.opacity = "0.7"; // Чуть тусклее для Free
+                // Если не залогинен: "Sync / Login"
+                loginBtnText.innerText = t.login_text || "Sync / Login";
             }
         }
 
-        // 3. РАСЧЕТ ЛИМИТОВ (Для счетчика)
+        // --- ОБНОВЛЕНИЕ СЧЕТЧИКА ЛИМИТОВ (Карточка Free в модалке) ---
+        const freeLimitRow = document.getElementById('free-limit-row');
         const count = parseInt(localStorage.getItem('xch_limit_count') || '0');
-        const startTime = parseInt(localStorage.getItem('xch_limit_start') || '0');
-        const now = Date.now();
-        const oneDay = 24 * 60 * 60 * 1000;
+        const remaining = Math.max(0, DAILY_LIMIT - count);
 
-        let displayCount = count;
-        // Если сутки прошли с момента начала отсчета - сбрасываем визуально в 0
-        if (startTime > 0 && (now - startTime > oneDay)) {
-            displayCount = 0;
-        }
-        const remaining = Math.max(0, DAILY_LIMIT - displayCount);
-
-        // 4. ОБНОВЛЕНИЕ ТЕКСТА В МОДАЛЬНОМ ОКНЕ (Карточка Free)
         if (freeLimitRow) {
             if (subscriptionLevel === 'free') {
-                // Берем шаблон из langData (добавьте limit_text_full в переводы!)
-                // Пример: "🎲 15 Gen... (left: {n}/15)"
                 let text = t.limit_text_full || `🎲 ${DAILY_LIMIT} Generations / day (left: {n}/${DAILY_LIMIT})`;
                 text = text.replace('{n}', remaining);
-                
                 freeLimitRow.innerHTML = text;
-
-                // Красим в красный, если 0
-                if (remaining === 0) {
-                    freeLimitRow.style.color = "var(--highlight-red)";
-                    freeLimitRow.style.fontWeight = "700";
-                } else {
-                    freeLimitRow.style.color = "";
-                    freeLimitRow.style.fontWeight = "";
-                }
+                freeLimitRow.style.color = remaining === 0 ? "var(--highlight-red)" : "";
             } else {
-                // Если у юзера Премиум — пишем в карточке Free, что лимит снят или просто дефолтный текст
                 freeLimitRow.innerHTML = t.feat_limit || `🎲 ${DAILY_LIMIT} Generations / day`;
                 freeLimitRow.style.color = ""; 
             }
         }
 
-        // 5. ЛОГИКА КНОПОК В МОДАЛЬНОМ ОКНЕ
-        // Тексты для кнопок
-        const tCurrent = t.btn_current || "Current Plan";
-        const tExtend = currentLang === 'ru' ? "Продлить" : "Extend"; 
-        const tUpgrade = currentLang === 'ru' ? "Улучшить" : "Upgrade";
-        const tLower = t.btn_lower_tier || "Included";
-        
-        const tPro = t.btn_get_pro || "Get Pro";
-        const tBeast = t.btn_get_beast || "Unleash Beast";
-        const tBestie = t.btn_get_bestie || "Get Forever"; 
-
-        // Хелпер настройки одной кнопки
+        // --- НАСТРОЙКА КНОПОК ПОКУПКИ (Pro/Beast/Bestie) ---
         const configureBtn = (btn, state, buyText, planType) => {
             if (!btn) return;
-            
-            // Сброс классов и событий
             btn.onclick = null;
             btn.classList.remove('current', 'pro-btn', 'beast-btn', 'bestie-btn');
             btn.disabled = false;
             btn.style.opacity = "1";
 
+            const tCurrent = t.btn_current || "Current Plan";
+            const tExtend = currentLang === 'ru' ? "Продлить" : "Extend"; 
+            const tUpgrade = currentLang === 'ru' ? "Улучшить" : "Upgrade";
+            const tLower = t.btn_lower_tier || "Included";
+
             if (state === 'current') {
-                // Текущий план
                 if (planType === 'bestie') {
-                    // Bestie нельзя продлить, он вечный
-                    btn.disabled = true;
-                    btn.classList.add('current');
-                    btn.innerText = "Purchased";
+                    btn.disabled = true; btn.classList.add('current'); btn.innerText = "Purchased";
                 } else {
-                    // Pro/Beast можно продлить
-                    // Восстанавливаем цветные классы для красоты
                     if (btn.closest('.pro')) btn.classList.add('pro-btn');
                     if (btn.closest('.beast')) btn.classList.add('beast-btn');
-                    
-                    btn.innerText = tExtend; // "Продлить"
+                    btn.innerText = tExtend; 
                     btn.onclick = () => openPaymentSelection(planType);
                 }
-            } 
-            else if (state === 'lower') {
-                // План ниже текущего
-                btn.disabled = true;
-                btn.classList.add('current');
-                btn.innerText = tLower; // "Включено" или "Вам доступно"
-                btn.style.opacity = "0.6";
-            } 
-            else { 
-                // state === 'buy' или 'upgrade'
-                // Восстанавливаем цвета кнопок
+            } else if (state === 'lower') {
+                btn.disabled = true; btn.classList.add('current'); btn.innerText = tLower; btn.style.opacity = "0.6";
+            } else { 
                 if (btn.closest('.pro')) btn.classList.add('pro-btn');
                 if (btn.closest('.beast')) btn.classList.add('beast-btn');
                 if (btn.closest('.bestie')) btn.classList.add('bestie-btn');
-                
                 btn.innerText = state === 'upgrade' ? tUpgrade : buyText;
                 btn.onclick = () => openPaymentSelection(planType);
             }
         };
 
-        // Применяем логику в зависимости от уровня
-        if (subscriptionLevel === 'bestie') {
-            configureBtn(btnFree, 'lower', null, null);
-            configureBtn(btnPro, 'lower', null, null);
-            configureBtn(btnBeast, 'lower', null, null);
-            configureBtn(btnBestie, 'current', null, 'bestie');
-        }
-        else if (subscriptionLevel === 'beast') {
-            configureBtn(btnFree, 'lower', null, null);
-            configureBtn(btnPro, 'lower', null, null);
-            configureBtn(btnBeast, 'current', null, 'beast');
-            configureBtn(btnBestie, 'upgrade', tBestie, 'bestie');
-        } 
-        else if (subscriptionLevel === 'pro') {
-            configureBtn(btnFree, 'lower', null, null);
-            configureBtn(btnPro, 'current', null, 'pro');
-            configureBtn(btnBeast, 'upgrade', tBeast, 'beast');
-            configureBtn(btnBestie, 'upgrade', tBestie, 'bestie');
-        } 
-        else {
-            // Free
-            configureBtn(btnFree, 'current', null, null);
-            if(btnFree) { 
-                btnFree.disabled = true; 
-                btnFree.innerText = tCurrent; 
-                btnFree.classList.add('current');
-            }
+        const btnFree = document.querySelector('.plan-card:nth-child(1) .plan-btn'); 
+        const btnPro = document.querySelector('.plan-card.pro .plan-btn');
+        const btnBeast = document.querySelector('.plan-card.beast .plan-btn');
+        const btnBestie = document.querySelector('.plan-card.bestie .plan-btn');
+        const tPro = t.btn_get_pro || "Get Pro";
+        const tBeast = t.btn_get_beast || "Unleash Beast";
+        const tBestie = t.btn_get_bestie || "Get Forever"; 
 
-            configureBtn(btnPro, 'buy', tPro, 'pro');
-            configureBtn(btnBeast, 'buy', tBeast, 'beast');
-            configureBtn(btnBestie, 'buy', tBestie, 'bestie');
+        if (subscriptionLevel === 'bestie') {
+            configureBtn(btnFree, 'lower'); configureBtn(btnPro, 'lower'); configureBtn(btnBeast, 'lower'); configureBtn(btnBestie, 'current', null, 'bestie');
+        } else if (subscriptionLevel === 'beast') {
+            configureBtn(btnFree, 'lower'); configureBtn(btnPro, 'lower'); configureBtn(btnBeast, 'current', null, 'beast'); configureBtn(btnBestie, 'upgrade', tBestie, 'bestie');
+        } else if (subscriptionLevel === 'pro') {
+            configureBtn(btnFree, 'lower'); configureBtn(btnPro, 'current', null, 'pro'); configureBtn(btnBeast, 'upgrade', tBeast, 'beast'); configureBtn(btnBestie, 'upgrade', tBestie, 'bestie');
+        } else {
+            configureBtn(btnFree, 'current'); if(btnFree){btnFree.disabled=true; btnFree.innerText=t.btn_current;}
+            configureBtn(btnPro, 'buy', tPro, 'pro'); configureBtn(btnBeast, 'buy', tBeast, 'beast'); configureBtn(btnBestie, 'buy', tBestie, 'bestie');
         }
     }
 
@@ -15222,7 +15258,7 @@
     }
 
     function resetToHome() {
-        
+
         const homeTab = document.getElementById('tab-home');
         if (!homeTab || !homeTab.classList.contains('active')) {
             return; 
