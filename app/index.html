@@ -996,7 +996,7 @@
             content: ""; 
             position: absolute; 
             bottom: 0; 
-            left: 16px; 
+            left: 48px; 
             right: 16px;
             height: 1px;
             background-color: var(--ios-separator); 
@@ -4259,7 +4259,7 @@
         .custom-separator {
             height: 1px;
             background-color: var(--ios-separator);
-            margin-left: 16px; 
+            margin-left: 48px; 
             margin-right: 16px; 
             transform: scaleY(0.5); 
             display: block;
@@ -4339,8 +4339,7 @@
 
         .slider-narrow-wrapper {
             width: 85%;
-            /* Минимальный отступ снизу (15px), чтобы текст не наезжал на разделитель, но и не висел в пустоте */
-            margin: 5px auto 15px auto !important; 
+            margin: 5px auto 5px auto !important; 
             position: relative;
             overflow: visible; /* Текст может выходить за границы (для длинных слов) */
             padding: 0 !important; /* Убираем внутренние отступы */
@@ -4591,6 +4590,112 @@
             top: 0;
             right: 0;
             opacity: 0.6;
+        }
+
+        /* --- Сетка категорий --- */
+        .explored-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 2 колонки */
+            gap: 12px;
+            padding-bottom: 20px;
+        }
+
+        /* --- Карточка категории --- */
+        .ex-card {
+            background: var(--ios-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            transition: transform 0.2s;
+            overflow: hidden;
+        }
+
+        .ex-card:active {
+            transform: scale(0.98);
+        }
+
+        /* Иконка сверху по центру */
+        .ex-card-icon {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            margin-bottom: 10px;
+            /* Инверсия для темной темы, если иконки черные */
+            filter: invert(1) drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+            transition: filter 0.3s;
+        }
+
+        body.light-theme .ex-card-icon {
+            filter: invert(0) drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+        }
+
+        body.rainbow-mode .ex-card-icon {
+            filter: invert(1) drop-shadow(0 0 5px rgba(255,255,255,0.8));
+        }
+
+        /* Название категории */
+        .ex-card-title {
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        /* Прогресс-бар контейнер */
+        .ex-progress-track {
+            width: 100%;
+            height: 6px;
+            background: rgba(128,128,128,0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 5px;
+        }
+
+        /* Прогресс-бар заливка */
+        .ex-progress-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        /* Текст статистики (снизу) */
+        .ex-card-stats {
+            font-size: 10px;
+            color: var(--text-secondary);
+            font-weight: 700;
+        }
+
+        /* --- СТИЛЬ ДЛЯ ПОЛНОСТЬЮ ОТКРЫТЫХ (ЗЕЛЕНЫЙ) --- */
+        .ex-card.completed {
+            border: 1px solid #2ecc71;
+            background: rgba(46, 204, 113, 0.1); /* Легкий зеленый фон */
+            box-shadow: 0 0 15px rgba(46, 204, 113, 0.2);
+        }
+
+        .ex-card.completed .ex-progress-fill {
+            background: #2ecc71; /* Зеленая полоска */
+        }
+
+        .ex-card.completed .ex-card-title {
+            color: #2ecc71;
+        }
+
+        .ex-card.completed .ex-card-icon {
+            /* Зеленое свечение иконки */
+            filter: invert(1) sepia(1) saturate(5) hue-rotate(80deg) drop-shadow(0 0 5px #2ecc71); 
+        }
+        /* Коррекция для светлой темы для completed */
+        body.light-theme .ex-card.completed .ex-card-icon {
+            filter: invert(0) sepia(1) saturate(5) hue-rotate(80deg);
         }
 
         /* --- СТИЛИ ДЛЯ ПОЛЕЗНОСТЕЙ (TIPS) --- */
@@ -5612,35 +5717,29 @@
         <div class="ios-group">
             
             <!-- 3. INTENSITY -->
-            <div style="padding: 12px 16px;">
-                <!-- Заголовок -->
-                <div class="ios-row-left" style="margin-bottom: 10px;">
-                    <img src="safety.png" class="settings-icon" alt="Safety">
-                    <div style="font-size:16px;" data-key="exploration_mode">Intensity</div>
+            <div style="padding: 12px 16px; overflow: visible;">
+                <!-- Заголовок + Иконка + Текст значения -->
+                <div class="ios-row-left" style="margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; width: 100%; overflow: visible;">
+                    
+                    <!-- Левая часть: Иконка и Заголовок -->
+                    <div style="display:flex; align-items:center; overflow: visible;">
+                        <!-- Контейнер для иконки -->
+                        <div style="width: 24px; height: 24px; margin-right: 12px; display: flex; align-items: center; justify-content: center; overflow: visible;">
+                            <img src="safe.png" id="main-intensity-icon" class="settings-icon" alt="Safety" style="width: 24px; height: 24px; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); object-fit: contain; margin: 0;">
+                        </div>
+                        <!-- Заголовок -->
+                        <div style="font-size:16px;" data-key="exploration_mode">Intensity</div>
+                    </div>
+                    
+                    <!-- Текст значения справа -->
+                    <span id="intensity-value-label" style="font-size:14px; font-weight:800; opacity: 0; transition: opacity 0.6s ease; text-transform: uppercase; margin-right: 2px;">
+                        Safe 🛡️
+                    </span>
                 </div>
                 
-                <!-- Слайдер -->
-                <div class="slider-container" style="margin-bottom: 8px;">
-                    <!-- Тост (всплывашка) -->
-                    <div id="intensity-toast"></div> 
-                    
+                <!-- Слайдер  -->
+                <div class="slider-container" style="margin-left: 24px; width: calc(100% - 20px); box-sizing: border-box; margin-bottom: 5px;">
                     <input type="range" min="1" max="3" value="1" step="1" id="intensity-slider" oninput="updateIntensity(this.value)">
-                </div>
-
-                <!-- Иконки -->
-                <div class="intensity-labels-icons">
-                    <!-- Safe (1) -->
-                    <div class="int-icon-box" onclick="updateIntensity(1)">
-                        <img src="safe.png" id="icon-int-1" class="int-icon">
-                    </div>
-                    <!-- Spicy (2) -->
-                    <div class="int-icon-box" onclick="updateIntensity(2)">
-                        <img src="spicy.png" id="icon-int-2" class="int-icon">
-                    </div>
-                    <!-- Extreme (3) -->
-                    <div class="int-icon-box" onclick="updateIntensity(3)">
-                        <img src="extreme.png" id="icon-int-3" class="int-icon">
-                    </div>
                 </div>
             </div>
 
@@ -5835,28 +5934,15 @@
                 </div>
                 <div class="chevron"></div>
             </div>
-            <!-- ИССЛЕДОВАНО -->
-            <div class="explored-row">
-                <!-- Левая часть: Иконка и Текст -->
-                <div class="explored-left">
+            <div class="ios-row clickable" onclick="openExploredModal()">
+                <div class="ios-row-left">
                     <img src="explored.png" class="settings-icon" alt="Explored">
                     <span data-key="explored_label">Explored</span>
                 </div>
                 
-                <!-- Правая часть -->
-                <div class="explored-right">
-                    <!-- 1. Прогресс-бар -->
-                    <div class="explored-track">
-                        <div class="explored-fill" id="ex-fill"></div>
-                    </div>
-                    
-                    <!-- 2. Цифры (Бегущая и Статичная) -->
-                    <div class="explored-nums-container">
-                        <!-- Бегущее число (left будет меняться) -->
-                        <span id="ex-current">0</span>
-                        <!-- Статичный конец -->
-                        <span id="ex-total-label">/ <span id="ex-total">0</span></span>
-                    </div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span id="ex-total-display" style="font-size:15px; color:var(--text-secondary); font-weight:600;">0 / 0</span>
+                    <div class="chevron"></div>
                 </div>
             </div>
         </div>
@@ -6646,6 +6732,23 @@
                 </button>
             </div>
 
+        </div>
+    </div>
+</div>
+
+<!-- EXPLORED CATEGORIES MODAL -->
+<div class="modal-overlay" id="modal-explored-overlay" onclick="closeExploredModal(event)">
+    <div class="modal">
+        <div class="modal-header">
+            <span data-key="explored_label">Explored Categories</span>
+            <span onclick="closeExploredModal(null, true)">✕</span>
+        </div>
+        
+        <div class="modal-body" style="padding: 15px;">
+            <!-- Сетка карточек -->
+            <div id="explored-grid" class="explored-grid">
+                <!-- JS сгенерирует карточки здесь -->
+            </div>
         </div>
     </div>
 </div>
@@ -10316,42 +10419,83 @@
         markDayActive();
     }
 
+    // 1. Обновленная функция подсчета (только цифры на кнопке)
     function updateExploredCount() {
         const total = (typeof data !== 'undefined') ? data.length : 0;
         
-        // Считаем уникальные ID из лога
+        // Считаем уникальные ID из лога (уже открытые)
         const uniqueExplored = (window.activityLog) ? new Set(window.activityLog.map(h => h.id)).size : 0;
         
-        // Считаем процент
-        let percent = 0;
-        if (total > 0) {
-            percent = (uniqueExplored / total) * 100;
+        const displayEl = document.getElementById('ex-total-display');
+        if (displayEl) {
+            displayEl.innerText = `${uniqueExplored} / ${total}`;
         }
-        // Ограничиваем от 0 до 100
-        percent = Math.min(100, Math.max(0, percent));
+    }
 
-        // Элементы
-        const currentEl = document.getElementById('ex-current');
-        const totalEl = document.getElementById('ex-total');
-        const fillEl = document.getElementById('ex-fill');
+    // 2. Открытие модального окна и рендер карточек
+    function openExploredModal() {
+        const grid = document.getElementById('explored-grid');
+        grid.innerHTML = '';
         
-        // 1. Обновляем текст
-        if (currentEl) currentEl.innerText = uniqueExplored;
-        if (totalEl) totalEl.innerText = total;
+        // Получаем список категорий из TAG_ICONS (ключи объекта)
+        const categories = Object.keys(TAG_ICONS);
+        
+        // Собираем ID всех просмотренных предметов
+        const exploredIds = new Set(window.activityLog.map(log => log.id));
 
-        // 2. Анимация
-        if (fillEl && currentEl) {
-            setTimeout(() => {
-                // Двигаем бар
-                fillEl.style.width = `${percent}%`;
+        categories.forEach(catKey => {
+            // А. Считаем общее кол-во видео с этим тегом в базе
+            const totalItems = data.filter(item => item.tags.includes(catKey));
+            const totalCount = totalItems.length;
+            
+            if (totalCount === 0) return; // Пропускаем пустые категории
+
+            // Б. Считаем, сколько из них открыто пользователем
+            const exploredCount = totalItems.filter(item => exploredIds.has(item.id)).length;
+            
+            // В. Процент
+            const percent = Math.round((exploredCount / totalCount) * 100);
+            const isCompleted = (percent === 100);
+
+            // Г. Выбираем иконку (первую из массива)
+            const iconSrc = TAG_ICONS[catKey][0] || 'logo_icon.png';
+            
+            // Д. Локализуем название (Первая буква заглавная)
+            let displayTitle = catKey.charAt(0).toUpperCase() + catKey.slice(1);
+
+            // Е. Создаем карточку
+            const card = document.createElement('div');
+            card.className = `ex-card ${isCompleted ? 'completed' : ''}`;
+            
+            card.innerHTML = `
+                <img src="${iconSrc}" class="ex-card-icon" alt="${catKey}">
+                <div class="ex-card-title">${displayTitle}</div>
                 
-                // Двигаем цифру. 
-                let labelPos = percent;
-                if (labelPos < 5) labelPos = 5; 
-                if (labelPos > 90) labelPos = 90; // Чтобы не наехать на правую цифру
+                <div class="ex-progress-track">
+                    <div class="ex-progress-fill" style="width: ${percent}%"></div>
+                </div>
+                
+                <div class="ex-card-stats">
+                    ${exploredCount} / ${totalCount} (${percent}%)
+                </div>
+            `;
+            
+            // Добавляем клик для быстрого перехода к генерации этого тега (как бонус)
+            card.onclick = () => {
+                closeExploredModal(null, true);
+                // Если есть функция поиска по тегу, можно вызвать её:
+                if (typeof searchByTag === 'function') searchByTag(catKey);
+            };
 
-                currentEl.style.left = `${labelPos}%`;
-            }, 100);
+            grid.appendChild(card);
+        });
+
+        document.getElementById('modal-explored-overlay').classList.add('open');
+    }
+
+    function closeExploredModal(e, force) {
+        if (force || e.target.id === 'modal-explored-overlay') {
+            document.getElementById('modal-explored-overlay').classList.remove('open');
         }
     }
 
@@ -11347,89 +11491,116 @@
             updateIntensity(currentIntensity);
         }
     
+    // Таймер для скрытия текста
+    let intensityTextTimeout = null;
+
     function updateIntensity(val) {
         currentIntensity = parseInt(val);
         localStorage.setItem(STORAGE.INTENSITY, currentIntensity);
         
         const slider = document.getElementById('intensity-slider');
-        const toast = document.getElementById('intensity-toast');
-        
-        const icon1 = document.getElementById('icon-int-1');
-        const icon2 = document.getElementById('icon-int-2');
-        const icon3 = document.getElementById('icon-int-3');
+        const mainIcon = document.getElementById('main-intensity-icon');
+        const labelText = document.getElementById('intensity-value-label');
 
-        if (!slider || !icon1) return;
+        if (!slider || !mainIcon) return;
 
         slider.value = currentIntensity;
 
-        // Сброс иконок
-        icon1.className = 'int-icon';
-        icon2.className = 'int-icon';
-        icon3.className = 'int-icon';
-
-        // Цвета
+        const t = langData[currentLang] || langData['en'];
         const isNoir = document.body.getAttribute('data-theme') === 'noir';
         const colorBg = 'var(--border)'; 
-        const colorSpicy = isNoir ? '#ffffff' : '#f39c12'; 
-        const colorExtreme = isNoir ? '#ffffff' : '#e74c3c'; 
+        
+        // Цвета
+        const cGreen = '#2ecc71';
+        const cOrange = isNoir ? '#ffffff' : '#f39c12';
+        const cRed = isNoir ? '#ffffff' : '#e74c3c';
 
-        const t = langData[currentLang] || langData['en'];
+        // Фильтры для иконок
+        const filterGreen = "invert(68%) sepia(61%) saturate(452%) hue-rotate(97deg) brightness(89%) contrast(85%)";
+        const filterOrange = "invert(77%) sepia(33%) saturate(5427%) hue-rotate(357deg) brightness(101%) contrast(90%)";
+        const filterRed = "invert(43%) sepia(97%) saturate(1874%) hue-rotate(338deg) brightness(96%) contrast(89%)";
+        
+        const isLight = document.body.classList.contains('light-theme');
+        const baseFilter = isLight ? "invert(0)" : "invert(1)";
 
-        // Сброс анимации
-        if (toast) {
-            toast.classList.remove('anim-toast');
-            // Сброс трансформаций (важно после экспериментов)
-            toast.style.transform = ''; 
-            toast.style.left = '0';
-            toast.style.width = '100%';
-        }
-
-        // --- ЛОГИКА ВЫРАВНИВАНИЯ (Text Align) ---
+        let iconSrc = 'safe.png';
+        let textKey = 'val_safe';
+        let sliderBg = colorBg;
+        let activeColor = cGreen;
+        let activeFilter = isNoir ? baseFilter : filterGreen;
+        let emojiSuffix = "🛡️"; // Эмодзи по умолчанию
+        
+        // --- ЛОГИКА ВЫБОРА ---
         if (currentIntensity === 1) {
-            // SAFE
-            slider.style.background = colorBg;
-            icon1.classList.add('active-safe');
-            
-            if(toast) {
-                toast.innerText = t.val_safe || "Safe";
-                toast.className = 'toast-safe';
-                toast.style.textAlign = 'left';
-                toast.style.paddingLeft = '5px';
-                toast.style.paddingRight = '0';
-            }
+            iconSrc = 'safe.png';
+            textKey = 'val_safe';
+            sliderBg = colorBg;
+            activeColor = cGreen;
+            activeFilter = isNoir ? baseFilter : filterGreen;
+            emojiSuffix = "🛡️";
         } 
         else if (currentIntensity === 2) {
-            // SPICY
-            slider.style.background = `linear-gradient(to right, ${colorSpicy} 0%, ${colorSpicy} 50%, ${colorBg} 50%, ${colorBg} 100%)`;
-            icon2.classList.add('active-spicy');
-            
-            if(toast) {
-                toast.innerText = t.val_spicy || "Spicy";
-                toast.className = 'toast-spicy';
-                toast.style.textAlign = 'center';
-                toast.style.padding = '0';
-            }
+            iconSrc = 'spicy.png';
+            textKey = 'val_spicy';
+            sliderBg = `linear-gradient(to right, ${cOrange} 0%, ${cOrange} 50%, ${colorBg} 50%, ${colorBg} 100%)`;
+            activeColor = cOrange;
+            activeFilter = isNoir ? baseFilter : filterOrange;
+            emojiSuffix = "🔥";
         } 
         else if (currentIntensity === 3) {
-            // EXTREME
-            slider.style.background = colorExtreme;
-            icon3.classList.add('active-extreme');
-            
-            if(toast) {
-                toast.innerText = t.val_extreme || "Extreme";
-                toast.className = 'toast-extreme';
-                toast.style.textAlign = 'right';
-                toast.style.paddingRight = '5px';
-                toast.style.paddingLeft = '0';
-            }
+            iconSrc = 'extreme.png';
+            textKey = 'val_extreme';
+            sliderBg = cRed;
+            activeColor = cRed;
+            activeFilter = isNoir ? baseFilter : filterRed;
+            emojiSuffix = "💀";
         }
 
-        // Запуск анимации
-        if (toast) {
-            void toast.offsetWidth; 
-            toast.classList.add('anim-toast');
-            if(navigator.vibrate) navigator.vibrate(15);
+        // 1. Иконка
+        if (mainIcon.src.indexOf(iconSrc) === -1) {
+            mainIcon.style.transform = "scale(0.9)";
+            setTimeout(() => {
+                mainIcon.src = iconSrc;
+                mainIcon.style.filter = activeFilter;
+                mainIcon.style.opacity = "1";
+                mainIcon.style.transform = "scale(1.1)";
+                setTimeout(() => { mainIcon.style.transform = "scale(1)"; }, 200);
+            }, 100);
+        } else {
+            mainIcon.style.filter = activeFilter;
+            mainIcon.style.opacity = "1";
         }
+
+        // 2. Слайдер
+        slider.style.background = sliderBg;
+
+        // 3. Текст (с плавным исчезновением и эмодзи)
+        if (labelText) {
+            let txt = t[textKey] || "Level " + currentIntensity;
+            
+            if (!txt.includes(emojiSuffix)) {
+                txt = txt + " " + emojiSuffix;
+            }
+            
+            labelText.innerText = txt;
+            labelText.style.color = activeColor;
+            
+            // Мгновенно показываем
+            labelText.style.transition = 'none'; // Отключаем плавность для появления
+            labelText.style.opacity = '1';
+            
+            // Сброс старого таймера
+            if (intensityTextTimeout) clearTimeout(intensityTextTimeout);
+            
+            // Таймер на исчезновение
+            intensityTextTimeout = setTimeout(() => {
+                // Включаем плавность перед исчезновением
+                labelText.style.transition = 'opacity 0.6s ease'; 
+                labelText.style.opacity = '0';
+            }, 1500); 
+        }
+        
+        if(navigator.vibrate) navigator.vibrate(10);
     }
 
     function initIdleSlot() {
