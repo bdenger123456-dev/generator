@@ -5193,8 +5193,8 @@
             /* 3. НАСТРАИВАЕМ САМИ БЛОКИ */
             .ios-group {
                 /* Маленькие отступы от краев (10px) */
-                margin-left: 10px !important; 
-                margin-right: 10px !important;
+                margin-left: 20px !important; 
+                margin-right: 20px !important;
                 width: auto !important;
                 
                 margin-top: 0 !important;
@@ -7151,7 +7151,7 @@
             subDesc.innerText = "Check connection";
         }
     };
-    
+
     window.closeSyncInfoModal = function(e, force) {
         if (force || e.target.id === 'modal-sync-info-overlay') {
             document.getElementById('modal-sync-info-overlay').classList.remove('open');
@@ -7573,6 +7573,9 @@
     ];
 
     const TAG_ICONS = {
+
+        'general': ['deco9.png'], 
+
         // 1. ANAL & ASS (Самые частые)
         'anal': ['anal1.png', 'anal2.png', 'anal3.png'],
         'ass': ['anal1.png', 'anal2.png'],
@@ -7696,7 +7699,7 @@
         // 1. Основа
         { 
             id: 'general', 
-            iconTag: 'masturbation',
+            iconTag: 'general',
             tags: ['general', 'specific', 'softcore', 'vanilla', 'romantic', 'sensual'] 
         },
         // 2. Соло и Руки
@@ -10840,75 +10843,124 @@
 
         const exploredIds = permanentExplored; 
 
-        EXPLORED_GROUPS.forEach(group => {
+        // ЭТАП 1: Подготовка данных (Считаем проценты и даты для всех групп)
+        const groupsWithStats = EXPLORED_GROUPS.map(group => {
             // 1. Ищем все видео группы
             const groupItems = data.filter(item => 
                 item.tags.some(tag => group.tags.includes(tag))
             );
             
             const totalCount = groupItems.length;
-            if (totalCount === 0) return;
+            // Если в группе нет видео (на всякий случай), возвращаем нули
+            if (totalCount === 0) return { ...group, percent: 0, count: 0, total: 0, dateTs: Infinity, dateStr: "" };
 
             // 2. Считаем прогресс
             const exploredCount = groupItems.filter(item => exploredIds.has(item.id)).length;
             const percent = Math.round((exploredCount / totalCount) * 100);
-            const isCompleted = (percent === 100);
-
-            // 3. ЛОГИКА ДАТЫ
-            let dateText = "";
             
-            if (isCompleted) {
-                // Если уже есть дата в памяти - берем её
+            // 3. Логика даты (для сортировки и отображения)
+            let dateStr = "";
+            let dateTs = Infinity; // По умолчанию "бесконечность", чтобы незавершенные были в конце при сортировке по дате
+
+            if (percent === 100) {
+                // Пробуем достать дату из памяти
                 if (achievementDates[group.id]) {
-                    dateText = achievementDates[group.id];
+                    dateStr = achievementDates[group.id];
                 } else {
-                    // Если нет - значит открыли только что. Сохраняем текущую дату.
+                    // Если даты нет, но 100% — сохраняем текущую
                     const now = new Date();
-                    dateText = now.toLocaleDateString(); // Формат: 26.01.2026
-                    
-                    achievementDates[group.id] = dateText;
+                    dateStr = now.toLocaleDateString();
+                    achievementDates[group.id] = dateStr;
                     localStorage.setItem('xch_achievement_dates', JSON.stringify(achievementDates));
+                }
+
+                // Пытаемся превратить дату "DD.MM.YYYY" в число для правильной сортировки
+                // Если формат другой (зависит от локали), Date.parse может справиться или нет
+                // Для надежности пробуем разбить по точкам (формат RU/DE)
+                const parts = dateStr.split('.');
+                if (parts.length === 3) {
+                    // new Date(year, monthIndex, day)
+                    dateTs = new Date(parts[2], parts[1] - 1, parts[0]).getTime();
+                } else {
+                    // Фоллбэк на стандартный парсинг
+                    dateTs = Date.parse(dateStr) || Date.now();
                 }
             }
 
-            // 4. Иконка
+            return {
+                ...group,
+                percent,
+                count: exploredCount,
+                total: totalCount,
+                dateStr,
+                dateTs
+            };
+        });
+
+        // ЭТАП 2: Сортировка
+        groupsWithStats.sort((a, b) => {
+            // Правило 1: "general" (База) ВСЕГДА первая
+            if (a.id === 'general') return -1;
+            if (b.id === 'general') return 1;
+
+            const aDone = a.percent === 100;
+            const bDone = b.percent === 100;
+
+            // Правило 2: Завершенные (100%) выше незавершенных
+            if (aDone && !bDone) return -1;
+            if (!aDone && bDone) return 1;
+
+            // Правило 3: Если ОБА завершены -> Сортируем по дате (кто раньше, тот выше)
+            if (aDone && bDone) {
+                return a.dateTs - b.dateTs; // От меньшего (старого) к большему (новому)
+            }
+
+            // Правило 4: Если ОБА НЕ завершены -> Сортируем по проценту (наиболее заполненные выше)
+            return b.percent - a.percent;
+        });
+
+        // ЭТАП 3: Отрисовка
+        groupsWithStats.forEach(stats => {
+            if (stats.total === 0) return; // Пропускаем пустые группы
+
+            // Иконка
             let iconSrc = 'logo_icon.png';
-            if (TAG_ICONS[group.iconTag] && TAG_ICONS[group.iconTag][0]) {
-                iconSrc = TAG_ICONS[group.iconTag][0];
+            if (TAG_ICONS[stats.iconTag] && TAG_ICONS[stats.iconTag][0]) {
+                iconSrc = TAG_ICONS[stats.iconTag][0];
             } else if (TAG_ICONS['general'] && TAG_ICONS['general'][0]) {
                 iconSrc = TAG_ICONS['general'][0];
             }
 
-            // 5. Название
-            const displayTitle = t['cat_' + group.id] || group.id.toUpperCase();
-            // Текст "Открыто: [Дата]"
+            // Название
+            const displayTitle = t['cat_' + stats.id] || stats.id.toUpperCase();
             const unlockedLabel = t.unlocked_on || "Unlocked:"; 
+            const isCompleted = stats.percent === 100;
 
-            // 6. Карточка HTML
+            // HTML Карточки
             const card = document.createElement('div');
             card.className = `ex-card ${isCompleted ? 'completed' : ''}`;
             
             card.innerHTML = `
-                <img src="${iconSrc}" class="ex-card-icon" alt="${group.id}">
+                <img src="${iconSrc}" class="ex-card-icon" alt="${stats.id}">
                 <div class="ex-card-title">${displayTitle}</div>
                 
                 <div class="ex-progress-track">
-                    <div class="ex-progress-fill" style="width: ${percent}%"></div>
+                    <div class="ex-progress-fill" style="width: ${stats.percent}%"></div>
                 </div>
                 
                 <div class="ex-card-stats">
-                    ${exploredCount} / ${totalCount} (${percent}%)
+                    ${stats.count} / ${stats.total} (${stats.percent}%)
                 </div>
                 
                 <!-- БЛОК С ДАТОЙ -->
                 <div class="ex-date">
-                    ${isCompleted ? `🏆 ${unlockedLabel} ${dateText}` : ''}
+                    ${isCompleted ? `🏆 ${unlockedLabel} ${stats.dateStr}` : ''}
                 </div>
             `;
             
             card.onclick = () => {
                 closeExploredModal(null, true);
-                if (typeof searchByTag === 'function') searchByTag(group.iconTag);
+                if (typeof searchByTag === 'function') searchByTag(stats.iconTag);
             };
 
             grid.appendChild(card);
@@ -10916,7 +10968,7 @@
 
         document.getElementById('modal-explored-overlay').classList.add('open');
     }
-
+    
     function closeExploredModal(e, force) {
         if (force || e.target.id === 'modal-explored-overlay') {
             document.getElementById('modal-explored-overlay').classList.remove('open');
