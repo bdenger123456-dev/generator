@@ -2474,14 +2474,20 @@
         }
 
         .sync-stat-item.full-width {
-            grid-column: span 2; 
-            width: 100%;        
+            grid-column: span 2;
+            width: 100%;
+            
+            display: flex;
             flex-direction: column;
-            align-items: flex-start; 
-            padding: 15px;
+            align-items: center !important; 
+            justify-content: center !important;
+            text-align: center !important;
+            
+            padding: 20px 15px;
             cursor: pointer;
             transition: background 0.2s, transform 0.2s;
             background: var(--ios-card);
+            border-radius: 16px;
         }
 
         .sync-stat-item.full-width:active {
@@ -5081,6 +5087,24 @@
             }
         }
 
+        /* Закрепленный футер модального окна */
+        .modal-footer {
+            flex-shrink: 0; /* Запрещаем сжиматься */
+            padding: 15px 20px;
+            background: var(--sidebar-bg); /* Цвет фона как у модалки */
+            border-top: 1px solid var(--border); /* Разделитель сверху */
+            z-index: 10;
+            
+            /* Учет безопасной зоны на iPhone (чтобы не перекрывало полоску домой) */
+            padding-bottom: calc(15px + env(safe-area-inset-bottom));
+        }
+
+        /* Корректировка капсулы, чтобы она растягивалась красиво */
+        .modal-footer .stats-nav-capsule {
+            margin-top: 0;
+            width: 100%;
+        }
+
         /* =========================================
         MACOS STYLE SIDEBAR (DESKTOP ONLY)
         ========================================= */
@@ -5600,26 +5624,29 @@
             <span data-key="history_title">History</span>
             <span onclick="closeHistoryModal(null, true)">✕</span>
         </div>
-        <div class="modal-body">
+        
+        <!-- Тело с контентом (скроллится) -->
+        <div class="modal-body" style="padding-bottom: 10px !important;">
             <div id="hist-list-swipes" style="display:block;"></div>
             <div id="hist-list-watch" style="display:none;"></div>
             <div id="hist-list-wrapped" style="display:none;"></div>
-            
-            <!-- Footer Controls (Moved to bottom of body content) -->
-            <div style="margin-top: 20px;">
-                <div class="stats-nav-capsule">
-                    <div class="stats-nav-item active" id="hist-nav-swipes" onclick="switchHistoryTab('swipes')">
-                        <span data-key="hist_tab_swipes">Swipes</span>
-                    </div>
-                    <div class="stats-nav-item" id="hist-nav-watch" onclick="switchHistoryTab('watch')">
-                        <span data-key="hist_tab_watch">Time</span>
-                    </div>
-                    <div class="stats-nav-item" id="hist-nav-wrapped" onclick="switchHistoryTab('wrapped')">
-                        <span>Wrapped</span>
-                    </div>
+        </div>
+
+        <!-- Футер с кнопками (ПРИБИТ К НИЗУ) -->
+        <div class="modal-footer">
+            <div class="stats-nav-capsule">
+                <div class="stats-nav-item active" id="hist-nav-swipes" onclick="switchHistoryTab('swipes')">
+                    <span data-key="hist_tab_swipes">Swipes</span>
+                </div>
+                <div class="stats-nav-item" id="hist-nav-watch" onclick="switchHistoryTab('watch')">
+                    <span data-key="hist_tab_watch">Time</span>
+                </div>
+                <div class="stats-nav-item" id="hist-nav-wrapped" onclick="switchHistoryTab('wrapped')">
+                    <span>Wrapped</span>
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 
@@ -6459,10 +6486,7 @@
         <div class="modal-body">
             <div style="text-align:center; margin-bottom:20px; color:var(--text-secondary); font-size:13px;">
                 <span id="sync-email-display" style="color:var(--text-main); font-weight:700; font-size:16px;">...</span>
-                <div id="sync-plan-box" style="margin-top: 8px; display: inline-flex; align-items: center; gap: 8px; background: var(--ios-card); border: 1px solid var(--border); padding: 4px 10px; border-radius: 20px;">
-                    <span id="sync-plan-badge" style="font-weight: 800; font-size: 11px;">FREE</span>
-                    <span id="sync-plan-expiry" style="font-size: 11px; color: var(--text-secondary); display: none;">...</span>
-                </div>
+                
                 <br><br>
                 <span data-key="sync_desc">Data stored safely on Google servers</span>
             </div>
@@ -6486,14 +6510,17 @@
                 </div>
             </div>
 
-            <div id="sync-sub-card" class="sync-stat-item full-width clickable" onclick="closeSyncInfoModal(null, true); openSubModal();" style="margin-bottom: 20px; border: 1px solid var(--accent);">
-                <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                    <span class="sync-stat-label" style="font-size: 13px;" data-key="lbl_subscription">SUBSCRIPTION</span>
-                    <span id="sync-sub-value" style="font-weight:900; font-size:18px; color:var(--accent);">FREE</span>
-                </div>
-                <div id="sync-sub-desc" style="font-size:11px; color:var(--text-secondary); margin-top:6px; width:100%; text-align:left;">
+            <!-- ДИЗАЙН КАРТОЧКИ ПОДПИСКИ -->
+            <div id="sync-sub-card" class="sync-stat-item full-width clickable" onclick="closeSyncInfoModal(null, true); openSubModal();" style="margin-bottom: 20px; border: 1px solid var(--border);">
+                
+                <!-- Заголовок (План) -->
+                <span id="sync-sub-value" style="font-weight:900; font-size:24px; letter-spacing: 1px; margin-bottom: 4px;">FREE</span>
+                
+                <!-- Подпись (Дата или Призыв) -->
+                <div id="sync-sub-desc" style="font-size:12px; color:var(--text-secondary); text-transform: uppercase; font-weight: 600;">
                     Tap to upgrade
                 </div>
+
             </div>
 
             <div style="background:rgba(255,153,0,0.1); border:1px solid rgba(255,153,0,0.3); padding:10px; border-radius:12px; margin-bottom:20px; font-size:12px; color:var(--text-secondary); text-align:center;">
@@ -7002,18 +7029,20 @@
         document.getElementById('modal-sync-info-overlay').classList.add('open');
         document.getElementById('sync-email-display').innerText = user.email;
 
-        // Ссылки на элементы нового блока подписки
+        // Ссылки на элементы новой центральной карточки
         const subValue = document.getElementById('sync-sub-value');
         const subDesc = document.getElementById('sync-sub-desc');
         const subCard = document.getElementById('sync-sub-card');
 
-        // Временно ставим загрузку
-        subValue.innerText = "LOADING...";
-        subDesc.innerText = "...";
+        // Сброс (Загрузка)
+        subValue.innerText = "...";
+        subDesc.innerText = "Checking status...";
+        subCard.style.borderColor = "var(--border)";
+        subValue.style.color = "var(--text-main)";
 
         const t = langData[currentLang] || langData['en'];
 
-        // Сброс статистики
+        // Сброс счетчиков статистики
         ['cloud-fav-count', 'cloud-wl-count', 'cloud-explored-count', 'cloud-ban-count'].forEach(id => {
             const el = document.getElementById(id);
             if(el) el.innerText = "...";
@@ -7033,36 +7062,64 @@
                     localStorage.setItem('xch_user_mods', JSON.stringify(userModifiersPool));
                 }
                 
-                // === ЗАПОЛНЕНИЕ БЛОКА ПОДПИСКИ ===
+                // === ЛОГИКА ПОДПИСКИ (НОВЫЙ ДИЗАЙН) ===
                 const plan = d.subscription || 'free';
                 subValue.innerText = plan.toUpperCase();
                 
-                // Цвет текста
-                if (plan === 'pro') { subValue.style.color = '#ff9900'; subCard.style.borderColor = '#ff9900'; }
-                else if (plan === 'beast') { subValue.style.color = '#9b59b6'; subCard.style.borderColor = '#9b59b6'; }
-                else if (plan === 'bestie') { subValue.style.color = '#00d2ff'; subCard.style.borderColor = '#00d2ff'; }
-                else { subValue.style.color = 'var(--text-main)'; subCard.style.borderColor = 'var(--border)'; }
+                // 1. Цвета и Бордеры
+                if (plan === 'pro') { 
+                    subValue.style.color = '#ff9900'; 
+                    subCard.style.borderColor = 'rgba(255, 153, 0, 0.5)'; 
+                    subCard.style.boxShadow = '0 4px 15px rgba(255, 153, 0, 0.1)';
+                }
+                else if (plan === 'beast') { 
+                    subValue.style.color = '#9b59b6'; 
+                    subCard.style.borderColor = 'rgba(155, 89, 182, 0.5)'; 
+                    subCard.style.boxShadow = '0 4px 15px rgba(155, 89, 182, 0.1)';
+                }
+                else if (plan === 'bestie') { 
+                    subValue.style.color = '#00d2ff'; 
+                    subCard.style.borderColor = 'rgba(0, 210, 255, 0.5)';
+                    subCard.style.boxShadow = '0 4px 15px rgba(0, 210, 255, 0.1)';
+                }
+                else { 
+                    // FREE
+                    subValue.style.color = 'var(--text-main)'; 
+                    subCard.style.borderColor = 'var(--border)';
+                    subCard.style.boxShadow = 'none';
+                }
 
-                // Дата окончания
-                if (plan !== 'free' && plan !== 'bestie' && d.expiresAt) {
-                    const dateObj = d.expiresAt.toDate(); 
-                    const dateStr = dateObj.toLocaleDateString();
-                    const daysLeft = Math.ceil((dateObj - new Date()) / (1000 * 60 * 60 * 24));
-                    
-                    if (daysLeft > 0) {
-                        subDesc.innerHTML = `${t.sub_exp || "Expires:"} <b>${dateStr}</b> (${daysLeft}${t.time_d || "d"})`;
-                        subDesc.style.color = "var(--text-secondary)";
-                    } else {
-                        subDesc.innerText = t.sub_expired || "Expired"; 
-                        subDesc.style.color = "var(--highlight-red)";
-                    }
-                } else if (plan === 'bestie') {
-                    subDesc.innerText = "Lifetime Access ♾️";
-                    subDesc.style.color = "var(--accent)";
-                } else {
-                    // Free
-                    subDesc.innerText = (currentLang === 'ru' ? "Нажми, чтобы улучшить" : "Tap to upgrade");
+                // 2. Текст снизу (Дата или Призыв)
+                if (plan === 'free') {
+                    // Для Free: Призыв к действию
+                    subDesc.innerText = (currentLang === 'ru' ? "Нажми, чтобы улучшить" : "Tap to Upgrade");
+                    subDesc.style.color = "var(--accent)"; // Розовый цвет для призыва
+                    subDesc.style.fontWeight = "700";
+                } 
+                else if (plan === 'bestie') {
+                    // Для Bestie
+                    subDesc.innerHTML = "♾️ Lifetime Access";
                     subDesc.style.color = "var(--text-secondary)";
+                    subDesc.style.fontWeight = "600";
+                }
+                else {
+                    // Для Pro/Beast: Дата истечения
+                    if (d.expiresAt) {
+                        const dateObj = d.expiresAt.toDate(); 
+                        const dateStr = dateObj.toLocaleDateString();
+                        const daysLeft = Math.ceil((dateObj - new Date()) / (1000 * 60 * 60 * 24));
+                        
+                        if (daysLeft > 0) {
+                            subDesc.innerHTML = `${t.sub_exp || "Expires:"} ${dateStr} (${daysLeft}${t.time_d || "d"})`;
+                            subDesc.style.color = "var(--text-secondary)";
+                            subDesc.style.fontWeight = "500";
+                        } else {
+                            subDesc.innerText = t.sub_expired || "Expired (Tap to renew)"; 
+                            subDesc.style.color = "var(--highlight-red)";
+                        }
+                    } else {
+                        subDesc.innerText = "Active";
+                    }
                 }
 
                 // Статистика
@@ -7078,8 +7135,11 @@
                 document.getElementById('cloud-explored-count').innerText = exCount;
 
             } else {
+                // Если документа нет (ошибка или новый юзер)
                 subValue.innerText = "FREE";
-                subDesc.innerText = (currentLang === 'ru' ? "Нажми, чтобы улучшить" : "Tap to upgrade");
+                subDesc.innerText = (currentLang === 'ru' ? "Нажми, чтобы улучшить" : "Tap to Upgrade");
+                subDesc.style.color = "var(--accent)";
+                
                 ['cloud-fav-count', 'cloud-wl-count', 'cloud-explored-count', 'cloud-ban-count'].forEach(id => {
                     const el = document.getElementById(id);
                     if(el) el.innerText = "0";
@@ -7088,6 +7148,7 @@
         } catch (e) {
             console.error("Error fetching sync stats:", e);
             subValue.innerText = "ERROR";
+            subDesc.innerText = "Check connection";
         }
     };
     
