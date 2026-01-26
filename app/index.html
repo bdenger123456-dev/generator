@@ -5937,7 +5937,7 @@
                     <option value="sb">SpankBang</option>
                     <option value="yp">YouPorn</option>
                     <option value="rt">RedTube</option>
-                    <option value="google">Google Images</option>
+                    <option value="random" data-key="site_random">Random</option>
                 </select>
             </div>
 
@@ -6154,20 +6154,6 @@
                 </div>
                 <div class="chevron"></div>
             </div>
-            <div class="ios-row clickable" onclick="openRoadmap()">
-                <div class="ios-row-left">
-                    <img src="roadmap.png" class="settings-icon" alt="Roadmap">
-                    <span data-key="btn_roadmap">Roadmap</span>
-                </div>
-                <div class="chevron"></div>
-            </div>
-            <div class="ios-row clickable" onclick="openPanicSettings()">
-                <div class="ios-row-left">
-                    <img src="sos.png" class="settings-icon" alt="SOS">
-                    <span data-key="panic_btn">Emergency Mode</span>
-                </div>
-                <div class="chevron"></div>
-            </div>
             <div class="ios-row clickable" onclick="openExploredModal()">
                 <div class="ios-row-left">
                     <img src="explored.png" class="settings-icon" alt="Explored">
@@ -6228,6 +6214,21 @@
                 <div class="ios-row-left">
                     <img src="install.png" class="settings-icon" alt="Install">
                     <span data-key="btn_install_phone">Install on Phone</span>
+                </div>
+                <div class="chevron"></div>
+            </div>
+
+            <div class="ios-row clickable" onclick="openRoadmap()">
+                <div class="ios-row-left">
+                    <img src="roadmap.png" class="settings-icon" alt="Roadmap">
+                    <span data-key="btn_roadmap">Roadmap</span>
+                </div>
+                <div class="chevron"></div>
+            </div>
+            <div class="ios-row clickable" onclick="openPanicSettings()">
+                <div class="ios-row-left">
+                    <img src="sos.png" class="settings-icon" alt="SOS">
+                    <span data-key="panic_btn">Emergency Mode</span>
                 </div>
                 <div class="chevron"></div>
             </div>
@@ -8386,6 +8387,8 @@
             expl_hist: "From Archives 📜",
             deco_label: "Show Decorations",
 
+            site_random: "Random",
+
             btn_version: "Version",
             changelog_title: "Version History",
 
@@ -8935,6 +8938,8 @@
             expl_hist: "Из архивов 📜",
             deco_label: "Показывать декор",
 
+            site_random: "Случайный",
+
             btn_version: "Версия",
             changelog_title: "История версий",
 
@@ -9479,6 +9484,8 @@
             expl_hist: "De los archivos 📜",
             deco_label: "Mostrar decoración",
 
+            site_random: "Aleatorio",
+
             btn_version: "Versión",
             changelog_title: "Historial de versiones",
 
@@ -10015,6 +10022,8 @@
             expl_undo: "Meinung geändert? 😏",
             expl_hist: "Aus dem Archiv 📜",
             deco_label: "Dekoration anzeigen",
+
+            site_random: "Zufällig",
 
             btn_version: "Version",
             changelog_title: "Versionsverlauf",
@@ -11504,21 +11513,25 @@
 
     function finishGeneration(item, mode) {
         isGenerating = false;
+
+        // Проверяем текущую настройку
+        const currentPlatformPref = document.getElementById('platform') ? document.getElementById('platform').value : 'xh';
+        
+        // Если стоит "Random" и у предмета еще нет закрепленного сайта
+        if (currentPlatformPref === 'random' && !item.assignedPlatform) {
+            const sites = ['xh', 'ph', 'xv', 'sb', 'yp', 'rt'];
+            item.assignedPlatform = sites[Math.floor(Math.random() * sites.length)];
+        }
         
         if (isPanicMode || mode === 'panic') {
-            // Просто рендерим UI, не пишем в localStorage
             const card = document.getElementById('card-block');
             if(card) card.classList.add('has-results');
-            
-            // Убираем реальные бейджи статуса
             updateCardStatusVisuals(); 
-            
-            // Рендерим результат
             renderResultUI(item, mode);
             return;
         }
 
-        addToHistory(item);
+        addToHistory(item); 
 
         cooldownList.push(item.id);
         if (cooldownList.length > COOLDOWN_SIZE) {
@@ -12071,14 +12084,26 @@
         
         if (isPanicMode) {
             if(btnWatch) {
-                // Убираем ссылку, чтобы браузер не переходил
                 btnWatch.removeAttribute('href');
                 btnWatch.removeAttribute('target');
             }
             return;
         }
 
-        const platform = document.getElementById('platform').value;
+        // 1. Получаем текущий выбор из селектора
+        let platform = document.getElementById('platform').value;
+
+        // === НОВАЯ ЛОГИКА: ПРОВЕРКА RANDOM ===
+        // Если в настройках "Random", и у текущего предмета есть сохраненный сайт -> используем его
+        if (platform === 'random' && currentItem && currentItem.assignedPlatform) {
+            platform = currentItem.assignedPlatform;
+        }
+        // Если вдруг (баг) в настройках Random, но у предмета нет сайта -> фолбек на xHamster
+        else if (platform === 'random') {
+            platform = 'xh';
+        }
+        // =====================================
+
         const root = document.documentElement;
         const currentThemeId = localStorage.getItem('xch_theme_id') || 'dark';
         const currentTheme = APP_THEMES.find(t => t.id === currentThemeId);
@@ -12090,8 +12115,10 @@
             'sb': ['#ffd700', '#ffe666'],
             'yp': ['#ff3366', '#ff668a'],
             'rt': ['#ff0000', '#ff4d4d'],
-            'google': ['#4285F4', '#7aaafc']
+            'google': ['#4285F4', '#7aaafc'], // Логика Google осталась (цвета)
+            'random': ['#9b59b6', '#b07cc6'] // Фолбек цвета
         };
+        
         const [platMain, platLight] = colors[platform] || colors['xh'];
 
         if (!currentTheme || !currentTheme.accent) {
@@ -12106,14 +12133,18 @@
         
         let queryName = useRu ? (currentItem.name_ru || currentItem.name) : currentItem.name;
         let queryParts = [queryName];
-        activeMods.forEach(key => {
-            const mod = modifiersData.find(m => m.key === key);
-            queryParts.push(useRu ? mod.ru : mod.en);
-        });
+        
+        if (typeof activeMods !== 'undefined') {
+            activeMods.forEach(key => {
+                const mod = modifiersData.find(m => m.key === key);
+                queryParts.push(useRu ? mod.ru : mod.en);
+            });
+        }
         
         let plusQuery = queryParts.join("+").toLowerCase();
         let url = "";
         
+        // Логика формирования ссылок
         if (platform === 'google') {
             url = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(queryParts.join(" ") + " porn")}`;
         } else {
@@ -12124,6 +12155,7 @@
                 case 'sb': url = `https://spankbang.com/s/${plusQuery}/`; break;
                 case 'yp': url = `https://www.youporn.com/search/?query=${plusQuery}`; break;
                 case 'rt': url = `https://www.redtube.com/?search=${plusQuery}`; break;
+                default: url = `https://xhamster.com/search/${plusQuery}`; break;
             }
         }
         
