@@ -5105,72 +5105,59 @@
             width: 100%;
         }
 
-        /* CHANGELOG TIMELINE */
-        .cl-item {
-            position: relative;
-            padding-left: 25px; /* Отступ для линии */
-            margin-bottom: 30px;
-            border-left: 2px solid var(--border); /* Линия таймлайна */
-        }
-
-        /* Последний элемент без линии вниз */
-        .cl-item:last-child {
-            border-left: 2px solid transparent;
-        }
-
-        .cl-dot {
-            position: absolute;
-            left: -7px; /* Центрируем на линии (2px ширина линии / 2 - 12px ширина точки / 2) */
-            top: 0;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--accent);
-            box-shadow: 0 0 10px var(--accent);
-        }
-
-        .cl-header {
+        /* VERSION CAPSULE STYLE */
+        .version-card {
             display: flex;
+            align-items: center; /* Центрирование по вертикали */
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 5px;
-            margin-top: -4px; /* Выравнивание по точке */
+            
+            background: var(--ios-card);
+            border: 1px solid var(--border);
+            border-radius: 18px; /* Скругление капсулы */
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            
+            transition: transform 0.2s;
         }
 
-        .cl-ver {
-            font-size: 18px;
+        .version-card:active {
+            transform: scale(0.98);
+            background: var(--nav-bg);
+        }
+
+        /* Левая часть: Версия */
+        .v-ver-badge {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: var(--accent);
             font-weight: 800;
-            color: var(--text-main);
+            font-size: 13px;
+            padding: 6px 10px;
+            border-radius: 10px;
+            min-width: 50px;
+            text-align: center;
+            margin-right: 12px;
+            flex-shrink: 0; /* Чтобы не сжималась */
         }
 
-        .cl-date {
-            font-size: 11px;
-            font-weight: 600;
+        /* Середина: Описание */
+        .v-content {
+            flex: 1; /* Занимает всё свободное место */
+            font-size: 13px;
+            color: var(--text-main);
+            line-height: 1.3;
+            margin-right: 12px;
+            font-weight: 500;
+        }
+
+        /* Правая часть: Дата */
+        .v-date {
+            font-size: 10px;
+            font-weight: 700;
             color: var(--text-secondary);
             text-transform: uppercase;
-            background: var(--nav-bg);
-            padding: 2px 8px;
-            border-radius: 8px;
-        }
-
-        .cl-desc {
-            font-size: 14px;
-            color: var(--text-secondary);
-            line-height: 1.5;
-        }
-
-        .cl-desc li {
-            margin-bottom: 4px;
-            list-style: none;
-            position: relative;
-            padding-left: 15px;
-        }
-
-        .cl-desc li::before {
-            content: "•";
-            position: absolute;
-            left: 0;
-            color: var(--text-main);
+            white-space: nowrap; /* Чтобы дата не переносилась */
+            flex-shrink: 0;
         }
 
         /* =========================================
@@ -7005,6 +6992,20 @@
                 <span data-key="btn_close">Close</span>
             </button>
 
+        </div>
+    </div>
+</div>
+
+<!-- CHANGELOG MODAL -->
+<div class="modal-overlay" id="modal-changelog-overlay" onclick="closeChangelogModal(event)">
+    <div class="modal">
+        <div class="modal-header">
+            <span data-key="changelog_title">What's New</span>
+            <span onclick="closeChangelogModal(null, true)">✕</span>
+        </div>
+        
+        <div class="modal-body" id="changelog-container" style="padding: 20px 25px;">
+            <!-- JS сгенерирует историю здесь -->
         </div>
     </div>
 </div>
@@ -18446,31 +18447,25 @@
         const container = document.getElementById('changelog-container');
         container.innerHTML = '';
         
-        // Определяем текущий язык (fallback to 'en')
+        // Определяем текущий язык
         const langKey = ['en','ru','es','de'].includes(currentLang) ? currentLang : 'en';
 
-        CHANGELOG_DATA.forEach((item, index) => {
-            // Берем текст для текущего языка
-            const lines = item.changes[langKey] || item.changes['en'];
-            
-            // Превращаем массив строк в список <li>
-            const listHTML = lines.map(line => `<li>${line}</li>`).join('');
+        CHANGELOG_DATA.forEach(item => {
+            // Берем текст
+            const text = item.changes[langKey] || item.changes['en'];
 
             const div = document.createElement('div');
-            div.className = 'cl-item';
-            
-            // Для самой первой (актуальной) версии делаем точку яркой
-            const dotStyle = index === 0 ? '' : 'background: var(--text-secondary); box-shadow: none; opacity: 0.5;';
+            div.className = 'version-card';
             
             div.innerHTML = `
-                <div class="cl-dot" style="${dotStyle}"></div>
-                <div class="cl-header">
-                    <span class="cl-ver">v${item.ver}</span>
-                    <span class="cl-date">${item.date}</span>
-                </div>
-                <div class="cl-desc">
-                    <ul>${listHTML}</ul>
-                </div>
+                <!-- СЛЕВА: Версия -->
+                <div class="v-ver-badge">v${item.ver}</div>
+                
+                <!-- ЦЕНТР: Текст -->
+                <div class="v-content">${text}</div>
+                
+                <!-- СПРАВА: Дата -->
+                <div class="v-date">${item.date}</div>
             `;
             container.appendChild(div);
         });
@@ -18483,7 +18478,7 @@
             document.getElementById('modal-changelog-overlay').classList.remove('open');
         }
     }
-
+    
 </script>
 
 <!-- SEO CONTEXT BLOCK -->
