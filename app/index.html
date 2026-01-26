@@ -977,6 +977,26 @@
             font-weight: 800;
         }
 
+        #intensity-value-label {
+            font-size: 14px; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            margin-right: 2px;
+            
+            /* По умолчанию скрыт и смещен немного вниз */
+            opacity: 0;
+            transform: translateY(5px);
+            
+            /* Плавная анимация для всех свойств */
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        /* Класс для показа */
+        #intensity-value-label.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         /* =========================================
         6. IOS SETTINGS & COMPONENTS
         ========================================= */
@@ -4345,16 +4365,17 @@
             width: 100%;
             padding: 0 5px;
             position: relative;
-            margin-bottom: 8px;
+            margin-top: 5px !important; 
+            margin-bottom: 0px;
         }
 
         .slider-narrow-wrapper {
             width: 85%;
             margin: 5px auto 5px auto !important; 
             position: relative;
-            overflow: visible; /* Текст может выходить за границы (для длинных слов) */
-            padding: 0 !important; /* Убираем внутренние отступы */
-            height: auto !important; /* Высота по содержимому */
+            overflow: visible; 
+            padding: 0 !important; 
+            height: auto !important;
         }
 
         /* Иконки под слайдером */
@@ -5319,6 +5340,29 @@
             }
         }
 
+        /* === PC TWEAKS FOR GRIDS (3 COLUMNS) === */
+        @media (min-width: 769px) {
+            
+            /* 1. Делаем модальные окна шире именно для Tips и Explored, 
+                чтобы 3 карточки влезли свободно */
+            #modal-tips-overlay .modal,
+            #modal-explored-overlay .modal {
+                width: 750px !important; /* Увеличили ширину (было 550px) */
+                max-width: 95vw !important;
+            }
+
+            /* 2. Переключаем сетку на 3 колонки */
+            .tips-grid,
+            .explored-grid {
+                grid-template-columns: repeat(3, 1fr) !important; /* 3 равные колонки */
+                gap: 20px !important; /* Чуть больше воздуха между карточками */
+            }
+
+            .ex-card-title {
+                font-size: 12px !important; 
+            }
+        }
+
         .seo-context {
             position: absolute;
             width: 1px;
@@ -5925,7 +5969,13 @@
                             <img src="safe.png" id="main-intensity-icon" class="settings-icon" alt="Safety" style="width: 24px; height: 24px; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); object-fit: contain; margin: 0;">
                         </div>
                         <!-- Заголовок -->
-                        <div style="font-size:16px;" data-key="exploration_mode">Intensity</div>
+                        <div style="display:flex; align-items:center;">
+                            <div style="font-size:16px;" data-key="exploration_mode">Intensity</div>
+                            <img src="question.png" id="intensity-info-icon" class="settings-icon" 
+                                onclick="openSpecificTip('intensity')"
+                                alt="Info" 
+                                style="width:14px; height:14px; margin-left:6px; opacity:0.5; cursor:pointer; transition: opacity 0.3s ease;">
+                        </div>
                     </div>
                     
                     <!-- Текст значения справа -->
@@ -8579,6 +8629,17 @@
             tip_layout_desc: "Fixing layout bugs",
             tip_layout_text: "Due to PWA specifics on some mobile devices, the card might move too high, causing phrases to overlap with the logo capsule.<br><br><b>The Fix:</b><br>Simply rotate your phone to <b>landscape</b> mode and back to <b>portrait</b>. The layout will reset and look perfect again.",
 
+            tip_int_title: "Intensity Levels",
+            tip_int_desc: "What exactly changes?",
+            tip_int_text: `
+                <b>🛡️ SAFE (Level 1):</b><br>
+                Vanilla, romantic, and standard sex. Completely filters out BDSM, fetish, and any rough content. Safe for work (almost).<br><br>
+                <b>🔥 SPICY (Level 2):</b><br>
+                Unlocks <b>BDSM & Kink</b>. Adds bondage, spanking, domination, submission, and fetishes. Filters out bodily fluids and pain.<br><br>
+                <b>💀 EXTREME (Level 3):</b><br>
+                Unlocks <b>Hardcore & Mess</b>. Adds what was hidden: watersports, scat, fisting, pain, and extreme fetishes. No filters.
+            `,
+
 
             // --- 2. Generator (Main Tab) ---
             generate: "Random Genre",
@@ -8904,7 +8965,7 @@
             panic_active_phrases: ["Ничего подозрительного 😇", "Просто хобби", "Сама невинность", "Минутка продуктивности 📈", "Пейте воду 💧"],
 
             val_safe: "Безопасно",
-            val_spicy: "С перчинкой 🔥",
+            val_spicy: "Горячо 🔥",
             val_extreme: "ЭКСТРИМ 💀",
 
             share_caption: "Узнай себя",
@@ -9115,6 +9176,16 @@
             tip_layout_desc: "Исправление верстки",
             tip_layout_text: "Из-за особенностей PWA иногда карточка на мобильных может уходить слишком вверх, и фразы перекрываются капсулой с логотипом.<br><br><b>Решение:</b><br>Смени ориентацию телефона на <b>горизонтальную</b> и верни её в <b>вертикальную</b>. Проблема решится, и всё встанет на места.",
 
+            tip_int_title: "Уровни Откровенности",
+            tip_int_desc: "Что именно меняется?",
+            tip_int_text: `
+                <b>🛡️ БЕЗОПАСНО (Ур. 1):</b><br>
+                Ваниль, романтика и классика. Полностью блокирует БДСМ, фетиши и любую грубость. Максимально "чистый" контент.<br><br>
+                <b>🔥 ГОРЯЧО (Ур. 2):</b><br>
+                Открывает <b>БДСМ и Кинки</b>. Добавляет связывание, порку, доминирование и фетиши. Но всё ещё блокирует "грязь" и боль.<br><br>
+                <b>💀 ЭКСТРИМ (Ур. 3):</b><br>
+                Открывает <b>Хардкор и Треш</b>. Добавляет то, что было скрыто: туалетную тему, фистинг, боль и жидкости. Без фильтров.
+            `,
 
             // --- 2. Генератор ---
             generate: "Случайный жанр",
@@ -9655,7 +9726,17 @@
             tip_layout_desc: "Arreglar diseño",
             tip_layout_text: "Debido a la PWA, a veces la tarjeta sube demasiado y el logo tapa el texto.<br><br><b>Solución:</b><br>Gira el teléfono a <b>horizontal</b> y vuelve a <b>vertical</b>. El diseño se arreglará automáticamente.",
 
-            
+            tip_int_title: "Niveles de Intensidad",
+            tip_int_desc: "¿Qué cambia exactamente?",
+            tip_int_text: `
+                <b>🛡️ TRANQUILO (Nivel 1):</b><br>
+                Vainilla y romance. Bloquea completamente BDSM y fetiches. Contenido "limpio".<br><br>
+                <b>🔥 PICANTE (Nivel 2):</b><br>
+                Desbloquea <b>BDSM y Kink</b>. Añade bondage, nalgadas, dominación y fetiches. Aún bloquea fluidos y dolor.<br><br>
+                <b>💀 EXTREMO (Nivel 3):</b><br>
+                Desbloquea <b>Hardcore</b>. Añade lo prohibido: lluvia dorada, scat, fisting, dolor y fetiches extremos. Sin filtros.
+            `,
+
             // --- Generator ---
             generate: "Género Aleatorio",
             generate_again: "Otro Género",
@@ -10179,6 +10260,17 @@
             tip_layout_desc: "Layout korrigieren",
             tip_layout_text: "Wegen PWA-Eigenheiten rutscht die Karte manchmal zu hoch und Text wird verdeckt.<br><br><b>Lösung:</b><br>Drehe das Handy ins <b>Querformat</b> und zurück ins <b>Hochformat</b>. Das Layout wird korrigiert.",
 
+            tip_int_title: "Intensitätsstufen",
+            tip_int_desc: "Was genau ändert sich?",
+            tip_int_text: `
+                <b>🛡️ SICHER (Stufe 1):</b><br>
+                Vanille und Romantik. Blockiert BDSM und Fetische komplett. "Sauberer" Inhalt.<br><br>
+                <b>🔥 WÜRZIG (Stufe 2):</b><br>
+                Schaltet <b>BDSM & Kink</b> frei. Fügt Fesselspiele, Spanking und Dominanz hinzu. Blockiert noch Körperflüssigkeiten.<br><br>
+                <b>💀 EXTREM (Stufe 3):</b><br>
+                Schaltet <b>Hardcore</b> frei. Fügt hinzu, was verborgen war: Natursekt, Scat, Fisting und Schmerz. Keine Filter.
+            `,
+
             // --- Generator ---
             generate: "Zufallsgenre",
             generate_again: "Anderes Genre",
@@ -10477,6 +10569,14 @@
         descKey: 'tip_layout_desc', 
         textKey: 'tip_layout_text',
         gradient: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)' // Фиолетовый
+    },
+    { 
+        id: 'intensity', 
+        icon: '🌶️', 
+        titleKey: 'tip_int_title', 
+        descKey: 'tip_int_desc', 
+        textKey: 'tip_int_text',
+        gradient: 'linear-gradient(135deg, #fceabb 0%, #f8b500 100%)' // Желто-оранжевый
     }
 ];
     // --- WRAPPED DATA & TEXTS ---
@@ -12131,7 +12231,6 @@
             updateIntensity(currentIntensity);
         }
     
-    // Таймер для скрытия текста
     let intensityTextTimeout = null;
 
     function updateIntensity(val) {
@@ -12150,97 +12249,84 @@
         const isNoir = document.body.getAttribute('data-theme') === 'noir';
         const colorBg = 'var(--border)'; 
         
-        // Цвета
-        const cGreen = '#2ecc71';
-        const cOrange = isNoir ? '#ffffff' : '#f39c12';
-        const cRed = isNoir ? '#ffffff' : '#e74c3c';
-
-        // Фильтры для иконок
-        const filterGreen = "invert(68%) sepia(61%) saturate(452%) hue-rotate(97deg) brightness(89%) contrast(85%)";
-        const filterOrange = "invert(77%) sepia(33%) saturate(5427%) hue-rotate(357deg) brightness(101%) contrast(90%)";
-        const filterRed = "invert(43%) sepia(97%) saturate(1874%) hue-rotate(338deg) brightness(96%) contrast(89%)";
-        
-        const isLight = document.body.classList.contains('light-theme');
-        const baseFilter = isLight ? "invert(0)" : "invert(1)";
-
-        let iconSrc = 'safe.png';
-        let textKey = 'val_safe';
-        let sliderBg = colorBg;
-        let activeColor = cGreen;
-        let activeFilter = isNoir ? baseFilter : filterGreen;
-        let emojiSuffix = "🛡️"; // Эмодзи по умолчанию
-        
-        // --- ЛОГИКА ВЫБОРА ---
+        // Конфигурация уровней
+        let config = {};
         if (currentIntensity === 1) {
-            iconSrc = 'safe.png';
-            textKey = 'val_safe';
-            sliderBg = colorBg;
-            activeColor = cGreen;
-            activeFilter = isNoir ? baseFilter : filterGreen;
-            emojiSuffix = "🛡️";
-        } 
-        else if (currentIntensity === 2) {
-            iconSrc = 'spicy.png';
-            textKey = 'val_spicy';
-            sliderBg = `linear-gradient(to right, ${cOrange} 0%, ${cOrange} 50%, ${colorBg} 50%, ${colorBg} 100%)`;
-            activeColor = cOrange;
-            activeFilter = isNoir ? baseFilter : filterOrange;
-            emojiSuffix = "🔥";
-        } 
-        else if (currentIntensity === 3) {
-            iconSrc = 'extreme.png';
-            textKey = 'val_extreme';
-            sliderBg = cRed;
-            activeColor = cRed;
-            activeFilter = isNoir ? baseFilter : filterRed;
-            emojiSuffix = "💀";
+            config = {
+                icon: 'safe.png', key: 'val_safe', color: '#2ecc71', emoji: "🛡️",
+                bg: colorBg,
+                filter: isNoir ? (document.body.classList.contains('light-theme') ? "invert(0)" : "invert(1)") : "invert(68%) sepia(61%) saturate(452%) hue-rotate(97deg) brightness(89%) contrast(85%)"
+            };
+        } else if (currentIntensity === 2) {
+            config = {
+                icon: 'spicy.png', key: 'val_spicy', color: isNoir ? '#ffffff' : '#f39c12', emoji: "🔥",
+                bg: `linear-gradient(to right, ${isNoir ? '#fff' : '#f39c12'} 0%, ${isNoir ? '#fff' : '#f39c12'} 50%, ${colorBg} 50%, ${colorBg} 100%)`,
+                filter: isNoir ? (document.body.classList.contains('light-theme') ? "invert(0)" : "invert(1)") : "invert(77%) sepia(33%) saturate(5427%) hue-rotate(357deg) brightness(101%) contrast(90%)"
+            };
+        } else {
+            config = {
+                icon: 'extreme.png', key: 'val_extreme', color: isNoir ? '#ffffff' : '#e74c3c', emoji: "💀",
+                bg: isNoir ? '#ffffff' : '#e74c3c',
+                filter: isNoir ? (document.body.classList.contains('light-theme') ? "invert(0)" : "invert(1)") : "invert(43%) sepia(97%) saturate(1874%) hue-rotate(338deg) brightness(96%) contrast(89%)"
+            };
         }
 
         // 1. Иконка
-        if (mainIcon.src.indexOf(iconSrc) === -1) {
-            mainIcon.style.transform = "scale(0.9)";
+        if (mainIcon.src.indexOf(config.icon) === -1) {
+            mainIcon.style.transform = "scale(0.8)";
             setTimeout(() => {
-                mainIcon.src = iconSrc;
-                mainIcon.style.filter = activeFilter;
-                mainIcon.style.opacity = "1";
+                mainIcon.src = config.icon;
+                mainIcon.style.filter = config.filter;
                 mainIcon.style.transform = "scale(1.1)";
-                setTimeout(() => { mainIcon.style.transform = "scale(1)"; }, 200);
+                setTimeout(() => mainIcon.style.transform = "scale(1)", 150);
             }, 100);
         } else {
-            mainIcon.style.filter = activeFilter;
-            mainIcon.style.opacity = "1";
+            mainIcon.style.filter = config.filter;
         }
 
         // 2. Слайдер
-        slider.style.background = sliderBg;
+        slider.style.background = config.bg;
 
-        // 3. Текст (с плавным исчезновением и эмодзи)
+        const infoIcon = document.getElementById('intensity-info-icon');
+
+        // 3. Обновляем текст
         if (labelText) {
-            let txt = t[textKey] || "Level " + currentIntensity;
-            
-            if (!txt.includes(emojiSuffix)) {
-                txt = txt + " " + emojiSuffix;
-            }
-            
-            labelText.innerText = txt;
-            labelText.style.color = activeColor;
-            
-            // Мгновенно показываем
-            labelText.style.transition = 'none'; // Отключаем плавность для появления
-            labelText.style.opacity = '1';
-            
-            // Сброс старого таймера
+            // Сбрасываем инлайн-стили
+            labelText.style.opacity = "";
+            labelText.style.transform = ""; 
+            labelText.style.transition = ""; 
+
             if (intensityTextTimeout) clearTimeout(intensityTextTimeout);
+
+            // Формируем текст
+            let rawText = t[config.key] || "Level " + currentIntensity;
+            rawText = rawText.replace(config.emoji, '').trim(); 
             
-            // Таймер на исчезновение
+            labelText.innerText = rawText + " " + config.emoji;
+            labelText.style.color = config.color;
+
+            // ПОКАЗЫВАЕМ ТЕКСТ -> СКРЫВАЕМ ИКОНКУ
+            requestAnimationFrame(() => {
+                labelText.classList.add('visible');
+                if(infoIcon) {
+                    infoIcon.style.opacity = '0'; // Исчезает
+                    infoIcon.style.pointerEvents = 'none'; // Нельзя нажать пока не видно
+                }
+            });
+
+            // Таймер исчезновения
             intensityTextTimeout = setTimeout(() => {
-                // Включаем плавность перед исчезновением
-                labelText.style.transition = 'opacity 0.6s ease'; 
-                labelText.style.opacity = '0';
-            }, 1500); 
+                labelText.classList.remove('visible');
+                
+                // СКРЫВАЕМ ТЕКСТ -> ПОКАЗЫВАЕМ ИКОНКУ
+                if(infoIcon) {
+                    infoIcon.style.opacity = '0.5'; // Возвращается (полупрозрачная)
+                    infoIcon.style.pointerEvents = 'auto';
+                }
+            }, 1200);
         }
         
-        if(navigator.vibrate) navigator.vibrate(10);
+        if(navigator.vibrate) navigator.vibrate(15);
     }
 
     function initIdleSlot() {
@@ -18394,6 +18480,18 @@
         }
     }
 
+    function openSpecificTip(id) {
+        // 1. Открываем саму модалку (чтобы инициализировать список)
+        openTipsModal();
+        
+        // 2. Ищем нужный тип в базе
+        const tip = tipsData.find(t => t.id === id);
+        if (tip) {
+            // 3. Сразу показываем детали
+            showTipDetail(tip);
+        }
+    }
+
     function renderTipsList() {
         const container = document.getElementById('tips-list-container');
         container.innerHTML = '';
@@ -18478,7 +18576,7 @@
             document.getElementById('modal-changelog-overlay').classList.remove('open');
         }
     }
-    
+
 </script>
 
 <!-- SEO CONTEXT BLOCK -->
