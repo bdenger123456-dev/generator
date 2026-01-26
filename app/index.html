@@ -7914,6 +7914,7 @@
 
     let blacklist = JSON.parse(localStorage.getItem(STORAGE.BLACKLIST)) || [];
     let favorites = JSON.parse(localStorage.getItem(STORAGE.FAVORITES)) || [];
+    let itemScores = JSON.parse(localStorage.getItem('xch_item_scores')) || {};
     let watchLater = JSON.parse(localStorage.getItem(STORAGE.WATCH_LATER)) || [];
     let tagScores = JSON.parse(localStorage.getItem(STORAGE.TAG_SCORES)) || {};
     let historyData = JSON.parse(localStorage.getItem(STORAGE.HISTORY)) || [];
@@ -10615,6 +10616,7 @@
         renderModifiers();
         renderHistory();
         updateCounts();
+        syncScoresFromLists(); 
         
         // 2. Инициализация систем
         initAgeGate();
@@ -10968,7 +10970,7 @@
 
         document.getElementById('modal-explored-overlay').classList.add('open');
     }
-    
+
     function closeExploredModal(e, force) {
         if (force || e.target.id === 'modal-explored-overlay') {
             document.getElementById('modal-explored-overlay').classList.remove('open');
@@ -15002,61 +15004,103 @@
         }
     }
 
+    function updateItemScore(id, delta) {
+        // Если записи нет, создаем (0)
+        if (!itemScores[id]) itemScores[id] = 0;
+
+        // Изменяем счет
+        itemScores[id] += delta;
+
+        // Логика распределения по спискам
+        if (itemScores[id] > 0) {
+            // Баланс положительный -> В Избранное
+            if (!favorites.includes(id)) favorites.push(id);
+            // Убираем из ЧС, если было
+            blacklist = blacklist.filter(x => x !== id);
+        } 
+        else if (itemScores[id] < 0) {
+            // Баланс отрицательный -> В ЧС
+            if (!blacklist.includes(id)) blacklist.push(id);
+            // Убираем из Избранного, если было
+            favorites = favorites.filter(x => x !== id);
+        } 
+        else {
+            // Баланс НОЛЬ -> Нейтрально (убираем отовсюду)
+            favorites = favorites.filter(x => x !== id);
+            blacklist = blacklist.filter(x => x !== id);
+            // Удаляем ключ, чтобы не засорять память
+            delete itemScores[id];
+        }
+
+        // Сохраняем всё
+        saveLists();
+        localStorage.setItem('xch_item_scores', JSON.stringify(itemScores));
+        
+        // Обновляем UI
+        updateActionButtons(); 
+        updateCounts();
+        updateCardStatusVisuals();
+    }
+
+    function syncScoresFromLists() {
+        let changed = false;
+        // Если есть в Избранном, но нет счета — ставим +1
+        favorites.forEach(id => {
+            if (!itemScores[id] || itemScores[id] <= 0) {
+                itemScores[id] = 1;
+                changed = true;
+            }
+        });
+        // Если есть в ЧС, но нет счета — ставим -1
+        blacklist.forEach(id => {
+            if (!itemScores[id] || itemScores[id] >= 0) {
+                itemScores[id] = -1;
+                changed = true;
+            }
+        });
+        if (changed) {
+            localStorage.setItem('xch_item_scores', JSON.stringify(itemScores));
+        }
+    }
+
     function toggleFavorite(silent = false) {
         if (isPanicMode) return;
-        if(!currentItem) return;
+        if (!currentItem) return;
         const id = currentItem.id;
         
-        if (favorites.includes(id)) {
-            if (!silent) favorites = favorites.filter(x => x !== id);
-        } else {
-            favorites.push(id); 
-            blacklist = blacklist.filter(x => x !== id);
-            
+        // Добавляем +1 к карме видео
+        updateItemScore(id, 1);
+
+        if (!silent) {
             const fullTags = getCombinedTags(currentItem);
-            adjustTagScoresByTags(fullTags, 5); // Лайк влияет на выдачу
-            
+            adjustTagScoresByTags(fullTags, 5); // Бустим теги
             hasInteractedWithCurrent = true;
             logActivity('like', id, fullTags);
         }
-        saveLists(); 
-        updateActionButtons(); 
-        updateCounts();
-        updateCardStatusVisuals(); 
     }
 
     function toggleBlacklist(silent = false) {
         if (isPanicMode) return;
-        if(!currentItem) return;
+        if (!currentItem) return;
         const id = currentItem.id;
-        
-        // Не баним, если это Watch Later ИЛИ Favorites (вброс)
-        if (watchLater.includes(id) || favorites.includes(id)) {
-            return;
-        }
 
-        if (blacklist.includes(id)) {
-            if (!silent) blacklist = blacklist.filter(x => x !== id);
-        } else { 
-            blacklist.push(id); 
+        if (watchLater.includes(id)) return;
 
-            favorites = favorites.filter(x => x !== id); 
-            
+        // Отнимаем -1 от кармы видео
+        updateItemScore(id, -1);
+
+        if (!silent) {
             const fullTags = getCombinedTags(currentItem);
-            adjustTagScoresByTags(fullTags, -5); 
-            
+            adjustTagScoresByTags(fullTags, -5); // Понижаем теги
             logActivity('dislike', id, fullTags);
         }
-        
-        saveLists(); 
-        updateActionButtons();
     }
 
     function toggleWatchLater() {
         if (isPanicMode) return;
         if(!currentItem) return;
         const id = currentItem.id;
-        const btn = document.getElementById('btn-t-wl'); // Новый ID
+        const btn = document.getElementById('btn-t-wl');
 
         if (watchLater.includes(id)) {
             watchLater = watchLater.filter(x => x !== id);
