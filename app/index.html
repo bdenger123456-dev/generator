@@ -8207,6 +8207,8 @@
             expl_hist: "From Archives 📜",
             deco_label: "Show Decorations",
 
+            act_time: "Time",
+
             unlocked_on: "Unlocked:",
             explored_subtitle: "Here are the achievements you need to get 'Platinum' 😈",
             cat_general: "General & Basic",
@@ -8737,6 +8739,8 @@
             expl_hist: "Из архивов 📜",
             deco_label: "Показывать декор",
 
+            act_time: "Время",
+
             unlocked_on: "Получено:",
             explored_subtitle: "Вот тебе ачивки, которые нужно получить для достижения «Платины» 😈",
             cat_general: "База",
@@ -9263,6 +9267,8 @@
             expl_hist: "De los archivos 📜",
             deco_label: "Mostrar decoración",
 
+            act_time: "Tiempo",
+
             unlocked_on: "Desbloqueado:",
             explored_subtitle: "Aquí están los logros que necesitas para obtener el 'Platino' 😈",
             cat_general: "General",
@@ -9780,6 +9786,8 @@
             expl_undo: "Meinung geändert? 😏",
             expl_hist: "Aus dem Archiv 📜",
             deco_label: "Dekoration anzeigen",
+
+            act_time: "Zeit",
 
             unlocked_on: "Freigeschaltet:",
             explored_subtitle: "Hier sind die Erfolge, die du für 'Platin' brauchst 😈",
@@ -12648,15 +12656,19 @@
     }
 
     function switchStatsTab(tab) {
-        if (tab === 'activity' && subscriptionLevel === 'free') {
-            openSubModal();
-            return;
-        }
         
         currentStatsTab = tab;
+        
+        // Переключаем классы
         document.getElementById('stat-nav-tags').classList.toggle('active', tab === 'tags');
         document.getElementById('stat-nav-activity').classList.toggle('active', tab === 'activity');
-        renderStatsContent();
+        
+        // Если пользователь бесплатный, принудительно переключаем на 'week' при смене вкладки,
+        if (subscriptionLevel === 'free' && currentStatsTimeframe !== 'week') {
+            switchTimeframe('week'); 
+        } else {
+            renderStatsContent();
+        }
     }
 
     function switchTimeframe(tf) {
@@ -12675,7 +12687,7 @@
     function updateStatsLocks() {
         const isFree = subscriptionLevel === 'free';
         
-        const idsToLock = ['tf-month', 'tf-year', 'tf-all', 'stat-nav-activity'];
+        const idsToLock = ['tf-month', 'tf-year', 'tf-all'];
         
         idsToLock.forEach(id => {
             const el = document.getElementById(id);
@@ -12698,14 +12710,21 @@
                 el.appendChild(lockSpan);
             }
         });
+        
+        const actBtn = document.getElementById('stat-nav-activity');
+        if (actBtn) {
+            const lock = actBtn.querySelector('.lock-icon-small');
+            if(lock) lock.remove();
+            actBtn.style.opacity = '1';
+        }
     }
-
+    
     function renderStatsContent() {
         const body = document.getElementById('modal-stats-body');
         body.innerHTML = '';
         const t = langData[currentLang];
 
-        // --- ВАРИАНТ А: ТЕГИ ---
+        // --- ВАРИАНТ А: ТЕГИ (PREFERENCES) ---
         if (currentStatsTab === 'tags') {
             const tempScores = {};
             const IGNORED_TAGS = ['general', 'specific', 'straight', 'male', 'female', 'adult', 'video', 'hd'];
@@ -12754,7 +12773,7 @@
             }
             html += `</div></div>`;
             
-            // === ЛЕГЕНДА (Только для UI) ===
+            // Легенда Тегов
             html += `
                 <div class="stats-legend-row">
                     <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div> ${t.legend_watch}</div>
@@ -12766,7 +12785,7 @@
             body.innerHTML = html;
         } 
         
-        // --- ВАРИАНТ Б: АКТИВНОСТЬ ---
+        // --- ВАРИАНТ Б: АКТИВНОСТЬ (ACTIVITY) ---
         else {
             const aggregated = {};
             const nowTime = Date.now();
@@ -12829,13 +12848,18 @@
                     const hTime = (d.time / maxTime) * 100;
                     const timeMin = Math.round(d.time / 60);
 
+                    // --- HTML ДЛЯ СТОЛБЦОВ АКТИВНОСТИ ---
                     html += `
                         <div class="act-col" style="min-width: 40px; margin-right: 5px;">
-                            <div style="display:flex; align-items:flex-end; gap:2px; height:75%; width:100%; padding-bottom:5px;">
+                            <!-- Цифра свайпов (сверху) -->
+                            <div style="font-size:8px; text-align:center; color:var(--text-secondary); font-weight:700; margin-bottom:2px;">${d.gen}</div>
+                            
+                            <div style="display:flex; align-items:flex-end; gap:2px; height:70%; width:100%; padding-bottom:5px;">
                                 <div style="flex:1; background:var(--text-secondary); height:${Math.max(5, hGen)}%; border-radius:2px 2px 0 0; opacity:0.3;"></div>
                                 <div style="flex:1; background:var(--accent); height:${Math.max(5, hWatch)}%; border-radius:2px 2px 0 0;"></div>
                                 <div style="flex:1; background:#9b59b6; height:${Math.max(5, hTime)}%; border-radius:2px 2px 0 0;"></div>
                             </div>
+                            <!-- Цифра времени (снизу) -->
                             <div style="font-size:8px; text-align:center; color:#9b59b6; font-weight:700;">${timeMin}</div>
                             <div class="chart-label-x" style="font-size:9px;">${d.label}</div>
                         </div>
@@ -12844,33 +12868,31 @@
             }
             html += `</div></div>`;
 
-            // === ЛЕГЕНДА (Только для UI) ===
+            // === ЛЕГЕНДА АКТИВНОСТИ ===
             let legendUnit = currentLang === 'ru' ? 'мин' : 'min';
             html += `
                 <div class="stats-legend-row">
                     <div class="legend-item"><div class="legend-dot" style="background:var(--text-secondary); opacity:0.3;"></div> ${t.act_actions}</div>
                     <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div> ${t.act_watches}</div>
-                    <div class="legend-item"><div class="legend-dot" style="background:#9b59b6"></div> Time (${legendUnit})</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#9b59b6"></div> ${t.act_time} (${legendUnit})</div>
                 </div>
             `;
 
             body.innerHTML = html;
         }
     }
-
+    
     function shareStats() {
         if(navigator.vibrate) navigator.vibrate(50);
 
-        // 1. СОБИРАЕМ ДАННЫЕ
+        // 1. СОБИРАЕМ ОБЩИЕ ДАННЫЕ
         const t = langData[currentLang] || langData['en'];
-        // Получаем правильное лого темы для скриншота
         const themeId = localStorage.getItem('xch_theme_id') || 'dark';
         const logoSrc = getThemeLogoSrc(themeId); 
         
         const slogan = t.share_caption || "Discover yourself";
         const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=0&data=${encodeURIComponent(window.location.origin)}`;
         
-        // Дата
         const now = new Date();
         const pad = (n) => n < 10 ? '0'+n : n;
         const formatDate = (d) => `${pad(d.getDate())}.${pad(d.getMonth()+1)}`;
@@ -12884,60 +12906,144 @@
             rangeStr = `${formatDate(new Date(now.getTime() - (days * 86400000)))} - ${formatDate(now)}`;
         }
 
-        // 2. ГЕНЕРИРУЕМ ТОП-5 ТЕГОВ ЗАНОВО (ЧТОБЫ НЕ БЫЛО СКРОЛЛА И ЛИШНИХ КОЛОНОК)
-        // Рассчитываем веса (копия логики из renderStatsContent)
-        const tempScores = {};
-        const IGNORED_TAGS = ['general', 'specific', 'straight', 'male', 'female', 'adult', 'video', 'hd'];
-        
-        activityLog.forEach(log => {
-            if (log.tags) {
-                let weight = 0;
-                if (log.type === 'watch') weight = 10;
-                else if (log.type === 'like' || log.type === 'similar') weight = 5;
-                else if (log.type === 'dislike') weight = -5;
-
-                if (weight !== 0) {
-                    log.tags.forEach(tag => {
-                        if(!IGNORED_TAGS.includes(tag)) {
-                            tempScores[tag] = (tempScores[tag] || 0) + weight;
-                        }
-                    });
-                }
-            }
-        });
-
-        // Берем ТОЛЬКО ТОП-5
-        const sortedTags = Object.entries(tempScores)
-            .sort((a, b) => b[1] - a[1])
-            .filter(x => x[1] > 0)
-            .slice(0, 5); 
-
-        // Генерируем HTML для графика (Без скролла, фиксированный Flex)
         let chartHtml = '';
-        
-        if(sortedTags.length === 0) {
-            chartHtml = `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-secondary);">${t.stats_no_data}</div>`;
-        } else {
-            const maxVal = Math.max(...sortedTags.map(x => x[1]));
-            // Контейнер с justify-content: space-between или space-around для красивого распределения 5 колонок
-            chartHtml = `<div style="display:flex; width:100%; height:100%; align-items:flex-end; justify-content: space-between; padding: 0 10px;">`;
-            
-            sortedTags.forEach(([tag, score]) => {
-                const height = Math.max(10, (score / maxVal) * 85);
-                let displayTag = tag.charAt(0).toUpperCase() + tag.slice(1);
-                // Обрезаем длинные названия
-                if (displayTag.length > 8) displayTag = displayTag.substring(0, 6) + '..';
+        let subTitleText = "";
 
-                // Используем flex:1 для равномерной ширины
-                chartHtml += `
-                    <div class="pref-col" style="flex:1; max-width:18%; display:flex; flex-direction:column; align-items:center; justify-content:flex-end;">
-                        <div class="chart-value-y" style="margin-bottom:4px; font-weight:800; font-size:12px; color:#fff;">${score}</div>
-                        <div class="chart-bar" style="height:${height}%; width:100%; border-radius: 6px 6px 0 0; background:var(--accent); min-height:4px;"></div>
-                        <div class="chart-label-x" style="margin-top:6px; font-size:11px; font-weight:600; color:var(--text-secondary);">${displayTag}</div>
-                    </div>
-                `;
+        // === ВЕТВЛЕНИЕ: ПРЕДПОЧТЕНИЯ ИЛИ АКТИВНОСТЬ ===
+
+        if (currentStatsTab === 'tags') {
+            // --- ЛОГИКА ДЛЯ ПРЕДПОЧТЕНИЙ (TAGS) ---
+            subTitleText = `TOP 5 ${t.stats_prefs}`;
+
+            const tempScores = {};
+            const IGNORED_TAGS = ['general', 'specific', 'straight', 'male', 'female', 'adult', 'video', 'hd'];
+            
+            activityLog.forEach(log => {
+                if (log.tags) {
+                    let weight = 0;
+                    if (log.type === 'watch') weight = 10;
+                    else if (log.type === 'like' || log.type === 'similar') weight = 5;
+                    else if (log.type === 'dislike') weight = -5;
+
+                    if (weight !== 0) {
+                        log.tags.forEach(tag => {
+                            if(!IGNORED_TAGS.includes(tag)) {
+                                tempScores[tag] = (tempScores[tag] || 0) + weight;
+                            }
+                        });
+                    }
+                }
             });
-            chartHtml += `</div>`;
+
+            const sortedTags = Object.entries(tempScores)
+                .sort((a, b) => b[1] - a[1])
+                .filter(x => x[1] > 0)
+                .slice(0, 5); 
+
+            if(sortedTags.length === 0) {
+                chartHtml = `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-secondary);">${t.stats_no_data}</div>`;
+            } else {
+                const maxVal = Math.max(...sortedTags.map(x => x[1]));
+                chartHtml = `<div style="display:flex; width:100%; height:100%; align-items:flex-end; justify-content: space-between; padding: 0 10px;">`;
+                
+                sortedTags.forEach(([tag, score]) => {
+                    const height = Math.max(10, (score / maxVal) * 85);
+                    let displayTag = tag.charAt(0).toUpperCase() + tag.slice(1);
+                    if (displayTag.length > 8) displayTag = displayTag.substring(0, 6) + '..';
+
+                    chartHtml += `
+                        <div class="pref-col" style="flex:1; max-width:18%; display:flex; flex-direction:column; align-items:center; justify-content:flex-end;">
+                            <div class="chart-value-y" style="margin-bottom:4px; font-weight:800; font-size:12px; color:#fff;">${score}</div>
+                            <div class="chart-bar" style="height:${height}%; width:100%; border-radius: 6px 6px 0 0; background:var(--accent); min-height:4px;"></div>
+                            <div class="chart-label-x" style="margin-top:6px; font-size:11px; font-weight:600; color:var(--text-secondary);">${displayTag}</div>
+                        </div>
+                    `;
+                });
+                chartHtml += `</div>`;
+            }
+
+        } else {
+            // --- ЛОГИКА ДЛЯ АКТИВНОСТИ (ACTIVITY) ---
+            subTitleText = (currentLang === 'ru' ? "ИСТОРИЯ АКТИВНОСТИ" : "ACTIVITY HISTORY");
+
+            const aggregated = {};
+            // Для экспорта берем последние 7 дней (или единиц времени), чтобы влезло красиво
+            const exportLimit = 7; 
+            
+            // Агрегация (копия логики из renderStatsContent, но без фильтра по времени, берем всё и режем в конце)
+            activityLog.forEach(log => {
+                const d = new Date(log.ts);
+                let key, label;
+                // Упрощаем: всегда по дням для наглядности графика, или по месяцам если выбран год
+                if (currentStatsTimeframe === 'year' || currentStatsTimeframe === 'all') {
+                    key = `${d.getFullYear()}-${d.getMonth()}`;
+                    label = d.toLocaleDateString(currentLang, { month: 'short' });
+                } else {
+                    key = d.toISOString().split('T')[0];
+                    label = d.toLocaleDateString(currentLang, { day: 'numeric', month: 'numeric' });
+                }
+                
+                if (!aggregated[key]) aggregated[key] = { gen: 0, watch: 0, time: 0, label: label, sort: d.getTime() };
+                if (log.type === 'watch') aggregated[key].watch++;
+                else if (['like', 'gen', 'pass', 'dislike'].includes(log.type)) aggregated[key].gen++;
+            });
+
+            watchHistory.forEach(entry => {
+                const d = new Date(entry.timestamp);
+                let key = (currentStatsTimeframe === 'year' || currentStatsTimeframe === 'all') 
+                    ? `${d.getFullYear()}-${d.getMonth()}` 
+                    : d.toISOString().split('T')[0];
+                
+                if (aggregated[key]) aggregated[key].time += entry.seconds;
+                else {
+                    const label = d.toLocaleDateString(currentLang, { day: 'numeric', month: 'numeric' });
+                    aggregated[key] = { gen: 0, watch: 0, time: entry.seconds, label: label, sort: d.getTime() };
+                }
+            });
+
+            // Берем последние N элементов
+            const chartData = Object.values(aggregated)
+                .sort((a, b) => a.sort - b.sort)
+                .slice(-exportLimit);
+
+            if (chartData.length === 0) {
+                chartHtml = `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-secondary);">${t.stats_no_data}</div>`;
+            } else {
+                let maxCount = 0, maxTime = 0;
+                chartData.forEach(d => {
+                    if (d.gen > maxCount) maxCount = d.gen;
+                    if (d.watch > maxCount) maxCount = d.watch;
+                    if (d.time > maxTime) maxTime = d.time;
+                });
+                if (maxCount < 5) maxCount = 5;
+                if (maxTime < 300) maxTime = 300;
+
+                chartHtml = `<div style="display:flex; width:100%; height:100%; align-items:flex-end; justify-content: space-between; padding: 0 10px;">`;
+
+                chartData.forEach(d => {
+                    const hGen = (d.gen / maxCount) * 100;
+                    const hWatch = (d.watch / maxCount) * 100;
+                    const hTime = (d.time / maxTime) * 100;
+                    
+                    chartHtml += `
+                        <div style="flex:1; max-width:13%; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; margin:0 2px;">
+                            <!-- Число свайпов -->
+                            <div style="font-size:9px; font-weight:700; color:var(--text-secondary); margin-bottom:2px;">${d.gen}</div>
+                            
+                            <div style="display:flex; align-items:flex-end; gap:2px; height:80%; width:100%;">
+                                <div style="flex:1; background:var(--text-secondary); height:${Math.max(5, hGen)}%; border-radius:2px 2px 0 0; opacity:0.3;"></div>
+                                <div style="flex:1; background:var(--accent); height:${Math.max(5, hWatch)}%; border-radius:2px 2px 0 0;"></div>
+                                <div style="flex:1; background:#9b59b6; height:${Math.max(5, hTime)}%; border-radius:2px 2px 0 0;"></div>
+                            </div>
+                            
+                            <!-- Число минут -->
+                            <div style="font-size:9px; font-weight:700; color:#9b59b6; margin-top:2px;">${Math.round(d.time/60)}</div>
+                            <div class="chart-label-x" style="margin-top:2px; font-size:9px; font-weight:600; color:var(--text-secondary);">${d.label}</div>
+                        </div>
+                    `;
+                });
+                chartHtml += `</div>`;
+            }
         }
 
         // 3. СОЗДАЕМ СКРЫТЫЙ КОНТЕЙНЕР (Карточка)
@@ -12963,7 +13069,7 @@
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:-5px;">
                 <span style="font-size:12px; color:var(--text-secondary); font-weight:700;">${rangeStr}</span>
                 <span style="font-size:12px; color:var(--accent); font-weight:800; text-transform:uppercase;">
-                    TOP 5 ${t.stats_prefs}
+                    ${subTitleText}
                 </span>
             </div>
             
