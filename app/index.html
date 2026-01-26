@@ -6894,6 +6894,41 @@
     </div>
 </div>
 
+<!-- LIMIT REACHED MODAL -->
+<div class="modal-overlay" id="modal-limit-overlay" onclick="closeLimitModal(event)">
+    <div class="modal" style="max-width: 340px; text-align: center;">
+        <!-- Заголовок не нужен, используем крупную иконку -->
+        <div class="modal-body" style="padding: 30px 20px 20px 20px; display: flex; flex-direction: column; align-items: center;">
+            
+            <div style="font-size: 50px; margin-bottom: 15px;">✋</div>
+            
+            <h3 style="margin-bottom: 10px; color: var(--text-main);" data-key="limit_title">
+                Limit Reached
+            </h3>
+
+            <p id="limit-custom-text" style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px;">
+                That's enough for today, buddy. Come back tomorrow, or join Pro and watch until you turn blue 😏
+            </p>
+
+            <!-- Маленькая подпись с временем сброса -->
+            <div id="limit-reset-time" style="font-size: 11px; background: var(--nav-bg); padding: 4px 10px; border-radius: 8px; margin-bottom: 25px; opacity: 0.8;">
+                Reset: 00:00
+            </div>
+
+            <!-- Кнопка купить -->
+            <button class="btn-gen" onclick="closeLimitModal(null, true); openSubModal();" style="width: 100%; margin-bottom: 10px; background: var(--accent); color: #000;">
+                <span data-key="btn_get_pro">Get Pro</span>
+            </button>
+
+            <!-- Кнопка закрыть -->
+            <button class="btn-gen secondary" onclick="closeLimitModal(null, true)" style="width: 100%;">
+                <span data-key="btn_close">Close</span>
+            </button>
+
+        </div>
+    </div>
+</div>
+
 <div id="wrapped-mount" class="wrapped-overlay"></div>
 
 <!-- FIREBASE INTEGRATION -->
@@ -7808,7 +7843,7 @@
         }
     });
 
-    const DAILY_LIMIT = 15;
+    const DAILY_LIMIT = 50;
     let currentItem = null;
     let lastGeneratedItem = null; 
     let hasInteractedWithCurrent = false;
@@ -8207,6 +8242,9 @@
             expl_hist: "From Archives 📜",
             deco_label: "Show Decorations",
 
+            limit_title: "Limit Reached",
+            limit_desc_fun: "That's enough for today, buddy. Come back tomorrow, or join Pro and watch until you turn blue 😏",
+
             act_time: "Time",
 
             unlocked_on: "Unlocked:",
@@ -8467,7 +8505,7 @@
             sub_intro: "xFetishHub is a one-of-a-kind project that helps you discover and analyze your adult preferences in one cozy, ad-free place. By subscribing, you ensure the project's survival, and in return, I'll give you significantly more features:",
             
             // Plans Features
-            feat_limit: "🎲 15 Generations / day",
+            feat_limit: "🎲 50 Generations / day",
             feat_stats_basic: "📊 Basic Statistics",
             feat_filters: "✔️ Standard Filters",
             btn_current: "Current Plan",
@@ -8475,7 +8513,7 @@
             feat_wrapped_unlim: "✨ <b>Unlimited</b> Fetish Wrapped",
 
             lbl_subscription: "Subscription",
-            limit_text_full: "🎲 15 Generations / day (left: {n}/15)",
+            limit_text_full: "🎲 50 Generations / day (left: {n}/50)",
 
             feat_unlim: "🔥 Unlimited Generations",
             feat_stats_adv: "📈 Advanced Stats & History",
@@ -8739,6 +8777,9 @@
             expl_hist: "Из архивов 📜",
             deco_label: "Показывать декор",
 
+            limit_title: "Лимит исчерпан",
+            limit_desc_fun: "На сегодня хватит, дружище. Возвращайся завтра, либо присоединяйся к Pro, и смотри хоть до посинения 😏",
+            
             act_time: "Время",
 
             unlocked_on: "Получено:",
@@ -8997,7 +9038,7 @@
             sub_intro: "xFetishHub — это единственный в своём роде проект, который помогает тебе узнать и проанализировать твои взрослые предпочтения в одном уютном месте без рекламы. Если оплатишь подписку, то проект и дальше сможет существовать, а взамен я тебе дам ощутимо больше возможностей:",
             
             // Планы
-            feat_limit: "🎲 15 Генераций / день",
+            feat_limit: "🎲 50 Генераций / день",
             feat_stats_basic: "📊 Базовая статистика",
             feat_filters: "✔️ Стандартные фильтры",
             btn_current: "Текущий план",
@@ -9005,7 +9046,7 @@
             feat_wrapped_unlim: "✨ <b>Безлимитный</b> Wrapped",
 
             lbl_subscription: "Подписка",
-            limit_text_full: "🎲 15 Генераций / день (осталось: {n}/15)",
+            limit_text_full: "🎲 50 Генераций / день (осталось: {n}/50)",
 
             feat_unlim: "🔥 Безлимитные генерации",
             feat_stats_adv: "📈 Расширенные сводки",
@@ -9266,6 +9307,10 @@
             expl_undo: "¿Cambiaste de opinión? 😏",
             expl_hist: "De los archivos 📜",
             deco_label: "Mostrar decoración",
+
+            limit_title: "Límite Alcanzado",
+            limit_desc_fun: "Suficiente por hoy, amigo. Vuelve mañana o únete a Pro y mira hasta que te pongas azul 😏",
+
 
             act_time: "Tiempo",
 
@@ -9535,7 +9580,7 @@
             sub_title: "Acceso Premium",
             sub_intro: "xFetishHub es un proyecto único en su tipo que te ayuda a descubrir y analizar tus preferencias adultas en un lugar acogedor y sin publicidad. Al suscribirte aseguras la supervivencia del proyecto, y a cambio te daré muchas más funciones:",
             
-            feat_limit: "🎲 15 Generaciones / día",
+            feat_limit: "🎲 50 Generaciones / día",
             feat_stats_basic: "📊 Estadísticas Básicas",
             feat_filters: "✔️ Filtros Estándar",
             btn_current: "Plan Actual",
@@ -9544,7 +9589,7 @@
             feat_wrapped_unlim: "✨ Fetish Wrapped <b>Ilimitado</b>",
 
             lbl_subscription: "Suscripción",
-            limit_text_full: "🎲 15 Generaciones / día (quedan: {n}/15)",
+            limit_text_full: "🎲 50 Generaciones / día (quedan: {n}/50)",
 
             feat_unlim: "🔥 Generaciones Ilimitadas",
             feat_stats_adv: "📈 Estadísticas Avanzadas",
@@ -9786,6 +9831,9 @@
             expl_undo: "Meinung geändert? 😏",
             expl_hist: "Aus dem Archiv 📜",
             deco_label: "Dekoration anzeigen",
+
+            limit_title: "Limit erreicht",
+            limit_desc_fun: "Das reicht für heute, Kumpel. Komm morgen wieder oder hol dir Pro und schau bis du blau wirst 😏",
 
             act_time: "Zeit",
 
@@ -10046,7 +10094,7 @@
             sub_title: "Premium Zugang",
             sub_intro: "xFetishHub ist ein einzigartiges Projekt, das dir hilft, deine Vorlieben an einem gemütlichen, werbefreien Ort zu entdecken und zu analysieren. Mit einem Abo sicherst du den Fortbestand des Projekts, und im Gegenzug biete ich dir deutlich mehr Funktionen:",
             
-            feat_limit: "🎲 15 Generationen / Tag",
+            feat_limit: "🎲 50 Generationen / Tag",
             feat_stats_basic: "📊 Basis-Statistik",
             feat_filters: "✔️ Standardfilter",
             btn_current: "Aktueller Plan",
@@ -10054,7 +10102,7 @@
             feat_wrapped_unlim: "✨ <b>Unbegrenztes</b> Wrapped",
 
             lbl_subscription: "Abonnement",
-            limit_text_full: "🎲 15 Generationen / Tag (übrig: {n}/15)",
+            limit_text_full: "🎲 50 Generationen / Tag (übrig: {n}/50)",
 
             feat_unlim: "🔥 Unbegrenzte Generationen",
             feat_stats_adv: "📈 Erweiterte Statistik",
@@ -12718,7 +12766,7 @@
             actBtn.style.opacity = '1';
         }
     }
-    
+
     function renderStatsContent() {
         const body = document.getElementById('modal-stats-body');
         body.innerHTML = '';
@@ -13815,7 +13863,7 @@
         let count = parseInt(localStorage.getItem('xch_limit_count') || '0');
         let startTime = parseInt(localStorage.getItem('xch_limit_start') || '0');
 
-        // Логика сброса: Если прошло 24 часа с момента старта отсчета — сбрасываем визуально
+        // Логика сброса: Если прошло 24 часа с момента старта отсчета — сбрасываем
         if (startTime > 0 && (now - startTime > oneDay)) {
             if (!onlyCheck) {
                 count = 0;
@@ -13823,17 +13871,14 @@
                 localStorage.setItem('xch_limit_count', '0');
                 localStorage.setItem('xch_limit_start', '0');
             } else {
-                // Для проверки притворяемся, что счетчик сброшен
                 count = 0; 
             }
         }
 
         // Если лимит исчерпан
         if (count >= DAILY_LIMIT) {
-            // Показываем модалку и Алерт
-            openSubModal();
             
-            // Вычисляем время сброса
+            // Вычисляем время сброса для отображения
             const resetTime = startTime > 0 ? startTime + oneDay : now + oneDay;
             const resetDate = new Date(resetTime);
             
@@ -13841,27 +13886,20 @@
                 day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
             });
 
-            const t = langData[currentLang] || langData['en'];
-            let msg = currentLang === 'ru' 
-                ? `Лимит исчерпан (${DAILY_LIMIT}).\nСброс: ${dateStr}.\nКупи Pro для безлимита!` 
-                : `Daily limit reached (${DAILY_LIMIT}).\nReset: ${dateStr}.\nGet Pro for unlimited!`;
-
-            alert(msg);
+            // --- ОТКРЫВАЕМ ОКНО ---
+            if (!onlyCheck) {
+                openLimitModal(dateStr); 
+            }
             
-            // Обновляем кнопку (красная)
+            // Обновляем кнопку подписки (красная)
             updateSubscriptionUI();
             
             return false;
         }
 
-        // === ЕСЛИ ЭТО ТОЛЬКО ПРОВЕРКА (без списания) ===
-        if (onlyCheck) {
-            return true; 
-        }
+        if (onlyCheck) return true; 
 
-        // === СПИСАНИЕ (только если onlyCheck = false) ===
-        
-        // Если это первая генерация в цикле
+        // Списание
         if (count === 0 || startTime === 0) {
             localStorage.setItem('xch_limit_start', now);
         }
@@ -13996,6 +14034,30 @@
     function closeThemeModal(e, force) {
         if (force || e.target.id === 'modal-theme-overlay') {
             document.getElementById('modal-theme-overlay').classList.remove('open');
+        }
+    }
+
+    function openLimitModal(resetTimeStr) {
+        const modal = document.getElementById('modal-limit-overlay');
+        const textEl = document.getElementById('limit-custom-text');
+        const timeEl = document.getElementById('limit-reset-time');
+        
+        // Берем перевод фразы
+        const t = langData[currentLang] || langData['en'];
+        if (textEl) textEl.innerText = t.limit_desc_fun;
+        
+        // Обновляем время сброса
+        if (timeEl) {
+            const label = currentLang === 'ru' ? "Сброс:" : "Reset:";
+            timeEl.innerText = `${label} ${resetTimeStr}`;
+        }
+
+        modal.classList.add('open');
+    }
+
+    function closeLimitModal(e, force) {
+        if (force || e.target.id === 'modal-limit-overlay') {
+            document.getElementById('modal-limit-overlay').classList.remove('open');
         }
     }
 
