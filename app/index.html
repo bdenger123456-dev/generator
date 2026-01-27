@@ -292,6 +292,54 @@
             filter: invert(0) !important; 
         }
 
+        /* === THEME: OLD MONEY (Mahogany & Gold) === */
+        body[data-theme="old-money"] {
+            /* Основные цвета: Глубокий махагон и Золото */
+            --bg-color: #1a0505;
+            --sidebar-bg: #260909;
+            --card-bg: #2e0b0b;
+            --nav-bg: #2e0b0b;
+            
+            --text-main: #f0e6d2; /* Кремовый/Папирус */
+            --text-secondary: #a38970; /* Приглушенная медь */
+            
+            --accent: #c5a059; /* Старое золото */
+            --accent-light: #e6c98c; /* Светлое золото */
+            
+            --border: #4a1919;
+            --ios-card: #2e0b0b;
+            --ios-bg: #1a0505;
+            --ios-separator: #4a1919;
+            --ios-header: #8a6a4b;
+
+            --card-gradient: linear-gradient(165deg, #2e0b0b 0%, #1a0505 100%);
+            --modal-bg: rgba(26, 5, 5, 0.95);
+        }
+
+        /* Иконки в теме Old Money (Золотой фильтр) */
+        body[data-theme="old-money"] .nav-icon-img,
+        body[data-theme="old-money"] .settings-icon,
+        body[data-theme="old-money"] .side-icon-img,
+        body[data-theme="old-money"] .ai-icon-img,
+        body[data-theme="old-money"] .voice-icon-img,
+        body[data-theme="old-money"] .share-icon-img,
+        body[data-theme="old-money"] .ex-card-icon {
+            /* Фильтр для превращения черного/белого в золото (#c5a059) */
+            filter: invert(75%) sepia(26%) saturate(677%) hue-rotate(357deg) brightness(89%) contrast(88%) drop-shadow(0 2px 5px rgba(0,0,0,0.3)) !important;
+            opacity: 1;
+        }
+
+        /* Активные элементы */
+        body[data-theme="old-money"] .nav-item.active .nav-icon-img {
+            filter: invert(89%) sepia(19%) saturate(886%) hue-rotate(328deg) brightness(98%) contrast(90%) drop-shadow(0 0 8px rgba(197, 160, 89, 0.6)) !important; /* Светлое золото */
+        }
+
+        /* Кнопки управления */
+        body[data-theme="old-money"] .t-circle-btn {
+            border-color: #5c2424 !important;
+            background: rgba(46, 11, 11, 0.6);
+        }
+
         body {
             font-family: var(--font-main);
             background-color: var(--bg-color);
@@ -1106,11 +1154,6 @@
         body.light-theme .nav-icon-img {
             filter: invert(0);
             opacity: 0.6;
-        }
-
-        /* Радужная тема: Белый с тенью */
-        body.rainbow-mode .nav-icon-img {
-            filter: invert(1) drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
         }
 
         /* Активное состояние (светлая тема) */
@@ -2048,11 +2091,6 @@
         /* Для светлой темы */
         body.light-theme .share-icon-img {
             filter: invert(0); /* Черная */
-        }
-
-        /* Для радужной темы */
-        body.rainbow-mode .share-icon-img {
-            filter: invert(1) drop-shadow(0 0 2px rgba(255,255,255,0.8));
         }
 
         /* Контейнер для генерации скриншота (скрыт от глаз, но виден для скрипта) */
@@ -3254,43 +3292,6 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
-        /* === RAINBOW THEME STYLES === */
-
-        /* Анимированный градиент для фона карточки */
-        body.rainbow-mode .card {
-            background: linear-gradient(
-                120deg, 
-                #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000
-            );
-            background-size: 400% 400%;
-            animation: rainbowMove 10s ease infinite;
-            border: 2px solid rgba(255, 255, 255, 0.3) !important;
-        }
-
-        /* Затемняющая подложка внутри карточки, чтобы текст читался */
-        body.rainbow-mode .card > div {
-            z-index: 2;
-        }
-        /* Псевдо-элемент для затемнения фона карточки, но сохранения градиента */
-        body.rainbow-mode .card::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.75); /* Темная вуаль */
-            z-index: 1;
-        }
-
-        @keyframes rainbowMove {
-            0% { background-position: 0% 50% }
-            50% { background-position: 100% 50% }
-            100% { background-position: 0% 50% }
-        }
-
-        /* Цвет текста в радужной теме всегда белый для контраста */
-        body.rainbow-mode .card, body.rainbow-mode .slot-item {
-            color: #ffffff !important;
-        }
-
         .swipe-overlay {
             position: absolute;
             top: 0;
@@ -3381,13 +3382,6 @@
         body.light-theme .deco-icon {
             filter: invert(0) drop-shadow(0 5px 15px rgba(0, 0, 0, 0.15));
             opacity: 0.8; 
-        }
-
-        /* --- 3. РАДУЖНАЯ ТЕМА --- */
-        /* Делаем белыми, чтобы выделялись на ярком фоне + сильная тень */
-        body.rainbow-mode .deco-icon {
-            filter: invert(1) drop-shadow(0 0 15px rgba(255, 255, 255, 0.9));
-            opacity: 1;
         }
 
         /* АНИМАЦИИ ПАРЕНИЯ */
@@ -3605,13 +3599,6 @@
         .card.status-ban .card-notch {
             background: #e74c3c;
             box-shadow: 0 5px 20px rgba(231, 76, 60, 0.4);
-        }
-
-        body.rainbow-mode .card.status-wl,
-        body.rainbow-mode .card.status-fav,
-        body.rainbow-mode .card.status-ban {
-            animation: none !important;
-            background: var(--card-gradient) !important; 
         }
 
         /* === 1. MODE CAPSULE (DROPDOWN STYLE) === */
@@ -4047,11 +4034,6 @@
             filter: invert(0) drop-shadow(0 0 2px rgba(0, 0, 0, 0.1));
         }
 
-        /* Радужная тема -> Делаем белым с сильной тенью */
-        body.rainbow-mode .ai-icon-img {
-            filter: invert(1) drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
-        }
-
         .mode-circle-btn.center-btn.ai-assist {
             /* Адаптивный градиент темы */
             background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 100%) !important;
@@ -4213,10 +4195,6 @@
             filter: invert(0) drop-shadow(0 0 2px rgba(0, 0, 0, 0.1));
         }
 
-        body.rainbow-mode .side-icon-img {
-            filter: invert(1) drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
-        }
-
         body[data-theme="noir"] .side-icon-img {
             filter: invert(1) !important;
         }
@@ -4238,11 +4216,6 @@
         /* Светлая тема: Оставляем черным */
         body.light-theme .voice-icon-img {
             filter: invert(0) opacity(0.7);
-        }
-
-        /* Радужная тема: Белый с сильным свечением */
-        body.rainbow-mode .voice-icon-img {
-            filter: invert(1) drop-shadow(0 0 5px rgba(255, 255, 255, 0.9));
         }
 
         /* Анимация при записи (Красное свечение) */
@@ -4273,12 +4246,6 @@
         body.light-theme .settings-icon {
             filter: invert(0);
             opacity: 0.65;
-        }
-
-        /* Радужная тема: Белые с тенью */
-        body.rainbow-mode .settings-icon {
-            filter: invert(1) drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
-            opacity: 1;
         }
 
         /* Обертка для левой части (Иконка + Текст), чтобы они стояли в ряд */
@@ -4707,10 +4674,6 @@
             filter: invert(0) drop-shadow(0 4px 6px rgba(0,0,0,0.1));
         }
 
-        body.rainbow-mode .ex-card-icon {
-            filter: invert(1) drop-shadow(0 0 5px rgba(255,255,255,0.8));
-        }
-
         /* Название категории */
         .ex-card-title {
             font-size: 13px;
@@ -4978,19 +4941,18 @@
             text-shadow: 0 0 10px rgba(255,255,255,0.3);
         }
 
-        /* --- 8. RAINBOW (Радуга) --- */
-        body[data-theme="rainbow"] .logo span,
-        body[data-theme="rainbow"] .sum-logo-text span.grad {
-            background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000) !important;
-            background-size: 200% auto !important;
+        /* --- 8. OLD MONEY (Mahogany) --- */
+        body[data-theme="old-money"] .logo span,
+        body[data-theme="old-money"] .sum-logo-text span.grad {
+            /* Золотой градиент */
+            background: linear-gradient(180deg, #e6c98c 20%, #c5a059 100%) !important;
             -webkit-background-clip: text !important;
             background-clip: text !important;
             -webkit-text-fill-color: transparent !important;
-            animation: rainbowText 3s linear infinite;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
 
         /* --- 9. DEFAULT (Розовый) --- */
-        /* Важно! Это сработает для тем 'dark' и 'light', если у body нет атрибута data-theme или он равен dark/light */
         body:not([data-theme^="blue"]):not([data-theme^="green"]):not([data-theme^="red"]):not([data-theme^="gold"]):not([data-theme^="purple"]):not([data-theme^="orange"]):not([data-theme="noir"]):not([data-theme="rainbow"]) .logo span {
             background: linear-gradient(180deg, #CB53F0 20%, #ff00cc 100%) !important;
             -webkit-background-clip: text !important;
@@ -4998,9 +4960,6 @@
             -webkit-text-fill-color: transparent !important;
         }
 
-        @keyframes rainbowText {
-            to { background-position: 200% center; }
-        }
 
         /* === НОВЫЙ БЛОК ИНТЕНСИВНОСТИ === */
         .intensity-wrapper {
@@ -5276,12 +5235,6 @@
                 box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15) !important;
             }
 
-            /* Адаптация для РАДУЖНОЙ ТЕМЫ */
-            body.rainbow-mode .sidebar {
-                background: rgba(20, 20, 20, 0.4) !important; /* Более прозрачный */
-                border: 1px solid rgba(255, 255, 255, 0.2) !important;
-            }
-
             /* Убираем скроллбар внутри сайдбара, чтобы было красиво, но оставляем возможность скроллить */
             .sidebar::-webkit-scrollbar {
                 width: 0px;
@@ -5455,7 +5408,7 @@
             'green-dark': '#020a02', 'green-light': '#dcfce7',
             'red-dark': '#0d0000', 'red-light': '#ffe4e6',
             'gold-dark': '#0a0900', 'gold-light': '#fef3c7',
-            'noir': '#000000', 'rainbow': '#12000b'
+            'noir': '#000000', 'old-money': '#1a0505'
         };
         // Карта акцентов (для бара)
         const accentColors = {
@@ -5464,7 +5417,7 @@
             'green-dark': '#2ecc71', 'green-light': '#16a34a',
             'red-dark': '#e74c3c', 'red-light': '#e11d48',
             'gold-dark': '#f1c40f', 'gold-light': '#d97706',
-            'noir': '#ffffff', 'rainbow': '#ff00cc'
+            'noir': '#ffffff', 'old-money': '#c5a059'
         };
 
         if (bgColors[themeId]) overlay.style.backgroundColor = bgColors[themeId];
@@ -7129,8 +7082,10 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, getDocs, updateDoc, serverTimestamp, writeBatch, query, where, collection, deleteField, Timestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
+    import { 
+        getFirestore, doc, setDoc, getDoc, getDocs, updateDoc, serverTimestamp, writeBatch, query, where, collection, deleteField, Timestamp, limit, 
+        initializeFirestore, persistentLocalCache 
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyC94QWRaFu0o60kDSU8Uz0VJAcXwaDWjlI",
@@ -7146,10 +7101,16 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     window.auth = auth;
-    const db = getFirestore(app);
+    const db = initializeFirestore(app, {
+        localCache: persistentLocalCache()
+    });
     const provider = new GoogleAuthProvider();
 
     let syncTimeout = null;
+
+    let cachedUserProfile = null;
+    let lastProfileReadTime = 0;
+    const PROFILE_CACHE_TTL = 60000; 
 
     // Глобальное состояние входа
     window.isUserLoggedIn = false;
@@ -7250,7 +7211,7 @@
         }
     };
 
-    // === 2. ОТКРЫТИЕ ОКНА И ПОДГРУЗКА СТАТИСТИКИ ===
+    // === 2. ОТКРЫТИЕ ОКНА И ПОДГРУЗКА СТАТИСТИКИ (ОПТИМИЗИРОВАНО) ===
     window.openSyncInfoModal = async function() {
         const user = auth.currentUser;
         if (!user) return;
@@ -7258,129 +7219,130 @@
         document.getElementById('modal-sync-info-overlay').classList.add('open');
         document.getElementById('sync-email-display').innerText = user.email;
 
-        // Элементы карточки
+        // Элементы UI
         const subValue = document.getElementById('sync-sub-value');
         const subDesc = document.getElementById('sync-sub-desc');
         const subCard = document.getElementById('sync-sub-card');
+        
+        // Получаем переводы (проверка на существование langData)
+        const currentLang = localStorage.getItem('xch_lang') || 'en';
+        const t = (window.langData && window.langData[currentLang]) ? window.langData[currentLang] : (window.langData ? window.langData['en'] : {});
 
-        // Сброс (Загрузка)
-        subValue.innerText = "...";
-        subDesc.innerText = "Checking status...";
-        subCard.style.borderColor = "var(--border)";
-        subCard.style.background = "var(--ios-card)"; // Сброс фона
-        subValue.style.color = "var(--text-main)";
+        // === ОПТИМИЗАЦИЯ: Проверка кэша ===
+        const now = Date.now();
+        let d = cachedUserProfile; // Пытаемся взять из памяти
 
-        const t = langData[currentLang] || langData['en'];
+        // Если кэша нет ИЛИ он протух (старше 1 минуты) -> читаем из базы
+        if (!d || (now - lastProfileReadTime > PROFILE_CACHE_TTL)) {
+            // UI показывает "Загрузка..." только если мы реально идем в сеть
+            subValue.innerText = "...";
+            ['cloud-fav-count', 'cloud-wl-count', 'cloud-explored-count', 'cloud-ban-count'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.innerText = "...";
+            });
 
-        // Сброс счетчиков
-        ['cloud-fav-count', 'cloud-wl-count', 'cloud-explored-count', 'cloud-ban-count'].forEach(id => {
-            const el = document.getElementById(id);
-            if(el) el.innerText = "...";
-        });
-
-        try {
-            const userRef = doc(db, "users", user.uid);
-            const docSnap = await getDoc(userRef);
-
-            if (docSnap.exists()) {
-                const d = docSnap.data();
-
-                // Модификаторы
-                const cloudMods = d.modifiersPool || null; 
-                if (cloudMods && Array.isArray(cloudMods)) {
-                    userModifiersPool = cloudMods;
-                    localStorage.setItem('xch_user_mods', JSON.stringify(userModifiersPool));
-                }
+            try {
+                const userRef = doc(db, "users", user.uid);
+                // Используем getDoc (благодаря персистенции он может взять и с диска)
+                const docSnap = await getDoc(userRef);
                 
-                // === ЛОГИКА ПОДПИСКИ (ГРАДИЕНТЫ) ===
-                const plan = d.subscription || 'free';
-                subValue.innerText = plan.toUpperCase();
-                
-                // Настройка стилей для планов
-                if (plan === 'pro') { 
-                    subValue.style.color = '#ff9900'; 
-                    subCard.style.borderColor = 'rgba(255, 153, 0, 0.5)'; 
-                    subCard.style.background = 'linear-gradient(135deg, rgba(255, 153, 0, 0.15) 0%, rgba(255, 153, 0, 0.05) 100%)'; // Оранжевый градиент
-                    subCard.style.boxShadow = '0 4px 15px rgba(255, 153, 0, 0.1)';
+                if (docSnap.exists()) {
+                    d = docSnap.data();
+                    cachedUserProfile = d; // Обновляем кэш
+                    lastProfileReadTime = now;
+                } else {
+                    d = null; // Документа нет
                 }
-                else if (plan === 'beast') { 
-                    subValue.style.color = '#9b59b6'; 
-                    subCard.style.borderColor = 'rgba(155, 89, 182, 0.5)'; 
-                    subCard.style.background = 'linear-gradient(135deg, rgba(155, 89, 182, 0.15) 0%, rgba(155, 89, 182, 0.05) 100%)'; // Фиолетовый градиент
-                    subCard.style.boxShadow = '0 4px 15px rgba(155, 89, 182, 0.1)';
-                }
-                else if (plan === 'bestie') { 
-                    subValue.style.color = '#00d2ff'; 
-                    subCard.style.borderColor = 'rgba(0, 210, 255, 0.5)';
-                    subCard.style.background = 'linear-gradient(135deg, rgba(0, 210, 255, 0.15) 0%, rgba(58, 123, 213, 0.05) 100%)'; // Голубой градиент
-                    subCard.style.boxShadow = '0 4px 15px rgba(0, 210, 255, 0.1)';
-                }
-                else { 
-                    // FREE
-                    subValue.style.color = 'var(--text-main)'; 
-                    subCard.style.borderColor = 'var(--border)';
-                    subCard.style.background = 'var(--ios-card)';
-                    subCard.style.boxShadow = 'none';
-                }
+            } catch (e) {
+                console.error("Error fetching sync stats:", e);
+                subValue.innerText = "ERROR";
+                return;
+            }
+        } else {
+            console.log("Using cached profile data (Optimized read)");
+        }
 
-                // Текст описания
-                if (plan === 'free') {
-                    subDesc.innerText = (currentLang === 'ru' ? "Нажми, чтобы улучшить" : "Tap to Upgrade");
-                    subDesc.style.color = "var(--accent)";
-                    subDesc.style.fontWeight = "700";
-                } 
-                else if (plan === 'bestie') {
-                    subDesc.innerHTML = "♾️ Lifetime Access";
-                    subDesc.style.color = "var(--text-secondary)";
-                    subDesc.style.fontWeight = "600";
+        if (d) {
+            // Модификаторы
+            const cloudMods = d.modifiersPool || null; 
+            if (cloudMods && Array.isArray(cloudMods)) {
+                if(window.userModifiersPool) {
+                    window.userModifiersPool = cloudMods;
+                    localStorage.setItem('xch_user_mods', JSON.stringify(window.userModifiersPool));
                 }
-                else {
-                    // Дата истечения
-                    if (d.expiresAt) {
-                        const dateObj = d.expiresAt.toDate(); 
-                        const dateStr = dateObj.toLocaleDateString();
-                        const daysLeft = Math.ceil((dateObj - new Date()) / (1000 * 60 * 60 * 24));
-                        
-                        if (daysLeft > 0) {
-                            subDesc.innerHTML = `${t.sub_exp || "Expires:"} ${dateStr} (${daysLeft}${t.time_d || "d"})`;
-                            subDesc.style.color = "var(--text-secondary)";
-                            subDesc.style.fontWeight = "500";
-                        } else {
-                            subDesc.innerText = t.sub_expired || "Expired (Tap to renew)"; 
-                            subDesc.style.color = "var(--highlight-red)";
-                        }
-                    } else {
-                        subDesc.innerText = "Active";
-                    }
-                }
+            }
+            
+            const plan = d.subscription || 'free';
+            subValue.innerText = plan.toUpperCase();
+            
+            // Стили планов
+            if (plan === 'pro') { 
+                subValue.style.color = '#ff9900'; 
+                subCard.style.borderColor = 'rgba(255, 153, 0, 0.5)'; 
+                subCard.style.background = 'linear-gradient(135deg, rgba(255, 153, 0, 0.15) 0%, rgba(255, 153, 0, 0.05) 100%)';
+            }
+            else if (plan === 'beast') { 
+                subValue.style.color = '#9b59b6'; 
+                subCard.style.borderColor = 'rgba(155, 89, 182, 0.5)'; 
+                subCard.style.background = 'linear-gradient(135deg, rgba(155, 89, 182, 0.15) 0%, rgba(155, 89, 182, 0.05) 100%)';
+            }
+            else if (plan === 'bestie') { 
+                subValue.style.color = '#00d2ff'; 
+                subCard.style.borderColor = 'rgba(0, 210, 255, 0.5)';
+                subCard.style.background = 'linear-gradient(135deg, rgba(0, 210, 255, 0.15) 0%, rgba(58, 123, 213, 0.05) 100%)';
+            }
+            else { 
+                subValue.style.color = 'var(--text-main)'; 
+                subCard.style.borderColor = 'var(--border)';
+                subCard.style.background = 'var(--ios-card)';
+            }
 
-                // Статистика
-                document.getElementById('cloud-fav-count').innerText = d.favorites ? d.favorites.length : 0;
-                document.getElementById('cloud-wl-count').innerText = d.watchLater ? d.watchLater.length : 0;
-                document.getElementById('cloud-ban-count').innerText = d.blacklist ? d.blacklist.length : 0;
-                
-                let exCount = d.exploredCount || 0;
-                if (exCount === 0 && d.activityLog) {
-                    const unique = new Set(d.activityLog.map(i => i.id));
-                    exCount = unique.size;
-                }
-                document.getElementById('cloud-explored-count').innerText = exCount;
-
-            } else {
-                // Если документа нет
-                subValue.innerText = "FREE";
+            // Текст описания
+            if (plan === 'free') {
                 subDesc.innerText = (currentLang === 'ru' ? "Нажми, чтобы улучшить" : "Tap to Upgrade");
                 subDesc.style.color = "var(--accent)";
-                
-                ['cloud-fav-count', 'cloud-wl-count', 'cloud-explored-count', 'cloud-ban-count'].forEach(id => {
-                    const el = document.getElementById(id);
-                    if(el) el.innerText = "0";
-                });
+            } else if (plan === 'bestie') {
+                subDesc.innerHTML = "♾️ Lifetime Access";
+                subDesc.style.color = "var(--text-secondary)";
+            } else {
+                if (d.expiresAt) {
+                    const dateObj = d.expiresAt.toDate(); 
+                    const dateStr = dateObj.toLocaleDateString();
+                    const daysLeft = Math.ceil((dateObj - new Date()) / (1000 * 60 * 60 * 24));
+                    if (daysLeft > 0) {
+                        subDesc.innerHTML = `${t.sub_exp || "Expires:"} ${dateStr} (${daysLeft}${t.time_d || "d"})`;
+                        subDesc.style.color = "var(--text-secondary)";
+                    } else {
+                        subDesc.innerText = t.sub_expired || "Expired"; 
+                        subDesc.style.color = "var(--highlight-red)";
+                    }
+                } else {
+                    subDesc.innerText = "Active";
+                }
             }
-        } catch (e) {
-            console.error("Error fetching sync stats:", e);
-            subValue.innerText = "ERROR";
-            subDesc.innerText = "Check connection";
+
+            // Статистика
+            document.getElementById('cloud-fav-count').innerText = d.favorites ? d.favorites.length : 0;
+            document.getElementById('cloud-wl-count').innerText = d.watchLater ? d.watchLater.length : 0;
+            document.getElementById('cloud-ban-count').innerText = d.blacklist ? d.blacklist.length : 0;
+            
+            let exCount = d.exploredCount || 0;
+            if (exCount === 0 && d.activityLog) {
+                const unique = new Set(d.activityLog.map(i => i.id));
+                exCount = unique.size;
+            }
+            document.getElementById('cloud-explored-count').innerText = exCount;
+
+        } else {
+            // Если документа нет
+            subValue.innerText = "FREE";
+            subDesc.innerText = (currentLang === 'ru' ? "Нажми, чтобы улучшить" : "Tap to Upgrade");
+            subValue.style.color = "var(--text-main)";
+            
+            ['cloud-fav-count', 'cloud-wl-count', 'cloud-explored-count', 'cloud-ban-count'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.innerText = "0";
+            });
         }
     };
 
@@ -7610,6 +7572,35 @@
         }
     };
     
+    // Флаг: есть ли несохраненные изменения?
+    window.unsavedChanges = false;
+    let saveInterval = null;
+
+    // Функция, которую вызываем при ЛЮБОМ изменении (свайп, лайк, настройка)
+    window.markDirty = function() {
+        window.unsavedChanges = true;
+        // Можно добавить визуальную индикацию, если хочешь (например, точка в углу)
+    };
+
+    // 1. Слушатель ухода с вкладки (Сворачивание / Закрытие)
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === 'hidden') {
+            if (window.isUserLoggedIn && window.unsavedChanges) {
+                console.log("App hidden, forcing save...");
+                window.syncToCloud(true);
+            }
+        }
+    });
+
+    // 2. Таймер: сохраняем раз в 3 минуты (180 секунд), если есть изменения
+    if (saveInterval) clearInterval(saveInterval);
+    saveInterval = setInterval(() => {
+        if (window.isUserLoggedIn && window.unsavedChanges) {
+            console.log("Auto-saving by timer...");
+            window.syncToCloud(true);
+        }
+    }, 180 * 1000); // 180 секунд = 3 минуты
+
     // === ЗАГРУЗКА И СЛИЯНИЕ ДАННЫХ (СЕРДЦЕ СИНХРОНИЗАЦИИ) ===
     async function loadUserData(user) {
         const userRef = doc(db, "users", user.uid);
@@ -7619,6 +7610,9 @@
 
             if (docSnap.exists()) {
                 const cloudData = docSnap.data();
+                cachedUserProfile = cloudData;
+                lastProfileReadTime = Date.now();
+                
                 console.log("Cloud data received. Merging...");
 
                 // --- 1. СИНХРОНИЗАЦИЯ ПОДПИСКИ ---
@@ -7700,8 +7694,7 @@
                 
                 console.log(`Sync complete. Subscription is: ${cloudSub}`);
                 
-                // Отправляем объединенные данные обратно в облако (чтобы сохранить локальные изменения там)
-                window.syncToCloud(false); 
+                window.unsavedChanges = false;
 
             } else {
                 // === СЦЕНАРИЙ: ДОКУМЕНТ УДАЛЕН (СБРОС ПОДПИСКИ) ===
@@ -7725,51 +7718,59 @@
         const user = auth.currentUser;
         if (!user) return; 
 
-        const performSave = async () => {
-            const userRef = doc(db, "users", user.uid);
-            const currentPlatform = document.getElementById('platform') ? document.getElementById('platform').value : 'xh';
-            
-            const fullLog = window.activityLog || [];
-            const fullHistory = window.historyData || [];
-            
-            const cloudLog = fullLog.slice(-200); 
-            const cloudHistory = fullHistory.slice(-100);
+        // ОПТИМИЗАЦИЯ: Если это не принудительное сохранение И нет изменений, выходим
+        if (!immediate && !window.unsavedChanges) {
+            return;
+        }
 
-            const dataToSave = {
-                favorites: JSON.parse(localStorage.getItem('xch_favorites')) || [],
-                blacklist: JSON.parse(localStorage.getItem('xch_blacklist')) || [],
-                watchLater: JSON.parse(localStorage.getItem('xch_watch_later')) || [],
-                tagScores: JSON.parse(localStorage.getItem('xch_tag_scores')) || {},
-                history: cloudHistory,
-                activityLog: cloudLog,
-                watchHistory: window.watchHistory || [],
-                platform: currentPlatform,
-                subscription: localStorage.getItem('xch_sub_level') || 'free', 
-                email: user.email,
-                lastUpdated: serverTimestamp(),
-                modifiersPool: userModifiersPool || [],
-                exploredCount: permanentExplored.size 
-            };
+        const userRef = doc(db, "users", user.uid);
+        const currentPlatform = document.getElementById('platform') ? document.getElementById('platform').value : 'xh';
+        
+        // Берем только последние записи для экономии трафика
+        const fullLog = window.activityLog || [];
+        const fullHistory = window.historyData || [];
+        const cloudLog = fullLog.slice(-300); 
+        const cloudHistory = fullHistory.slice(-100);
 
-            try {
-                await setDoc(userRef, dataToSave, { merge: true });
-                
-                const now = Date.now();
-                localStorage.setItem('xch_last_sync_ts', now);
-                if(window.updateLastSyncUI) window.updateLastSyncUI();
-                
-                console.log(`☁️ Synced`);
-            } catch (e) {
-                console.error("Auto-save error:", e);
-            }
+        const dataToSave = {
+            favorites: JSON.parse(localStorage.getItem('xch_favorites')) || [],
+            blacklist: JSON.parse(localStorage.getItem('xch_blacklist')) || [],
+            watchLater: JSON.parse(localStorage.getItem('xch_watch_later')) || [],
+            tagScores: JSON.parse(localStorage.getItem('xch_tag_scores')) || {},
+            
+            history: cloudHistory,
+            activityLog: cloudLog,
+            watchHistory: (window.watchHistory || []).slice(-100),
+            
+            platform: currentPlatform,
+            subscription: localStorage.getItem('xch_sub_level') || 'free', 
+            email: user.email,
+            lastUpdated: serverTimestamp(),
+            modifiersPool: window.userModifiersPool || [],
+            exploredCount: window.permanentExplored ? window.permanentExplored.size : 0
         };
 
-        if (syncTimeout) clearTimeout(syncTimeout);
-
-        if (immediate) {
-            await performSave();
-        } else {
-            syncTimeout = setTimeout(performSave, 5000);
+        try {
+            // merge: true позволяет обновлять только измененные поля (экономия операций записи)
+            await setDoc(userRef, dataToSave, { merge: true });
+            
+            const now = Date.now();
+            localStorage.setItem('xch_last_sync_ts', now);
+            
+            // ВАЖНО: Сбрасываем флаг изменений после успешного сохранения
+            window.unsavedChanges = false;
+            
+            // Обновляем UI кнопки в настройках
+            const btnText = document.getElementById('sync-btn-text');
+            if(btnText) {
+                const originalText = btnText.innerText;
+                btnText.innerHTML = "✅ Saved";
+                setTimeout(() => { if(btnText) btnText.innerHTML = "🔄 Synchronize Device"; }, 2000);
+            }
+            
+            console.log(`☁️ Cloud Save Success (Writes saved via batching!)`);
+        } catch (e) {
+            console.error("Auto-save error:", e);
         }
     };
 </script>
@@ -8152,13 +8153,15 @@
             colors: { bg: '#0f0700', sidebar: '#1f0f00', card: '#331a00', nav: '#331a00', border: '#663300' },
             accent: '#ff6600', accentLight: '#ff9933'
         },
-
-        // === SPECIAL ===
         { 
-            id: 'rainbow', name: 'Rainbow', type: 'pro', isLight: false, 
-            preview: 'linear-gradient(135deg, #ff0000, #ffff00, #0000ff)',
-            isRainbow: true,
-            accent: null 
+            id: 'old-money', 
+            name: 'Old Money', 
+            type: 'pro', 
+            isLight: false, 
+            preview: '#1a0505', // Темный квадрат для превью
+            colors: { bg: '#1a0505', sidebar: '#260909', card: '#2e0b0b', nav: '#2e0b0b', border: '#4a1919' },
+            accent: '#c5a059', 
+            accentLight: '#e6c98c'
         }
     ];
 
@@ -8532,6 +8535,7 @@
             "theme_purple-light": "Lavender",
             "theme_orange-dark": "Magma",
             "theme_orange-light": "Peach",
+            "theme_old-money": "Old Money",
     
 
             plan_bestie_sub: "Lifetime",
@@ -8806,7 +8810,6 @@
             "theme_green-light": "Mint",
             "theme_red-light": "Rose",
             "theme_gold-light": "Sand",
-            "theme_rainbow": "Rainbow",
             "theme_dark": "Dark",
             "theme_light": "Light",
 
@@ -9100,6 +9103,7 @@
             "theme_purple-light": "Лаванда",
             "theme_orange-dark": "Магма",
             "theme_orange-light": "Персик",
+            "theme_old-money": "Old Money",
 
             plan_bestie_sub: "Навсегда",
             plan_bestie_price: "/ разово",
@@ -9365,7 +9369,6 @@
             "theme_green-light": "Мята",
             "theme_red-light": "Роза",
             "theme_gold-light": "Песок",
-            "theme_rainbow": "Радуга",
             "theme_dark": "Тёмная",
             "theme_light": "Светлая",
 
@@ -9663,6 +9666,7 @@
             "theme_purple-light": "Lavanda",
             "theme_orange-dark": "Magma",
             "theme_orange-light": "Melocotón",
+            "theme_old-money": "Old Money",
 
             plan_bestie_sub: "De por vida",
             plan_bestie_price: "/ una vez",
@@ -9943,7 +9947,6 @@
             "theme_green-light": "Menta",
             "theme_red-light": "Rosa",
             "theme_gold-light": "Arena",
-            "theme_rainbow": "Arcoíris",
             "theme_dark": "Oscuro",
             "theme_light": "Claro",
 
@@ -10217,6 +10220,7 @@
             "theme_purple-light": "Lavendel",
             "theme_orange-dark": "Magma",
             "theme_orange-light": "Pfirsich",
+            "theme_old-money": "Old Money",
 
             plan_bestie_sub: "Lebenslang",
             plan_bestie_price: "/ einmalig",
@@ -10489,7 +10493,6 @@
             "theme_green-light": "Minze",
             "theme_red-light": "Rose",
             "theme_gold-light": "Sand",
-            "theme_rainbow": "Regenbogen",
             "theme_dark": "Dunkel",
             "theme_light": "Hell",
 
@@ -11235,6 +11238,7 @@
         }
         
         markDayActive();
+        if (window.markDirty) window.markDirty(); 
     }
 
     // 1. Обновленная функция подсчета (только цифры на кнопке)
@@ -12095,6 +12099,7 @@
         localStorage.setItem(STORAGE.HISTORY, JSON.stringify(historyData));
         renderHistory();
         updateExploredCount();
+        if (window.markDirty) window.markDirty();
     }
     
     function getLocalizedName(item) {
@@ -12808,7 +12813,7 @@
                             localStorage.setItem(STORAGE.BLACKLIST, JSON.stringify(blacklist));
                             
                             updateCounts();
-                            if (window.syncToCloud) window.syncToCloud();
+                            if (window.markDirty) window.markDirty();
                             
                             input.value = ''; 
                             suggestBox.style.display = 'none';
@@ -12874,7 +12879,7 @@
                 localStorage.setItem(STORAGE.WATCH_LATER, JSON.stringify(watchLater));
                 
                 updateCounts();
-                if (window.syncToCloud) window.syncToCloud();
+                if (window.markDirty) window.markDirty();
                 
                 div.style.opacity = '0';
                 div.style.transform = 'scale(0.8)';
@@ -13814,7 +13819,7 @@
         if (changed) {
             saveLists();
             updateCounts();
-            if (window.syncToCloud) window.syncToCloud();
+            if (window.markDirty) window.markDirty();
         }
         
         localStorage.setItem('xch_onboarding_done', 'true');
@@ -14586,15 +14591,15 @@
             'blue-dark': 'midnight_icon.png', 
             'blue-light': 'midnight_icon.png',
             
-            // Радужная
-            'rainbow': 'rainbow_icon.png',
-            
             // Красная
             'red-dark': 'vampire_icon.png',
             'red-light': 'vampire_icon.png',
             
             // Нуар
-            'noir': 'noir_icon.png'
+            'noir': 'noir_icon.png',
+
+            // Old Money 
+            'old-money': 'oldmoney_icon.png', 
         };
 
         // Если темы нет в списке (например, 'dark' или 'light'), возвращаем дефолт
@@ -14656,12 +14661,7 @@
         
         document.body.classList.toggle('light-theme', theme.isLight);
         
-        if (theme.isRainbow) {
-            document.body.classList.add('rainbow-mode');
-            setRandomRainbowColor();
-        } else {
-            document.body.classList.remove('rainbow-mode');
-        }
+        document.body.classList.remove('rainbow-mode');
         
         const props = ['--bg-color', '--sidebar-bg', '--card-bg', '--nav-bg', '--border', '--ios-card', '--ios-bg', '--card-gradient'];
         props.forEach(p => root.style.removeProperty(p));
@@ -14692,17 +14692,6 @@
         }
 
         updateThemeLabel(theme.id);
-    }
-
-    function setRandomRainbowColor() {
-        // Генерируем случайный оттенок (Hue) от 0 до 360
-        const hue = Math.floor(Math.random() * 360);
-        const color = `hsl(${hue}, 100%, 60%)`; // Яркий цвет
-        const lightColor = `hsl(${hue}, 100%, 80%)`; 
-
-        const root = document.documentElement;
-        root.style.setProperty('--accent', color);
-        root.style.setProperty('--accent-light', lightColor);
     }
 
     // Обновленная функция обновления текста в кнопке
@@ -15070,7 +15059,6 @@
             generatePanicCard(direction);
             return;
         }
-        if (document.body.classList.contains('rainbow-mode')) setRandomRainbowColor();
         if (!checkGenerationLimit()) return; 
         if (isGenerating) return;
 
@@ -15628,6 +15616,7 @@
         updateActionButtons(); 
         updateCounts();
         updateCardStatusVisuals();
+        if (window.markDirty) window.markDirty();
     }
 
     function syncScoresFromLists() {
@@ -15701,6 +15690,7 @@
         
         localStorage.setItem(STORAGE.WATCH_LATER, JSON.stringify(watchLater));
         updateCounts(); 
+        if (window.markDirty) window.markDirty();
     }
 
     function openWatchLaterCatalog() {
@@ -15982,7 +15972,7 @@
         localStorage.setItem(STORAGE.WATCH_HISTORY, JSON.stringify(watchHistory));
         
         // Обновляем облако
-        if (window.syncToCloud) window.syncToCloud();
+        if (window.markDirty) window.markDirty();
         // ======================================
 
         // Показ сообщения
@@ -17160,8 +17150,6 @@
     function closeModifiersSettings(e, force) {
         if (force || e.target.id === 'modal-mods-overlay') {
             document.getElementById('modal-mods-overlay').classList.remove('open');
-            // При закрытии сохраняем в облако, если изменилось
-            if (window.isUserLoggedIn) window.syncToCloud();
         }
     }
 
