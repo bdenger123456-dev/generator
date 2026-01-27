@@ -2314,24 +2314,34 @@
 
         /* Колонка активности */
         .act-col {
-            flex: 1; 
-            height: 100%;
+            min-width: 45px; 
+            margin-right: 8px;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
             align-items: center;
-            min-width: 30px; 
+            height: 100%;
         }
 
-        .act-bar-group {
-            width: 100%;
-            max-width: 50px; /* Максимальная ширина "толстых" столбиков */
+        /* Контейнер для трех столбиков */
+        .act-bars-group {
             display: flex;
             align-items: flex-end;
-            justify-content: center;
-            height: 100%;
-            gap: 4px; /* Зазор между серым и цветным столбиком */
+            gap: 3px; /* Расстояние между столбиками */
+            height: 70%; /* Высота зоны столбиков */
+            width: 100%;
+            padding-bottom: 4px;
+            border-bottom: 1px solid rgba(128,128,128,0.1);
         }
+
+        .act-bar {
+            flex: 1;
+            border-radius: 2px 2px 0 0;
+            min-height: 2px;
+            transition: height 0.3s ease;
+        }
+
+
 
         /* Сами бары */
         .chart-bar {
@@ -2354,6 +2364,28 @@
             overflow: hidden;
             text-overflow: ellipsis;
             width: 100%;
+        }
+
+        .act-values-row {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 4px;
+            padding: 0 2px;
+        }
+
+        .act-val {
+            font-size: 8px;
+            font-weight: 700;
+            text-align: center;
+            flex: 1;
+        }
+
+        .chart-label-x {
+            margin-top: 4px;
+            font-size: 9px;
+            color: var(--text-secondary);
+            font-weight: 500;
         }
 
         /* Цифры для активности (ПОД графиком) */
@@ -4000,6 +4032,16 @@
             transition: filter 0.3s ease;
         }
 
+        .ai-hint-text {
+            display: block;
+            margin-top: 15px; /* Отступ сверху побольше */
+            font-size: 14px;  /* Было ~10px (0.65em), стало крупнее */
+            font-weight: 600; /* Жирнее */
+            opacity: 0.9;     /* Ярче (было 0.8) */
+            line-height: 1.4;
+            color: var(--text-secondary);
+        }
+
         /* Светлая тема -> Оставляем черным */
         body.light-theme .ai-icon-img {
             filter: invert(0) drop-shadow(0 0 2px rgba(0, 0, 0, 0.1));
@@ -4828,6 +4870,13 @@
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
+        }
+
+        .tip-card.viewed {
+            opacity: 0.5;
+            transform: scale(0.98);
+            order: 1;
+            filter: grayscale(0.5); 
         }
 
         /* Текст заголовка "Стань гуру" (маленький и серый) */
@@ -5946,6 +5995,10 @@
                 <div class="ios-row-left">
                     <img src="modes.png" class="settings-icon" alt="Mode">
                     <span class="platform-label" data-key="mode_label">Mode</span>
+                    <img src="question.png" id="tip-icon-modes" class="settings-icon" 
+                        onclick="openSpecificTip('modes')"
+                        alt="Info" 
+                        style="width:14px; height:14px; margin-left:6px; opacity:0.5; cursor:pointer; transition: opacity 0.3s ease;">
                 </div>
                 <select id="app-mode-select" class="platform-select" onchange="setAppMode(this.value)" dir="rtl">
                     <option value="explore" data-key="mode_explore">Explore</option>
@@ -6108,18 +6161,8 @@
                 </div>
                 <span class="badge" id="count-wl" style="color:var(--text-secondary); font-size:17px;">0</span>
             </div>
-            
-            <!-- 4. СБРОС (Всё красное) -->
-            <div class="ios-row clickable" onclick="resetAppHistory()">
-                <div class="ios-row-left">
-                    <!-- Добавлен класс red-icon -->
-                    <img src="reset_data.png" class="settings-icon red-icon" alt="Reset">
-                    <!-- Явный стиль цвета для текста -->
-                    <span data-key="btn_reset" style="color: var(--highlight-red); font-weight: 600;">Reset Data</span>
-                </div>
-            </div>
 
-            <!-- ADMIN BUTTON (Без лишних стилей) -->
+            <!-- ADMIN BUTTON -->
             <div id="btn-admin-trigger" class="ios-row clickable" onclick="openAdminModal()" style="display:none;">
                 <div class="ios-row-left">
                     <img src="admin.png" class="settings-icon" alt="Admin">
@@ -6170,7 +6213,9 @@
 
     <!-- BLOCK: EXTRAS -->
     <div id="block-extras">
-        <div class="ios-header" data-key="header_extras">Extras</div>
+    
+        <!-- 1. ССЫЛКИ (Community) -->
+        <div class="ios-header" data-key="header_community">Community</div>
         <div class="ios-group">
             <!-- Reddit -->
             <div class="ios-row clickable" onclick="window.open('https://www.reddit.com/user/xfetishhub/', '_blank')">
@@ -6205,11 +6250,13 @@
                     <img src="about.png" class="settings-icon" alt="About">
                     <span data-key="lbl_about">About Project</span>
                 </div>
-                <!-- Меняем шеврон на стрелочку вверх-вправо, как у внешних ссылок -->
                 <div style="font-size:18px; color:var(--text-secondary); line-height: 0;">↗</div>
             </div>
+        </div>
 
-            <!-- Install App -->
+        <!-- 2. УСТАНОВКА (Install) -->
+        <div class="ios-header" data-key="install_title">Install App</div>
+        <div class="ios-group">
             <div id="row-install-app" class="ios-row clickable" onclick="openQRModal()">
                 <div class="ios-row-left">
                     <img src="install.png" class="settings-icon" alt="Install">
@@ -6217,7 +6264,11 @@
                 </div>
                 <div class="chevron"></div>
             </div>
+        </div>
 
+        <!-- 3. ФУНКЦИИ (Roadmap + Panic) -->
+        <div class="ios-header" data-key="header_features">Features</div>
+        <div class="ios-group">
             <div class="ios-row clickable" onclick="openRoadmap()">
                 <div class="ios-row-left">
                     <img src="roadmap.png" class="settings-icon" alt="Roadmap">
@@ -6232,8 +6283,11 @@
                 </div>
                 <div class="chevron"></div>
             </div>
+        </div>
 
-            <!-- Legal Docs -->
+        <!-- 4. ЮРИДИЧЕСКОЕ (Legal) -->
+        <div class="ios-header" data-key="header_legal">Legal</div>
+        <div class="ios-group">
             <div class="ios-row clickable" onclick="window.openLegal('terms')">
                 <div class="ios-row-left">
                     <img src="terms.png" class="settings-icon" alt="Terms">
@@ -6255,8 +6309,11 @@
                 </div>
                 <div class="chevron"></div>
             </div>
+        </div>
 
-            <!-- Sponsors -->
+        <!-- 5. СПОНСОРЫ (Sponsors) -->
+        <!-- Без заголовка, просто отдельный блок -->
+        <div class="ios-group" style="margin-top: 25px;">
             <div class="ios-row clickable" onclick="openSponsorsModal()">
                 <div class="ios-row-left">
                     <img src="sponsors.png" class="settings-icon" alt="Sponsors">
@@ -6264,19 +6321,22 @@
                 </div>
                 <div class="chevron"></div>
             </div>
+        </div>
 
+        <!-- 6. ВЕРСИЯ (Version) -->
+        <div class="ios-group">
             <div class="ios-row clickable" onclick="openChangelogModal()">
                 <div class="ios-row-left">
                     <img src="info.png" class="settings-icon" alt="Version"> 
                     <span data-key="btn_version">Version</span>
                 </div>
-                <!-- Номер версии справа -->
                 <div style="display:flex; align-items:center; gap:8px;">
                     <span style="font-size:15px; color:var(--text-secondary); font-weight:500;">0.1</span>
                     <div class="chevron"></div>
                 </div>
             </div>
         </div>
+
     </div>
     
     <div id="block-history" style="margin-top:20px;">
@@ -6305,11 +6365,11 @@
             <!-- Toggle -->
             <div class="billing-toggle-container" style="display:flex; justify-content:center; margin-bottom: 20px;">
                 <div class="stats-nav-capsule" style="width: auto; min-width: 200px;">
-                    <div id="btn-billing-monthly" class="stats-nav-item active" onclick="switchBilling('monthly')">
+                    <div id="btn-billing-monthly" class="stats-nav-item active" onclick="switchBilling('monthly')" data-key="bill_monthly">
                         Monthly
                     </div>
                     <div id="btn-billing-yearly" class="stats-nav-item" onclick="switchBilling('yearly')">
-                        Yearly <span style="font-size:10px; color:var(--accent); margin-left:3px;">-20%</span>
+                        <span data-key="bill_yearly">Yearly</span> <span style="font-size:10px; color:var(--accent); margin-left:3px;">-20%</span>
                     </div>
                 </div>
             </div>
@@ -6371,6 +6431,7 @@
 
                     <ul class="plan-features">
                         <li style="color:var(--text-main)" data-key="feat_lifetime">♾️ <b>Lifetime Access</b></li>
+                        <li data-key="feat_all_beast">🦁 <b>All Beast Features</b></li> 
                         <li data-key="feat_sponsors">💎 In Sponsors List</li>
                     </ul>
                     <button class="plan-btn bestie-btn" onclick="openPaymentSelection('bestie')" data-key="btn_get_bestie" style="background:linear-gradient(90deg, #00d2ff, #3a7bd5); color:#fff;">Get Forever</button>
@@ -6602,13 +6663,13 @@
             <span onclick="closeSyncInfoModal(null, true)">✕</span>
         </div>
         <div class="modal-body">
-            <div style="text-align:center; margin-bottom:20px; color:var(--text-secondary); font-size:13px;">
+            
+            <!-- Email -->
+            <div style="text-align:center; margin-bottom:20px; margin-top:5px;">
                 <span id="sync-email-display" style="color:var(--text-main); font-weight:700; font-size:16px;">...</span>
-                
-                <br><br>
-                <span data-key="sync_desc">Data stored safely on Google servers</span>
             </div>
 
+            <!-- Stats Grid -->
             <div class="sync-stats-grid">
                 <div class="sync-stat-item">
                     <span class="sync-stat-val" id="cloud-fav-count">...</span>
@@ -6628,29 +6689,30 @@
                 </div>
             </div>
 
-            <!-- ДИЗАЙН КАРТОЧКИ ПОДПИСКИ -->
+            <!-- Sub Card -->
             <div id="sync-sub-card" class="sync-stat-item full-width clickable" onclick="closeSyncInfoModal(null, true); openSubModal();" style="margin-bottom: 20px; border: 1px solid var(--border);">
-                
-                <!-- Заголовок (План) -->
                 <span id="sync-sub-value" style="font-weight:900; font-size:24px; letter-spacing: 1px; margin-bottom: 4px;">FREE</span>
-                
-                <!-- Подпись (Дата или Призыв) -->
                 <div id="sync-sub-desc" style="font-size:12px; color:var(--text-secondary); text-transform: uppercase; font-weight: 600;">
                     Tap to upgrade
                 </div>
-
             </div>
 
             <div style="background:rgba(255,153,0,0.1); border:1px solid rgba(255,153,0,0.3); padding:10px; border-radius:12px; margin-bottom:20px; font-size:12px; color:var(--text-secondary); text-align:center;">
                 <span data-key="sync_tip">Click "Synchronize" to merge Cloud data.</span>
             </div>
 
+            <!-- Buttons -->
             <div style="display:flex; flex-direction:column; gap:10px;">
                 <button class="btn-gen" onclick="performManualSync()" id="btn-manual-sync" style="background:var(--accent); color:#000;">
                     <span id="sync-btn-text" data-key="btn_sync">Synchronize Device</span>
                 </button>
-                <button class="btn-gen secondary" onclick="window.logout()" style="border-color:var(--highlight-red); color:var(--highlight-red);">
+                
+                <button class="btn-gen secondary" onclick="window.logout()" style="border-color:var(--border); color:var(--text-main);">
                     <span data-key="logout_text">Log Out</span>
+                </button>
+
+                <button class="btn-gen secondary" onclick="resetAppHistory()" style="border-color:rgba(231, 76, 60, 0.3); color:var(--highlight-red); margin-top: 10px;">
+                    <span data-key="btn_reset">Reset Data</span>
                 </button>
             </div>
         </div>
@@ -7196,7 +7258,7 @@
         document.getElementById('modal-sync-info-overlay').classList.add('open');
         document.getElementById('sync-email-display').innerText = user.email;
 
-        // Ссылки на элементы новой центральной карточки
+        // Элементы карточки
         const subValue = document.getElementById('sync-sub-value');
         const subDesc = document.getElementById('sync-sub-desc');
         const subCard = document.getElementById('sync-sub-card');
@@ -7205,11 +7267,12 @@
         subValue.innerText = "...";
         subDesc.innerText = "Checking status...";
         subCard.style.borderColor = "var(--border)";
+        subCard.style.background = "var(--ios-card)"; // Сброс фона
         subValue.style.color = "var(--text-main)";
 
         const t = langData[currentLang] || langData['en'];
 
-        // Сброс счетчиков статистики
+        // Сброс счетчиков
         ['cloud-fav-count', 'cloud-wl-count', 'cloud-explored-count', 'cloud-ban-count'].forEach(id => {
             const el = document.getElementById(id);
             if(el) el.innerText = "...";
@@ -7229,48 +7292,50 @@
                     localStorage.setItem('xch_user_mods', JSON.stringify(userModifiersPool));
                 }
                 
-                // === ЛОГИКА ПОДПИСКИ (НОВЫЙ ДИЗАЙН) ===
+                // === ЛОГИКА ПОДПИСКИ (ГРАДИЕНТЫ) ===
                 const plan = d.subscription || 'free';
                 subValue.innerText = plan.toUpperCase();
                 
-                // 1. Цвета и Бордеры
+                // Настройка стилей для планов
                 if (plan === 'pro') { 
                     subValue.style.color = '#ff9900'; 
                     subCard.style.borderColor = 'rgba(255, 153, 0, 0.5)'; 
+                    subCard.style.background = 'linear-gradient(135deg, rgba(255, 153, 0, 0.15) 0%, rgba(255, 153, 0, 0.05) 100%)'; // Оранжевый градиент
                     subCard.style.boxShadow = '0 4px 15px rgba(255, 153, 0, 0.1)';
                 }
                 else if (plan === 'beast') { 
                     subValue.style.color = '#9b59b6'; 
                     subCard.style.borderColor = 'rgba(155, 89, 182, 0.5)'; 
+                    subCard.style.background = 'linear-gradient(135deg, rgba(155, 89, 182, 0.15) 0%, rgba(155, 89, 182, 0.05) 100%)'; // Фиолетовый градиент
                     subCard.style.boxShadow = '0 4px 15px rgba(155, 89, 182, 0.1)';
                 }
                 else if (plan === 'bestie') { 
                     subValue.style.color = '#00d2ff'; 
                     subCard.style.borderColor = 'rgba(0, 210, 255, 0.5)';
+                    subCard.style.background = 'linear-gradient(135deg, rgba(0, 210, 255, 0.15) 0%, rgba(58, 123, 213, 0.05) 100%)'; // Голубой градиент
                     subCard.style.boxShadow = '0 4px 15px rgba(0, 210, 255, 0.1)';
                 }
                 else { 
                     // FREE
                     subValue.style.color = 'var(--text-main)'; 
                     subCard.style.borderColor = 'var(--border)';
+                    subCard.style.background = 'var(--ios-card)';
                     subCard.style.boxShadow = 'none';
                 }
 
-                // 2. Текст снизу (Дата или Призыв)
+                // Текст описания
                 if (plan === 'free') {
-                    // Для Free: Призыв к действию
                     subDesc.innerText = (currentLang === 'ru' ? "Нажми, чтобы улучшить" : "Tap to Upgrade");
-                    subDesc.style.color = "var(--accent)"; // Розовый цвет для призыва
+                    subDesc.style.color = "var(--accent)";
                     subDesc.style.fontWeight = "700";
                 } 
                 else if (plan === 'bestie') {
-                    // Для Bestie
                     subDesc.innerHTML = "♾️ Lifetime Access";
                     subDesc.style.color = "var(--text-secondary)";
                     subDesc.style.fontWeight = "600";
                 }
                 else {
-                    // Для Pro/Beast: Дата истечения
+                    // Дата истечения
                     if (d.expiresAt) {
                         const dateObj = d.expiresAt.toDate(); 
                         const dateStr = dateObj.toLocaleDateString();
@@ -7302,7 +7367,7 @@
                 document.getElementById('cloud-explored-count').innerText = exCount;
 
             } else {
-                // Если документа нет (ошибка или новый юзер)
+                // Если документа нет
                 subValue.innerText = "FREE";
                 subDesc.innerText = (currentLang === 'ru' ? "Нажми, чтобы улучшить" : "Tap to Upgrade");
                 subDesc.style.color = "var(--accent)";
@@ -7993,6 +8058,9 @@
     let lastGeneratedItem = null; 
     let hasInteractedWithCurrent = false;
 
+    let suggestedFavId = null;
+    let suggestedNewId = null; 
+
     let pendingPlan = null;
 
     let activeMods = new Set();
@@ -8025,6 +8093,8 @@
     let currentAppMode = 'explore';
     let aiContextTokens = [];
     let isModeSelectActive = false; 
+
+    let viewedTips = JSON.parse(localStorage.getItem('xch_viewed_tips')) || [];
 
     const API_BASE_URL = "https://api.fetishback.site";
 
@@ -8371,6 +8441,9 @@
             ori_trans: "Trans",
             ori_pan: "Pansexual",
             header_extras: "Extras",
+            header_community: "Community",
+            header_features: "Features",
+            header_legal: "Legal",
             theme_label: "Appearance",
             theme_title: "Choose Theme",
             theme_basic: "Basic",
@@ -8431,9 +8504,9 @@
                 "Roll the dice 🔭, replay hits 🥰, or describe a fantasy ✨?"
             ],
             mode_greeting_dynamic: [
-                "In the mood for<br><b>{tag}</b> 🥰<br>or something new 🔭?<br><span style='font-size:0.65em; opacity:0.8; display:block; margin-top:8px;'>Or type your wish ✨, I won't disappoint 😏</span>",
-                "Back to<br><b>{tag}</b> 🥰<br>or trusting chance 🔭?<br><span style='font-size:0.65em; opacity:0.8; display:block; margin-top:8px;'>You can also tell me exactly what you want ✨</span>",
-                "Missing<br><b>{tag}</b> 🥰?<br>We can repeat or explore 🔭<br><span style='font-size:0.65em; opacity:0.8; display:block; margin-top:8px;'>Or just ask me ✨</span>"
+                "In the mood for<br><b>{fav}</b> 🥰<br>or maybe check something new like<br><b>{new}</b> 🔭?<br><span class='ai-hint-text'>Or type specific ✨, I won't disappoint 😏</span>",
+                "Back to<br><b>{fav}</b> 🥰<br>or take a risk with<br><b>{new}</b> 🔭?<br><span class='ai-hint-text'>You can also describe a fantasy ✨</span>",
+                "Missed<br><b>{fav}</b> 🥰?<br>Or let's explore<br><b>{new}</b> 🔭<br><span class='ai-hint-text'>Or just ask me, I'll find it ✨</span>"
             ],
             mode_explore: "Explore",
             mode_pleasure: "Pleasure",
@@ -8497,7 +8570,7 @@
             auth_p2: "Activate Pro / Beast status",
             auth_p3: "Anonymous storage on Google servers",
             btn_google_signin: "Continue with Google",
-            auth_security_note: "Developer has no access to data. Don't worry about your history safety 😏",
+            auth_security_note: "The developer doesn't have access to the data. But if you're worried, you can use a second account. 😏",
             btn_cancel: "Cancel",
 
             pay_header: "USDT (TRC20) Payment",
@@ -8643,6 +8716,16 @@
                 Unlocks <b>Hardcore & Mess</b>. Adds what was hidden: watersports, scat, fisting, pain, and extreme fetishes. No filters.
             `,
 
+            tip_modes_title: "Game Modes",
+            tip_modes_desc: "Explore vs Pleasure vs AI",
+            tip_modes_text: `
+                <b>🔭 Explore (Default):</b><br>
+                Balanced randomness. Uses your history slightly but prioritizes discovering new tags. Perfect when you don't know what you want.<br><br>
+                <b>🥰 Pleasure:</b><br>
+                Strictly follows your preferences. Uses "Liked" tags heavily and avoids experiments. Ideal for a quick guaranteed hit.<br><br>
+                <b>🤖 AI Agent:</b><br>
+                Activates when you use text or voice search. It understands context ("harder", "something new") and searches for specific scenarios.
+            `,
 
             // --- 2. Generator (Main Tab) ---
             generate: "Random Genre",
@@ -8685,9 +8768,12 @@
             feat_all_pro: "👑 All Pro Features",
             feat_all_beast: "🦁 <b>All Beast Features</b>",
             feat_sponsors: "💎 Listed in Sponsors",
-            feat_discord: "💬 Discord (Dev Chat)",
+            feat_discord: "💬 Discord with Developer",
             feat_vote: "🗳️ Vote on Roadmap",
             btn_get_beast: "Unleash Beast",
+
+            bill_monthly: "Monthly",
+            bill_yearly: "Yearly",
 
             btn_lower_tier: "You deserve better",
 
@@ -8922,6 +9008,9 @@
             ori_trans: "Транс",
             ori_pan: "Пансексуал",
             header_extras: "Дополнительно",
+            header_community: "Сообщество",
+            header_features: "Возможности",
+            header_legal: "Юридическое",
             theme_label: "Оформление",
             theme_title: "Выбор темы",
             theme_basic: "Базовые",
@@ -8982,9 +9071,9 @@
                 "Рискнем 🔭, повторим 🥰 или загадаешь сам ✨?"
             ],
             mode_greeting_dynamic: [
-                "Настроен на<br><b>{tag}</b> 🥰<br>или ищешь новое 🔭?<br><span style='font-size:0.65em; opacity:0.8; display:block; margin-top:8px;'>Либо пиши что конкретно ✨, не разочарую 😏</span>",
-                "Вернемся к<br><b>{tag}</b> 🥰<br>или рискнем 🔭?<br><span style='font-size:0.65em; opacity:0.8; display:block; margin-top:8px;'>Можешь просто описать фантазию ✨</span>",
-                "Соскучился по<br><b>{tag}</b> 🥰?<br>Повторим или крути рулетку 🔭<br><span style='font-size:0.65em; opacity:0.8; display:block; margin-top:8px;'>А лучше спроси меня ✨</span>"
+                "Настроен на<br><b>{fav}</b> 🥰<br>или может посмотрим что-то новое, например<br><b>{new}</b> 🔭?<br><span class='ai-hint-text'>Либо пиши что конкретно ✨, не разочарую 😏</span>",
+                "Вернемся к<br><b>{fav}</b> 🥰<br>или рискнем с<br><b>{new}</b> 🔭?<br><span class='ai-hint-text'>Можешь просто описать фантазию ✨</span>",
+                "Соскучился по<br><b>{fav}</b> 🥰?<br>Или изучим жанр<br><b>{new}</b> 🔭<br><span class='ai-hint-text'>А лучше спроси меня, я найду ✨</span>"
             ],
 
             mode_explore: "Исследование",
@@ -9048,7 +9137,7 @@
             auth_p2: "Активация Pro / Beast статуса",
             auth_p3: "Анонимное хранение на серверах Google",
             btn_google_signin: "Войти через Google",
-            auth_security_note: "Разработчик не имеет доступа к данным. Можешь не беспокоиться о сохранности своей истории 😏",
+            auth_security_note: "Разработчик не имеет доступа к данным. Но если боишься, то можешь использовать второй аккаунт. 😏",
             btn_cancel: "Отмена",
 
             pay_header: "Оплата USDT (TRC20)",
@@ -9192,6 +9281,17 @@
                 Открывает <b>Хардкор и Треш</b>. Добавляет то, что было скрыто: туалетную тему, фистинг, боль и жидкости. Без фильтров.
             `,
 
+            tip_modes_title: "Режимы Игры",
+            tip_modes_desc: "Исследование vs Наслаждение",
+            tip_modes_text: `
+                <b>🔭 Исследование (Explore):</b><br>
+                Баланс случайности. Учитывает историю, но приоритет отдается поиску новых жанров. Идеально, когда не знаешь, чего хочешь.<br><br>
+                <b>🥰 Наслаждение (Pleasure):</b><br>
+                Строго следует твоим вкусам. Часто предлагает то, что содержит твои любимые теги. Минимум экспериментов, максимум гарантии.<br><br>
+                <b>🤖 ИИ Агент (AI):</b><br>
+                Включается при текстовом или голосовом поиске. Понимает контекст («пожестче», «что-то новое») и ищет конкретные сценарии.
+            `,
+
             // --- 2. Генератор ---
             generate: "Случайный жанр",
             generate_again: "Другой жанр",
@@ -9233,9 +9333,12 @@
             feat_all_pro: "👑 Всё, что есть в Pro",
             feat_all_beast: "🦁 <b>Всё, что есть в Beast</b>",
             feat_sponsors: "💎 Имя во вкладке Спонсоры",
-            feat_discord: "💬 Доступ в Discord чат",
+            feat_discord: "💬 Discord с разработчиком",
             feat_vote: "🗳️ Влияние на развитие",
             btn_get_beast: "Стать Зверем",
+
+            bill_monthly: "Ежемесячно",
+            bill_yearly: "Ежегодно",
 
             btn_lower_tier: "Ты достоен большего",
             pay_desc: "Выбери способ оплаты. Ты получишь код активации мгновенно после оплаты.",
@@ -9472,6 +9575,9 @@
             ori_trans: "Trans",
             ori_pan: "Pansexual",
             header_extras: "Extras",
+            header_community: "Comunidad",
+            header_features: "Funciones",
+            header_legal: "Legal",
             theme_label: "Apariencia",
             theme_title: "Elegir Tema",
             theme_basic: "Básico",
@@ -9528,9 +9634,9 @@
                 "¿Algo nuevo 🔭, familiar 🥰 o específico ✨?"
             ],
             mode_greeting_dynamic: [
-                "¿Con ganas de<br><b>{tag}</b> 🥰<br>o algo nuevo 🔭?<br><span style='font-size:0.65em; opacity:0.8; display:block; margin-top:8px;'>O escribe tu deseo ✨, no te decepcionaré 😏</span>",
-                "¿Volvemos a<br><b>{tag}</b> 🥰<br>o probamos suerte 🔭?<br><span style='font-size:0.65em; opacity:0.8; display:block; margin-top:8px;'>También puedes decírmelo ✨</span>",
-                "¿Extrañas<br><b>{tag}</b> 🥰?<br>Repitamos o exploremos 🔭<br><span style='font-size:0.65em; opacity:0.8; display:block; margin-top:8px;'>O pregúntale a la IA ✨</span>"
+                "¿Con ganas de<br><b>{fav}</b> 🥰<br>o tal vez algo nuevo como<br><b>{new}</b> 🔭?<br><span class='ai-hint-text'>O escribe tu deseo ✨, no te decepcionaré 😏</span>",
+                "¿Volvemos a<br><b>{fav}</b> 🥰<br>o nos arriesgamos con<br><b>{new}</b> 🔭?<br><span class='ai-hint-text'>También puedes describir una fantasía ✨</span>",
+                "¿Extrañas<br><b>{fav}</b> 🥰?<br>O exploremos<br><b>{new}</b> 🔭<br><span class='ai-hint-text'>O simplemente pregúntame ✨</span>"
             ],
 
             mode_explore: "Explorar",
@@ -9594,7 +9700,7 @@
             auth_p2: "Activar estado Pro / Beast",
             auth_p3: "Almacenamiento anónimo en servidores de Google",
             btn_google_signin: "Continuar con Google",
-            auth_security_note: "El desarrollador no tiene acceso a los datos. No te preocupes por tu historial 😏",
+            auth_security_note: "El desarrollador no tiene acceso a los datos. Pero si te preocupa, puedes usar una segunda cuenta. 😏",
             btn_cancel: "Cancelar",
 
             pay_header: "Pago USDT (TRC20)",
@@ -9744,6 +9850,17 @@
                 Desbloquea <b>Hardcore</b>. Añade lo prohibido: lluvia dorada, scat, fisting, dolor y fetiches extremos. Sin filtros.
             `,
 
+            tip_modes_title: "Modos de Juego",
+            tip_modes_desc: "Explorar vs Placer vs IA",
+            tip_modes_text: `
+                <b>🔭 Explorar:</b><br>
+                Aleatoriedad equilibrada. Prioriza descubrir nuevos géneros. Perfecto cuando no sabes qué quieres.<br><br>
+                <b>🥰 Placer:</b><br>
+                Sigue estrictamente tus gustos. Usa tus etiquetas favoritas. Ideal para un éxito garantizado.<br><br>
+                <b>🤖 Agente IA:</b><br>
+                Se activa con búsqueda de texto o voz. Entiende el contexto ("más duro", "algo nuevo").
+            `,
+
             // --- Generator ---
             generate: "Género Aleatorio",
             generate_again: "Otro Género",
@@ -9791,9 +9908,12 @@
             feat_all_pro: "👑 Todo lo de Pro",
             feat_all_beast: "🦁 <b>Todo lo de Beast</b>",
             feat_sponsors: "💎 En Patrocinadores",
-            feat_discord: "💬 Acceso a Discord",
+            feat_discord: "💬 Discord con el desarrollador",
             feat_vote: "🗳️ Votar Futuro",
             btn_get_beast: "Modo Bestia",
+
+            bill_monthly: "Mensual",
+            bill_yearly: "Anual",
 
             btn_lower_tier: "Mereces algo mejor",
 
@@ -10011,6 +10131,9 @@
             ori_trans: "Trans",
             ori_pan: "Pansexuell",
             header_extras: "Extras",
+            header_community: "Gemeinschaft",
+            header_features: "Funktionen",
+            header_legal: "Rechtliches",
             theme_label: "Aussehen",
             theme_title: "Thema wählen",
             theme_basic: "Basis",
@@ -10066,9 +10189,9 @@
                 "Etwas Neues 🔭, Bekanntes 🥰 oder Spezifisches ✨?"
             ],
             mode_greeting_dynamic: [
-                "Lust auf<br><b>{tag}</b> 🥰<br>oder etwas Neues 🔭?<br><span style='font-size:0.65em; opacity:0.8; display:block; margin-top:8px;'>Oder schreib deinen Wunsch ✨, ich enttäusche nicht 😏</span>",
-                "Zurück zu<br><b>{tag}</b> 🥰<br>oder Zufall 🔭?<br><span style='font-size:0.65em; opacity:0.8; display:block; margin-top:8px;'>Du kannst mir auch sagen, was du willst ✨</span>",
-                "Vermisst du<br><b>{tag}</b> 🥰?<br>Wiederholen oder erkunden 🔭<br><span style='font-size:0.65em; opacity:0.8; display:block; margin-top:8px;'>Oder frag die KI ✨</span>"
+                "Lust auf<br><b>{fav}</b> 🥰<br>oder vielleicht etwas Neues wie<br><b>{new}</b> 🔭?<br><span class='ai-hint-text'>Oder schreib deinen Wunsch ✨</span>",
+                "Zurück zu<br><b>{fav}</b> 🥰<br>oder ein Risiko eingehen mit<br><b>{new}</b> 🔭?<br><span class='ai-hint-text'>Du kannst auch eine Fantasie beschreiben ✨</span>",
+                "Vermisst du<br><b>{fav}</b> 🥰?<br>Oder erkunden wir<br><b>{new}</b> 🔭<br><span class='ai-hint-text'>Oder frag mich einfach ✨</span>"
             ],
             mode_explore: "Erkunden",
             mode_pleasure: "Genießen",
@@ -10131,7 +10254,7 @@
             auth_p2: "Pro / Beast Status aktivieren",
             auth_p3: "Anonyme Speicherung auf Google-Servern",
             btn_google_signin: "Weiter mit Google",
-            auth_security_note: "Entwickler hat keinen Zugriff auf Daten. Keine Sorge um deinen Verlauf 😏",
+            auth_security_note: "Der Entwickler hat keinen Zugriff auf die Daten. Falls Sie dennoch Bedenken haben, können Sie ein zweites Konto verwenden. 😏",
             btn_cancel: "Abbrechen",
 
             pay_header: "Zahlung USDT (TRC20)",
@@ -10280,6 +10403,17 @@
                 Schaltet <b>Hardcore</b> frei. Fügt hinzu, was verborgen war: Natursekt, Scat, Fisting und Schmerz. Keine Filter.
             `,
 
+            tip_modes_title: "Spielmodi",
+            tip_modes_desc: "Erkunden vs Genuss vs KI",
+            tip_modes_text: `
+                <b>🔭 Erkunden:</b><br>
+                Ausgewogener Zufall. Priorisiert das Entdecken neuer Genres. Perfekt, wenn du unentschlossen bist.<br><br>
+                <b>🥰 Genuss:</b><br>
+                Folgt streng deinen Vorlieben. Nutzt deine "Likes". Ideal für einen garantierten Treffer.<br><br>
+                <b>🤖 KI-Agent:</b><br>
+                Aktiviert bei Text- oder Sprachsuche. Versteht Kontext ("härter", "etwas Neues").
+            `,
+
             // --- Generator ---
             generate: "Zufallsgenre",
             generate_again: "Anderes Genre",
@@ -10320,9 +10454,12 @@
             feat_all_pro: "👑 Alle Pro-Funktionen",
             feat_all_beast: "🦁 <b>Alle Beast-Funktionen</b>",
             feat_sponsors: "💎 In Sponsorenliste",
-            feat_discord: "💬 Discord Zugang",
+            feat_discord: "💬 Discord mit dem Entwickler",
             feat_vote: "🗳️ Abstimmung",
             btn_get_beast: "Beast werden",
+
+            bill_monthly: "Monatlich",
+            bill_yearly: "Jährlich",
 
             btn_lower_tier: "Du verdienst Besseres",
 
@@ -10586,6 +10723,14 @@
         descKey: 'tip_int_desc', 
         textKey: 'tip_int_text',
         gradient: 'linear-gradient(135deg, #fceabb 0%, #f8b500 100%)' // Желто-оранжевый
+    },
+    { 
+        id: 'modes', 
+        icon: '🎛️', 
+        titleKey: 'tip_modes_title', 
+        descKey: 'tip_modes_desc', 
+        textKey: 'tip_modes_text',
+        gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' // Сине-фиолетовый
     }
 ];
     // --- WRAPPED DATA & TEXTS ---
@@ -11033,6 +11178,8 @@
         initIdleSlot(); 
 
         updateSubscriptionUI();
+
+        checkTipIcons();
         
         // Инициализация Ориентации
         const oriSelect = document.getElementById('orientation-select');
@@ -13060,90 +13207,128 @@
         // --- ВАРИАНТ Б: АКТИВНОСТЬ (ACTIVITY) ---
         else {
             const aggregated = {};
-            const nowTime = Date.now();
+            const now = new Date();
+            // Сбрасываем время в 00:00 для корректного сравнения дней
+            now.setHours(23, 59, 59, 999);
+            const nowTs = now.getTime();
+            
             const oneDay = 86400000;
             let cutoffTime = 0;
             
-            if (currentStatsTimeframe === 'week') cutoffTime = nowTime - 7 * oneDay;
-            else if (currentStatsTimeframe === 'month') cutoffTime = nowTime - 30 * oneDay;
-            else if (currentStatsTimeframe === 'year') cutoffTime = nowTime - 365 * oneDay;
-            
+            // Четкий расчет времени отсечки
+            if (currentStatsTimeframe === 'week') cutoffTime = nowTs - (7 * oneDay);
+            else if (currentStatsTimeframe === 'month') cutoffTime = nowTs - (30 * oneDay);
+            else if (currentStatsTimeframe === 'year') cutoffTime = nowTs - (365 * oneDay);
+            else cutoffTime = 0; // All time
+
+            // Хелпер для ключа даты (Местное время!)
+            const getDateKey = (ts) => {
+                const d = new Date(ts);
+                if (currentStatsTimeframe === 'year' || currentStatsTimeframe === 'all') {
+                    // Месяц: "2024-0" (Январь)
+                    return `${d.getFullYear()}-${d.getMonth()}`;
+                }
+                // День: "2024-01-27" (Местное время)
+                return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+            };
+
+            const getLabel = (ts) => {
+                const d = new Date(ts);
+                if (currentStatsTimeframe === 'year' || currentStatsTimeframe === 'all') {
+                    return d.toLocaleDateString(currentLang, { month: 'short' }).replace('.', '');
+                }
+                return d.toLocaleDateString(currentLang, { day: 'numeric', month: 'numeric' });
+            };
+
+            // 1. Агрегация Логов (Свайпы и Лайки)
             activityLog.forEach(log => {
                 if (log.ts < cutoffTime) return;
-                const d = new Date(log.ts);
-                let key, label;
-                if (currentStatsTimeframe === 'year' || currentStatsTimeframe === 'all') {
-                    key = `${d.getFullYear()}-${d.getMonth()}`;
-                    label = d.toLocaleDateString(currentLang, { month: 'short' }).replace('.', '');
-                } else {
-                    key = d.toISOString().split('T')[0];
-                    label = d.toLocaleDateString(currentLang, { day: 'numeric', month: 'numeric' });
-                }
-                if (!aggregated[key]) aggregated[key] = { gen: 0, watch: 0, time: 0, label: label, sort: d.getTime() };
+                
+                const key = getDateKey(log.ts);
+                if (!aggregated[key]) aggregated[key] = { gen: 0, watch: 0, time: 0, label: getLabel(log.ts), sort: log.ts };
+                
+                // Считаем генерации (свайпы)
+                if (['like', 'gen', 'pass', 'dislike'].includes(log.type)) aggregated[key].gen++;
+                // Считаем нажатия на кнопку Watch (намерение)
                 if (log.type === 'watch') aggregated[key].watch++;
-                else if (['like', 'gen', 'pass', 'dislike'].includes(log.type)) aggregated[key].gen++;
             });
 
-            // Добавляем время просмотра
+            // 2. Агрегация Времени (Реальные просмотры)
             watchHistory.forEach(entry => {
                 if (entry.timestamp < cutoffTime) return;
-                const d = new Date(entry.timestamp);
-                let key = (currentStatsTimeframe === 'year' || currentStatsTimeframe === 'all') 
-                    ? `${d.getFullYear()}-${d.getMonth()}` 
-                    : d.toISOString().split('T')[0];
                 
-                if (aggregated[key]) aggregated[key].time += entry.seconds;
-                else {
-                    const label = d.toLocaleDateString(currentLang, { day: 'numeric', month: 'numeric' });
-                    aggregated[key] = { gen: 0, watch: 0, time: entry.seconds, label: label, sort: d.getTime() };
+                const key = getDateKey(entry.timestamp);
+                if (!aggregated[key]) {
+                    aggregated[key] = { gen: 0, watch: 0, time: 0, label: getLabel(entry.timestamp), sort: entry.timestamp };
                 }
+                aggregated[key].time += entry.seconds;
+                
+                if (aggregated[key].watch === 0) aggregated[key].watch++;
             });
 
             const chartData = Object.values(aggregated).sort((a, b) => a.sort - b.sort);
+            
+            // Контейнер графика
             let html = `<div class="chart-wrapper"><div class="chart-scroll-view" id="chart-source-el" style="justify-content: flex-start; padding-left: 5px;">`;
 
             if (chartData.length === 0) {
                 html += `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-secondary);">${t.stats_no_data}</div>`;
             } else {
-                let maxCount = 0, maxTime = 0;
+                // Вычисляем максимумы для масштабирования
+                let maxGen = 0, maxWatch = 0, maxTime = 0;
                 chartData.forEach(d => {
-                    if (d.gen > maxCount) maxCount = d.gen;
-                    if (d.watch > maxCount) maxCount = d.watch;
+                    if (d.gen > maxGen) maxGen = d.gen;
+                    if (d.watch > maxWatch) maxWatch = d.watch;
                     if (d.time > maxTime) maxTime = d.time;
                 });
-                if (maxCount < 5) maxCount = 5;
-                if (maxTime < 300) maxTime = 300;
+                
+                // Минимальные пороги, чтобы график не был пустым
+                if (maxGen < 5) maxGen = 5;
+                if (maxWatch < 3) maxWatch = 3; 
+                if (maxTime < 300) maxTime = 300; // 5 минут минимум
 
                 chartData.forEach(d => {
-                    const hGen = (d.gen / maxCount) * 100;
-                    const hWatch = (d.watch / maxCount) * 100;
+                    // Высота в процентах
+                    const hGen = (d.gen / maxGen) * 100;
+                    const hWatch = (d.watch / maxWatch) * 100;
                     const hTime = (d.time / maxTime) * 100;
                     const timeMin = Math.round(d.time / 60);
 
-                    // --- HTML ДЛЯ СТОЛБЦОВ АКТИВНОСТИ ---
+                    // Рендер столбца
                     html += `
-                        <div class="act-col" style="min-width: 40px; margin-right: 5px;">
-                            <!-- Цифра свайпов (сверху) -->
-                            <div style="font-size:8px; text-align:center; color:var(--text-secondary); font-weight:700; margin-bottom:2px;">${d.gen}</div>
+                        <div class="act-col">
                             
-                            <div style="display:flex; align-items:flex-end; gap:2px; height:70%; width:100%; padding-bottom:5px;">
-                                <div style="flex:1; background:var(--text-secondary); height:${Math.max(5, hGen)}%; border-radius:2px 2px 0 0; opacity:0.3;"></div>
-                                <div style="flex:1; background:var(--accent); height:${Math.max(5, hWatch)}%; border-radius:2px 2px 0 0;"></div>
-                                <div style="flex:1; background:#9b59b6; height:${Math.max(5, hTime)}%; border-radius:2px 2px 0 0;"></div>
+                            <!-- Группа столбиков -->
+                            <div class="act-bars-group">
+                                <!-- 1. Свайпы (Серый) -->
+                                <div class="act-bar" style="background:var(--text-secondary); height:${Math.max(5, hGen)}%; opacity:0.3;"></div>
+                                
+                                <!-- 2. Просмотры (Цвет темы) -->
+                                <div class="act-bar" style="background:var(--accent); height:${Math.max(5, hWatch)}%;"></div>
+                                
+                                <!-- 3. Время (Фиолетовый) -->
+                                <div class="act-bar" style="background:#9b59b6; height:${Math.max(5, hTime)}%;"></div>
                             </div>
-                            <!-- Цифра времени (снизу) -->
-                            <div style="font-size:8px; text-align:center; color:#9b59b6; font-weight:700;">${timeMin}</div>
-                            <div class="chart-label-x" style="font-size:9px;">${d.label}</div>
+
+                            <!-- Цифры под графиком -->
+                            <div class="act-values-row">
+                                <span class="act-val" style="color:var(--text-secondary); opacity:0.7;">${d.gen}</span>
+                                <span class="act-val" style="color:var(--text-main);">${d.watch}</span>
+                                <span class="act-val" style="color:#9b59b6;">${timeMin}</span>
+                            </div>
+
+                            <!-- Дата -->
+                            <div class="chart-label-x">${d.label}</div>
                         </div>
                     `;
                 });
             }
             html += `</div></div>`;
 
-            // === ЛЕГЕНДА АКТИВНОСТИ ===
+            // Легенда
             let legendUnit = currentLang === 'ru' ? 'мин' : 'min';
             html += `
-                <div class="stats-legend-row">
+                <div class="stats-legend-row" style="margin-top:10px;">
                     <div class="legend-item"><div class="legend-dot" style="background:var(--text-secondary); opacity:0.3;"></div> ${t.act_actions}</div>
                     <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div> ${t.act_watches}</div>
                     <div class="legend-item"><div class="legend-dot" style="background:#9b59b6"></div> ${t.act_time} (${legendUnit})</div>
@@ -13235,81 +13420,75 @@
             }
 
         } else {
-            // --- ЛОГИКА ДЛЯ АКТИВНОСТИ (ACTIVITY) ---
+            // --- ЛОГИКА ДЛЯ АКТИВНОСТИ (ACTIVITY - EXPORT) ---
             subTitleText = (currentLang === 'ru' ? "ИСТОРИЯ АКТИВНОСТИ" : "ACTIVITY HISTORY");
 
             const aggregated = {};
-            // Для экспорта берем последние 7 дней (или единиц времени), чтобы влезло красиво
-            const exportLimit = 7; 
+            const exportLimit = 7; // Берем последние 7 точек
             
-            // Агрегация (копия логики из renderStatsContent, но без фильтра по времени, берем всё и режем в конце)
+            // Используем ту же логику агрегации, но без фильтра времени (берем всё)
+            const getDateKey = (ts) => {
+                const d = new Date(ts);
+                if (currentStatsTimeframe === 'year' || currentStatsTimeframe === 'all') return `${d.getFullYear()}-${d.getMonth()}`;
+                return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+            };
+            const getLabel = (ts) => {
+                const d = new Date(ts);
+                if (currentStatsTimeframe === 'year' || currentStatsTimeframe === 'all') return d.toLocaleDateString(currentLang, { month: 'short' });
+                return d.toLocaleDateString(currentLang, { day: 'numeric', month: 'numeric' });
+            };
+
             activityLog.forEach(log => {
-                const d = new Date(log.ts);
-                let key, label;
-                // Упрощаем: всегда по дням для наглядности графика, или по месяцам если выбран год
-                if (currentStatsTimeframe === 'year' || currentStatsTimeframe === 'all') {
-                    key = `${d.getFullYear()}-${d.getMonth()}`;
-                    label = d.toLocaleDateString(currentLang, { month: 'short' });
-                } else {
-                    key = d.toISOString().split('T')[0];
-                    label = d.toLocaleDateString(currentLang, { day: 'numeric', month: 'numeric' });
-                }
-                
-                if (!aggregated[key]) aggregated[key] = { gen: 0, watch: 0, time: 0, label: label, sort: d.getTime() };
+                const key = getDateKey(log.ts);
+                if (!aggregated[key]) aggregated[key] = { gen: 0, watch: 0, time: 0, label: getLabel(log.ts), sort: log.ts };
+                if (['like', 'gen', 'pass', 'dislike'].includes(log.type)) aggregated[key].gen++;
                 if (log.type === 'watch') aggregated[key].watch++;
-                else if (['like', 'gen', 'pass', 'dislike'].includes(log.type)) aggregated[key].gen++;
             });
 
             watchHistory.forEach(entry => {
-                const d = new Date(entry.timestamp);
-                let key = (currentStatsTimeframe === 'year' || currentStatsTimeframe === 'all') 
-                    ? `${d.getFullYear()}-${d.getMonth()}` 
-                    : d.toISOString().split('T')[0];
-                
-                if (aggregated[key]) aggregated[key].time += entry.seconds;
-                else {
-                    const label = d.toLocaleDateString(currentLang, { day: 'numeric', month: 'numeric' });
-                    aggregated[key] = { gen: 0, watch: 0, time: entry.seconds, label: label, sort: d.getTime() };
-                }
+                const key = getDateKey(entry.timestamp);
+                if (!aggregated[key]) aggregated[key] = { gen: 0, watch: 0, time: 0, label: getLabel(entry.timestamp), sort: entry.timestamp };
+                aggregated[key].time += entry.seconds;
+                if (aggregated[key].watch === 0) aggregated[key].watch++;
             });
 
-            // Берем последние N элементов
-            const chartData = Object.values(aggregated)
-                .sort((a, b) => a.sort - b.sort)
-                .slice(-exportLimit);
+            const chartData = Object.values(aggregated).sort((a, b) => a.sort - b.sort).slice(-exportLimit);
 
             if (chartData.length === 0) {
                 chartHtml = `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-secondary);">${t.stats_no_data}</div>`;
             } else {
-                let maxCount = 0, maxTime = 0;
+                let maxGen = 5, maxWatch = 3, maxTime = 300;
                 chartData.forEach(d => {
-                    if (d.gen > maxCount) maxCount = d.gen;
-                    if (d.watch > maxCount) maxCount = d.watch;
+                    if (d.gen > maxGen) maxGen = d.gen;
+                    if (d.watch > maxWatch) maxWatch = d.watch;
                     if (d.time > maxTime) maxTime = d.time;
                 });
-                if (maxCount < 5) maxCount = 5;
-                if (maxTime < 300) maxTime = 300;
 
                 chartHtml = `<div style="display:flex; width:100%; height:100%; align-items:flex-end; justify-content: space-between; padding: 0 10px;">`;
 
                 chartData.forEach(d => {
-                    const hGen = (d.gen / maxCount) * 100;
-                    const hWatch = (d.watch / maxCount) * 100;
+                    const hGen = (d.gen / maxGen) * 100;
+                    const hWatch = (d.watch / maxWatch) * 100;
                     const hTime = (d.time / maxTime) * 100;
+                    const timeMin = Math.round(d.time/60);
                     
                     chartHtml += `
                         <div style="flex:1; max-width:13%; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; margin:0 2px;">
-                            <!-- Число свайпов -->
-                            <div style="font-size:9px; font-weight:700; color:var(--text-secondary); margin-bottom:2px;">${d.gen}</div>
                             
-                            <div style="display:flex; align-items:flex-end; gap:2px; height:80%; width:100%;">
-                                <div style="flex:1; background:var(--text-secondary); height:${Math.max(5, hGen)}%; border-radius:2px 2px 0 0; opacity:0.3;"></div>
+                            <!-- График (3 столбика) -->
+                            <div style="display:flex; align-items:flex-end; gap:2px; height:75%; width:100%; border-bottom:1px solid rgba(128,128,128,0.2);">
+                                <div style="flex:1; background:var(--text-secondary); height:${Math.max(5, hGen)}%; opacity:0.3; border-radius:2px 2px 0 0;"></div>
                                 <div style="flex:1; background:var(--accent); height:${Math.max(5, hWatch)}%; border-radius:2px 2px 0 0;"></div>
                                 <div style="flex:1; background:#9b59b6; height:${Math.max(5, hTime)}%; border-radius:2px 2px 0 0;"></div>
                             </div>
                             
-                            <!-- Число минут -->
-                            <div style="font-size:9px; font-weight:700; color:#9b59b6; margin-top:2px;">${Math.round(d.time/60)}</div>
+                            <!-- Цифры -->
+                            <div style="display:flex; justify-content:space-between; width:100%; margin-top:2px; font-size:8px; font-weight:700;">
+                                <span style="color:var(--text-secondary); opacity:0.7;">${d.gen}</span>
+                                <span style="color:var(--text-main);">${d.watch}</span>
+                                <span style="color:#9b59b6;">${timeMin}</span>
+                            </div>
+
                             <div class="chart-label-x" style="margin-top:2px; font-size:9px; font-weight:600; color:var(--text-secondary);">${d.label}</div>
                         </div>
                     `;
@@ -13643,17 +13822,29 @@
     }
 
     function resetAppHistory() {
-        const t = langData[currentLang];
+        const t = langData[currentLang] || langData['en'];
         
         if (confirm(t.confirm_reset)) {
-            localStorage.removeItem(STORAGE.HISTORY);
-            localStorage.removeItem(STORAGE.ACTIVITY_LOG);
-            localStorage.removeItem(STORAGE.TAG_SCORES);
-            localStorage.removeItem(STORAGE.BLACKLIST);
-            localStorage.removeItem(STORAGE.FAVORITES);
-            localStorage.removeItem(STORAGE.WATCH_LATER);
-            localStorage.removeItem(STORAGE.WATCH_HISTORY);
+            // 1. ОЧИСТКА LOCAL STORAGE
+            const keysToRemove = [
+                STORAGE.HISTORY, 
+                STORAGE.ACTIVITY_LOG, 
+                STORAGE.TAG_SCORES, 
+                STORAGE.BLACKLIST, 
+                STORAGE.FAVORITES, 
+                STORAGE.WATCH_LATER, 
+                STORAGE.WATCH_HISTORY,
+                'xch_permanent_explored', // Счетчик открытых фетишей
+                'xch_active_days',        // Прогресс Wrapped (дни)
+                'xch_wrapped_archive',    // Архив Wrapped
+                'xch_achievement_dates',  // Даты ачивок
+                'xch_viewed_tips',        // Прочитанные советы
+                'xch_last_archive_check'
+            ];
             
+            keysToRemove.forEach(k => localStorage.removeItem(k));
+            
+            // 2. СБРОС ГЛОБАЛЬНЫХ ПЕРЕМЕННЫХ (В ПАМЯТИ)
             historyData = [];
             activityLog = [];
             tagScores = {};
@@ -13662,25 +13853,39 @@
             watchLater = [];
             watchHistory = [];
             
-            updateCounts();
-            updateExploredCount();
-            renderHistory();
-            if (window.syncToCloud) window.syncToCloud();
+            // Важные сбросы
+            permanentExplored = new Set(); // Сброс счетчика фетишей
+            activeDaysSet = new Set();     // Сброс прогресса дней
+            wrappedArchive = [];           // Сброс архива
+            achievementDates = {};
+            viewedTips = [];               // Сброс подсказок
             
+            // 3. ОБНОВЛЕНИЕ ИНТЕРФЕЙСА
+            updateCounts();
+            updateExploredCount(); // Обновляет цифру "0 / 1200"
+            renderHistory();
+            checkTipIcons();       // Возвращает знаки вопроса (?)
+            
+            // Сброс UI статистики и Wrapped
             const progressUI = document.getElementById('wrapped-progress-ui');
             if (progressUI) progressUI.remove();
             
             const wBtn = document.getElementById('btn-wrapped-trigger');
             if (wBtn) wBtn.style.display = 'none';
 
-            // Сбрасываем график
-            const modalBody = document.getElementById('modal-stats-body');
-            if (modalBody && document.getElementById('modal-stats-overlay').classList.contains('open')) {
+            // Если открыто окно статистики, обновляем его содержимое (чтобы исчез график)
+            const statsBody = document.getElementById('modal-stats-body');
+            if (statsBody && document.getElementById('modal-stats-overlay').classList.contains('open')) {
                 renderStatsContent();
-                // Перерисовываем заголовок статистики, чтобы обновить прогресс бар (показать заблокированный)
-                openStatistics(); 
+                openStatistics(); // Перерисовываем прогресс-бар (покажет 0/7)
             }
 
+            // 4. СИНХРОНИЗАЦИЯ С ОБЛАКОМ (Отправляем пустые данные)
+            if (window.isUserLoggedIn) {
+                // Принудительная отправка немедленно
+                window.syncToCloud(true);
+            }
+            
             alert(t.reset_done);
         }
     }
@@ -14202,7 +14407,12 @@
                     btn.onclick = () => openPaymentSelection(planType);
                 }
             } else if (state === 'lower') {
-                btn.disabled = true; btn.classList.add('current'); btn.innerText = tLower; btn.style.opacity = "0.6";
+                btn.disabled = true; 
+                btn.classList.add('current'); 
+                
+                btn.innerText = t.btn_lower_tier || "You deserve better"; 
+                
+                btn.style.opacity = "0.6";
             } else { 
                 if (btn.closest('.pro')) btn.classList.add('pro-btn');
                 if (btn.closest('.beast')) btn.classList.add('beast-btn');
@@ -14854,7 +15064,8 @@
         if(undoBtn) undoBtn.disabled = false;
     }
 
-    function startGeneration(mode, direction = 'next') {
+    function startGeneration(mode, direction = 'next', specificId = null) {
+        // 1. Проверки состояния
         if (isPanicMode) {
             generatePanicCard(direction);
             return;
@@ -14865,90 +15076,113 @@
 
         randomizeDecorations();
 
-        if (mode === 'random') {
-            const roll = Math.random(); // Генерируем число от 0.0 до 1.0
-            const depth = sessionHistoryStack.length; // Глубина текущей сессии
+        // 2. Сброс модификаторов (базовый)
+        activeMods.clear(); 
+        if (currentOrientation === 'gay') activeMods.add('Gay');
+        else if (currentOrientation === 'trans') activeMods.add('Trans');
+        
+        // === ЛОГИКА 1: КОНКРЕТНЫЙ ПРЕДМЕТ (из приветствия или истории) ===
+        if (mode === 'specific' && specificId) {
+            const targetItem = data.find(i => i.id === specificId);
+            
+            if (targetItem) {
+                // Сразу запускаем анимацию с этим предметом
+                // Используем mode='random', чтобы сработала стандартная логика объяснения ("Судьба" или "Потому что ты любишь")
+                launchAnimation(targetItem, 'random', direction);
+                return;
+            }
+            // Если предмет не найден (удален из базы), проваливаемся в обычный рандом
+        }
 
-            // Хелпер для проверки валидности предмета (чтобы не дублировать код)
+        // === ЛОГИКА 2: ВБРОСЫ (INJECTIONS) - WL / Favs / Ban ===
+        if (mode === 'random') {
+            const roll = Math.random(); 
+            const depth = sessionHistoryStack.length; 
+
             const isValidInjection = (item) => {
                 if (!item) return false;
-                if (cooldownList.includes(item.id)) return false; // Недавно было
-                
-                // Проверка ориентации (не показывать гей-контент в гетеро режиме и наоборот)
+                if (cooldownList.includes(item.id)) return false; 
                 if (currentOrientation === 'gay' && !item.tags.includes('gay')) return false;
                 if (currentOrientation === 'hetero' && item.tags.includes('gay')) return false;
                 if (currentOrientation === 'trans' && !item.tags.some(t=>['trans','shemale'].includes(t))) return false;
-                
                 return true;
             };
 
             let targetItem = null;
             let injectionMode = null;
 
-            // 1. WATCH LATER (Приоритет: Высокий, Шанс: ~12%, Глубина: >2)
+            // 1. WATCH LATER (12%)
             if (roll < 0.12 && watchLater.length > 0 && depth > 2) {
                 const candidate = data.find(x => x.id === watchLater[Math.floor(Math.random() * watchLater.length)]);
-                if (isValidInjection(candidate)) {
-                    targetItem = candidate;
-                    injectionMode = 'wl_reminder';
-                }
+                if (isValidInjection(candidate)) { targetItem = candidate; injectionMode = 'wl_reminder'; }
             }
-            
-            // 2. FAVORITES (Приоритет: Средний, Шанс: ~4% (0.12 - 0.16), Глубина: >5)
-            // Напоминаем о любимом, только если уже немного посвайпали
+            // 2. FAVORITES (4%)
             else if (roll >= 0.12 && roll < 0.16 && favorites.length > 0 && depth > 5) {
                 const candidate = data.find(x => x.id === favorites[Math.floor(Math.random() * favorites.length)]);
-                if (isValidInjection(candidate)) {
-                    targetItem = candidate;
-                    injectionMode = 'fav_reminder';
-                }
+                if (isValidInjection(candidate)) { targetItem = candidate; injectionMode = 'fav_reminder'; }
             }
-
-            // 3. BLACKLIST (Приоритет: Низкий, Шанс: ~1.5% (0.16 - 0.175), Глубина: >10)
-            // Очень редко и только если сессия долгая
+            // 3. BLACKLIST (1.5%)
             else if (roll >= 0.16 && roll < 0.175 && blacklist.length > 0 && depth > 10) {
                 const candidate = data.find(x => x.id === blacklist[Math.floor(Math.random() * blacklist.length)]);
-                if (isValidInjection(candidate)) {
-                    targetItem = candidate;
-                    injectionMode = 'ban_reminder';
-                }
+                if (isValidInjection(candidate)) { targetItem = candidate; injectionMode = 'ban_reminder'; }
             }
 
-            // ЕСЛИ ВБРОС СРАБОТАЛ:
+            // Если вброс сработал
             if (targetItem && injectionMode) {
                 console.log(`Injection Triggered: ${injectionMode}`);
-                isGenerating = true;
-                hasInteractedWithCurrent = false;
-
-                const wrapper = document.getElementById('card-anim-wrapper');
-                if(wrapper) wrapper.style.opacity = '0';
-                
-                // Запускаем с особым режимом
-                finishGeneration(targetItem, injectionMode);
-
-                if(wrapper) {
-                    wrapper.style.transform = '';
-                    void wrapper.offsetWidth; 
-                    wrapper.style.opacity = '1';
-                    const animClass = (direction === 'like') ? 'anim-fly-left' : 'anim-fly-right';
-                    wrapper.classList.add(animClass);
-                    setTimeout(() => {
-                        wrapper.classList.remove('anim-fly-right', 'anim-fly-left');
-                        wrapper.style.transform = '';
-                    }, 800);
-                }
+                // Запускаем анимацию вброса
+                launchAnimation(targetItem, injectionMode, direction);
                 return; 
             }
         }
 
-        // 1. Модификаторы
-        activeMods.clear(); 
-        if (currentOrientation === 'gay') activeMods.add('Gay');
-        else if (currentOrientation === 'trans') activeMods.add('Trans');
+        // === ЛОГИКА 3: СТАНДАРТНЫЙ РАНДОМ И ФИЛЬТРАЦИЯ ===
+        
+        // Корректировка весов на основе предыдущего действия (если это рандом)
+        if (mode === 'random' && currentItem && !hasInteractedWithCurrent) {
+            if (watchLater.includes(currentItem.id)) adjustTagScores(currentItem, 1);
+            else adjustTagScores(currentItem, -1);
+        }
+        if (mode === 'similar' && currentItem) adjustTagScores(currentItem, 1);
 
+        // Фильтрация
+        let filtered = filterData();
+        
+        // Если режим "Похожее"
+        if (mode === 'similar' && lastGeneratedItem) {
+            const subset = filtered.filter(item => {
+                if (item.id === lastGeneratedItem.id) return false;
+                const intersection = item.tags.filter(t => lastGeneratedItem.tags.includes(t));
+                return intersection.length >= 2;
+            });
+            if (subset.length > 0) filtered = subset;
+        }
+
+        // Если пусто
+        if (filtered.length === 0) {
+            const reel = document.getElementById('slot-reel');
+            reel.innerHTML = `<div class="slot-item" style="color:var(--highlight-red);">List Empty</div>`;
+            document.getElementById('tinder-controls').classList.remove('hidden-initial');
+            return;
+        }
+
+        // Выбор победителя
+        const finalItem = getWeightedRandom(filtered);
+
+        // Запуск анимации
+        launchAnimation(finalItem, mode, direction);
+    }
+
+    function launchAnimation(finalItem, mode, direction) {
+        // 1. Блокируем интерфейс
+        isGenerating = true;
+        hasInteractedWithCurrent = false;
+        hasWatchedCurrentItem = false;
+
+        // 2. Обновляем UI модификаторов (рендерим те, что есть по дефолту)
         renderModifiers();
 
-        // 2. Чистка UI
+        // 3. Очистка старого контента карточки
         const descEl = document.getElementById('result-desc');
         if(descEl) descEl.style.display = 'none';
         const statusText = document.getElementById('status-text');
@@ -14959,18 +15193,22 @@
         const modContainer = document.getElementById('mod-container');
         if (modContainer) modContainer.classList.remove('open');
         
-        document.getElementById('tinder-controls').classList.add('hidden-initial');
-        document.getElementById('mods-block').classList.add('hidden-initial');
-        document.getElementById('related-block').classList.add('hidden-initial');
+        // Скрываем кнопки управления
+        const uiToHide = ['tinder-controls', 'mods-block', 'related-block'];
+        uiToHide.forEach(id => {
+            const el = document.getElementById(id);
+            if(el) {
+                el.classList.add('hidden-initial'); 
+            }
+        });
 
-        // 3. Элементы
+        // 4. Сброс стилей карточки
         const card = document.getElementById('card-block');
         const wrapper = document.getElementById('card-anim-wrapper');
+        const overlay = document.querySelector('.swipe-overlay');
         const iconLeft = document.querySelector('.icon-left');
         const iconRight = document.querySelector('.icon-right');
-        const overlay = document.querySelector('.swipe-overlay');
-        
-        // === СБРОС СОСТОЯНИЯ ===
+
         if (wrapper) {
             wrapper.classList.remove('anim-fly-left', 'anim-fly-right');
             wrapper.style.transform = '';
@@ -14988,85 +15226,52 @@
             card.style.borderColor = '';
             card.style.filter = '';
             
-            // Сброс оверлея
             if (overlay) {
-                overlay.style.transition = 'none'; // Убираем анимацию, чтобы сбросилось мгновенно
+                overlay.style.transition = 'none';
                 overlay.style.backgroundColor = 'transparent';
                 overlay.style.opacity = ''; 
             }
             
-            // Сброс блюра на элементах
+            // Сброс блюра
             const blurTargets = [
                 document.getElementById('slot-reel'), 
                 document.getElementById('result-desc'), 
                 document.getElementById('badge-wrapper'), 
                 document.getElementById('related-block'),
-                document.getElementById('tinder-controls') // Добавили кнопки
+                document.getElementById('tinder-controls')
             ];
-            
             blurTargets.forEach(el => { 
-                if(el) { 
-                    el.style.transition = 'none'; // Мгновенно
-                    el.style.filter = 'none'; 
-                }
+                if(el) { el.style.transition = 'none'; el.style.filter = 'none'; }
             });
             
             void card.offsetWidth; // Force reflow
         }
-        
-        // --- ПОЛНЫЙ СБРОС ИКОНОК ---
+
+        // Сброс иконок
         if(iconLeft) {
-            iconLeft.style.transition = 'none'; // Убираем плавность, чтобы они вернулись мгновенно
-            iconLeft.style.opacity = '';        // Сбрасываем прозрачность (вернется к CSS значению)
-            iconLeft.style.transform = '';      // Возвращаем на место
-            iconLeft.style.animation = '';      // Сбрасываем паузу анимации
+            iconLeft.style.transition = 'none'; iconLeft.style.opacity = ''; iconLeft.style.transform = ''; iconLeft.style.animation = ''; 
         }
         if(iconRight) {
-            iconRight.style.transition = 'none';
-            iconRight.style.opacity = '';
-            iconRight.style.transform = '';
-            iconRight.style.animation = '';
-        }
-        
-        // 4. Логика выбора
-        if (mode === 'random' && currentItem && !hasInteractedWithCurrent) {
-            if (watchLater.includes(currentItem.id)) adjustTagScores(currentItem, 1);
-            else adjustTagScores(currentItem, -1);
-        }
-        if (mode === 'similar' && currentItem) adjustTagScores(currentItem, 1);
-
-        let filtered = filterData();
-        if (mode === 'similar' && lastGeneratedItem) {
-            const subset = filtered.filter(item => {
-                if (item.id === lastGeneratedItem.id) return false;
-                const intersection = item.tags.filter(t => lastGeneratedItem.tags.includes(t));
-                return intersection.length >= 2;
-            });
-            if (subset.length > 0) filtered = subset;
+            iconRight.style.transition = 'none'; iconRight.style.opacity = ''; iconRight.style.transform = ''; iconRight.style.animation = '';
         }
 
         const reel = document.getElementById('slot-reel');
-        if (filtered.length === 0) {
-            reel.innerHTML = `<div class="slot-item" style="color:var(--highlight-red);">List Empty</div>`;
-            document.getElementById('tinder-controls').classList.remove('hidden-initial');
-            return;
-        }
 
-        isGenerating = true;
-        hasInteractedWithCurrent = false;
-        hasWatchedCurrentItem = false;
-        const finalItem = getWeightedRandom(filtered);
-
-        // === АНИМАЦИЯ ===
-
+        // === СЦЕНАРИЙ 1: ПЕРВЫЙ ЗАПУСК (СЛОТ-МАШИНА) ===
         if (isFirstGen) {
-            // Сценарий 1: Первый запуск
+            // Генерируем фейковые имена для прокрутки
+            // (Используем filterData или просто берем случайные из data, если filter пуст)
+            let spinCandidates = filterData();
+            if (spinCandidates.length === 0) spinCandidates = data; // Fallback
+
             const spinCount = 10;
             let html = '';
+            
             for (let i = 0; i < spinCount - 1; i++) {
-                const randomItem = filtered[Math.floor(Math.random() * filtered.length)];
+                const randomItem = spinCandidates[Math.floor(Math.random() * spinCandidates.length)];
                 html += `<div class="slot-item">${getLocalizedName(randomItem)}</div>`;
             }
+            
             const winnerName = getLocalizedName(finalItem);
             html += `<div class="slot-item" id="result-text">${winnerName}</div>`;
             
@@ -15081,7 +15286,7 @@
             setTimeout(() => {
                 isFirstGen = false;
                 const isPC = window.innerWidth > 768;
-                const itemHeight = isPC ? 450 : 300;
+                const itemHeight = isPC ? 450 : 300; // Примерная высота элемента
                 const realHeight = reel.firstElementChild ? reel.firstElementChild.offsetHeight : itemHeight;
                 const targetIndex = 9; 
                 const targetY = -(targetIndex * realHeight);
@@ -15090,11 +15295,13 @@
                     reel.style.transition = 'transform 1.2s cubic-bezier(0.25, 1, 0.5, 1)';
                     reel.style.transform = `translateY(${targetY}px)`;
                 });
+                
                 setTimeout(() => { finishGeneration(finalItem, mode); }, 1200);
             }, 300);
 
-        } else {
-            // Сценарий 2: Обычная генерация
+        } 
+        // === СЦЕНАРИЙ 2: ОБЫЧНАЯ ГЕНЕРАЦИЯ (СВАЙП) ===
+        else {
             if(wrapper) wrapper.style.opacity = '0'; 
             
             finishGeneration(finalItem, mode);
@@ -15104,22 +15311,12 @@
                 void wrapper.offsetWidth; 
                 wrapper.style.opacity = '1';
 
-                // ОПРЕДЕЛЕНИЕ АНИМАЦИИ ВХОДА
-                let animClass = 'anim-fly-left'; // По умолчанию слева
-
-                if (direction === 'entry-right') {
-                    // Прилетает СПРАВА (для режима Explore)
-                    animClass = 'anim-fly-right';
-                } else if (direction === 'entry-left') {
-                    // Прилетает СЛЕВА (для режима Pleasure)
-                    animClass = 'anim-fly-left';
-                } else if (direction === 'like') {
-                    // Свайп вправо (Like) -> следующая приходит слева
-                    animClass = 'anim-fly-left';
-                } else if (direction === 'dislike') {
-                    // Свайп влево (Dislike) -> следующая приходит справа
-                    animClass = 'anim-fly-right';
-                }
+                // Определение направления анимации
+                let animClass = 'anim-fly-left'; 
+                if (direction === 'entry-right') animClass = 'anim-fly-right';
+                else if (direction === 'entry-left') animClass = 'anim-fly-left';
+                else if (direction === 'like') animClass = 'anim-fly-left';
+                else if (direction === 'dislike') animClass = 'anim-fly-right';
 
                 wrapper.classList.add(animClass);
 
@@ -15131,21 +15328,18 @@
         }
     }
 
-    function startNewSession(exitDirection = 'right') {
+    function startNewSession(exitDirection = 'right', targetId = null) {
         if (!checkGenerationLimit(true)) return;
         
         const wrapper = document.getElementById('card-anim-wrapper');
         const startBtn = document.getElementById('start-btn-container');
         
-        // Скрываем кнопку старта (если она была)
         if(startBtn) {
             startBtn.classList.add('hidden-initial');
             startBtn.style.display = 'none';
         }
 
         if(wrapper) {
-            // Анимация ВЫХОДА (Меню улетает)
-            // Если exitDirection 'left', улетаем влево (-150%)
             const moveX = exitDirection === 'left' ? -150 : 150;
             const rotate = exitDirection === 'left' ? -15 : 15;
 
@@ -15160,8 +15354,10 @@
             
             const entryAnimation = exitDirection === 'left' ? 'entry-right' : 'entry-left';
             
-            // Запускаем генерацию с указанием анимации
-            startGeneration('random', entryAnimation); 
+            // ПЕРЕДАЕМ targetId в startGeneration
+            const mode = targetId ? 'specific' : 'random';
+            
+            startGeneration(mode, entryAnimation, targetId); 
         }, 350);
     }
 
@@ -16245,60 +16441,67 @@
         const el = document.getElementById('mode-start-text');
         if (!el) return;
         
+        suggestedFavId = null;
+        suggestedNewId = null;
+        
         const t = langData[currentLang] || langData['en'];
         let finalPhrase = "";
-        let foundName = null;
+        let favName = null;
+        let newName = null;
 
-        // 1. Находим любимые теги пользователя (вес > 10)
+        // --- 1. ИЩЕМ ЛЮБИМОЕ (Для режима Pleasure) ---
         const ignoreTags = ['general', 'specific', 'straight', 'male', 'female', 'adult', 'video', 'hd', 'kinky', 'fetish', 'fantasy', 'action', 'body-part'];
         
         const topTags = Object.entries(tagScores)
             .filter(([tag, score]) => score > 10 && !ignoreTags.includes(tag))
-            .sort((a, b) => b[1] - a[1]) // Сортируем: от самых любимых
-            .slice(0, 5) // Берем топ-5 тегов
+            .sort((a, b) => b[1] - a[1]) 
+            .slice(0, 5) 
             .map(x => x[0]);
 
-        // Проверяем, загружена ли база данных и есть ли любимые теги
         if (typeof data !== 'undefined' && topTags.length > 0) {
-            
-            // Выбираем один случайный тег из топа 
             const randomTag = topTags[Math.floor(Math.random() * topTags.length)];
-
-            // 2. Ищем в базе КОНКРЕТНЫЕ ФЕТИШИ, содержащие этот тег
-            const candidates = data.filter(item => 
-                item.tags.includes(randomTag) && 
-                !blacklist.includes(item.id)
-            );
+            const candidates = data.filter(item => item.tags.includes(randomTag) && !blacklist.includes(item.id));
 
             if (candidates.length > 0) {
-                // 3. Берем случайный фетиш из найденных
                 const winnerItem = candidates[Math.floor(Math.random() * candidates.length)];
-                
-                // 4. Получаем его локализованное имя
-                const langKey = ['en','ru','es','de'].includes(currentLang) ? currentLang : 'en';
-                
-                if (langKey === 'ru' && winnerItem.name_ru) foundName = winnerItem.name_ru;
-                else if (langKey === 'es' && winnerItem.name_es) foundName = winnerItem.name_es;
-                else if (langKey === 'de' && winnerItem.name_de) foundName = winnerItem.name_de;
-                else foundName = winnerItem.name;
+                favName = getLocalizedName(winnerItem);
+                suggestedFavId = winnerItem.id; // СОХРАНЯЕМ ID
             }
         }
 
-        // 3. Формируем фразу
-        if (foundName && t.mode_greeting_dynamic && t.mode_greeting_dynamic.length > 0) {
+        // --- 2. ИЩЕМ НОВОЕ (Для режима Explore) ---
+        if (typeof data !== 'undefined' && data.length > 0) {
+            const randomPool = data
+                .sort(() => 0.5 - Math.random())
+                .slice(0, 50)
+                .filter(item => 
+                    !blacklist.includes(item.id) && 
+                    !favorites.includes(item.id) && 
+                    item.name !== favName
+                );
+            
+            if (randomPool.length > 0) {
+                const randomNewItem = randomPool[0];
+                newName = getLocalizedName(randomNewItem);
+                suggestedNewId = randomNewItem.id; // СОХРАНЯЕМ ID
+            }
+        }
+
+        // --- 3. ФОРМИРУЕМ ФРАЗУ ---
+        if (favName && newName && t.mode_greeting_dynamic && t.mode_greeting_dynamic.length > 0) {
             const templates = t.mode_greeting_dynamic;
             const template = templates[Math.floor(Math.random() * templates.length)];
             
-            // Подставляем имя фетиша
-            finalPhrase = template.replace('{tag}', `<span style="color:var(--accent);">${foundName}</span>`);
+            finalPhrase = template
+                .replace('{fav}', `<span style="color:var(--accent);">${favName}</span>`)
+                .replace('{new}', `<span style="color:#00d2ff;">${newName}</span>`);
         } 
         else {
-            // ФОЛЛБЭК: Если нет истории или данных, показываем стандартные фразы
             const phrases = Array.isArray(t.mode_greeting_hint) 
                 ? t.mode_greeting_hint 
                 : [t.mode_greeting_hint];
-                
             finalPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+            
         }
             
         el.innerHTML = finalPhrase;
@@ -16330,7 +16533,6 @@
     function setAppModeAndStart(mode) {
         setAppMode(mode);
         
-        // Анимация скрытия оверлея
         const overlay = document.getElementById('mode-start-overlay');
         if(overlay) {
             overlay.style.transition = 'opacity 0.3s, transform 0.3s';
@@ -16342,7 +16544,16 @@
         
         const direction = (mode === 'explore') ? 'left' : 'right';
         
-        startNewSession(direction);
+        // ОПРЕДЕЛЯЕМ ЦЕЛЕВОЙ ID
+        let specificId = null;
+        if (mode === 'pleasure' && suggestedFavId) {
+            specificId = suggestedFavId;
+        } else if (mode === 'explore' && suggestedNewId) {
+            specificId = suggestedNewId;
+        }
+        
+        // Передаем ID дальше
+        startNewSession(direction, specificId);
     }
 
     function updateCapsuleUI() {
@@ -18529,23 +18740,25 @@
         container.innerHTML = '';
         const t = langData[currentLang] || langData['en'];
 
-        tipsData.forEach(tip => {
+        const sortedTips = [...tipsData].sort((a, b) => {
+            const aViewed = viewedTips.includes(a.id);
+            const bViewed = viewedTips.includes(b.id);
+            return aViewed - bViewed; // false (0) - true (1) = -1 (Unviewed first)
+        });
+
+        sortedTips.forEach(tip => {
+            const isViewed = viewedTips.includes(tip.id);
+            
             const card = document.createElement('div');
-            card.className = 'tip-card';
+            // Добавляем класс 'viewed', если прочитано
+            card.className = `tip-card ${isViewed ? 'viewed' : ''}`;
             
             card.onclick = () => showTipDetail(tip);
 
-            // Вставляем HTML: Шапка + Тело (с иконкой и текстом внутри)
             card.innerHTML = `
-                <!-- 1/3 Шапка с цветом -->
                 <div class="tip-card-header" style="background: ${tip.gradient};"></div>
-                
-                <!-- 2/3 Тело -->
                 <div class="tip-card-body">
-                    <!-- Иконка на пересечении -->
                     <div class="tip-card-icon">${tip.icon}</div>
-                    
-                    <!-- Текст -->
                     <div class="tip-card-title">${t[tip.titleKey]}</div>
                     <div class="tip-card-desc">${t[tip.descKey]}</div>
                 </div>
@@ -18558,12 +18771,18 @@
     function showTipDetail(tip) {
         const t = langData[currentLang] || langData['en'];
         
-        // Заполняем контент
+        if (!viewedTips.includes(tip.id)) {
+            viewedTips.push(tip.id);
+            localStorage.setItem('xch_viewed_tips', JSON.stringify(viewedTips));
+            
+            // Скрываем вопросики сразу же
+            checkTipIcons();
+        }
+        
         document.getElementById('tip-detail-icon').innerText = tip.icon;
         document.getElementById('tip-detail-title').innerText = t[tip.titleKey];
-        document.getElementById('tip-detail-content').innerHTML = t[tip.textKey]; // innerHTML для поддержки <br> и <b>
+        document.getElementById('tip-detail-content').innerHTML = t[tip.textKey];
 
-        // Переключаем вид (Свайп-эффект через display)
         document.getElementById('tips-view-list').style.display = 'none';
         document.getElementById('tips-view-detail').style.display = 'block';
     }
@@ -18571,6 +18790,8 @@
     function backToTipsList() {
         document.getElementById('tips-view-detail').style.display = 'none';
         document.getElementById('tips-view-list').style.display = 'block';
+        
+        renderTipsList();
     }
 
     function openChangelogModal() {
@@ -18606,6 +18827,20 @@
     function closeChangelogModal(e, force) {
         if (force || e.target.id === 'modal-changelog-overlay') {
             document.getElementById('modal-changelog-overlay').classList.remove('open');
+        }
+    }
+
+    function checkTipIcons() {
+        // 1. Иконка Интенсивности (существующая)
+        const intIcon = document.getElementById('intensity-info-icon');
+        if (intIcon) {
+            intIcon.style.display = viewedTips.includes('intensity') ? 'none' : 'block';
+        }
+
+        // 2. Иконка Режимов (новая)
+        const modeIcon = document.getElementById('tip-icon-modes');
+        if (modeIcon) {
+            modeIcon.style.display = viewedTips.includes('modes') ? 'none' : 'block';
         }
     }
 
