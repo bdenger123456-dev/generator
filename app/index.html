@@ -7689,10 +7689,12 @@
     };
 
     // === 2. ОТКРЫТИЕ ОКНА И ПОДГРУЗКА СТАТИСТИКИ ===
+    // === 2. ОТКРЫТИЕ ОКНА И ПОДГРУЗКА СТАТИСТИКИ (ИСПРАВЛЕНО) ===
     window.openSyncInfoModal = async function() {
         const user = auth.currentUser;
         if (!user) return;
 
+        // Открываем окно
         document.getElementById('modal-sync-info-overlay').classList.add('open');
         document.getElementById('sync-email-display').innerText = user.email;
 
@@ -7701,6 +7703,16 @@
         const subDesc = document.getElementById('sync-sub-desc');
         const subCard = document.getElementById('sync-sub-card');
         
+        // Ссылки на счетчики
+        const ids = ['cloud-fav-count', 'cloud-wl-count', 'cloud-explored-count', 'cloud-ban-count'];
+
+        // Очищаем старые значения перед загрузкой (чтобы не было наложений)
+        subValue.innerText = "...";
+        ids.forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.innerText = "...";
+        });
+
         // Переводы
         const currentLang = localStorage.getItem('xch_lang') || 'en';
         const t = (window.langData && window.langData[currentLang]) ? window.langData[currentLang] : (window.langData ? window.langData['en'] : {});
@@ -7708,16 +7720,10 @@
         // --- ЛОГИКА ЗАГРУЗКИ ДАННЫХ ---
         const now = Date.now();
         let d = cachedUserProfile;
-        const PROFILE_CACHE_TTL = 60000;
+        const PROFILE_CACHE_TTL = 60000; // 1 минута кеша
 
         // Если кэша нет или он старый -> грузим из базы
         if (!d || (now - lastProfileReadTime > PROFILE_CACHE_TTL)) {
-            // Показываем "..." пока грузится
-            subValue.innerText = "...";
-            ['cloud-fav-count', 'cloud-wl-count', 'cloud-explored-count', 'cloud-ban-count'].forEach(id => {
-                document.getElementById(id).innerText = "...";
-            });
-
             try {
                 const userRef = doc(db, "users", user.uid);
                 const docSnap = await getDoc(userRef);
@@ -7785,10 +7791,15 @@
                 }
             }
 
-            // 2. Цифры статистики (Вставляем в существующие ID)
-            document.getElementById('cloud-fav-count').innerText = d.favorites ? d.favorites.length : 0;
-            document.getElementById('cloud-wl-count').innerText = d.watchLater ? d.watchLater.length : 0;
-            document.getElementById('cloud-ban-count').innerText = d.blacklist ? d.blacklist.length : 0;
+            // 2. Цифры статистики (без append, только присваивание)
+            if(document.getElementById('cloud-fav-count')) 
+                document.getElementById('cloud-fav-count').innerText = d.favorites ? d.favorites.length : 0;
+            
+            if(document.getElementById('cloud-wl-count')) 
+                document.getElementById('cloud-wl-count').innerText = d.watchLater ? d.watchLater.length : 0;
+            
+            if(document.getElementById('cloud-ban-count')) 
+                document.getElementById('cloud-ban-count').innerText = d.blacklist ? d.blacklist.length : 0;
             
             // Подсчет Explored
             let exCount = d.exploredCount || 0;
@@ -7796,10 +7807,8 @@
                 const unique = new Set(d.activityLog.map(i => i.id));
                 exCount = unique.size;
             }
-            document.getElementById('cloud-explored-count').innerText = exCount;
-
-            // 3. Обновляем переводы (если язык менялся)
-            applyLanguage(); 
+            if(document.getElementById('cloud-explored-count'))
+                document.getElementById('cloud-explored-count').innerText = exCount;
 
         } else {
             // Новый пользователь (пусто)
@@ -7808,11 +7817,14 @@
             subDesc.innerText = (currentLang === 'ru' ? "Нажми, чтобы улучшить" : "Tap to Upgrade");
             subValue.style.color = "var(--text-main)";
             
-            ['cloud-fav-count', 'cloud-wl-count', 'cloud-explored-count', 'cloud-ban-count'].forEach(id => {
-                document.getElementById(id).innerText = "0";
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.innerText = "0";
             });
-            applyLanguage();
         }
+        
+        // 3. Обновляем переводы, но НЕ трогаем уже заполненные динамические данные
+        applyLanguage();
     };
 
     window.closeSyncInfoModal = function(e, force) {
