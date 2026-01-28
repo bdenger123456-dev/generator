@@ -294,13 +294,12 @@
 
         /* === THEME: OLD MONEY (Mahogany & Gold) === */
         body[data-theme="old-money"] {
-            /* Палитра: Темное дерево, Золото, Папирус */
             --bg-color: #1a0505;
             --sidebar-bg: #260909;
             --card-bg: #2e0b0b;
             --nav-bg: #3d0e0e;
             
-            --text-main: #f0e6d2; /* Кремовый */
+            --text-main: #f0e6d2; /* Папирус */
             --text-secondary: #a38970; /* Медь */
             
             --accent: #c5a059; /* Старое золото */
@@ -316,8 +315,7 @@
             --modal-bg: rgba(26, 5, 5, 0.95);
         }
 
-        /* 1. ЛОГОТИП (Сливки -> Золото) */
-        /* Используем !important, чтобы перебить дефолтный розовый */
+        /* 1. ЛОГОТИП (Золотой градиент) */
         body[data-theme="old-money"] .logo span,
         body[data-theme="old-money"] .sum-logo-text span.grad {
             background: linear-gradient(180deg, #f9f1d8 0%, #c5a059 100%) !important;
@@ -327,70 +325,81 @@
             text-shadow: 0 2px 10px rgba(197, 160, 89, 0.2);
         }
 
-        /* 2. ВСЕ ИКОНКИ (Золотой фильтр) */
+        /* 2. ИКОНКИ В ИНТЕРФЕЙСЕ (Золотой фильтр) */
         body[data-theme="old-money"] .nav-icon-img,
         body[data-theme="old-money"] .settings-icon,
         body[data-theme="old-money"] .share-icon-img,
         body[data-theme="old-money"] .ex-card-icon {
-            /* Превращаем белое/черное в #c5a059 */
             filter: invert(75%) sepia(26%) saturate(677%) hue-rotate(357deg) brightness(89%) contrast(88%) drop-shadow(0 2px 5px rgba(0,0,0,0.3)) !important;
             opacity: 1;
         }
 
-        /* 3. ДЕКОРАЦИИ (Летающие иконки - Эффект объема/градиента) */
+        /* 3. ДЕКОРАЦИИ (Летающие иконки) - ЗОЛОТОЙ ГРАДИЕНТ/ОТЛИВ */
         body[data-theme="old-money"] .deco-icon {
-            /* Сложный фильтр для имитации блестящего золота */
+            /* Фильтр, превращающий белое/черное в золото + тень для объема */
             filter: invert(68%) sepia(35%) saturate(735%) hue-rotate(2deg) brightness(110%) contrast(100%) drop-shadow(0 4px 0px #3d1515) !important;
-            opacity: 0.85;
+            opacity: 0.9;
         }
 
-        /* 4. КНОПКИ В КАРТОЧКЕ (ВСЕ: Undo, Dislike, Like, WL) */
-        body[data-theme="old-money"] .t-circle-btn {
-            background: linear-gradient(145deg, #2e0b0b, #1a0505) !important; /* Глубокий градиент фона */
-            border: 1px solid #5c2424 !important; /* Темно-золотая рамка */
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05) !important; /* Объем */
+        /* =========================================
+           4. КНОПКИ УПРАВЛЕНИЯ (TINDER) - ИСПРАВЛЕНИЕ
+           ========================================= */
+        
+        /* ОБЩИЙ СТИЛЬ для кнопок: Undo, Pass, Like, WL */
+        body[data-theme="old-money"] .t-circle-btn.undo,
+        body[data-theme="old-money"] .t-circle-btn.dislike,
+        body[data-theme="old-money"] .t-circle-btn.like,
+        body[data-theme="old-money"] .t-circle-btn.wl {
+            background: #260909 !important; /* Темный фон (Махагон) */
+            border: 1px solid #5c2424 !important; /* Рамка */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5) !important; /* Тень */
         }
 
-        /* Иконки внутри кнопок - делаем Золотыми */
-        body[data-theme="old-money"] .t-circle-btn .action-icon-img {
+        /* ИКОНКИ ВНУТРИ ЭТИХ КНОПОК -> ДЕЛАЕМ ЗОЛОТЫМИ */
+        body[data-theme="old-money"] .t-circle-btn.undo .action-icon-img,
+        body[data-theme="old-money"] .t-circle-btn.dislike .action-icon-img,
+        body[data-theme="old-money"] .t-circle-btn.like .action-icon-img,
+        body[data-theme="old-money"] .t-circle-btn.wl .action-icon-img {
+            /* Золотой фильтр (#c5a059) */
             filter: invert(75%) sepia(26%) saturate(677%) hue-rotate(357deg) brightness(89%) contrast(88%) !important;
         }
 
-        /* Нажатие на обычные кнопки */
-        body[data-theme="old-money"] .t-circle-btn:active {
-            background: #f0e6d2 !important; /* Вспышка светлым */
+        /* АКТИВНОЕ СОСТОЯНИЕ (При нажатии) */
+        body[data-theme="old-money"] .t-circle-btn:active,
+        body[data-theme="old-money"] .t-circle-btn.wl.active {
+            background: #f0e6d2 !important; /* Светлая вспышка */
             border-color: #fff !important;
         }
-        /* При нажатии иконка темнеет (для контраста) */
-        body[data-theme="old-money"] .t-circle-btn:active .action-icon-img {
-            filter: brightness(0) !important; 
+        /* При нажатии иконка темнеет */
+        body[data-theme="old-money"] .t-circle-btn:active .action-icon-img,
+        body[data-theme="old-money"] .t-circle-btn.wl.active .action-icon-img {
+            filter: brightness(0.2) !important; 
         }
 
-        /* 5. ОСОБАЯ КНОПКА WATCH (Центральная) */
+        /* ОСОБЫЙ СТИЛЬ ДЛЯ КНОПКИ WATCH (Центральная) */
         body[data-theme="old-money"] .t-circle-btn.watch {
             /* Яркий золотой градиент */
             background: linear-gradient(135deg, #c5a059 0%, #8a6a4b 100%) !important;
-            border: 1px solid #f0e6d2 !important; /* Светлая обводка */
-            box-shadow: 0 0 25px rgba(197, 160, 89, 0.3) !important; /* Золотое свечение */
+            border: 1px solid #f0e6d2 !important; 
+            box-shadow: 0 0 25px rgba(197, 160, 89, 0.4) !important;
         }
-        /* Иконка внутри Watch - Темная (Махагон) */
+        /* Иконка внутри Watch -> ТЕМНАЯ (для контраста с золотом) */
         body[data-theme="old-money"] .t-circle-btn.watch .action-icon-img {
-            filter: brightness(0) invert(0.1) sepia(1) saturate(5) hue-rotate(330deg) !important; /* Темно-коричневый */
+            filter: brightness(0.15) !important; 
         }
 
-        /* 6. КНОПКИ НА СТАРТОВОМ ЭКРАНЕ (Start Screen) */
-        /* Фон кругов - темный махагон */
+        /* 5. КНОПКИ НА СТАРТОВОМ ЭКРАНЕ (Start Screen) */
         body[data-theme="old-money"] .mode-circle-btn {
             background: #260909 !important;
             border: 1px solid #5c2424 !important;
             box-shadow: 0 10px 30px rgba(0,0,0,0.6) !important;
         }
-        /* Иконки внутри - ЧИСТО БЕЛЫЕ (для контраста) */
+        /* Иконки внутри - БЕЛЫЕ */
         body[data-theme="old-money"] .mode-circle-btn .side-icon-img,
         body[data-theme="old-money"] .mode-circle-btn .ai-icon-img {
             filter: brightness(0) invert(1) !important; 
             opacity: 1 !important;
-            drop-shadow: 0 0 10px rgba(197, 160, 89, 0.5) !important; /* Легкое золотое свечение */
+            drop-shadow: 0 0 10px rgba(197, 160, 89, 0.5) !important;
         }
 
         body {
@@ -481,6 +490,66 @@
             top: 50%;
             transform: translateY(-50%);
             font-size: 16px;
+        }
+
+        /* Стили для элемента темы в режиме предпросмотра */
+        .theme-item.previewing {
+            border-color: var(--accent) !important;
+            background: var(--nav-bg);
+        }
+
+        /* Убираем прозрачность для заблокированных тем, чтобы их было видно при клике */
+        .theme-item.locked.previewing {
+            opacity: 1 !important;
+        }
+
+        .pro-badge-icon {
+            font-size: 10px;
+            font-weight: 800;
+            background: var(--accent); /* Цвет темы */
+            color: #000; /* Контрастный текст */
+            padding: 3px 6px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        /* 2. Плавающая панель "Unlock" (внизу экрана) */
+        #preview-floating-bar {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(120px); /* Спрятана внизу */
+            width: 90%;
+            max-width: 380px; /* Чуть компактнее */
+            
+            background: rgba(20, 20, 20, 0.95);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            
+            padding: 10px 10px 10px 20px; /* Больше воздуха */
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px; /* Гарантированный отступ между текстом и кнопкой */
+            
+            z-index: 30000;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            pointer-events: auto;
+        }
+
+        /* Состояние "Видно" */
+        #preview-floating-bar.visible {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Светлая тема для плашки */
+        body.light-theme #preview-floating-bar {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(0, 0, 0, 0.1);
         }
 
         /* =========================================
@@ -5052,12 +5121,11 @@
         ========================================= */
 
         @media (max-width: 768px) {
-            #row-install-app {
+            #row-install-app, 
+            #group-install-container { 
                 display: none !important;
             }
         }
-
-
 
         /* DESKTOP / TABLET (> 768px) */
         @media (min-width: 769px) {
@@ -5337,6 +5405,29 @@
             #block-account .ios-group:first-child {
                 margin-top: 15px !important;
             }
+        }
+
+        @media (max-width: 768px) {
+            
+            /* Сбрасываем внешние отступы у контейнеров-оберток */
+            #block-prefs, #block-account, #block-extras, #block-history {
+                margin-top: 0 !important;
+                margin-bottom: 0 !important;
+                padding-top: 0 !important;
+            }
+
+            /* Единственный источник отступа - сама группа кнопок */
+            .ios-group {
+                /* Стандартный отступ между всеми блоками */
+                margin-bottom: 15px !important;
+                margin-top: 0 !important;
+            }
+
+            /* Фикс для первого элемента, чтобы не прилипал к шапке */
+            #block-prefs {
+                margin-top: 15px !important;
+            }
+            
         }
 
         /* --- 2. ПК ВЕРСИЯ (Стиль macOS Finder) --- */
@@ -6262,7 +6353,7 @@
 
         <!-- 2. УСТАНОВКА (Install) -->
         <div class="ios-header" data-key="install_title">Install App</div>
-        <div class="ios-group">
+        <div class="ios-group" id="group-install-container">
             <div id="row-install-app" class="ios-row clickable" onclick="openQRModal()">
                 <div class="ios-row-left">
                     <img src="install.png" class="settings-icon" alt="Install">
@@ -6466,6 +6557,15 @@
             <div class="theme-grid" id="theme-list-premium">
                 <!-- JS inserts themes here -->
             </div>
+        </div>
+        <!-- Панель предпросмотра (Скрыта по умолчанию) -->
+        <div id="theme-preview-bar" style="display:none; padding: 15px; border-top: 1px solid var(--border); background: var(--sidebar-bg); flex-direction: column; gap: 10px; align-items: center; text-align: center;">
+            <div style="font-size: 13px; color: var(--text-secondary);">
+                <span data-key="theme_preview_mode">Preview Mode</span>
+            </div>
+            <button class="btn-gen" onclick="buyCurrentPreview()" style="width: 100%; padding: 12px; background: linear-gradient(45deg, #FF9900, #9B59B6); color: white; border: none; font-size: 14px; text-transform: uppercase; font-weight: 800; box-shadow: 0 4px 15px rgba(155, 89, 182, 0.3);">
+                <span data-key="btn_unlock_theme">Unlock Theme 🔒</span>
+            </button>
         </div>
     </div>
 </div>
@@ -7127,6 +7227,27 @@
             <!-- JS сгенерирует историю здесь -->
         </div>
     </div>
+</div>
+
+<!-- THEME PREVIEW FLOATING BAR -->
+<div id="preview-floating-bar">
+    
+    <div style="display:flex; flex-direction:column; align-items: center; text-align: center; flex: 1;">
+        
+        <span style="font-size:13px; font-weight:800; color:var(--text-main); letter-spacing: 0.5px;" data-key="theme_preview_mode">
+            Preview Mode
+        </span>
+        
+        <span style="font-size:10px; color:var(--text-secondary); opacity:0.8; margin-top: 3px;" data-key="theme_tap_cancel">
+            Tap anywhere to cancel
+        </span>
+        
+    </div>
+
+    <button class="btn-gen" onclick="buyFromPreview(event)" style="flex-shrink: 0; width:auto; padding: 10px 24px; border-radius: 40px; font-size:13px; margin:0; background: var(--accent); color: #000; font-weight: 700; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+        <span data-key="btn_unlock_theme">Unlock</span>
+    </button>
+    
 </div>
 
 <div id="wrapped-mount" class="wrapped-overlay"></div>
@@ -7844,6 +7965,10 @@
     let cryptoTimerInterval = null;
     let currentBillingCycle = '1'; 
 
+    let originalThemeId = null;
+    let previewThemeId = null;
+    let isPreviewActive = false;
+
     let isPanicEnabled = localStorage.getItem('xch_panic_enabled') !== 'false';
     let panicKey = localStorage.getItem('xch_panic_key') || 'Escape';
     let panicDouble = localStorage.getItem('xch_panic_is_double') !== 'false';
@@ -8516,6 +8641,10 @@
             expl_hist: "From Archives 📜",
             deco_label: "Show Decorations",
 
+            theme_preview_mode: "Preview",
+            btn_unlock_theme: "Unlock Theme 🔒",
+            theme_tap_cancel: "Tap anywhere to cancel",
+
             site_random: "Random",
 
             btn_version: "Version",
@@ -9083,6 +9212,10 @@
             expl_hist: "Из архивов 📜",
             deco_label: "Показывать декор",
 
+            theme_preview_mode: "Предпросмотр",
+            btn_unlock_theme: "Разблокировать тему 🔒",
+            theme_tap_cancel: "Нажми куда угодно для отмены",
+
             site_random: "Случайный",
 
             btn_version: "Версия",
@@ -9646,6 +9779,10 @@
             expl_hist: "De los archivos 📜",
             deco_label: "Mostrar decoración",
 
+            theme_preview_mode: "Avance",
+            btn_unlock_theme: "Desbloquear Tema 🔒",
+            theme_tap_cancel: "Toca donde sea para cancelar",
+
             site_random: "Aleatorio",
 
             btn_version: "Versión",
@@ -10201,6 +10338,10 @@
             expl_undo: "Meinung geändert? 😏",
             expl_hist: "Aus dem Archiv 📜",
             deco_label: "Dekoration anzeigen",
+
+            theme_preview_mode: "Vorschau",
+            btn_unlock_theme: "Thema freischalten 🔒",
+            theme_tap_cancel: "Tippe irgendwo zum Abbrechen",
 
             site_random: "Zufällig",
 
@@ -12620,7 +12761,6 @@
             
             // 2. Ссылки (Extras) в Settings
             if(mPrefs && bExtras) {
-                bExtras.style.marginTop = "25px"; 
                 mPrefs.appendChild(bExtras);
             }
 
@@ -14519,6 +14659,10 @@
     }
 
     function openThemeModal() {
+        if (!isPreviewActive) {
+            originalThemeId = localStorage.getItem('xch_theme_id') || 'dark';
+        }
+        
         renderThemes();
         document.getElementById('modal-theme-overlay').classList.add('open');
     }
@@ -14556,9 +14700,10 @@
     function renderThemes() {
         const basicCont = document.getElementById('theme-list-basic');
         const premCont = document.getElementById('theme-list-premium');
-        const currentTheme = localStorage.getItem('xch_theme_id') || 'dark';
         
-        // Получаем объект переводов
+        // Активная тема (если превью - показываем её, иначе сохраненную)
+        const currentId = document.body.getAttribute('data-theme') || 'dark';
+        
         const t = langData[currentLang] || langData['en'];
         
         basicCont.innerHTML = '';
@@ -14566,24 +14711,28 @@
 
         APP_THEMES.forEach(theme => {
             const isLocked = (theme.type === 'pro' && subscriptionLevel === 'free');
-            const isActive = (currentTheme === theme.id);
+            const isActive = (currentId === theme.id);
             
-            // 1. ЛОКАЛИЗАЦИЯ НАЗВАНИЯ
-            // Ищем ключ 'theme_midnight', 'theme_blue-dark' и т.д.
             const themeKey = 'theme_' + theme.id;
-            
-            // Если перевод есть - берем его, иначе дефолтное имя
             const localizedName = (t && t[themeKey]) ? t[themeKey] : theme.name;
-
-            // 2. ЛОКАЛИЗАЦИЯ ТИПА (Light/Dark)
+            
             let typeText = theme.isLight ? 'Light' : 'Dark';
-            if (currentLang === 'ru') typeText = theme.isLight ? 'Светлая' : 'Тёмная';
-            else if (currentLang === 'es') typeText = theme.isLight ? 'Claro' : 'Oscuro';
-            else if (currentLang === 'de') typeText = theme.isLight ? 'Hell' : 'Dunkel';
+            // (Локализация типа - оставьте свой старый код здесь если есть)
 
-            // Создаем элемент
+            // ИКОНКА СТАТУСА:
+            // Если активно -> Галочка
+            // Если закрыто -> "PRO"
+            // Иначе -> пусто
+            let statusIcon = '';
+            if (isActive) {
+                statusIcon = '<span class="lock-icon" style="color:var(--accent)">✓</span>';
+            } else if (isLocked) {
+                statusIcon = '<span class="pro-badge-icon">PRO</span>';
+            }
+
             const div = document.createElement('div');
-            div.className = `theme-item ${isActive ? 'active' : ''} ${isLocked ? 'locked' : ''}`;
+            // Убираем класс locked, чтобы не было прозрачности (пользователь должен хотеть нажать)
+            div.className = `theme-item ${isActive ? 'active' : ''}`;
             
             div.innerHTML = `
                 <div class="theme-preview-box" style="background: ${theme.preview}; border: 1px solid var(--border);">
@@ -14595,31 +14744,110 @@
                         ${typeText}
                     </span>
                 </div>
-                ${isLocked ? '<span class="lock-icon">🔒</span>' : ''}
-                ${isActive ? '<span class="lock-icon" style="color:var(--accent)">✓</span>' : ''}
+                ${statusIcon}
             `;
 
             div.onclick = () => selectTheme(theme);
             
-            // Распределяем по контейнерам
             if (theme.type === 'free') basicCont.appendChild(div);
             else premCont.appendChild(div);
         });
     }
 
     function selectTheme(theme) {
-        if (theme.type === 'pro' && subscriptionLevel === 'free') {
-            closeThemeModal(null, true);
-            openSubModal(); // Открываем окно покупки
-            return;
+        const isLocked = (theme.type === 'pro' && subscriptionLevel === 'free');
+
+        if (isLocked) {
+            // == ЗАПУСК ПРЕДПРОСМОТРА ==
+            startPreview(theme.id);
+        } else {
+            // == ОБЫЧНЫЙ ВЫБОР ==
+            applyTheme(theme.id, true); // Сохраняем
+            originalThemeId = theme.id; // Обновляем оригинал
+            renderThemes(); // Обновляем галочки
         }
+    }
+
+    function startPreview(themeId) {
+        isPreviewActive = true;
+
+        // 1. Применяем тему визуально (без сохранения)
+        applyTheme(themeId, false);
+
+        // 2. Закрываем окно тем
+        document.getElementById('modal-theme-overlay').classList.remove('open');
+
+        // 3. Переходим на главную (если мобилка), чтобы было видно красоту
+        if (window.innerWidth < 768) {
+            switchTab('home');
+            // Скроллим наверх
+            const home = document.getElementById('tab-home');
+            if(home) home.scrollTop = 0;
+        }
+
+        // 4. Показываем плашку снизу
+        const bar = document.getElementById('preview-floating-bar');
+        bar.classList.add('visible');
+
+        // 5. Добавляем слушатель клика "в никуда" для отмены
+        // Делаем небольшую задержку, чтобы текущий клик не сработал сразу
+        setTimeout(() => {
+            document.addEventListener('click', handlePreviewOutsideClick);
+        }, 100);
+    }
+
+    function handlePreviewOutsideClick(e) {
+        const bar = document.getElementById('preview-floating-bar');
         
-        applyTheme(theme.id);
-        renderThemes(); // Обновить галочки
+        // Если кликнули ВНУТРИ плашки (кнопка Unlock), ничего не делаем (там свой onclick)
+        if (bar.contains(e.target)) return;
+
+        // Если кликнули МИМО -> Отмена
+        cancelPreview();
+    }
+
+    // Отмена предпросмотра (возврат)
+    function cancelPreview() {
+        if (!isPreviewActive) return;
+        isPreviewActive = false;
+
+        // 1. Возвращаем старую тему
+        if (originalThemeId) {
+            applyTheme(originalThemeId, true);
+        }
+
+        // 2. Скрываем плашку
+        document.getElementById('preview-floating-bar').classList.remove('visible');
+
+        // 3. Удаляем слушатель кликов
+        document.removeEventListener('click', handlePreviewOutsideClick);
+
+        // 4. Открываем окно тем обратно
+        openThemeModal();
+    }
+
+    // Покупка из режима предпросмотра
+    function buyFromPreview(e) {
+        // Останавливаем всплытие, чтобы не сработал handlePreviewOutsideClick
+        if(e) e.stopPropagation();
+
+        // 1. Убираем слушатель отмены (чтобы не моргало)
+        document.removeEventListener('click', handlePreviewOutsideClick);
         
-        // Обновляем текст в меню настроек
-        const label = document.getElementById('current-theme-name');
-        if(label) label.innerText = theme.name;
+        // 2. Возвращаем тему (пока не купил) - опционально, но безопаснее
+        applyTheme(originalThemeId, true);
+        isPreviewActive = false;
+        
+        // 3. Скрываем плашку
+        document.getElementById('preview-floating-bar').classList.remove('visible');
+
+        // 4. Открываем окно оплаты
+        openSubModal();
+    }
+
+    function buyCurrentPreview() {
+        closeThemeModal(null, true);
+        openSubModal();
     }
 
     function getThemeLogoSrc(themeId) {
@@ -14700,11 +14928,15 @@
         linkApple.href = faviconSrc;
     }
 
-    function applyTheme(themeId) {
-        localStorage.setItem('xch_theme_id', themeId);
+    function applyTheme(themeId, save = true) {
+        // Если сохраняем, пишем в память
+        if (save) {
+            localStorage.setItem('xch_theme_id', themeId);
+        }
+        
         const root = document.documentElement;
         
-        // 1. Устанавливаем атрибут
+        // Устанавливаем атрибут для CSS
         document.body.setAttribute('data-theme', themeId);
 
         updateGlobalLogos(themeId); 
@@ -14739,29 +14971,33 @@
             root.style.setProperty('--accent', theme.accent);
             root.style.setProperty('--accent-light', theme.accentLight || theme.accent);
         } else {
-            updateLink();
+            updateLink(); // Для дефолтных тем пересчитываем цвета из платформы
         }
 
+        // Обновляем текст в кнопке настроек
         updateThemeLabel(theme.id);
     }
-
-    // Обновленная функция обновления текста в кнопке
+    
+    //  функция обновления текста в кнопке
     function updateThemeLabel(themeId) {
-        // Если ID не передан, берем из памяти или дефолт
-        if (!themeId) themeId = localStorage.getItem('xch_theme_id') || 'dark';
+        // 1. Если ID не передан, пытаемся найти текущий активный (из атрибута body или памяти)
+        if (!themeId) {
+            themeId = document.body.getAttribute('data-theme') || localStorage.getItem('xch_theme_id') || 'dark';
+        }
         
+        // 2. Берем текущий словарь переводов
         const t = langData[currentLang] || langData['en'];
         const label = document.getElementById('current-theme-name');
         
         if (label) {
-            // Формируем ключ перевода (например: theme_blue-dark)
+            // Формируем ключ (например, theme_blue-dark)
             const key = 'theme_' + themeId;
             
-            // Проверяем, есть ли перевод для этого ключа в текущем языке
+            // 3. ПРИОРИТЕТ: Ищем в переводах
             if (t && t[key]) {
                 label.innerText = t[key];
             } else {
-                // Если перевода нет, ищем оригинальное английское название
+                // Фолбек: Ищем в массиве тем (там английские названия)
                 const themeObj = APP_THEMES.find(x => x.id === themeId);
                 label.innerText = themeObj ? themeObj.name : themeId;
             }
@@ -18279,7 +18515,14 @@
     // Закрытие всех модалок по ESC
     document.addEventListener('keydown', function(event) {
         if (event.key === "Escape") {
-            // Находим все открытые оверлеи
+            
+            // 1. ЕСЛИ АКТИВЕН ПРЕДПРОСМОТР ТЕМЫ -> ОТМЕНЯЕМ ЕГО
+            if (typeof isPreviewActive !== 'undefined' && isPreviewActive) {
+                cancelPreview();
+                return; // Прерываем, чтобы не закрыть открывшуюся модалку тем
+            }
+
+            // 2. Иначе закрываем модалки (стандартное поведение)
             const openModals = document.querySelectorAll('.modal-overlay.open');
             openModals.forEach(modal => {
                 modal.classList.remove('open');
