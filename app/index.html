@@ -7689,40 +7689,38 @@
     };
 
     // === 2. ОТКРЫТИЕ ОКНА И ПОДГРУЗКА СТАТИСТИКИ ===
-    // === 2. ОТКРЫТИЕ ОКНА И ПОДГРУЗКА СТАТИСТИКИ (ИСПРАВЛЕНО) ===
     window.openSyncInfoModal = async function() {
         const user = auth.currentUser;
         if (!user) return;
 
-        // Открываем окно
+        // 1. Блокируем прокрутку фона и ставим класс
+        document.body.classList.add('modal-open');
         document.getElementById('modal-sync-info-overlay').classList.add('open');
-        document.getElementById('sync-email-display').innerText = user.email;
+        
+        // 2. Заполняем Email
+        const emailEl = document.getElementById('sync-email-display');
+        if(emailEl) emailEl.innerText = user.email;
 
-        // Ссылки на элементы DOM
+        // 3. Сбрасываем значения на "..." перед загрузкой
+        const ids = ['cloud-fav-count', 'cloud-wl-count', 'cloud-explored-count', 'cloud-ban-count'];
         const subValue = document.getElementById('sync-sub-value');
         const subDesc = document.getElementById('sync-sub-desc');
         const subCard = document.getElementById('sync-sub-card');
-        
-        // Ссылки на счетчики
-        const ids = ['cloud-fav-count', 'cloud-wl-count', 'cloud-explored-count', 'cloud-ban-count'];
 
-        // Очищаем старые значения перед загрузкой (чтобы не было наложений)
-        subValue.innerText = "...";
+        if(subValue) subValue.innerText = "...";
+        if(subDesc) subDesc.innerText = "Checking...";
+        
         ids.forEach(id => {
             const el = document.getElementById(id);
             if(el) el.innerText = "...";
         });
 
-        // Переводы
-        const currentLang = localStorage.getItem('xch_lang') || 'en';
-        const t = (window.langData && window.langData[currentLang]) ? window.langData[currentLang] : (window.langData ? window.langData['en'] : {});
-
-        // --- ЛОГИКА ЗАГРУЗКИ ДАННЫХ ---
+        // 4. Загрузка данных
         const now = Date.now();
         let d = cachedUserProfile;
-        const PROFILE_CACHE_TTL = 60000; // 1 минута кеша
+        const PROFILE_CACHE_TTL = 60000; 
 
-        // Если кэша нет или он старый -> грузим из базы
+        // Грузим из сети, если кеш старый
         if (!d || (now - lastProfileReadTime > PROFILE_CACHE_TTL)) {
             try {
                 const userRef = doc(db, "users", user.uid);
@@ -7732,66 +7730,65 @@
                     cachedUserProfile = d;
                     lastProfileReadTime = now;
                 } else {
-                    d = null; // Нет данных (новый юзер)
+                    d = null; 
                 }
             } catch (e) {
-                console.error("Error fetching sync stats:", e);
-                subValue.innerText = "Error";
+                console.error("Sync error:", e);
+                if(subValue) subValue.innerText = "Error";
                 return;
             }
         }
 
-        // --- ЗАПОЛНЯЕМ HTML ДАННЫМИ ---
-        
-        // Сброс цветов подписки
-        subCard.classList.remove('is-free', 'is-pro', 'is-beast', 'is-bestie');
+        // 5. Отображение данных
+        if(subCard) subCard.classList.remove('is-free', 'is-pro', 'is-beast', 'is-bestie');
+
+        const currentLang = localStorage.getItem('xch_lang') || 'en';
+        const t = (window.langData && window.langData[currentLang]) ? window.langData[currentLang] : (window.langData ? window.langData['en'] : {});
 
         if (d) {
-            // 1. Подписка
+            // Подписка
             const plan = d.subscription || 'free';
-            subValue.innerText = plan.toUpperCase();
-            
-            // Стилизация карточки
-            if (plan === 'pro') subCard.classList.add('is-pro');
-            else if (plan === 'beast') subCard.classList.add('is-beast');
-            else if (plan === 'bestie') subCard.classList.add('is-bestie');
-            else subCard.classList.add('is-free');
+            if(subValue) {
+                subValue.innerText = plan.toUpperCase();
+                
+                if (plan === 'pro') subValue.style.color = '#ff9900';
+                else if (plan === 'beast') subValue.style.color = '#9b59b6';
+                else if (plan === 'bestie') subValue.style.color = '#00d2ff';
+                else subValue.style.color = 'var(--text-main)';
+            }
 
-            // Цвет текста
-            if (plan === 'pro') subValue.style.color = '#ff9900';
-            else if (plan === 'beast') subValue.style.color = '#9b59b6';
-            else if (plan === 'bestie') subValue.style.color = '#00d2ff';
-            else subValue.style.color = 'var(--text-main)';
+            if(subCard) {
+                if (plan === 'pro') subCard.classList.add('is-pro');
+                else if (plan === 'beast') subCard.classList.add('is-beast');
+                else if (plan === 'bestie') subCard.classList.add('is-bestie');
+                else subCard.classList.add('is-free');
+            }
 
-            // Описание срока действия
-            if (plan === 'free') {
-                subDesc.innerText = (currentLang === 'ru' ? "Нажми, чтобы улучшить" : "Tap to Upgrade");
-                subDesc.style.color = "var(--accent)";
-            } else if (plan === 'bestie') {
-                subDesc.innerHTML = "♾️ Lifetime Access";
-                subDesc.style.color = "var(--text-secondary)";
-            } else {
-                if (d.expiresAt) {
-                    const dateObj = d.expiresAt.toDate(); 
-                    const dateStr = dateObj.toLocaleDateString();
-                    const daysLeft = Math.ceil((dateObj - new Date()) / (1000 * 60 * 60 * 24));
-                    
-                    const txtExp = t.sub_exp || "Expires:";
-                    const txtD = t.time_d || "d";
-                    
-                    if (daysLeft > 0) {
-                        subDesc.innerHTML = `${txtExp} ${dateStr} (${daysLeft}${txtD})`;
-                        subDesc.style.color = "var(--text-secondary)";
-                    } else {
-                        subDesc.innerText = t.sub_expired || "Expired"; 
-                        subDesc.style.color = "var(--highlight-red)";
-                    }
+            if(subDesc) {
+                if (plan === 'free') {
+                    subDesc.innerText = (currentLang === 'ru' ? "Нажми, чтобы улучшить" : "Tap to Upgrade");
+                    subDesc.style.color = "var(--accent)";
+                } else if (plan === 'bestie') {
+                    subDesc.innerHTML = "♾️ Lifetime Access";
+                    subDesc.style.color = "var(--text-secondary)";
                 } else {
-                    subDesc.innerText = "Active";
+                    if (d.expiresAt) {
+                        const dateObj = d.expiresAt.toDate(); 
+                        const daysLeft = Math.ceil((dateObj - new Date()) / (1000 * 60 * 60 * 24));
+                        if (daysLeft > 0) {
+                            subDesc.innerText = `${t.sub_exp || "Exp:"} ${daysLeft}${t.time_d || "d"}`;
+                            subDesc.style.color = "var(--text-secondary)";
+                        } else {
+                            subDesc.innerText = t.sub_expired || "Expired"; 
+                            subDesc.style.color = "var(--highlight-red)";
+                        }
+                    } else {
+                        subDesc.innerText = "Active";
+                    }
                 }
             }
 
-            // 2. Цифры статистики (без append, только присваивание)
+            // Счетчики (используем только innerText, чтобы не дублировать HTML)
             if(document.getElementById('cloud-fav-count')) 
                 document.getElementById('cloud-fav-count').innerText = d.favorites ? d.favorites.length : 0;
             
@@ -7801,7 +7798,6 @@
             if(document.getElementById('cloud-ban-count')) 
                 document.getElementById('cloud-ban-count').innerText = d.blacklist ? d.blacklist.length : 0;
             
-            // Подсчет Explored
             let exCount = d.exploredCount || 0;
             if (exCount === 0 && d.activityLog) {
                 const unique = new Set(d.activityLog.map(i => i.id));
@@ -7811,11 +7807,10 @@
                 document.getElementById('cloud-explored-count').innerText = exCount;
 
         } else {
-            // Новый пользователь (пусто)
-            subValue.innerText = "FREE";
-            subCard.classList.add('is-free');
-            subDesc.innerText = (currentLang === 'ru' ? "Нажми, чтобы улучшить" : "Tap to Upgrade");
-            subValue.style.color = "var(--text-main)";
+            // Новый юзер
+            if(subValue) subValue.innerText = "FREE";
+            if(subCard) subCard.classList.add('is-free');
+            if(subDesc) subDesc.innerText = (currentLang === 'ru' ? "Нажми, чтобы улучшить" : "Tap to Upgrade");
             
             ids.forEach(id => {
                 const el = document.getElementById(id);
@@ -7823,13 +7818,13 @@
             });
         }
         
-        // 3. Обновляем переводы, но НЕ трогаем уже заполненные динамические данные
         applyLanguage();
     };
 
     window.closeSyncInfoModal = function(e, force) {
         if (force || e.target.id === 'modal-sync-info-overlay') {
             document.getElementById('modal-sync-info-overlay').classList.remove('open');
+            document.body.classList.remove('modal-open');
         }
     };
 
