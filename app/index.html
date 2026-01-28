@@ -2456,6 +2456,35 @@
             padding-bottom: 20px;
         }
 
+        /* Убедимся, что при экспорте карточка ведет себя нормально */
+        .export-clone-container {
+            position: fixed;
+            top: -9999px;
+            left: -9999px;
+            z-index: -100;
+            /* Фиксированная ширина для красивой картинки, чтобы не была узкой */
+            width: 600px !important; 
+            max-width: none !important;
+            background: #12000b; /* Фон подложки, если прозрачность глючит */
+            padding: 40px !important; /* Больше отступов для красоты */
+            border-radius: 0 !important; /* Квадратные края для картинки или скругленные, как угодно */
+        }
+
+        /* Принудительно растягиваем внутреннюю карточку при экспорте */
+        .export-clone-container .sum-card-new {
+            width: 100% !important;
+            max-width: 100% !important;
+            box-shadow: none !important;
+            margin: 0 !important;
+        }
+
+        /* Фикс для переносов в психотипе */
+        .sum-stat-box {
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            hyphens: auto;
+        }
+
         /* === STATS UPDATE === */
         /* Контейнер графика */
         .chart-wrapper {
@@ -5423,6 +5452,55 @@
             justify-content: space-between;
         }
 
+        .bento-stat-large {
+            display: flex;
+            flex-direction: column;
+            align-items: center;      /* Центрирование по горизонтали */
+            justify-content: center;  /* Центрирование по вертикали */
+            text-align: center;
+            padding: 15px 10px;
+            gap: 6px;                 /* Отступы между элементами */
+            aspect-ratio: 1 / 1;      /* Строгий квадрат */
+        }
+
+        /* Крупная иконка по центру */
+        .bento-img-icon {
+            width: 42px;
+            height: 42px;
+            object-fit: contain;
+            margin-bottom: 2px;
+            
+            /* Адаптация цвета (инверсия для темной темы, как в сайдбаре) */
+            filter: invert(1);
+            opacity: 0.9;
+            transition: transform 0.2s;
+        }
+
+        /* Светлая тема - иконки темные */
+        body.light-theme .bento-img-icon {
+            filter: invert(0);
+            opacity: 0.7;
+        }
+
+        /* Эффект при нажатии на блок */
+        .bento-stat-large:active .bento-img-icon {
+            transform: scale(0.9);
+        }
+
+        /* Корректировка цифры */
+        .bento-stat-large .bento-val {
+            font-size: 28px;     /* Чуть крупнее */
+            margin-top: 0;       /* Убираем старый margin-top: auto */
+            line-height: 1;
+        }
+
+        /* Корректировка подписи */
+        .bento-stat-large .bento-label {
+            font-size: 10px;
+            opacity: 0.6;
+            margin-top: 2px;
+        }
+
         /* --- ВНУТРЕННОСТИ КАРТОЧЕК --- */
 
         /* Иконка в углу */
@@ -6971,14 +7049,16 @@
     <div class="modal">
         <div class="modal-header">
             <span data-key="sync_title">Cloud Storage</span>
-            <span onclick="closeSyncInfoModal(null, true)">✕</span>
+            <div class="modal-header-actions">
+                <div class="icon-btn-round" onclick="closeSyncInfoModal(null, true)">✕</div>
+            </div>
         </div>
         
         <div class="modal-body">
             
             <div class="bento-container">
                 
-                <!-- 1. PROFILE (WIDE) -->
+                <!-- 1. ПРОФИЛЬ -->
                 <div class="bento-box bento-wide bento-profile">
                     <div class="profile-avatar">👤</div>
                     <div style="display:flex; flex-direction:column; overflow:hidden;">
@@ -6987,62 +7067,54 @@
                     </div>
                 </div>
 
-                <!-- 2. SUBSCRIPTION (HERO WIDE) -->
+                <!-- 2. ПОДПИСКА -->
                 <div id="sync-sub-card" class="bento-box bento-wide bento-sub clickable" onclick="closeSyncInfoModal(null, true); openSubModal();">
                     <div style="display:flex; justify-content:space-between; align-items:flex-start; width:100%; margin-bottom:5px;">
                         <div class="bento-label" data-key="lbl_subscription">SUBSCRIPTION</div>
                         <div style="font-size:18px;">✨</div>
                     </div>
-                    <div id="sync-sub-value" style="font-size:32px; font-weight:900; letter-spacing:1px; margin-bottom:2px;">FREE</div>
-                    <div id="sync-sub-desc" style="font-size:12px; opacity:0.7;">Tap to upgrade</div>
+                    <div id="sync-sub-value" style="font-size:32px; font-weight:900; letter-spacing:1px; margin-bottom:2px;">...</div>
+                    <div id="sync-sub-desc" style="font-size:12px; opacity:0.7;">Checking...</div>
                 </div>
 
-                <!-- 3. STATS (SQUARES) -->
+                <!-- 3. СЕТКА СТАТИСТИКИ -->
                 
                 <!-- Liked -->
-                <div class="bento-box bento-stat">
-                    <div class="bento-icon" style="color:#2ecc71; border-color:rgba(46,204,113,0.3);">💚</div>
-                    <div>
-                        <div class="bento-val" id="cloud-fav-count">0</div>
-                        <div class="bento-label" data-key="favorites_catalog">Liked</div>
-                    </div>
+                <div class="bento-box bento-stat-large clickable" onclick="closeSyncInfoModal(null, true); openFavoritesCatalog();">
+                    <img src="liked.png" class="bento-img-icon" alt="Liked">
+                    <div class="bento-val" id="cloud-fav-count">0</div>
+                    <div class="bento-label" data-key="favorites_catalog">Liked</div>
                 </div>
 
                 <!-- Watch Later -->
-                <div class="bento-box bento-stat">
-                    <div class="bento-icon" style="color:#3498db; border-color:rgba(52,152,219,0.3);">⏰</div>
-                    <div>
-                        <div class="bento-val" id="cloud-wl-count">0</div>
-                        <div class="bento-label" data-key="watch_later">Saved</div>
-                    </div>
+                <div class="bento-box bento-stat-large clickable" onclick="closeSyncInfoModal(null, true); openWatchLaterCatalog();">
+                    <img src="watched-later.png" class="bento-img-icon" alt="Saved">
+                    <div class="bento-val" id="cloud-wl-count">0</div>
+                    <div class="bento-label" data-key="watch_later">Saved</div>
                 </div>
 
                 <!-- Explored -->
-                <div class="bento-box bento-stat">
-                    <div class="bento-icon" style="color:var(--accent); border-color:var(--border);">🔭</div>
-                    <div>
-                        <div class="bento-val" id="cloud-explored-count">0</div>
-                        <div class="bento-label" data-key="explored_label">Explored</div>
-                    </div>
+                <div class="bento-box bento-stat-large clickable" onclick="closeSyncInfoModal(null, true); openExploredModal();">
+                    <img src="explored.png" class="bento-img-icon" alt="Explored">
+                    <div class="bento-val" id="cloud-explored-count">0</div>
+                    <div class="bento-label" data-key="explored_label">Explored</div>
                 </div>
 
                 <!-- Disliked -->
-                <div class="bento-box bento-stat">
-                    <div class="bento-icon" style="color:#e74c3c; border-color:rgba(231,76,60,0.3);">⛔</div>
-                    <div>
-                        <div class="bento-val" id="cloud-ban-count">0</div>
-                        <div class="bento-label" data-key="blacklist_catalog">Ban</div>
-                    </div>
+                <div class="bento-box bento-stat-large clickable" onclick="closeSyncInfoModal(null, true); openBlacklistCatalog();">
+                    <img src="disliked.png" class="bento-img-icon" alt="Ban">
+                    <div class="bento-val" id="cloud-ban-count">0</div>
+                    <div class="bento-label" data-key="blacklist_catalog">Disliked</div>
                 </div>
 
-                <!-- 4. ACTION (WIDE BUTTON) -->
+                <!-- 4. КНОПКА СИНХРОНИЗАЦИИ -->
                 <button class="bento-box bento-wide bento-action" onclick="performManualSync()" id="btn-manual-sync">
                     <span id="sync-btn-text" data-key="btn_sync">Synchronize Device</span>
                 </button>
 
             </div>
 
-            <!-- Footer Actions -->
+            <!-- Футер (Выход) -->
             <div class="bento-footer-actions">
                 <button class="bento-small-btn" onclick="window.logout()">
                     <span data-key="logout_text">Log Out</span>
@@ -7616,7 +7688,7 @@
         }
     };
 
-    // === 2. ОТКРЫТИЕ ОКНА И ПОДГРУЗКА СТАТИСТИКИ (ОПТИМИЗИРОВАНО) ===
+    // === 2. ОТКРЫТИЕ ОКНА И ПОДГРУЗКА СТАТИСТИКИ ===
     window.openSyncInfoModal = async function() {
         const user = auth.currentUser;
         if (!user) return;
@@ -7624,78 +7696,68 @@
         document.getElementById('modal-sync-info-overlay').classList.add('open');
         document.getElementById('sync-email-display').innerText = user.email;
 
-        // Элементы UI
+        // Ссылки на элементы DOM
         const subValue = document.getElementById('sync-sub-value');
         const subDesc = document.getElementById('sync-sub-desc');
-        const subCard = document.getElementById('sync-sub-card'); // Это теперь .bento-sub
+        const subCard = document.getElementById('sync-sub-card');
         
-        // Сброс классов цветов
-        subCard.classList.remove('is-free', 'is-pro', 'is-beast', 'is-bestie');
-
-        // Получаем переводы
+        // Переводы
         const currentLang = localStorage.getItem('xch_lang') || 'en';
         const t = (window.langData && window.langData[currentLang]) ? window.langData[currentLang] : (window.langData ? window.langData['en'] : {});
 
-        // === ОПТИМИЗАЦИЯ: Проверка кэша ===
+        // --- ЛОГИКА ЗАГРУЗКИ ДАННЫХ ---
         const now = Date.now();
-        let d = cachedUserProfile; // Пытаемся взять из памяти
+        let d = cachedUserProfile;
+        const PROFILE_CACHE_TTL = 60000;
 
-        // Если кэша нет ИЛИ он протух (старше 1 минуты) -> читаем из базы
+        // Если кэша нет или он старый -> грузим из базы
         if (!d || (now - lastProfileReadTime > PROFILE_CACHE_TTL)) {
-            // UI показывает "Загрузка..." только если мы реально идем в сеть
+            // Показываем "..." пока грузится
             subValue.innerText = "...";
             ['cloud-fav-count', 'cloud-wl-count', 'cloud-explored-count', 'cloud-ban-count'].forEach(id => {
-                const el = document.getElementById(id);
-                if(el) el.innerText = "...";
+                document.getElementById(id).innerText = "...";
             });
 
             try {
                 const userRef = doc(db, "users", user.uid);
-                // Используем getDoc (благодаря персистенции он может взять и с диска)
                 const docSnap = await getDoc(userRef);
-                
                 if (docSnap.exists()) {
                     d = docSnap.data();
-                    cachedUserProfile = d; // Обновляем кэш
+                    cachedUserProfile = d;
                     lastProfileReadTime = now;
                 } else {
-                    d = null; // Документа нет
+                    d = null; // Нет данных (новый юзер)
                 }
             } catch (e) {
                 console.error("Error fetching sync stats:", e);
-                subValue.innerText = "ERROR";
+                subValue.innerText = "Error";
                 return;
             }
-        } else {
-            console.log("Using cached profile data (Optimized read)");
         }
 
+        // --- ЗАПОЛНЯЕМ HTML ДАННЫМИ ---
+        
+        // Сброс цветов подписки
+        subCard.classList.remove('is-free', 'is-pro', 'is-beast', 'is-bestie');
+
         if (d) {
-            // Модификаторы
-            const cloudMods = d.modifiersPool || null; 
-            if (cloudMods && Array.isArray(cloudMods)) {
-                if(window.userModifiersPool) {
-                    window.userModifiersPool = cloudMods;
-                    localStorage.setItem('xch_user_mods', JSON.stringify(window.userModifiersPool));
-                }
-            }
-            
+            // 1. Подписка
             const plan = d.subscription || 'free';
             subValue.innerText = plan.toUpperCase();
             
-            // Применяем CSS классы вместо инлайн-стилей 
+            // Стилизация карточки
             if (plan === 'pro') subCard.classList.add('is-pro');
             else if (plan === 'beast') subCard.classList.add('is-beast');
             else if (plan === 'bestie') subCard.classList.add('is-bestie');
             else subCard.classList.add('is-free');
 
-            // Цвет текста значения
+            // Цвет текста
             if (plan === 'pro') subValue.style.color = '#ff9900';
             else if (plan === 'beast') subValue.style.color = '#9b59b6';
             else if (plan === 'bestie') subValue.style.color = '#00d2ff';
             else subValue.style.color = 'var(--text-main)';
 
-            // Текст описания
+            // Описание срока действия
             if (plan === 'free') {
                 subDesc.innerText = (currentLang === 'ru' ? "Нажми, чтобы улучшить" : "Tap to Upgrade");
                 subDesc.style.color = "var(--accent)";
@@ -7707,8 +7769,12 @@
                     const dateObj = d.expiresAt.toDate(); 
                     const dateStr = dateObj.toLocaleDateString();
                     const daysLeft = Math.ceil((dateObj - new Date()) / (1000 * 60 * 60 * 24));
+                    
+                    const txtExp = t.sub_exp || "Expires:";
+                    const txtD = t.time_d || "d";
+                    
                     if (daysLeft > 0) {
-                        subDesc.innerHTML = `${t.sub_exp || "Expires:"} ${dateStr} (${daysLeft}${t.time_d || "d"})`;
+                        subDesc.innerHTML = `${txtExp} ${dateStr} (${daysLeft}${txtD})`;
                         subDesc.style.color = "var(--text-secondary)";
                     } else {
                         subDesc.innerText = t.sub_expired || "Expired"; 
@@ -7719,10 +7785,12 @@
                 }
             }
 
+            // 2. Цифры статистики (Вставляем в существующие ID)
             document.getElementById('cloud-fav-count').innerText = d.favorites ? d.favorites.length : 0;
             document.getElementById('cloud-wl-count').innerText = d.watchLater ? d.watchLater.length : 0;
             document.getElementById('cloud-ban-count').innerText = d.blacklist ? d.blacklist.length : 0;
             
+            // Подсчет Explored
             let exCount = d.exploredCount || 0;
             if (exCount === 0 && d.activityLog) {
                 const unique = new Set(d.activityLog.map(i => i.id));
@@ -7730,16 +7798,20 @@
             }
             document.getElementById('cloud-explored-count').innerText = exCount;
 
+            // 3. Обновляем переводы (если язык менялся)
+            applyLanguage(); 
+
         } else {
-            // Если документа нет
+            // Новый пользователь (пусто)
             subValue.innerText = "FREE";
+            subCard.classList.add('is-free');
             subDesc.innerText = (currentLang === 'ru' ? "Нажми, чтобы улучшить" : "Tap to Upgrade");
             subValue.style.color = "var(--text-main)";
             
             ['cloud-fav-count', 'cloud-wl-count', 'cloud-explored-count', 'cloud-ban-count'].forEach(id => {
-                const el = document.getElementById(id);
-                if(el) el.innerText = "0";
+                document.getElementById(id).innerText = "0";
             });
+            applyLanguage();
         }
     };
 
@@ -18264,10 +18336,17 @@
             since: {en:"Since Last Time", ru:"С прошлого раза", es:"Desde la última vez", de:"Seit dem letzten Mal"},
             act: {en:"Swipes", ru:"Свайпов", es:"Deslizamientos", de:"Swipes"},
             watch: {en:"Watch Time", ru:"Время просмотра", es:"Tiempo visto", de:"Zeit"},
+            period_daily: {en: "Last 24 Hours", ru: "За последние 24ч", es: "Últimas 24h", de: "Letzte 24h"},
+            period_weekly: {en: "This Week", ru: "За эту неделю", es: "Esta semana", de: "Diese Woche"},
+            period_monthly: {en: "This Month", ru: "За этот месяц", es: "Este mes", de: "Diesen Monat"},
+            period_yearly: {en: "This Year", ru: "За этот год", es: "Este año", de: "Dieses Jahr"},
             vibe: {en:"Your Vibe", ru:"Твой Вайб", es:"Tu Vibra", de:"Deine Stimmung"},
             evol: {en:"Taste Evolution", ru:"Эволюция Вкусов", es:"Evolución", de:"Entwicklung"},
             evol_sub: {en:"Vs Previous Period", ru:"Сравнение с прошлым", es:"Vs periodo anterior", de:"Vs letztes Mal"},
             obsess: {en:"Your Obsessions", ru:"Твои Одержимости", es:"Tus Obsesiones", de:"Deine Obsessionen"},
+            cmp_more: {en:"more", ru:"больше", es:"más", de:"mehr"},
+            cmp_less: {en:"less", ru:"меньше", es:"menos", de:"weniger"},
+            cmp_same: {en:"same", ru:"также", es:"igual", de:"gleich"},
             
             // Финальная карточка
             sum_watch: {en:"Videos Watched", ru:"Видео просмотрено", es:"Videos vistos", de:"Angeschaut"},
@@ -18312,43 +18391,55 @@
 
         // --- СЛАЙД 2: СРАВНЕНИЕ ---
         if (type !== 'daily' || Math.abs(stats.deltaActions) > 0) {
-            // Логика знаков и цветов для сравнения
-            const trendAct = stats.deltaActions >= 0 ? "+" : "";
-            const trendTime = stats.deltaWatchTime >= 0 ? "+" : "";
-            
-            // Цвета для трендов (Зеленый если рост, Красный если падение)
-            const colorAct = stats.deltaActions >= 0 ? "#2ecc71" : "#e74c3c"; 
-            const colorTime = stats.deltaWatchTime >= 0 ? "#2ecc71" : "#e74c3c"; // Или другой цвет по логике
+        
+            // 1. Выбираем правильный заголовок
+            let periodHeader = t('period_' + type); 
+            if (!periodHeader) periodHeader = t('since'); // Фолбек
 
-            // Абсолютные значения (форматируем время)
+            // 2. Логика сравнения (vs prev)
+            const getTrendHTML = (delta, labelKey) => {
+                if (delta === 0) return `<span style="opacity:0.6">= ${t('cmp_same')}</span>`;
+                const isPos = delta > 0;
+                const color = isPos ? "#2ecc71" : "#e74c3c";
+                const sign = isPos ? "+" : "";
+                // Пример: "+50 больше, чем в прошлый раз"
+                // Для краткости просто: "+50 vs prev" или локализовать "vs prev"
+                return `<span style="color:${color}">${sign}${delta}</span> <span style="opacity:0.6">vs prev</span>`;
+            };
+
+            const htmlActTrend = getTrendHTML(stats.deltaActions);
+            const htmlTimeTrend = getTrendHTML(Math.round(stats.deltaWatchTime/60));
+
+            // Абсолютные значения
             const absActions = stats.totalActions;
             const absTimeMin = Math.round(stats.totalWatchTime / 60);
 
             slides.push(`
                 <div class="wrapped-slide bg-fire">
-                    <div class="wrapped-sub-text" style="text-transform:uppercase; letter-spacing:2px; font-size:12px; margin-bottom:40px;">${t('since')}</div>
+                    <!-- Динамический заголовок -->
+                    <div class="wrapped-sub-text" style="text-transform:uppercase; letter-spacing:2px; font-size:14px; margin-bottom:40px; font-weight:800; color:rgba(255,255,255,0.9); border-bottom:1px solid rgba(255,255,255,0.3); padding-bottom:10px;">
+                        ${periodHeader}
+                    </div>
                     
                     <!-- Блок 1: Действия -->
                     <div style="margin-bottom:50px; width:100%; display:flex; flex-direction:column; align-items:center;">
-                        <!-- Абсолютное число (Сразу) -->
                         <div class="wrapped-big-text" style="font-size:80px; margin-bottom:0; line-height:1;">${absActions}</div>
                         <div class="wrapped-sub-text" style="font-weight:700; margin-bottom:10px;">${t('act')}</div>
                         
-                        <!-- Сравнение (С задержкой 1.5с) -->
-                        <div class="reveal-delayed delay-1500" style="background:rgba(0,0,0,0.3); padding:5px 15px; border-radius:20px; font-size:16px; font-weight:700; color:${colorAct}; border:1px solid rgba(255,255,255,0.1);">
-                            ${trendAct}${stats.deltaActions} vs prev
+                        <!-- Сравнение (выезжает) -->
+                        <div class="reveal-delayed delay-1500" style="background:rgba(0,0,0,0.3); padding:5px 15px; border-radius:20px; font-size:15px; font-weight:600; border:1px solid rgba(255,255,255,0.1);">
+                            ${htmlActTrend}
                         </div>
                     </div>
 
                     <!-- Блок 2: Время -->
-                    <div style="border-top:1px solid rgba(255,255,255,0.2); padding-top:40px; width:80%; display:flex; flex-direction:column; align-items:center;">
-                        <!-- Абсолютное число (Сразу) -->
+                    <div style="border-top:1px solid rgba(255,255,255,0.1); padding-top:40px; width:80%; display:flex; flex-direction:column; align-items:center;">
                         <div class="wrapped-big-text" style="font-size:80px; margin-bottom:0; line-height:1;">${absTimeMin}<span style="font-size:30px">m</span></div>
                         <div class="wrapped-sub-text" style="font-weight:700; margin-bottom:10px;">${t('watch')}</div>
                         
-                        <!-- Сравнение (С задержкой 1.5с) -->
-                        <div class="reveal-delayed delay-1500" style="background:rgba(0,0,0,0.3); padding:5px 15px; border-radius:20px; font-size:16px; font-weight:700; color:${colorTime}; border:1px solid rgba(255,255,255,0.1);">
-                            ${trendTime}${Math.round(stats.deltaWatchTime/60)}m vs prev
+                        <!-- Сравнение (выезжает) -->
+                        <div class="reveal-delayed delay-1500" style="background:rgba(0,0,0,0.3); padding:5px 15px; border-radius:20px; font-size:15px; font-weight:600; border:1px solid rgba(255,255,255,0.1);">
+                            ${htmlTimeTrend}
                         </div>
                     </div>
                 </div>
@@ -18725,48 +18816,57 @@
         return header;
     }
 
-    // 1. ШЕРИНГ WRAPPED (Круглая кнопка)
     function shareWrappedCard() {
-        const card = document.getElementById('wrapped-summary-card');
-        if(!card) return;
+        // 1. Находим исходную карточку
+        const originalCard = document.getElementById('wrapped-summary-card');
+        if (!originalCard) return;
 
-        if(navigator.vibrate) navigator.vibrate(50);
+        if (navigator.vibrate) navigator.vibrate(50);
 
-        // --- ВРЕМЕННО УБИРАЕМ ГРАДИЕНТНЫЙ ТЕКСТ ---
-        const gradSpan = card.querySelector('.sum-logo-text span.grad');
-        let originalStyle = "";
+        // 2. Создаем контейнер-клон (вне экрана)
+        // Используем id или класс, который мы прописали в CSS выше
+        const exportContainer = document.createElement('div');
+        exportContainer.className = 'export-clone-container';
         
+        // 3. Клонируем карточку
+        const cloneCard = originalCard.cloneNode(true);
+        
+        // Находим спан с классом .grad внутри клона
+        const gradSpan = cloneCard.querySelector('.sum-logo-text span.grad');
         if (gradSpan) {
-            originalStyle = gradSpan.getAttribute('style'); // Сохраняем стиль
-            // Ставим сплошной цвет (Акцент) и убираем клиппинг
+            // Принудительно ставим сплошной цвет
             gradSpan.style.background = 'none';
             gradSpan.style.webkitTextFillColor = 'var(--accent)'; 
             gradSpan.style.color = 'var(--accent)';
+            // Убираем любые маски
+            gradSpan.style.webkitBackgroundClip = 'border-box';
+            gradSpan.style.backgroundClip = 'border-box';
         }
 
-        // --- useCORS для QR кода ---
-        html2canvas(card, {
-            backgroundColor: null,
-            scale: 2,
-            useCORS: true, // Разрешает загрузку картинки QR с внешнего домена
-            allowTaint: true
-        }).then(canvas => {
-            // ВОЗВРАЩАЕМ СТИЛЬ ГРАДИЕНТА ОБРАТНО
-            if (gradSpan && originalStyle) {
-                gradSpan.setAttribute('style', originalStyle);
-            } else if (gradSpan) {
-                gradSpan.removeAttribute('style');
-            }
+        // Добавляем клон в контейнер, а контейнер в body
+        exportContainer.appendChild(cloneCard);
+        document.body.appendChild(exportContainer);
 
+        // 4. Генерируем скриншот с клона
+        html2canvas(exportContainer, {
+            backgroundColor: null, // Прозрачный фон (или цвет из CSS контейнера)
+            scale: 2, // Высокое качество
+            useCORS: true,
+            allowTaint: true,
+            logging: false
+        }).then(canvas => {
+            // 5. Убираем клон
+            document.body.removeChild(exportContainer);
+
+            // 6. Скачивание
             const link = document.createElement('a');
             link.download = `fetish-wrapped-${Date.now()}.png`;
-            link.href = canvas.toDataURL();
+            link.href = canvas.toDataURL('image/png');
             link.click();
         }).catch(e => {
-            // Возвращаем стиль даже при ошибке
-            if (gradSpan && originalStyle) gradSpan.setAttribute('style', originalStyle);
             console.error("Screenshot error:", e);
-            alert("Could not save image.");
+            if (document.body.contains(exportContainer)) document.body.removeChild(exportContainer);
+            alert("Error creating image");
         });
     }
 
