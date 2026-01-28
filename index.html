@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     
     <!-- === PRIMARY SEO === -->
-    <title>xFetishHub — FetishLM 1.0 & Private Adult Analytics</title>
-    <meta name="title" content="xFetishHub — FetishLM 1.0 & Private Adult Analytics">
+    <title>xFetishHub — FetishAI 1.0 & Private Adult Analytics</title>
+    <meta name="title" content="xFetishHub — FetishAI 1.0 & Private Adult Analytics">
     <meta name="description" content="Discover your true desires with xFetishHub. The #1 AI-powered adult preference tracker. Analyze porn statistics, explore 1000+ genres, and browse privately.">
     <meta name="keywords" content="adult analytics, porn statistics, fetish tracker, private adult browser, porn habit tracker, fetish discovery, secure porn watching, AI adult recommendation, FetishLM">
     <meta name="robots" content="index, follow, max-image-preview:large">
@@ -15,7 +15,7 @@
     <!-- === SOCIAL / OPEN GRAPH === -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://www.xfetishhub.site/">
-    <meta property="og:title" content="xFetishHub — FetishLM 1.0 & Preference Tracker">
+    <meta property="og:title" content="xFetishHub — FetishAI 1.0 & Preference Tracker">
     <meta property="og:description" content="Discover your true desires with xFetishHub. The #1 AI-powered adult preference tracker. Analyze porn statistics, explore 1000+ genres, and browse privately.">
     <meta property="og:image" content="https://www.xfetishhub.site/og-image.jpg">
     <meta property="og:image:width" content="1200">
@@ -24,7 +24,7 @@
 
     <!-- === TWITTER CARD === -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="xFetishHub — FetishLM 1.0 & Preference Tracker">
+    <meta name="twitter:title" content="xFetishHub — FetishAI 1.0 & Preference Tracker">
     <meta name="twitter:description" content="Discover your true desires with AI. Analyze stats, explore 1000+ genres, and browse privately.">
     <meta name="twitter:image" content="https://www.xfetishhub.site/og-image.jpg">
     
@@ -75,8 +75,6 @@
             --gradient-text: linear-gradient(90deg, var(--accent-start), var(--accent-end));
             --font: 'Inter', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
-            
-            --divider-height: 150px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -90,103 +88,216 @@
         }
         
         a { text-decoration: none; color: inherit; transition: color 0.2s; }
+        ul { list-style: none; }
+
+        /* === UTILS === */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 40px; position: relative; z-index: 10; }
+        section { position: relative; width: 100%; }
+        h2 { font-size: clamp(28px, 4vw, 42px); font-weight: 800; margin-bottom: 20px; line-height: 1.1; color: #fff; }
+        .gradient-text { background: var(--gradient-text); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .fade-in { opacity: 0; transform: translateY(40px); transition: 0.8s ease; }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+        /* === BUTTONS === */
+        .btn-cta { 
+            padding: 18px 45px; font-size: 16px; font-weight: 800; text-transform: uppercase; color: #fff; 
+            background: var(--gradient-text); border-radius: 50px; 
+            box-shadow: 0 10px 40px rgba(155, 89, 182, 0.4); 
+            transition: transform 0.2s, box-shadow 0.2s; 
+            display: inline-flex; align-items: center; gap: 10px; z-index: 15; border: none; cursor: pointer; 
+        }
+        .btn-cta:hover { transform: scale(1.05); box-shadow: 0 15px 50px rgba(155, 89, 182, 0.6); }
+
+        .btn-secondary { 
+            padding: 18px 30px; font-size: 16px; font-weight: 700; text-transform: uppercase; 
+            color: var(--text-main); background: rgba(255,255,255,0.1); 
+            border: 1px solid rgba(255,255,255,0.2); border-radius: 50px; 
+            transition: background 0.2s, transform 0.2s; cursor: pointer; 
+            display: inline-flex; align-items: center; gap: 8px; z-index: 15; 
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); }
 
         /* === NAVBAR === */
         .navbar {
             position: fixed; top: 0; left: 0; width: 100%; 
-            padding: 20px 40px; z-index: 1000;
+            padding: 15px 40px; z-index: 1000;
             display: flex; justify-content: space-between; align-items: center;
-            background: rgba(5,5,5,0.8); backdrop-filter: blur(10px);
+            background: rgba(5,5,5,0.85); backdrop-filter: blur(15px);
             border-bottom: 1px solid rgba(255,255,255,0.05);
+            transform: translateY(-100%); transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
-        .nav-logo { font-weight: 900; font-size: 20px; color: #fff; }
+        .navbar.visible { transform: translateY(0); }
+        .nav-logo-img { height: 32px; width: auto; object-fit: contain; }
         .nav-links { display: flex; gap: 30px; }
-        .nav-links a { font-size: 14px; font-weight: 600; color: var(--text-sec); text-transform: uppercase; }
+        .nav-links a { font-size: 13px; font-weight: 600; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.5px; }
         .nav-links a:hover { color: #fff; }
+        .lang-switcher select { background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 6px 10px; font-weight: 700; cursor: pointer; outline: none; text-transform: uppercase; }
+        .lang-switcher select option { background: #111; }
         @media (max-width: 768px) { .nav-links { display: none; } .navbar { padding: 15px 20px; } }
 
-        /* === UTILS === */
-        section, footer { position: relative; width: 100%; }
-        section { padding: 100px 0; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 40px; position: relative; z-index: 10; }
-        .bg-sec { background-color: var(--bg-sec); }
-        .bg-main { background-color: var(--bg-main); }
-        h2 { font-size: 42px; font-weight: 800; margin-bottom: 20px; line-height: 1.1; }
-        .gradient-text { background: var(--gradient-text); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-        /* === DIVIDERS === */
-        .section-divider { position: absolute; left: 0; width: 100%; height: var(--divider-height); z-index: 3; pointer-events: none; }
-        .divider-hero-feat { top: 0; background: linear-gradient(to bottom, var(--bg-main), var(--bg-sec)); }
-        
-        /* Стандартный переход Серый -> Черный */
-        .divider-gray-black { bottom: 0; background: linear-gradient(to bottom, var(--bg-sec), var(--bg-main)); }
-        /* Стандартный переход Черный -> Серый */
-        .divider-black-gray { bottom: 0; background: linear-gradient(to bottom, var(--bg-main), var(--bg-sec)); }
-        
-        .divider-map-foot { bottom: 0; background: linear-gradient(to bottom, var(--bg-sec), rgba(5,5,5,0)); z-index: 5; }
-
-        /* HERO */
+        /* === HERO === */
+        .hero { min-height: 100vh; display: flex; align-items: center; position: relative; overflow: hidden; padding: 80px 0 40px; }
         .parallax-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 0; }
         .parallax-img { width: 100%; height: 120%; object-fit: cover; opacity: 0.4; will-change: transform; }
         .bg-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(5,5,5,0.7); z-index: 1; }
         
-        .hero { min-height: 100vh; display: flex; align-items: center; position: relative; overflow: hidden; padding: 80px 0 40px; }
         .hero-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 60px; align-items: center; width: 100%; }
-        .hero-visual { display: flex; justify-content: center; align-items: center; }
         .hero-logo-img { width: 100%; max-width: 450px; height: auto; filter: drop-shadow(0 0 40px rgba(203, 83, 240, 0.15)); animation: floatLogo 6s ease-in-out infinite; }
         @keyframes floatLogo { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
         
-        .hero-content { display: flex; flex-direction: column; align-items: flex-start; text-align: left; }
-        h1.brand-title { font-size: clamp(48px, 6vw, 80px); font-weight: 900; margin-bottom: 20px; line-height: 1; letter-spacing: -2px; color: #fff; }
+        h1.brand-title { font-size: clamp(48px, 6vw, 80px); font-weight: 900; margin-bottom: 20px; line-height: 1; letter-spacing: -2px; }
         .hero-subtitle-wrapper { font-size: clamp(20px, 3vw, 32px); font-weight: 700; color: var(--text-sec); margin-bottom: 40px; display: flex; align-items: center; flex-wrap: wrap; gap: 0.3em; line-height: 1.2; }
         
+        /* ROLLING TEXT ANIMATION (FIXED) */
         .rolling-container { height: 1.2em; overflow: hidden; position: relative; display: inline-block; vertical-align: bottom; }
         .rolling-list { display: flex; flex-direction: column; }
         .rolling-word { height: 1.2em; display: flex; align-items: center; background: var(--gradient-text); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; white-space: nowrap; }
         .animate-scroll { animation: scrollWords 14s cubic-bezier(0.6, 0.0, 0.4, 1.0) infinite; }
-        @keyframes scrollWords { 0%, 10% { transform: translateY(0); } 14%, 24% { transform: translateY(-1.2em); } 28%, 38% { transform: translateY(-2.4em); } 42%, 52% { transform: translateY(-3.6em); } 56%, 66% { transform: translateY(-4.8em); } 70%, 80% { transform: translateY(-6.0em); } 84%, 94% { transform: translateY(-7.2em); } 100% { transform: translateY(-8.4em); } }
-        
+        @keyframes scrollWords { 
+            0%, 10% { transform: translateY(0); } 
+            14%, 24% { transform: translateY(-1.2em); } 
+            28%, 38% { transform: translateY(-2.4em); } 
+            42%, 52% { transform: translateY(-3.6em); } 
+            56%, 66% { transform: translateY(-4.8em); } 
+            70%, 80% { transform: translateY(-6.0em); } 
+            84%, 94% { transform: translateY(-7.2em); } 
+            100% { transform: translateY(-8.4em); } 
+        }
+
         .btn-row { display: flex; gap: 15px; flex-wrap: wrap; }
-        .btn-cta { padding: 18px 45px; font-size: 16px; font-weight: 800; text-transform: uppercase; color: #fff; background: var(--gradient-text); border-radius: 50px; box-shadow: 0 10px 40px rgba(155, 89, 182, 0.4); transition: transform 0.2s, box-shadow 0.2s; display: inline-flex; align-items: center; gap: 10px; z-index: 15; text-decoration: none !important; border: none; cursor: pointer; }
-        .btn-cta:hover { transform: scale(1.05); box-shadow: 0 15px 50px rgba(155, 89, 182, 0.6); }
-        .btn-secondary { padding: 18px 30px; font-size: 16px; font-weight: 700; text-transform: uppercase; color: var(--text-main); background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 50px; transition: background 0.2s, transform 0.2s; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; z-index: 15; }
-        .btn-secondary:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); }
+        .hero-fade-bottom { position: absolute; bottom: 0; left: 0; width: 100%; height: 200px; background: linear-gradient(to bottom, transparent, var(--bg-main)); z-index: 5; pointer-events: none; }
+        
+        @media (max-width: 900px) { .hero-grid { grid-template-columns: 1fr; text-align: center; gap: 40px; } .hero-visual { order: -1; } .hero-logo-img { max-width: 250px; } .hero-subtitle-wrapper { justify-content: center; } }
 
-        /* HOW IT WORKS */
-        .step-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-top: 60px; }
-        .step-card { text-align: center; padding: 20px; }
-        .step-num { font-size: 60px; font-weight: 900; color: #222; margin-bottom: 20px; font-family: var(--font-mono); }
-        .step-title { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 10px; }
-        .step-desc { font-size: 15px; color: var(--text-sec); }
+        /* === DIVIDERS === */
+        .section-divider { position: absolute; bottom: 0; left: 0; width: 100%; height: 150px; z-index: 5; pointer-events: none; }
+        .divider-what-features { background: linear-gradient(to bottom, #050505 0%, #050505 40%, #111111 100%); }
+        .divider-gray-black { background: linear-gradient(to bottom, var(--bg-sec), var(--bg-main)); }
+        .divider-black-gray { background: linear-gradient(to bottom, var(--bg-main), var(--bg-sec)); }
+        .divider-faq-footer { background: linear-gradient(to bottom, var(--bg-sec), #000000); }
 
-        /* FETISHLM / SCIENCE */
-        .text-block-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-top: 40px; align-items: start; }
-        .text-content h3 { font-size: 24px; margin-bottom: 15px; color: #fff; }
-        .text-content p { font-size: 16px; color: var(--text-sec); margin-bottom: 25px; line-height: 1.7; }
-        .highlight { color: var(--accent-start); font-weight: 600; }
+        /* === SECTION: WHAT IS (Black) === */
+        #what-is { background-color: var(--bg-main); padding: 100px 0 180px; position: relative; z-index: 10; }
+        .unique-bento-grid { display: grid; grid-template-columns: 0.9fr 1.1fr; grid-template-rows: 1fr 1fr; gap: 24px; max-width: 1000px; margin: 0 auto; min-height: 520px; }
+        
+        .glass-card {
+            background: #0a0a0a; border-radius: 30px; position: relative; overflow: hidden;
+            display: flex; flex-direction: column; padding: 40px;
+            border: 1px solid rgba(255,255,255,0.06); box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            transition: transform 0.4s, border-color 0.4s;
+        }
+        .glass-card:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.15); }
+        
+        .glass-card h3 { font-size: 28px; font-weight: 800; margin-bottom: 15px; color: #fff; position: relative; z-index: 5; }
+        .glass-card p { font-size: 16px; color: #888; max-width: 90%; position: relative; z-index: 5; }
+        
+        .bento-img-3d { position: absolute; width: 140px; height: 140px; object-fit: contain; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.4)); z-index: 3; transition: all 0.6s; }
+        .icon-glow-bg { position: absolute; width: 180px; height: 180px; border-radius: 50%; filter: blur(60px); opacity: 0.15; z-index: 2; transition: opacity 0.4s; }
+        .glass-card:hover .icon-glow-bg { opacity: 0.3; }
 
-        /* FEATURES (WITH ANIMATIONS) */
+        .cell-tall { grid-row: span 2; justify-content: space-between; }
+        .cell-tall .bento-img-3d { bottom: -20px; right: -20px; transform: rotate(-10deg); }
+        .cell-tall .icon-glow-bg { background: var(--accent-start); bottom: -30px; right: -30px; }
+        .cell-tall:hover .bento-img-3d { bottom: 10px; right: 10px; transform: rotate(0deg) scale(1.1); }
+
+        .cell-wide { grid-column: 2; justify-content: center; }
+        .cell-wide .bento-img-3d { right: 10px; top: 50%; width: 110px; height: 110px; transform: translateY(-50%) rotate(5deg); }
+        .cell-wide .icon-glow-bg { background: #00ff88; right: 0; top: 50%; transform: translateY(-50%); }
+        .cell-wide:hover .bento-img-3d { transform: translateY(-50%) rotate(-5deg) scale(1.15) translateX(-10px); }
+        .cell-wide.evolve .icon-glow-bg { background: #00d2ff; }
+
+        @media (max-width: 900px) {
+            .unique-bento-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
+            .cell-tall { grid-row: span 1; min-height: 280px; }
+            .cell-wide { grid-column: span 1; min-height: 200px; }
+        }
+
+        /* === SECTION: FEATURES (Gray) === */
+        #features { background-color: var(--bg-sec); padding: 100px 0 200px; }
         .feature-row { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; margin-bottom: 120px; }
-        .feature-row:last-child { margin-bottom: 0; }
         .feature-row:nth-child(even) { direction: rtl; } 
         .feature-row:nth-child(even) .feature-text { direction: ltr; }
-        .feature-text h3 { font-size: 40px; margin-bottom: 20px; display: inline-block; position: relative; }
+        .feature-text h3 { font-size: 40px; margin-bottom: 20px; display: inline-block; }
         .feature-text p { font-size: 18px; color: var(--text-sec); line-height: 1.6; }
-        .feature-img-wrapper { width: 100%; border-radius: 24px; overflow: hidden; box-shadow: 0 25px 60px -10px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.05); transition: transform 0.3s; background: #1a1a1a; }
+        .feature-img-wrapper { width: 100%; border-radius: 50px; overflow: hidden; box-shadow: 0 25px 60px -10px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.05); transition: transform 0.3s; background: #1a1a1a; transform: translateZ(0); }
         .feature-img-wrapper:hover { transform: scale(1.02); }
         .feature-img { width: 100%; height: auto; display: block; }
-        .feature-img-wrapper.privacy-fix { background: transparent; border: none; box-shadow: none; min-height: 500px; display: flex; align-items: center; justify-content: center; }
-        .feature-img-wrapper.privacy-fix .feature-img { object-fit: contain; width: 100%; height: 100%; max-height: 800px; }
+        .privacy-fix { background: transparent; border: none; box-shadow: none; display: flex; justify-content: center; }
+        
+        @media (max-width: 900px) { .feature-row, .feature-row:nth-child(even) { display: flex; flex-direction: column-reverse; gap: 30px; text-align: center; } }
 
-        /* PRICING */
+        /* Feature Animations */
+        .anim-word-wrap { position: relative; display: inline-block; }
+        .base-text { color: #fff; position: relative; z-index: 1; }
+        .grad-layer { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background-size: 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; opacity: 0; z-index: 2; }
+        .g-search-grad { background-image: linear-gradient(90deg, #FF416C, #FF4B2B); }
+        .g-pleasure-grad { background-image: linear-gradient(90deg, #00b09b, #96c93d); }
+        .g-ai-grad { background-image: linear-gradient(90deg, #667eea, #764ba2); }
+        .anim-emoji { position: absolute; top: 0; left: 50%; transform: translate(-50%, 20px); opacity: 0; font-size: 32px; pointer-events: none; z-index: 3; }
+        
+        @keyframes emojiJump { 0% { transform: translate(-50%, 20px); opacity: 0; } 10% { transform: translate(-50%, -25px) scale(1.2); opacity: 1; } 25% { transform: translate(-50%, -25px) scale(1.2); opacity: 1; } 35% { transform: translate(-50%, 20px) scale(1); opacity: 0; } 100% { opacity: 0; } }
+        @keyframes textFade { 0% { opacity: 0; } 10% { opacity: 1; } 25% { opacity: 1; } 35% { opacity: 0; } 100% { opacity: 0; } }
+        
+        .visible .anim-search .anim-emoji, .visible .anim-search .grad-layer { animation: emojiJump 6s linear infinite; }
+        .visible .anim-search .grad-layer { animation-name: textFade; }
+        .visible .anim-pleasure .anim-emoji, .visible .anim-pleasure .grad-layer { animation: emojiJump 6s linear infinite; animation-delay: 2s; }
+        .visible .anim-pleasure .grad-layer { animation-name: textFade; }
+        .visible .anim-ai .anim-emoji, .visible .anim-ai .grad-layer { animation: emojiJump 6s linear infinite; animation-delay: 4s; }
+        .visible .anim-ai .grad-layer { animation-name: textFade; }
+
+        /* Smart Cards Tilt */
+        .anim-swipe-title { display: inline-block; transform-origin: bottom center; }
+        .visible .anim-swipe-title { animation: swipeTilt 3s ease-in-out infinite; }
+        @keyframes swipeTilt { 0% { transform: rotate(0deg); } 25% { transform: rotate(-5deg); } 50% { transform: rotate(0deg); } 75% { transform: rotate(5deg); } 100% { transform: rotate(0deg); } }
+
+        /* Matrix Text */
+        .matrix-text { font-family: var(--font-mono); display: inline-block; min-width: 120px; }
+        .matrix-active { color: #00ff80 !important; text-shadow: 0 0 5px rgba(0,255,128,0.5); }
+
+        /* === SECTION: FETISH AI (Black) === */
+        #deep-dive { background-color: var(--bg-main); padding: 100px 0 200px; }
+        
+        /* 3-Column Grid */
+        #deep-dive .bento-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+            grid-auto-rows: minmax(280px, auto);
+        }
+        #deep-dive .bento-cell {
+            position: relative; padding: 30px; display: flex; flex-direction: column; justify-content: center;
+            overflow: hidden; border: 1px solid rgba(255,255,255,0.05); transition: transform 0.3s;
+        }
+        #deep-dive .bento-cell:hover { transform: translateY(-5px); z-index: 2; }
+        
+        #deep-dive .span-large { grid-column: span 2; }
+        #deep-dive .span-small { grid-column: span 1; }
+        
+        #deep-dive .text-area { position: relative; z-index: 5; max-width: 90%; }
+        #deep-dive h3 { font-size: 24px; margin-bottom: 12px; line-height: 1.2; }
+        #deep-dive p { font-size: 15px; color: rgba(255,255,255,0.8); }
+        
+        .dd-icon { position: absolute; bottom: -20px; right: -20px; width: 140px; height: 140px; opacity: 0.15; transform: rotate(-15deg); transition: all 0.5s ease; pointer-events: none; }
+        #deep-dive .bento-cell:hover .dd-icon { opacity: 0.4; transform: rotate(0deg) scale(1.1); }
+
+        @media (max-width: 900px) {
+            #deep-dive .bento-grid { grid-template-columns: 1fr; gap: 15px; }
+            #deep-dive .span-large, #deep-dive .span-small { grid-column: span 1; min-height: 220px; }
+            /* ZigZag Mobile */
+            #deep-dive .bento-cell:nth-child(odd) { text-align: right; align-items: flex-end; padding-left: 120px; padding-right: 20px; }
+            #deep-dive .bento-cell:nth-child(odd) .dd-icon { right: auto; left: -10px; bottom: -10px; transform: rotate(10deg); }
+            #deep-dive .bento-cell:nth-child(even) { text-align: left; align-items: flex-start; padding-right: 120px; padding-left: 20px; }
+            #deep-dive .bento-cell:nth-child(even) .dd-icon { left: auto; right: -10px; bottom: -10px; transform: rotate(-10deg); }
+        }
+
+        /* === SECTION: PRICING (Gray) === */
+        #pricing { background-color: var(--bg-sec); padding: 100px 0 200px; }
         .pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 40px; }
-        .plan-card { background: var(--bg-sec); border: 1px solid var(--border); border-radius: 20px; padding: 30px 20px; display: flex; flex-direction: column; position: relative; transition: transform 0.3s, box-shadow 0.3s; min-height: 380px; overflow: hidden; }
+        .plan-card { background: #0a0a0a; border: 1px solid var(--border); border-radius: 20px; padding: 30px 20px; display: flex; flex-direction: column; position: relative; transition: transform 0.3s; min-height: 380px; }
         .plan-card:hover { transform: translateY(-5px); }
         .plan-title { font-size: 22px; font-weight: 900; text-transform: uppercase; margin-bottom: 5px; }
         .plan-price { font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 20px; }
-        .plan-price span { font-size: 14px; color: var(--text-sec); font-weight: 400; }
-        .plan-features { list-style: none; margin-bottom: 0; flex-grow: 1; padding: 0; }
-        .plan-features li { font-size: 14px; color: var(--text-sec); margin-bottom: 12px; padding-left: 0; position: relative; line-height: 1.4; }
+        .plan-features li { font-size: 14px; color: var(--text-sec); margin-bottom: 12px; }
+        
         .plan-card.pro { border-color: #ff9900; box-shadow: 0 0 20px rgba(255, 153, 0, 0.1); }
         .plan-card.pro .plan-title { color: #ff9900; }
         .plan-card.beast { border-color: #9b59b6; box-shadow: 0 0 20px rgba(155, 89, 182, 0.15); background: linear-gradient(135deg, rgba(155, 89, 182, 0.05), transparent); }
@@ -195,168 +306,176 @@
         .plan-card.bestie .plan-title { color: #00d2ff; background: linear-gradient(to right, #00d2ff, #3a7bd5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .bestie-badge { position: absolute; top: 0; right: 0; background: #00d2ff; color: #000; font-size: 10px; font-weight: 800; padding: 4px 10px; border-bottom-left-radius: 12px; }
         .limit-container { margin-bottom: 15px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); }
-        .limit-labels { display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 6px; color: var(--text-sec); }
-        .limit-track { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
-        .limit-fill { height: 100%; background: linear-gradient(90deg, #00d2ff, #3a7bd5); width: 96%; box-shadow: 0 0 10px #00d2ff; animation: pulseBar 2s infinite; }
-        @keyframes pulseBar { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
+        .limit-fill { height: 4px; background: linear-gradient(90deg, #00d2ff, #3a7bd5); width: 96%; box-shadow: 0 0 10px #00d2ff; animation: pulseBar 2s infinite; }
+        @media (max-width: 900px) { .pricing-grid { grid-template-columns: 1fr; } .plan-card.bestie { order: -1; } }
 
-        /* ROADMAP */
-        #roadmap .container { padding-bottom: 0; }
-        .roadmap-separator { display: flex; align-items: center; justify-content: center; gap: 20px; margin: 60px auto 30px; max-width: 900px; position: relative; z-index: 2; }
-        .roadmap-separator span { font-size: 0.9rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-sec); white-space: nowrap; }
-        .separator-line { height: 1px; flex-grow: 1; position: relative; }
-        .line-left { background: linear-gradient(to right, transparent, var(--border)); }
-        .line-right { background: linear-gradient(to right, var(--border), transparent); }
-        .roadmap-card { background: var(--bg-sec); border-radius: 32px; padding: 10px 0; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.3); max-width: 900px; margin: 0 auto 40px; overflow: hidden; position: relative; z-index: 2; }
-        .roadmap-row { display: grid; grid-template-columns: 180px 1fr 150px; gap: 30px; padding: 30px 50px; border-bottom: 1px solid var(--border); align-items: center; transition: background-color 0.3s; }
+        /* === SECTION: ROADMAP (Black) === */
+        #roadmap { background-color: var(--bg-main); padding: 100px 0 100px; }
+        .roadmap-separator { display: flex; align-items: center; justify-content: center; gap: 20px; margin: 60px auto 30px; max-width: 900px; }
+        .separator-line { height: 1px; flex-grow: 1; background: var(--border); }
+        .roadmap-card { background: var(--bg-sec); border-radius: 32px; padding: 10px 0; max-width: 900px; margin: 0 auto 40px; }
+        .roadmap-row { display: grid; grid-template-columns: 180px 1fr 150px; gap: 30px; padding: 30px 50px; border-bottom: 1px solid var(--border); align-items: center; }
         .roadmap-row:last-child { border-bottom: none; }
-        .roadmap-row:hover { background-color: rgba(255,255,255,0.03); }
-        .roadmap-date { font-size: 1.1rem; font-weight: 800; color: var(--accent-start); text-transform: uppercase; }
-        .roadmap-content h4 { margin-bottom: 5px; font-size: 1.3rem; font-weight: 700; color: #fff; }
-        .roadmap-content p { font-size: 1rem; margin: 0; color: var(--text-sec); line-height: 1.5; }
-        .roadmap-status { display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; text-align: center; white-space: nowrap; }
-        .status-done { background: rgba(40, 167, 69, 0.15); color: #28a745; border: 1px solid rgba(40, 167, 69, 0.2); }
-        .status-progress { background: rgba(0, 122, 255, 0.15); color: #007AFF; border: 1px solid rgba(0, 122, 255, 0.2); }
-        .status-planned { background: rgba(255,255,255,0.05); color: var(--text-sec); border: 1px solid var(--border); }
+        .roadmap-date { color: var(--accent-start); font-weight: 800; }
+        .status-done { color: #28a745; background: rgba(40,167,69,0.15); padding: 6px 14px; border-radius: 12px; font-size: 0.8rem; }
+        .status-planned { color: var(--text-sec); border: 1px solid var(--border); padding: 6px 14px; border-radius: 12px; font-size: 0.8rem; }
+        .status-progress { color: #007AFF; background: rgba(0,122,255,0.15); padding: 6px 14px; border-radius: 12px; font-size: 0.8rem; }
+        @media (max-width: 900px) { .roadmap-row { grid-template-columns: 1fr; text-align: left; } }
 
-        /* FAQ */
+        /* === SECTION: FAQ (Gray) === */
+        #faq { background-color: var(--bg-sec); padding: 100px 0 200px; }
         .faq-grid { max-width: 800px; margin: 0 auto; }
-        details.faq-item { margin-bottom: 20px; border: 1px solid var(--border); border-radius: 12px; padding: 20px; background: rgba(255,255,255,0.02); transition: background 0.3s; }
-        details.faq-item:hover { background: rgba(255,255,255,0.04); }
-        summary.faq-question { cursor: pointer; color: #fff; font-weight: 700; font-size: 18px; list-style: none; display: flex; align-items: center; justify-content: space-between; }
-        summary.faq-question::-webkit-details-marker { display: none; }
-        summary.faq-question::after { content: '+'; font-size: 24px; color: var(--accent-start); font-weight: 300; }
+        details.faq-item { margin-bottom: 20px; border: 1px solid var(--border); border-radius: 12px; padding: 20px; background: rgba(255,255,255,0.02); }
+        summary.faq-question { cursor: pointer; color: #fff; font-weight: 700; font-size: 18px; display: flex; justify-content: space-between; }
+        summary.faq-question::after { content: '+'; font-size: 24px; color: var(--accent-start); }
         details[open] summary.faq-question::after { content: '−'; }
-        .faq-answer { margin-top: 15px; color: var(--text-sec); font-size: 15px; line-height: 1.6; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); }
+        .faq-answer { margin-top: 15px; color: var(--text-sec); border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px; }
 
-        /* FOOTER */
-        .footer-cta { min-height: 80vh; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; text-align: center; }
-        .footer-cta .parallax-img { width: 100%; height: 140%; top: -20%; left: 0; position: absolute; object-fit: cover; }
-        .footer-content { position: relative; z-index: 10; max-width: 700px; padding: 0 20px; }
-        .footer-legal { margin-top: 20px; font-size: 12px; color: #666; display: flex; gap: 20px; justify-content: center; }
-        .footer-legal a { color: #666; text-decoration: none; cursor: pointer; }
-        .footer-legal a:hover { color: #999; }
-        
-        .fade-in { opacity: 0; transform: translateY(40px); transition: 0.8s ease; }
-        .fade-in.visible { opacity: 1; transform: translateY(0); }
-
-        /* SEO FOOTER */
-        .seo-footer { padding: 40px 20px; background: #000; color: #444; font-size: 12px; line-height: 1.6; border-top: 1px solid #111; text-align: center; }
-
-        /* ANIM UTILS */
-        .anim-word-wrap { position: relative; display: inline-block; }
-        .base-text { color: #fff; position: relative; z-index: 1; }
-        .grad-layer { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background-size: 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; opacity: 0; z-index: 2; }
-        
-        .g-search-grad { background-image: linear-gradient(90deg, #FF416C, #FF4B2B); }
-        .g-pleasure-grad { background-image: linear-gradient(90deg, #00b09b, #96c93d); }
-        .g-ai-grad { background-image: linear-gradient(90deg, #667eea, #764ba2); } /* New AI Gradient */
-
-        .anim-emoji { position: absolute; top: 0; left: 50%; transform: translate(-50%, 20px); opacity: 0; font-size: 32px; pointer-events: none; z-index: 3; }
-        
-        /* Исправленная анимация прыжка (пониже) */
-        @keyframes emojiJump { 
-            0% { transform: translate(-50%, 20px); opacity: 0; } 
-            10% { transform: translate(-50%, -25px) scale(1.2); opacity: 1; } 
-            25% { transform: translate(-50%, -25px) scale(1.2); opacity: 1; } 
-            35% { transform: translate(-50%, 20px) scale(1); opacity: 0; } 
-            100% { transform: translate(-50%, 20px); opacity: 0; } 
+        /* === FOOTER (12-Col Tetris) === */
+        .footer-cta {
+            background-color: transparent !important;
+            position: relative; overflow: hidden; min-height: 100vh;
+            display: flex; flex-direction: column; justify-content: center; padding-top: 100px;
+            z-index: 1;
         }
+        .footer-bg-wrapper { position: absolute; top: -30%; left: 0; width: 100%; height: 160%; z-index: 0; pointer-events: none; will-change: transform; }
+        .footer-parallax-img { width: 100%; height: 100%; object-fit: cover; }
+        .footer-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); z-index: 1; }
+        .footer-static-fade { position: absolute; top: 0; left: 0; width: 100%; height: 250px; background: linear-gradient(to bottom, #000000 0%, rgba(0,0,0,0) 100%); z-index: 2; pointer-events: none; }
+
+        /* 12-COLUMN GRID */
+        .footer-cta .bento-grid {
+            display: grid; grid-template-columns: repeat(12, 1fr); grid-auto-rows: 200px;
+            gap: 20px; max-width: 1200px !important; width: 100%; margin: 0 auto 60px;
+        }
+        .bento-cell {
+            position: relative; border-radius: 24px; padding: 24px;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(10px); overflow: hidden; display: flex; transition: transform 0.3s;
+        }
+        .bento-cell:hover { transform: translateY(-5px); background: rgba(255,255,255,0.1); z-index: 5; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
+
+        /* Gradients */
+        .bg-wrapped { background: linear-gradient(135deg, rgba(75, 18, 72, 0.6), rgba(240, 194, 123, 0.3)); }
+        .bg-modes { background: linear-gradient(135deg, rgba(15, 32, 39, 0.6), rgba(44, 83, 100, 0.4)); }
+        .bg-privacy { background: linear-gradient(135deg, rgba(19, 78, 94, 0.6), rgba(113, 178, 128, 0.4)); }
+        .bg-browser { background: linear-gradient(135deg, rgba(35, 37, 38, 0.6), rgba(65, 67, 69, 0.4)); }
+        .bg-fetishes { background: linear-gradient(135deg, rgba(255, 65, 108, 0.5), rgba(255, 75, 43, 0.3)); }
+        .bg-swipe { background: linear-gradient(135deg, rgba(142, 45, 226, 0.6), rgba(74, 0, 224, 0.4)); }
+        .bg-ai { background: linear-gradient(135deg, rgba(54, 0, 51, 0.6), rgba(11, 135, 147, 0.4)); }
+        .bg-sync { background: linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(67, 67, 67, 0.4)); }
+        .bg-custom { background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab); background-size: 400%; animation: gradientBG 6s ease infinite; opacity: 0.8; }
+        @keyframes gradientBG { 0% {background-position: 0% 50%} 50% {background-position: 100% 50%} 100% {background-position: 0% 50%} }
+
+        /* Desktop Spans */
+        .col-7 { grid-column: span 7; } .col-6 { grid-column: span 6; } .col-5 { grid-column: span 5; }
+        .col-4 { grid-column: span 4; } .col-3 { grid-column: span 3; } .col-2 { grid-column: span 2; }
+
+        .cell-center { flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .cell-row    { flex-direction: row; align-items: center; justify-content: space-between; text-align: left; }
         
-        /* Исправленная анимация текста (30% времени видимости) */
-        @keyframes textFade { 
-            0% { opacity: 0; } 
-            10% { opacity: 1; } 
-            25% { opacity: 1; } 
-            35% { opacity: 0; } 
-            100% { opacity: 0; } 
-        }
+        .bento-icon-lg { width: 80px; height: 80px; object-fit: contain; flex-shrink: 0; }
+        .bento-icon-sm { width: 50px; height: 50px; object-fit: contain; margin-bottom: 10px; }
+        .bento-icon-xs { width: 40px; height: 40px; object-fit: contain; margin-bottom: 5px; }
         
-        /* Тайминги для 3 элементов (6с цикл) */
-        .visible .anim-search .anim-emoji, .visible .anim-search .grad-layer { 
-            animation: emojiJump 6s linear infinite; 
-            animation-name: emojiJump; 
+        .bento-cell h3 { font-size: 18px; font-weight: 800; line-height: 1.1; margin-bottom: 5px; color: #fff; }
+        .bento-cell p { font-size: 13px; opacity: 0.7; line-height: 1.3; }
+        .col-2 h3, .col-2 .bento-label-bottom { font-size: 11px !important; }
+        .col-2 { padding: 15px; }
+        .bento-badge { background: #fff; color: #000; font-size: 10px; font-weight: 900; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 5px; }
+
+        /* Mobile Footer Grid (12 Cols) */
+        @media (max-width: 900px) {
+            .footer-cta .bento-grid { grid-template-columns: repeat(12, 1fr) !important; grid-auto-rows: auto; max-width: 100%; padding: 0 10px; gap: 10px; }
+            .mob-full { grid-column: span 12 !important; min-height: 180px; }
+            .mob-7 { grid-column: span 7 !important; min-height: 150px; }
+            .mob-5 { grid-column: span 5 !important; min-height: 150px; }
+            .bento-icon-lg { width: 60px; height: 60px; }
+            .bento-icon-sm { width: 40px; height: 40px; }
+            .col-2 .bento-icon-xs { width: 35px; height: 35px; }
         }
-        .visible .anim-search .grad-layer { animation-name: textFade; }
 
-        .visible .anim-pleasure .anim-emoji, .visible .anim-pleasure .grad-layer { 
-            animation: emojiJump 6s linear infinite; 
-            animation-delay: 2s; 
-            animation-name: emojiJump;
-        }
-        .visible .anim-pleasure .grad-layer { animation-name: textFade; }
+        .final-action { margin-top: 50px; text-align: center; position: relative; z-index: 10; }
+        .copyright { margin-top: 30px; font-size: 12px; }
+        .btn-huge { padding: 22px 60px; font-size: 20px; box-shadow: 0 0 30px rgba(203, 83, 240, 0.3); }
 
-        .visible .anim-ai .anim-emoji, .visible .anim-ai .grad-layer { 
-            animation: emojiJump 6s linear infinite; 
-            animation-delay: 4s; 
-            animation-name: emojiJump;
-        }
-        .visible .anim-ai .grad-layer { animation-name: textFade; }
-
-        .anim-swipe-title { display: inline-block; transform-origin: bottom center; }
-        .visible .anim-swipe-title { animation: swipeTilt 3s ease-in-out infinite; }
-        @keyframes swipeTilt { 0% { transform: rotate(0deg); } 25% { transform: rotate(-5deg); } 50% { transform: rotate(0deg); } 75% { transform: rotate(5deg); } 100% { transform: rotate(0deg); } }
-        .matrix-text { font-family: var(--font-mono); display: inline-block; min-width: 120px; }
-        .matrix-active { color: #00ff80; text-shadow: 0 0 5px rgba(0,255,128,0.5); }
-        .lock-container { display: flex; align-items: center; gap: 15px; }
-        .lock-icon { width: 40px; height: 40px; object-fit: contain; }
-
-        /* MODALS */
+        /* === MODALS === */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 20000; display: none; justify-content: center; align-items: center; }
         .modal-overlay.open { display: flex; animation: fadeIn 0.3s ease; }
-        .modal { background: var(--bg-sec); width: 90%; max-width: 500px; border-radius: 20px; border: 1px solid var(--border); padding: 30px; text-align: center; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .modal-close { position: absolute; top: 15px; right: 15px; font-size: 24px; cursor: pointer; opacity: 0.7; z-index: 5; }
+        .modal { background: var(--bg-sec); width: 90%; max-width: 500px; border-radius: 20px; border: 1px solid var(--border); padding: 30px; text-align: center; position: relative; }
+        .modal-close { position: absolute; top: 15px; right: 15px; font-size: 24px; cursor: pointer; opacity: 0.7; }
         .modal-scrollable { max-height: 70vh; overflow-y: auto; text-align: left; padding-right: 10px; margin-top: 15px; }
-        .modal-scrollable h4 { color: #fff; margin-top: 20px; margin-bottom: 10px; }
-        .modal-scrollable p, .modal-scrollable li { font-size: 13px; color: var(--text-sec); line-height: 1.6; margin-bottom: 10px; }
-        .modal-scrollable::-webkit-scrollbar { width: 6px; }
-        .modal-scrollable::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
-        .modal-scrollable::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        @media (max-width: 900px) {
-            .hero-grid { grid-template-columns: 1fr; text-align: center; gap: 40px; }
-            .hero-content { align-items: center; }
-            .hero-subtitle-wrapper { justify-content: center; font-size: 18px; }
-            .hero-visual { order: -1; }
-            .hero-logo-img { max-width: 250px; }
-            .feature-row, .feature-row:nth-child(even) { display: flex; flex-direction: column-reverse; gap: 30px; text-align: center; }
-            .pricing-grid { grid-template-columns: 1fr; }
-            .plan-card { margin-bottom: 10px; min-height: auto; }
-            .plan-card.bestie { order: -1; } 
-            .roadmap-row { grid-template-columns: 1fr; gap: 15px; text-align: left; padding: 25px 20px; }
-            .roadmap-date { font-size: 0.9rem; margin-bottom: 5px; }
-            .roadmap-status { justify-self: start; margin-top: 10px; font-size: 0.7rem; }
-            .feature-img-wrapper.privacy-fix { min-height: auto; max-height: 500px; }
-            .text-block-grid, .step-grid { grid-template-columns: 1fr; gap: 30px; }
-        }
-    </style>
+        /* AGE OVERLAY */
+        .age-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 99999; display: none; justify-content: center; align-items: center; padding: 20px; }
+        .age-modal { background: #111; border: 1px solid #333; border-radius: 24px; padding: 40px; max-width: 400px; width: 100%; text-align: center; box-shadow: 0 0 50px rgba(203, 83, 240, 0.15); animation: fadeIn 0.5s ease; }
+        .age-icon { font-size: 48px; margin-bottom: 20px; display: block; }
+        .age-title { font-size: 24px; font-weight: 800; color: #fff; margin-bottom: 10px; }
+        .age-desc { font-size: 14px; color: #888; margin-bottom: 30px; line-height: 1.6; }
+        .age-btn-row { display: flex; flex-direction: column; gap: 15px; }
+        .btn-age-yes { padding: 16px; background: var(--gradient-text); color: #fff; font-weight: 700; border: none; border-radius: 12px; cursor: pointer; font-size: 16px; transition: transform 0.2s; }
+        .btn-age-yes:hover { transform: scale(1.02); }
+        .btn-age-no { padding: 16px; background: transparent; color: #666; font-weight: 600; border: 1px solid #333; border-radius: 12px; cursor: pointer; font-size: 14px; }
+        .btn-age-no:hover { color: #fff; border-color: #555; }
+</style>
+
 </head>
 <body>
 
+    <!-- AGE VERIFICATION MODAL -->
+    <div id="age-overlay" class="age-overlay">
+        <div class="age-modal">
+            <span class="age-icon">🔞</span>
+            <h2 class="age-title" data-i18n="age_title">Adult Content</h2>
+            <p class="age-desc" data-i18n="age_desc">
+                This website contains material restricted to adults. 
+                <br>Are you 18 years of age or older?
+            </p>
+            <div class="age-btn-row">
+                <button class="btn-age-yes" onclick="confirmAge()" data-i18n="btn_yes">Yes, I am 18+</button>
+                <button class="btn-age-no" onclick="exitSite()" data-i18n="btn_no">No, take me back</button>
+            </div>
+        </div>
+    </div>
+
     <!-- NAVBAR -->
-    <nav class="navbar">
-        <a href="#" class="nav-logo">x<span style="color:var(--accent-start)">Fetish</span>Hub</a>
+    <nav class="navbar" id="sticky-nav">
+        <!-- Логотип (картинка) -->
+        <a href="#" class="nav-logo-wrapper" onclick="window.scrollTo({top:0, behavior:'smooth'}); return false;">
+            <img src="hero_logo.png" alt="Logo" class="nav-logo-img"> 
+        </a>
+
+        <!-- Ссылки (скрыты на мобильных) -->
         <div class="nav-links">
+            <a href="#what-is" data-i18n="nav_about">About</a>
             <a href="#features" data-i18n="nav_feat">Features</a>
-            <a href="#how-it-works" data-i18n="nav_how">How It Works</a>
+            <a href="#deep-dive" data-i18n="nav_ai">FetishAI</a>
             <a href="#pricing" data-i18n="nav_price">Pricing</a>
             <a href="#faq" data-i18n="nav_faq">FAQ</a>
         </div>
-        <div class="pc-only" style="width: 100px;"></div>
+
+        <!-- Переключатель языка -->
+        <div class="lang-switcher">
+            <select id="lang-select" onchange="changeLanguage(this.value)" aria-label="Change Language">
+                <option value="en">EN</option>
+                <option value="ru">RU</option>
+                <option value="es">ES</option>
+                <option value="de">DE</option>
+            </select>
+        </div>
     </nav>
 
     <!-- HERO SECTION -->
     <header class="hero">
         <div class="parallax-wrapper">
-            <img src="hero_bg.webp" alt="Abstract dark aesthetic background for xFetishHub" class="parallax-img" id="hero-bg-img" decoding="async" fetchpriority="high">
+            <img src="hero_bg.webp" alt="Background" class="parallax-img" id="hero-bg-img">
             <div class="bg-overlay"></div>
         </div>
 
         <div class="container">
             <div class="hero-grid">
                 <div class="hero-visual">
-                    <img src="hero_logo.png" alt="xFetishHub Application Logo" class="hero-logo-img">
+                    <img src="hero_logo.png" alt="xFetishHub Logo" class="hero-logo-img">
                 </div>
                 <div class="hero-content">
                     <h1 class="brand-title">x<span class="gradient-text">Fetish</span>Hub</h1>
@@ -364,19 +483,15 @@
                         <div class="static-prefix" data-i18n="hero_prefix">Your home for adult</div>
                         <div class="rolling-container">
                             <div class="rolling-list animate-scroll" id="rolling-list">
-                                <span class="rolling-word">preferences</span>
-                                <span class="rolling-word">interests</span>
-                                <span class="rolling-word">genres</span>
-                                <span class="rolling-word">analytics</span>
                             </div>
                         </div>
                     </div>
                     
                     <div class="btn-row">
-                        <a href="app/" class="btn-cta" onclick="markUserActive()" aria-label="Launch xFetishHub App">
+                        <a href="app/" class="btn-cta" onclick="markUserActive()">
                             <span data-i18n="btn_launch">Launch App</span>
                         </a>
-                        <button class="btn-secondary pc-only" onclick="openQRModal()" aria-label="Install on Mobile">
+                        <button class="btn-secondary pc-only" onclick="openQRModal()">
                             📱 <span data-i18n="btn_install">Install on Phone</span>
                         </button>
                     </div>
@@ -384,11 +499,65 @@
             </div>
         </div>
         
-        <div class="scroll-arrow" onclick="document.getElementById('features').scrollIntoView({behavior: 'smooth'})" aria-label="Scroll down"></div>
+        <!-- ПЛАВНЫЙ ФЕЙД ПЕРЕХОД -->
+        <div class="hero-fade-bottom"></div>
     </header>
 
     <!-- MAIN CONTENT -->
     <main>
+        <!-- WHAT IS XFETISHHUB (FINAL DESIGN) -->
+        <section id="what-is" class="bg-main">
+            <div class="container fade-in">
+                <div style="text-align: center; max-width: 900px; margin: 0 auto 60px;">
+                    <h2 style="font-size: clamp(28px, 4vw, 42px); font-weight: 800; line-height: 1.2;">
+                        <span data-i18n="wi_title">Not just a tube site.</span><br>
+                        <span class="gradient-text" data-i18n="wi_subtitle">It's your personal discovery engine.</span>
+                    </h2>
+                </div>
+                
+                <div class="unique-bento-grid">
+                    
+                    <!-- 1. UNDERSTAND (Tall) -->
+                    <div class="glass-card cell-tall">
+                        <div>
+                            <h3 data-i18n="wi_p1_head">Understand</h3>
+                            <p data-i18n="wi_p1_desc">Stop mindless scrolling. We analyze every video you watch to help you understand the root of your desires.</p>
+                        </div>
+                        <!-- Glow Effect -->
+                        <div class="icon-glow-bg"></div>
+                        <!-- PNG Icon (Используем Brain или Eye) -->
+                        <img src="icon_brain.png" alt="Understand" class="bento-img-3d">
+                    </div>
+
+                    <!-- 2. PROTECT (Wide) -->
+                    <div class="glass-card cell-wide">
+                        <div>
+                            <h3 data-i18n="wi_p2_head">Protect</h3>
+                            <p data-i18n="wi_p2_desc">No history tracking, no social logins. Your desires are encrypted.</p>
+                        </div>
+                        <div class="icon-glow-bg"></div>
+                        <!-- PNG Icon (Lock) -->
+                        <img src="icon_lock.png" alt="Privacy" class="bento-img-3d">
+                    </div>
+
+                    <!-- 3. EVOLVE (Wide) -->
+                    <div class="glass-card cell-wide evolve">
+                        <div>
+                            <h3 data-i18n="wi_p3_head">Evolve</h3>
+                            <p data-i18n="wi_p3_desc">From vanilla to niche. The algorithm guides you through 1200+ genres.</p>
+                        </div>
+                        <div class="icon-glow-bg"></div>
+                        <!-- PNG Icon (Compass) -->
+                        <img src="icon_compass.png" alt="Explore" class="bento-img-3d">
+                    </div>
+
+                </div>
+            </div>
+            
+            <!-- Плавный переход: Черный -> Серый (для следующего блока) -->
+            <div class="divider-what-features"></div>
+        </section>
+
         <!-- FEATURES SECTION -->
         <section id="features" class="bg-sec">
             <div class="section-divider divider-hero-feat"></div>
@@ -460,65 +629,60 @@
             <div class="section-divider divider-gray-black"></div>
         </section>
 
-        <!-- HOW IT WORKS -->
-        <section id="how-it-works" class="bg-main">
+        <!-- FETISHAI 1.0 (GOLDEN RATIO + ZIGZAG) -->
+        <section id="deep-dive" class="bg-main bento-section">
             <div class="container fade-in">
-                <div style="text-align: center;">
-                    <h2><span data-i18n="hiw_title">How <span class="gradient-text">It Works</span></span></h2>
-                    <p style="color:var(--text-sec)" data-i18n="hiw_sub">Discovering your hidden interests is simpler than you think.</p>
+                <div style="text-align: center; margin-bottom: 50px;">
+                    <h2><span class="gradient-text" data-i18n="flm_title">FetishAI 1.0</span></h2>
+                    <p style="color:var(--text-sec); font-size:18px; margin-top:10px;" data-i18n="flm_subtitle">Uncensored & Serverless</p>
+                </div>
+                
+                <div class="bento-grid">
+                
+                    <!-- 1. БОЛЬШОЙ (2/3) -->
+                    <div class="bento-cell span-large bg-ai">
+                        <div class="text-area">
+                            <h3 data-i18n="sci_1_head">Personal Engine</h3>
+                            <p data-i18n="sci_1_desc">Unlike generic tube sites, FetishLM creates an echo chamber of your true desires based on micro-interactions.</p>
+                        </div>
+                        <img src="icon_brain.png" class="dd-icon" alt="AI">
+                    </div>
+
+                    <!-- 2. МАЛЕНЬКИЙ (1/3) -->
+                    <div class="bento-cell span-small bg-sync">
+                        <div class="text-area">
+                            <h3 data-i18n="sci_2_head">Encrypted</h3>
+                            <p data-i18n="sci_2_desc">Your interest graph is stored securely.</p>
+                        </div>
+                        <img src="icon_cloud.png" class="dd-icon" alt="Cloud">
+                    </div>
+
+                    <!-- 3. МАЛЕНЬКИЙ (1/3) -->
+                    <div class="bento-cell span-small bg-privacy">
+                        <div class="text-area">
+                            <h3 data-i18n="sci_3_head">Zero Data</h3>
+                            <p data-i18n="sci_3_desc">Built privacy-first. Client-side only logic.</p>
+                        </div>
+                        <img src="icon_lock.png" class="dd-icon" alt="Lock">
+                    </div>
+
+                    <!-- 4. БОЛЬШОЙ (2/3) -->
+                    <div class="bento-cell span-large bg-browser">
+                        <div class="text-area">
+                            <h3 data-i18n="sci_4_head">Works Everywhere</h3>
+                            <p data-i18n="sci_4_desc">Seamless on iPhone, Android, or PC. Install as a PWA for a full-screen native experience.</p>
+                        </div>
+                        <img src="icon_globe.png" class="dd-icon" alt="Globe">
+                    </div>
+
                 </div>
 
-                <div class="step-grid">
-                    <div class="step-card">
-                        <div class="step-num">01</div>
-                        <h3 class="step-title" data-i18n="step1_title">Choose Your Path</h3>
-                        <p class="step-desc" data-i18n="step1_desc">Select 'Explore', 'Pleasure' or tell the AI Agent what you desire. Then simply Swipe.</p>
-                    </div>
-                    <div class="step-card">
-                        <div class="step-num">02</div>
-                        <h3 class="step-title" data-i18n="step2_title">Algorithm Learns</h3>
-                        <p class="step-desc" data-i18n="step2_desc">Our machine learning model analyzes the visual patterns of your likes and dislikes. It builds a unique anonymous profile of your preferences.</p>
-                    </div>
-                    <div class="step-card">
-                        <div class="step-num">03</div>
-                        <h3 class="step-title" data-i18n="step3_title">Get Statistics</h3>
-                        <p class="step-desc" data-i18n="step3_desc">After a few sessions, open your Profile to see detailed charts. Maybe you will discover a completely new side of yourself.</p>
-                    </div>
-                </div>
             </div>
             <div class="section-divider divider-black-gray"></div>
         </section>
 
-        <!-- FETISHLM 1.0 (Former Science) -->
-        <section id="deep-dive" class="bg-sec">
-            <div class="container fade-in">
-                <div style="text-align: center; margin-bottom: 40px;">
-                    <h2><span class="gradient-text" data-i18n="flm_title">FetishLM 1.0</span></h2>
-                    <p style="color:var(--text-sec); font-size:18px; margin-top:10px;" data-i18n="flm_subtitle">Uncensored & Serverless</p>
-                </div>
-                
-                <div class="text-block-grid">
-                    <div class="text-content">
-                        <h3 data-i18n="sci_1_head">Better than Tube Systems</h3>
-                        <p data-i18n="sci_1_desc">Most adult websites use basic algorithms that only show you what is popular globally. FetishLM creates an echo chamber of your true desires. It functions as a <strong>personal discovery engine</strong>, tracking micro-interactions to build a complex map of your interests.</p>
-                        
-                        <h3 data-i18n="sci_2_head">Local & Private Storage</h3>
-                        <p data-i18n="sci_2_desc">Your 'interest graph' and viewing history are stored locally on your device or in an encrypted cloud container if you choose to sync. We do not sell your data. Your secrets stay on your device.</p>
-                    </div>
-                    <div class="text-content">
-                        <h3 data-i18n="sci_3_head">No Data Collection</h3>
-                        <p data-i18n="sci_3_desc">Unlike big corporations, xFetishHub is built with privacy first. We don't need your personal data to provide recommendations. The AI runs on the client-side logic, ensuring maximum anonymity.</p>
-                        
-                        <h3 data-i18n="sci_4_head">Works on Any Device</h3>
-                        <p data-i18n="sci_4_desc">Whether you are on iPhone, Android, or PC, xFetishHub works seamlessly. Install it as a PWA app directly from the browser for a full-screen experience that doesn't clutter your main history.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="section-divider divider-gray-black"></div>
-        </section>
-
         <!-- PRICING SECTION -->
-        <section id="pricing" class="bg-main">
+        <section id="pricing" class="bg-sec">
             <div class="container">
                 <div style="text-align: center; margin-bottom: 60px;" class="fade-in">
                     <h2 data-i18n="price_title">What is the price of pleasure?</h2>
@@ -571,11 +735,11 @@
                     </div>
                 </div>
             </div>
-            <div class="section-divider divider-black-gray"></div>
+            <div class="section-divider divider-gray-black"></div>
         </section>
 
         <!-- ROADMAP -->
-        <section id="roadmap" class="bg-sec">
+        <section id="roadmap" class="bg-main">
             <div class="container">
                 <div style="text-align: center; margin-bottom: 20px;" class="fade-in">
                     <h2 data-i18n="map_title">Future <span class="gradient-text">Plans</span></h2>
@@ -594,11 +758,11 @@
                     </div>
                 </div>
             </div>
-            <div class="section-divider divider-map-foot"></div>
+            <div class="section-divider divider-black-gray"></div>
         </section>
 
         <!-- FAQ -->
-        <section id="faq" class="bg-main">
+        <section id="faq" class="bg-sec">
             <div class="container fade-in">
                 <div style="text-align: center; margin-bottom: 40px;">
                     <h2><span data-i18n="faq_title">Frequently Asked <span class="gradient-text">Questions</span></span></h2>
@@ -626,39 +790,108 @@
                     </details>
                 </div>
             </div>
+            <div class="section-divider divider-faq-footer" style="bottom: 0;"></div>
         </section>
     </main>
 
-    <!-- FOOTER CTA -->
-    <footer class="footer-cta">
-        <div class="parallax-wrapper">
-            <img src="footer_bg.webp" alt="Abstract background" loading="lazy" class="parallax-img" id="footer-bg-img">
-            <div class="bg-overlay"></div>
-        </div>
+    <footer class="footer-cta bento-section">
         
-        <div class="footer-content fade-in">
-            <h2 style="font-size: 3rem; margin-bottom: 20px;" data-i18n="footer_head">Ready to start?</h2>
-            <p style="color: #ccc; margin-bottom: 40px; font-size: 1.2rem;" data-i18n="footer_desc">Join anonymously and discover your true nature.</p>
-            <div class="btn-row" style="justify-content:center;">
-                <a href="app/" class="btn-cta" onclick="markUserActive()" aria-label="Start using xFetishHub">
+        <!-- Background + Overlay -->
+        <div class="footer-bg-wrapper">
+            <img src="footer_bg.webp" alt="Background" class="footer-parallax-img" id="footer-bg-img">
+            <div class="footer-overlay"></div>
+        </div>
+
+        <!-- Black Fade Top -->
+        <div class="footer-static-fade"></div>
+
+        <div class="container fade-in" style="z-index: 10; position: relative;">
+            <div style="text-align: center; margin-bottom: 50px;">
+                <h2 style="font-size: 3.5rem; margin-bottom: 10px; font-weight: 900;" data-i18n="footer_head">Ready to explore?</h2>
+                <p style="color: rgba(255,255,255,0.7); font-size: 1.2rem;" data-i18n="footer_sub">Everything you need in one secure place.</p>
+            </div>
+
+            <div class="bento-grid">
+                
+                <!-- РЯД 1 -->
+                <div class="bento-cell col-7 mob-full bg-wrapped cell-row">
+                    <div style="max-width: 60%;">
+                        <span class="bento-badge">WEEKLY</span>
+                        <h3 data-i18n="bn_wrapped">Fetish Wrapped</h3>
+                        <p data-i18n="bn_wrapped_desc">Your personal stats</p>
+                    </div>
+                    <img src="icon_gift.png" class="bento-icon-lg" alt="Wrapped">
+                </div>
+
+                <div class="bento-cell col-3 mob-5 bg-modes cell-center">
+                    <img src="icon_compass.png" class="bento-icon-sm" alt="Modes">
+                    <h3 data-i18n="bn_modes">3 Modes</h3>
+                </div>
+
+                <div class="bento-cell col-2 mob-7 bg-privacy cell-center">
+                    <img src="icon_lock.png" class="bento-icon-xs" alt="Privacy">
+                    <div class="bento-label-bottom" data-i18n="bn_priv">Privacy</div>
+                </div>
+
+                <!-- РЯД 2 -->
+                <div class="bento-cell col-2 mob-5 bg-browser cell-center">
+                    <img src="icon_globe.png" class="bento-icon-xs" alt="Browser">
+                    <div class="bento-label-bottom" data-i18n="bn_browser">Browser</div>
+                </div>
+
+                <div class="bento-cell col-7 mob-7 bg-fetishes cell-row">
+                    <img src="icon_tags.png" class="bento-icon-lg" alt="Tags">
+                    <div style="text-align: right;">
+                        <h3 style="font-size: 24px;">1200+</h3>
+                        <p data-i18n="bn_fetishes">Fetishes</p>
+                    </div>
+                </div>
+
+                <div class="bento-cell col-3 mob-full bg-swipe cell-center">
+                    <div class="hand-anim-wrapper" style="width:40px; height:40px; margin-bottom:5px;">
+                        <img src="icon_hand.png" class="hand-icon" alt="Swipe">
+                    </div>
+                    <div class="bento-label-bottom" data-i18n="bn_swipe">Swipes</div>
+                </div>
+
+                <!-- РЯД 3 -->
+                <div class="bento-cell col-4 mob-7 bg-sync cell-row">
+                     <img src="icon_cloud.png" class="bento-icon-sm" alt="Sync">
+                     <div style="text-align: right;">
+                        <h3 data-i18n="bn_sync">Sync</h3>
+                        <p style="font-size:10px; opacity:0.6;">Backup</p>
+                    </div>
+                </div>
+
+                <div class="bento-cell col-2 mob-5 bg-custom animated-gradient cell-center">
+                    <img src="icon_palette.png" class="bento-icon-xs" alt="Custom">
+                    <div class="bento-label-bottom" data-i18n="bn_custom">UI</div>
+                </div>
+
+                <div class="bento-cell col-6 mob-full bg-ai cell-row">
+                     <div style="max-width: 60%;">
+                        <h3 data-i18n="flm_title">FetishAI 1.0</h3>
+                        <p>Serverless Engine</p>
+                    </div>
+                    <img src="icon_brain.png" class="bento-icon-lg" alt="AI">
+                </div>
+
+            </div>
+
+            <!-- FINAL BUTTON -->
+            <div class="final-action">
+                <a href="app/" class="btn-cta btn-huge" onclick="markUserActive()">
                     <span data-i18n="btn_launch">Start Now</span>
                 </a>
-            </div>
-            
-            <div style="margin-top: 60px; font-size: 12px; opacity: 0.5;">&copy; 2026 xFetishHub.</div>
-            <div class="footer-legal">
-                <a onclick="openModal('privacy-modal')" aria-label="Privacy Policy" data-i18n="link_priv">Privacy Policy</a>
-                <a onclick="openModal('terms-modal')" aria-label="Terms of Service" data-i18n="link_terms">Terms</a>
+                <div class="footer-legal">
+                    <a onclick="openModal('privacy-modal')" data-i18n="link_priv" style="color: rgba(255,255,255,0.5);">Privacy</a>
+                    <span style="color: rgba(255,255,255,0.3);">•</span>
+                    <a onclick="openModal('terms-modal')" data-i18n="link_terms" style="color: rgba(255,255,255,0.5);">Terms</a>
+                </div>
+                <div class="copyright" style="color: rgba(255,255,255,0.3);">&copy; 2026 xFetishHub.</div>
             </div>
         </div>
     </footer>
-
-    <!-- SEO FOOTER -->
-    <div class="seo-footer">
-        <div class="container">
-            <p data-i18n="seo_text">xFetishHub is the world's leading <strong>adult preference tracker</strong> and discovery engine. By combining advanced <strong>porn statistics</strong> with a secure, <strong>private browser</strong> environment, we help users explore their sexuality safely. Our platform supports over 1000+ genres, utilizing machine learning to provide personalized recommendations.</p>
-        </div>
-    </div>
 
     <!-- QR MODAL -->
     <div class="modal-overlay" id="qr-modal" onclick="closeModal(event)">
@@ -716,30 +949,43 @@
     <script>
         const translations = {
             en: {
-                // Nav
-                nav_feat: "Features", nav_how: "How It Works", nav_price: "Pricing", nav_faq: "FAQ",
+                // --- NAV & HERO ---
+                nav_about: "About", nav_feat: "Features", nav_ai: "FetishAI", nav_price: "Pricing", nav_faq: "FAQ",
                 hero_prefix: "Your home for adult",
                 roll_words: ["preferences", "interests", "genres", "dirty things", "data", "discoveries", "pleasures"],
                 btn_launch: "Launch App", btn_install: "Install on Phone",
-                feat_title: "Why <span class='gradient-text'>xFetishHub</span>?",
-                price_title: "What is the price of pleasure?", price_subtitle: "If you want total freedom, here are my terms:",
+
                 
-                // Features
+                // --- WHAT IS XFETISHHUB ---
+                wi_title: "Not just a tube site.",
+                wi_subtitle: "It's your personal discovery engine.",
+                wi_p1_head: "Understand", wi_p1_desc: "Stop mindless scrolling. We analyze what you watch to help you understand what you actually like.",
+                wi_p2_head: "Protect", wi_p2_desc: "Your desires are yours alone. No history tracking, no social logins required, pure anonymity.",
+                wi_p3_head: "Evolve", wi_p3_desc: "From vanilla to niche. Let the algorithm guide you through 1200+ genres you never knew existed.",
+
+                // --- FEATURES ---
+                feat_title: "Why <span class='gradient-text'>xFetishHub</span>?",
                 f1_w1: "Explore", f1_w2: "Pleasure", f1_w3: "AI Agent",
                 f1_desc: "Trust us with your choice of what to watch: we will adapt to your requests and mood 😈",
                 f2_title: "Smart Cards", f2_desc: "The more you use it, the better recommendations await you 😏",
                 f3_prefix: "Adult ", f3_target: "Statistics", f3_desc: "Learn about your favorite genres and see detailed summaries in Wrapped style 🔥",
                 f4_title: "Total Privacy", f4_desc: "Watch videos on your phone in a private browser that doesn't keep history in your main browser 🤫",
-                
-                // FetishLM
-                flm_title: "FetishLM 1.0",
-                flm_subtitle: "Uncensored & Serverless",
-                sci_1_head: "Better than Tube Systems", sci_1_desc: "Most adult websites use basic algorithms that only show you what is popular globally. FetishLM creates an echo chamber of your true desires. It functions as a <strong>personal discovery engine</strong>, tracking micro-interactions to build a complex map of your interests.",
-                sci_2_head: "Local & Private Storage", sci_2_desc: "Your 'interest graph' and viewing history are stored locally on your device or in an encrypted cloud container if you choose to sync. We do not sell your data. Your secrets stay on your device.",
-                sci_3_head: "No Data Collection", sci_3_desc: "Unlike big corporations, xFetishHub is built with privacy first. We don't need your personal data to provide recommendations. The AI runs on the client-side logic, ensuring maximum anonymity.",
-                sci_4_head: "Works on Any Device", sci_4_desc: "Whether you are on iPhone, Android, or PC, xFetishHub works seamlessly. Install it as a PWA app directly from the browser for a full-screen experience that doesn't clutter your main history.",
 
-                // Plans
+                // --- HOW IT WORKS ---
+                hiw_title: "How <span class='gradient-text'>It Works</span>", hiw_sub: "Discovering your hidden interests is simpler than you think.",
+                step1_title: "Choose Your Path", step1_desc: "Select 'Explore', 'Pleasure' or tell the AI Agent what you desire. Then simply Swipe.",
+                step2_title: "Algorithm Learns", step2_desc: "Our machine learning model analyzes the visual patterns of your likes and dislikes. It builds a unique anonymous profile of your preferences.",
+                step3_title: "Get Statistics", step3_desc: "After a few sessions, open your Profile to see detailed charts. Maybe you will discover a completely new side of yourself.",
+
+                // --- FETISHLM (SCIENCE) ---
+                flm_title: "FetishAI 1.0", flm_subtitle: "Uncensored & Serverless",
+                sci_1_head: "Better than Tube Systems", sci_1_desc: "Most adult websites use basic algorithms that only show you what is popular globally. FetishLM creates an echo chamber of your true desires. It functions as a <strong>personal discovery engine</strong>.",
+                sci_2_head: "Local & Private Storage", sci_2_desc: "Your 'interest graph' and viewing history are stored locally on your device or in an encrypted cloud container if you choose to sync. We do not sell your data.",
+                sci_3_head: "No Data Collection", sci_3_desc: "Unlike big corporations, xFetishHub is built with privacy first. We don't need your personal data to provide recommendations. The AI runs on the client-side logic.",
+                sci_4_head: "Works on Any Device", sci_4_desc: "Whether you are on iPhone, Android, or PC, xFetishHub works seamlessly. Install it as a PWA app directly from the browser for a full-screen experience.",
+
+                // --- PRICING ---
+                price_title: "What is the price of pleasure?", price_subtitle: "If you want total freedom, here are my terms:",
                 feat_limit: "🎲 10 Generations / day", feat_wrapped_limited: "🎁 1 Fetish Wrapped / week", feat_stats_basic: "📊 Basic Statistics", feat_no_ads: "🚫 No Ads", feat_privacy_list: "🔒 Total Privacy",
                 per_mo: "/ mo", per_once: "/ once",
                 feat_unlim: "🔥 <b>Unlimited</b> Generations", feat_stats_adv: "📈 Advanced Stats & History", feat_wrapped_unlim: "✨ <b>Unlimited</b> Fetish Wrapped", feat_custom: "🎨 Deep Customization",
@@ -747,7 +993,7 @@
                 feat_lifetime_full: "♾️ <b>Lifetime Access</b>", feat_sponsors: "💎 Listed in 'Sponsors'", badge_limited: "LIMITED OFFER", feat_lifetime: "Lifetime", limit_burn: "🔥 ALMOST GONE", limit_claimed: "claimed",
                 feat_all_beast: "👑 <b>All Beast Features</b>",
 
-                // Roadmap
+                // --- ROADMAP ---
                 map_title: "Future <span class='gradient-text'>Plans</span>",
                 rm_phase_1: "Phase 1: Intelligence", 
                 rm_1_head: "Global Intelligence", rm_1_desc: "Match with similar users & see global trends.",
@@ -759,46 +1005,71 @@
                 st_progress: "In Progress", st_plan: "Planned",
                 rm_q1: "Q1 2026", rm_q2: "Q2 2026", rm_q3: "Q3 2026",
 
-                // Footer
-                footer_head: "Ready to start?", footer_desc: "Join anonymously and discover your true nature.",
+                // --- FAQ ---
+                faq_title: "Frequently Asked <span class='gradient-text'>Questions</span>",
+                q1: "Is xFetishHub completely anonymous?", a1: "Yes. We prioritize your privacy above all else. xFetishHub operates as a secure sandbox. Your viewing history and generated statistics are stored in a secure, encrypted cloud environment.",
+                q2: "How does the recommendation algorithm work?", a2: "Think of it as 'Tinder for Adult Content'. Our AI analyzes the metadata of the videos you like versus those you dislike to build a vector profile.",
+                q3: "Does it work on iPhone and Android?", a3: "Absolutely. xFetishHub is optimized for mobile use as a Progressive Web App (PWA).",
+                q4: "Is the content hosted on your servers?", a4: "No. xFetishHub is an intelligent aggregator and analytics tool. We do not host video files.",
+                q5: "What is included in the Free vs Pro plan?", a5: "The Free plan includes basic daily generations. Pro unlocks unlimited AI generations, detailed 'Wrapped' reports, and advanced filtering.",
+
+                // --- BENTO FOOTER CTA ---
+                footer_head: "Ready to explore?", footer_sub: "Everything you need in one secure place.",
+                bn_wrapped: "Fetish Wrapped", bn_wrapped_desc: "Your personal stats",
+                bn_modes: "3 Modes", bn_modes_desc: "Explore, Pleasure, AI",
+                bn_fetishes: "Unique Fetishes",
+                bn_swipe: "Swipes", 
+                bn_custom: "Custom UI",
+                bn_priv: "Total Privacy",
+                bn_browser: "Private Browser",
+                bn_sync: "Cloud Sync",
+                
+                // --- LINKS & MODALS ---
                 link_priv: "Privacy Policy", link_terms: "Terms of Use",
                 qr_title: "Scan to Install", qr_desc: "Open camera on your phone",
-                seo_text: "xFetishHub is the world's leading <strong>adult preference tracker</strong> and discovery engine. By combining advanced <strong>porn statistics</strong> with a secure, <strong>private browser</strong> environment, we help users explore their sexuality safely. Our platform supports over 1000+ genres, utilizing machine learning to provide personalized recommendations.",
-
-                // Sections
-                hiw_title: "How <span class='gradient-text'>It Works</span>", hiw_sub: "Discovering your hidden interests is simpler than you think.",
-                step1_title: "Choose Your Path", step1_desc: "Select 'Explore', 'Pleasure' or tell the AI Agent what you desire. Then simply Swipe.",
-                step2_title: "Algorithm Learns", step2_desc: "Our machine learning model analyzes the visual patterns of your likes and dislikes. It builds a unique anonymous profile of your preferences.",
-                step3_title: "Get Statistics", step3_desc: "After a few sessions, open your Profile to see detailed charts. Maybe you will discover a completely new side of yourself.",
-                
-                faq_title: "Frequently Asked <span class='gradient-text'>Questions</span>",
-                q1: "Is xFetishHub completely anonymous?", a1: "Yes. We prioritize your privacy above all else. xFetishHub operates as a secure sandbox. Your viewing history and generated statistics are stored in a secure, encrypted cloud environment to allow synchronization. When used as a PWA, your session is isolated from your main browser history.",
-                q2: "How does the recommendation algorithm work?", a2: "Think of it as 'Tinder for Adult Content'. Our AI analyzes the metadata of the videos you like versus those you dislike. Over time, it builds a vector profile of your tastes to suggest new genres you might enjoy but haven't discovered yet.",
-                q3: "Does it work on iPhone and Android?", a3: "Absolutely. xFetishHub is optimized for mobile use as a Progressive Web App (PWA). You can install it directly from Safari (iOS) or Chrome (Android) by selecting 'Add to Home Screen'. This creates an app icon that launches in full-screen mode, separate from your main browser history.",
-                q4: "Is the content hosted on your servers?", a4: "No. xFetishHub is an intelligent aggregator and analytics tool. We do not host video files. We provide a smart interface to discover content that is publicly available on major adult networks, acting as a sophisticated search engine for your preferences.",
-                q5: "What is included in the Free vs Pro plan?", a5: "The Free plan includes basic daily generations and privacy features. The Pro plan unlocks unlimited AI generations, detailed 'Wrapped' style history reports, advanced filtering, and deeper customization options for the player interface."
+                age_title: "Adult Content",
+                age_desc: "This website contains material restricted to adults.<br>Are you 18 years of age or older?",
+                btn_yes: "Yes, I am 18+",
+                btn_no: "No, take me back"
             },
+
             ru: {
-                nav_feat: "Возможности", nav_how: "Как это работает", nav_price: "Цены", nav_faq: "Вопросы",
+                // --- NAV & HERO ---
+                nav_about: "О нас", nav_feat: "Возможности", nav_ai: "FetishAI", nav_price: "Цены", nav_faq: "Вопросы",
                 hero_prefix: "Твой дом для взрослых",
                 roll_words: ["предпочтений", "интересов", "жанров", "пошлостей", "данных", "открытий", "наслаждений"],
                 btn_launch: "Запустить", btn_install: "Установить на телефон",
+
+                // --- WHAT IS ---
+                wi_title: "Не просто тьюб сайт.",
+                wi_subtitle: "Это твой поисковик желаний.",
+                wi_p1_head: "Понимай", wi_p1_desc: "Хватит бездумного скроллинга. Мы анализируем просмотры, чтобы ты понял, что тебе реально нравится.",
+                wi_p2_head: "Защищай", wi_p2_desc: "Твои желания только твои. Никакой истории, никаких соцсетей, полная анонимность.",
+                wi_p3_head: "Развивай", wi_p3_desc: "От ванили до ниши. Алгоритм проведет тебя через 1200+ жанров.",
+
+                // --- FEATURES ---
                 feat_title: "Почему <span class='gradient-text'>xFetishHub</span>?",
-                price_title: "Какова цена удовольствия?", price_subtitle: "Если хочешь полную свободу, то вот мои условия:",
                 f1_w1: "Поиск", f1_w2: "Наслаждение", f1_w3: "Скажи сам",
                 f1_desc: "Доверь нам свой выбор что посмотреть: подстроимся под твои запросы и настроение 😈",
                 f2_title: "Умные карточки", f2_desc: "Чем больше ты пользуешься, тем лучше рекомендации тебя ожидают 😏",
                 f3_prefix: "Взрослая ", f3_target: "статистика", f3_desc: "Узнавай о своих любимых жанрах, и смотри детальные сводки в стиле Wrapped 🔥",
                 f4_title: "Полная приватность", f4_desc: "Смотри видео на телефоне в приватном браузере, который не хранит историю в твоём браузере 🤫",
-                
-                // FetishLM
-                flm_title: "FetishLM 1.0",
-                flm_subtitle: "Без цензуры и сервера",
-                sci_1_head: "Лучше системы тьюбов", sci_1_desc: "Обычные тьюбы показывают только то, что популярно у масс. FetishLM — это <strong>персональный поисковик</strong>. Он строит векторную карту твоих интересов, основываясь на микро-реакциях, создавая эхо-камеру твоих истинных желаний.",
-                sci_2_head: "Локальная статистика", sci_2_desc: "Твой «граф интересов» и история хранятся локально на устройстве или в зашифрованном облаке (если включишь синхронизацию). Твои секреты остаются при тебе.",
-                sci_3_head: "Не собирает данные", sci_3_desc: "В отличие от корпораций, мы не продаем данные. ИИ работает на стороне клиента, обеспечивая максимальную анонимность.",
-                sci_4_head: "Работает везде", sci_4_desc: "iPhone, Android или ПК — неважно. Установи как PWA-приложение прямо из браузера для полного погружения без засорения истории основного браузера.",
 
+                // --- HOW IT WORKS ---
+                hiw_title: "Как <span class='gradient-text'>Это Работает</span>", hiw_sub: "Найти свои скрытые интересы проще, чем кажется.",
+                step1_title: "Выбери Свой Путь", step1_desc: "Выбери 'Исследование', 'Наслаждение' или просто скажи ИИ, чего ты хочешь. Дальше просто свайпай.",
+                step2_title: "Алгоритм Учится", step2_desc: "Наша модель машинного обучения анализирует паттерны твоих лайков и дизлайков. Она строит уникальный анонимный профиль предпочтений.",
+                step3_title: "Смотри Статистику", step3_desc: "После пары сессий открой профиль. Возможно, ты откроешь себя с совершенно другой стороны.",
+
+                // --- FETISHLM ---
+                flm_title: "FetishAI 1.0", flm_subtitle: "Без цензуры и сервера",
+                sci_1_head: "Лучше системы тьюбов", sci_1_desc: "Обычные тьюбы показывают только то, что популярно у масс. FetishLM — это <strong>персональный поисковик</strong>.",
+                sci_2_head: "Локальная статистика", sci_2_desc: "Твой «граф интересов» и история хранятся локально на устройстве или в зашифрованном облаке. Твои секреты остаются при тебе.",
+                sci_3_head: "Не собирает данные", sci_3_desc: "В отличие от корпораций, мы не продаем данные. ИИ работает на стороне клиента, обеспечивая максимальную анонимность.",
+                sci_4_head: "Работает везде", sci_4_desc: "iPhone, Android или ПК — неважно. Установи как PWA-приложение прямо из браузера.",
+
+                // --- PRICING ---
+                price_title: "Какова цена удовольствия?", price_subtitle: "Если хочешь полную свободу, то вот мои условия:",
                 feat_limit: "🎲 10 Генераций / день", feat_wrapped_limited: "🎁 1 Fetish Wrapped / неделю", feat_stats_basic: "📊 Базовая статистика", feat_no_ads: "🚫 Без рекламы", feat_privacy_list: "🔒 Полная приватность",
                 per_mo: "/ мес", per_once: "/ раз",
                 feat_unlim: "🔥 <b>Безлимитные</b> генерации", feat_stats_adv: "📈 Расширенные сводки", feat_wrapped_unlim: "✨ <b>Безлимитный</b> Wrapped", feat_custom: "🎨 Кастомизация",
@@ -806,59 +1077,80 @@
                 feat_lifetime_full: "♾️ <b>Доступ навсегда</b>", feat_sponsors: "💎 В списке Спонсоров", badge_limited: "ОГРАНИЧЕНО", feat_lifetime: "Навсегда", limit_burn: "🔥 СКОРО РАЗБЕРУТ", limit_claimed: "забрали",
                 feat_all_beast: "👑 <b>Все функции Beast</b>",
 
+                // --- ROADMAP ---
                 map_title: "Планы <span class='gradient-text'>Развития</span>",
-                rm_phase_1: "Этап 1: Интеллект", 
-                rm_1_head: "Глобальный Разум", rm_1_desc: "Подбор фетишей, которые нравятся людям, похожим на вас, и глобальная статистика лучших и хайповых фетишей 🔥.",
-                rm_phase_2: "Этап 2: Связь", 
-                rm_2_head: "Совместный Режим", rm_2_desc: "Подключай партнёра или друзей к своей сессии и вместе готовьте планы на вечер 😈.",
-                rm_phase_3: "Этап 3: Экспансия", 
-                rm_3_head: "Расширение базы данных", rm_3_desc: "Каждый микрофетиш в микронише, больше не будет повода переживать, что что-то пропустишь 😏.",
-                rm_actors_head: "Режим с актёрами", rm_actors_desc: "На основе своих предпочтений находи актёров, которые смогут реализовать твои фантазии ☺️.",
+                rm_phase_1: "Этап 1: Интеллект", rm_1_head: "Глобальный Разум", rm_1_desc: "Подбор фетишей похожих людей и глобальные тренды.",
+                rm_phase_2: "Этап 2: Связь", rm_2_head: "Совместный Режим", rm_2_desc: "Подключай партнёра, чтобы вместе готовить планы на вечер.",
+                rm_phase_3: "Этап 3: Экспансия", rm_3_head: "Расширение базы данных", rm_3_desc: "Каждый микрофетиш в микронише.",
+                rm_actors_head: "Режим с актёрами", rm_actors_desc: "Поиск актёров, которые реализуют твои фантазии.",
                 st_progress: "В работе", st_plan: "В планах",
                 rm_q1: "Q1 2026", rm_q2: "Q2 2026", rm_q3: "Q3 2026",
 
-                footer_head: "Готов начать?", footer_desc: "Присоединяйся анонимно и узнай себя.",
+                // --- FAQ ---
+                faq_title: "Частые <span class='gradient-text'>Вопросы</span>",
+                q1: "xFetishHub полностью анонимен?", a1: "Да. Приватность — наш приоритет. История просмотров и статистика хранятся в зашифрованном облаке. Мы не связываем эти данные с твоей реальной личностью.",
+                q2: "Как работают рекомендации?", a2: "Как «Tinder для взрослых». ИИ анализирует метаданные видео, которые ты лайкаешь или дизлайкаешь.",
+                q3: "Работает ли на iPhone и Android?", a3: "Конечно. Приложение оптимизировано как PWA. Ты можешь установить его прямо из браузера.",
+                q4: "Контент хранится у вас?", a4: "Нет. xFetishHub — это умный агрегатор. Мы предоставляем интерфейс для поиска контента, публично доступного в сети.",
+                q5: "В чем разница Free и Pro?", a5: "Free включает базовые генерации и приватность. Pro открывает безлимит, детальные отчеты «Wrapped» и фильтры.",
+
+                // --- BENTO FOOTER CTA ---
+                footer_head: "Готов начать?", footer_sub: "Всё что нужно в одном безопасном месте.",
+                bn_wrapped: "Fetish Wrapped", bn_wrapped_desc: "Твоя статистика",
+                bn_modes: "3 Режима", bn_modes_desc: "Поиск, Наслаждение, AI",
+                bn_fetishes: "Уникальных Фетишей",
+                bn_swipe: "Свайпы", 
+                bn_custom: "Кастомизация",
+                bn_priv: "Приватность",
+                bn_browser: "Браузер внутри",
+                bn_sync: "Облако",
+
+                // --- LINKS ---
                 link_priv: "Политика конфиденциальности", link_terms: "Условия использования",
                 qr_title: "Сканируйте для установки", qr_desc: "Откройте камеру на телефоне",
-                seo_text: "xFetishHub — ведущий мировой <strong>трекер предпочтений</strong> и поисковая система для взрослых. Сочетая продвинутую <strong>порно-статистику</strong> с защищенным <strong>приватным браузером</strong>, мы помогаем пользователям безопасно исследовать свою сексуальность. Платформа поддерживает более 1000+ жанров, используя машинное обучение для персональных рекомендаций.",
-
-                hiw_title: "Как <span class='gradient-text'>Это Работает</span>", hiw_sub: "Найти свои скрытые интересы проще, чем кажется.",
-                step1_title: "Выбери Свой Путь", step1_desc: "Выбери 'Исследование', 'Наслаждение' или просто скажи ИИ, чего ты хочешь. Дальше просто свайпай.",
-                step2_title: "Алгоритм Учится", step2_desc: "Наша модель машинного обучения анализирует паттерны твоих лайков и дизлайков. Она строит уникальный анонимный профиль предпочтений.",
-                step3_title: "Смотри Статистику", step3_desc: "После пары сессий открой профиль. Возможно, ты откроешь себя с совершенно другой стороны.",
-
-                faq_title: "Частые <span class='gradient-text'>Вопросы</span>",
-                q1: "xFetishHub полностью анонимен?", a1: "Да. Приватность — наш приоритет. История просмотров и статистика хранятся в зашифрованном облаке для синхронизации. Мы не связываем эти данные с твоей реальной личностью или аккаунтом Google. В PWA режиме история браузера не сохраняется.",
-                q2: "Как работают рекомендации?", a2: "Как «Tinder для взрослых». ИИ анализирует метаданные видео, которые ты лайкаешь или дизлайкаешь. Со временем он строит профиль вкусов, чтобы предлагать новые жанры.",
-                q3: "Работает ли на iPhone и Android?", a3: "Конечно. Приложение оптимизировано как PWA. Ты можешь установить его из Safari (iOS) или Chrome (Android) через кнопку «На экран домой».",
-                q4: "Контент хранится у вас?", a4: "Нет. xFetishHub — это умный агрегатор и аналитический инструмент. Мы не хостим видео. Мы предоставляем интерфейс для поиска контента, публично доступного в сети.",
-                q5: "В чем разница Free и Pro?", a5: "Free включает базовые генерации и приватность. Pro открывает безлимит, детальные отчеты «Wrapped», фильтры и глубокую кастомизацию плеера."
+                age_title: "Контент 18+",
+                age_desc: "Этот сайт содержит материалы для взрослых.<br>Вам уже исполнилось 18 лет?",
+                btn_yes: "Да, мне есть 18",
+                btn_no: "Нет, вернуться назад"
             },
+
             es: {
-                // Nav
-                nav_feat: "Funciones", nav_how: "Cómo funciona", nav_price: "Precios", nav_faq: "Preguntas",
+                // --- NAV & HERO ---
+                nav_about: "Sobre", nav_feat: "Funciones", nav_ai: "FetishAI", nav_price: "Precios", nav_faq: "Preguntas",
                 hero_prefix: "Tu hogar para",
                 roll_words: ["preferencias", "intereses", "géneros", "cosas sucias", "datos", "descubrimientos", "placeres"],
                 btn_launch: "Lanzar App", btn_install: "Instalar en Móvil",
+
+                // --- WHAT IS ---
+                wi_title: "No es solo un sitio tube.",
+                wi_subtitle: "Es tu motor de descubrimiento.",
+                wi_p1_head: "Entender", wi_p1_desc: "Deja el scroll sin sentido. Analizamos lo que ves para ayudarte a entender lo que realmente te gusta.",
+                wi_p2_head: "Proteger", wi_p2_desc: "Tus deseos son solo tuyos. Sin historial, sin redes sociales, pura anonimidad.",
+                wi_p3_head: "Evolucionar", wi_p3_desc: "De vainilla a nicho. Deja que el algoritmo te guíe a través de 1200+ géneros.",
+
+                // --- FEATURES ---
                 feat_title: "¿Por qué <span class='gradient-text'>xFetishHub</span>?",
-                price_title: "¿Cuál es el precio del placer?", price_subtitle: "Si quieres libertad total, aquí están mis condiciones:",
-                
-                // Features
                 f1_w1: "Explorar", f1_w2: "Placer", f1_w3: "Dilo tú",
                 f1_desc: "Confíanos tu elección: nos adaptaremos a tus peticiones y estado de ánimo 😈",
                 f2_title: "Tarjetas Inteligentes", f2_desc: "Cuanto más lo usas, mejores recomendaciones te esperan 😏",
                 f3_prefix: "Estadísticas ", f3_target: "Adultas", f3_desc: "Aprende sobre tus géneros favoritos y mira resúmenes detallados al estilo Wrapped 🔥",
                 f4_title: "Privacidad Total", f4_desc: "Mira videos en tu teléfono en un navegador privado que no guarda historial en tu navegador principal 🤫",
-                
-                // FetishLM
-                flm_title: "FetishLM 1.0",
-                flm_subtitle: "Sin censura y sin servidor",
-                sci_1_head: "Mejor que los sitios tube", sci_1_desc: "La mayoría de sitios usan algoritmos básicos. FetishLM funciona como un <strong>motor de descubrimiento personal</strong>, rastreando micro-interacciones para construir un mapa complejo de tus intereses.",
-                sci_2_head: "Almacenamiento Local y Privado", sci_2_desc: "Tu 'gráfico de intereses' e historial se guardan localmente o en una nube encriptada. No vendemos tus datos. Tus secretos se quedan en tu dispositivo.",
-                sci_3_head: "Sin Recopilación de Datos", sci_3_desc: "A diferencia de las grandes corporaciones, xFetishHub está construido con privacidad primero. La IA corre en el lado del cliente.",
-                sci_4_head: "Funciona en Cualquier Dispositivo", sci_4_desc: "iPhone, Android o PC. Instálalo como PWA directamente desde el navegador para una experiencia de pantalla completa.",
 
-                // Plans
+                // --- HOW IT WORKS ---
+                hiw_title: "Cómo <span class='gradient-text'>Funciona</span>", hiw_sub: "Descubrir tus intereses ocultos es más simple de lo que crees.",
+                step1_title: "Elige tu Camino", step1_desc: "Selecciona 'Explorar', 'Placer' o dile a la IA lo que deseas. Luego simplemente desliza.",
+                step2_title: "El Algoritmo Aprende", step2_desc: "Nuestro modelo de aprendizaje automático analiza los patrones visuales de tus gustos.",
+                step3_title: "Obtén Estadísticas", step3_desc: "Después de unas sesiones, abre tu Perfil para ver gráficos detallados.",
+
+                // --- FETISHLM ---
+                flm_title: "FetishAI 1.0", flm_subtitle: "Sin censura y sin servidor",
+                sci_1_head: "Mejor que los sitios tube", sci_1_desc: "FetishLM funciona como un <strong>motor de descubrimiento personal</strong>.",
+                sci_2_head: "Almacenamiento Local y Privado", sci_2_desc: "Tu 'gráfico de intereses' e historial se guardan localmente. No vendemos tus datos.",
+                sci_3_head: "Sin Recopilación de Datos", sci_3_desc: "xFetishHub está construido con privacidad primero. La IA corre en el lado del cliente.",
+                sci_4_head: "Funciona en Cualquier Dispositivo", sci_4_desc: "iPhone, Android o PC. Instálalo como PWA directamente desde el navegador.",
+
+                // --- PRICING ---
+                price_title: "¿Cuál es el precio del placer?", price_subtitle: "Si quieres libertad total, aquí están mis condiciones:",
                 feat_limit: "🎲 10 Generaciones / día", feat_wrapped_limited: "🎁 1 Fetish Wrapped / semana", feat_stats_basic: "📊 Estadísticas básicas", feat_no_ads: "🚫 Sin anuncios", feat_privacy_list: "🔒 Privacidad Total",
                 per_mo: "/ mes", per_once: "/ una vez",
                 feat_unlim: "🔥 Generaciones <b>Ilimitadas</b>", feat_stats_adv: "📈 Estadísticas Avanzadas", feat_wrapped_unlim: "✨ Fetish Wrapped <b>Ilimitado</b>", feat_custom: "🎨 Personalización Profunda",
@@ -866,62 +1158,80 @@
                 feat_lifetime_full: "♾️ <b>Acceso de por vida</b>", feat_sponsors: "💎 En la lista de Patrocinadores", badge_limited: "OFERTA LIMITADA", feat_lifetime: "De por vida", limit_burn: "🔥 CASI AGOTADO", limit_claimed: "reclamados",
                 feat_all_beast: "👑 <b>Todo de Beast</b>",
 
-                // Roadmap
+                // --- ROADMAP ---
                 map_title: "Planes <span class='gradient-text'>Futuros</span>",
-                rm_phase_1: "Fase 1: Inteligencia", 
-                rm_1_head: "Inteligencia Global", rm_1_desc: "Coincidencias con usuarios similares y tendencias globales.",
-                rm_phase_2: "Fase 2: Conexión", 
-                rm_2_head: "Modo Cooperativo", rm_2_desc: "Conecta con tu pareja/amigos para planear la noche.",
-                rm_phase_3: "Fase 3: Expansión", 
-                rm_3_head: "Expansión de Base de Datos", rm_3_desc: "Micro-fetiches en micro-nichos. No te pierdas nada.",
-                rm_actors_head: "Modo Actor", rm_actors_desc: "Encuentra estrellas basadas en preferencias para realizar fantasías.",
+                rm_phase_1: "Fase 1: Inteligencia", rm_1_head: "Inteligencia Global", rm_1_desc: "Coincidencias con usuarios similares y tendencias globales.",
+                rm_phase_2: "Fase 2: Conexión", rm_2_head: "Modo Cooperativo", rm_2_desc: "Conecta con tu pareja/amigos para planear la noche.",
+                rm_phase_3: "Fase 3: Expansión", rm_3_head: "Expansión de Base de Datos", rm_3_desc: "Micro-fetiches en micro-nichos. No te pierdas nada.",
+                rm_actors_head: "Modo Actor", rm_actors_desc: "Encuentra estrellas basadas en preferencias.",
                 st_progress: "En Progreso", st_plan: "Planeado",
                 rm_q1: "T1 2026", rm_q2: "T2 2026", rm_q3: "T3 2026",
 
-                // Footer & SEO
-                footer_head: "¿Listo para empezar?", footer_desc: "Únete anónimamente y descubre tu verdadera naturaleza.",
+                // --- FAQ ---
+                faq_title: "Preguntas <span class='gradient-text'>Frecuentes</span>",
+                q1: "¿Es xFetishHub totalmente anónimo?", a1: "Sí. Priorizamos tu privacidad. Tu historial y estadísticas se guardan encriptados.",
+                q2: "¿Cómo funciona el algoritmo?", a2: "Piénsalo como un 'Tinder para Contenido Adulto'. Nuestra IA analiza los metadatos de los videos que te gustan.",
+                q3: "¿Funciona en iPhone y Android?", a3: "Absolutamente. Está optimizado como PWA. Puedes instalarlo desde Safari (iOS) o Chrome (Android).",
+                q4: "¿El contenido está en sus servidores?", a4: "No. xFetishHub es una herramienta de análisis y agregación. No alojamos archivos de video.",
+                q5: "¿Qué incluye Gratis vs Pro?", a5: "El plan Gratis incluye generaciones diarias básicas. El Pro desbloquea IA ilimitada, informes detallados estilo 'Wrapped', filtros avanzados.",
+
+                // --- BENTO FOOTER CTA ---
+                footer_head: "¿Listo para explorar?", footer_sub: "Todo lo que necesitas en un lugar seguro.",
+                bn_wrapped: "Fetish Wrapped", bn_wrapped_desc: "Tus estadísticas",
+                bn_modes: "3 Modos", bn_modes_desc: "Explorar, Placer, IA",
+                bn_fetishes: "Fetiches Únicos",
+                bn_swipe: "Deslizar", 
+                bn_custom: "Interfaz UI",
+                bn_priv: "Privacidad",
+                bn_browser: "Navegador",
+                bn_sync: "Sincronización",
+
+                // --- LINKS ---
                 link_priv: "Política de Privacidad", link_terms: "Términos de Uso",
                 qr_title: "Escanea para instalar", qr_desc: "Abre la cámara de tu teléfono",
-                seo_text: "xFetishHub es el líder mundial en <strong>rastreo de preferencias adultas</strong>. Combinando <strong>estadísticas porno</strong> avanzadas con un <strong>navegador privado</strong> seguro, ayudamos a los usuarios a explorar su sexualidad de forma segura. Nuestra plataforma soporta más de 1000 géneros utilizando aprendizaje automático para recomendaciones personalizadas.",
-
-                // Sections
-                hiw_title: "Cómo <span class='gradient-text'>Funciona</span>", hiw_sub: "Descubrir tus intereses ocultos es más simple de lo que crees.",
-                step1_title: "Elige tu Camino", step1_desc: "Selecciona 'Explorar', 'Placer' o dile a la IA lo que deseas. Luego simplemente desliza.",
-                step2_title: "El Algoritmo Aprende", step2_desc: "Nuestro modelo de aprendizaje automático analiza los patrones visuales de tus gustos. Construye un perfil anónimo único de tus preferencias.",
-                step3_title: "Obtén Estadísticas", step3_desc: "Después de unas sesiones, abre tu Perfil para ver gráficos detallados. Quizás descubras un lado completamente nuevo de ti mismo.",
-                
-                faq_title: "Preguntas <span class='gradient-text'>Frecuentes</span>",
-                q1: "¿Es xFetishHub totalmente anónimo?", a1: "Sí. Priorizamos tu privacidad. Tu historial y estadísticas se guardan encriptados. Al usar la PWA, tu sesión está aislada del historial de tu navegador principal.",
-                q2: "¿Cómo funciona el algoritmo?", a2: "Piénsalo como un 'Tinder para Contenido Adulto'. Nuestra IA analiza los metadatos de los videos que te gustan. Con el tiempo, construye un perfil para sugerir nuevos géneros.",
-                q3: "¿Funciona en iPhone y Android?", a3: "Absolutamente. Está optimizado como PWA. Puedes instalarlo desde Safari (iOS) o Chrome (Android) seleccionando 'Añadir a Pantalla de Inicio'.",
-                q4: "¿El contenido está en sus servidores?", a4: "No. xFetishHub es una herramienta de análisis y agregación. No alojamos archivos de video. Proporcionamos una interfaz inteligente para descubrir contenido público.",
-                q5: "¿Qué incluye Gratis vs Pro?", a5: "El plan Gratis incluye generaciones diarias básicas. El Pro desbloquea IA ilimitada, informes detallados estilo 'Wrapped', filtros avanzados y personalización profunda."
+                age_title: "Contenido Adulto",
+                age_desc: "Este sitio contiene material restringido a adultos.<br>¿Tienes 18 años o más?",
+                btn_yes: "Sí, tengo 18+",
+                btn_no: "No, salir"
             },
+
             de: {
-                // Nav
-                nav_feat: "Funktionen", nav_how: "Wie es funktioniert", nav_price: "Preise", nav_faq: "FAQ",
+                // --- NAV & HERO ---
+                nav_about: "Über uns", nav_feat: "Funktionen", nav_ai: "FetishAI", nav_price: "Preise", nav_faq: "FAQ",
                 hero_prefix: "Dein Zuhause für",
                 roll_words: ["Vorlieben", "Interessen", "Genres", "schmutzige Dinge", "Daten", "Entdeckungen", "Vergnügen"],
                 btn_launch: "App Starten", btn_install: "Auf Handy installieren",
+
+                // --- WHAT IS ---
+                wi_title: "Nicht nur eine Tube-Seite.",
+                wi_subtitle: "Deine Entdeckungsmaschine.",
+                wi_p1_head: "Verstehen", wi_p1_desc: "Stoppe sinnloses Scrollen. Wir analysieren, was du siehst, damit du verstehst, was du wirklich magst.",
+                wi_p2_head: "Schützen", wi_p2_desc: "Deine Wünsche gehören dir. Kein Verlauf, kein Social Login, pure Anonymität.",
+                wi_p3_head: "Entwickeln", wi_p3_desc: "Von Vanilla bis Nische. Lass dich vom Algorithmus durch 1200+ Genres führen.",
+
+                // --- FEATURES ---
                 feat_title: "Warum <span class='gradient-text'>xFetishHub</span>?",
-                price_title: "Was kostet das Vergnügen?", price_subtitle: "Wenn du totale Freiheit willst, hier sind meine Bedingungen:",
-                
-                // Features
                 f1_w1: "Suche", f1_w2: "Vergnügen", f1_w3: "Sag es selbst",
                 f1_desc: "Vertraue uns deine Wahl an: Wir passen uns deinen Wünschen und deiner Stimmung an 😈",
                 f2_title: "Smart Cards", f2_desc: "Je mehr du es nutzt, desto bessere Empfehlungen erwarten dich 😏",
                 f3_prefix: "Erotik ", f3_target: "Statistik", f3_desc: "Erfahre mehr über deine Lieblingsgenres und sieh dir detaillierte Zusammenfassungen im Wrapped-Stil an 🔥",
                 f4_title: "Totale Privatsphäre", f4_desc: "Schaue Videos auf deinem Handy in einem privaten Browser, der keinen Verlauf in deinem Hauptbrowser speichert 🤫",
-                
-                // FetishLM
-                flm_title: "FetishLM 1.0",
-                flm_subtitle: "Unzensiert & Serverlos",
-                sci_1_head: "Besser als Tube-Systeme", sci_1_desc: "FetishLM fungiert als <strong>persönliche Entdeckungsmaschine</strong>. Indem wir Mikro-Interaktionen verfolgen, erstellen wir eine komplexe Karte deiner Interessen.",
+
+                // --- HOW IT WORKS ---
+                hiw_title: "Wie <span class='gradient-text'>Es Funktioniert</span>", hiw_sub: "Deine versteckten Interessen zu entdecken ist einfacher als du denkst.",
+                step1_title: "Wähle deinen Weg", step1_desc: "Wähle 'Entdecken', 'Vergnügen' oder sag dem KI-Agenten, was du willst. Dann einfach swipen.",
+                step2_title: "Algorithmus Lernt", step2_desc: "Unser maschinelles Lernmodell analysiert die visuellen Muster deiner Likes und Dislikes.",
+                step3_title: "Erhalte Statistiken", step3_desc: "Öffne nach ein paar Sitzungen dein Profil, um detaillierte Diagramme zu sehen.",
+
+                // --- FETISHLM ---
+                flm_title: "FetishAI 1.0", flm_subtitle: "Unzensiert & Serverlos",
+                sci_1_head: "Besser als Tube-Systeme", sci_1_desc: "FetishLM fungiert als <strong>persönliche Entdeckungsmaschine</strong>.",
                 sci_2_head: "Lokaler & Privater Speicher", sci_2_desc: "Dein 'Interessengraph' wird lokal oder verschlüsselt gespeichert. Wir verkaufen keine Daten.",
                 sci_3_head: "Keine Datenerfassung", sci_3_desc: "xFetishHub ist 'Privacy First'. Die KI läuft clientseitig für maximale Anonymität.",
                 sci_4_head: "Funktioniert überall", sci_4_desc: "iPhone, Android oder PC. Installiere es als PWA für ein Vollbild-Erlebnis.",
 
-                // Plans
+                // --- PRICING ---
+                price_title: "Was kostet das Vergnügen?", price_subtitle: "Wenn du totale Freiheit willst, hier sind meine Bedingungen:",
                 feat_limit: "🎲 10 Generierungen / Tag", feat_wrapped_limited: "🎁 1 Fetish Wrapped / Woche", feat_stats_basic: "📊 Basis-Statistiken", feat_no_ads: "🚫 Keine Werbung", feat_privacy_list: "🔒 Totale Privatsphäre",
                 per_mo: "/ Monat", per_once: "/ Einmalig",
                 feat_unlim: "🔥 <b>Unbegrenzte</b> Generierungen", feat_stats_adv: "📈 Erweiterte Statistik & Verlauf", feat_wrapped_unlim: "✨ <b>Unbegrenztes</b> Fetish Wrapped", feat_custom: "🎨 Tiefe Anpassung",
@@ -929,61 +1239,96 @@
                 feat_lifetime_full: "♾️ <b>Lebenslanger Zugriff</b>", feat_sponsors: "💎 In der Sponsorenliste", badge_limited: "BEGRENZTES ANGEBOT", feat_lifetime: "Lifetime", limit_burn: "🔥 FAST WEG", limit_claimed: "beansprucht",
                 feat_all_beast: "👑 <b>Alle Beast-Funktionen</b>",
 
-                // Roadmap
+                // --- ROADMAP ---
                 map_title: "Zukunfts <span class='gradient-text'>pläne</span>",
-                rm_phase_1: "Phase 1: Intelligenz", 
-                rm_1_head: "Globale Intelligenz", rm_1_desc: "Abgleich mit ähnlichen Nutzern & globale Trends.",
-                rm_phase_2: "Phase 2: Verbindung", 
-                rm_2_head: "Koop-Modus", rm_2_desc: "Verbinde dich mit Partnern/Freunden für den Abend.",
-                rm_phase_3: "Phase 3: Expansion", 
-                rm_3_head: "Datenbank-Erweiterung", rm_3_desc: "Mikro-Fetische in Mikro-Nischen. Verpasse nichts.",
+                rm_phase_1: "Phase 1: Intelligenz", rm_1_head: "Globale Intelligenz", rm_1_desc: "Abgleich mit ähnlichen Nutzern & globale Trends.",
+                rm_phase_2: "Phase 2: Verbindung", rm_2_head: "Koop-Modus", rm_2_desc: "Verbinde dich mit Partnern/Freunden für den Abend.",
+                rm_phase_3: "Phase 3: Expansion", rm_3_head: "Datenbank-Erweiterung", rm_3_desc: "Mikro-Fetische in Mikro-Nischen. Verpasse nichts.",
                 rm_actors_head: "Darsteller-Modus", rm_actors_desc: "Finde Stars basierend auf Vorlieben.",
                 st_progress: "In Arbeit", st_plan: "Geplant",
                 rm_q1: "Q1 2026", rm_q2: "Q2 2026", rm_q3: "Q3 2026",
 
-                // Footer & SEO
-                footer_head: "Bereit zu starten?", footer_desc: "Tritt anonym bei und entdecke deine wahre Natur.",
+                // --- FAQ ---
+                faq_title: "Häufige <span class='gradient-text'>Fragen</span>",
+                q1: "Ist xFetishHub völlig anonym?", a1: "Ja. Deine Privatsphäre hat oberste Priorität. Verlauf und Statistiken werden verschlüsselt gespeichert.",
+                q2: "Wie funktioniert der Algorithmus?", a2: "Stell es dir vor wie 'Tinder für Erwachseneninhalte'. Unsere KI analysiert die Metadaten der Videos, die du magst.",
+                q3: "Funktioniert es auf iPhone und Android?", a3: "Absolut. xFetishHub ist als PWA optimiert. Du kannst es direkt aus Safari (iOS) oder Chrome (Android) installieren.",
+                q4: "Werden die Inhalte bei euch gehostet?", a4: "Nein. xFetishHub ist ein intelligentes Analyse-Tool. Wir hosten keine Videodateien.",
+                q5: "Was ist im Free vs Pro Plan enthalten?", a5: "Der Free-Plan enthält grundlegende tägliche Generierungen. Der Pro-Plan schaltet unbegrenzte KI, detaillierte Berichte im 'Wrapped'-Stil frei.",
+
+                // --- BENTO FOOTER CTA ---
+                footer_head: "Bereit zu starten?", footer_sub: "Alles, was du brauchst, an einem sicheren Ort.",
+                bn_wrapped: "Fetish Wrapped", bn_wrapped_desc: "Deine Statistiken",
+                bn_modes: "3 Modi", bn_modes_desc: "Entdecken, Vergnügen, KI",
+                bn_fetishes: "Einzigartige Fetische",
+                bn_swipe: "Swipes", 
+                bn_custom: "Custom UI",
+                bn_priv: "Privatsphäre",
+                bn_browser: "Browser",
+                bn_sync: "Cloud Sync",
+
+                // --- LINKS ---
                 link_priv: "Datenschutz", link_terms: "Nutzungsbedingungen",
                 qr_title: "Zum Installieren scannen", qr_desc: "Öffne die Kamera auf deinem Handy",
-                seo_text: "xFetishHub ist der weltweit führende <strong>Tracker für Erwachsenen-Präferenzen</strong>. Durch die Kombination fortschrittlicher <strong>Pornostatistiken</strong> mit einem sicheren, <strong>privaten Browser</strong> helfen wir Nutzern, ihre Sexualität sicher zu erkunden. Unsere Plattform unterstützt über 1000 Genres und nutzt maschinelles Lernen für personalisierte Empfehlungen.",
-
-                // Sections
-                hiw_title: "Wie <span class='gradient-text'>Es Funktioniert</span>", hiw_sub: "Deine versteckten Interessen zu entdecken ist einfacher als du denkst.",
-                step1_title: "Wähle deinen Weg", step1_desc: "Wähle 'Entdecken', 'Vergnügen' oder sag dem KI-Agenten, was du willst. Dann einfach swipen.",
-                step2_title: "Algorithmus Lernt", step2_desc: "Unser maschinelles Lernmodell analysiert die visuellen Muster deiner Likes und Dislikes. Es erstellt ein einzigartiges anonymes Profil deiner Vorlieben.",
-                step3_title: "Erhalte Statistiken", step3_desc: "Öffne nach ein paar Sitzungen dein Profil, um detaillierte Diagramme zu sehen. Vielleicht entdeckst du eine ganz neue Seite an dir.",
-                
-                faq_title: "Häufige <span class='gradient-text'>Fragen</span>",
-                q1: "Ist xFetishHub völlig anonym?", a1: "Ja. Deine Privatsphäre hat oberste Priorität. Verlauf und Statistiken werden verschlüsselt gespeichert. Bei Nutzung als PWA ist deine Sitzung vom Hauptbrowser-Verlauf isoliert.",
-                q2: "Wie funktioniert der Algorithmus?", a2: "Stell es dir vor wie 'Tinder für Erwachseneninhalte'. Unsere KI analysiert die Metadaten der Videos, die du magst. Mit der Zeit erstellt sie ein Profil, um neue Genres vorzuschlagen.",
-                q3: "Funktioniert es auf iPhone und Android?", a3: "Absolut. xFetishHub ist als PWA optimiert. Du kannst es direkt aus Safari (iOS) oder Chrome (Android) installieren, indem du 'Zum Home-Bildschirm hinzufügen' wählst.",
-                q4: "Werden die Inhalte bei euch gehostet?", a4: "Nein. xFetishHub ist ein intelligentes Analyse-Tool. Wir hosten keine Videodateien. Wir bieten eine intelligente Schnittstelle, um öffentlich verfügbare Inhalte zu entdecken.",
-                q5: "Was ist im Free vs Pro Plan enthalten?", a5: "Der Free-Plan enthält grundlegende tägliche Generierungen. Der Pro-Plan schaltet unbegrenzte KI, detaillierte Berichte im 'Wrapped'-Stil, erweiterte Filter und tiefere Anpassungen frei."
+                age_title: "Inhalt ab 18",
+                age_desc: "Diese Website enthält Material für Erwachsene.<br>Sind Sie 18 Jahre oder älter?",
+                btn_yes: "Ja, ich bin 18+",
+                btn_no: "Nein, zurück"
             }
         };
-        
+
+        document.querySelectorAll('.glass-card').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+
         let currentLang = 'en';
+
         function init() {
-            let lang = navigator.language.slice(0, 2);
+            // 1. Проверяем сохраненный язык, иначе берем системный
+            const savedLang = localStorage.getItem('xfetishhub_lang');
+            let lang = savedLang || navigator.language.slice(0, 2);
+            
             if (!translations[lang]) lang = 'en'; 
             currentLang = lang;
+            
+            // Устанавливаем значение в селекте
+            const langSelect = document.getElementById('lang-select');
+            if(langSelect) langSelect.value = lang;
+
             applyLang(lang);
+            checkAge(); 
+        }
+
+        function changeLanguage(lang) {
+            localStorage.setItem('xfetishhub_lang', lang);
+            location.reload(); // Перезагрузка страницы, как вы просили
         }
         
         function applyLang(lang) {
             const t = translations[lang];
+            
+            // Перевод обычных текстов
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if (t[key]) el.innerHTML = t[key];
             });
             
-            // Rolling words Logic
+            // Rolling words Logic 
             const list = document.getElementById('rolling-list');
             const words = t.roll_words;
             let html = "";
-            let suffix = (lang === 'es' || lang === 'de') ? " (18+)" : ""; 
-            words.forEach(w => { html += `<span class="rolling-word">${w}${suffix}</span>`; });
-            html += `<span class="rolling-word">${words[0]}${suffix}</span>`;
+            
+            // Просто выводим слова без добавления (18+)
+            words.forEach(w => { html += `<span class="rolling-word">${w}</span>`; });
+            // Дублируем первое слово для замыкания цикла
+            html += `<span class="rolling-word">${words[0]}</span>`;
+            
             list.innerHTML = html;
             
             // Matrix Text Logic
@@ -1046,21 +1391,69 @@
         document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
         
         window.addEventListener('scroll', () => {
-            const scrolled = window.scrollY;
+            const navbar = document.getElementById('sticky-nav');
+            const showPoint = window.innerHeight * 0.8; // Показать, когда проскроллили 80% первого экрана
+            
+            if (window.scrollY > showPoint) {
+                navbar.classList.add('visible');
+            } else {
+                navbar.classList.remove('visible');
+            }
+
             const heroImg = document.getElementById('hero-bg-img');
-            if (heroImg) heroImg.style.transform = `translateY(${scrolled * 0.4}px)`;
+            if (heroImg) heroImg.style.transform = `translateY(${window.scrollY * 0.4}px)`;
+            
             const footer = document.querySelector('.footer-cta');
-            const footerImg = document.getElementById('footer-bg-img');
-            if (footer && footerImg) {
+            const footerWrapper = document.querySelector('.footer-bg-wrapper');
+            
+            if (footer && footerWrapper) {
                 const footerTop = footer.offsetTop;
-                const winH = window.innerHeight;
-                if (scrolled + winH > footerTop) {
-                    const distance = (scrolled + winH) - footerTop;
-                    footerImg.style.transform = `translateY(${distance * 0.15}px)`; 
+                const scrollPos = window.scrollY + window.innerHeight;
+                
+                // Если футер хотя бы частично виден
+                if (scrollPos > footerTop) {
+                    // Вычисляем, насколько пикселей мы "заехали" на футер
+                    const distance = scrollPos - footerTop;
+                    
+                    // Двигаем картинку ВНИЗ (противоход скроллу), создавая эффект глубины.
+                    footerWrapper.style.transform = `translate3d(0, ${distance * 0.15}px, 0)`;
                 }
             }
-        });
+            });
         init();
+
+        // --- AGE VERIFICATION LOGIC ---
+        
+        function checkAge() {
+            // Проверяем, есть ли запись в localStorage
+            const isVerified = localStorage.getItem('xfetishhub_age_verified');
+            
+            if (!isVerified) {
+                // Если нет - показываем модалку и блокируем скролл
+                const overlay = document.getElementById('age-overlay');
+                overlay.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function confirmAge() {
+            // Пользователь нажал ДА
+            localStorage.setItem('xfetishhub_age_verified', 'true');
+            
+            // Скрываем модалку с анимацией
+            const overlay = document.getElementById('age-overlay');
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                document.body.style.overflow = ''; // Возвращаем скролл
+            }, 300);
+        }
+
+        function exitSite() {
+            // Пользователь нажал НЕТ - редирект на Google
+            window.location.href = "https://www.google.com";
+        }
+
     </script>
 </body>
 </html>
