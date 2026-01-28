@@ -552,6 +552,24 @@
             border: 1px solid rgba(0, 0, 0, 0.1);
         }
 
+        /* Прозрачный щит-перехватчик */
+        #preview-overlay-shield {
+            display: none; /* Скрыт по умолчанию */
+            position: fixed;
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
+            z-index: 29000; /* Перекрывает всё, кроме плашки Unlock */
+            background: transparent; /* Невидимый */
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Когда активен — блокирует всё */
+        #preview-overlay-shield.active {
+            display: block;
+        }
+
         /* =========================================
         2. MAIN LAYOUT (Sidebar & Content)
         ========================================= */
@@ -5310,6 +5328,152 @@
             flex-shrink: 0;
         }
 
+        /* === BENTO GRID SYSTEM === */
+        .bento-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Две колонки */
+            grid-auto-rows: min-content;    /* Высота по содержимому */
+            gap: 12px;
+            padding-bottom: 20px;
+        }
+
+        /* Базовая карточка Бенто */
+        .bento-box {
+            background: var(--ios-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 16px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+        }
+
+        .bento-box:active {
+            transform: scale(0.98);
+            background: var(--nav-bg);
+        }
+
+        /* --- ТИПЫ БЛОКОВ --- */
+
+        /* 1. Широкий блок (на всю ширину) */
+        .bento-wide {
+            grid-column: span 2;
+        }
+
+        /* 2. Блок подписки (Акцентный) */
+        .bento-sub {
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+            min-height: 100px;
+            justify-content: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Цветовые модификаторы для подписки */
+        .bento-sub.is-free { border-color: var(--border); }
+        .bento-sub.is-pro { border-color: #ff9900; background: linear-gradient(135deg, rgba(255, 153, 0, 0.1), transparent); }
+        .bento-sub.is-beast { border-color: #9b59b6; background: linear-gradient(135deg, rgba(155, 89, 182, 0.1), transparent); }
+        .bento-sub.is-bestie { border-color: #00d2ff; background: linear-gradient(135deg, rgba(0, 210, 255, 0.1), transparent); }
+
+        /* 3. Квадратные статы (Apple Watch style) */
+        .bento-stat {
+            aspect-ratio: 1.1 / 1; /* Почти квадрат */
+            justify-content: space-between;
+        }
+
+        /* --- ВНУТРЕННОСТИ КАРТОЧЕК --- */
+
+        /* Иконка в углу */
+        .bento-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: var(--bg-color); /* Темнее фона карточки */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        /* Заголовок (мелкий) */
+        .bento-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* Значение (большое) */
+        .bento-val {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1;
+            margin-top: auto; /* Прижать к низу, если флекс */
+        }
+
+        /* Профиль (User Identity) */
+        .bento-profile {
+            display: flex;
+            flex-direction: row !important;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+        }
+        .profile-avatar {
+            width: 36px; 
+            height: 36px; 
+            border-radius: 50%; 
+            background: var(--nav-bg); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        /* Кнопка синхронизации */
+        .bento-action {
+            background: var(--accent);
+            color: #000;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 14px;
+            padding: 18px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            border: none;
+            cursor: pointer;
+        }
+        .bento-action:active {
+            transform: scale(0.96);
+            filter: brightness(0.9);
+        }
+
+        /* Кнопки выхода/сброса (мелкие внизу) */
+        .bento-footer-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        .bento-small-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 16px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+        }
+
         /* =========================================
         MACOS STYLE SIDEBAR (DESKTOP ONLY)
         ========================================= */
@@ -6761,66 +6925,92 @@
     </div>
 </div>
 
-<!-- SYNC INFO MODAL -->
+<!-- SYNC INFO MODAL (BENTO GRID VERSION) -->
 <div class="modal-overlay" id="modal-sync-info-overlay" onclick="closeSyncInfoModal(event)">
     <div class="modal">
         <div class="modal-header">
             <span data-key="sync_title">Cloud Storage</span>
             <span onclick="closeSyncInfoModal(null, true)">✕</span>
         </div>
+        
         <div class="modal-body">
             
-            <!-- Email -->
-            <div style="text-align:center; margin-bottom:20px; margin-top:5px;">
-                <span id="sync-email-display" style="color:var(--text-main); font-weight:700; font-size:16px;">...</span>
-            </div>
+            <div class="bento-container">
+                
+                <!-- 1. PROFILE (WIDE) -->
+                <div class="bento-box bento-wide bento-profile">
+                    <div class="profile-avatar">👤</div>
+                    <div style="display:flex; flex-direction:column; overflow:hidden;">
+                        <span style="font-size:10px; color:var(--text-secondary); text-transform:uppercase;">Account ID</span>
+                        <span id="sync-email-display" style="font-weight:700; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">...</span>
+                    </div>
+                </div>
 
-            <!-- Stats Grid -->
-            <div class="sync-stats-grid">
-                <div class="sync-stat-item">
-                    <span class="sync-stat-val" id="cloud-fav-count">...</span>
-                    <span class="sync-stat-label" data-key="favorites_catalog">Liked</span>
+                <!-- 2. SUBSCRIPTION (HERO WIDE) -->
+                <div id="sync-sub-card" class="bento-box bento-wide bento-sub clickable" onclick="closeSyncInfoModal(null, true); openSubModal();">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; width:100%; margin-bottom:5px;">
+                        <div class="bento-label" data-key="lbl_subscription">SUBSCRIPTION</div>
+                        <div style="font-size:18px;">✨</div>
+                    </div>
+                    <div id="sync-sub-value" style="font-size:32px; font-weight:900; letter-spacing:1px; margin-bottom:2px;">FREE</div>
+                    <div id="sync-sub-desc" style="font-size:12px; opacity:0.7;">Tap to upgrade</div>
                 </div>
-                <div class="sync-stat-item">
-                    <span class="sync-stat-val" id="cloud-wl-count">...</span>
-                    <span class="sync-stat-label" data-key="watch_later">Watch Later</span>
-                </div>
-                <div class="sync-stat-item">
-                    <span class="sync-stat-val" id="cloud-explored-count">...</span>
-                    <span class="sync-stat-label" data-key="explored_label">Explored</span>
-                </div>
-                <div class="sync-stat-item">
-                    <span class="sync-stat-val" id="cloud-ban-count">...</span>
-                    <span class="sync-stat-label" data-key="blacklist_catalog">Disliked</span>
-                </div>
-            </div>
 
-            <!-- Sub Card -->
-            <div id="sync-sub-card" class="sync-stat-item full-width clickable" onclick="closeSyncInfoModal(null, true); openSubModal();" style="margin-bottom: 20px; border: 1px solid var(--border);">
-                <span id="sync-sub-value" style="font-weight:900; font-size:24px; letter-spacing: 1px; margin-bottom: 4px;">FREE</span>
-                <div id="sync-sub-desc" style="font-size:12px; color:var(--text-secondary); text-transform: uppercase; font-weight: 600;">
-                    Tap to upgrade
+                <!-- 3. STATS (SQUARES) -->
+                
+                <!-- Liked -->
+                <div class="bento-box bento-stat">
+                    <div class="bento-icon" style="color:#2ecc71; border-color:rgba(46,204,113,0.3);">💚</div>
+                    <div>
+                        <div class="bento-val" id="cloud-fav-count">0</div>
+                        <div class="bento-label" data-key="favorites_catalog">Liked</div>
+                    </div>
                 </div>
-            </div>
 
-            <div style="background:rgba(255,153,0,0.1); border:1px solid rgba(255,153,0,0.3); padding:10px; border-radius:12px; margin-bottom:20px; font-size:12px; color:var(--text-secondary); text-align:center;">
-                <span data-key="sync_tip">Click "Synchronize" to merge Cloud data.</span>
-            </div>
+                <!-- Watch Later -->
+                <div class="bento-box bento-stat">
+                    <div class="bento-icon" style="color:#3498db; border-color:rgba(52,152,219,0.3);">⏰</div>
+                    <div>
+                        <div class="bento-val" id="cloud-wl-count">0</div>
+                        <div class="bento-label" data-key="watch_later">Saved</div>
+                    </div>
+                </div>
 
-            <!-- Buttons -->
-            <div style="display:flex; flex-direction:column; gap:10px;">
-                <button class="btn-gen" onclick="performManualSync()" id="btn-manual-sync" style="background:var(--accent); color:#000;">
+                <!-- Explored -->
+                <div class="bento-box bento-stat">
+                    <div class="bento-icon" style="color:var(--accent); border-color:var(--border);">🔭</div>
+                    <div>
+                        <div class="bento-val" id="cloud-explored-count">0</div>
+                        <div class="bento-label" data-key="explored_label">Explored</div>
+                    </div>
+                </div>
+
+                <!-- Disliked -->
+                <div class="bento-box bento-stat">
+                    <div class="bento-icon" style="color:#e74c3c; border-color:rgba(231,76,60,0.3);">⛔</div>
+                    <div>
+                        <div class="bento-val" id="cloud-ban-count">0</div>
+                        <div class="bento-label" data-key="blacklist_catalog">Ban</div>
+                    </div>
+                </div>
+
+                <!-- 4. ACTION (WIDE BUTTON) -->
+                <button class="bento-box bento-wide bento-action" onclick="performManualSync()" id="btn-manual-sync">
                     <span id="sync-btn-text" data-key="btn_sync">Synchronize Device</span>
                 </button>
-                
-                <button class="btn-gen secondary" onclick="window.logout()" style="border-color:var(--border); color:var(--text-main);">
+
+            </div>
+
+            <!-- Footer Actions -->
+            <div class="bento-footer-actions">
+                <button class="bento-small-btn" onclick="window.logout()">
                     <span data-key="logout_text">Log Out</span>
                 </button>
-
-                <button class="btn-gen secondary" onclick="resetAppHistory()" style="border-color:rgba(231, 76, 60, 0.3); color:var(--highlight-red); margin-top: 10px;">
+                <button class="bento-small-btn" onclick="resetAppHistory()" style="color:var(--highlight-red); border-color:rgba(231,76,60,0.3);">
                     <span data-key="btn_reset">Reset Data</span>
                 </button>
             </div>
+
         </div>
     </div>
 </div>
@@ -7396,9 +7586,12 @@
         // Элементы UI
         const subValue = document.getElementById('sync-sub-value');
         const subDesc = document.getElementById('sync-sub-desc');
-        const subCard = document.getElementById('sync-sub-card');
+        const subCard = document.getElementById('sync-sub-card'); // Это теперь .bento-sub
         
-        // Получаем переводы (проверка на существование langData)
+        // Сброс классов цветов
+        subCard.classList.remove('is-free', 'is-pro', 'is-beast', 'is-bestie');
+
+        // Получаем переводы
         const currentLang = localStorage.getItem('xch_lang') || 'en';
         const t = (window.langData && window.langData[currentLang]) ? window.langData[currentLang] : (window.langData ? window.langData['en'] : {});
 
@@ -7449,27 +7642,17 @@
             const plan = d.subscription || 'free';
             subValue.innerText = plan.toUpperCase();
             
-            // Стили планов
-            if (plan === 'pro') { 
-                subValue.style.color = '#ff9900'; 
-                subCard.style.borderColor = 'rgba(255, 153, 0, 0.5)'; 
-                subCard.style.background = 'linear-gradient(135deg, rgba(255, 153, 0, 0.15) 0%, rgba(255, 153, 0, 0.05) 100%)';
-            }
-            else if (plan === 'beast') { 
-                subValue.style.color = '#9b59b6'; 
-                subCard.style.borderColor = 'rgba(155, 89, 182, 0.5)'; 
-                subCard.style.background = 'linear-gradient(135deg, rgba(155, 89, 182, 0.15) 0%, rgba(155, 89, 182, 0.05) 100%)';
-            }
-            else if (plan === 'bestie') { 
-                subValue.style.color = '#00d2ff'; 
-                subCard.style.borderColor = 'rgba(0, 210, 255, 0.5)';
-                subCard.style.background = 'linear-gradient(135deg, rgba(0, 210, 255, 0.15) 0%, rgba(58, 123, 213, 0.05) 100%)';
-            }
-            else { 
-                subValue.style.color = 'var(--text-main)'; 
-                subCard.style.borderColor = 'var(--border)';
-                subCard.style.background = 'var(--ios-card)';
-            }
+            // Применяем CSS классы вместо инлайн-стилей 
+            if (plan === 'pro') subCard.classList.add('is-pro');
+            else if (plan === 'beast') subCard.classList.add('is-beast');
+            else if (plan === 'bestie') subCard.classList.add('is-bestie');
+            else subCard.classList.add('is-free');
+
+            // Цвет текста значения
+            if (plan === 'pro') subValue.style.color = '#ff9900';
+            else if (plan === 'beast') subValue.style.color = '#9b59b6';
+            else if (plan === 'bestie') subValue.style.color = '#00d2ff';
+            else subValue.style.color = 'var(--text-main)';
 
             // Текст описания
             if (plan === 'free') {
@@ -7495,7 +7678,6 @@
                 }
             }
 
-            // Статистика
             document.getElementById('cloud-fav-count').innerText = d.favorites ? d.favorites.length : 0;
             document.getElementById('cloud-wl-count').innerText = d.watchLater ? d.watchLater.length : 0;
             document.getElementById('cloud-ban-count').innerText = d.blacklist ? d.blacklist.length : 0;
