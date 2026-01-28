@@ -294,14 +294,13 @@
 
         /* === THEME: OLD MONEY (Mahogany & Gold) === */
         body[data-theme="old-money"] {
-            /* Основные цвета: Глубокий махагон и Золото */
             --bg-color: #1a0505;
             --sidebar-bg: #260909;
             --card-bg: #2e0b0b;
-            --nav-bg: #2e0b0b;
+            --nav-bg: #3d0e0e;
             
-            --text-main: #f0e6d2; /* Кремовый/Папирус */
-            --text-secondary: #a38970; /* Приглушенная медь */
+            --text-main: #f0e6d2; /* Папирус */
+            --text-secondary: #a38970; /* Медь */
             
             --accent: #c5a059; /* Старое золото */
             --accent-light: #e6c98c; /* Светлое золото */
@@ -316,28 +315,75 @@
             --modal-bg: rgba(26, 5, 5, 0.95);
         }
 
-        /* Иконки в теме Old Money (Золотой фильтр) */
+        /* 1. ЛОГОТИП (Золотой градиент) */
+        body[data-theme="old-money"] .logo span,
+        body[data-theme="old-money"] .sum-logo-text span.grad {
+            /* Градиент от светлого золота к темному */
+            background: linear-gradient(180deg, #f9f1d8 10%, #c5a059 100%) !important;
+            -webkit-background-clip: text !important;
+            background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            text-shadow: 0 2px 10px rgba(197, 160, 89, 0.2);
+        }
+
+        /* 2. ИКОНКИ В ИНТЕРФЕЙСЕ (Золотой фильтр для меню, настроек и т.д.) */
         body[data-theme="old-money"] .nav-icon-img,
         body[data-theme="old-money"] .settings-icon,
-        body[data-theme="old-money"] .side-icon-img,
-        body[data-theme="old-money"] .ai-icon-img,
-        body[data-theme="old-money"] .voice-icon-img,
         body[data-theme="old-money"] .share-icon-img,
         body[data-theme="old-money"] .ex-card-icon {
-            /* Фильтр для превращения черного/белого в золото (#c5a059) */
+            /* Превращаем белое/черное в золото #c5a059 */
             filter: invert(75%) sepia(26%) saturate(677%) hue-rotate(357deg) brightness(89%) contrast(88%) drop-shadow(0 2px 5px rgba(0,0,0,0.3)) !important;
             opacity: 1;
         }
 
-        /* Активные элементы */
-        body[data-theme="old-money"] .nav-item.active .nav-icon-img {
-            filter: invert(89%) sepia(19%) saturate(886%) hue-rotate(328deg) brightness(98%) contrast(90%) drop-shadow(0 0 8px rgba(197, 160, 89, 0.6)) !important; /* Светлое золото */
+        /* 3. КНОПКИ НА СТАРТОВОМ ЭКРАНЕ (Белые иконки, чтобы не сливались) */
+        body[data-theme="old-money"] .mode-circle-btn .side-icon-img,
+        body[data-theme="old-money"] .mode-circle-btn .ai-icon-img {
+            filter: brightness(0) invert(1) !important; /* Чисто белый */
+            opacity: 1 !important;
+            drop-shadow: 0 2px 4px rgba(0,0,0,0.5) !important;
+        }
+        
+        /* Сами круги кнопок режимов */
+        body[data-theme="old-money"] .mode-circle-btn {
+            border: 1px solid rgba(255,255,255,0.2) !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
         }
 
-        /* Кнопки управления */
+        /* 4. КНОПКИ УПРАВЛЕНИЯ (Tinder-style) - Делаем красивый фон */
         body[data-theme="old-money"] .t-circle-btn {
-            border-color: #5c2424 !important;
-            background: rgba(46, 11, 11, 0.6);
+            background: #260909 !important; /* Темный махагон */
+            border: 1px solid #5c2424 !important;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4) !important;
+        }
+        
+        /* Иконки внутри обычных кнопок (Золотые) */
+        body[data-theme="old-money"] .t-circle-btn .action-icon-img {
+            filter: invert(75%) sepia(26%) saturate(677%) hue-rotate(357deg) brightness(89%) contrast(88%) !important;
+        }
+
+        /* Кнопка WATCH (Центральная) - Выделяем золотом */
+        body[data-theme="old-money"] .t-circle-btn.watch {
+            background: linear-gradient(135deg, #c5a059 0%, #8a6a4b 100%) !important;
+            border: 1px solid #f0e6d2 !important;
+            box-shadow: 0 0 20px rgba(197, 160, 89, 0.4) !important;
+        }
+        
+        /* Иконка внутри Watch (Темная, для контраста) */
+        body[data-theme="old-money"] .t-circle-btn.watch .action-icon-img {
+            filter: brightness(0.2) !important; 
+        }
+
+        /* Активные состояния кнопок (Нажатие) */
+        body[data-theme="old-money"] .t-circle-btn:active,
+        body[data-theme="old-money"] .t-circle-btn.wl.active {
+            background: #f0e6d2 !important; /* Светлый фон */
+            border-color: #fff !important;
+        }
+        /* При нажатии иконка становится темной */
+        body[data-theme="old-money"] .t-circle-btn:active .action-icon-img,
+        body[data-theme="old-money"] .t-circle-btn.wl.active .action-icon-img {
+            filter: brightness(0) !important;
         }
 
         body {
@@ -4953,7 +4999,7 @@
         }
 
         /* --- 9. DEFAULT (Розовый) --- */
-        body:not([data-theme^="blue"]):not([data-theme^="green"]):not([data-theme^="red"]):not([data-theme^="gold"]):not([data-theme^="purple"]):not([data-theme^="orange"]):not([data-theme="noir"]):not([data-theme="rainbow"]) .logo span {
+        body:not([data-theme^="blue"]):not([data-theme^="green"]):not([data-theme^="red"]):not([data-theme^="gold"]):not([data-theme^="purple"]):not([data-theme^="orange"]):not([data-theme="noir"]):not([data-theme="old-money"]) .logo span {
             background: linear-gradient(180deg, #CB53F0 20%, #ff00cc 100%) !important;
             -webkit-background-clip: text !important;
             background-clip: text !important;
@@ -14661,8 +14707,6 @@
         
         document.body.classList.toggle('light-theme', theme.isLight);
         
-        document.body.classList.remove('rainbow-mode');
-        
         const props = ['--bg-color', '--sidebar-bg', '--card-bg', '--nav-bg', '--border', '--ios-card', '--ios-bg', '--card-gradient'];
         props.forEach(p => root.style.removeProperty(p));
         
@@ -14687,7 +14731,7 @@
         if (theme.accent) {
             root.style.setProperty('--accent', theme.accent);
             root.style.setProperty('--accent-light', theme.accentLight || theme.accent);
-        } else if (!theme.isRainbow) {
+        } else {
             updateLink();
         }
 
