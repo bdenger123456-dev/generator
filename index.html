@@ -544,7 +544,19 @@
         .bg-swipe { background: linear-gradient(135deg, rgba(142, 45, 226, 0.6), rgba(74, 0, 224, 0.4)); }
         .bg-ai { background: linear-gradient(135deg, rgba(54, 0, 51, 0.6), rgba(11, 135, 147, 0.4)); }
         .bg-sync { background: linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(67, 67, 67, 0.4)); }
-        .bg-custom { background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab); background-size: 400%; animation: gradientBG 6s ease infinite; opacity: 0.8; }
+        .bg-custom { 
+            background: linear-gradient(-45deg, 
+                rgba(238, 119, 82, 0.1), 
+                rgba(231, 60, 126, 0.1), 
+                rgba(35, 166, 213, 0.1), 
+                rgba(35, 213, 171, 0.1)
+            );
+            background-size: 400% 400%;
+            animation: gradientBG 10s ease infinite; 
+            
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
         @keyframes gradientBG { 0% {background-position: 0% 50%} 50% {background-position: 100% 50%} 100% {background-position: 0% 50%} }
 
         /* Desktop Spans */
@@ -1058,6 +1070,139 @@
             .bento-icon-giant { width: 60px; height: 60px; margin-bottom: 10px; }
         }
 
+        /* === BENTO COLORS REWORKED === */
+
+        /* 1. KEY BLOCKS (Яркие, привлекают внимание) */
+        .bg-wrapped { 
+            background: linear-gradient(135deg, rgba(203, 83, 240, 0.5), rgba(75, 18, 72, 0.4)); 
+            box-shadow: inset 0 0 20px rgba(203, 83, 240, 0.1);
+        }
+        .bg-ai { 
+            background: linear-gradient(135deg, rgba(112, 0, 255, 0.5), rgba(54, 0, 51, 0.4)); 
+            box-shadow: inset 0 0 20px rgba(112, 0, 255, 0.1);
+        }
+        .bg-fetishes { 
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05)); 
+            /* Добавим легкое свечение контента, а не фона */
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        /* 2. FUNCTIONAL BLOCKS (Стекло, средняя важность) */
+        /* Sync, Privacy, Browser, Swipes */
+        .bg-glass-blue { 
+            background: rgba(0, 210, 255, 0.08); /* Очень легкий голубой тинт */
+            border: 1px solid rgba(0, 210, 255, 0.15);
+        }
+        .bg-glass-purple {
+            background: rgba(142, 45, 226, 0.08); /* Очень легкий фиолетовый тинт */
+            border: 1px solid rgba(142, 45, 226, 0.15);
+        }
+
+        /* 3. MINOR BLOCKS (Темные, уходят на задний план) */
+        /* No Ads, Modes, Devices */
+        .bg-dark-dim { 
+            background: rgba(0, 0, 0, 0.6); /* Темнее основного фона */
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .bg-dark-dim img { opacity: 0.7; } /* Чуть приглушаем иконки */
+        .bg-dark-dim h3, .bg-dark-dim .bento-label-bold { color: #aaa; } /* Чуть приглушаем текст */
+
+        /* === TYPOGRAPHY UNIFICATION === */
+        /* Заголовки блоков - Title Case */
+        .bento-cell h3 {
+            text-transform: none; /* Сбрасываем Caps если был */
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+        
+        /* Мелкие подписи - UPPERCASE */
+        .bento-label-bold, .bento-label-bottom {
+            text-transform: uppercase !important;
+            letter-spacing: 1px;
+            font-size: 11px !important;
+            opacity: 0.8;
+        }
+        
+        /* Фикс для "1200+" чтобы смотрелось эпично */
+        .text-giant {
+            background: linear-gradient(to bottom, #ffffff 30%, #666666 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* === FOOTER BUTTONS REFINEMENT === */
+        
+        /* Primary (Launch) - Оставляем яркой */
+        .footer-btn-row .btn-cta {
+            box-shadow: 0 0 40px rgba(203, 83, 240, 0.4);
+        }
+
+        /* Secondary (Install) - Успокаиваем */
+        .footer-btn-row .btn-secondary {
+            background: rgba(255, 255, 255, 0.05) !important; /* Убираем цветной градиент */
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.8);
+            box-shadow: none;
+            backdrop-filter: blur(10px);
+        }
+        .footer-btn-row .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1) !important;
+            border-color: #fff;
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        /* === BENTO COLORS: FINAL REWORK === */
+
+        /* 1. HERO BLOCK (Самый яркий - 1200+) */
+        .bg-hero {
+            background: rgba(255, 255, 255, 0.03); /* Прозрачная база */
+            /* Яркая фиолетовая рамка */
+            border: 1px solid rgba(203, 83, 240, 0.5); 
+            /* Легкое фиолетовое свечение внутри и снаружи */
+            box-shadow: 0 0 20px rgba(112, 0, 255, 0.15), inset 0 0 20px rgba(112, 0, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        /* 2. PREMIUM DARK (Wrapped, AI) */
+        /* Чуть темнее и насыщеннее остальных */
+        .bg-premium-dark {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
+        }
+
+        /* 3. STANDARD GLASS (No Ads, Modes, Sync...) */
+        /* Чистое стекло, нейтральное */
+        .bg-glass-standard {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+        }
+
+        /* === TYPOGRAPHY (ALL CAPS) === */
+        .bento-cell h3, 
+        .bento-cell .bento-label-bold,
+        .bento-cell .bento-label-bottom,
+        .text-label-caps,
+        .text-title-caps {
+            text-transform: uppercase !important;
+            font-weight: 800 !important;
+            letter-spacing: 0.5px;
+        }
+
+        /* Настройки размеров текста */
+        .text-label-caps {
+            font-size: 11px !important;
+            margin-top: 8px;
+            color: rgba(255,255,255,0.6);
+        }
+        .text-title-caps {
+            font-size: 14px !important;
+            margin-top: 5px;
+            color: #fff;
+        }
+
         /* AGE OVERLAY */
         .age-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 99999; display: none; justify-content: center; align-items: center; padding: 20px; }
         .age-modal { background: #111; border: 1px solid #333; border-radius: 24px; padding: 40px; max-width: 400px; width: 100%; text-align: center; box-shadow: 0 0 50px rgba(203, 83, 240, 0.15); animation: fadeIn 0.5s ease; }
@@ -1480,76 +1625,77 @@
 
             <div class="bento-grid">
     
-                <!-- 1. FETISH WRAPPED (ЛЕВЫЙ ВЕРХНИЙ) -->
-                <div class="bento-cell col-3 mob-full row-2 bg-wrapped cell-center-perfect">
-                    <span class="bento-badge" id="cycle-badge" style="position: absolute; top: 20px;">WEEKLY</span>
+                <!-- 1. FETISH WRAPPED -->
+                <div class="bento-cell col-3 mob-full row-2 bg-premium-dark cell-center-perfect">
                     <img src="icon_gift.png" class="bento-icon-xl" alt="Wrapped">
-                    <h3 class="text-huge" data-i18n="bn_wrapped">Fetish Wrapped</h3>
+                    <h3 class="text-huge" style="margin-top: 15px;">FETISH WRAPPED</h3>
+                    
+                    <span class="bento-badge" id="cycle-badge" style="position: absolute; bottom: 20px;">WEEKLY</span>
                 </div>
 
                 <!-- 2. NO ADS -->
-                <div class="bento-cell col-2 mob-6 bg-noads cell-center-perfect">
+                <div class="bento-cell col-2 mob-6 bg-glass-standard cell-center-perfect">
                     <img src="icon_noadds.png" class="bento-icon-sm" alt="No Ads">
-                    <h3 data-i18n="feat_no_ads" class="text-small-bold">No Ads</h3>
+                    <h3 class="text-label-caps" data-i18n="feat_no_ads">NO ADS</h3>
                 </div>
 
                 <!-- 3. 3 MODES -->
-                <div class="bento-cell col-2 mob-6 bg-modes cell-center-perfect">
+                <div class="bento-cell col-2 mob-6 bg-glass-standard cell-center-perfect">
                     <img id="modes-icon-anim" src="icon_discovery.png" class="bento-icon-sm" alt="Modes">
-                    <h3 data-i18n="bn_modes" class="text-small-bold">3 Modes</h3>
+                    <h3 class="text-label-caps" data-i18n="bn_modes">3 MODES</h3>
                 </div>
 
-                <!-- 4. MADE FOR -->
-                <div class="bento-cell col-2 mob-full bg-devices cell-center-perfect">
+                <!-- 4. DEVICES -->
+                <div class="bento-cell col-2 mob-full bg-glass-standard cell-center-perfect">
                     <img src="icon_devices.png" class="bento-icon-sm" style="margin-bottom: 5px;" alt="Devices">
-                    <div id="device-text-anim" class="bento-label-bold">iPhone</div>
+                    <div id="device-text-anim" class="bento-label-bold" style="font-size: 11px; opacity: 0.6;">IPHONE</div>
                 </div>
 
-                <!-- 5. SYNC (ОБЛАКО) -->
-                <div class="bento-cell col-3 mob-full bg-sync cell-center-perfect">
+                <!-- 5. CLOUD SYNC -->
+                <div class="bento-cell col-3 mob-full bg-glass-standard cell-center-perfect">
                     <img src="icon_cloud.png" class="bento-icon-sm" style="margin-bottom: 5px;" alt="Sync">
-                    <h3 data-i18n="bn_sync" style="font-size: 18px; font-weight: 800;">Sync</h3>
+                    <h3 class="text-title-caps" data-i18n="bn_sync">CLOUD SYNC</h3>
                 </div>
 
-                <!-- === РЯД 2 (Desktop) / ПРОДОЛЖЕНИЕ (Mobile) === -->
+                <!-- === РЯД 2 === -->
 
                 <!-- 6. 1200+ FETISHES -->
-                <div class="bento-cell col-6 mob-full bg-fetishes cell-flex-row">
+                <div class="bento-cell col-6 mob-full bg-hero cell-flex-row">
                     <img src="icon_tags.png" class="bento-icon-giant" alt="Tags">
                     <div style="text-align: left;">
-                        <h3 class="text-giant">1200+</h3>
-                        <div class="bento-label-bold" style="font-size: 20px; letter-spacing: 2px; opacity: 0.9;">FETISHES</div>
+                        <h3 class="text-giant" style="font-size: 60px; line-height: 0.9;">1200+</h3>
+                        <div class="bento-label-bold" style="font-size: 20px; opacity: 1; color: #fff;">FETISHES</div>
                     </div>
                 </div>
 
-                <!-- 7. FETISH AI (ПРАВЫЙ НИЖНИЙ) -->
-                <div class="bento-cell col-3 mob-full row-2 bg-ai cell-center-perfect">
+                <!-- 7. FETISH AI -->
+                <div class="bento-cell col-3 mob-full row-2 bg-premium-dark cell-center-perfect">
                     <img src="icon_brain.png" class="bento-icon-xl" alt="AI">
-                    <h3 class="text-huge gradient-text-bento">FetishAI</h3>
+                    <h3 class="text-huge gradient-text-bento" style="margin-top: 15px;">FETISH AI</h3>
                 </div>
 
-                <!-- === РЯД 3 (Desktop) / НИЗ (Mobile) === -->
+                <!-- === РЯД 3 === -->
 
-                <!-- 8. SWIPES (СВАЙПЫ) -->
-                <div class="bento-cell col-3 mob-6 bg-swipe cell-center-perfect">
+                <!-- 8. SWIPES -->
+                <div class="bento-cell col-3 mob-6 bg-glass-standard cell-center-perfect">
                     <img src="icon_hand.png" class="hand-icon-anim" style="margin-bottom: 5px;" alt="Swipe">
-                    <div class="bento-label-bottom" data-i18n="bn_swipe">Swipes</div>
+                    <h3 class="text-title-caps" data-i18n="bn_swipe">SWIPES</h3>
                 </div>
 
-                <!-- 9. PRIVACY (ПРИВАТНОСТЬ) -->
-                <div class="bento-cell col-2 mob-6 bg-privacy cell-center-perfect">
+                <!-- 9. PRIVACY -->
+                <div class="bento-cell col-2 mob-6 bg-glass-standard cell-center-perfect">
                     <img src="lock.apng" class="bento-icon-xs" alt="Privacy">
                     <div class="bento-label-bold" data-i18n="bn_priv">PRIVACY</div>
                 </div>
 
-                <!-- 10. BROWSER (БРАУЗЕР) -->
-                <div class="bento-cell col-2 mob-6 bg-browser cell-center-perfect">
+                <!-- 10. BROWSER -->
+                <div class="bento-cell col-2 mob-6 bg-glass-standard cell-center-perfect">
                     <img src="icon_globe.png" class="bento-icon-xs" alt="Browser">
                     <div class="bento-label-bold" data-i18n="bn_browser">BROWSER</div>
                 </div>
 
-                <!-- 11. UI (КАСТОМИЗАЦИЯ) -->
-                <div class="bento-cell col-2 mob-6 bg-custom animated-gradient cell-center-perfect">
+                <!-- 11. UI (Новый легкий градиент) -->
+                <div class="bento-cell col-2 mob-6 bg-custom cell-center-perfect">
                     <img src="icon_palette.png" class="bento-icon-xs" alt="Custom">
                     <div class="bento-label-bold" data-i18n="bn_custom">UI</div>
                 </div>
@@ -1728,7 +1874,7 @@
                 bn_wrapped: "Fetish Wrapped", bn_wrapped_desc: "Your personal stats",
                 bn_modes: "3 Modes", bn_modes_desc: "Explore, Pleasure, AI",
                 bn_fetishes: "Unique Fetishes",
-                bn_swipe: "Swipes", 
+                bn_swipe: "SWIPES", 
                 bn_custom: "Custom UI",
                 bn_priv: "Total Privacy",
                 bn_browser: "Private Browser",
@@ -1827,7 +1973,7 @@
                 bn_wrapped: "Fetish Wrapped", bn_wrapped_desc: "Твоя статистика",
                 bn_modes: "3 Режима", bn_modes_desc: "Поиск, Наслаждение, AI",
                 bn_fetishes: "Уникальных Фетишей",
-                bn_swipe: "Свайпы", 
+                bn_swipe: "СВАЙПЫ", 
                 bn_custom: "Кастомизация",
                 bn_priv: "Приватность",
                 bn_browser: "Браузер внутри",
@@ -1926,7 +2072,7 @@
                 bn_wrapped: "Fetish Wrapped", bn_wrapped_desc: "Tus estadísticas",
                 bn_modes: "3 Modos", bn_modes_desc: "Explorar, Placer, IA",
                 bn_fetishes: "Fetiches Únicos",
-                bn_swipe: "Deslizar", 
+                bn_swipe: "DESLIZAR", 
                 bn_custom: "Interfaz UI",
                 bn_priv: "Privacidad",
                 bn_browser: "Navegador",
@@ -2025,7 +2171,7 @@
                 bn_wrapped: "Fetish Wrapped", bn_wrapped_desc: "Deine Statistiken",
                 bn_modes: "3 Modi", bn_modes_desc: "Entdecken, Vergnügen, KI",
                 bn_fetishes: "Einzigartige Fetische",
-                bn_swipe: "Swipes", 
+                bn_swipe: "SWIPES", 
                 bn_custom: "Custom UI",
                 bn_priv: "Privatsphäre",
                 bn_browser: "Browser",
