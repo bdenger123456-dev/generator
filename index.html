@@ -101,39 +101,168 @@
 
         /* === BUTTONS === */
         .btn-cta { 
-            padding: 18px 45px; font-size: 16px; font-weight: 800; text-transform: uppercase; color: #fff; 
-            background: var(--gradient-text); border-radius: 50px; 
-            box-shadow: 0 10px 40px rgba(155, 89, 182, 0.4); 
-            transition: transform 0.2s, box-shadow 0.2s; 
-            display: inline-flex; align-items: center; gap: 10px; z-index: 15; border: none; cursor: pointer; 
+            padding: 18px 45px; 
+            font-size: 16px; font-weight: 800; text-transform: uppercase; 
+            color: #ffffff; 
+            
+            /* ПОЛУПРОЗРАЧНЫЙ ГРАДИЕНТ */
+            background: linear-gradient(135deg, rgba(203, 83, 240, 0.4), rgba(112, 0, 255, 0.4)) !important;
+            
+            /* Эффект стекла */
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            
+            /* Рамка и тень */
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(112, 0, 255, 0.3), 
+                        inset 0 0 20px rgba(255, 255, 255, 0.1);
+            
+            border-radius: 50px; 
+            transition: all 0.3s ease;
+            display: inline-flex; align-items: center; gap: 10px; z-index: 15; cursor: pointer;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
-        .btn-cta:hover { transform: scale(1.05); box-shadow: 0 15px 50px rgba(155, 89, 182, 0.6); }
+
+        .btn-cta:hover { 
+            transform: scale(1.05); 
+            /* При наведении делаем градиент ярче (менее прозрачным) */
+            background: linear-gradient(135deg, rgba(203, 83, 240, 0.6), rgba(112, 0, 255, 0.6)) !important;
+            box-shadow: 0 15px 50px rgba(203, 83, 240, 0.6);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
 
         .btn-secondary { 
-            padding: 18px 30px; font-size: 16px; font-weight: 700; text-transform: uppercase; 
-            color: var(--text-main); background: rgba(255,255,255,0.1); 
-            border: 1px solid rgba(255,255,255,0.2); border-radius: 50px; 
-            transition: background 0.2s, transform 0.2s; cursor: pointer; 
-            display: inline-flex; align-items: center; gap: 8px; z-index: 15; 
+            padding: 18px 30px; 
+            font-size: 16px; font-weight: 700; text-transform: uppercase; 
+            color: #ffffff; 
+            
+            /* ПОЛУПРОЗРАЧНЫЙ ГРАДИЕНТ (Голубой/Бирюза) */
+            background: linear-gradient(135deg, rgba(0, 210, 255, 0.15), rgba(58, 123, 213, 0.15));
+            
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            
+            border: 1px solid rgba(0, 210, 255, 0.3); /* Голубая обводка */
+            border-radius: 50px; 
+            
+            transition: all 0.3s ease; 
+            cursor: pointer; 
+            display: inline-flex; align-items: center; gap: 8px; z-index: 15;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
-        .btn-secondary:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); }
+
+        .btn-secondary:hover { 
+            transform: scale(1.05); 
+            /* Ярче при наведении */
+            background: linear-gradient(135deg, rgba(0, 210, 255, 0.3), rgba(58, 123, 213, 0.3));
+            border-color: rgba(0, 210, 255, 0.8);
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.4);
+        }
 
         /* === NAVBAR === */
         .navbar {
             position: fixed; top: 0; left: 0; width: 100%; 
-            padding: 15px 40px; z-index: 1000;
-            display: flex; justify-content: space-between; align-items: center;
-            background: rgba(5,5,5,0.85); backdrop-filter: blur(15px);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            transform: translateY(-100%); transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            /* Увеличиваем высоту, чтобы градиент был плавным */
+            padding: 20px 40px 60px; 
+            z-index: 1000;
+            display: flex; justify-content: space-between; align-items: flex-start; /* Выравнивание по верху */
+            
+            /* Убираем старый фон и рамку */
+            background: transparent !important; 
+            border-bottom: none !important;
+            backdrop-filter: none !important; /* Блюр переносим в псевдо-элемент */
+            
+            transform: translateY(-100%); 
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            
+            pointer-events: none; 
         }
+
         .navbar.visible { transform: translateY(0); }
+        .nav-logo-wrapper, .nav-links, .lang-custom { pointer-events: auto; }
+
+        .navbar::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            
+            /* Темный фон, исчезающий к низу */
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 40%, transparent 100%);
+            
+            /* Само размытие */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            
+            /* Маска, чтобы блюр плавно исчезал, а не обрывался */
+            mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+        }
+
         .nav-logo-img { height: 32px; width: auto; object-fit: contain; }
-        .nav-links { display: flex; gap: 30px; }
+        .nav-links { display: flex; gap: 30px; margin-top: 5px; }
         .nav-links a { font-size: 13px; font-weight: 600; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.5px; }
         .nav-links a:hover { color: #fff; }
-        .lang-switcher select { background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 6px 10px; font-weight: 700; cursor: pointer; outline: none; text-transform: uppercase; }
-        .lang-switcher select option { background: #111; }
+        .lang-custom {
+            position: relative;
+            font-family: var(--font-mono); /* Шрифт моноширинный для стиля */
+            font-weight: 700;
+            font-size: 20px; /* Крупный текст */
+            color: #fff;
+            cursor: pointer;
+            z-index: 1001;
+            user-select: none;
+        }
+        
+        /* Активный язык */
+        .current-lang {
+            display: inline-block;
+            transition: color 0.2s, text-shadow 0.2s;
+        }
+        .current-lang:hover {
+            color: var(--accent-start);
+            text-shadow: 0 0 15px rgba(203, 83, 240, 0.6);
+        }
+
+        /* Выпадающий список (скрыт по умолчанию) */
+        .lang-list {
+            position: absolute;
+            top: 100%;
+            right: 0; /* Выравнивание по правому краю */
+            background: rgba(10,10,10,0.95);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 60px;
+            text-align: center;
+            
+            opacity: 0;
+            transform: translateY(-10px);
+            pointer-events: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* Когда меню открыто */
+        .lang-custom.active .lang-list {
+            opacity: 1;
+            transform: translateY(10px);
+            pointer-events: auto;
+        }
+
+        .lang-list span {
+            font-size: 16px;
+            color: #888;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+        .lang-list span:hover {
+            color: #fff;
+        }
+
         @media (max-width: 768px) { .nav-links { display: none; } .navbar { padding: 15px 20px; } }
 
         /* === HERO === */
@@ -208,6 +337,8 @@
         .icon-glow-bg { position: absolute; width: 180px; height: 180px; border-radius: 50%; filter: blur(60px); opacity: 0.15; z-index: 2; transition: opacity 0.4s; }
         .glass-card:hover .icon-glow-bg { opacity: 0.3; }
 
+
+
         .cell-tall { grid-row: span 2; justify-content: space-between; }
         .cell-tall .bento-img-3d { bottom: -20px; right: -20px; transform: rotate(-10deg); }
         .cell-tall .icon-glow-bg { background: var(--accent-start); bottom: -30px; right: -30px; }
@@ -236,14 +367,19 @@
         .feature-img-wrapper:hover { transform: scale(1.02); }
         .feature-img { width: 100%; height: auto; display: block; }
         .privacy-fix { 
-            display: flex; 
-            justify-content: center; 
+            display: block !important;       /* Убираем flex, возвращаем стандартный блок */
+            padding: 0 !important;           /* Убираем внутренние отступы */
             background: #1a1a1a; 
+            min-height: auto !important;     /* Сбрасываем ограничения высоты */
+            aspect-ratio: auto !important;   /* Убираем фиксацию пропорций */
         }
+        
         .privacy-fix .feature-img {
-            max-height: 100%;
-            object-fit: contain;
-            padding: 20px;
+            width: 100% !important;          /* Растягиваем на всю ширину, как другие */
+            height: auto !important;         /* Высота подстроится под ширину */
+            max-height: none !important;     /* Разрешаем картинке быть высокой */
+            padding: 0 !important;           /* Убираем отступы у самой картинки */
+            object-fit: cover !important;    /* Стандартное заполнение */
         }
         
         @media (max-width: 900px) { .feature-row, .feature-row:nth-child(even) { display: flex; flex-direction: column-reverse; gap: 30px; text-align: center; } }
@@ -313,7 +449,7 @@
         /* === SECTION: PRICING (Gray) === */
         #pricing { background-color: var(--bg-sec); padding: 100px 0 200px; }
         .pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 40px; }
-        .plan-card { background: #0a0a0a; border: 1px solid var(--border); border-radius: 20px; padding: 30px 20px; display: flex; flex-direction: column; position: relative; transition: transform 0.3s; min-height: 380px; }
+        .plan-card { background: #0a0a0a; border: 1px solid var(--border); border-radius: 20px; padding: 30px 20px; display: flex; flex-direction: column; position: relative; transition: transform 0.3s; min-height: 380px; overflow: hidden; }
         .plan-card:hover { transform: translateY(-5px); }
         .plan-title { font-size: 22px; font-weight: 900; text-transform: uppercase; margin-bottom: 5px; }
         .plan-price { font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 20px; }
@@ -375,8 +511,22 @@
 
         /* 12-COLUMN GRID */
         .footer-cta .bento-grid {
-            display: grid; grid-template-columns: repeat(12, 1fr); grid-auto-rows: 200px;
-            gap: 20px; max-width: 1200px !important; width: 100%; margin: 0 auto 60px;
+            display: grid; 
+            grid-template-columns: repeat(12, 1fr); 
+            /* Было 200px, ставим 130px — это существенно уменьшит высоту */
+            grid-auto-rows: 135px; 
+            gap: 15px; 
+            max-width: 1000px !important; 
+            width: 100%; 
+            margin: 0 auto 40px;
+        }
+        .bento-label-bottom {
+            font-size: 18px !important;    /* Крупнее */
+            font-weight: 900 !important;   /* Жирнее */
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: auto;              /* Прижимаем к низу, если flex-col */
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5); /* Чтобы читалось на фоне */
         }
         .bento-cell {
             position: relative; border-radius: 24px; padding: 24px;
@@ -404,10 +554,46 @@
         .cell-center { flex-direction: column; align-items: center; justify-content: center; text-align: center; }
         .cell-row    { flex-direction: row; align-items: center; justify-content: space-between; text-align: left; }
         
-        .bento-icon-lg { width: 80px; height: 80px; object-fit: contain; flex-shrink: 0; }
-        .bento-icon-sm { width: 50px; height: 50px; object-fit: contain; margin-bottom: 10px; }
-        .bento-icon-xs { width: 40px; height: 40px; object-fit: contain; margin-bottom: 5px; }
+        .bento-icon-lg { width: 65px; height: 65px; }
+        .bento-icon-sm { width: 65px; height: 65px; margin-bottom: 5px; }
+        .bento-icon-xs { 
+            width: 55px !important;    
+            height: 55px !important; 
+            margin-bottom: 8px;        /* Отступ до текста */
+            opacity: 1 !important;     /* Убираем прозрачность */
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+        }
         
+        .hand-icon-anim {
+            width: 50px; height: 50px;
+            margin-bottom: 5px;
+            transform-origin: bottom center;
+            animation: swipeHand 1.5s ease-in-out infinite;
+            filter: drop-shadow(0 5px 15px rgba(142, 45, 226, 0.4));
+        }
+
+        @keyframes swipeHand {
+            0% { transform: rotate(-12deg); }
+            50% { transform: rotate(12deg); }
+            100% { transform: rotate(-12deg); }
+        }
+
+        /* 4. Анимация текста в бейджике (Wrapped) */
+        #cycle-badge {
+            display: inline-block;
+            min-width: 60px;
+            text-align: center;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        .badge-fade-out {
+            opacity: 0;
+            transform: translateY(-5px);
+        }
+        .badge-fade-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         .bento-cell h3 { font-size: 18px; font-weight: 800; line-height: 1.1; margin-bottom: 5px; color: #fff; }
         .bento-cell p { font-size: 13px; opacity: 0.7; line-height: 1.3; }
         .col-2 h3, .col-2 .bento-label-bottom { font-size: 11px !important; }
@@ -425,9 +611,188 @@
             .col-2 .bento-icon-xs { width: 35px; height: 35px; }
         }
 
+        @media (max-width: 900px) {
+            .footer-cta .bento-grid { 
+                grid-auto-rows: auto !important; /* Автоматическая высота */
+                gap: 10px;
+            }
+            .mob-full { min-height: 160px; }
+            .mob-7, .mob-5 { min-height: 140px; }
+            
+            /* Чуть уменьшаем шрифт на мобильных, чтобы влезало */
+            .bento-label-bottom { font-size: 15px !important; } 
+        }
+
         .final-action { margin-top: 50px; text-align: center; position: relative; z-index: 10; }
         .copyright { margin-top: 30px; font-size: 12px; }
         .btn-huge { padding: 22px 60px; font-size: 20px; box-shadow: 0 0 30px rgba(203, 83, 240, 0.3); }
+
+        .footer-btn-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-top: 40px;
+            margin-bottom: 80px; /* Отступ от кнопок до черной полосы */
+            flex-wrap: wrap;
+        }
+        
+        /* Делаем кнопку установки чуть крупнее для футера, чтобы сочеталась с Start Now */
+        .footer-btn-row .btn-secondary {
+            padding: 22px 50px !important;  
+            font-size: 20px !important;    
+            font-weight: 800 !important;
+            height: auto; 
+            min-height: 70px;              
+            min-width: 250px;               
+            justify-content: center;
+        }
+
+        .footer-btn-row .btn-cta {
+            padding: 22px 60px !important;
+            font-size: 20px !important;
+            min-height: 70px;
+            min-width: 250px;
+            justify-content: center;
+        }
+
+        /* Адаптив для кнопок футера на мобилках */
+        @media (max-width: 600px) {
+            .footer-btn-row { flex-direction: column; width: 100%; }
+            .footer-btn-row .btn-cta, 
+            .footer-btn-row .btn-secondary {
+                width: 100%;
+                min-width: unset;
+            }
+        }
+
+        /* 3. Черная полоса внизу (Copyright & Legal) */
+        .footer-legal-bar {
+            width: 100%;
+            background: #000000; /* Глубокий черный */
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 25px 40px;
+            display: flex;
+            justify-content: space-between; /* Copyright слева, ссылки справа */
+            align-items: center;
+            position: relative;
+            z-index: 20;
+            margin-top: auto; /* Прижимаем к самому низу контейнера */
+        }
+
+        .legal-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .legal-links a {
+            font-size: 13px;
+            color: var(--text-sec);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+        .legal-links a:hover { color: #fff; }
+        
+        .copyright-text {
+            font-size: 13px;
+            color: #555;
+        }
+
+        /* Адаптив для черной полосы на мобильных */
+        @media (max-width: 768px) {
+            .footer-legal-bar {
+                flex-direction: column-reverse; /* Ссылки сверху, копирайт снизу */
+                gap: 15px;
+                padding: 30px 20px;
+                text-align: center;
+            }
+            .legal-links { gap: 20px; }
+        }
+
+        .glass-card .card-content {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+        }
+
+        /* 1. TALL CARD (Выбирай) - Иконка справа снизу */
+        .cell-tall { 
+            position: relative; 
+        }
+        .cell-tall .bento-img-3d {
+            bottom: -20px; 
+            right: -20px; 
+            transform: rotate(-10deg);
+        }
+        /* Убедимся, что длинный текст не наедет на иконку снизу */
+        .cell-tall .card-content {
+            padding-bottom: 100px; /* Место под иконку */
+        }
+
+
+        /* 2. WIDE CARD 1 (Расслабься) - ИКОНКА СЛЕВА (Зиг-Заг) */
+        .cell-wide.left-icon {
+            flex-direction: row-reverse; /* Разворачиваем контент: иконка слева */
+            align-items: center;
+            text-align: right; /* Текст прижимаем вправо */
+        }
+        .cell-wide.left-icon .bento-img-3d {
+            left: -10px !important; /* Ставим слева */
+            right: auto !important;
+            top: 50%;
+            transform: translateY(-50%) rotate(-10deg);
+        }
+        .cell-wide.left-icon .icon-glow-bg {
+            left: -20px;
+            right: auto;
+            background: #00d2ff; /* Голубое свечение */
+        }
+        .cell-wide.left-icon .card-content {
+            padding-left: 140px; /* Отступ слева под иконку */
+            padding-right: 0;
+        }
+
+
+        /* 3. WIDE CARD 2 (Открывай) - ИКОНКА СПРАВА */
+        .cell-wide.right-icon {
+            flex-direction: row;
+            align-items: center;
+            text-align: left;
+        }
+        .cell-wide.right-icon .card-content {
+            padding-right: 140px; /* Отступ справа под иконку */
+        }
+        .cell-wide.right-icon .icon-glow-bg {
+            background: #CB53F0; /* Фиолетовое свечение */
+        }
+
+
+        @media (max-width: 900px) {
+            .cell-tall .card-content { padding-bottom: 0; }
+            
+            /* На мобилках убираем сложные отступы, иконки просто снизу или сбоку */
+            .cell-wide.left-icon, .cell-wide.right-icon {
+                display: block; /* Сбрасываем flex */
+                text-align: left;
+            }
+            .cell-wide.left-icon .card-content, 
+            .cell-wide.right-icon .card-content {
+                padding: 0;
+                padding-bottom: 20px; /* Место под иконку, если нужно */
+            }
+            /* Иконки на мобилках возвращаем в правый нижний угол или делаем меньше */
+            .cell-wide.left-icon .bento-img-3d {
+                left: auto !important;
+                right: 0 !important;
+                top: auto;
+                bottom: 0;
+                transform: none;
+                width: 90px;
+            }
+        }
 
         /* === MODALS === */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 20000; display: none; justify-content: center; align-items: center; }
@@ -435,6 +800,111 @@
         .modal { background: var(--bg-sec); width: 90%; max-width: 500px; border-radius: 20px; border: 1px solid var(--border); padding: 30px; text-align: center; position: relative; }
         .modal-close { position: absolute; top: 15px; right: 15px; font-size: 24px; cursor: pointer; opacity: 0.7; }
         .modal-scrollable { max-height: 70vh; overflow-y: auto; text-align: left; padding-right: 10px; margin-top: 15px; }
+
+        /* === ADVANCED AURORA GRADIENTS === */
+
+        .aurora-container {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #000; /* Глубокая подложка */
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        /* Общий слой размытия для слияния красок */
+        .aurora-blur-layer {
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            filter: blur(100px); /* Экстремальное размытие для мягкости */
+            opacity: 0.6;
+        }
+
+        /* --- HERO: Фиолетовый / Неон / Синий --- */
+        .hero-aurora .layer-1 {
+            background: conic-gradient(
+                from 0deg,
+                #240046, 
+                #7b2cbf, 
+                #3a0ca3, 
+                #4cc9f0, 
+                #7b2cbf, 
+                #240046
+            );
+            animation: auroraSpin 30s linear infinite;
+            opacity: 0.7;
+        }
+        
+        .hero-aurora .layer-2 {
+            background: radial-gradient(ellipse at center, rgba(203, 83, 240, 0.8), transparent 70%);
+            width: 150%; height: 150%;
+            top: -25%; left: -25%;
+            mix-blend-mode: screen; /* Осветление */
+            animation: auroraPulse 10s ease-in-out infinite alternate;
+        }
+
+        .hero-aurora .layer-3 {
+            background: linear-gradient(120deg, transparent 30%, rgba(76, 201, 240, 0.4) 50%, transparent 70%);
+            width: 200%; height: 200%;
+            top: -50%; left: -50%;
+            mix-blend-mode: overlay;
+            animation: auroraWave 20s ease-in-out infinite;
+        }
+
+
+        /* --- FOOTER: Бирюза / Маджента / Глубина --- */
+        .footer-aurora .layer-1 {
+            background: conic-gradient(
+                from 180deg,
+                #000000,
+                #3a0ca3,
+                #f72585,
+                #00d2ff,
+                #3a0ca3,
+                #000000
+            );
+            animation: auroraSpin 40s linear infinite reverse;
+            opacity: 0.5;
+        }
+
+        .footer-aurora .layer-2 {
+            background: radial-gradient(circle at 50% 50%, rgba(0, 210, 255, 0.4), transparent 60%);
+            width: 120%; height: 120%;
+            top: -10%; left: -10%;
+            mix-blend-mode: color-dodge; /* Яркие блики */
+            animation: auroraPulse 15s ease-in-out infinite alternate;
+        }
+
+        .footer-aurora .layer-3 {
+            background: linear-gradient(to right, transparent, rgba(247, 37, 133, 0.3), transparent);
+            width: 100%; height: 100%;
+            mix-blend-mode: screen;
+            transform: skewY(-20deg);
+            animation: auroraWave 25s ease-in-out infinite alternate;
+        }
+
+        /* --- АНИМАЦИИ --- */
+        
+        /* Вращение цветового круга */
+        @keyframes auroraSpin {
+            0% { transform: rotate(0deg) scale(1.2); }
+            50% { transform: rotate(180deg) scale(1.5); }
+            100% { transform: rotate(360deg) scale(1.2); }
+        }
+
+        /* Пульсация света */
+        @keyframes auroraPulse {
+            0% { transform: scale(1); opacity: 0.6; }
+            100% { transform: scale(1.2); opacity: 0.9; }
+        }
+
+        /* Движение волн */
+        @keyframes auroraWave {
+            0% { transform: translateX(-20%) translateY(-20%) rotate(0deg); }
+            50% { transform: translateX(10%) translateY(10%) rotate(5deg); }
+            100% { transform: translateX(-20%) translateY(-20%) rotate(0deg); }
+        }
 
         /* AGE OVERLAY */
         .age-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 99999; display: none; justify-content: center; align-items: center; padding: 20px; }
@@ -485,21 +955,30 @@
         </div>
 
         <!-- Переключатель языка -->
-        <div class="lang-switcher">
-            <select id="lang-select" onchange="changeLanguage(this.value)" aria-label="Change Language">
-                <option value="en">EN</option>
-                <option value="ru">RU</option>
-                <option value="es">ES</option>
-                <option value="de">DE</option>
-            </select>
+        <div class="lang-custom">
+            <!-- Текущий язык -->
+            <span class="current-lang" id="current-lang-display" onclick="toggleLangMenu()">EN</span>
+            
+            <!-- Выпадающее текстовое меню -->
+            <div class="lang-list" id="lang-list">
+                <span onclick="setLang('en')">EN</span>
+                <span onclick="setLang('ru')">RU</span>
+                <span onclick="setLang('es')">ES</span>
+                <span onclick="setLang('de')">DE</span>
+            </div>
         </div>
     </nav>
 
     <!-- HERO SECTION -->
     <header class="hero">
-        <div class="parallax-wrapper">
-            <img src="hero_bg.webp" alt="Background" class="parallax-img" id="hero-bg-img">
-            <div class="bg-overlay"></div>
+        <div class="parallax-wrapper" id="hero-bg-img">
+            <div class="aurora-container hero-aurora">
+                <div class="aurora-blur-layer layer-1"></div>
+                <div class="aurora-blur-layer layer-2"></div>
+                <div class="aurora-blur-layer layer-3"></div>
+            </div>
+            
+            <div class="bg-overlay" style="opacity: 0.8; background: #000;"></div> 
         </div>
 
         <div class="container">
@@ -547,41 +1026,40 @@
                 
                 <div class="unique-bento-grid">
                     
-                    <!-- 1. UNDERSTAND (Tall) -->
+                    <!-- 1. CHOOSE (Tall) -> Иконка СПРАВА СНИЗУ -->
                     <div class="glass-card cell-tall">
-                        <div>
-                            <h3 data-i18n="wi_p1_head">Understand</h3>
-                            <p data-i18n="wi_p1_desc">Stop mindless scrolling. We analyze every video you watch to help you understand the root of your desires.</p>
+                        <div class="card-content">
+                            <h3 data-i18n="wi_p1_head">Choose</h3>
+                            <p data-i18n="wi_p1_desc">Think you're tired of watching the same old thing. We give you a choice...</p>
                         </div>
-                        <!-- Glow Effect -->
                         <div class="icon-glow-bg"></div>
-                        <!-- PNG Icon (Используем Brain или Eye) -->
-                        <img src="icon_brain.png" alt="Understand" class="bento-img-3d">
+                        <img src="icon_brain.png" alt="Choose" class="bento-img-3d">
                     </div>
 
-                    <!-- 2. PROTECT (Wide) -->
-                    <div class="glass-card cell-wide">
-                        <div>
-                            <h3 data-i18n="wi_p2_head">Protect</h3>
-                            <p data-i18n="wi_p2_desc">No history tracking, no social logins. Your desires are encrypted.</p>
+                    <!-- 2. RELAX (Wide) -> Иконка СЛЕВА (Зиг-Заг) -->
+                    <div class="glass-card cell-wide left-icon">
+                        <div class="card-content">
+                            <h3 data-i18n="wi_p2_head">Relax</h3>
+                            <p data-i18n="wi_p2_desc">Store all your data locally or encrypted in the cloud...</p>
                         </div>
                         <div class="icon-glow-bg"></div>
-                        <!-- PNG Icon (Lock) -->
-                        <img src="icon_lock.png" alt="Privacy" class="bento-img-3d">
+                        <!-- Иконка замка -->
+                        <img src="icon_lock.png" alt="Relax" class="bento-img-3d">
                     </div>
 
-                    <!-- 3. EVOLVE (Wide) -->
-                    <div class="glass-card cell-wide evolve">
-                        <div>
-                            <h3 data-i18n="wi_p3_head">Evolve</h3>
-                            <p data-i18n="wi_p3_desc">From vanilla to niche. The algorithm guides you through 1200+ genres.</p>
+                    <!-- 3. DISCOVER (Wide) -> Иконка СПРАВА -->
+                    <div class="glass-card cell-wide right-icon">
+                        <div class="card-content">
+                            <h3 data-i18n="wi_p3_head">Discover</h3>
+                            <p data-i18n="wi_p3_desc">Think you know every genre? With our collection...</p>
                         </div>
                         <div class="icon-glow-bg"></div>
-                        <!-- PNG Icon (Compass) -->
-                        <img src="icon_compass.png" alt="Explore" class="bento-img-3d">
+                        <!-- Иконка компаса -->
+                        <img src="icon_compass.png" alt="Discover" class="bento-img-3d">
                     </div>
 
                 </div>
+
             </div>
             
             <!-- Плавный переход: Черный -> Серый (для следующего блока) -->
@@ -702,7 +1180,7 @@
                             <h3 data-i18n="sci_4_head">Works Everywhere</h3>
                             <p data-i18n="sci_4_desc">Seamless on iPhone, Android, or PC. Install as a PWA for a full-screen native experience.</p>
                         </div>
-                        <img src="icon_globe.png" class="dd-icon" alt="Globe">
+                        <img src="icon_devices.png" class="dd-icon" alt="Globe">
                     </div>
 
                 </div>
@@ -826,10 +1304,17 @@
 
     <footer class="footer-cta bento-section">
         
-        <!-- Background + Overlay -->
-        <div class="footer-bg-wrapper">
-            <img src="footer_bg.webp" alt="Background" class="footer-parallax-img" id="footer-bg-img">
-            <div class="footer-overlay"></div>
+        <div class="footer-bg-wrapper" id="footer-bg-img">
+            <div class="aurora-container footer-aurora">
+                <!-- Слой 1: Темная база с переливами -->
+                <div class="aurora-blur-layer layer-1"></div>
+                <!-- Слой 2: Бирюзовые блики -->
+                <div class="aurora-blur-layer layer-2"></div>
+                <!-- Слой 3: Розовые полосы -->
+                <div class="aurora-blur-layer layer-3"></div>
+            </div>
+            <!-- Затемнение посильнее для контраста текста -->
+            <div class="footer-overlay" style="background: rgba(0,0,0,0.8);"></div>
         </div>
 
         <!-- Black Fade Top -->
@@ -846,7 +1331,8 @@
                 <!-- РЯД 1 -->
                 <div class="bento-cell col-7 mob-full bg-wrapped cell-row">
                     <div style="max-width: 60%;">
-                        <span class="bento-badge">WEEKLY</span>
+                        <!-- АНИМИРОВАННЫЙ БЕЙДЖИК -->
+                        <span class="bento-badge" id="cycle-badge">WEEKLY</span>
                         <h3 data-i18n="bn_wrapped">Fetish Wrapped</h3>
                         <p data-i18n="bn_wrapped_desc">Your personal stats</p>
                     </div>
@@ -859,13 +1345,15 @@
                 </div>
 
                 <div class="bento-cell col-2 mob-7 bg-privacy cell-center">
-                    <img src="icon_lock.png" class="bento-icon-xs" alt="Privacy">
+                    <img src="lock.apng" class="bento-icon-xs" alt="Privacy">
+                    <!-- Жирный текст -->
                     <div class="bento-label-bottom" data-i18n="bn_priv">Privacy</div>
                 </div>
 
                 <!-- РЯД 2 -->
                 <div class="bento-cell col-2 mob-5 bg-browser cell-center">
                     <img src="icon_globe.png" class="bento-icon-xs" alt="Browser">
+                    <!-- Жирный текст -->
                     <div class="bento-label-bottom" data-i18n="bn_browser">Browser</div>
                 </div>
 
@@ -878,9 +1366,9 @@
                 </div>
 
                 <div class="bento-cell col-3 mob-full bg-swipe cell-center">
-                    <div class="hand-anim-wrapper" style="width:40px; height:40px; margin-bottom:5px;">
-                        <img src="icon_hand.png" class="hand-icon" alt="Swipe">
-                    </div>
+                    <!-- АНИМИРОВАННАЯ РУКА -->
+                    <img src="icon_hand.png" class="hand-icon-anim" alt="Swipe">
+                    <!-- Жирный текст -->
                     <div class="bento-label-bottom" data-i18n="bn_swipe">Swipes</div>
                 </div>
 
@@ -889,12 +1377,13 @@
                      <img src="icon_cloud.png" class="bento-icon-sm" alt="Sync">
                      <div style="text-align: right;">
                         <h3 data-i18n="bn_sync">Sync</h3>
-                        <p style="font-size:10px; opacity:0.6;">Backup</p>
+                        <p style="font-size:11px; opacity:0.6;">Backup</p>
                     </div>
                 </div>
 
                 <div class="bento-cell col-2 mob-5 bg-custom animated-gradient cell-center">
                     <img src="icon_palette.png" class="bento-icon-xs" alt="Custom">
+                    <!-- Жирный текст -->
                     <div class="bento-label-bottom" data-i18n="bn_custom">UI</div>
                 </div>
 
@@ -910,15 +1399,29 @@
 
             <!-- FINAL BUTTON -->
             <div class="final-action">
-                <a href="app/" class="btn-cta btn-huge" onclick="markUserActive()">
-                    <span data-i18n="btn_launch">Start Now</span>
-                </a>
-                <div class="footer-legal">
-                    <a onclick="openModal('privacy-modal')" data-i18n="link_priv" style="color: rgba(255,255,255,0.5);">Privacy</a>
-                    <span style="color: rgba(255,255,255,0.3);">•</span>
-                    <a onclick="openModal('terms-modal')" data-i18n="link_terms" style="color: rgba(255,255,255,0.5);">Terms</a>
+                <div class="footer-btn-row">
+                    <!-- Главная кнопка -->
+                    <a href="app/" class="btn-cta btn-huge" onclick="markUserActive()">
+                        <span data-i18n="btn_launch">Start Now</span>
+                    </a>
+                    
+                    <!-- Кнопка установки (как в шапке, только для ПК) -->
+                    <button class="btn-secondary pc-only" onclick="openQRModal()">
+                        📱 <span data-i18n="btn_install">Install on Phone</span>
+                    </button>
                 </div>
-                <div class="copyright" style="color: rgba(255,255,255,0.3);">&copy; 2026 xFetishHub.</div>
+            </div>
+        </div>
+        <div class="footer-legal-bar">
+            <!-- Слева: Копирайт -->
+            <div class="copyright-text">
+                &copy; 2026 xFetishHub. All rights reserved.
+            </div>
+
+            <!-- Справа: Ссылки -->
+            <div class="legal-links">
+                <a onclick="openModal('privacy-modal')" data-i18n="link_priv">Privacy Policy</a>
+                <a onclick="openModal('terms-modal')" data-i18n="link_terms">Terms of Use</a>
             </div>
         </div>
     </footer>
@@ -989,10 +1492,16 @@
                 // --- WHAT IS XFETISHHUB ---
                 wi_title: "Not just a tube site.",
                 wi_subtitle: "It's your personal discovery engine.",
-                wi_p1_head: "Understand", wi_p1_desc: "Stop mindless scrolling. We analyze what you watch to help you understand what you actually like.",
-                wi_p2_head: "Protect", wi_p2_desc: "Your desires are yours alone. No history tracking, no social logins required, pure anonymity.",
-                wi_p3_head: "Evolve", wi_p3_desc: "From vanilla to niche. Let the algorithm guide you through 1200+ genres you never knew existed.",
-
+                
+                wi_p1_head: "Choose", 
+                wi_p1_desc: "I think you're tired of always watching the same thing. We give you a choice, based on which the algorithm will offer you better results so you never get bored 😏.",
+                
+                wi_p2_head: "Relax", 
+                wi_p2_desc: "Store all your data locally on your device or encrypted in the cloud. You don't have to worry about anyone finding out about your secret hobbies 🌚.",
+                
+                wi_p3_head: "Discover", 
+                wi_p3_desc: "Think you already know all 18+ genres? With our collection of 1200+ tags, you will constantly learn something new for yourself for years to come 🔭.",
+               
                 // --- FEATURES ---
                 feat_title: "Why <span class='gradient-text'>xFetishHub</span>?",
                 f1_w1: "Explore", f1_w2: "Pleasure", f1_w3: "AI Agent",
@@ -1037,11 +1546,20 @@
 
                 // --- FAQ ---
                 faq_title: "Frequently Asked <span class='gradient-text'>Questions</span>",
-                q1: "Is xFetishHub completely anonymous?", a1: "Yes. We prioritize your privacy above all else. xFetishHub operates as a secure sandbox. Your viewing history and generated statistics are stored in a secure, encrypted cloud environment.",
-                q2: "How does the recommendation algorithm work?", a2: "Think of it as 'Tinder for Adult Content'. Our AI analyzes the metadata of the videos you like versus those you dislike to build a vector profile.",
-                q3: "Does it work on iPhone and Android?", a3: "Absolutely. xFetishHub is optimized for mobile use as a Progressive Web App (PWA).",
-                q4: "Is the content hosted on your servers?", a4: "No. xFetishHub is an intelligent aggregator and analytics tool. We do not host video files.",
-                q5: "What is included in the Free vs Pro plan?", a5: "The Free plan includes basic daily generations. Pro unlocks unlimited AI generations, detailed 'Wrapped' reports, and advanced filtering.",
+                q1: "Is xFetishHub completely anonymous?", 
+                a1: "Yes. You have the option to store all data locally on your device. In case of synchronization, all your data is encrypted, and we only collect your email address.",
+                
+                q2: "How do recommendations work?", 
+                a2: "The more you swipe, the better the system understands what you like and dislike, and offers the best options based on that.",
+                
+                q3: "Does it work on iPhone and Android?", 
+                a3: "The site was created specifically for them 😊. To turn the site into an app, go to the main page, tap 'Share' (iOS) or Menu (Android) and select 'Add to Home Screen'.",
+                
+                q4: "Is content hosted on your servers?", 
+                a4: "Videos — no. We only host our database of genres 😏.",
+                
+                q5: "What is the difference between Free and Pro?", 
+                a5: "The difference is that a paid subscription allows you to use the site without any restrictions, and at the same time, you support the developer in further developing the site 😊.",
 
                 // --- BENTO FOOTER CTA ---
                 footer_head: "Ready to explore?", footer_sub: "Everything you need in one secure place.",
@@ -1073,9 +1591,15 @@
                 // --- WHAT IS ---
                 wi_title: "Не просто тьюб сайт.",
                 wi_subtitle: "Это твой поисковик желаний.",
-                wi_p1_head: "Понимай", wi_p1_desc: "Хватит бездумного скроллинга. Мы анализируем просмотры, чтобы ты понял, что тебе реально нравится.",
-                wi_p2_head: "Защищай", wi_p2_desc: "Твои желания только твои. Никакой истории, никаких соцсетей, полная анонимность.",
-                wi_p3_head: "Развивай", wi_p3_desc: "От ванили до ниши. Алгоритм проведет тебя через 1200+ жанров.",
+                
+                wi_p1_head: "Выбирай", 
+                wi_p1_desc: "Думаю ты устал вечно смотреть на одно и то же. Мы даём тебе выбор, на основе которого алгоритм будет предлагать тебе всё более лучшие результаты, чтобы ты никогда не заскучал 😏.",
+                
+                wi_p2_head: "Расслабься", 
+                wi_p2_desc: "Храни все свои данные у себя на устройстве, либо в зашифрованном виде в облаке. Можешь не беспокоиться, что о твоих тайных увлечениях кто-то узнает 🌚.",
+                
+                wi_p3_head: "Открывай", 
+                wi_p3_desc: "Думаешь, что уже знаешь про все 18+ жанры? С нашей коллекцией 1200+ предпочтений ты будешь постоянно узнавать о чём-то новом для себя на протяжении нескольких лет 🔭.",
 
                 // --- FEATURES ---
                 feat_title: "Почему <span class='gradient-text'>xFetishHub</span>?",
@@ -1118,11 +1642,20 @@
 
                 // --- FAQ ---
                 faq_title: "Частые <span class='gradient-text'>Вопросы</span>",
-                q1: "xFetishHub полностью анонимен?", a1: "Да. Приватность — наш приоритет. История просмотров и статистика хранятся в зашифрованном облаке. Мы не связываем эти данные с твоей реальной личностью.",
-                q2: "Как работают рекомендации?", a2: "Как «Tinder для взрослых». ИИ анализирует метаданные видео, которые ты лайкаешь или дизлайкаешь.",
-                q3: "Работает ли на iPhone и Android?", a3: "Конечно. Приложение оптимизировано как PWA. Ты можешь установить его прямо из браузера.",
-                q4: "Контент хранится у вас?", a4: "Нет. xFetishHub — это умный агрегатор. Мы предоставляем интерфейс для поиска контента, публично доступного в сети.",
-                q5: "В чем разница Free и Pro?", a5: "Free включает базовые генерации и приватность. Pro открывает безлимит, детальные отчеты «Wrapped» и фильтры.",
+                q1: "xFetishHub полностью анонимен?", 
+                a1: "Да, поскольку вам даётся возможность все данные хранить у себя на устройстве, но в случае синхронизации все ваши данные шифруются и берётся лишь адрес электронной почты.",
+                
+                q2: "Как работают рекомендации?", 
+                a2: "Чем больше вы свайпаете, тем система лучше понимает что вам нравится и не нравится, и на основе этого предлагает лучшие варианты.",
+                
+                q3: "Работает ли на iPhone и Android?", 
+                a3: "Ради них сайт и создавался 😊. Чтобы превратить сайт в приложение необходимо перейти на основной сайт, нажать на «Поделиться» и «Добавить на экран Домой».",
+                
+                q4: "Контент хранится у вас?", 
+                a4: "Видео — нет, мы храним только нашу базу данных с жанрами 😏.",
+                
+                q5: "В чем разница Free и Pro?", 
+                a5: "Разница в том, что платная подписка позволяет вам без каких-либо ограничений пользоваться сайтом, а заодно вы поддерживаете разработчика и дальше развивать сайт 😊.",
 
                 // --- BENTO FOOTER CTA ---
                 footer_head: "Готов начать?", footer_sub: "Всё что нужно в одном безопасном месте.",
@@ -1154,9 +1687,15 @@
                 // --- WHAT IS ---
                 wi_title: "No es solo un sitio tube.",
                 wi_subtitle: "Es tu motor de descubrimiento.",
-                wi_p1_head: "Entender", wi_p1_desc: "Deja el scroll sin sentido. Analizamos lo que ves para ayudarte a entender lo que realmente te gusta.",
-                wi_p2_head: "Proteger", wi_p2_desc: "Tus deseos son solo tuyos. Sin historial, sin redes sociales, pura anonimidad.",
-                wi_p3_head: "Evolucionar", wi_p3_desc: "De vainilla a nicho. Deja que el algoritmo te guíe a través de 1200+ géneros.",
+
+                wi_p1_head: "Elige", 
+                wi_p1_desc: "Creo que estás cansado de ver siempre lo mismo. Te damos a elegir, y el algoritmo te ofrecerá mejores resultados para que nunca te aburras 😏.",
+                
+                wi_p2_head: "Relájate", 
+                wi_p2_desc: "Guarda todos tus datos localmente o cifrados en la nube. No tienes que preocuparte de que nadie se entere de tus aficiones secretas 🌚.",
+                
+                wi_p3_head: "Descubre", 
+                wi_p3_desc: "¿Crees que ya conoces todos los géneros 18+? Con nuestra colección de 1200+ preferencias, descubrirás algo nuevo constantemente durante años 🔭.",
 
                 // --- FEATURES ---
                 feat_title: "¿Por qué <span class='gradient-text'>xFetishHub</span>?",
@@ -1199,11 +1738,20 @@
 
                 // --- FAQ ---
                 faq_title: "Preguntas <span class='gradient-text'>Frecuentes</span>",
-                q1: "¿Es xFetishHub totalmente anónimo?", a1: "Sí. Priorizamos tu privacidad. Tu historial y estadísticas se guardan encriptados.",
-                q2: "¿Cómo funciona el algoritmo?", a2: "Piénsalo como un 'Tinder para Contenido Adulto'. Nuestra IA analiza los metadatos de los videos que te gustan.",
-                q3: "¿Funciona en iPhone y Android?", a3: "Absolutamente. Está optimizado como PWA. Puedes instalarlo desde Safari (iOS) o Chrome (Android).",
-                q4: "¿El contenido está en sus servidores?", a4: "No. xFetishHub es una herramienta de análisis y agregación. No alojamos archivos de video.",
-                q5: "¿Qué incluye Gratis vs Pro?", a5: "El plan Gratis incluye generaciones diarias básicas. El Pro desbloquea IA ilimitada, informes detallados estilo 'Wrapped', filtros avanzados.",
+                q1: "¿Es xFetishHub totalmente anónimo?", 
+                a1: "Sí, ya que tienes la opción de guardar todos los datos localmente en tu dispositivo. En caso de sincronización, tus datos se cifran y solo tomamos tu correo electrónico.",
+                
+                q2: "¿Cómo funcionan las recomendaciones?", 
+                a2: "Cuanto más deslizas (swipes), mejor entiende el sistema lo que te gusta y lo que no, ofreciéndote las mejores opciones basándose en ello.",
+                
+                q3: "¿Funciona en iPhone y Android?", 
+                a3: "El sitio fue creado específicamente para ellos 😊. Para convertir el sitio en una app, ve a la página principal, pulsa 'Compartir' y selecciona 'Añadir a pantalla de inicio'.",
+                
+                q4: "¿El contenido está en sus servidores?", 
+                a4: "Videos — no. Solo alojamos nuestra base de datos de géneros 😏.",
+                
+                q5: "¿Qué diferencia hay entre Gratis y Pro?", 
+                a5: "La diferencia es que la suscripción de pago te permite usar el sitio sin restricciones, y al mismo tiempo apoyas al desarrollador para seguir mejorando el sitio 😊.",
 
                 // --- BENTO FOOTER CTA ---
                 footer_head: "¿Listo para explorar?", footer_sub: "Todo lo que necesitas en un lugar seguro.",
@@ -1235,9 +1783,15 @@
                 // --- WHAT IS ---
                 wi_title: "Nicht nur eine Tube-Seite.",
                 wi_subtitle: "Deine Entdeckungsmaschine.",
-                wi_p1_head: "Verstehen", wi_p1_desc: "Stoppe sinnloses Scrollen. Wir analysieren, was du siehst, damit du verstehst, was du wirklich magst.",
-                wi_p2_head: "Schützen", wi_p2_desc: "Deine Wünsche gehören dir. Kein Verlauf, kein Social Login, pure Anonymität.",
-                wi_p3_head: "Entwickeln", wi_p3_desc: "Von Vanilla bis Nische. Lass dich vom Algorithmus durch 1200+ Genres führen.",
+
+                wi_p1_head: "Wähle", 
+                wi_p1_desc: "Ich glaube, du bist es leid, immer das Gleiche zu sehen. Wir geben dir die Wahl, damit der Algorithmus dir bessere Ergebnisse liefert und du dich nie langweilst 😏.",
+                
+                wi_p2_head: "Entspann dich", 
+                wi_p2_desc: "Speichere alle Daten lokal oder verschlüsselt in der Cloud. Du musst dir keine Sorgen machen, dass jemand von deinen geheimen Hobbys erfährt 🌚.",
+                
+                wi_p3_head: "Entdecke", 
+                wi_p3_desc: "Glaubst du, du kennst schon alle 18+ Genres? Mit unserer Sammlung von 1200+ Vorlieben wirst du jahrelang ständig etwas Neues über dich lernen 🔭.",
 
                 // --- FEATURES ---
                 feat_title: "Warum <span class='gradient-text'>xFetishHub</span>?",
@@ -1280,11 +1834,20 @@
 
                 // --- FAQ ---
                 faq_title: "Häufige <span class='gradient-text'>Fragen</span>",
-                q1: "Ist xFetishHub völlig anonym?", a1: "Ja. Deine Privatsphäre hat oberste Priorität. Verlauf und Statistiken werden verschlüsselt gespeichert.",
-                q2: "Wie funktioniert der Algorithmus?", a2: "Stell es dir vor wie 'Tinder für Erwachseneninhalte'. Unsere KI analysiert die Metadaten der Videos, die du magst.",
-                q3: "Funktioniert es auf iPhone und Android?", a3: "Absolut. xFetishHub ist als PWA optimiert. Du kannst es direkt aus Safari (iOS) oder Chrome (Android) installieren.",
-                q4: "Werden die Inhalte bei euch gehostet?", a4: "Nein. xFetishHub ist ein intelligentes Analyse-Tool. Wir hosten keine Videodateien.",
-                q5: "Was ist im Free vs Pro Plan enthalten?", a5: "Der Free-Plan enthält grundlegende tägliche Generierungen. Der Pro-Plan schaltet unbegrenzte KI, detaillierte Berichte im 'Wrapped'-Stil frei.",
+                q1: "Ist xFetishHub völlig anonym?", 
+                a1: "Ja, da du die Möglichkeit hast, alle Daten lokal auf deinem Gerät zu speichern. Bei der Synchronisierung werden deine Daten verschlüsselt und wir erfassen nur deine E-Mail-Adresse.",
+                
+                q2: "Wie funktionieren die Empfehlungen?", 
+                a2: "Je mehr du swipest, desto besser versteht das System, was du magst und was nicht, und bietet dir darauf basierend die besten Optionen an.",
+                
+                q3: "Funktioniert es auf iPhone und Android?", 
+                a3: "Die Seite wurde speziell dafür erstellt 😊. Um die Seite in eine App zu verwandeln, gehe auf die Hauptseite, tippe auf 'Teilen' und wähle 'Zum Home-Bildschirm hinzufügen'.",
+                
+                q4: "Werden die Inhalte bei euch gehostet?", 
+                a4: "Videos — nein. Wir hosten nur unsere Datenbank mit Genres 😏.",
+                
+                q5: "Was ist der Unterschied zwischen Free und Pro?", 
+                a5: "Der Unterschied ist, dass ein kostenpflichtiges Abo dir erlaubt, die Seite ohne Einschränkungen zu nutzen, und du gleichzeitig den Entwickler bei der Weiterentwicklung unterstützt 😊.",
 
                 // --- BENTO FOOTER CTA ---
                 footer_head: "Bereit zu starten?", footer_sub: "Alles, was du brauchst, an einem sicheren Ort.",
@@ -1320,20 +1883,38 @@
         let currentLang = 'en';
 
         function init() {
-            // 1. Проверяем сохраненный язык, иначе берем системный
             const savedLang = localStorage.getItem('xfetishhub_lang');
             let lang = savedLang || navigator.language.slice(0, 2);
-            
             if (!translations[lang]) lang = 'en'; 
             currentLang = lang;
             
-            // Устанавливаем значение в селекте
-            const langSelect = document.getElementById('lang-select');
-            if(langSelect) langSelect.value = lang;
-
             applyLang(lang);
+            
+            // --- Обновляем текст в шапке ---
+            const display = document.getElementById('current-lang-display');
+            if(display) display.innerText = lang.toUpperCase();
+            // -------------------------------------
+
             checkAge(); 
         }
+
+        // Переключалка видимости меню
+        function toggleLangMenu() {
+            document.querySelector('.lang-custom').classList.toggle('active');
+        }
+
+        // Выбор языка
+        function setLang(lang) {
+            changeLanguage(lang); // Вызываем вашу старую функцию перезагрузки
+        }
+
+        // Закрываем меню, если кликнули мимо
+        document.addEventListener('click', function(e) {
+            const langCustom = document.querySelector('.lang-custom');
+            if (langCustom && !langCustom.contains(e.target)) {
+                langCustom.classList.remove('active');
+            }
+        });
 
         function changeLanguage(lang) {
             localStorage.setItem('xfetishhub_lang', lang);
@@ -1483,6 +2064,35 @@
             // Пользователь нажал НЕТ - редирект на Google
             window.location.href = "https://www.google.com";
         }
+
+        // --- ЦИКЛ СЛОВ ДЛЯ WRAPPED BADGE ---
+        function initBadgeCycle() {
+            const badge = document.getElementById('cycle-badge');
+            if (!badge) return;
+
+            // Слова для перебора
+            const words = ["DAILY", "WEEKLY", "MONTHLY", "YEARLY"];
+            let index = 0;
+
+            setInterval(() => {
+                // 1. Запускаем анимацию исчезновения
+                badge.classList.remove('badge-fade-in');
+                badge.classList.add('badge-fade-out');
+
+                // 2. Через 300мс (когда исчез) меняем текст и появляем обратно
+                setTimeout(() => {
+                    index = (index + 1) % words.length;
+                    badge.innerText = words[index];
+                    
+                    badge.classList.remove('badge-fade-out');
+                    badge.classList.add('badge-fade-in');
+                }, 300);
+                
+            }, 2500); // Меняем каждые 2.5 секунды
+        }
+
+        // Запускаем после загрузки страницы
+        document.addEventListener('DOMContentLoaded', initBadgeCycle);
 
     </script>
 </body>
