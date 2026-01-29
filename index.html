@@ -168,6 +168,18 @@
         .btn-row { display: flex; gap: 15px; flex-wrap: wrap; }
         .hero-fade-bottom { position: absolute; bottom: 0; left: 0; width: 100%; height: 200px; background: linear-gradient(to bottom, transparent, var(--bg-main)); z-index: 5; pointer-events: none; }
         
+        @media (max-width: 900px) {
+            .btn-row { 
+                justify-content: center; /* Центруем кнопку */
+            }
+            .pc-only { 
+                display: none !important; /* Скрываем кнопку установки */
+            }
+            /* Центровка заголовков на мобильном */
+            .hero-grid { text-align: center; }
+            .hero-content { align-items: center; }
+        }
+
         @media (max-width: 900px) { .hero-grid { grid-template-columns: 1fr; text-align: center; gap: 40px; } .hero-visual { order: -1; } .hero-logo-img { max-width: 250px; } .hero-subtitle-wrapper { justify-content: center; } }
 
         /* === DIVIDERS === */
@@ -223,7 +235,16 @@
         .feature-img-wrapper { width: 100%; border-radius: 50px; overflow: hidden; box-shadow: 0 25px 60px -10px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.05); transition: transform 0.3s; background: #1a1a1a; transform: translateZ(0); }
         .feature-img-wrapper:hover { transform: scale(1.02); }
         .feature-img { width: 100%; height: auto; display: block; }
-        .privacy-fix { background: transparent; border: none; box-shadow: none; display: flex; justify-content: center; }
+        .privacy-fix { 
+            display: flex; 
+            justify-content: center; 
+            background: #1a1a1a; 
+        }
+        .privacy-fix .feature-img {
+            max-height: 100%;
+            object-fit: contain;
+            padding: 20px;
+        }
         
         @media (max-width: 900px) { .feature-row, .feature-row:nth-child(even) { display: flex; flex-direction: column-reverse; gap: 30px; text-align: center; } }
 
@@ -306,21 +327,30 @@
         .plan-card.bestie .plan-title { color: #00d2ff; background: linear-gradient(to right, #00d2ff, #3a7bd5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .bestie-badge { position: absolute; top: 0; right: 0; background: #00d2ff; color: #000; font-size: 10px; font-weight: 800; padding: 4px 10px; border-bottom-left-radius: 12px; }
         .limit-container { margin-bottom: 15px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); }
-        .limit-fill { height: 4px; background: linear-gradient(90deg, #00d2ff, #3a7bd5); width: 96%; box-shadow: 0 0 10px #00d2ff; animation: pulseBar 2s infinite; }
+        .limit-labels { display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 6px; color: var(--text-sec); }
+        .limit-track { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
+        .limit-fill { height: 100%; background: linear-gradient(90deg, #00d2ff, #3a7bd5); width: 96%; box-shadow: 0 0 10px #00d2ff; animation: pulseBar 2s infinite; }
         @media (max-width: 900px) { .pricing-grid { grid-template-columns: 1fr; } .plan-card.bestie { order: -1; } }
 
         /* === SECTION: ROADMAP (Black) === */
         #roadmap { background-color: var(--bg-main); padding: 100px 0 100px; }
-        .roadmap-separator { display: flex; align-items: center; justify-content: center; gap: 20px; margin: 60px auto 30px; max-width: 900px; }
-        .separator-line { height: 1px; flex-grow: 1; background: var(--border); }
-        .roadmap-card { background: var(--bg-sec); border-radius: 32px; padding: 10px 0; max-width: 900px; margin: 0 auto 40px; }
-        .roadmap-row { display: grid; grid-template-columns: 180px 1fr 150px; gap: 30px; padding: 30px 50px; border-bottom: 1px solid var(--border); align-items: center; }
+        .roadmap-separator { display: flex; align-items: center; justify-content: center; gap: 20px; margin: 60px auto 30px; max-width: 900px; position: relative; z-index: 2; }
+        .roadmap-separator span { font-size: 0.9rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-sec); white-space: nowrap; }
+        .separator-line { height: 1px; flex-grow: 1; position: relative; }
+        .line-left { background: linear-gradient(to right, transparent, var(--border)); }
+        .line-right { background: linear-gradient(to right, var(--border), transparent); }
+        .roadmap-card { background: var(--bg-sec); border-radius: 32px; padding: 10px 0; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.3); max-width: 900px; margin: 0 auto 40px; overflow: hidden; position: relative; z-index: 2; }
+        .roadmap-row { display: grid; grid-template-columns: 180px 1fr 150px; gap: 30px; padding: 30px 50px; border-bottom: 1px solid var(--border); align-items: center; transition: background-color 0.3s; }
         .roadmap-row:last-child { border-bottom: none; }
-        .roadmap-date { color: var(--accent-start); font-weight: 800; }
-        .status-done { color: #28a745; background: rgba(40,167,69,0.15); padding: 6px 14px; border-radius: 12px; font-size: 0.8rem; }
-        .status-planned { color: var(--text-sec); border: 1px solid var(--border); padding: 6px 14px; border-radius: 12px; font-size: 0.8rem; }
-        .status-progress { color: #007AFF; background: rgba(0,122,255,0.15); padding: 6px 14px; border-radius: 12px; font-size: 0.8rem; }
-        @media (max-width: 900px) { .roadmap-row { grid-template-columns: 1fr; text-align: left; } }
+        .roadmap-row:hover { background-color: rgba(255,255,255,0.03); }
+        .roadmap-date { font-size: 1.1rem; font-weight: 800; color: var(--accent-start); text-transform: uppercase; }
+        .roadmap-content h4 { margin-bottom: 5px; font-size: 1.3rem; font-weight: 700; color: #fff; }
+        .roadmap-content p { font-size: 1rem; margin: 0; color: var(--text-sec); line-height: 1.5; }
+        .roadmap-status { display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; text-align: center; white-space: nowrap; }
+        .status-done { background: rgba(40, 167, 69, 0.15); color: #28a745; border: 1px solid rgba(40, 167, 69, 0.2); }
+        .status-progress { background: rgba(0, 122, 255, 0.15); color: #007AFF; border: 1px solid rgba(0, 122, 255, 0.2); }
+        .status-planned { background: rgba(255,255,255,0.05); color: var(--text-sec); border: 1px solid var(--border); }
+        @media (max-width: 900px) { .roadmap-row { grid-template-columns: 1fr; gap: 15px; text-align: left; padding: 25px 20px; } .roadmap-status { justify-self: start; margin-top: 10px; } }
 
         /* === SECTION: FAQ (Gray) === */
         #faq { background-color: var(--bg-sec); padding: 100px 0 200px; }
