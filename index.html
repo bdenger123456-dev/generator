@@ -68,13 +68,31 @@
             --bg-sec: #111111;        
             --text-main: #ffffff;
             --text-sec: #999999;
-            --accent-start: #CB53F0;  
-            --accent-end: #7000ff;    
+            --accent-start: #CB53F0; 
+            --accent-end: #ff00cc;   
             --border: #2a2a2a;
             
             --gradient-text: linear-gradient(90deg, var(--accent-start), var(--accent-end));
             --font: 'Inter', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        .gradient-text, 
+        h1.brand-title .gradient-text,
+        h2 .gradient-text {
+            background: var(--gradient-text) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            background-clip: text !important;
+            color: transparent !important;
+            
+            display: inline-block; 
+        }
+
+        .rolling-word {
+            background: var(--gradient-text) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -510,8 +528,18 @@
         /* === FOOTER (12-Col Tetris) === */
         .footer-cta {
             background-color: transparent !important;
-            position: relative; overflow: hidden; min-height: 100vh;
-            display: flex; flex-direction: column; justify-content: center; padding-top: 100px;
+            position: relative; 
+            overflow: hidden; 
+            min-height: 100vh;
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            
+            /* Отступ сверху */
+            padding-top: 100px; 
+            
+            padding-bottom: 220px !important; 
+            
             z-index: 1;
         }
         .footer-bg-wrapper { position: absolute; top: -30%; left: 0; width: 100%; height: 160%; z-index: 0; pointer-events: none; will-change: transform; }
@@ -678,6 +706,8 @@
             justify-content: center;
         }
 
+
+
         /* Адаптив для кнопок футера на мобилках */
         @media (max-width: 600px) {
             .footer-btn-row { flex-direction: column; width: 100%; }
@@ -690,48 +720,52 @@
 
         /* 3. Черная полоса внизу (Copyright & Legal) */
         .footer-legal-bar {
+            position: absolute; 
+            bottom: 0;
+            left: 0;
             width: 100%;
-            background: #000000; /* Глубокий черный */
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding: 25px 40px;
-            display: flex;
-            justify-content: space-between; /* Copyright слева, ссылки справа */
-            align-items: center;
-            position: relative;
             z-index: 20;
-            margin-top: auto; /* Прижимаем к самому низу контейнера */
-        }
-
-        .legal-links {
+            
+            height: auto; 
+            min-height: 160px;
+            padding: 60px 40px 30px; /* Большой паддинг сверху для плавного перехода */
+            
             display: flex;
-            gap: 30px;
+            justify-content: space-between;
+            align-items: flex-end; /* Прижимаем текст к самому низу */
+            
+            border: none; 
+            background-color: transparent;
+            
+            background: linear-gradient(to top, #000000 20%, rgba(0,0,0,0.9) 50%, rgba(0,0,0,0) 100%);
+            
+            pointer-events: none; /* Пропускаем клики в прозрачной зоне */
         }
 
-        .legal-links a {
-            font-size: 13px;
-            color: var(--text-sec);
-            text-transform: uppercase;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            transition: color 0.2s;
-            cursor: pointer;
-        }
-        .legal-links a:hover { color: #fff; }
-        
-        .copyright-text {
-            font-size: 13px;
-            color: #555;
+        /* Возвращаем кликабельность ссылкам и тексту */
+        .footer-legal-bar .legal-links,
+        .footer-legal-bar .copyright-text {
+            pointer-events: auto;
+            position: relative;
+            z-index: 21;
         }
 
-        /* Адаптив для черной полосы на мобильных */
-        @media (max-width: 768px) {
-            .footer-legal-bar {
-                flex-direction: column-reverse; /* Ссылки сверху, копирайт снизу */
-                gap: 15px;
-                padding: 30px 20px;
-                text-align: center;
+        /* Адаптив для мобилок */
+       @media (max-width: 900px) {
+            .footer-cta {
+                padding-bottom: 260px !important;
             }
-            .legal-links { gap: 20px; }
+
+            .footer-legal-bar {
+                flex-direction: column-reverse; /* Копирайт внизу, ссылки выше */
+                align-items: center;
+                text-align: center;
+                gap: 15px;
+                padding: 80px 20px 30px; /* Увеличиваем верхнюю зону градиента */
+                
+                /* Градиент чуть выше для мобилок */
+                background: linear-gradient(to top, #000000 40%, rgba(0,0,0,0.9) 70%, rgba(0,0,0,0) 100%);
+            }
         }
 
         .glass-card .card-content {
@@ -822,6 +856,49 @@
         .modal { background: var(--bg-sec); width: 90%; max-width: 500px; border-radius: 20px; border: 1px solid var(--border); padding: 30px; text-align: center; position: relative; }
         .modal-close { position: absolute; top: 15px; right: 15px; font-size: 24px; cursor: pointer; opacity: 0.7; }
         .modal-scrollable { max-height: 70vh; overflow-y: auto; text-align: left; padding-right: 10px; margin-top: 15px; }
+
+        /* --- ВЕРТИКАЛЬНЫЙ ГРАДИЕНТ (ШАПКА) --- */
+        h1.brand-title .gradient-text {
+            background: linear-gradient(to bottom, #CB53F0 20%, #ff00cc 100%);
+            
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* --- FETISH AI  --- */
+        .ai-title-animated {
+            font-size: clamp(36px, 5vw, 56px);
+            font-weight: 900;
+            
+            /* ЦВЕТА: Светло-фиолетовый -> Маджента -> Светло-фиолетовый */
+            background: linear-gradient(
+                90deg, 
+                #CB53F0 0%, 
+                #ff00cc 50%, 
+                #CB53F0 100%
+            );
+            
+            background-size: 200% auto;
+            
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+            
+            /* Бесконечная плавная анимация в одну сторону */
+            animation: gradientFlow 3s linear infinite;
+        }
+
+        @keyframes gradientFlow {
+            0% {
+                background-position: 0% center;
+            }
+            100% {
+                background-position: -200% center; /* Двигаем ровно на длину паттерна */
+            }
+        }
 
         /* === ADVANCED AURORA GRADIENTS === */
 
@@ -1033,9 +1110,9 @@
         }
 
         .gradient-text-bento {
-            background: linear-gradient(90deg, #CB53F0, #7000ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            background: linear-gradient(to bottom, #CB53F0 20%, #ff00cc 100%) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
         }
 
         /* ИКОНКИ */
@@ -1140,11 +1217,25 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* === FOOTER BUTTONS REFINEMENT === */
+        /* === FOOTER BUTTONS === */
         
         /* Primary (Launch) - Оставляем яркой */
         .footer-btn-row .btn-cta {
             box-shadow: 0 0 40px rgba(203, 83, 240, 0.4);
+        }
+
+        .btn-cta {
+            background: linear-gradient(135deg, rgba(203, 83, 240, 0.4), rgba(255, 0, 204, 0.4)) !important;
+            
+            box-shadow: 0 10px 30px rgba(255, 0, 204, 0.3), 
+                        inset 0 0 20px rgba(255, 255, 255, 0.1) !important;
+            
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-cta:hover {
+            background: linear-gradient(135deg, rgba(203, 83, 240, 0.6), rgba(255, 0, 204, 0.6)) !important;
+            box-shadow: 0 15px 50px rgba(255, 0, 204, 0.5) !important;
         }
 
         /* Secondary (Install) - Успокаиваем */
@@ -1167,10 +1258,11 @@
         /* 1. HERO BLOCK (Самый яркий - 1200+) */
         .bg-hero {
             background: rgba(255, 255, 255, 0.03); /* Прозрачная база */
-            /* Яркая фиолетовая рамка */
-            border: 1px solid rgba(203, 83, 240, 0.5); 
-            /* Легкое фиолетовое свечение внутри и снаружи */
-            box-shadow: 0 0 20px rgba(112, 0, 255, 0.15), inset 0 0 20px rgba(112, 0, 255, 0.1);
+            border: 1px solid rgba(255, 0, 204, 0.5) !important;
+    
+            /* Розовое свечение */
+            box-shadow: 0 0 20px rgba(255, 0, 204, 0.15), 
+                        inset 0 0 20px rgba(255, 0, 204, 0.1) !important;
             backdrop-filter: blur(10px);
         }
 
@@ -1376,13 +1468,13 @@
 
     <!-- MAIN CONTENT -->
     <main>
-        <!-- WHAT IS XFETISHHUB (FINAL DESIGN) -->
+        <!-- WHAT IS XFETISHHUB -->
         <section id="what-is" class="bg-main">
             <div class="container fade-in">
                 <div style="text-align: center; max-width: 900px; margin: 0 auto 60px;">
                     <h2 style="font-size: clamp(28px, 4vw, 42px); font-weight: 800; line-height: 1.2;">
-                        <span data-i18n="wi_title">Not just a tube site.</span><br>
-                        <span class="gradient-text" data-i18n="wi_subtitle">It's your personal discovery engine.</span>
+                        <span data-i18n="wi_title">Stop searching for 18+ videos.</span><br>
+                        <span class="gradient-text" data-i18n="wi_subtitle">I'll find them for you.</span>
                     </h2>
                 </div>
                 
@@ -1503,7 +1595,7 @@
         <section id="deep-dive" class="bg-main bento-section">
             <div class="container fade-in">
                 <div style="text-align: center; margin-bottom: 50px;">
-                    <h2><span class="gradient-text" data-i18n="flm_title">FetishAI 1.0</span></h2>
+                    <h2><span class="ai-title-animated" data-i18n="flm_title">FetishAI 1.0</span></h2>
                     <p style="color:var(--text-sec); font-size:18px; margin-top:10px;" data-i18n="flm_subtitle">Uncensored & Serverless</p>
                 </div>
                 
@@ -1613,6 +1705,9 @@
             <div class="container">
                 <div style="text-align: center; margin-bottom: 20px;" class="fade-in">
                     <h2 data-i18n="map_title">Future <span class="gradient-text">Plans</span></h2>
+                    <p style="color:var(--text-sec); margin-top: 10px; font-size: 16px;" data-i18n="map_subtitle">
+                        With your support, we will become legends 😎
+                    </p>
                 </div>
                  <div class="roadmap-list fade-in">
                     <div class="roadmap-separator"><div class="separator-line line-left"></div><span data-i18n="rm_phase_1">Phase 1: Intelligence</span><div class="separator-line line-right"></div></div>
@@ -1636,6 +1731,10 @@
             <div class="container fade-in">
                 <div style="text-align: center; margin-bottom: 40px;">
                     <h2><span data-i18n="faq_title">Frequently Asked <span class="gradient-text">Questions</span></span></h2>
+                    <!-- ПРАВКА 6: Подзаголовок -->
+                    <p style="color:var(--text-sec); margin-top: 10px; font-size: 16px;" data-i18n="faq_subtitle">
+                        In case you need clarification
+                    </p>
                 </div>
                 <div class="faq-grid">
                     <details class="faq-item">
@@ -1868,8 +1967,8 @@
 
                 
                 // --- WHAT IS XFETISHHUB ---
-                wi_title: "Not just a tube site.",
-                wi_subtitle: "It's your personal discovery engine.",
+                wi_title: "Stop searching for 18+ videos.",
+                wi_subtitle: "I'll find them for you.",
                 
                 wi_p1_head: "Choose", 
                 wi_p1_desc: "I think you're tired of always watching the same thing. We give you a choice, based on which the algorithm will offer you better results so you never get bored 😏.",
@@ -1880,6 +1979,9 @@
                 wi_p3_head: "Discover", 
                 wi_p3_desc: "Think you already know all 18+ genres? With our collection of 1200+ tags, you will constantly learn something new for yourself for years to come 🔭.",
                
+                map_subtitle: "With your support, we will become legends 😎",
+                faq_subtitle: "In case you need clarification", 
+
                 // --- FEATURES ---
                 feat_title: "Why <span class='gradient-text'>xFetishHub</span>?",
                 f1_w1: "Explore", f1_w2: "Pleasure", f1_w3: "AI Agent",
@@ -1972,8 +2074,8 @@
                 btn_launch: "Запустить", btn_install: "Установить на телефон",
 
                 // --- WHAT IS ---
-                wi_title: "Не просто тьюб сайт.",
-                wi_subtitle: "Это твой поисковик желаний.",
+                wi_title: "Хватит искать 18+ видео.",
+                wi_subtitle: "Я найду их за тебя.",
                 
                 wi_p1_head: "Выбирай", 
                 wi_p1_desc: "Думаю ты устал вечно смотреть на одно и то же. Мы даём тебе выбор, на основе которого алгоритм будет предлагать тебе всё более лучшие результаты, чтобы ты никогда не заскучал 😏.",
@@ -1983,6 +2085,9 @@
                 
                 wi_p3_head: "Открывай", 
                 wi_p3_desc: "Думаешь, что уже знаешь про все 18+ жанры? С нашей коллекцией 1200+ предпочтений ты будешь постоянно узнавать о чём-то новом для себя на протяжении нескольких лет 🔭.",
+
+                map_subtitle: "С твоей поддержкой мы станем легендами 😎",
+                faq_subtitle: "Если вдруг нужны уточнения",
 
                 // --- FEATURES ---
                 feat_title: "Почему <span class='gradient-text'>xFetishHub</span>?",
@@ -2073,8 +2178,8 @@
                 btn_launch: "Lanzar App", btn_install: "Instalar en Móvil",
 
                 // --- WHAT IS ---
-                wi_title: "No es solo un sitio tube.",
-                wi_subtitle: "Es tu motor de descubrimiento.",
+                wi_title: "Deja de buscar videos 18+.",
+                wi_subtitle: "Los encontraré por ti.",
 
                 wi_p1_head: "Elige", 
                 wi_p1_desc: "Creo que estás cansado de ver siempre lo mismo. Te damos a elegir, y el algoritmo te ofrecerá mejores resultados para que nunca te aburras 😏.",
@@ -2084,6 +2189,9 @@
                 
                 wi_p3_head: "Descubre", 
                 wi_p3_desc: "¿Crees que ya conoces todos los géneros 18+? Con nuestra colección de 1200+ preferencias, descubrirás algo nuevo constantemente durante años 🔭.",
+
+                map_subtitle: "Con tu apoyo nos convertiremos en leyendas 😎",
+                faq_subtitle: "En caso de que necesites aclaraciones",
 
                 // --- FEATURES ---
                 feat_title: "¿Por qué <span class='gradient-text'>xFetishHub</span>?",
@@ -2174,8 +2282,8 @@
                 btn_launch: "App Starten", btn_install: "Auf Handy installieren",
 
                 // --- WHAT IS ---
-                wi_title: "Nicht nur eine Tube-Seite.",
-                wi_subtitle: "Deine Entdeckungsmaschine.",
+                wi_title: "Hör auf, 18+ Videos zu suchen.",
+                wi_subtitle: "Ich finde sie für dich.",
 
                 wi_p1_head: "Wähle", 
                 wi_p1_desc: "Ich glaube, du bist es leid, immer das Gleiche zu sehen. Wir geben dir die Wahl, damit der Algorithmus dir bessere Ergebnisse liefert und du dich nie langweilst 😏.",
@@ -2185,6 +2293,9 @@
                 
                 wi_p3_head: "Entdecke", 
                 wi_p3_desc: "Glaubst du, du kennst schon alle 18+ Genres? Mit unserer Sammlung von 1200+ Vorlieben wirst du jahrelang ständig etwas Neues über dich lernen 🔭.",
+
+                map_subtitle: "Mit deiner Unterstützung werden wir Legenden 😎",
+                faq_subtitle: "Falls du Klärung brauchst",
 
                 // --- FEATURES ---
                 feat_title: "Warum <span class='gradient-text'>xFetishHub</span>?",
