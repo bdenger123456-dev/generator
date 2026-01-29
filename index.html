@@ -162,23 +162,24 @@
         /* === NAVBAR === */
         .navbar {
             position: fixed; top: 0; left: 0; width: 100%; 
-            /* Увеличиваем высоту, чтобы градиент был плавным */
+            /* Увеличиваем высоту зоны градиента */
             padding: 20px 40px 60px; 
             z-index: 1000;
-            display: flex; justify-content: space-between; align-items: flex-start; /* Выравнивание по верху */
+            display: flex; justify-content: space-between; align-items: flex-start;
             
-            /* Убираем старый фон и рамку */
+            /* ФОН ПРОЗРАЧНЫЙ (цвет задает псевдо-элемент ниже) */
             background: transparent !important; 
             border-bottom: none !important;
-            backdrop-filter: none !important; /* Блюр переносим в псевдо-элемент */
+            backdrop-filter: none !important;
             
-            transform: translateY(-100%); 
+            /* ВАЖНО: Убираем скрытие (-100%), ставим 0, чтобы она была видна всегда */
+            transform: translateY(0) !important; 
             transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
             
+            /* Чтобы клики проходили сквозь пустое место внизу градиента */
             pointer-events: none; 
         }
 
-        .navbar.visible { transform: translateY(0); }
         .nav-logo-wrapper, .nav-links, .lang-custom { pointer-events: auto; }
 
         .navbar::before {
@@ -187,17 +188,20 @@
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1;
             
-            /* Темный фон, исчезающий к низу */
-            background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 40%, transparent 100%);
+            /* Тот самый градиент (черный сверху, прозрачный снизу) */
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 40%, transparent 100%);
             
-            /* Само размытие */
+            /* Размытие */
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             
-            /* Маска, чтобы блюр плавно исчезал, а не обрывался */
+            /* Маска для плавного исчезновения блюра */
             mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
             -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
         }
+
+        /* Адаптив отступов */
+        @media (max-width: 768px) { .navbar { padding: 15px 20px 50px; } }
 
         .nav-logo-img { height: 32px; width: auto; object-fit: contain; }
         .nav-links { display: flex; gap: 30px; margin-top: 5px; }
@@ -317,6 +321,12 @@
         .divider-gray-black { background: linear-gradient(to bottom, var(--bg-sec), var(--bg-main)); }
         .divider-black-gray { background: linear-gradient(to bottom, var(--bg-main), var(--bg-sec)); }
         .divider-faq-footer { background: linear-gradient(to bottom, var(--bg-sec), #000000); }
+
+        .divider-hero-feat { 
+            top: 0; 
+            bottom: auto; 
+            background: linear-gradient(to bottom, var(--bg-main) 0%, var(--bg-sec) 100%);
+        }
 
         /* === SECTION: WHAT IS (Black) === */
         #what-is { background-color: var(--bg-main); padding: 100px 0 180px; position: relative; z-index: 10; }
@@ -1556,7 +1566,7 @@
                             <li data-i18n="feat_limit">🎲 50 Generations / day</li>
                             <li data-i18n="feat_wrapped_limited">🎁 1 Fetish Wrapped / week</li>
                             <li data-i18n="feat_stats_basic">📊 Basic Statistics</li>
-                            <li data-i18n="feat_no_ads">🚫 No Ads</li>
+                            <li data-i18n="feat_no_ads_emoji">🚫 No Ads</li>
                             <li data-i18n="feat_privacy_list">🔒 Total Privacy</li>
                         </ul>
                     </div>
@@ -1903,6 +1913,8 @@
                 feat_lifetime_full: "♾️ <b>Lifetime Access</b>", feat_sponsors: "💎 Listed in 'Sponsors'", badge_limited: "LIMITED OFFER", feat_lifetime: "Lifetime", limit_burn: "🔥 ALMOST GONE", limit_claimed: "claimed",
                 feat_all_beast: "👑 <b>All Beast Features</b>",
 
+                feat_no_ads_emoji: "🚫 No Ads",
+
                 // --- ROADMAP ---
                 map_title: "Future <span class='gradient-text'>Plans</span>",
                 rm_phase_1: "Phase 1: Intelligence", 
@@ -2005,6 +2017,8 @@
                 feat_lifetime_full: "♾️ <b>Доступ навсегда</b>", feat_sponsors: "💎 В списке Спонсоров", badge_limited: "ОГРАНИЧЕНО", feat_lifetime: "Навсегда", limit_burn: "🔥 СКОРО РАЗБЕРУТ", limit_claimed: "забрали",
                 feat_all_beast: "👑 <b>Все функции Beast</b>",
 
+                feat_no_ads_emoji: "🚫 Без рекламы",
+
                 // --- ROADMAP ---
                 map_title: "Планы <span class='gradient-text'>Развития</span>",
                 rm_phase_1: "Этап 1: Интеллект", rm_1_head: "Глобальный Разум", rm_1_desc: "Подбор фетишей похожих людей и глобальные тренды.",
@@ -2104,6 +2118,8 @@
                 feat_lifetime_full: "♾️ <b>Acceso de por vida</b>", feat_sponsors: "💎 En la lista de Patrocinadores", badge_limited: "OFERTA LIMITADA", feat_lifetime: "De por vida", limit_burn: "🔥 CASI AGOTADO", limit_claimed: "reclamados",
                 feat_all_beast: "👑 <b>Todo de Beast</b>",
 
+                feat_no_ads_emoji: "🚫 Sin anuncios",
+
                 // --- ROADMAP ---
                 map_title: "Planes <span class='gradient-text'>Futuros</span>",
                 rm_phase_1: "Fase 1: Inteligencia", rm_1_head: "Inteligencia Global", rm_1_desc: "Coincidencias con usuarios similares y tendencias globales.",
@@ -2202,6 +2218,8 @@
                 feat_all_pro: "👑 <b>Alle Pro-Funktionen</b>", feat_discord: "💬 <b>Discord</b> (Dev Chat)", feat_vote: "🗳️ Abstimmung über neue Funktionen",
                 feat_lifetime_full: "♾️ <b>Lebenslanger Zugriff</b>", feat_sponsors: "💎 In der Sponsorenliste", badge_limited: "BEGRENZTES ANGEBOT", feat_lifetime: "Lifetime", limit_burn: "🔥 FAST WEG", limit_claimed: "beansprucht",
                 feat_all_beast: "👑 <b>Alle Beast-Funktionen</b>",
+
+                feat_no_ads_emoji: "🚫 Keine Werbung",
 
                 // --- ROADMAP ---
                 map_title: "Zukunfts <span class='gradient-text'>pläne</span>",
@@ -2381,36 +2399,32 @@
         }, { threshold: 0.2 });
         document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
         
+        // Логика шапки: прозрачная вверху, темная при скролле
         window.addEventListener('scroll', () => {
             const navbar = document.getElementById('sticky-nav');
-            const showPoint = window.innerHeight * 0.8; // Показать, когда проскроллили 80% первого экрана
             
-            if (window.scrollY > showPoint) {
-                navbar.classList.add('visible');
+            // Если прокрутили больше 50px, добавляем фон
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
             } else {
-                navbar.classList.remove('visible');
+                navbar.classList.remove('scrolled');
             }
 
+            // Параллакс эффекты (оставляем как были)
             const heroImg = document.getElementById('hero-bg-img');
             if (heroImg) heroImg.style.transform = `translateY(${window.scrollY * 0.4}px)`;
             
             const footer = document.querySelector('.footer-cta');
             const footerWrapper = document.querySelector('.footer-bg-wrapper');
-            
             if (footer && footerWrapper) {
                 const footerTop = footer.offsetTop;
                 const scrollPos = window.scrollY + window.innerHeight;
-                
-                // Если футер хотя бы частично виден
                 if (scrollPos > footerTop) {
-                    // Вычисляем, насколько пикселей мы "заехали" на футер
                     const distance = scrollPos - footerTop;
-                    
-                    // Двигаем картинку ВНИЗ (противоход скроллу), создавая эффект глубины.
                     footerWrapper.style.transform = `translate3d(0, ${distance * 0.15}px, 0)`;
                 }
             }
-            });
+        });
         init();
 
         // --- AGE VERIFICATION LOGIC ---
