@@ -906,6 +906,158 @@
             100% { transform: translateX(-20%) translateY(-20%) rotate(0deg); }
         }
 
+        /* Новые градиенты для добавленных блоков */
+        .bg-noads { background: linear-gradient(135deg, #434343 0%, #000000 100%); border: 1px solid rgba(255,255,255,0.1); }
+        .bg-devices { background: linear-gradient(135deg, rgba(58, 28, 113, 0.6), rgba(215, 109, 119, 0.4)); }
+
+        /* Специальный класс для идеальной центровки (Privacy, Browser, UI) */
+        .cell-center-perfect {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 10px !important; /* Уменьшаем паддинг чтобы влезло */
+        }
+
+        /* Убираем лишние отступы у иконок в этих блоках, чтобы они встали ровно по центру */
+        .cell-center-perfect .bento-icon-xs {
+            margin-bottom: 5px !important;
+            width: 45px !important; 
+            height: 45px !important;
+        }
+
+        /* Жирный текст под иконкой (вместо bento-label-bottom) */
+        .bento-label-bold {
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #fff;
+            margin-top: 2px;
+        }
+
+        /* Адаптив для мобильных (правки высоты) */
+        @media (max-width: 900px) {
+            .bento-cell h3 { font-size: 16px; } /* Чуть меньше заголовок на моб */
+            .cell-center-perfect .bento-icon-xs { width: 35px !important; height: 35px !important; }
+        }
+
+        /* ВЫСОКИЕ БЛОКИ (Wrapped слева, AI справа) */
+        .row-2 { grid-row: span 2; }
+
+        /* Flex Row для блока 1200+ (Иконка слева) */
+        .cell-flex-row {
+            display: flex;
+            flex-direction: row; /* Горизонтально */
+            align-items: center;
+            justify-content: center;
+            gap: 25px; /* Отступ между иконкой и текстом */
+        }
+
+        /* ОГРОМНАЯ ИКОНКА ТЕГОВ (для 1200+) */
+        .bento-icon-giant {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.4));
+        }
+
+        /* ОГРОМНЫЕ ЦИФРЫ */
+        .text-giant {
+            font-size: 60px;
+            font-weight: 900;
+            line-height: 0.9;
+            letter-spacing: -2px;
+            background: linear-gradient(to bottom, #ffffff 40%, #888888 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
+
+        /* ЦЕНТРОВКА (для всех остальных блоков) */
+        .cell-center-perfect {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 10px;
+            position: relative;
+        }
+
+        /* ТЕКСТЫ */
+        .text-huge {
+            font-size: 26px !important;
+            font-weight: 800 !important;
+            line-height: 1.1;
+            text-transform: uppercase;
+            margin-top: 15px;
+        }
+
+        .text-small-bold {
+            font-size: 15px;
+            font-weight: 800;
+            margin-top: 5px;
+            line-height: 1.1;
+        }
+
+        .bento-label-bold {
+            font-weight: 900;
+            text-transform: uppercase;
+            color: #fff;
+            font-size: 13px;
+            margin-top: 2px;
+        }
+
+        .gradient-text-bento {
+            background: linear-gradient(90deg, #CB53F0, #7000ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* ИКОНКИ */
+        .bento-icon-xl { width: 90px; height: 90px; object-fit: contain; }
+        .bento-icon-sm { width: 50px; height: 50px; object-fit: contain; }
+        .bento-icon-xs { width: 40px !important; height: 40px !important; margin-bottom: 4px !important; }
+
+        /* ФОНЫ */
+        .bg-noads { background: linear-gradient(135deg, #232526, #414345); }
+        .bg-devices { background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); }
+
+        /* МОБИЛЬНЫЙ АДАПТИВ */
+        @media (max-width: 900px) {
+            /* Настраиваем высоту строк */
+            .bento-grid {
+                /* Автоматическая высота рядов */
+                grid-auto-rows: minmax(130px, auto) !important; 
+                gap: 10px !important;
+            }
+            
+            /* Отключаем десктопное растягивание на 2 ряда */
+            .row-2 { 
+                grid-row: span 1 !important; 
+                min-height: 220px; /* Для AI и Wrapped делаем блоки высокими */
+            }
+            
+            /* СЕТКА БЕЗ ПУСТОТ */
+            .mob-full { grid-column: span 12 !important; } /* 100% ширины */
+            .mob-6 { grid-column: span 6 !important; }    /* 50% ширины */
+            
+            /* Убираем старый класс mob-4, он теперь не нужен для заполнения */
+            .mob-4 { grid-column: span 6 !important; }    /* На всякий случай, если где-то остался */
+
+            /* Фикс для блока 1200+ на мобильном */
+            .cell-flex-row { 
+                flex-direction: column; 
+                text-align: center;
+                padding: 20px 10px;
+            }
+            .cell-flex-row div { text-align: center !important; }
+            .text-giant { font-size: 50px; }
+            .bento-icon-giant { width: 60px; height: 60px; margin-bottom: 10px; }
+        }
+
         /* AGE OVERLAY */
         .age-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 99999; display: none; justify-content: center; align-items: center; padding: 20px; }
         .age-modal { background: #111; border: 1px solid #333; border-radius: 24px; padding: 40px; max-width: 400px; width: 100%; text-align: center; box-shadow: 0 0 50px rgba(203, 83, 240, 0.15); animation: fadeIn 0.5s ease; }
@@ -1322,77 +1474,84 @@
 
         <div class="container fade-in" style="z-index: 10; position: relative;">
             <div style="text-align: center; margin-bottom: 50px;">
-                <h2 style="font-size: 3.5rem; margin-bottom: 10px; font-weight: 900;" data-i18n="footer_head">Ready to explore?</h2>
-                <p style="color: rgba(255,255,255,0.7); font-size: 1.2rem;" data-i18n="footer_sub">Everything you need in one secure place.</p>
+                <h2 style="font-size: 3.5rem; margin-bottom: 10px; font-weight: 900;" data-i18n="footer_head">Impressed?</h2>
+                <p style="color: rgba(255,255,255,0.7); font-size: 1.2rem;" data-i18n="footer_sub">Take a look at the summary and let's go explore your tastes 😈</p>
             </div>
 
             <div class="bento-grid">
-                
-                <!-- РЯД 1 -->
-                <div class="bento-cell col-7 mob-full bg-wrapped cell-row">
-                    <div style="max-width: 60%;">
-                        <!-- АНИМИРОВАННЫЙ БЕЙДЖИК -->
-                        <span class="bento-badge" id="cycle-badge">WEEKLY</span>
-                        <h3 data-i18n="bn_wrapped">Fetish Wrapped</h3>
-                        <p data-i18n="bn_wrapped_desc">Your personal stats</p>
+    
+                <!-- 1. FETISH WRAPPED (ЛЕВЫЙ ВЕРХНИЙ) -->
+                <div class="bento-cell col-3 mob-full row-2 bg-wrapped cell-center-perfect">
+                    <span class="bento-badge" id="cycle-badge" style="position: absolute; top: 20px;">WEEKLY</span>
+                    <img src="icon_gift.png" class="bento-icon-xl" alt="Wrapped">
+                    <h3 class="text-huge" data-i18n="bn_wrapped">Fetish Wrapped</h3>
+                </div>
+
+                <!-- 2. NO ADS -->
+                <div class="bento-cell col-2 mob-6 bg-noads cell-center-perfect">
+                    <img src="icon_noadds.png" class="bento-icon-sm" alt="No Ads">
+                    <h3 data-i18n="feat_no_ads" class="text-small-bold">No Ads</h3>
+                </div>
+
+                <!-- 3. 3 MODES -->
+                <div class="bento-cell col-2 mob-6 bg-modes cell-center-perfect">
+                    <img id="modes-icon-anim" src="icon_discovery.png" class="bento-icon-sm" alt="Modes">
+                    <h3 data-i18n="bn_modes" class="text-small-bold">3 Modes</h3>
+                </div>
+
+                <!-- 4. MADE FOR -->
+                <div class="bento-cell col-2 mob-full bg-devices cell-center-perfect">
+                    <img src="icon_devices.png" class="bento-icon-sm" style="margin-bottom: 5px;" alt="Devices">
+                    <div id="device-text-anim" class="bento-label-bold">iPhone</div>
+                </div>
+
+                <!-- 5. SYNC (ОБЛАКО) -->
+                <div class="bento-cell col-3 mob-full bg-sync cell-center-perfect">
+                    <img src="icon_cloud.png" class="bento-icon-sm" style="margin-bottom: 5px;" alt="Sync">
+                    <h3 data-i18n="bn_sync" style="font-size: 18px; font-weight: 800;">Sync</h3>
+                </div>
+
+                <!-- === РЯД 2 (Desktop) / ПРОДОЛЖЕНИЕ (Mobile) === -->
+
+                <!-- 6. 1200+ FETISHES -->
+                <div class="bento-cell col-6 mob-full bg-fetishes cell-flex-row">
+                    <img src="icon_tags.png" class="bento-icon-giant" alt="Tags">
+                    <div style="text-align: left;">
+                        <h3 class="text-giant">1200+</h3>
+                        <div class="bento-label-bold" style="font-size: 20px; letter-spacing: 2px; opacity: 0.9;">FETISHES</div>
                     </div>
-                    <img src="icon_gift.png" class="bento-icon-lg" alt="Wrapped">
                 </div>
 
-                <div class="bento-cell col-3 mob-5 bg-modes cell-center">
-                    <img src="icon_compass.png" class="bento-icon-sm" alt="Modes">
-                    <h3 data-i18n="bn_modes">3 Modes</h3>
+                <!-- 7. FETISH AI (ПРАВЫЙ НИЖНИЙ) -->
+                <div class="bento-cell col-3 mob-full row-2 bg-ai cell-center-perfect">
+                    <img src="icon_brain.png" class="bento-icon-xl" alt="AI">
+                    <h3 class="text-huge gradient-text-bento">FetishAI</h3>
                 </div>
 
-                <div class="bento-cell col-2 mob-7 bg-privacy cell-center">
-                    <img src="lock.apng" class="bento-icon-xs" alt="Privacy">
-                    <!-- Жирный текст -->
-                    <div class="bento-label-bottom" data-i18n="bn_priv">Privacy</div>
-                </div>
+                <!-- === РЯД 3 (Desktop) / НИЗ (Mobile) === -->
 
-                <!-- РЯД 2 -->
-                <div class="bento-cell col-2 mob-5 bg-browser cell-center">
-                    <img src="icon_globe.png" class="bento-icon-xs" alt="Browser">
-                    <!-- Жирный текст -->
-                    <div class="bento-label-bottom" data-i18n="bn_browser">Browser</div>
-                </div>
-
-                <div class="bento-cell col-7 mob-7 bg-fetishes cell-row">
-                    <img src="icon_tags.png" class="bento-icon-lg" alt="Tags">
-                    <div style="text-align: right;">
-                        <h3 style="font-size: 24px;">1200+</h3>
-                        <p data-i18n="bn_fetishes">Fetishes</p>
-                    </div>
-                </div>
-
-                <div class="bento-cell col-3 mob-full bg-swipe cell-center">
-                    <!-- АНИМИРОВАННАЯ РУКА -->
-                    <img src="icon_hand.png" class="hand-icon-anim" alt="Swipe">
-                    <!-- Жирный текст -->
+                <!-- 8. SWIPES (СВАЙПЫ) -->
+                <div class="bento-cell col-3 mob-6 bg-swipe cell-center-perfect">
+                    <img src="icon_hand.png" class="hand-icon-anim" style="margin-bottom: 5px;" alt="Swipe">
                     <div class="bento-label-bottom" data-i18n="bn_swipe">Swipes</div>
                 </div>
 
-                <!-- РЯД 3 -->
-                <div class="bento-cell col-4 mob-7 bg-sync cell-row">
-                     <img src="icon_cloud.png" class="bento-icon-sm" alt="Sync">
-                     <div style="text-align: right;">
-                        <h3 data-i18n="bn_sync">Sync</h3>
-                        <p style="font-size:11px; opacity:0.6;">Backup</p>
-                    </div>
+                <!-- 9. PRIVACY (ПРИВАТНОСТЬ) -->
+                <div class="bento-cell col-2 mob-6 bg-privacy cell-center-perfect">
+                    <img src="lock.apng" class="bento-icon-xs" alt="Privacy">
+                    <div class="bento-label-bold" data-i18n="bn_priv">PRIVACY</div>
                 </div>
 
-                <div class="bento-cell col-2 mob-5 bg-custom animated-gradient cell-center">
+                <!-- 10. BROWSER (БРАУЗЕР) -->
+                <div class="bento-cell col-2 mob-6 bg-browser cell-center-perfect">
+                    <img src="icon_globe.png" class="bento-icon-xs" alt="Browser">
+                    <div class="bento-label-bold" data-i18n="bn_browser">BROWSER</div>
+                </div>
+
+                <!-- 11. UI (КАСТОМИЗАЦИЯ) -->
+                <div class="bento-cell col-2 mob-6 bg-custom animated-gradient cell-center-perfect">
                     <img src="icon_palette.png" class="bento-icon-xs" alt="Custom">
-                    <!-- Жирный текст -->
-                    <div class="bento-label-bottom" data-i18n="bn_custom">UI</div>
-                </div>
-
-                <div class="bento-cell col-6 mob-full bg-ai cell-row">
-                     <div style="max-width: 60%;">
-                        <h3 data-i18n="flm_title">FetishAI 1.0</h3>
-                        <p>Serverless Engine</p>
-                    </div>
-                    <img src="icon_brain.png" class="bento-icon-lg" alt="AI">
+                    <div class="bento-label-bold" data-i18n="bn_custom">UI</div>
                 </div>
 
             </div>
@@ -1510,6 +1669,9 @@
                 f3_prefix: "Adult ", f3_target: "Statistics", f3_desc: "Learn about your favorite genres and see detailed summaries in Wrapped style 🔥",
                 f4_title: "Total Privacy", f4_desc: "Watch videos on your phone in a private browser that doesn't keep history in your main browser 🤫",
 
+                lbl_madefor: "Made For",
+                dev_iphone: "iPhone", dev_android: "Android", dev_pc: "PC",
+
                 // --- HOW IT WORKS ---
                 hiw_title: "How <span class='gradient-text'>It Works</span>", hiw_sub: "Discovering your hidden interests is simpler than you think.",
                 step1_title: "Choose Your Path", step1_desc: "Select 'Explore', 'Pleasure' or tell the AI Agent what you desire. Then simply Swipe.",
@@ -1562,7 +1724,7 @@
                 a5: "The difference is that a paid subscription allows you to use the site without any restrictions, and at the same time, you support the developer in further developing the site 😊.",
 
                 // --- BENTO FOOTER CTA ---
-                footer_head: "Ready to explore?", footer_sub: "Everything you need in one secure place.",
+                footer_head: "Impressed?", footer_sub: "Take a look at the summary and let's go explore your tastes 😈",
                 bn_wrapped: "Fetish Wrapped", bn_wrapped_desc: "Your personal stats",
                 bn_modes: "3 Modes", bn_modes_desc: "Explore, Pleasure, AI",
                 bn_fetishes: "Unique Fetishes",
@@ -1608,6 +1770,9 @@
                 f2_title: "Умные карточки", f2_desc: "Чем больше ты пользуешься, тем лучше рекомендации тебя ожидают 😏",
                 f3_prefix: "Взрослая ", f3_target: "статистика", f3_desc: "Узнавай о своих любимых жанрах, и смотри детальные сводки в стиле Wrapped 🔥",
                 f4_title: "Полная приватность", f4_desc: "Смотри видео на телефоне в приватном браузере, который не хранит историю в твоём браузере 🤫",
+
+                lbl_madefor: "Работает на",
+                dev_iphone: "iPhone", dev_android: "Android", dev_pc: "ПК",
 
                 // --- HOW IT WORKS ---
                 hiw_title: "Как <span class='gradient-text'>Это Работает</span>", hiw_sub: "Найти свои скрытые интересы проще, чем кажется.",
@@ -1658,7 +1823,7 @@
                 a5: "Разница в том, что платная подписка позволяет вам без каких-либо ограничений пользоваться сайтом, а заодно вы поддерживаете разработчика и дальше развивать сайт 😊.",
 
                 // --- BENTO FOOTER CTA ---
-                footer_head: "Готов начать?", footer_sub: "Всё что нужно в одном безопасном месте.",
+                footer_head: "Впечатлило?", footer_sub: "Глянь сводку и погнали исследовать твои вкусы 😈",
                 bn_wrapped: "Fetish Wrapped", bn_wrapped_desc: "Твоя статистика",
                 bn_modes: "3 Режима", bn_modes_desc: "Поиск, Наслаждение, AI",
                 bn_fetishes: "Уникальных Фетишей",
@@ -1704,6 +1869,9 @@
                 f2_title: "Tarjetas Inteligentes", f2_desc: "Cuanto más lo usas, mejores recomendaciones te esperan 😏",
                 f3_prefix: "Estadísticas ", f3_target: "Adultas", f3_desc: "Aprende sobre tus géneros favoritos y mira resúmenes detallados al estilo Wrapped 🔥",
                 f4_title: "Privacidad Total", f4_desc: "Mira videos en tu teléfono en un navegador privado que no guarda historial en tu navegador principal 🤫",
+
+                lbl_madefor: "Hecho para",
+                dev_iphone: "iPhone", dev_android: "Android", dev_pc: "PC",
 
                 // --- HOW IT WORKS ---
                 hiw_title: "Cómo <span class='gradient-text'>Funciona</span>", hiw_sub: "Descubrir tus intereses ocultos es más simple de lo que crees.",
@@ -1754,7 +1922,7 @@
                 a5: "La diferencia es que la suscripción de pago te permite usar el sitio sin restricciones, y al mismo tiempo apoyas al desarrollador para seguir mejorando el sitio 😊.",
 
                 // --- BENTO FOOTER CTA ---
-                footer_head: "¿Listo para explorar?", footer_sub: "Todo lo que necesitas en un lugar seguro.",
+                footer_head: "¿Impresionado?", footer_sub: "Echa un vistazo al resumen y vamos a explorar tus gustos 😈",
                 bn_wrapped: "Fetish Wrapped", bn_wrapped_desc: "Tus estadísticas",
                 bn_modes: "3 Modos", bn_modes_desc: "Explorar, Placer, IA",
                 bn_fetishes: "Fetiches Únicos",
@@ -1800,6 +1968,9 @@
                 f2_title: "Smart Cards", f2_desc: "Je mehr du es nutzt, desto bessere Empfehlungen erwarten dich 😏",
                 f3_prefix: "Erotik ", f3_target: "Statistik", f3_desc: "Erfahre mehr über deine Lieblingsgenres und sieh dir detaillierte Zusammenfassungen im Wrapped-Stil an 🔥",
                 f4_title: "Totale Privatsphäre", f4_desc: "Schaue Videos auf deinem Handy in einem privaten Browser, der keinen Verlauf in deinem Hauptbrowser speichert 🤫",
+
+                lbl_madefor: "Gemacht für",
+                dev_iphone: "iPhone", dev_android: "Android", dev_pc: "PC",
 
                 // --- HOW IT WORKS ---
                 hiw_title: "Wie <span class='gradient-text'>Es Funktioniert</span>", hiw_sub: "Deine versteckten Interessen zu entdecken ist einfacher als du denkst.",
@@ -1850,7 +2021,7 @@
                 a5: "Der Unterschied ist, dass ein kostenpflichtiges Abo dir erlaubt, die Seite ohne Einschränkungen zu nutzen, und du gleichzeitig den Entwickler bei der Weiterentwicklung unterstützt 😊.",
 
                 // --- BENTO FOOTER CTA ---
-                footer_head: "Bereit zu starten?", footer_sub: "Alles, was du brauchst, an einem sicheren Ort.",
+                footer_head: "Beeindruckt?", footer_sub: "Schau dir die Zusammenfassung an und lass uns gemeinsam deinen Geschmack entdecken 😈",
                 bn_wrapped: "Fetish Wrapped", bn_wrapped_desc: "Deine Statistiken",
                 bn_modes: "3 Modi", bn_modes_desc: "Entdecken, Vergnügen, KI",
                 bn_fetishes: "Einzigartige Fetische",
@@ -2091,8 +2262,75 @@
             }, 2500); // Меняем каждые 2.5 секунды
         }
 
+        function initModesCycle() {
+            const imgEl = document.getElementById('modes-icon-anim');
+            if (!imgEl) return;
+            
+            const icons = ['icon_discovery.png', 'icon_pleasure.png', 'icon_aimode.png'];
+            let idx = 0;
+
+            setInterval(() => {
+                // 1. Исчезаем (поворот и уменьшение)
+                imgEl.style.transform = 'scale(0.5) rotate(-20deg)';
+                imgEl.style.opacity = '0';
+                imgEl.style.transition = 'all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55)';
+
+                setTimeout(() => {
+                    // 2. Меняем картинку
+                    idx = (idx + 1) % icons.length;
+                    imgEl.src = icons[idx];
+                    
+                    // 3. Появляемся (увеличение и возврат угла)
+                    imgEl.style.transform = 'scale(1) rotate(0deg)';
+                    imgEl.style.opacity = '1';
+                }, 400);
+
+            }, 2000); // Каждые 2 сек
+        }
+
+        // --- АНИМАЦИЯ: УСТРОЙСТВА (iPhone -> Android -> PC) ---
+        function initDeviceTextCycle() {
+            const txtEl = document.getElementById('device-text-anim');
+            if (!txtEl) return;
+
+            // Берем текущий язык или дефолтный EN
+            const lang = localStorage.getItem('xfetishhub_lang') || 'en';
+            const t = translations[lang] || translations['en'];
+            
+            // Массив слов
+            const devices = [t.dev_iphone, t.dev_android, t.dev_pc];
+            let idx = 0;
+
+            setInterval(() => {
+                // Уезжаем вниз и исчезаем
+                txtEl.style.transform = 'translateY(15px)';
+                txtEl.style.opacity = '0';
+                txtEl.style.transition = 'all 0.3s ease';
+
+                setTimeout(() => {
+                    idx = (idx + 1) % devices.length;
+                    txtEl.innerText = devices[idx];
+                    
+                    // Приезжаем снизу (без анимации возвращаем позицию -15px, потом плавно в 0)
+                    txtEl.style.transition = 'none';
+                    txtEl.style.transform = 'translateY(-15px)';
+                    
+                    setTimeout(() => {
+                        txtEl.style.transition = 'all 0.3s ease';
+                        txtEl.style.transform = 'translateY(0)';
+                        txtEl.style.opacity = '1';
+                    }, 50);
+
+                }, 300);
+            }, 3000); // Каждые 3 сек
+        }
+
         // Запускаем после загрузки страницы
-        document.addEventListener('DOMContentLoaded', initBadgeCycle);
+        document.addEventListener('DOMContentLoaded', () => {
+            initModesCycle();
+            initDeviceTextCycle();
+            initBadgeCycle(); 
+        });
 
     </script>
 </body>
