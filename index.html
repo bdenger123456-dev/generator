@@ -1203,6 +1203,61 @@
             color: #fff;
         }
 
+        /* === SPACING FOR TOP-TEXT BLOCKS === */
+        
+        /* Если текст стоит ПЕРВЫМ (сверху), даем ему отступ СНИЗУ */
+        .cell-text-top h3, 
+        .cell-text-top .bento-label-bold,
+        .cell-text-top .text-label-caps,
+        .cell-text-top .text-title-caps {
+            margin-top: 0 !important;
+            margin-bottom: 10px !important;
+        }
+
+        /* Убираем лишние отступы у иконок в этих блоках */
+        .cell-text-top img {
+            margin-bottom: 0 !important;
+        }
+
+        /* Для блока Wrapped, чтобы картинка была ближе к низу/центру */
+        .cell-text-top.bg-premium-dark img {
+            margin-top: auto;
+            margin-bottom: 20px; /* Место под бейдж, если он снизу */
+        }
+
+        /* === WRAPPED BLOCK === */
+        
+        /* Заголовок прижат к верху */
+        .cell-text-top.bg-premium-dark {
+            /* Весь контент начинается сверху */
+            justify-content: flex-start !important;
+            padding-top: 35px !important;    /* Отступ сверху */
+            padding-bottom: 20px !important; /* Отступ снизу */
+        }
+
+        /* Заголовок */
+        .cell-text-top.bg-premium-dark h3 {
+            margin-top: 0 !important;
+            margin-bottom: 12px !important;
+        }
+
+        /* Бейджик (статичный, под заголовком) */
+        .cell-text-top.bg-premium-dark #cycle-badge {
+            position: static !important;
+            display: inline-block;
+            margin-bottom: 0;
+        }
+
+        /* Иконка - ЦЕНТРИРОВАНИЕ В СВОБОДНОМ МЕСТЕ */
+        .cell-text-top.bg-premium-dark img {
+            /* Эти два свойства центрируют иконку в оставшемся пустом пространстве */
+            margin-top: auto !important;
+            margin-bottom: auto !important;
+            
+            /* Чуть увеличим её для баланса, если нужно */
+            transform: scale(1.1); 
+        }
+
         /* AGE OVERLAY */
         .age-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 99999; display: none; justify-content: center; align-items: center; padding: 20px; }
         .age-modal { background: #111; border: 1px solid #333; border-radius: 24px; padding: 40px; max-width: 400px; width: 100%; text-align: center; box-shadow: 0 0 50px rgba(203, 83, 240, 0.15); animation: fadeIn 0.5s ease; }
@@ -1625,41 +1680,48 @@
 
             <div class="bento-grid">
     
-                <!-- 1. FETISH WRAPPED -->
-                <div class="bento-cell col-3 mob-full row-2 bg-premium-dark cell-center-perfect">
-                    <img src="icon_gift.png" class="bento-icon-xl" alt="Wrapped">
-                    <h3 class="text-huge" style="margin-top: 15px;">FETISH WRAPPED</h3>
+                <!-- === РЯД 1 (ТЕКСТ СВЕРХУ) === -->
+
+                <!-- 1. FETISH WRAPPED (Premium) -->
+                <div class="bento-cell col-3 mob-full row-2 bg-premium-dark cell-center-perfect cell-text-top">
+                    <!-- 1. Заголовок -->
+                    <h3 class="text-huge">FETISH WRAPPED</h3>
                     
-                    <span class="bento-badge" id="cycle-badge" style="position: absolute; bottom: 20px;">WEEKLY</span>
+                    <!-- 2. Бейдж (сразу под заголовком) -->
+                    <span class="bento-badge" id="cycle-badge">WEEKLY</span>
+                    
+                    <!-- 3. Иконка (уедет вниз благодаря CSS margin-top: auto) -->
+                    <img src="icon_gift.png" class="bento-icon-xl" alt="Wrapped">
                 </div>
 
-                <!-- 2. NO ADS -->
-                <div class="bento-cell col-2 mob-6 bg-glass-standard cell-center-perfect">
-                    <img src="icon_noadds.png" class="bento-icon-sm" alt="No Ads">
+                <!-- 2. NO ADS (Glass) -->
+                <div class="bento-cell col-2 mob-6 bg-glass-standard cell-center-perfect cell-text-top">
                     <h3 class="text-label-caps" data-i18n="feat_no_ads">NO ADS</h3>
+                    <img src="icon_noadds.png" class="bento-icon-sm" alt="No Ads">
                 </div>
 
-                <!-- 3. 3 MODES -->
-                <div class="bento-cell col-2 mob-6 bg-glass-standard cell-center-perfect">
-                    <img id="modes-icon-anim" src="icon_discovery.png" class="bento-icon-sm" alt="Modes">
+                <!-- 3. 3 MODES (Glass) -->
+                <div class="bento-cell col-2 mob-6 bg-glass-standard cell-center-perfect cell-text-top">
                     <h3 class="text-label-caps" data-i18n="bn_modes">3 MODES</h3>
+                    <img id="modes-icon-anim" src="icon_discovery.png" class="bento-icon-sm" alt="Modes">
                 </div>
 
-                <!-- 4. DEVICES -->
-                <div class="bento-cell col-2 mob-full bg-glass-standard cell-center-perfect">
-                    <img src="icon_devices.png" class="bento-icon-sm" style="margin-bottom: 5px;" alt="Devices">
+                <!-- 4. DEVICES (Glass) -->
+                <div class="bento-cell col-2 mob-full bg-glass-standard cell-center-perfect cell-text-top">
                     <div id="device-text-anim" class="bento-label-bold" style="font-size: 11px; opacity: 0.6;">IPHONE</div>
+                    <img src="icon_devices.png" class="bento-icon-sm" alt="Devices">
                 </div>
 
-                <!-- 5. CLOUD SYNC -->
-                <div class="bento-cell col-3 mob-full bg-glass-standard cell-center-perfect">
-                    <img src="icon_cloud.png" class="bento-icon-sm" style="margin-bottom: 5px;" alt="Sync">
+                <!-- 5. CLOUD SYNC (Glass) -->
+                <div class="bento-cell col-3 mob-full bg-glass-standard cell-center-perfect cell-text-top">
                     <h3 class="text-title-caps" data-i18n="bn_sync">CLOUD SYNC</h3>
+                    <img src="icon_cloud.png" class="bento-icon-sm" alt="Sync">
                 </div>
 
-                <!-- === РЯД 2 === -->
 
-                <!-- 6. 1200+ FETISHES -->
+                <!-- === РЯД 2 (СМЕШАННЫЙ / ТЕКСТ СНИЗУ) === -->
+
+                <!-- 6. 1200+ FETISHES (Hero) -->
                 <div class="bento-cell col-6 mob-full bg-hero cell-flex-row">
                     <img src="icon_tags.png" class="bento-icon-giant" alt="Tags">
                     <div style="text-align: left;">
@@ -1668,13 +1730,14 @@
                     </div>
                 </div>
 
-                <!-- 7. FETISH AI -->
+                <!-- 7. FETISH AI (Premium - Текст СНИЗУ) -->
                 <div class="bento-cell col-3 mob-full row-2 bg-premium-dark cell-center-perfect">
                     <img src="icon_brain.png" class="bento-icon-xl" alt="AI">
                     <h3 class="text-huge gradient-text-bento" style="margin-top: 15px;">FETISH AI</h3>
                 </div>
 
-                <!-- === РЯД 3 === -->
+
+                <!-- === РЯД 3 (ТЕКСТ СНИЗУ) === -->
 
                 <!-- 8. SWIPES -->
                 <div class="bento-cell col-3 mob-6 bg-glass-standard cell-center-perfect">
@@ -1694,7 +1757,7 @@
                     <div class="bento-label-bold" data-i18n="bn_browser">BROWSER</div>
                 </div>
 
-                <!-- 11. UI (Новый легкий градиент) -->
+                <!-- 11. UI -->
                 <div class="bento-cell col-2 mob-6 bg-custom cell-center-perfect">
                     <img src="icon_palette.png" class="bento-icon-xs" alt="Custom">
                     <div class="bento-label-bold" data-i18n="bn_custom">UI</div>
