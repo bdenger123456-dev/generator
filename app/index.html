@@ -16344,7 +16344,7 @@
         randomizeDecorations();
 
         // 2. Сброс модификаторов (базовый)
-        activeMods.clear(); 
+        activeMods.clear();
         if (currentOrientation === 'gay') activeMods.add('Gay');
         else if (currentOrientation === 'trans') activeMods.add('Trans');
         
@@ -18467,92 +18467,84 @@
         activeContainer.innerHTML = '';
         inactiveContainer.innerHTML = '';
         
-        // 1. СЧЕТЧИК (Лимит 10)
+        // 1. СЧЕТЧИК: Считает, сколько кнопок пользователь вывел на карточку (лимит 10)
         if (counter) {
             counter.innerText = `${userModifiersPool.length} / 10`;
             counter.style.color = userModifiersPool.length >= 10 ? 'var(--highlight-red)' : 'var(--text-secondary)';
         }
 
-        // 2. РЕНДЕРИНГ СПИСКА
+        // 2. РЕНДЕРИМ АКТИВНЫЕ (Те, что в пуле и видны на карточке)
         userModifiersPool.forEach(modKey => {
-            const isActive = activeMods.has(modKey);
             const systemMod = modifiersData.find(x => x.key === modKey);
             const isCustom = !systemMod;
-            
-            // Получаем перевод
             let label = modKey;
-            if (systemMod) {
-                const langKey = ['en', 'ru', 'es', 'de'].includes(currentLang) ? currentLang : 'en';
-                label = systemMod[langKey] || systemMod.en;
-            }
+            if (systemMod) label = systemMod[currentLang] || systemMod.en;
 
             const btn = document.createElement('div');
-            btn.className = isActive ? 'mod-chip active' : 'mod-chip inactive';
+            btn.className = 'mod-chip active'; // Они всегда активны в контексте этого окна
             
-            if (isCustom && !isActive) btn.style.borderStyle = "dashed";
-
-            // Иконки
-            let iconsHtml = isActive ? `<span style="font-size:12px; font-weight:800; margin-left:6px;">✓</span>` : '';
-            // Крестик удаления для ВСЕХ элементов (пользователь может удалить и системные)
-            iconsHtml += `<span class="custom-mod-del" title="Delete" style="margin-left:8px; opacity:0.6;">✕</span>`;
-
+            // Кнопка удаления (вернуть в неактивные / удалить кастомный)
+            let iconsHtml = `<span class="custom-mod-del" style="margin-left:8px; opacity:0.6;">✕</span>`;
             btn.innerHTML = `${label}${iconsHtml}`;
-            
-            // Удаление
-            const delBtn = btn.querySelector('.custom-mod-del');
-            if (delBtn) {
-                delBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    deleteCustomMod(modKey);
-                };
-            }
-            
-            // Переключение
-            btn.onclick = (e) => {
-                if (e.target.classList.contains('custom-mod-del')) return;
+
+            btn.onclick = () => {
+                // Убираем из пула (скрываем с карточки)
+                userModifiersPool = userModifiersPool.filter(k => k !== modKey);
+                activeMods.delete(modKey); // На всякий случай выключаем и в выборе
                 
-                if (activeMods.has(modKey)) activeMods.delete(modKey);
-                else activeMods.add(modKey);
-                
-                renderModifiersModal(); 
-                if (currentItem) {
-                    renderModifiersInCard();
-                    renderResultName();
-                    updateLink();
-                }
+                localStorage.setItem('xch_user_mods', JSON.stringify(userModifiersPool));
+                renderModifiersModal();
+                renderModifiersInCard();
+                if (currentItem) renderResultName();
             };
-            
-            if (isActive) activeContainer.appendChild(btn);
-            else inactiveContainer.appendChild(btn);
+
+            activeContainer.appendChild(btn);
         });
 
-        // 3. ФОРМА ВВОДА (Создается один раз)
-        let addForm = document.getElementById('custom-mod-form');
-        if (!addForm && modalBody) {
-            addForm = document.createElement('div');
-            addForm.id = 'custom-mod-form';
-            addForm.style.marginTop = "20px";
-            addForm.style.borderTop = "1px solid var(--border)";
-            addForm.style.paddingTop = "15px";
-            modalBody.appendChild(addForm);
-            
-            const t = (typeof langData !== 'undefined' && langData[currentLang]) ? langData[currentLang] : {};
-            
-            addForm.innerHTML = `
-                <div id="btn-show-custom-input" class="ios-row clickable" onclick="toggleCustomInput(true)" style="justify-content:center; color:var(--accent); font-weight:700; background:rgba(255,255,255,0.05); border-radius:12px;">
-                    + ${t.mod_add_custom || "Add Custom"}
+        // 3. РЕНДЕРИМ НЕАКТИВНЫЕ (Те, что скрыты и доступны для добавления)
+        modifiersData.forEach(mod => {
+            // Если этого мода нет в пуле пользователя — он в списке неактивных
+            if (!userModifiersPool.includes(mod.key)) {
+                const btn = document.createElement('div');
+                btn.className = 'mod-chip inactive';
+                btn.innerText = mod[currentLang] || mod.en;
+
+                btn.onclick = () => {
+                    if (userModifiersPool.length >= 10) {
+                        alert(langData[currentLang].mod_limit_reached || "Limit reached!");
+                        return;
+                    }
+                    // Добавляем в пул (теперь он появится на карточке)
+                    userModifiersPool.push(mod.key);
+                    localStorage.setItem('xch_user_mods', JSON.stringify(userModifiersPool));
+                    renderModifiersModal();
+                    renderModifiersInCard();
+                };
+                inactiveContainer.appendChild(btn);
+            }
+        });
+
+        // 4. Форма для кастомных (остается без изменений)
+        if (!document.getElementById('custom-mod-form')) {
+            const t = langData[currentLang] || langData['en'];
+            const form = document.createElement('div');
+            form.id = 'custom-mod-form';
+            form.style.cssText = "margin-top:20px; border-top:1px solid var(--border); paddingTop:15px;";
+            form.innerHTML = `
+                <div id="btn-show-custom-input" class="ios-row clickable" onclick="toggleCustomInput(true)" style="justify-content:center; color:var(--accent); font-weight:700;">
+                    + ${t.mod_add_custom}
                 </div>
-                
                 <div id="custom-input-container" style="display:none; gap:10px;">
-                    <input type="text" id="custom-mod-input" class="promo-input" placeholder="${t.mod_input_ph || "e.g. Redhead..."}" style="font-size:14px; padding:10px;">
-                    <button class="btn-gen" onclick="submitCustomMod()" style="width:auto; padding:0 20px; font-size:14px; min-width:80px; height: 42px;">
-                        ${t.mod_add_btn || "Add"}
+                    <input type="text" id="custom-mod-input" class="promo-input" placeholder="${t.mod_input_ph}" style="font-size:14px; padding:10px;">
+                    <button class="btn-gen" onclick="submitCustomMod()" style="width:auto; padding:0 20px; font-size:14px; min-width:80px; height:42px;">
+                        ${t.mod_add_btn}
                     </button>
                 </div>
             `;
+            modalBody.appendChild(form);
         }
     }
-    
+
     function submitCustomMod() {
         const input = document.getElementById('custom-mod-input');
         if (!input) return;
@@ -18657,69 +18649,65 @@
         container.innerHTML = '';
         const t = langData[currentLang] || langData['en'];
 
-        // 1. ЗАГОЛОВОК (Отображается ВСЕГДА)
         const header = document.createElement('div');
         header.className = 'mods-header';
-        header.innerText = t.add_genre || "Add to genre:";
+        header.innerText = t.add_genre;
         container.appendChild(header);
 
-        // 2. ЕСЛИ СПИСОК ПУСТ -> Кнопка "Добавить"
+        // Если на карточку ничего не выведено
         if (userModifiersPool.length === 0) {
             const addBtn = document.createElement('div');
-            addBtn.className = 'tag'; // Используем тот же класс, чтобы выглядело органично
-            
-            // Стиль "пунктир" для акцента
+            addBtn.className = 'tag';
             addBtn.style.border = '1px dashed var(--accent)';
-            addBtn.style.color = 'var(--accent)';
-            addBtn.style.fontWeight = '700';
-            addBtn.style.justifyContent = 'center';
-            addBtn.style.opacity = '1';
-            
-            // Текст из переводов (mod_add_btn) + Плюс
             addBtn.innerText = "+ " + (t.mod_add_btn || "Add");
-            
-            // Открывает настройки
-            addBtn.onclick = (e) => {
-                e.stopPropagation(); 
-                openModifiersSettings();
-            };
-            
+            addBtn.onclick = (e) => { e.stopPropagation(); openModifiersSettings(); };
             container.appendChild(addBtn);
             return;
         }
 
-        // 3. ЕСЛИ ЕСТЬ МОДЫ -> Рендерим их
-        const itemTags = currentItem ? currentItem.tags : [];
-        const itemName = currentItem ? currentItem.name.toLowerCase() : "";
+        const itemTags = currentItem ? currentItem.tags.map(t => t.toLowerCase()) : [];
+        const itemName = currentItem ? getLocalizedName(currentItem).toLowerCase() : "";
 
+        // Показываем только те кнопки, которые пользователь "активировал" в модалке
         userModifiersPool.forEach(modKey => {
             const modObj = modifiersData.find(m => m.key === modKey);
-            // Берем перевод из modifiersData или показываем ключ как есть
             const label = modObj ? (modObj[currentLang] || modObj.en) : modKey;
 
-            // Умный фильтр: не показываем, если тег уже есть в жанре
-            if (itemTags.includes(modKey.toLowerCase())) return;
-            if (itemName.includes(modKey.toLowerCase())) return;
+            // Фильтр дублей (чтобы не предлагать Anal если это и так Anal)
+            const tagLower = modKey.toLowerCase();
+            if (itemTags.includes(tagLower) || itemName.includes(tagLower)) return;
 
-            const tag = document.createElement('div'); 
-            tag.className = 'tag';
-            if(activeMods.has(modKey)) tag.classList.add('selected');
+            const tagBtn = document.createElement('div'); 
+            tagBtn.className = 'tag';
             
-            tag.innerText = label;
+            // ПРОВЕРКА: Если модификатор ВЫБРАН для этой карточки — красим в синий/акцент
+            if (activeMods.has(modKey)) {
+                tagBtn.classList.add('selected');
+            }
             
-            tag.onclick = (e) => {
+            tagBtn.innerText = label;
+            
+            tagBtn.onclick = (e) => {
                 e.stopPropagation();
-                if(activeMods.has(modKey)) activeMods.delete(modKey); 
-                else activeMods.add(modKey);
+                if (activeMods.has(modKey)) {
+                    activeMods.delete(modKey);
+                } else {
+                    if (activeMods.size >= 10) return;
+                    activeMods.add(modKey);
+                }
                 
+                // Перерисовываем кнопки, чтобы сработал .selected
                 renderModifiersInCard();
+                // Обновляем название в слоте (+ POV...)
                 renderResultName(); 
+                // Обновляем ссылку на видео
                 updateLink();
+                if (navigator.vibrate) navigator.vibrate(10);
             };
-            container.appendChild(tag);
+            container.appendChild(tagBtn);
         });
     }
-
+    
     function renderModifiers() {
         renderModifiersInCard();
     }
