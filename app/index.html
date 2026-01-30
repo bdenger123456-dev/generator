@@ -595,6 +595,7 @@
             display: flex;
             flex-direction: column;
             width: 100%;
+            overflow-x: hidden !important;
         }
 
         .tab-content {
@@ -603,7 +604,7 @@
             flex-direction: column;
             align-items: center;
             overflow-y: auto;
-            overflow-x: hidden;
+            overflow-x: visible;
             -webkit-overflow-scrolling: touch; 
             padding: 20px 15px;
             padding-bottom: 120px;
@@ -795,7 +796,7 @@
             left: 0;
             width: 100%;
             margin-bottom: 15px; /* Отступ от карточки */
-            z-index: 25; /* Поверх декораций */
+            z-index: 15; 
             
             /* Стили текста */
             text-align: center; 
@@ -2548,17 +2549,18 @@
             transition: height 0.3s ease;
         }
 
-
-
         /* Сами бары */
         .chart-bar {
             width: 100%; 
-            background: var(--accent);
-            border-radius: 4px 4px 0 0;
-            transition: height 0.5s ease;
+            /* Градиент сверху вниз: от светлого акцента к основному цвету */
+            background: linear-gradient(180deg, var(--accent-light) 0%, var(--accent) 100%) !important;
+            border-radius: 6px 6px 0 0; /* Скругляем только верх */
+            transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             min-height: 4px;
             position: relative;
-            margin: 0; 
+            margin: 0;
+            /* Легкое свечение для красоты */
+            box-shadow: 0 -2px 10px rgba(var(--accent), 0.3); 
         }
 
         /* Подписи под графиком */
@@ -3573,7 +3575,7 @@
         /* Общий стиль для иконок */
         .deco-icon {
             position: absolute;
-            z-index: 20 !important; 
+            z-index: 99 !important; 
             pointer-events: none; /* Клики проходят сквозь них */
             will-change: transform;
             transition: filter 0.3s ease; /* Плавная смена цвета при смене темы */
@@ -3622,17 +3624,16 @@
         }
 
         @media (max-width: 768px) {
-            /* МОБИЛЬНАЯ ВЕРСИЯ ИКОНОК */
             .icon-left {
-                width: 75px !important;  /* Было 120px -> стало 75px */
-                top: 5px !important;     /* Опустили ниже (было -30px) */
-                left: -5px !important;   /* Прижали ближе к краю */
+                width: 75px !important;  
+                top: 5px !important;    
+                left: -5px !important;  
             }
 
             .icon-right {
-                width: 60px !important;  /* Было 90px -> стало 60px */
-                top: 15px !important;    /* Опустили ниже (было -20px) */
-                right: 0px !important;   /* Прижали ближе к краю */
+                width: 60px !important;  
+                top: 15px !important;   
+                right: 0px !important;  
             }
         }
 
@@ -5591,6 +5592,24 @@
             font-size: 12px;
             font-weight: 600;
             text-align: center;
+        }
+
+        #age-gate {
+            background-color: var(--bg-color) !important; /* Сплошной цвет темы */
+            backdrop-filter: none !important; /* Убираем блюр, он не нужен на сплошном */
+            opacity: 1 !important; /* Гарантируем видимость */
+        }
+
+        /* 2. Центрирование кнопок в модальных окнах (Установка и Онбординг) */
+        #modal-install-overlay .btn-gen,
+        #onboarding-overlay .btn-gen {
+            display: flex !important;
+            justify-content: center !important; /* Центрирует текст/иконку по горизонтали */
+            align-items: center !important;     /* Центрирует по вертикали */
+            text-align: center !important;      /* На всякий случай для текста */
+            width: 100% !important;             /* Растягиваем кнопку на всю ширину */
+            margin-left: 0 !important;
+            margin-right: 0 !important;
         }
 
         /* =========================================
@@ -13708,27 +13727,19 @@
         else {
             const aggregated = {};
             const now = new Date();
-            // Сбрасываем время в 00:00 для корректного сравнения дней
             now.setHours(23, 59, 59, 999);
             const nowTs = now.getTime();
-            
             const oneDay = 86400000;
             let cutoffTime = 0;
             
-            // Четкий расчет времени отсечки
             if (currentStatsTimeframe === 'week') cutoffTime = nowTs - (7 * oneDay);
             else if (currentStatsTimeframe === 'month') cutoffTime = nowTs - (30 * oneDay);
             else if (currentStatsTimeframe === 'year') cutoffTime = nowTs - (365 * oneDay);
-            else cutoffTime = 0; // All time
+            else cutoffTime = 0; 
 
-            // Хелпер для ключа даты (Местное время!)
             const getDateKey = (ts) => {
                 const d = new Date(ts);
-                if (currentStatsTimeframe === 'year' || currentStatsTimeframe === 'all') {
-                    // Месяц: "2024-0" (Январь)
-                    return `${d.getFullYear()}-${d.getMonth()}`;
-                }
-                // День: "2024-01-27" (Местное время)
+                if (currentStatsTimeframe === 'year' || currentStatsTimeframe === 'all') return `${d.getFullYear()}-${d.getMonth()}`;
                 return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
             };
 
@@ -13740,41 +13751,29 @@
                 return d.toLocaleDateString(currentLang, { day: 'numeric', month: 'numeric' });
             };
 
-            // 1. Агрегация Логов (Свайпы и Лайки)
             activityLog.forEach(log => {
                 if (log.ts < cutoffTime) return;
-                
                 const key = getDateKey(log.ts);
                 if (!aggregated[key]) aggregated[key] = { gen: 0, watch: 0, time: 0, label: getLabel(log.ts), sort: log.ts };
-                
-                // Считаем генерации (свайпы)
                 if (['like', 'gen', 'pass', 'dislike'].includes(log.type)) aggregated[key].gen++;
-                // Считаем нажатия на кнопку Watch (намерение)
                 if (log.type === 'watch') aggregated[key].watch++;
             });
 
-            // 2. Агрегация Времени (Реальные просмотры)
             watchHistory.forEach(entry => {
                 if (entry.timestamp < cutoffTime) return;
-                
                 const key = getDateKey(entry.timestamp);
-                if (!aggregated[key]) {
-                    aggregated[key] = { gen: 0, watch: 0, time: 0, label: getLabel(entry.timestamp), sort: entry.timestamp };
-                }
+                if (!aggregated[key]) aggregated[key] = { gen: 0, watch: 0, time: 0, label: getLabel(entry.timestamp), sort: entry.timestamp };
                 aggregated[key].time += entry.seconds;
-                
                 if (aggregated[key].watch === 0) aggregated[key].watch++;
             });
 
             const chartData = Object.values(aggregated).sort((a, b) => a.sort - b.sort);
             
-            // Контейнер графика
             let html = `<div class="chart-wrapper"><div class="chart-scroll-view" id="chart-source-el" style="justify-content: flex-start; padding-left: 5px;">`;
 
             if (chartData.length === 0) {
                 html += `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-secondary);">${t.stats_no_data}</div>`;
             } else {
-                // Вычисляем максимумы для масштабирования
                 let maxGen = 0, maxWatch = 0, maxTime = 0;
                 chartData.forEach(d => {
                     if (d.gen > maxGen) maxGen = d.gen;
@@ -13782,42 +13781,43 @@
                     if (d.time > maxTime) maxTime = d.time;
                 });
                 
-                // Минимальные пороги, чтобы график не был пустым
                 if (maxGen < 5) maxGen = 5;
                 if (maxWatch < 3) maxWatch = 3; 
-                if (maxTime < 300) maxTime = 300; // 5 минут минимум
+                if (maxTime < 300) maxTime = 300; 
+
+                // --- НАСТРОЙКИ ГРАДИЕНТОВ ДЛЯ АКТИВНОСТИ ---
+                // 1. Серый (Свайпы)
+                const gradGrey = `linear-gradient(180deg, #95a5a6 0%, #34495e 100%)`;
+                // 2. Акцент (Просмотры - берет цвета темы)
+                const gradAccent = `linear-gradient(180deg, var(--accent-light) 0%, var(--accent) 100%)`;
+                // 3. Фиолетовый (Время)
+                const gradPurple = `linear-gradient(180deg, #d2b4de 0%, #8e44ad 100%)`;
 
                 chartData.forEach(d => {
-                    // Высота в процентах
                     const hGen = (d.gen / maxGen) * 100;
                     const hWatch = (d.watch / maxWatch) * 100;
                     const hTime = (d.time / maxTime) * 100;
                     const timeMin = Math.round(d.time / 60);
 
-                    // Рендер столбца
                     html += `
                         <div class="act-col">
-                            
-                            <!-- Группа столбиков -->
                             <div class="act-bars-group">
-                                <!-- 1. Свайпы (Серый) -->
-                                <div class="act-bar" style="background:var(--text-secondary); height:${Math.max(5, hGen)}%; opacity:0.3;"></div>
+                                <!-- 1. Свайпы (Серый градиент) -->
+                                <div class="act-bar" style="background:${gradGrey}; height:${Math.max(5, hGen)}%; opacity:0.6;"></div>
                                 
-                                <!-- 2. Просмотры (Цвет темы) -->
-                                <div class="act-bar" style="background:var(--accent); height:${Math.max(5, hWatch)}%;"></div>
+                                <!-- 2. Просмотры (Акцентный градиент) -->
+                                <div class="act-bar" style="background:${gradAccent}; height:${Math.max(5, hWatch)}%;"></div>
                                 
-                                <!-- 3. Время (Фиолетовый) -->
-                                <div class="act-bar" style="background:#9b59b6; height:${Math.max(5, hTime)}%;"></div>
+                                <!-- 3. Время (Фиолетовый градиент) -->
+                                <div class="act-bar" style="background:${gradPurple}; height:${Math.max(5, hTime)}%;"></div>
                             </div>
 
-                            <!-- Цифры под графиком -->
                             <div class="act-values-row">
                                 <span class="act-val" style="color:var(--text-secondary); opacity:0.7;">${d.gen}</span>
                                 <span class="act-val" style="color:var(--text-main);">${d.watch}</span>
                                 <span class="act-val" style="color:#9b59b6;">${timeMin}</span>
                             </div>
 
-                            <!-- Дата -->
                             <div class="chart-label-x">${d.label}</div>
                         </div>
                     `;
@@ -13825,11 +13825,10 @@
             }
             html += `</div></div>`;
 
-            // Легенда
             let legendUnit = currentLang === 'ru' ? 'мин' : 'min';
             html += `
                 <div class="stats-legend-row" style="margin-top:10px;">
-                    <div class="legend-item"><div class="legend-dot" style="background:var(--text-secondary); opacity:0.3;"></div> ${t.act_actions}</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:var(--text-secondary)"></div> ${t.act_actions}</div>
                     <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div> ${t.act_watches}</div>
                     <div class="legend-item"><div class="legend-dot" style="background:#9b59b6"></div> ${t.act_time} (${legendUnit})</div>
                 </div>
@@ -13838,7 +13837,7 @@
             body.innerHTML = html;
         }
     }
-    
+
     function shareStats() {
         if(navigator.vibrate) navigator.vibrate(50);
 
