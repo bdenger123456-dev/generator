@@ -8909,16 +8909,15 @@
     // Дефолтный пул
     const DEFAULT_MODS_POOL = []; 
 
-    // 1. Загружаем то, что сохранено. Если нет — пустой массив.
-    let savedPool = [];
+    // Загрузка
+    let userModifiersPool = [];
     try {
-        savedPool = JSON.parse(localStorage.getItem('xch_user_mods'));
+        const saved = JSON.parse(localStorage.getItem('xch_user_mods'));
+        // Если в памяти что-то есть (массив), берем его. Иначе — пустой массив.
+        userModifiersPool = Array.isArray(saved) ? saved : [];
     } catch (e) {
-        console.error("Error parsing user mods", e);
+        userModifiersPool = [];
     }
-
-    // Если в памяти ничего нет — начинаем с нуля
-    let userModifiersPool = Array.isArray(savedPool) ? savedPool : [];
 
     localStorage.setItem('xch_user_mods', JSON.stringify(userModifiersPool));
 
@@ -18465,34 +18464,22 @@
         
         if (!activeContainer || !inactiveContainer) return;
 
-        // Очистка
         activeContainer.innerHTML = '';
         inactiveContainer.innerHTML = '';
         
-        // Обновляем счетчик
+        // 1. СЧЕТЧИК (Лимит 10)
         if (counter) {
-            counter.innerText = `${userModifiersPool.length} / 20`;
-            counter.style.color = userModifiersPool.length >= 20 ? 'var(--highlight-red)' : 'var(--text-secondary)';
+            counter.innerText = `${userModifiersPool.length} / 10`;
+            counter.style.color = userModifiersPool.length >= 10 ? 'var(--highlight-red)' : 'var(--text-secondary)';
         }
 
-        // Если пусто — пишем подсказку
-        if (userModifiersPool.length === 0) {
-            const emptyMsg = document.createElement('div');
-            emptyMsg.style.width = "100%";
-            emptyMsg.style.textAlign = "center";
-            emptyMsg.style.color = "var(--text-secondary)";
-            emptyMsg.style.fontSize = "13px";
-            emptyMsg.style.padding = "20px 0";
-            emptyMsg.innerText = currentLang === 'ru' ? "Список пуст. Добавьте свои теги ниже." : "List empty. Add tags below.";
-            inactiveContainer.appendChild(emptyMsg);
-        }
-
-        // Рендеринг чипов
+        // 2. РЕНДЕРИНГ СПИСКА
         userModifiersPool.forEach(modKey => {
             const isActive = activeMods.has(modKey);
             const systemMod = modifiersData.find(x => x.key === modKey);
             const isCustom = !systemMod;
             
+            // Получаем перевод
             let label = modKey;
             if (systemMod) {
                 const langKey = ['en', 'ru', 'es', 'de'].includes(currentLang) ? currentLang : 'en';
@@ -18502,12 +18489,11 @@
             const btn = document.createElement('div');
             btn.className = isActive ? 'mod-chip active' : 'mod-chip inactive';
             
-            // Если кастомный — пунктир
             if (isCustom && !isActive) btn.style.borderStyle = "dashed";
 
-            // HTML
+            // Иконки
             let iconsHtml = isActive ? `<span style="font-size:12px; font-weight:800; margin-left:6px;">✓</span>` : '';
-            // Крестик удаления есть У ВСЕХ теперь (чтобы можно было очистить список полностью)
+            // Крестик удаления для ВСЕХ элементов (пользователь может удалить и системные)
             iconsHtml += `<span class="custom-mod-del" title="Delete" style="margin-left:8px; opacity:0.6;">✕</span>`;
 
             btn.innerHTML = `${label}${iconsHtml}`;
@@ -18524,9 +18510,11 @@
             // Переключение
             btn.onclick = (e) => {
                 if (e.target.classList.contains('custom-mod-del')) return;
+                
                 if (activeMods.has(modKey)) activeMods.delete(modKey);
                 else activeMods.add(modKey);
-                renderModifiersModal();
+                
+                renderModifiersModal(); 
                 if (currentItem) {
                     renderModifiersInCard();
                     renderResultName();
@@ -18538,7 +18526,7 @@
             else inactiveContainer.appendChild(btn);
         });
 
-        // Форма ввода (без изменений, просто убедитесь что она есть)
+        // 3. ФОРМА ВВОДА (Создается один раз)
         let addForm = document.getElementById('custom-mod-form');
         if (!addForm && modalBody) {
             addForm = document.createElement('div');
@@ -18564,7 +18552,7 @@
             `;
         }
     }
-
+    
     function submitCustomMod() {
         const input = document.getElementById('custom-mod-input');
         if (!input) return;
@@ -18573,8 +18561,8 @@
         if (!val) return;
         
         // Валидация
-        if (val.length > 20) {
-            alert("Too long! Max 20 chars.");
+        if (val.length > 10) {
+            alert("Too long! Max 10 chars.");
             return;
         }
         
@@ -18589,7 +18577,7 @@
         
         // Лимит
         if (userModifiersPool.length >= 20) {
-            alert("Limit reached (Max 20). Delete some first.");
+            alert("Limit reached (Max 10). Delete some first.");
             return;
         }
 
@@ -18669,47 +18657,47 @@
         container.innerHTML = '';
         const t = langData[currentLang] || langData['en'];
 
-        // 1. Если список ПУСТ -> Показываем кнопку "Добавить"
-        if (!userModifiersPool || userModifiersPool.length === 0) {
+        // 1. ЗАГОЛОВОК (Отображается ВСЕГДА)
+        const header = document.createElement('div');
+        header.className = 'mods-header';
+        header.innerText = t.add_genre || "Add to genre:";
+        container.appendChild(header);
+
+        // 2. ЕСЛИ СПИСОК ПУСТ -> Кнопка "Добавить"
+        if (userModifiersPool.length === 0) {
             const addBtn = document.createElement('div');
-            // Используем стили тега, но делаем его акцентным (пунктир)
-            addBtn.className = 'tag';
-            addBtn.style.border = '1px dashed var(--text-secondary)';
+            addBtn.className = 'tag'; // Используем тот же класс, чтобы выглядело органично
+            
+            // Стиль "пунктир" для акцента
+            addBtn.style.border = '1px dashed var(--accent)';
             addBtn.style.color = 'var(--accent)';
             addBtn.style.fontWeight = '700';
+            addBtn.style.justifyContent = 'center';
+            addBtn.style.opacity = '1';
             
-            // Текст кнопки
-            const btnText = currentLang === 'ru' ? "+ Добавить моды" : "+ Add Modifiers";
-            addBtn.innerText = btnText;
+            // Текст из переводов (mod_add_btn) + Плюс
+            addBtn.innerText = "+ " + (t.mod_add_btn || "Add");
             
-            // При клике открываем настройки
+            // Открывает настройки
             addBtn.onclick = (e) => {
-                e.stopPropagation(); // Чтобы не закрылась капсула
+                e.stopPropagation(); 
                 openModifiersSettings();
             };
             
             container.appendChild(addBtn);
             return;
         }
-        
-        // 2. Если список НЕ пуст -> Рисуем как обычно
-        
-        // Заголовок "Добавить к жанру:"
-        const header = document.createElement('div');
-        header.className = 'mods-header';
-        header.innerText = t.add_genre;
-        container.appendChild(header);
 
-        // Сбор тегов текущей карточки для фильтрации (умный фильтр)
+        // 3. ЕСЛИ ЕСТЬ МОДЫ -> Рендерим их
         const itemTags = currentItem ? currentItem.tags : [];
         const itemName = currentItem ? currentItem.name.toLowerCase() : "";
 
         userModifiersPool.forEach(modKey => {
             const modObj = modifiersData.find(m => m.key === modKey);
-            // Если это кастомный мод, создаем заглушку объекта
+            // Берем перевод из modifiersData или показываем ключ как есть
             const label = modObj ? (modObj[currentLang] || modObj.en) : modKey;
 
-            // SMART FILTER: Пропускаем, если тег/название уже есть в карточке
+            // Умный фильтр: не показываем, если тег уже есть в жанре
             if (itemTags.includes(modKey.toLowerCase())) return;
             if (itemName.includes(modKey.toLowerCase())) return;
 
