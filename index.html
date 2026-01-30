@@ -1068,53 +1068,93 @@
 
 
         @media (max-width: 900px) {
-            .cell-tall .card-content { padding-bottom: 0; }
-            
-            /* Общий сброс флекса */
-            .cell-wide.left-icon, .cell-wide.right-icon {
-                display: block; 
-                text-align: left;
-                position: relative;
-                min-height: 160px; /* Чуть уменьшаем высоту для компактности */
+            .unique-bento-grid {
+                /* Уменьшаем расстояние между карточками */
+                gap: 15px; 
             }
 
-            /* --- 1. RELAX (Left Icon) - Иконка СЛЕВА --- */
-            .cell-wide.left-icon .card-content {
+            .cell-tall .card-content { padding-bottom: 0; }
+            
+            /* --- ОБЩИЕ СТИЛИ ДЛЯ ШИРОКИХ КАРТОЧЕК (Flexbox) --- */
+            .cell-wide.left-icon, .cell-wide.right-icon {
+                display: flex !important;
+                flex-direction: row !important; /* Выстраиваем в ряд */
+                align-items: center !important; /* Центруем по вертикали */
+                justify-content: space-between;
+                
+                min-height: auto !important;    /* Высота по содержимому (убирает пустоту) */
+                padding: 20px 25px !important;  /* Компактные отступы внутри */
+                text-align: left !important;    /* Текст всегда слева для читаемости */
+            }
+
+            /* Контент (Текст) занимает все свободное место */
+            .cell-wide .card-content {
                 padding: 0 !important;
-                padding-left: 110px !important; /* Сдвигаем текст вправо */
-                padding-top: 10px !important;
-                z-index: 10;
+                flex: 1; 
+                z-index: 5;
+                min-width: 0; /* Важно: разрешает тексту переноситься, если тесно */
+            }
+
+            /* Уменьшаем заголовок на мобильных, чтобы "Relax" влезал */
+            .cell-wide h3 {
+                font-size: 22px !important; 
+                margin-bottom: 5px !important;
+            }
+            .cell-wide p {
+                font-size: 14px !important;
+                line-height: 1.4;
+            }
+
+            /* --- НАСТРОЙКА ИКОНОК (Теперь они не absolute) --- */
+            .cell-wide .bento-img-3d {
+                position: relative !important; /* Возвращаем в поток */
+                left: auto !important; right: auto !important;
+                top: auto !important; bottom: auto !important;
+                transform: none !important;
+                
+                width: 75px !important;  /* Фиксированный размер иконки */
+                height: 75px !important;
+                object-fit: contain;
+                flex-shrink: 0;          /* Запрещаем иконке сжиматься */
+                margin-top: 0 !important;
+            }
+
+            /* --- 1. RELAX (Иконка СЛЕВА) --- */
+            /* В HTML сначала идет Текст, потом Картинка. 
+               Используем row-reverse, чтобы Картинка стала первой (слева) */
+            .cell-wide.left-icon {
+                flex-direction: row-reverse !important; 
+            }
+            
+            .cell-wide.left-icon .card-content {
+                margin-left: 15px; /* Отступ текста от иконки слева */
             }
             
             .cell-wide.left-icon .bento-img-3d {
-                left: -10px !important;       /* Прижимаем влево */
-                right: auto !important;       /* Сбрасываем право */
-                bottom: -10px !important;     /* Прижимаем к низу */
-                top: auto !important;         /* Сбрасываем верх */
-                transform: rotate(-10deg) !important; /* Легкий наклон */
-                width: 100px !important;      /* Размер иконки */
+                transform: rotate(-5deg) !important; /* Легкий наклон для стиля */
             }
 
-            .cell-wide.left-icon .icon-glow-bg {
-                left: -30px !important;       /* Свечение тоже влево */
-                right: auto !important;
-                bottom: -30px !important;
+
+            /* --- 2. DISCOVER (Иконка СПРАВА) --- */
+            /* Обычный порядок: Текст -> Картинка */
+            .cell-wide.right-icon {
+                flex-direction: row !important;
             }
 
-            /* --- 2. DISCOVER (Right Icon) - Иконка СПРАВА --- */
             .cell-wide.right-icon .card-content {
-                padding: 0 !important;
-                padding-right: 110px !important; /* Сдвигаем текст влево */
-                padding-top: 10px !important;
+                margin-right: 15px; /* Отступ текста от иконки справа */
             }
 
             .cell-wide.right-icon .bento-img-3d {
-                left: auto !important;
-                right: -10px !important;      /* Прижимаем вправо */
-                bottom: -10px !important;
-                top: auto !important;
                 transform: rotate(5deg) !important;
-                width: 100px !important;
+            }
+
+            /* Свечение (центруем относительно иконки сложнее, поэтому скрываем или делаем общим фоном) */
+            .cell-wide .icon-glow-bg {
+                width: 100%; height: 100%;
+                left: 0; top: 0;
+                border-radius: 0;
+                opacity: 0.1; /* Легкая подсветка всей карточки */
             }
         }
 
