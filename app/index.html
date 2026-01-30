@@ -5825,6 +5825,150 @@
             }
         }
 
+        /* === НОВЫЕ СТИЛИ ДЛЯ БАЗЫ ЗНАНИЙ (КАРУСЕЛЬ) === */
+
+        /* Заголовок категории */
+        .tips-category-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 30px 0 15px 0;
+            text-align: center; /* Центрирование */
+            width: 100%;
+        }
+
+        /* Контейнер скролла */
+        .tips-scroll-row {
+            display: flex;
+            overflow-x: auto;
+            overflow-y: visible; /* Чтобы тени не обрезались */
+            gap: 15px;
+            padding: 20px 20px 40px 20px; /* Отступы по бокам + снизу для теней */
+            
+            /* Убираем жесткий snap, чтобы скролл был плавным как в Instagram/AppStore */
+            /* scroll-snap-type: x mandatory; <- УДАЛЕНО, чтобы не конфликтовало */
+            
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .tips-scroll-row::-webkit-scrollbar { display: none; }
+
+        /* Карточка */
+        .tip-card {
+            /* Фиксируем размер, но используем min-width, чтобы не сжимались */
+            min-width: 240px;
+            width: 240px;
+            height: 320px;
+            
+            display: flex;
+            flex-direction: column;
+            
+            /* ВАЖНО: visible, чтобы иконка могла торчать наружу */
+            overflow: visible !important; 
+            
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            background: var(--ios-card);
+            position: relative;
+            cursor: pointer;
+            
+            /* Убираем тусклость */
+            opacity: 1 !important;
+            filter: none !important;
+            transform: scale(1) !important;
+            
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .tip-card:active {
+            transform: scale(0.96) !important;
+        }
+
+        /* Верхняя цветная часть (1/3) */
+        .tip-card-header {
+            height: 35% !important;
+            width: 100%;
+            /* Скругляем только верх */
+            border-radius: 24px 24px 0 0;
+        }
+
+        /* Нижняя часть (2/3) */
+        .tip-card-body {
+            height: 65% !important;
+            width: 100%;
+            padding: 15px;
+            background: var(--ios-card);
+            
+            display: flex;
+            flex-direction: column;
+            text-align: left; /* Текст слева, как раньше */
+            
+            /* Скругляем только низ */
+            border-radius: 0 0 24px 24px;
+            position: relative;
+        }
+
+        .tip-card-icon {
+            font-size: 42px;
+            position: absolute;
+            
+            /* Поднимаем вверх, чтобы она села на границу */
+            top: -25px !important; 
+            left: 15px !important;
+            
+            /* Сбрасываем центрирование, которое ломало вид */
+            transform: none !important; 
+            
+            z-index: 10;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.2));
+            line-height: 1;
+        }
+
+        /* Заголовок */
+        .tip-card-title {
+            /* Отступ сверху, чтобы не наехать на иконку */
+            margin-top: 25px !important;
+            font-size: 15px;
+            font-weight: 800;
+            line-height: 1.2;
+            color: var(--text-main);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Описание */
+        .tip-card-desc {
+            font-size: 11px;
+            margin-top: 5px;
+            opacity: 0.7;
+            line-height: 1.4;
+            color: var(--text-secondary);
+            
+            display: -webkit-box;
+            -webkit-line-clamp: 5; /* Показываем больше текста */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Галочка прочитанного */
+        .tip-card.viewed::after {
+            content: "✓";
+            position: absolute;
+            top: 10px; right: 10px;
+            background: rgba(0,0,0,0.5);
+            color: #fff;
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px;
+            z-index: 20;
+            backdrop-filter: blur(4px);
+        }
+
         .seo-context {
             position: absolute;
             width: 1px;
@@ -7565,6 +7709,32 @@
     </div>
 </div>
 
+<!-- PROMO TIPS MODAL -->
+<div class="modal-overlay" id="modal-promo-tips-overlay">
+    <div class="modal" style="max-width: 360px; text-align: center;">
+        
+        <div class="modal-header">
+            <span style="color:var(--accent);">💡 <span data-key="pt_title">Did you know?</span></span>
+        </div>
+        
+        <div class="modal-body" style="padding-bottom: 25px;">
+            <p style="font-size:14px; color:var(--text-main); line-height:1.5; margin-bottom:25px;" data-key="pt_desc">
+                If you want to learn how to completely disable ads in videos or not get caught at the right moment, read the Knowledge Base here, you won't be disappointed 🌚
+            </p>
+
+            <!-- Кнопка перехода к Базе знаний -->
+            <button class="btn-gen" onclick="openTipsFromPromo()" style="width:100%; padding:14px; font-size:15px; margin-bottom: 15px;">
+                <span data-key="pt_btn_go">Open Knowledge Base</span>
+            </button>
+
+            <!-- Кнопка пропуска -->
+            <div style="text-align:center;">
+                <span style="font-size:13px; color:var(--text-secondary); text-decoration:underline; cursor:pointer; opacity: 0.7;" onclick="closePromoTips()" data-key="onb_skip">Skip</span>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- THEME PREVIEW FLOATING BAR -->
 <div id="preview-floating-bar">
     
@@ -8976,6 +9146,83 @@
             expl_hist: "From Archives 📜",
             deco_label: "Show Decorations",
 
+            cat_tips_tech: "Tech & Features",
+            cat_tips_info: "Info & 18+ Knowledge",
+
+            tip_sites_title: "Site Guide 2026",
+            tip_sites_desc: "Pros, cons, and which to pick",
+            tip_sites_text: `
+                <b>xVideos</b> — The People's Choice.<br>
+                ✅ <b>Pros:</b> Largest library, loads instantly, tons of amateur/niche content.<br>
+                ❌ <b>Cons:</b> Lower video quality, lots of ads and spam.<br>
+                👉 <i>Best for maximum variety and rare niches.</i><br><br>
+
+                <b>Pornhub</b> — Premium Experience.<br>
+                ✅ <b>Pros:</b> Best UI, great recommendations, verified models, lots of 4K.<br>
+                ❌ <b>Cons:</b> Geo-blocked in some US states (VPN needed), aggressive Premium ads.<br>
+                👉 <i>Best for quality, convenience, and community.</i><br><br>
+
+                <b>xHamster</b> — Amateur Heaven.<br>
+                ✅ <b>Pros:</b> Clean design, focus on real amateur videos, photos, and cams. Less censorship.<br>
+                ❌ <b>Cons:</b> Fewer professional studio videos.<br>
+                👉 <i>Best for "real" sex fans and VR.</i><br><br>
+
+                <b>SpankBang</b> — Connoisseur's Choice.<br>
+                ✅ <b>Pros:</b> Lots of free HD/4K, great "similar" algorithms, user playlists.<br>
+                ❌ <b>Cons:</b> Frequent duplicates, fewer categories.<br>
+                👉 <i>Best for high quality for free.</i><br><br>
+
+                <b>YouPorn / RedTube</b> — The Classics.<br>
+                ✅ <b>Pros:</b> Stable quality, simple interface (part of PH network).<br>
+                ❌ <b>Cons:</b> Less unique content, essentially PH's "little brothers".<br>
+                👉 <i>Simple alternatives without clutter.</i>
+            `,
+
+            // 1. ALGORITHM
+            tip_algo_title: "How the Algorithm Works",
+            tip_algo_desc: "Training xFetishHub secrets",
+            tip_algo_text: `
+                xFetishHub is not just a randomizer. It's a neural network of your arousal.<br><br>
+                <b>👍 Swipe Right (Like):</b><br>
+                You tell the system: "I want more of this." We remember the tags (e.g., <i>Milf, Stockings</i>) and boost their weight. They will appear more often.<br><br>
+                <b>👎 Swipe Left (Dislike):</b><br>
+                You say: "Take this away." Tag weights drop. If you dislike <i>BDSM</i> often, the system will stop suggesting it.<br><br>
+                <b>💡 Tip:</b><br>
+                Don't be afraid to dislike what turns you off. The more honest you are, the better the recommendations in <b>"Pleasure"</b> mode become.
+            `,
+
+            // 2. GLOSSARY
+            tip_dict_title: "Fetish Glossary",
+            tip_dict_desc: "POV, PMV, JOI and others",
+            tip_dict_text: `
+                Confused by acronyms? Here is a breakdown of the most popular ones:<br><br>
+                <b>POV (Point Of View):</b> Filmed from the first-person perspective. You see through the actor's eyes.<br>
+                <b>PMV (Porn Music Video):</b> Clips edited to music. Aesthetic and rhythmic.<br>
+                <b>JOI (Jerk Off Instruction):</b> The model tells you exactly what to do and when.<br>
+                <b>BBW (Big Beautiful Woman):</b> Plus-size women. More than just "chubby".<br>
+                <b>PAWG (Phat Ass White Girl):</b> Self-explanatory. A cult favorite.<br>
+                <b>SPH (Small Penis Humiliation):</b> A popular niche involving teasing sizes.<br>
+                <b>CBT (Cock and Ball Torture):</b> Hardcore fetish involving pain to genitals.<br>
+                <b>Creampie:</b> Finishing inside. A timeless classic.
+            `,
+
+            // 3. PSYCHOTYPES
+            tip_psycho_title: "All Psychotypes",
+            tip_psycho_desc: "Badges you can earn",
+            tip_psycho_text: `
+                In your weekly <b>Fetish Wrapped</b>, you get a psychotype based on your history. Here are the rarest ones:<br><br>
+                👑 <b>The Dark Lord:</b><br>You love BDSM, Humiliation, and Taboo. You explore the deepest shadows.<br><br>
+                🎭 <b>The Performer:</b><br>Frequent Public and Roleplay tags. Life is a stage for you.<br><br>
+                🕯️ <b>The Idolater:</b><br>Focus on body parts (Feet, Hands) and Clothing (Latex, Stockings). You worship the form.<br><br>
+                🧠 <b>The Manipulator:</b><br>Psychological play, JOI, Hypno. You play with souls, not just bodies.<br><br>
+                🍇 <b>The Caligula:</b><br>Group sex + Hardcore. Chaos and pleasure intertwined.<br><br>
+                🍦 <b>The Classic:</b><br>Vanilla, Romantic, Standard. Simplicity is the ultimate sophistication.
+            `,
+
+            pt_title: "Did you know?",
+            pt_desc: "If you want to learn how to completely disable ads in videos or not get caught at the right moment, read the Knowledge Base here, you won't be disappointed 🌚",
+            pt_btn_go: "Open Knowledge Base",
+
             theme_preview_mode: "Preview",
             btn_unlock_theme: "Unlock Theme 🔒",
             theme_tap_cancel: "Tap anywhere to cancel",
@@ -9547,6 +9794,83 @@
             expl_hist: "Из архивов 📜",
             deco_label: "Показывать декор",
 
+            cat_tips_tech: "Техническое и Функции",
+            cat_tips_info: "Инфо и 18+ Знания",
+
+            tip_sites_title: "Гид по сайтам 2026",
+            tip_sites_desc: "Плюсы, минусы и кого выбрать",
+            tip_sites_text: `
+                <b>xVideos</b> — Народный выбор.<br>
+                ✅ <b>Плюсы:</b> Самая большая библиотека, грузится мгновенно даже с плохим интернетом, много любительского и нишевого контента.<br>
+                ❌ <b>Минусы:</b> Качество видео часто ниже среднего, много рекламы и спама.<br>
+                👉 <i>Для тех, кто ищет максимальное разнообразие и редкости.</i><br><br>
+
+                <b>Pornhub</b> — Премиум опыт.<br>
+                ✅ <b>Плюсы:</b> Лучший интерфейс, отличные рекомендации, верифицированные модели, много 4K.<br>
+                ❌ <b>Минусы:</b> Блокировки в США (нужен VPN), агрессивная реклама Premium.<br>
+                👉 <i>Для ценителей удобства, качества и живого сообщества.</i><br><br>
+
+                <b>xHamster</b> — Любительский рай.<br>
+                ✅ <b>Плюсы:</b> Чистый дизайн, фокус на реальных любительских видео, фото и камерах. Меньше цензуры.<br>
+                ❌ <b>Минусы:</b> Чуть меньше профессиональных студийных роликов.<br>
+                👉 <i>Для фанатов "реального" секса и VR.</i><br><br>
+
+                <b>SpankBang</b> — Выбор гурманов.<br>
+                ✅ <b>Плюсы:</b> Много HD/4K бесплатно, отличные алгоритмы "похожего", пользовательские плейлисты.<br>
+                ❌ <b>Минусы:</b> Часто встречаются дубликаты, меньше категорий.<br>
+                👉 <i>Если нужно хорошее качество бесплатно.</i><br><br>
+
+                <b>YouPorn / RedTube</b> — Классика.<br>
+                ✅ <b>Плюсы:</b> Стабильное качество, простой интерфейс (часть сети Pornhub).<br>
+                ❌ <b>Минусы:</b> Меньше уникального контента, по сути "младшие братья" PH.<br>
+                👉 <i>Простая альтернатива без лишних наворотов.</i>
+            `,
+
+            // 1. АЛГОРИТМ
+            tip_algo_title: "Как работает умная лента",
+            tip_algo_desc: "Секреты обучения xFetishHub",
+            tip_algo_text: `
+                xFetishHub — это не просто рандомайзер. Это нейросеть твоего возбуждения.<br><br>
+                <b>👍 Свайп вправо (Лайк):</b><br>
+                Ты говоришь системе: "Хочу больше такого". Мы запоминаем теги этого видео (например, <i>Milf, Stockings</i>) и повышаем их вес. В следующий раз они выпадут с большей вероятностью.<br><br>
+                <b>👎 Свайп влево (Дизлайк):</b><br>
+                Ты говоришь: "Убери это". Вес тегов снижается. Если ты часто дизлайкаешь <i>BDSM</i>, система перестанет его предлагать.<br><br>
+                <b>💡 Совет:</b><br>
+                Не бойся дизлайкать то, что тебе не по душе. Чем честнее ты свайпаешь, тем точнее становятся рекомендации в режиме <b>"Наслаждение"</b>.
+            `,
+
+            // 2. СЛОВАРЬ
+            tip_dict_title: "Словарь терминов",
+            tip_dict_desc: "POV, PMV, JOI и другие",
+            tip_dict_text: `
+                Часто встречаешь непонятные аббревиатуры? Вот расшифровка самых популярных:<br><br>
+                <b>POV (Point Of View):</b> Съемка от первого лица. Ты видишь всё глазами актера.<br>
+                <b>PMV (Porn Music Video):</b> Нарезка кадров под музыку. Эстетично и ритмично.<br>
+                <b>JOI (Jerk Off Instruction):</b> Инструкции для мастурбации. Модель говорит тебе, что и как делать.<br>
+                <b>BBW (Big Beautiful Woman):</b> Пышные дамы. Больше, чем просто "толстушка".<br>
+                <b>PAWG (Phat Ass White Girl):</b> Белая девушка с очень большой попой.<br>
+                <b>SPH (Small Penis Humiliation):</b> Унижение маленького члена. Популярный фетиш.<br>
+                <b>CBT (Cock and Ball Torture):</b> Пытки гениталий. Жесткий фетиш для любителей боли.<br>
+                <b>Creampie:</b> Финал внутрь. Классика.
+            `,
+
+            // 3. ПСИХОТИПЫ
+            tip_psycho_title: "Все Психотипы",
+            tip_psycho_desc: "Какие статусы можно получить",
+            tip_psycho_text: `
+                В конце недели ты получаешь <b>Fetish Wrapped</b>, где тебе присваивается психотип на основе твоих действий. Вот самые редкие из них:<br><br>
+                👑 <b>The Dark Lord (Тёмный Лорд):</b><br>Любишь БДСМ, унижение и Табу. Ты исследуешь самые темные уголки.<br><br>
+                🎭 <b>The Performer (Артист):</b><br>Часто смотришь Public (на улице) и Ролевые игры. Жизнь для тебя — сцена.<br><br>
+                🕯️ <b>The Idolater (Идолопоклонник):</b><br>Фокус на частях тела (ноги, руки) и одежде (чулки, латекс). Ты ценишь детали.<br><br>
+                🧠 <b>The Manipulator (Манипулятор):</b><br>Психологическое доминирование, JOI, гипноз. Тебя возбуждают игры разума.<br><br>
+                🍇 <b>The Caligula (Калигула):</b><br>Групповой секс + БДСМ. Хаос и наслаждение переплетены.<br><br>
+                🍦 <b>The Classic (Классик):</b><br>Ваниль, романтика, традиционный секс. Простота — залог успеха.
+            `,
+
+            pt_title: "Ты знал?",
+            pt_desc: "Если хочешь узнать как полностью отключить рекламу в видео или не спалиться в нужный момент, то прочитай здешнюю Базу знаний, точно не разочаруешься 🌚",
+            pt_btn_go: "Открыть Базу Знаний",
+
             theme_preview_mode: "Предпросмотр",
             btn_unlock_theme: "Разблокировать тему 🔒",
             theme_tap_cancel: "Нажми куда угодно для отмены",
@@ -10114,6 +10438,66 @@
             expl_hist: "De los archivos 📜",
             deco_label: "Mostrar decoración",
 
+            cat_tips_tech: "Técnico y Funciones",
+            cat_tips_info: "Info y Conocimiento +18",
+
+            tip_sites_title: "Guía de Sitios 2026",
+            tip_sites_desc: "Pros, contras y cuál elegir",
+            tip_sites_text: `
+                <b>xVideos</b> — La elección popular.<br>
+                ✅ <b>Pros:</b> Biblioteca enorme, carga rápido, mucho contenido amateur/nicho.<br>
+                ❌ <b>Contras:</b> Menor calidad, muchos anuncios.<br>
+                👉 <i>Para máxima variedad y rarezas.</i><br><br>
+
+                <b>Pornhub</b> — Experiencia Premium.<br>
+                ✅ <b>Pros:</b> Mejor interfaz, modelos verificadas, mucho 4K.<br>
+                ❌ <b>Contras:</b> Bloqueado en algunos lugares, muchos anuncios Premium.<br>
+                👉 <i>Para calidad y comodidad.</i><br><br>
+
+                <b>xHamster</b> — Paraíso Amateur.<br>
+                ✅ <b>Pros:</b> Diseño limpio, enfoque en amateur real y VR. Menos censura.<br>
+                ❌ <b>Contras:</b> Menos contenido de estudio profesional.<br>
+                👉 <i>Para fans del sexo "real".</i><br><br>
+
+                <b>SpankBang</b> — Elección experta.<br>
+                ✅ <b>Pros:</b> Mucho HD/4K gratis, grandes algoritmos, listas de usuarios.<br>
+                ❌ <b>Contras:</b> Duplicados frecuentes, menos categorías.<br>
+                👉 <i>Para alta calidad gratis.</i>
+            `,
+
+            tip_algo_title: "Cómo funciona el Algoritmo",
+            tip_algo_desc: "Secretos de xFetishHub",
+            tip_algo_text: `
+                <b>👍 Deslizar Derecha (Like):</b> Aumenta el peso de las etiquetas (ej. Milf). Aparecerán más seguido.<br><br>
+                <b>👎 Deslizar Izquierda (Dislike):</b> Disminuye el peso. El sistema dejará de sugerirlo.<br><br>
+                <b>💡 Consejo:</b> Sé honesto con tus swipes para mejorar el modo <b>"Placer"</b>.
+            `,
+
+            tip_dict_title: "Glosario Fetiche",
+            tip_dict_desc: "Qué significa POV, BBW, etc.",
+            tip_dict_text: `
+                <b>POV:</b> Punto de vista (primera persona).<br>
+                <b>PMV:</b> Video musical porno.<br>
+                <b>JOI:</b> Instrucciones de masturbación.<br>
+                <b>BBW:</b> Mujeres grandes y hermosas.<br>
+                <b>PAWG:</b> Chica blanca con trasero grande.<br>
+                <b>CBT:</b> Tortura genital (Hardcore).
+            `,
+
+            tip_psycho_title: "Todos los Psicotipos",
+            tip_psycho_desc: "Insignias desbloqueables",
+            tip_psycho_text: `
+                👑 <b>Señor Oscuro:</b> Amas el BDSM y Tabú.<br>
+                🎭 <b>El Artista:</b> Público y Juegos de Rol.<br>
+                🕯️ <b>El Idólatra:</b> Partes del cuerpo y Ropa.<br>
+                🍇 <b>Calígula:</b> Orgia + Hardcore.<br>
+                🍦 <b>El Clásico:</b> Vainilla y Romántico.
+            `,
+
+            pt_title: "¿Sabías qué?",
+            pt_desc: "Si quieres saber cómo desactivar completamente los anuncios en videos o no ser descubierto en el momento justo, lee la Base de Conocimientos aquí, no te decepcionará 🌚",
+            pt_btn_go: "Abrir Base de Conocimientos",
+
             theme_preview_mode: "Avance",
             btn_unlock_theme: "Desbloquear Tema 🔒",
             theme_tap_cancel: "Toca donde sea para cancelar",
@@ -10673,6 +11057,66 @@
             expl_undo: "Meinung geändert? 😏",
             expl_hist: "Aus dem Archiv 📜",
             deco_label: "Dekoration anzeigen",
+
+            cat_tips_tech: "Technik & Funktionen",
+            cat_tips_info: "Info & 18+ Wissen",
+
+            tip_sites_title: "Seiten-Guide 2026",
+            tip_sites_desc: "Vor- & Nachteile im Vergleich",
+            tip_sites_text: `
+                <b>xVideos</b> — Die Wahl des Volkes.<br>
+                ✅ <b>Vorteile:</b> Riesige Bibliothek, lädt sofort, viel Amateur/Nischen.<br>
+                ❌ <b>Nachteile:</b> Geringere Qualität, viel Werbung.<br>
+                👉 <i>Für maximale Vielfalt.</i><br><br>
+
+                <b>Pornhub</b> — Premium-Erlebnis.<br>
+                ✅ <b>Vorteile:</b> Beste UI, verifizierte Modelle, viel 4K.<br>
+                ❌ <b>Nachteile:</b> Regionale Sperren, aggressive Premium-Werbung.<br>
+                👉 <i>Für Qualität und Komfort.</i><br><br>
+
+                <b>xHamster</b> — Amateur-Himmel.<br>
+                ✅ <b>Vorteile:</b> Sauberes Design, Fokus auf echtes Amateur und VR.<br>
+                ❌ <b>Nachteile:</b> Weniger professionelle Studio-Videos.<br>
+                👉 <i>Für Fans von "echtem" Sex.</i><br><br>
+
+                <b>SpankBang</b> — Kenner-Wahl.<br>
+                ✅ <b>Vorteile:</b> Viel HD/4K kostenlos, tolle Algorithmen.<br>
+                ❌ <b>Nachteile:</b> Häufige Duplikate, weniger Kategorien.<br>
+                👉 <i>Für hohe Qualität kostenlos.</i>
+            `,
+
+            tip_algo_title: "Wie der Algorithmus funktioniert",
+            tip_algo_desc: "Training von xFetishHub",
+            tip_algo_text: `
+                <b>👍 Rechts (Like):</b> Erhöht die Gewichtung von Tags. Sie erscheinen öfter.<br><br>
+                <b>👎 Links (Dislike):</b> Verringert die Gewichtung. Das System schlägt es seltener vor.<br><br>
+                <b>💡 Tipp:</b> Sei ehrlich, um den <b>"Genuss"</b>-Modus zu verbessern.
+            `,
+
+            tip_dict_title: "Fetisch-Glossar",
+            tip_dict_desc: "POV, BBW und mehr erklärt",
+            tip_dict_text: `
+                <b>POV:</b> Perspektive der ersten Person.<br>
+                <b>PMV:</b> Porno-Musikvideo.<br>
+                <b>JOI:</b> Wichsanleitung.<br>
+                <b>BBW:</b> Große schöne Frauen.<br>
+                <b>PAWG:</b> Weiße Frau mit großem Hintern.<br>
+                <b>CBT:</b> Genitalfolter (Hardcore).
+            `,
+
+            tip_psycho_title: "Alle Psychotypen",
+            tip_psycho_desc: "Freischaltbare Abzeichen",
+            tip_psycho_text: `
+                👑 <b>Dunkler Lord:</b> Du liebst BDSM und Tabus.<br>
+                🎭 <b>Der Performer:</b> Öffentlich und Rollenspiel.<br>
+                🕯️ <b>Der Götzendiener:</b> Körperteile und Kleidung.<br>
+                🍇 <b>Caligula:</b> Gruppe + Hardcore.<br>
+                🍦 <b>Der Klassiker:</b> Vanille und Romantik.
+            `,
+
+            pt_title: "Wusstest du?",
+            pt_desc: "Wenn du wissen willst, wie man Werbung in Videos komplett deaktiviert oder im richtigen Moment nicht erwischt wird, lies die Wissensdatenbank hier, du wirst nicht enttäuscht sein 🌚",
+            pt_btn_go: "Wissensdatenbank öffnen",
 
             theme_preview_mode: "Vorschau",
             btn_unlock_theme: "Thema freischalten 🔒",
@@ -11263,8 +11707,48 @@
         descKey: 'tip_modes_desc', 
         textKey: 'tip_modes_text',
         gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' // Сине-фиолетовый
+    },
+    { 
+        id: 'sites_guide', 
+        icon: '🌐', 
+        titleKey: 'tip_sites_title', 
+        descKey: 'tip_sites_desc', 
+        textKey: 'tip_sites_text',
+        gradient: 'linear-gradient(135deg, #00c6ff 0%, #0072ff 100%)' // Голубой градиент
+    },
+    { 
+        id: 'algo_secrets', 
+        icon: '🧠', 
+        titleKey: 'tip_algo_title', 
+        descKey: 'tip_algo_desc', 
+        textKey: 'tip_algo_text',
+        gradient: 'linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%)' // Фиолетовый (Интеллект)
+    },
+    { 
+        id: 'glossary', 
+        icon: '🎓', 
+        titleKey: 'tip_dict_title', 
+        descKey: 'tip_dict_desc', 
+        textKey: 'tip_dict_text',
+        gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' // Изумрудный (Знания)
+    },
+    { 
+        id: 'psychotypes', 
+        icon: '🎭', 
+        titleKey: 'tip_psycho_title', 
+        descKey: 'tip_psycho_desc', 
+        textKey: 'tip_psycho_text',
+        gradient: 'linear-gradient(135deg, #f2994a 0%, #f2c94c 100%)' // Золотой (Ачивки)
     }
 ];
+    
+    const TIPS_CATS = {
+        // Техническое: Приложение, оплата, баги, интерфейс, режимы
+        tech: ['ads', 'video', 'pay', 'bug', 'panic', 'layout', 'modes', 'sites_guide'],
+        // Инфо: Алгоритмы, словари, психология, советы
+        info: ['algo_secrets', 'glossary', 'psychotypes', 'intensity']
+    };
+
     // --- WRAPPED DATA & TEXTS ---
     const WRAPPED_CONFIG = {
         badges: {
@@ -12771,24 +13255,25 @@
             return;
         }
 
-        // 1. Получаем текущий выбор из селектора
-        let platform = document.getElementById('platform').value;
+        // 1. Получаем то, что выбрал ПОЛЬЗОВАТЕЛЬ в настройках
+        const userSelectedPlatform = document.getElementById('platform') ? document.getElementById('platform').value : 'xh';
+        
+        // 2. Определяем реальную платформу для ссылки (внутренняя логика)
+        let targetPlatform = userSelectedPlatform;
 
-        // === НОВАЯ ЛОГИКА: ПРОВЕРКА RANDOM ===
-        // Если в настройках "Random", и у текущего предмета есть сохраненный сайт -> используем его
-        if (platform === 'random' && currentItem && currentItem.assignedPlatform) {
-            platform = currentItem.assignedPlatform;
+        // Если стоит "Random", но у предмета уже есть закрепленный сайт -> используем его для ССЫЛКИ
+        if (userSelectedPlatform === 'random' && currentItem && currentItem.assignedPlatform) {
+            targetPlatform = currentItem.assignedPlatform;
         }
-        // Если вдруг (баг) в настройках Random, но у предмета нет сайта -> фолбек на xHamster
-        else if (platform === 'random') {
-            platform = 'xh';
+        else if (userSelectedPlatform === 'random') {
+            targetPlatform = 'xh'; // Фолбек
         }
-        // =====================================
 
         const root = document.documentElement;
         const currentThemeId = localStorage.getItem('xch_theme_id') || 'dark';
         const currentTheme = APP_THEMES.find(t => t.id === currentThemeId);
 
+        // Цвета конкретных сайтов
         const colors = {
             'xh': ['#9b59b6', '#b07cc6'],
             'ph': ['#ff9900', '#ffbd55'],
@@ -12796,12 +13281,18 @@
             'sb': ['#ffd700', '#ffe666'],
             'yp': ['#ff3366', '#ff668a'],
             'rt': ['#ff0000', '#ff4d4d'],
-            'google': ['#4285F4', '#7aaafc'], // Логика Google осталась (цвета)
-            'random': ['#9b59b6', '#b07cc6'] // Фолбек цвета
+            'google': ['#4285F4', '#7aaafc'],
+            // Дефолтные цвета (App Brand Colors)
+            'default': ['#ff00cc', '#CB53F0'] 
         };
         
-        const [platMain, platLight] = colors[platform] || colors['xh'];
+        // Если пользователь выбрал "Random", мы показываем ДЕФОЛТНЫЕ цвета, чтобы не палить контору.
+        // Если выбран конкретный сайт, показываем цвета сайта.
+        let colorKey = (userSelectedPlatform === 'random') ? 'default' : targetPlatform;
+        
+        const [platMain, platLight] = colors[colorKey] || colors['xh'];
 
+        // Применяем цвета, только если тема не имеет своих жестких акцентов (как в премиум темах)
         if (!currentTheme || !currentTheme.accent) {
             root.style.setProperty('--accent', platMain);
             root.style.setProperty('--accent-light', platLight);
@@ -12825,11 +13316,11 @@
         let plusQuery = queryParts.join("+").toLowerCase();
         let url = "";
         
-        // Логика формирования ссылок
-        if (platform === 'google') {
+        // Генерируем ссылку на основе РЕАЛЬНОЙ платформы (targetPlatform)
+        if (targetPlatform === 'google') {
             url = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(queryParts.join(" ") + " porn")}`;
         } else {
-            switch(platform) {
+            switch(targetPlatform) {
                 case 'xh': url = `https://xhamster.com/search/${plusQuery}`; break;
                 case 'ph': url = `https://www.pornhub.com/video/search?search=${plusQuery}`; break;
                 case 'xv': url = `https://www.xvideos.com/?k=${plusQuery}`; break;
@@ -14139,6 +14630,10 @@
     function skipOnboarding() {
         localStorage.setItem('xch_onboarding_done', 'true');
         document.getElementById('onboarding-overlay').classList.remove('open');
+        
+        setTimeout(() => {
+            document.getElementById('modal-promo-tips-overlay').classList.add('open');
+        }, 300);
     }
 
     function processOnboardingText() {
@@ -14288,14 +14783,11 @@
     function finishOnboarding() {
         let changed = false;
 
-        // 1. Сохраняем ЛАЙКИ
-        if (onbFoundLikes.length > 0) {
+        if (typeof onbFoundLikes !== 'undefined' && onbFoundLikes.length > 0) {
             onbFoundLikes.forEach(id => {
                 if (!favorites.includes(id)) {
                     favorites.push(id);
-                    // Убираем из ЧС, если там был
                     blacklist = blacklist.filter(x => x !== id);
-                    
                     const item = data.find(x => x.id === id);
                     if (item) {
                         adjustTagScores(item, 5);
@@ -14306,17 +14798,14 @@
             changed = true;
         }
 
-        // 2. Сохраняем ДИЗЛАЙКИ (ЧС)
-        if (onbFoundDislikes.length > 0) {
+        if (typeof onbFoundDislikes !== 'undefined' && onbFoundDislikes.length > 0) {
             onbFoundDislikes.forEach(id => {
                 if (!blacklist.includes(id)) {
                     blacklist.push(id);
-                    // Убираем из Избранного, если там был
                     favorites = favorites.filter(x => x !== id);
-                    
                     const item = data.find(x => x.id === id);
                     if (item) {
-                        adjustTagScores(item, -10); // Сильно понижаем вес
+                        adjustTagScores(item, -10);
                         logActivity('dislike', item.id, item.tags);
                     }
                 }
@@ -14330,8 +14819,16 @@
             if (window.markDirty) window.markDirty();
         }
         
+        // Сохраняем флаг, что онбординг пройден
         localStorage.setItem('xch_onboarding_done', 'true');
+        
+        // Закрываем окно онбординга
         document.getElementById('onboarding-overlay').classList.remove('open');
+
+        // Делаем небольшую задержку (300мс) для плавности
+        setTimeout(() => {
+            document.getElementById('modal-promo-tips-overlay').classList.add('open');
+        }, 300);
     }
 
     function resetAppHistory() {
@@ -19396,36 +19893,63 @@
     }
 
     function renderTipsList() {
-        const container = document.getElementById('tips-list-container');
-        container.innerHTML = '';
+        const viewList = document.getElementById('tips-view-list');
         const t = langData[currentLang] || langData['en'];
+        
+        // Заголовок окна
+        let html = `
+            <div class="tips-guru-text" data-key="tips_guru_title" style="margin-bottom:20px;">
+                ${t.tips_guru_title || "Become a Guru 😈"}
+            </div>
+        `;
 
-        const sortedTips = [...tipsData].sort((a, b) => {
-            const aViewed = viewedTips.includes(a.id);
-            const bViewed = viewedTips.includes(b.id);
-            return aViewed - bViewed; // false (0) - true (1) = -1 (Unviewed first)
-        });
-
-        sortedTips.forEach(tip => {
-            const isViewed = viewedTips.includes(tip.id);
+        const generateRow = (catKey, titleKey) => {
+            const title = t[titleKey];
+            const ids = TIPS_CATS[catKey];
             
-            const card = document.createElement('div');
-            // Добавляем класс 'viewed', если прочитано
-            card.className = `tip-card ${isViewed ? 'viewed' : ''}`;
-            
-            card.onclick = () => showTipDetail(tip);
+            // Получаем объекты
+            let items = ids.map(id => tipsData.find(x => x.id === id)).filter(Boolean);
+            if (items.length === 0) return '';
 
-            card.innerHTML = `
-                <div class="tip-card-header" style="background: ${tip.gradient};"></div>
-                <div class="tip-card-body">
-                    <div class="tip-card-icon">${tip.icon}</div>
-                    <div class="tip-card-title">${t[tip.titleKey]}</div>
-                    <div class="tip-card-desc">${t[tip.descKey]}</div>
+            // 1. Сортировка: Непрочитанные -> Прочитанные
+            items.sort((a, b) => {
+                const aViewed = viewedTips.includes(a.id);
+                const bViewed = viewedTips.includes(b.id);
+                return aViewed - bViewed;
+            });
+
+            // 2. Генерация HTML (БЕЗ ДУБЛИРОВАНИЯ)
+            const cardsHTML = items.map(tip => {
+                const isViewed = viewedTips.includes(tip.id);
+                return `
+                    <div class="tip-card ${isViewed ? 'viewed' : ''}" onclick="openSpecificTip('${tip.id}')">
+                        <div class="tip-card-header" style="background: ${tip.gradient};"></div>
+                        <div class="tip-card-body">
+                            <div class="tip-card-icon">${tip.icon}</div>
+                            <div class="tip-card-title">${t[tip.titleKey]}</div>
+                            <div class="tip-card-desc">${t[tip.descKey]}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            return `
+                <div class="tips-category-title" style="text-align:left; padding-left:20px; margin-bottom:10px;">${title}</div>
+                <div class="tips-scroll-row" id="scroll-row-${catKey}">
+                    ${cardsHTML}
                 </div>
             `;
-            
-            container.appendChild(card);
-        });
+        };
+
+        html += generateRow('tech', 'cat_tips_tech');
+        html += generateRow('info', 'cat_tips_info');
+
+        viewList.innerHTML = html;
+        
+    }
+
+    function initInfiniteRoulette(containerId) {
+        return; 
     }
 
     function showTipDetail(tip) {
@@ -19502,6 +20026,20 @@
         if (modeIcon) {
             modeIcon.style.display = viewedTips.includes('modes') ? 'none' : 'block';
         }
+    }
+
+    function closePromoTips() {
+        document.getElementById('modal-promo-tips-overlay').classList.remove('open');
+    }
+
+    function openTipsFromPromo() {
+        // 1. Закрываем окно промо
+        document.getElementById('modal-promo-tips-overlay').classList.remove('open');
+        
+        // 2. Через мгновение открываем Базу Знаний (Tips)
+        setTimeout(() => {
+            openTipsModal();
+        }, 250);
     }
 
 </script>
