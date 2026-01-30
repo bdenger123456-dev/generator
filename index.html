@@ -593,6 +593,8 @@
             background: linear-gradient(135deg, rgba(0, 210, 255, 0.15), rgba(20, 20, 20, 0.8));
             border-color: rgba(0, 210, 255, 0.4);
             box-shadow: inset 0 0 40px rgba(0, 210, 255, 0.05);
+            padding-top: 55px !important; 
+            position: relative;
         }
         /* Связь фич с темой Bestie */
         .theme-bestie .tile-feat { border-color: rgba(0, 210, 255, 0.15); } /* Голубая рамка */
@@ -637,6 +639,10 @@
             z-index: 2;
             
             animation: pulseBadge 2s infinite;
+        }
+
+        .theme-bestie .tile-main .plan-name-lg {
+            margin-top: 0 !important;
         }
 
         @keyframes pulseBadge {
@@ -1675,6 +1681,37 @@
             transform: translateX(-50%) translateY(0);
         }
 
+        /* --- HERO BUBBLE ON MOBILE --- */
+        @media (max-width: 900px) {
+            .hero-bubble-pos {
+                top: auto !important;
+                bottom: 100% !important; /* Ставим НАД логотипом */
+                margin-bottom: 20px;     /* Отступ снизу до логотипа */
+                margin-top: 0;
+                transform: translateX(-50%) translateY(0) !important; /* Сброс смещения */
+            }
+
+            /* Переворачиваем стрелочку, чтобы указывала ВНИЗ */
+            .hero-bubble-pos::before {
+                top: 100%; /* Стрелка снизу баббла */
+                bottom: auto;
+                border-top: 8px solid rgba(255, 255, 255, 0.2); /* Цвет рамки */
+                border-bottom: none;
+            }
+            .hero-bubble-pos::after {
+                top: 100%; /* Стрелка снизу баббла */
+                bottom: auto;
+                border-top: 6px solid rgba(20, 20, 20, 0.95); /* Цвет фона */
+                border-bottom: none;
+                margin-top: -3px; /* Коррекция наложения */
+            }
+            
+            /* Убедимся, что баббл не обрежется сверху */
+            .hero-visual {
+                margin-top: 40px; 
+            }
+        }
+
         /* === АНИМАЦИЯ КОНТЕНТА === */
         body:not(.animation-done) .hero-content h1,
         body:not(.animation-done) .hero-content .hero-subtitle-wrapper,
@@ -1833,10 +1870,121 @@
             }
         }
 
+        @media (max-width: 900px) {
+            /* 1. Убираем лишние отступы у контейнера, чтобы дать место сетке */
+            .footer-cta .container {
+                padding: 0 15px !important;
+                width: 100% !important;
+                overflow: hidden; /* На всякий случай */
+            }
+
+            /* 2. Переделываем сетку с 12 колонок на 2 колонки */
+            .footer-cta .bento-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr !important; /* Ровно 2 колонки */
+                width: 100% !important;
+                max-width: 100% !important;
+                gap: 10px !important;
+                margin: 0 !important;
+                padding-bottom: 40px;
+            }
+
+            /* 3. Адаптируем размеры блоков под 2 колонки */
+            
+            /* Блоки на всю ширину (были mob-full или span 12) становятся span 2 */
+            .mob-full, .col-6.mob-full, .col-3.mob-full, .col-2.mob-full {
+                grid-column: span 2 !important;
+            }
+
+            /* Блоки на половину ширины (были mob-6) становятся span 1 */
+            .mob-6, .col-2.mob-6, .col-3.mob-6 {
+                grid-column: span 1 !important;
+            }
+
+            /* Фикс для блока Fetish Wrapped (он мог быть слишком высоким) */
+            .row-2 {
+                grid-row: span 1 !important;
+                min-height: 160px !important;
+            }
+            
+            /* Убедимся, что иконки не распирают сетку */
+            .bento-cell img {
+                max-width: 100%;
+            }
+        }
+
+        /* --- PERFORMANCE OPTIMIZATION --- */
+
+        /* 1. Аппаратное ускорение для анимаций */
+        .hero-logo-img, 
+        .aurora-blur-layer,
+        .bento-cell,
+        .glass-card {
+            will-change: transform, opacity; /* Подсказка браузеру заранее подготовить слой */
+            transform: translateZ(0);        /* Включение GPU */
+        }
+
+        /* 2. Оптимизация шрифтов */
+        body {
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 3. Оптимизация для мобильных (снижаем нагрузку) */
+        @media (max-width: 900px) {
+            /* Уменьшаем радиус размытия фона (Auroras), так как 100px blur очень тяжел для телефона */
+            .aurora-blur-layer {
+                filter: blur(50px) !important; /* Было 100px */
+                opacity: 0.5; /* Чуть прозрачнее, чтобы скрыть артефакты */
+            }
+
+            /* Упрощаем "стекло" на слабых устройствах */
+            .glass-card, .btn-cta, .navbar, .bento-cell {
+                /* Если телефон не тянет стекло, делаем просто полупрозрачный фон */
+                @supports not (backdrop-filter: blur(10px)) {
+                    background: rgba(20, 20, 20, 0.95) !important;
+                }
+            }
+            
+            /* Отключаем сложные тени на мобильных */
+            .btn-cta, .glass-card {
+                box-shadow: 0 5px 15px rgba(0,0,0,0.3) !important;
+            }
+        }
+
+        /* 4. Предотвращение сдвигов контента (CLS) */
+        img {
+            height: auto;
+            max-width: 100%;
+            display: block;
+        }
+
 </style>
 
 </head>
 <body>
+
+    <script>
+        // 1. Сообщаем браузеру, что мы сами управляем скроллом (отключаем "память" позиции)
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+
+        // 2. Мгновенно перематываем наверх
+        window.scrollTo(0, 0);
+
+        // 3. Дублируем после полной загрузки страницы (на случай глюков на медленных телефонах)
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                window.scrollTo(0, 0);
+            }, 10);
+        });
+
+        // 4. Сбрасываем позицию перед уходом со страницы
+        window.onbeforeunload = function () {
+            window.scrollTo(0, 0);
+        };
+    </script>
 
     <!-- INTRO OVERLAY -->
     <div id="intro-overlay">
@@ -1910,7 +2058,11 @@
         <div class="container">
             <div class="hero-grid">
                 <div class="hero-visual">
-                    <img src="hero_logo.png" alt="xFetishHub Logo" class="hero-logo-img">
+                    <img src="hero_logo.png" 
+                        alt="xFetishHub Logo" 
+                        class="hero-logo-img" 
+                        width="1024" height="1024" 
+                        fetchpriority="high">
                     <div id="hero-bubble" class="speech-bubble hero-bubble-pos">
                         <span id="hero-bubble-text">...</span>
                     </div>
@@ -1962,7 +2114,12 @@
                             <p data-i18n="wi_p1_desc">Think you're tired of watching the same old thing. We give you a choice...</p>
                         </div>
                         <div class="icon-glow-bg"></div>
-                        <img src="icon_brain.png" alt="Choose" class="bento-img-3d">
+                        <img src="icon_brain.png" 
+                            alt="Choose" 
+                            class="bento-img-3d" 
+                            width="94" height="94" 
+                            loading="lazy" 
+                            decoding="async">
                     </div>
 
                     <!-- 2. RELAX (Wide) -> Иконка СЛЕВА (Зиг-Заг) -->
@@ -3408,100 +3565,98 @@
             init();
         });
 
-        // --- ЦИКЛ СЛОВ ДЛЯ WRAPPED BADGE ---
-        function initBadgeCycle() {
-            const badge = document.getElementById('cycle-badge');
-            if (!badge) return;
+        function createObserver(elementId, callback) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
 
-            // Слова для перебора
+            let interval;
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        // Если элемент виден — запускаем цикл
+                        if (!interval) interval = callback();
+                    } else {
+                        // Если элемент ушел с экрана — останавливаем цикл (экономим CPU)
+                        if (interval) {
+                            clearInterval(interval);
+                            interval = null;
+                        }
+                    }
+                });
+            }, { threshold: 0.1 }); // Срабатывает, когда видно хотя бы 10% элемента
+
+            observer.observe(el);
+        }
+
+        // 1. Badge Cycle (Wrapped)
+        function startBadgeCycle() {
+            const badge = document.getElementById('cycle-badge');
             const words = ["DAILY", "WEEKLY", "MONTHLY", "YEARLY"];
             let index = 0;
 
-            setInterval(() => {
-                // 1. Запускаем анимацию исчезновения
+            return setInterval(() => {
                 badge.classList.remove('badge-fade-in');
                 badge.classList.add('badge-fade-out');
-
-                // 2. Через 300мс (когда исчез) меняем текст и появляем обратно
                 setTimeout(() => {
                     index = (index + 1) % words.length;
                     badge.innerText = words[index];
-                    
                     badge.classList.remove('badge-fade-out');
                     badge.classList.add('badge-fade-in');
                 }, 300);
-                
-            }, 2500); // Меняем каждые 2.5 секунды
+            }, 2500);
         }
 
-        function initModesCycle() {
+        // 2. Modes Cycle (Icons)
+        function startModesCycle() {
             const imgEl = document.getElementById('modes-icon-anim');
-            if (!imgEl) return;
-            
             const icons = ['icon_discovery.png', 'icon_pleasure.png', 'icon_aimode.png'];
             let idx = 0;
 
-            setInterval(() => {
-                // 1. Исчезаем (поворот и уменьшение)
+            return setInterval(() => {
                 imgEl.style.transform = 'scale(0.5) rotate(-20deg)';
                 imgEl.style.opacity = '0';
-                imgEl.style.transition = 'all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55)';
-
                 setTimeout(() => {
-                    // 2. Меняем картинку
                     idx = (idx + 1) % icons.length;
                     imgEl.src = icons[idx];
-                    
-                    // 3. Появляемся (увеличение и возврат угла)
                     imgEl.style.transform = 'scale(1) rotate(0deg)';
                     imgEl.style.opacity = '1';
                 }, 400);
-
-            }, 2000); // Каждые 2 сек
+            }, 2000);
         }
 
-        // --- АНИМАЦИЯ: УСТРОЙСТВА (iPhone -> Android -> PC) ---
-        function initDeviceTextCycle() {
+        // 3. Device Text Cycle
+        function startDeviceTextCycle() {
             const txtEl = document.getElementById('device-text-anim');
-            if (!txtEl) return;
-
-            // Берем текущий язык или дефолтный EN
+            // Получаем переводы (упрощенно для примера, лучше брать из глобальной переменной)
             const lang = localStorage.getItem('xfetishhub_lang') || 'en';
             const t = translations[lang] || translations['en'];
-            
-            // Массив слов
             const devices = [t.dev_iphone, t.dev_android, t.dev_pc];
             let idx = 0;
 
-            setInterval(() => {
-                // Уезжаем вниз и исчезаем
+            return setInterval(() => {
                 txtEl.style.transform = 'translateY(15px)';
                 txtEl.style.opacity = '0';
-                txtEl.style.transition = 'all 0.3s ease';
-
                 setTimeout(() => {
                     idx = (idx + 1) % devices.length;
                     txtEl.innerText = devices[idx];
-                    
-                    // Приезжаем снизу (без анимации возвращаем позицию -15px, потом плавно в 0)
                     txtEl.style.transition = 'none';
                     txtEl.style.transform = 'translateY(-15px)';
-                    
                     setTimeout(() => {
                         txtEl.style.transition = 'all 0.3s ease';
                         txtEl.style.transform = 'translateY(0)';
                         txtEl.style.opacity = '1';
                     }, 50);
-
                 }, 300);
-            }, 3000); // Каждые 3 сек
+            }, 3000);
         }
 
-        // Запускаем после загрузки страницы
+        // Инициализация с Observer'ами
         document.addEventListener('DOMContentLoaded', () => {
-            initModesCycle();
-            initDeviceTextCycle();
-            initBadgeCycle(); 
+            // Вместо прямого вызова, оборачиваем в Observer
+            createObserver('cycle-badge', startBadgeCycle);
+            createObserver('modes-icon-anim', startModesCycle);
+            createObserver('device-text-anim', startDeviceTextCycle);
         });
 
     </script>
