@@ -15623,20 +15623,18 @@
         body.innerHTML = '';
         const t = langData[currentLang];
 
-        // 1. ОПРЕДЕЛЕНИЕ ВРЕМЕННОГО ДИАПАЗОНА (ОБЩЕЕ ДЛЯ ОБОИХ ТАБОВ)
+        // 1. ОПРЕДЕЛЕНИЕ ВРЕМЕННОГО ДИАПАЗОНА
         const now = new Date();
         const nowTs = now.getTime();
         const oneDay = 86400000;
         let cutoffTime = 0;
         let rangeText = "";
 
-        // Настройка начала периода
         if (currentStatsTimeframe === 'week') cutoffTime = nowTs - (7 * oneDay);
         else if (currentStatsTimeframe === 'month') cutoffTime = nowTs - (30 * oneDay);
         else if (currentStatsTimeframe === 'year') cutoffTime = nowTs - (365 * oneDay);
-        else cutoffTime = 0; // All time
+        else cutoffTime = 0;
 
-        // Форматирование текста даты (Например: "01.01 - 07.01")
         const formatDate = (ts) => {
             const d = new Date(ts);
             return `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}`;
@@ -15650,18 +15648,14 @@
             rangeText = `${startStr} — ${endStr}`;
         }
 
-        // 2. ВСТАВКА ДАТЫ В ИНТЕРФЕЙС
-        // Ищем или создаем контейнер для даты НАД графиком
         let dateHeader = document.getElementById('stats-date-display');
         if (!dateHeader) {
-            // Вставляем HTML перед телом графика
             body.insertAdjacentHTML('beforebegin', `<div id="stats-date-display" class="stats-date-range"></div>`);
             dateHeader = document.getElementById('stats-date-display');
         }
         dateHeader.innerText = rangeText;
-        // Перезапуск анимации текста
         dateHeader.style.animation = 'none';
-        dateHeader.offsetHeight; /* trigger reflow */
+        dateHeader.offsetHeight; 
         dateHeader.style.animation = 'fadeInUp 0.3s forwards';
 
 
@@ -15670,9 +15664,8 @@
             const tempScores = {};
             const IGNORED_TAGS = ['general', 'specific', 'straight', 'male', 'female', 'adult', 'video', 'hd'];
             
-            // !!! ФИЛЬТРАЦИЯ ПО ВРЕМЕНИ ТЕПЕРЬ ТУТ !!!
             activityLog.forEach(log => {
-                if (log.ts < cutoffTime) return; // Пропускаем старые записи
+                if (log.ts < cutoffTime) return;
 
                 if (log.tags) {
                     let weight = 0;
@@ -15702,19 +15695,20 @@
             } else {
                 const maxVal = Math.max(...sortedTags.map(x => x[1]));
                 sortedTags.forEach(([tag, score], index) => {
-                    const height = Math.max(10, (score / maxVal) * 85);
+                    // Вычисляем высоту в процентах (от 10% до 90% для красоты)
+                    const height = Math.max(10, (score / maxVal) * 90);
                     let displayTag = tag.charAt(0).toUpperCase() + tag.slice(1);
                     if (displayTag.length > 9) displayTag = displayTag.substring(0, 7) + '..';
 
-                    // Добавляем задержку анимации для каждого столбика
                     const delay = index * 0.05; 
 
                     html += `
                         <div class="pref-col">
                             <div class="chart-value-y stagger-text" style="animation-delay:${delay}s">${score}</div>
-                            <div class="chart-bar" style="height:0%; animation: growBar 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards ${delay}s;"></div>
+                            <!-- Здесь используем уникальное имя анимации growTag${index} -->
+                            <div class="chart-bar" style="height:0%; animation: growTag${index} 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards ${delay}s;"></div>
                             <div class="chart-label-x stagger-text" title="${tag}" style="animation-delay:${delay}s">${displayTag}</div>
-                            <style>@keyframes growBar { to { height: ${height}%; } }</style>
+                            <style>@keyframes growTag${index} { from { height: 0%; } to { height: ${height}%; } }</style>
                         </div>
                     `;
                 });
@@ -15734,8 +15728,6 @@
         
         // --- ВАРИАНТ Б: АКТИВНОСТЬ (ACTIVITY) ---
         else {
-            // (Оставляем логику Агрегации, она уже использовала cutoffTime правильно, 
-            // просто добавим анимации появления)
             const aggregated = {};
             
             const getDateKey = (ts) => {
