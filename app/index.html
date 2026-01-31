@@ -6508,6 +6508,82 @@
             gap: 10px !important; /* Расстояние между карточками */
         }
 
+        /* === АНИМАЦИИ СТАТИСТИКИ И WRAPPED === */
+
+        /* 1. Диапазон дат в статистике */
+        .stats-date-range {
+            text-align: center;
+            font-size: 11px;
+            color: var(--accent);
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            opacity: 0;
+            transform: translateY(5px);
+            animation: fadeInUp 0.3s forwards;
+        }
+
+        /* 2. Переливающийся текст (Градиент) */
+        .shimmer-text {
+            background: linear-gradient(90deg, #fff, var(--accent), #fff);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 3s linear infinite;
+        }
+        @keyframes shimmer {
+            to { background-position: 200% center; }
+        }
+
+        /* 3. Анимация Радара (Диаграммы) */
+        .radar-poly {
+            transform-origin: center;
+            transform: scale(0);
+            opacity: 0;
+            /* Анимация будет запускаться через JS класс */
+            transition: transform 1.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s;
+        }
+        .radar-poly.animate {
+            transform: scale(1);
+            opacity: 0.6;
+        }
+
+        /* 4. Анимация Эволюции (Контейнер) */
+        .evo-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .evo-row {
+            position: absolute; /* Абсолютное позиционирование для анимации перемещения */
+            width: 100%;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: top 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s, transform 0.5s;
+            left: 0;
+        }
+
+        /* 5. Асинхронное появление текста */
+        .stagger-text {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s forwards;
+        }
+        .stagger-delay-1 { animation-delay: 0.2s; }
+        .stagger-delay-2 { animation-delay: 0.5s; }
+        .stagger-delay-3 { animation-delay: 0.8s; }
+        .stagger-delay-4 { animation-delay: 1.2s; }
+
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .seo-context {
             position: absolute;
             width: 1px;
@@ -15350,13 +15426,13 @@
         // 2. Проверяем доступность НОВОГО отчета ПРЯМО СЕЙЧАС
         let readyToGenerate = false;
         if (isPaid) {
-            // Для платных: если сегодня еще не генерировали
-            const todayStr = new Date().toLocaleDateString();
-            const lastDaily = wrappedArchive.find(w => w.type === 'daily' && new Date(w.timestamp).toLocaleDateString() === todayStr);
-            if (!lastDaily) readyToGenerate = true;
+            // Готов к генерации, если за ВЧЕРА отчет еще не создан
+            if (!hasDailyForYesterday()) {
+                readyToGenerate = true;
+            }
         } else {
-            // Для бесплатных: если накопилось 7 дней
-            if (daysActive >= 7) readyToGenerate = true;
+            // Для бесплатных — если накопилось 7 дней
+            if (activeDaysSet.size >= 7) readyToGenerate = true;
         }
 
         // РЕШАЕМ: Показывать кнопку или нет
@@ -15547,12 +15623,57 @@
         body.innerHTML = '';
         const t = langData[currentLang];
 
+        // 1. ОПРЕДЕЛЕНИЕ ВРЕМЕННОГО ДИАПАЗОНА (ОБЩЕЕ ДЛЯ ОБОИХ ТАБОВ)
+        const now = new Date();
+        const nowTs = now.getTime();
+        const oneDay = 86400000;
+        let cutoffTime = 0;
+        let rangeText = "";
+
+        // Настройка начала периода
+        if (currentStatsTimeframe === 'week') cutoffTime = nowTs - (7 * oneDay);
+        else if (currentStatsTimeframe === 'month') cutoffTime = nowTs - (30 * oneDay);
+        else if (currentStatsTimeframe === 'year') cutoffTime = nowTs - (365 * oneDay);
+        else cutoffTime = 0; // All time
+
+        // Форматирование текста даты (Например: "01.01 - 07.01")
+        const formatDate = (ts) => {
+            const d = new Date(ts);
+            return `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}`;
+        };
+
+        if (currentStatsTimeframe === 'all') {
+            rangeText = (currentLang === 'ru') ? "За всё время" : "All Time History";
+        } else {
+            const startStr = formatDate(cutoffTime > 0 ? cutoffTime : activityLog[0]?.ts || Date.now());
+            const endStr = formatDate(nowTs);
+            rangeText = `${startStr} — ${endStr}`;
+        }
+
+        // 2. ВСТАВКА ДАТЫ В ИНТЕРФЕЙС
+        // Ищем или создаем контейнер для даты НАД графиком
+        let dateHeader = document.getElementById('stats-date-display');
+        if (!dateHeader) {
+            // Вставляем HTML перед телом графика
+            body.insertAdjacentHTML('beforebegin', `<div id="stats-date-display" class="stats-date-range"></div>`);
+            dateHeader = document.getElementById('stats-date-display');
+        }
+        dateHeader.innerText = rangeText;
+        // Перезапуск анимации текста
+        dateHeader.style.animation = 'none';
+        dateHeader.offsetHeight; /* trigger reflow */
+        dateHeader.style.animation = 'fadeInUp 0.3s forwards';
+
+
         // --- ВАРИАНТ А: ТЕГИ (PREFERENCES) ---
         if (currentStatsTab === 'tags') {
             const tempScores = {};
             const IGNORED_TAGS = ['general', 'specific', 'straight', 'male', 'female', 'adult', 'video', 'hd'];
             
+            // !!! ФИЛЬТРАЦИЯ ПО ВРЕМЕНИ ТЕПЕРЬ ТУТ !!!
             activityLog.forEach(log => {
+                if (log.ts < cutoffTime) return; // Пропускаем старые записи
+
                 if (log.tags) {
                     let weight = 0;
                     if (log.type === 'watch') weight = 10;
@@ -15574,31 +15695,34 @@
                 .filter(x => x[1] > 0)
                 .slice(0, 15); 
             
-            let html = `<div class="chart-wrapper"><div class="chart-scroll-view" id="chart-source-el">`;
+            let html = `<div class="chart-wrapper fade-visible" style="animation: fadeInUp 0.5s ease;"><div class="chart-scroll-view" id="chart-source-el">`;
 
             if(sortedTags.length === 0) {
                 html += `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-secondary);">${t.stats_no_data}</div>`;
             } else {
                 const maxVal = Math.max(...sortedTags.map(x => x[1]));
-                sortedTags.forEach(([tag, score]) => {
+                sortedTags.forEach(([tag, score], index) => {
                     const height = Math.max(10, (score / maxVal) * 85);
                     let displayTag = tag.charAt(0).toUpperCase() + tag.slice(1);
                     if (displayTag.length > 9) displayTag = displayTag.substring(0, 7) + '..';
 
+                    // Добавляем задержку анимации для каждого столбика
+                    const delay = index * 0.05; 
+
                     html += `
                         <div class="pref-col">
-                            <div class="chart-value-y">${score}</div>
-                            <div class="chart-bar" style="height:${height}%;"></div>
-                            <div class="chart-label-x" title="${tag}">${displayTag}</div>
+                            <div class="chart-value-y stagger-text" style="animation-delay:${delay}s">${score}</div>
+                            <div class="chart-bar" style="height:0%; animation: growBar 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards ${delay}s;"></div>
+                            <div class="chart-label-x stagger-text" title="${tag}" style="animation-delay:${delay}s">${displayTag}</div>
+                            <style>@keyframes growBar { to { height: ${height}%; } }</style>
                         </div>
                     `;
                 });
             }
             html += `</div></div>`;
             
-            // Легенда Тегов
             html += `
-                <div class="stats-legend-row">
+                <div class="stats-legend-row stagger-text" style="animation-delay:0.5s">
                     <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div> ${t.legend_watch}</div>
                     <div class="legend-item"><div class="legend-dot" style="background:var(--text-main)"></div> ${t.legend_like}</div>
                     <div class="legend-item"><div class="legend-dot" style="background:var(--highlight-red)"></div> ${t.legend_dislike}</div>
@@ -15610,18 +15734,10 @@
         
         // --- ВАРИАНТ Б: АКТИВНОСТЬ (ACTIVITY) ---
         else {
+            // (Оставляем логику Агрегации, она уже использовала cutoffTime правильно, 
+            // просто добавим анимации появления)
             const aggregated = {};
-            const now = new Date();
-            now.setHours(23, 59, 59, 999);
-            const nowTs = now.getTime();
-            const oneDay = 86400000;
-            let cutoffTime = 0;
             
-            if (currentStatsTimeframe === 'week') cutoffTime = nowTs - (7 * oneDay);
-            else if (currentStatsTimeframe === 'month') cutoffTime = nowTs - (30 * oneDay);
-            else if (currentStatsTimeframe === 'year') cutoffTime = nowTs - (365 * oneDay);
-            else cutoffTime = 0; 
-
             const getDateKey = (ts) => {
                 const d = new Date(ts);
                 if (currentStatsTimeframe === 'year' || currentStatsTimeframe === 'all') return `${d.getFullYear()}-${d.getMonth()}`;
@@ -15654,7 +15770,7 @@
 
             const chartData = Object.values(aggregated).sort((a, b) => a.sort - b.sort);
             
-            let html = `<div class="chart-wrapper"><div class="chart-scroll-view" id="chart-source-el" style="justify-content: flex-start; padding-left: 5px;">`;
+            let html = `<div class="chart-wrapper fade-visible"><div class="chart-scroll-view" id="chart-source-el" style="justify-content: flex-start; padding-left: 5px;">`;
 
             if (chartData.length === 0) {
                 html += `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-secondary);">${t.stats_no_data}</div>`;
@@ -15670,40 +15786,37 @@
                 if (maxWatch < 3) maxWatch = 3; 
                 if (maxTime < 300) maxTime = 300; 
 
-                // --- НАСТРОЙКИ ГРАДИЕНТОВ ДЛЯ АКТИВНОСТИ ---
-                // 1. Серый (Свайпы)
                 const gradGrey = `linear-gradient(180deg, #95a5a6 0%, #34495e 100%)`;
-                // 2. Акцент (Просмотры - берет цвета темы)
                 const gradAccent = `linear-gradient(180deg, var(--accent-light) 0%, var(--accent) 100%)`;
-                // 3. Фиолетовый (Время)
                 const gradPurple = `linear-gradient(180deg, #d2b4de 0%, #8e44ad 100%)`;
 
-                chartData.forEach(d => {
+                chartData.forEach((d, index) => {
                     const hGen = (d.gen / maxGen) * 100;
                     const hWatch = (d.watch / maxWatch) * 100;
                     const hTime = (d.time / maxTime) * 100;
                     const timeMin = Math.round(d.time / 60);
+                    const delay = index * 0.05;
 
                     html += `
                         <div class="act-col">
                             <div class="act-bars-group">
-                                <!-- 1. Свайпы (Серый градиент) -->
-                                <div class="act-bar" style="background:${gradGrey}; height:${Math.max(5, hGen)}%; opacity:0.6;"></div>
-                                
-                                <!-- 2. Просмотры (Акцентный градиент) -->
-                                <div class="act-bar" style="background:${gradAccent}; height:${Math.max(5, hWatch)}%;"></div>
-                                
-                                <!-- 3. Время (Фиолетовый градиент) -->
-                                <div class="act-bar" style="background:${gradPurple}; height:${Math.max(5, hTime)}%;"></div>
+                                <div class="act-bar" style="background:${gradGrey}; height:0%; opacity:0.6; animation: growBarH${index} 0.6s forwards ${delay}s;"></div>
+                                <div class="act-bar" style="background:${gradAccent}; height:0%; animation: growBarW${index} 0.6s forwards ${delay+0.1}s;"></div>
+                                <div class="act-bar" style="background:${gradPurple}; height:0%; animation: growBarT${index} 0.6s forwards ${delay+0.2}s;"></div>
                             </div>
+                            <style>
+                                @keyframes growBarH${index} { to { height: ${Math.max(5, hGen)}%; } }
+                                @keyframes growBarW${index} { to { height: ${Math.max(5, hWatch)}%; } }
+                                @keyframes growBarT${index} { to { height: ${Math.max(5, hTime)}%; } }
+                            </style>
 
-                            <div class="act-values-row">
+                            <div class="act-values-row stagger-text" style="animation-delay:${delay + 0.3}s">
                                 <span class="act-val" style="color:var(--text-secondary); opacity:0.7;">${d.gen}</span>
                                 <span class="act-val" style="color:var(--text-main);">${d.watch}</span>
                                 <span class="act-val" style="color:#9b59b6;">${timeMin}</span>
                             </div>
 
-                            <div class="chart-label-x">${d.label}</div>
+                            <div class="chart-label-x stagger-text" style="animation-delay:${delay + 0.3}s">${d.label}</div>
                         </div>
                     `;
                 });
@@ -15712,7 +15825,7 @@
 
             let legendUnit = currentLang === 'ru' ? 'мин' : 'min';
             html += `
-                <div class="stats-legend-row" style="margin-top:10px;">
+                <div class="stats-legend-row stagger-text" style="margin-top:10px; animation-delay:0.5s;">
                     <div class="legend-item"><div class="legend-dot" style="background:var(--text-secondary)"></div> ${t.act_actions}</div>
                     <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div> ${t.act_watches}</div>
                     <div class="legend-item"><div class="legend-dot" style="background:#9b59b6"></div> ${t.act_time} (${legendUnit})</div>
@@ -20162,49 +20275,65 @@
 
     // 3. Основная функция генерации
     function generateAndSaveWrapped(type) {
-        const now = Date.now();
+        const now = new Date();
         const oneDay = 86400000;
         let startTime = 0;
+        let endTime = now.getTime();
+        let targetDateKey = null;
 
-        if (type === 'daily') startTime = now - oneDay;
-        else if (type === 'weekly') startTime = now - (7 * oneDay);
-        else if (type === 'monthly') startTime = now - (30 * oneDay);
-        else if (type === 'yearly') startTime = now - (365 * oneDay);
+        if (type === 'daily') {
+            // Устанавливаем начало вчерашнего дня (00:00:00)
+            const yesterdayStart = new Date();
+            yesterdayStart.setDate(yesterdayStart.getDate() - 1);
+            yesterdayStart.setHours(0, 0, 0, 0);
+            startTime = yesterdayStart.getTime();
 
-        const relevantLogs = activityLog.filter(l => l.ts >= startTime);
-        const relevantWatch = watchHistory.filter(w => w.timestamp >= startTime);
+            // Устанавливаем конец вчерашнего дня (23:59:59)
+            const yesterdayEnd = new Date();
+            yesterdayEnd.setDate(yesterdayEnd.getDate() - 1);
+            yesterdayEnd.setHours(23, 59, 59, 999);
+            endTime = yesterdayEnd.getTime();
 
-        if (relevantLogs.length < 5 && type !== 'daily') return null;
+            targetDateKey = yesterdayStart.toDateString();
+        } 
+        else if (type === 'weekly') startTime = now.getTime() - (7 * oneDay);
+        else if (type === 'monthly') startTime = now.getTime() - (30 * oneDay);
+        else if (type === 'yearly') startTime = now.getTime() - (365 * oneDay);
+
+        // Фильтруем данные строго в рамках выбранного диапазона
+        const relevantLogs = activityLog.filter(l => l.ts >= startTime && l.ts <= endTime);
+        const relevantWatch = watchHistory.filter(w => w.timestamp >= startTime && w.timestamp <= endTime);
+
+        // Если активности за вчера почти не было, отчет не создаем
+        if (relevantLogs.length < 5 && type === 'daily') return null;
 
         const stats = calculateDeepStats(relevantLogs, relevantWatch);
 
-        // Сравнение с прошлым
-        const duration = now - startTime;
+        // Сравнение с предыдущим таким же периодом
+        const duration = endTime - startTime;
         const prevStartTime = startTime - duration;
-        const prevLogs = activityLog.filter(l => l.ts >= prevStartTime && l.ts < startTime);
-        const prevWatches = watchHistory.filter(w => w.timestamp >= prevStartTime && w.timestamp < startTime);
-        
+        const prevEndTime = startTime - 1;
+        const prevLogs = activityLog.filter(l => l.ts >= prevStartTime && l.ts <= prevEndTime);
+        const prevWatches = watchHistory.filter(w => w.timestamp >= prevStartTime && w.timestamp <= prevEndTime);
         const prevStats = calculateDeepStats(prevLogs, prevWatches);
         
         stats.deltaActions = stats.totalActions - prevStats.totalActions;
         stats.deltaWatchTime = stats.totalWatchTime - prevStats.totalWatchTime;
-        
-        // Сохраняем топы прошлого периода для слайда сравнения
         stats.prevTopTags = prevStats.topTags || [];
-
-        // Сохраняем психо-счетчики прошлого периода для диаграммы
         stats.prevPsychoCounts = prevStats.psychoCounts || {};
 
         const wrappedObj = {
             id: Date.now(),
             type: type,
-            timestamp: now,
-            rangeStr: getRangeString(startTime, now, type),
+            targetDate: targetDateKey, // Уникальный ключ дня
+            timestamp: Date.now(),
+            rangeStr: getRangeString(startTime, endTime, type),
             stats: stats,
             viewed: false,
             isLatest: true
         };
 
+        // Помечаем старые отчеты этого типа как не актуальные
         wrappedArchive.forEach(w => { if(w.type === type) w.isLatest = false; });
         wrappedArchive.unshift(wrappedObj);
         localStorage.setItem('xch_wrapped_archive', JSON.stringify(wrappedArchive));
@@ -20394,9 +20523,9 @@
     }
 
     function createRadarChartSVG(currentData, prevData) {
-        const size = 340; // Увеличили размер холста
+        const size = 340; 
         const center = size / 2;
-        const radius = 100; // Радиус остался тем же, чтобы было место для текста
+        const radius = 100; 
         const levels = 3;
 
         let maxVal = 0;
@@ -20479,7 +20608,7 @@
             currPoints.push(`${x},${y}`);
         });
         // Заливка цветом темы
-        const currPoly = `<polygon points="${currPoints.join(' ')}" fill="var(--accent)" fill-opacity="0.5" stroke="var(--accent)" stroke-width="2"/>`;
+        const currPoly = `<polygon class="radar-poly" points="${currPoints.join(' ')}" fill="var(--accent)" fill-opacity="0.5" stroke="var(--accent)" stroke-width="2"/>`;
         
         let dotsSVG = '';
         currPoints.forEach(p => {
@@ -20565,7 +20694,7 @@
         slides.push(`
             <div class="wrapped-slide bg-dark active-slide">
                 <div class="w-badge ${type}" style="transform:scale(1.5); margin-bottom:30px; box-shadow:0 10px 30px rgba(0,0,0,0.5);">${badgeText}</div>
-                <div class="wrapped-big-text" style="font-size:46px;">${t('title')}</div>
+                <div class="wrapped-big-text shimmer-text" style="font-size:46px;">${t('title')}</div>
                 <div class="wrapped-sub-text" style="opacity:0.8; margin-top:20px; font-family:monospace;">${dataObj.rangeStr}</div>
                 <div class="wrapped-sub-text" style="margin-top:40px; font-weight:700; max-width:80%;">${introText}</div>
             </div>
@@ -20605,7 +20734,7 @@
                     
                     <!-- Блок 1: Действия -->
                     <div style="margin-bottom:50px; width:100%; display:flex; flex-direction:column; align-items:center;">
-                        <div class="wrapped-big-text" style="font-size:80px; margin-bottom:0; line-height:1;">${absActions}</div>
+                        <div class="wrapped-big-text count-anim" data-target="${absActions}" style="font-size:80px; margin-bottom:0; line-height:1;">0</div>
                         <div class="wrapped-sub-text" style="font-weight:700; margin-bottom:10px;">${t('act')}</div>
                         
                         <!-- Сравнение (выезжает) -->
@@ -20616,7 +20745,9 @@
 
                     <!-- Блок 2: Время -->
                     <div style="border-top:1px solid rgba(255,255,255,0.1); padding-top:40px; width:80%; display:flex; flex-direction:column; align-items:center;">
-                        <div class="wrapped-big-text" style="font-size:80px; margin-bottom:0; line-height:1;">${absTimeMin}<span style="font-size:30px">m</span></div>
+                        <div class="wrapped-big-text" style="font-size:80px; margin-bottom:0; line-height:1;">
+                            <span class="count-anim" data-target="${absTimeMin}">0</span><span style="font-size:30px">m</span>
+                        </div>
                         <div class="wrapped-sub-text" style="font-weight:700; margin-bottom:10px;">${t('watch')}</div>
                         
                         <!-- Сравнение (выезжает) -->
@@ -20631,26 +20762,27 @@
         // --- СЛАЙД 3: ЭВОЛЮЦИЯ ---
         let hasEvolutionSlide = false;
         if (stats.prevTopTags && stats.prevTopTags.length > 0) {
-            let evolutionHtml = '';
-            stats.topTags.slice(0, 5).forEach((tag, i) => {
-                const prevIndex = stats.prevTopTags.indexOf(tag);
-                let statusBadge = '';
-                if (prevIndex === -1) statusBadge = `<span style="font-size:10px; background:#2ecc71; color:#000; padding:2px 6px; border-radius:4px; margin-left:10px; font-weight:800;">${t('badge_new')}</span>`;
-                else if (prevIndex > i) statusBadge = `<span style="font-size:10px; background:#f1c40f; color:#000; padding:2px 6px; border-radius:4px; margin-left:10px; font-weight:800;">${t('badge_up')}</span>`;
-                else if (prevIndex < i) statusBadge = `<span style="font-size:10px; background:rgba(255,255,255,0.2); color:#fff; padding:2px 6px; border-radius:4px; margin-left:10px; font-weight:800;">${t('badge_down')}</span>`;
+            // Подготовка красивых названий
+            const formatTag = (t) => {
+                let display = t.toUpperCase();
+                const m = modifiersData.find(x => x.key.toLowerCase() === t.toLowerCase());
+                if(m && m[langKey]) display = m[langKey].toUpperCase();
+                return display;
+            };
 
-                let displayTag = tag.toUpperCase();
-                const modMatch = modifiersData.find(m => m.key.toLowerCase() === tag.toLowerCase());
-                if (modMatch && modMatch[langKey]) displayTag = modMatch[langKey].toUpperCase();
-
-                evolutionHtml += `<div style="display:flex; align-items:center; justify-content:center; margin-bottom:15px;"><span style="font-size:24px; font-weight:800;">${i+1}. ${displayTag}</span>${statusBadge}</div>`;
-            });
+            const prevNames = stats.prevTopTags.slice(0, 5).map(formatTag);
+            const currNames = stats.topTags.slice(0, 5).map(formatTag);
+            
+            // JSON данные для скрипта анимации
+            const evoData = JSON.stringify({ prev: prevNames, curr: currNames }).replace(/"/g, '&quot;');
 
             slides.push(`
                 <div class="wrapped-slide" style="background:linear-gradient(45deg, #1cb5e0 0%, #000851 100%);">
-                    <div class="wrapped-sub-text" style="text-transform:uppercase; margin-bottom:10px;">${t('evol')}</div>
-                    <div class="wrapped-sub-text" style="font-size:12px; opacity:0.6; margin-bottom:30px;">${t('evol_sub')}</div>
-                    <div>${evolutionHtml}</div>
+                    <div class="wrapped-sub-text stagger-text stagger-delay-1" style="text-transform:uppercase; margin-bottom:10px;">${t('evol')}</div>
+                    <div class="wrapped-sub-text stagger-text stagger-delay-2" style="font-size:12px; opacity:0.6; margin-bottom:40px;">${t('evol_sub')}</div>
+                    
+                    <!-- Контейнер для скриптовой анимации -->
+                    <div class="evo-container" data-evo="${evoData}"></div>
                 </div>
             `);
             hasEvolutionSlide = true;
@@ -20861,6 +20993,8 @@
             // Переключаем слайды
             document.querySelectorAll('.wrapped-slide').forEach(el => el.classList.remove('active-slide'));
             document.querySelectorAll('.wrapped-slide')[idx].classList.add('active-slide');
+
+            handleSlideAnimations(idx);
             
             // Обновляем прогресс-бары
             for(let i=0; i<total; i++) {
@@ -20920,6 +21054,110 @@
                 }
             }
         }, step);
+    }
+
+    function handleSlideAnimations(slideIndex) {
+        const activeSlide = document.querySelectorAll('.wrapped-slide')[slideIndex];
+        if (!activeSlide) return;
+
+        // 1. АНИМАЦИЯ СЧЕТЧИКОВ
+        const counters = activeSlide.querySelectorAll('.count-anim');
+        counters.forEach(el => {
+            const target = parseInt(el.getAttribute('data-target'));
+            animateValue(el, 0, target, 1500);
+        });
+
+        // 2. АНИМАЦИЯ РАДАРА (ПСИХОТИП)
+        const radar = activeSlide.querySelector('.radar-poly');
+        if (radar) {
+            // Сброс и запуск
+            radar.classList.remove('animate');
+            void radar.offsetWidth; // Reflow
+            setTimeout(() => radar.classList.add('animate'), 500);
+        }
+
+        // 3. АНИМАЦИЯ ЭВОЛЮЦИИ (СЛОЖНАЯ)
+        const evoContainer = activeSlide.querySelector('.evo-container');
+        if (evoContainer) {
+            runEvolutionAnimation(evoContainer);
+        }
+    }
+
+    // Утилита для счета чисел
+    function animateValue(obj, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            // Easing easeOutQuart
+            const ease = 1 - Math.pow(1 - progress, 4);
+            obj.innerHTML = Math.floor(progress * (end - start) + start);
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            } else {
+                obj.innerHTML = end; // Финал
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    // Утилита для анимации Эволюции
+    function runEvolutionAnimation(container) {
+        // Данные храним в атрибуте контейнера (как JSON строка)
+        const dataTags = JSON.parse(container.getAttribute('data-evo'));
+        const { prev, curr } = dataTags;
+        
+        container.innerHTML = ''; // Очистка
+        const rowHeight = 50;
+        
+        // ЭТАП 1: Рендерим ПРЕДЫДУЩИЙ ТОП (как будто это старт)
+        // Создаем элементы
+        const elementsMap = {}; // Map для отслеживания элементов по имени тега
+
+        // 1. Создаем элементы для ВСЕХ тегов (и прошлых, и нынешних)
+        const allTags = new Set([...prev, ...curr]);
+        
+        allTags.forEach(tag => {
+            const el = document.createElement('div');
+            el.className = 'evo-row';
+            el.innerHTML = `<span style="font-size:20px; font-weight:800;">${tag}</span>`;
+            
+            // Начальная позиция
+            const prevIndex = prev.indexOf(tag);
+            if (prevIndex !== -1) {
+                // Если был в прошлом топе - ставим на его место
+                el.style.top = `${prevIndex * rowHeight}px`;
+                el.style.opacity = '1';
+            } else {
+                // Если новый - прячем снизу
+                el.style.top = `${5 * rowHeight + 20}px`; 
+                el.style.opacity = '0';
+                el.innerHTML += ` <span style="font-size:10px; background:#2ecc71; color:#000; padding:2px 6px; border-radius:4px; margin-left:10px; font-weight:800;">NEW</span>`;
+            }
+            
+            container.appendChild(el);
+            elementsMap[tag] = el;
+        });
+
+        // ЭТАП 2: ЗАПУСК ПЕРЕМЕЩЕНИЯ (Через 1 секунду)
+        setTimeout(() => {
+            allTags.forEach(tag => {
+                const el = elementsMap[tag];
+                const currIndex = curr.indexOf(tag);
+                
+                if (currIndex !== -1) {
+                    // Тег есть в текущем топе -> перемещаем на новую позицию
+                    el.style.top = `${currIndex * rowHeight}px`;
+                    el.style.opacity = '1';
+                    
+                    // Если поднялся/опустился - можно добавить стрелочку (опционально)
+                } else {
+                    // Тег вылетел из топа -> уводим вниз и растворяем
+                    el.style.top = `${5 * rowHeight + 50}px`;
+                    el.style.opacity = '0';
+                }
+            });
+        }, 1200);
     }
 
     // 7. Рендер списка в Истории (Archive Tab)
@@ -21708,27 +21946,23 @@
     }
 
     function checkWrappedAlert() {
-        // 1. Не показываем, если уже видели в этой сессии (чтобы не надоедать при перезагрузке)
         if (sessionStorage.getItem('xch_wrapped_alert_shown')) return;
 
-        // 2. Проверяем, нужно ли сгенерировать новый отчет (если наступил срок)
-        // (Используем логику из triggerWrappedBtn, но без открытия UI)
         const isPaid = subscriptionLevel !== 'free';
         const now = new Date();
         let targetWrapped = null;
 
-        // A. Если есть НЕПРОЧИТАННЫЕ в архиве
+        // 1. Приоритет: есть ли в архиве что-то, что пользователь еще не видел?
         const unread = wrappedArchive.filter(w => !w.viewed).sort((a,b) => b.timestamp - a.timestamp);
+        
         if (unread.length > 0) {
             targetWrapped = unread[0];
         } 
-        // B. Если ничего нет, но МОЖНО сгенерировать новый (Конец недели/дня)
-        else if (activeDaysSet.size >= 7 || (isPaid && !hasDailyForToday())) {
-            // Генерируем молча
+        // 2. Иначе: проверяем, можно ли сгенерировать отчет за ВЧЕРА (для платных) или за неделю (для всех)
+        else if (activeDaysSet.size >= 7 || (isPaid && !hasDailyForYesterday())) {
             const period = (activeDaysSet.size >= 7) ? 'weekly' : 'daily';
             targetWrapped = generateAndSaveWrapped(period);
             
-            // Если сгенерировали неделю - сбрасываем дни
             if (targetWrapped && period === 'weekly') {
                 activeDaysSet.clear();
                 activeDaysSet.add(now.toISOString().split('T')[0]);
@@ -21736,7 +21970,6 @@
             }
         }
 
-        // Если нашли или создали отчет — показываем окно
         if (targetWrapped) {
             showWrappedAlertModal(targetWrapped);
             sessionStorage.setItem('xch_wrapped_alert_shown', 'true');
@@ -21744,9 +21977,13 @@
     }
 
     // Хелпер: был ли сегодня дейли?
-    function hasDailyForToday() {
-        const todayStr = new Date().toLocaleDateString();
-        return wrappedArchive.some(w => w.type === 'daily' && new Date(w.timestamp).toLocaleDateString() === todayStr);
+    function hasDailyForYesterday() {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const dateKey = yesterday.toDateString(); // Например: "Fri Jan 30 2026"
+        
+        // Ищем в архиве отчет типа daily, который привязан к этой дате
+        return wrappedArchive.some(w => w.type === 'daily' && w.targetDate === dateKey);
     }
 
     function showWrappedAlertModal(wrappedObj) {
