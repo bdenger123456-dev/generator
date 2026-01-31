@@ -9915,6 +9915,9 @@
             expl_hist: "From Archives 📜",
             deco_label: "Show Decorations",
 
+            theme_random: "Random Theme on Start",
+            theme_include_light: "Include Light Themes",
+
             alert_titles: [
                 "Welcome back 😈", 
                 "Guess what?", 
@@ -10623,6 +10626,9 @@
             expl_hist: "Из архивов 📜",
             deco_label: "Показывать декор",
 
+            theme_random: "Случайная тема при старте",
+            theme_include_light: "Включая светлые",
+
             alert_titles: [
                 "С возвращением 😈", 
                 "У меня есть кое-что 🎁", 
@@ -11327,6 +11333,9 @@
             expl_hist: "De los archivos 📜",
             deco_label: "Mostrar decoración",
 
+            theme_random: "Tema aleatorio al inicio",
+            theme_include_light: "Incluir temas claros",
+
             alert_titles: [
                 "Bienvenido de nuevo 😈",
                 "¿Adivina qué? 🎁",
@@ -12004,6 +12013,9 @@
             expl_undo: "Meinung geändert? 😏",
             expl_hist: "Aus dem Archiv 📜",
             deco_label: "Dekoration anzeigen",
+
+            theme_random: "Zufälliges Design beim Start",
+            theme_include_light: "Helle Designs einschließen",
 
             alert_titles: [
                 "Willkommen zurück 😈",
@@ -15094,21 +15106,38 @@
     }
 
     function initTheme() {
-        let savedId = localStorage.getItem('xch_theme_id') || 'dark';
+        const isPaid = subscriptionLevel !== 'free';
+        const isRandomEnabled = localStorage.getItem('xch_random_theme') === 'true';
+        const includeLight = localStorage.getItem('xch_random_include_light') === 'true';
         
-        // ЗАЩИТА: Проверка прав на тему при загрузке
-        // Если подписка Free, проверяем, не является ли сохраненная тема платной
-        if (subscriptionLevel === 'free') {
-            const themeObj = APP_THEMES.find(t => t.id === savedId);
-            // Если тема Pro (или её нет в списке), принудительно ставим Dark
-            if (!themeObj || themeObj.type === 'pro') {
-                console.log("Free user detected with Premium theme. Resetting to Dark.");
-                savedId = 'dark';
-                localStorage.setItem('xch_theme_id', 'dark');
+        let themeToApply = localStorage.getItem('xch_theme_id') || 'dark';
+
+        // Логика выбора темы
+        if (isPaid && isRandomEnabled) {
+            let pool = APP_THEMES;
+
+            // Если "Включая светлые" выключено — фильтруем только темные
+            if (!includeLight) {
+                pool = pool.filter(t => !t.isLight);
+            }
+
+            // Выбираем абсолютно любую тему из пула
+            const randomIndex = Math.floor(Math.random() * pool.length);
+            themeToApply = pool[randomIndex].id;
+            
+            console.log("🎲 Random Theme Selected:", themeToApply);
+        } else {
+            // Обычная логика проверки прав для Free пользователей
+            if (!isPaid) {
+                const themeObj = APP_THEMES.find(t => t.id === themeToApply);
+                if (!themeObj || themeObj.type === 'pro') {
+                    themeToApply = 'dark';
+                    localStorage.setItem('xch_theme_id', 'dark');
+                }
             }
         }
 
-        applyTheme(savedId);
+        applyTheme(themeToApply, true); 
     }
     
     function initLanguage() {
@@ -17010,14 +17039,13 @@
         const premCont = document.getElementById('theme-list-premium');
         const iconsCont = document.getElementById('theme-list-icons'); 
         
-        // Активная тема (если превью - показываем её, иначе сохраненную)
         const currentId = document.body.getAttribute('data-theme') || 'dark';
-        
         const t = langData[currentLang] || langData['en'];
         
         basicCont.innerHTML = '';
         premCont.innerHTML = '';
 
+        // 1. Рендер основных тем
         APP_THEMES.forEach(theme => {
             const isLocked = (theme.type === 'pro' && subscriptionLevel === 'free');
             const isActive = (currentId === theme.id);
@@ -17026,12 +17054,7 @@
             const localizedName = (t && t[themeKey]) ? t[themeKey] : theme.name;
             
             let typeText = theme.isLight ? 'Light' : 'Dark';
-            // (Локализация типа - оставьте свой старый код здесь если есть)
 
-            // ИКОНКА СТАТУСА:
-            // Если активно -> Галочка
-            // Если закрыто -> "PRO"
-            // Иначе -> пусто
             let statusIcon = '';
             if (isActive) {
                 statusIcon = '<span class="lock-icon" style="color:var(--accent)">✓</span>';
@@ -17040,7 +17063,6 @@
             }
 
             const div = document.createElement('div');
-            // Убираем класс locked, чтобы не было прозрачности (пользователь должен хотеть нажать)
             div.className = `theme-item ${isActive ? 'active' : ''}`;
             
             div.innerHTML = `
@@ -17061,72 +17083,105 @@
             if (theme.type === 'free') basicCont.appendChild(div);
             else premCont.appendChild(div);
         });
+
+        // 2. Рендер иконок достижений (App Icons)
         if (iconsCont) {
             iconsCont.innerHTML = '';
-            
-            // 1. ПОЛУЧАЕМ ПЕРЕВОД ЗАГОЛОВКА
-            const iconsHeaderTitle = t.theme_icons_header || "App Icons (Rewards)";
-            
-            const headerEl = document.querySelector('#modal-theme-overlay .icons-section-header');
-            if (headerEl) {
-                headerEl.innerText = iconsHeaderTitle;
-            }
-
             const savedIcon = localStorage.getItem('xch_custom_icon');
             const exploredIds = permanentExplored;
-
-            // Фильтруем только те жанры, у которых есть appIcon
             const iconGroups = EXPLORED_GROUPS.filter(g => g.appIcon);
 
             iconGroups.forEach(group => {
-                // Проверка открытия
                 const groupItems = data.filter(item => item.tags.some(tag => group.tags.includes(tag)));
                 const unlockedCount = groupItems.filter(item => exploredIds.has(item.id)).length;
                 const isUnlocked = (unlockedCount === groupItems.length && groupItems.length > 0);
-                
                 const isActive = (savedIcon === group.appIcon);
                 const title = t['cat_' + group.id] || group.id;
 
                 const div = document.createElement('div');
                 div.className = `app-icon-item ${isActive ? 'active' : ''} ${!isUnlocked ? 'locked' : ''}`;
-                
                 div.innerHTML = `
                     <img src="${group.appIcon}" class="app-icon-img">
                     ${!isUnlocked ? '<span class="icon-lock-badge">🔒</span>' : ''}
                     <div class="app-icon-label">${title}</div>
                 `;
-
                 div.onclick = () => {
-                    if (isUnlocked) {
-                        toggleCustomIcon(group.appIcon);
-                    } else {
+                    if (isUnlocked) toggleCustomIcon(group.appIcon);
+                    else {
                         closeThemeModal(null, true); 
-                        const fakeGroupData = { 
-                            ...group, 
-                            percent: Math.round((unlockedCount / groupItems.length) * 100), 
-                            count: unlockedCount, 
-                            total: groupItems.length 
-                        };
-                        showGenreDetails(fakeGroupData);
+                        showGenreDetails({...group, percent: Math.round((unlockedCount/groupItems.length)*100), count: unlockedCount, total: groupItems.length});
                     }
                 };
-
                 iconsCont.appendChild(div);
             });
         }
+
+        // 3. БЛОК СЛУЧАЙНОЙ ТЕМЫ (Только для PRO)
+        const oldSettings = document.getElementById('theme-random-settings');
+        if (oldSettings) oldSettings.remove();
+
+        if (subscriptionLevel !== 'free') {
+            const isRandom = localStorage.getItem('xch_random_theme') === 'true';
+            const includeLight = localStorage.getItem('xch_random_include_light') === 'true';
+
+            const randomDiv = document.createElement('div');
+            randomDiv.id = 'theme-random-settings';
+            randomDiv.style.marginTop = '25px';
+            randomDiv.innerHTML = `
+                <div class="ios-group">
+                    <div class="ios-row">
+                        <div class="ios-row-left">
+                            <span style="font-weight:600;">${t.theme_random}</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="random-theme-toggle" ${isRandom ? 'checked' : ''} onchange="toggleRandomTheme(this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="ios-row" id="row-include-light" style="display: ${isRandom ? 'flex' : 'none'}">
+                        <div class="ios-row-left">
+                            <span style="font-weight:600;">${t.theme_include_light}</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="random-light-toggle" ${includeLight ? 'checked' : ''} onchange="toggleRandomIncludeLight(this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            `;
+            document.querySelector('#modal-theme-overlay .modal-body').appendChild(randomDiv);
+        }
+    }
+
+    function toggleRandomTheme(enabled) {
+        localStorage.setItem('xch_random_theme', enabled);
+        const lightRow = document.getElementById('row-include-light');
+        if (lightRow) {
+            lightRow.style.display = enabled ? 'flex' : 'none';
+        }
+        // Если включили, можно сразу инициировать смену или оставить до след. старта
+        if(navigator.vibrate) navigator.vibrate(10);
+    }
+
+    function toggleRandomIncludeLight(enabled) {
+        localStorage.setItem('xch_random_include_light', enabled);
+        if(navigator.vibrate) navigator.vibrate(10);
     }
 
     function selectTheme(theme) {
         const isLocked = (theme.type === 'pro' && subscriptionLevel === 'free');
 
         if (isLocked) {
-            // == ЗАПУСК ПРЕДПРОСМОТРА ==
             startPreview(theme.id);
         } else {
-            // == ОБЫЧНЫЙ ВЫБОР ==
-            applyTheme(theme.id, true); // Сохраняем
-            originalThemeId = theme.id; // Обновляем оригинал
-            renderThemes(); // Обновляем галочки
+            // При ручном выборе мы применяем тему и сохраняем её как основную
+            applyTheme(theme.id, true);
+            originalThemeId = theme.id;
+            
+            // Обновляем список, чтобы поставить галочку на новую тему
+            renderThemes();
+            
+            if(navigator.vibrate) navigator.vibrate(15);
         }
     }
 
