@@ -6442,6 +6442,72 @@
             backdrop-filter: blur(4px);
         }
 
+        /* === КОМПАКТНЫЕ КАРТОЧКИ БАЗЫ ЗНАНИЙ === */
+
+        /* 1. Уменьшаем контейнер карточки */
+        .tip-card {
+            min-width: 160px !important; /* Было 240px */
+            width: 160px !important;
+            height: 215px !important;    /* Было 320px */
+            border-radius: 18px !important;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08) !important; /* Чуть меньше тень */
+        }
+
+        /* 2. Адаптируем верхнюю и нижнюю части */
+        .tip-card-header {
+            border-radius: 18px 18px 0 0 !important;
+        }
+
+        .tip-card-body {
+            padding: 10px 12px !important; /* Уменьшаем внутренние отступы */
+            border-radius: 0 0 18px 18px !important;
+        }
+
+        /* 3. Уменьшаем и двигаем иконку (Эмодзи) */
+        .tip-card-icon {
+            font-size: 30px !important;  /* Было 42px */
+            top: -18px !important;       /* Чуть ниже, так как иконка меньше */
+            left: 10px !important;
+        }
+
+        /* 4. Тексты */
+        .tip-card-title {
+            font-size: 12px !important;  /* Было 15px */
+            margin-top: 15px !important; /* Меньше отступ от иконки */
+            margin-bottom: 3px !important;
+            line-height: 1.2 !important;
+        }
+
+        .tip-card-desc {
+            font-size: 9px !important;   /* Было 11px */
+            line-height: 1.35 !important;
+            opacity: 0.8 !important;
+            
+            /* Показываем чуть меньше текста, чтобы влезло */
+            -webkit-line-clamp: 5 !important; 
+        }
+
+        /* 5. Галочка прочитанного */
+        .tip-card.viewed::after {
+            width: 18px !important;
+            height: 18px !important;
+            font-size: 10px !important;
+            top: 8px !important;
+            right: 8px !important;
+        }
+
+        /* 6. Отступы между списками (чтобы две категории влезли в экран) */
+        .tips-category-title {
+            font-size: 11px !important;
+            margin: 15px 0 5px 0 !important; /* Сжимаем вертикальные отступы */
+            padding-left: 15px !important;
+        }
+
+        .tips-scroll-row {
+            padding: 5px 15px 20px 15px !important; /* Убираем лишний воздух */
+            gap: 10px !important; /* Расстояние между карточками */
+        }
+
         .seo-context {
             position: absolute;
             width: 1px;
@@ -9740,6 +9806,12 @@
             expl_hist: "From Archives 📜",
             deco_label: "Show Decorations",
 
+            ach_how_to: "How to unlock",
+            ach_progress: "Progress",
+            status_locked: "LOCKED",
+            ach_genre_hint: "Find and interact with all items in this category.",
+            ach_psycho_hint: "Earn this archetype in your weekly Fetish Wrapped.",
+
             lbl_badge: "BADGE",
             lbl_icon: "ICON",
 
@@ -10425,6 +10497,12 @@
             expl_hist: "Из архивов 📜",
             deco_label: "Показывать декор",
 
+            ach_how_to: "Как получить",
+            ach_progress: "Прогресс",
+            status_locked: "ЗАКРЫТО",
+            ach_genre_hint: "Найди и повзаимодействуй со всеми предметами этой категории.",
+            ach_psycho_hint: "Получи этот психотип в еженедельном Fetish Wrapped.",
+
             lbl_badge: "ЗНАЧОК",
             lbl_icon: "ИКОНКА",
 
@@ -11106,6 +11184,12 @@
             expl_hist: "De los archivos 📜",
             deco_label: "Mostrar decoración",
 
+            ach_how_to: "Cómo desbloquear",
+            ach_progress: "Progreso",
+            status_locked: "BLOQUEADO",
+            ach_genre_hint: "Encuentra e interactúa con todos los elementos de esta categoría.",
+            ach_psycho_hint: "Obtén este arquetipo en tu Fetish Wrapped semanal.",
+
             lbl_badge: "INSIGNIA",
             lbl_icon: "ICONO",
 
@@ -11762,6 +11846,12 @@
             expl_undo: "Meinung geändert? 😏",
             expl_hist: "Aus dem Archiv 📜",
             deco_label: "Dekoration anzeigen",
+
+            ach_how_to: "Wie freischalten",
+            ach_progress: "Fortschritt",
+            status_locked: "GESPERRT",
+            ach_genre_hint: "Finde und interagiere mit allen Elementen dieser Kategorie.",
+            ach_psycho_hint: "Erhalte diesen Archetyp in deinem wöchentlichen Fetish Wrapped.",
 
             lbl_badge: "ABZEICHEN",
             lbl_icon: "ICON",
@@ -13313,7 +13403,12 @@
                 desc: desc,
                 unlocked: isUnlocked,
                 date: dateStr,
-                type: 'genre' // Тип "Жанр" -> Картинка
+                type: 'genre',
+                stats: {
+                    count: count,
+                    total: total,
+                    percent: percent
+                }
             });
         });
 
@@ -13399,19 +13494,37 @@
     let currentDetailAch = null; // Для шеринга
 
     function showAchievementDetail(ach) {
-        currentDetailAch = ach;
+        currentDetailAch = ach; // Сохраняем для шеринга
         
         const modalBody = document.querySelector('#modal-ach-detail-overlay .modal-body');
-        const shareBtn = document.getElementById('btn-ach-share'); // Находим кнопку по ID
-        
-        // Удаляем старый элемент иконки
+        const modalHeader = document.querySelector('#modal-ach-detail-overlay .modal-header');
+        const shareBtn = document.getElementById('btn-ach-share');
+        const t = langData[currentLang] || langData['en'];
+
+        // --- 1. КНОПКА "НАЗАД" В ШАПКЕ ---
+        // Заменяем первый span (который был прозрачным) на стрелку
+        const backSpan = modalHeader.querySelector('span:first-child');
+        if (backSpan) {
+            backSpan.innerHTML = "←";
+            backSpan.style.opacity = "1";
+            backSpan.style.fontSize = "24px";
+            backSpan.style.cursor = "pointer";
+            backSpan.onclick = () => {
+                // Закрываем детали, открываем сетку
+                closeAchDetail(null, true);
+                openAchievementsModal();
+            };
+        }
+
+        // --- 2. ВИЗУАЛ (ИКОНКА) ---
+        // Удаляем старый элемент
         const oldIcon = document.getElementById('detail-ach-icon');
         if (oldIcon) oldIcon.remove();
         
         let newIconEl;
 
         if (ach.type === 'genre') {
-            // КАРТИНКА (Жанр)
+            // КАРТИНКА
             newIconEl = document.createElement('img');
             newIconEl.src = ach.icon;
             newIconEl.style.width = '120px';
@@ -13419,17 +13532,15 @@
             newIconEl.style.objectFit = 'contain';
             newIconEl.style.marginBottom = '15px';
             
-            // Ч/Б если закрыто
             if (!ach.unlocked) {
                 newIconEl.style.filter = 'grayscale(1) opacity(0.3)';
             }
         } else {
-            // ЭМОДЗИ (Психотип)
+            // ЭМОДЗИ
             newIconEl = document.createElement('div');
             newIconEl.className = `ach-emoji-box large ${!ach.unlocked ? 'locked' : ''}`;
             newIconEl.innerHTML = `<div class="ach-emoji-content">${ach.icon}</div>`;
             
-            // Если открыто - добавляем свечение
             if (ach.unlocked) {
                 newIconEl.style.borderColor = 'var(--accent)';
                 newIconEl.style.boxShadow = '0 0 30px rgba(255, 0, 204, 0.15), inset 0 0 20px rgba(255, 0, 204, 0.05)';
@@ -13438,36 +13549,84 @@
         
         newIconEl.id = 'detail-ach-icon';
         
-        // Вставляем иконку перед заголовком
+        // Вставляем иконку
         const titleEl = document.getElementById('detail-ach-title');
         modalBody.insertBefore(newIconEl, titleEl);
 
-        // Тексты
+        // --- 3. ТЕКСТЫ ---
         titleEl.innerText = ach.title;
         document.getElementById('detail-ach-desc').innerText = ach.desc;
         
         const dateEl = document.getElementById('detail-ach-date');
         
+        // СБРОС СТИЛЕЙ ДАТЫ
+        dateEl.className = ''; 
+        dateEl.style = '';
+        dateEl.style.fontSize = "12px";
+        dateEl.style.fontWeight = "700";
+        dateEl.style.padding = "4px 12px";
+        dateEl.style.borderRadius = "12px";
+        dateEl.style.marginBottom = "15px";
+
         if (ach.unlocked) {
-            // --- ЕСЛИ ОТКРЫТО ---
-            dateEl.style.display = 'block';
-            dateEl.innerText = `UNLOCKED: ${ach.date}`;
+            // ОТКРЫТО
+            dateEl.innerText = `${t.unlocked_on} ${ach.date}`;
             dateEl.style.background = "rgba(46, 204, 113, 0.15)";
             dateEl.style.color = "#2ecc71";
-            
-            // ПОКАЗЫВАЕМ кнопку "Поделиться"
             if (shareBtn) shareBtn.style.display = 'block';
-            
         } else {
-            // --- ЕСЛИ ЗАКРЫТО ---
-            dateEl.style.display = 'block';
-            dateEl.innerText = "LOCKED 🔒";
+            // ЗАКРЫТО
+            dateEl.innerText = `${t.status_locked} 🔒`;
             dateEl.style.background = "rgba(255,255,255,0.05)";
             dateEl.style.color = "var(--text-secondary)";
-            
-            // СКРЫВАЕМ кнопку "Поделиться"
             if (shareBtn) shareBtn.style.display = 'none';
         }
+
+        // --- 4. БЛОК ПРОГРЕССА И ИНСТРУКЦИИ (НОВОЕ) ---
+        
+        // Удаляем старый блок прогресса, если он есть
+        const oldProgress = document.getElementById('ach-progress-container');
+        if (oldProgress) oldProgress.remove();
+
+        const progressContainer = document.createElement('div');
+        progressContainer.id = 'ach-progress-container';
+        progressContainer.style.width = "100%";
+        progressContainer.style.marginTop = "10px";
+        progressContainer.style.marginBottom = "20px";
+        progressContainer.style.textAlign = "left";
+
+        // HTML для подсказки
+        let hintText = ach.type === 'genre' ? t.ach_genre_hint : t.ach_psycho_hint;
+        
+        let barHTML = '';
+        
+        // Если это ЖАНР, рисуем бар
+        if (ach.type === 'genre' && ach.stats) {
+            barHTML = `
+                <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-secondary); margin-bottom:5px; margin-top:15px;">
+                    <span style="text-transform:uppercase; font-weight:700;">${t.ach_progress}</span>
+                    <span>${ach.stats.count} / ${ach.stats.total} (${ach.stats.percent}%)</span>
+                </div>
+                <div style="width:100%; height:8px; background:rgba(255,255,255,0.1); border-radius:10px; overflow:hidden;">
+                    <div style="width:${ach.stats.percent}%; height:100%; background:var(--accent); transition:width 0.5s ease;"></div>
+                </div>
+            `;
+        }
+
+        progressContainer.innerHTML = `
+            <div style="border-top:1px solid var(--border); padding-top:15px;">
+                <div style="font-size:12px; font-weight:800; color:var(--text-secondary); text-transform:uppercase; margin-bottom:5px;">
+                    ${t.ach_how_to}
+                </div>
+                <div style="font-size:13px; line-height:1.4; color:var(--text-main); opacity:0.8;">
+                    ${hintText}
+                </div>
+                ${barHTML}
+            </div>
+        `;
+
+        // Вставляем перед кнопкой (последний элемент body)
+        modalBody.insertBefore(progressContainer, shareBtn || modalBody.lastElementChild);
 
         document.getElementById('modal-ach-detail-overlay').classList.add('open');
     }
