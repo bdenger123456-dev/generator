@@ -8344,6 +8344,38 @@
     </div>
 </div>
 
+<!-- WRAPPED ALERT MODAL -->
+<div class="modal-overlay" id="modal-wrapped-alert" style="z-index: 25000;">
+    <div class="modal" style="max-width: 340px; text-align: center;">
+        <div class="modal-body" style="padding: 30px 20px 20px 20px; display: flex; flex-direction: column; align-items: center;">
+            
+            <!-- Иконка подарка -->
+            <div style="font-size: 50px; margin-bottom: 15px; filter: drop-shadow(0 0 15px rgba(255, 0, 204, 0.4));">🎁</div>
+            
+            <!-- Заголовок -->
+            <h3 style="margin-bottom: 10px; color: var(--text-main); text-transform: uppercase; font-weight: 900; letter-spacing: 1px;">
+                Fetish Wrapped
+            </h3>
+
+            <!-- Текст с тизером -->
+            <p id="wrapped-alert-text" style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 25px;">
+                <!-- JS вставит текст сюда -->
+            </p>
+
+            <!-- Кнопка Посмотреть -->
+            <button class="btn-gen" id="btn-wrapped-alert-watch" style="width: 100%; margin-bottom: 10px; background: linear-gradient(45deg, #FF9900, #9B59B6); color: #fff; box-shadow: 0 5px 20px rgba(155, 89, 182, 0.4); border:none;">
+                <span data-key="btn_watch_now">Watch Now</span>
+            </button>
+
+            <!-- Кнопка Пропустить -->
+            <div style="padding: 10px; cursor: pointer; font-size: 13px; color: var(--text-secondary); opacity: 0.7; text-decoration: underline;" onclick="closeWrappedAlert()">
+                <span data-key="onb_skip">Skip</span>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 <!-- THEME PREVIEW FLOATING BAR -->
 <div id="preview-floating-bar">
     
@@ -9499,6 +9531,7 @@
 
     let blacklist = JSON.parse(localStorage.getItem(STORAGE.BLACKLIST)) || [];
     let favorites = JSON.parse(localStorage.getItem(STORAGE.FAVORITES)) || [];
+    let protectedFavorites = JSON.parse(localStorage.getItem('xch_protected_favorites')) || [];
     let itemScores = JSON.parse(localStorage.getItem('xch_item_scores')) || {};
     let watchLater = JSON.parse(localStorage.getItem(STORAGE.WATCH_LATER)) || [];
     let tagScores = JSON.parse(localStorage.getItem(STORAGE.TAG_SCORES)) || {};
@@ -9805,6 +9838,23 @@
             expl_undo: "Changed your mind? 😏",
             expl_hist: "From Archives 📜",
             deco_label: "Show Decorations",
+
+            alert_titles: [
+                "Welcome back 😈", 
+                "Guess what?", 
+                "Your stats are in 📊", 
+                "Curious about yourself?", 
+                "Time for truth 🕯️",
+                "Missed you 😏"
+            ],
+            alert_texts: [
+                "You have a ready Fetish Wrapped for <b>{period}</b>.<br>It reveals your obsession with <b style='color:var(--accent)'>{tag}</b>.",
+                "Let's see what you've been up to this <b>{period}</b>.<br>Spoiler: You really liked <b style='color:var(--accent)'>{tag}</b>.",
+                "Your personal report for <b>{period}</b> is here.<br>Top genre: <b style='color:var(--accent)'>{tag}</b>. Want to see details?",
+                "We analyzed your desires for <b>{period}</b>.<br>It seems you can't live without <b style='color:var(--accent)'>{tag}</b>.",
+                "Ready to face your stats for <b>{period}</b>?<br>Hint: <b style='color:var(--accent)'>{tag}</b> is dominating."
+            ],
+            btn_watch_now: "Watch Now",
 
             ach_how_to: "How to unlock",
             ach_progress: "Progress",
@@ -10497,6 +10547,23 @@
             expl_hist: "Из архивов 📜",
             deco_label: "Показывать декор",
 
+            alert_titles: [
+                "С возвращением 😈", 
+                "У меня есть кое-что 🎁", 
+                "Твоя статистика 📊", 
+                "Любопытно? 😏", 
+                "Время правды 🕯️", 
+                "Скучал по тебе..."
+            ],
+            alert_texts: [
+                "У тебя готов Fetish Wrapped за <b>{period}</b>.<br>Там рассказывают про твой любимый жанр <b style='color:var(--accent)'>{tag}</b>.",
+                "Давай глянем, чем ты занимался этот <b>{period}</b>.<br>Спойлер: Ты подсел на <b style='color:var(--accent)'>{tag}</b>.",
+                "Твой личный отчет за <b>{period}</b> собран.<br>Топ жанр: <b style='color:var(--accent)'>{tag}</b>. Взглянешь?",
+                "Мы проанализировали твои желания за <b>{period}</b>.<br>Кажется, ты жить не можешь без <b style='color:var(--accent)'>{tag}</b>.",
+                "Готов увидеть правду за <b>{period}</b>?<br>Подсказка: <b style='color:var(--accent)'>{tag}</b> доминирует."
+            ],
+            btn_watch_now: "Посмотреть",
+
             ach_how_to: "Как получить",
             ach_progress: "Прогресс",
             status_locked: "ЗАКРЫТО",
@@ -11184,6 +11251,21 @@
             expl_hist: "De los archivos 📜",
             deco_label: "Mostrar decoración",
 
+            alert_titles: [
+                "Bienvenido de nuevo 😈",
+                "¿Adivina qué? 🎁",
+                "Tus estadísticas 📊",
+                "¿Curioso? 😏",
+                "Hora de la verdad 🕯️"
+            ],
+            alert_texts: [
+                "Tienes un Fetish Wrapped listo para <b>{period}</b>.<br>Revela tu obsesión con <b style='color:var(--accent)'>{tag}</b>.",
+                "Veamos qué has hecho este <b>{period}</b>.<br>Spoiler: Te encantó <b style='color:var(--accent)'>{tag}</b>.",
+                "Tu informe personal de <b>{period}</b> está aquí.<br>Género top: <b style='color:var(--accent)'>{tag}</b>. ¿Quieres ver?",
+                "Analizamos tus deseos de <b>{period}</b>.<br>Parece que no puedes vivir sin <b style='color:var(--accent)'>{tag}</b>."
+            ],
+            btn_watch_now: "Ver ahora",
+
             ach_how_to: "Cómo desbloquear",
             ach_progress: "Progreso",
             status_locked: "BLOQUEADO",
@@ -11846,6 +11928,21 @@
             expl_undo: "Meinung geändert? 😏",
             expl_hist: "Aus dem Archiv 📜",
             deco_label: "Dekoration anzeigen",
+
+            alert_titles: [
+                "Willkommen zurück 😈",
+                "Rate mal? 🎁",
+                "Deine Statistik 📊",
+                "Neugierig? 😏",
+                "Zeit für die Wahrheit 🕯️"
+            ],
+            alert_texts: [
+                "Du hast einen fertigen Fetish Wrapped für <b>{period}</b>.<br>Er enthüllt deine Besessenheit von <b style='color:var(--accent)'>{tag}</b>.",
+                "Mal sehen, was du <b>{period}</b> getrieben hast.<br>Spoiler: Du mochtest <b style='color:var(--accent)'>{tag}</b> sehr.",
+                "Dein persönlicher Bericht für <b>{period}</b> ist da.<br>Top-Genre: <b style='color:var(--accent)'>{tag}</b>. Ansehen?",
+                "Wir haben deine Wünsche für <b>{period}</b> analysiert.<br>Es scheint, du kannst nicht ohne <b style='color:var(--accent)'>{tag}</b> leben."
+            ],
+            btn_watch_now: "Jetzt ansehen",
 
             ach_how_to: "Wie freischalten",
             ach_progress: "Fortschritt",
@@ -13044,6 +13141,7 @@
         updateSubscriptionUI();
 
         checkTipIcons();
+        checkWrappedAlert(); 
         
         // Инициализация Ориентации
         const oriSelect = document.getElementById('orientation-select');
@@ -13630,7 +13728,7 @@
 
         document.getElementById('modal-ach-detail-overlay').classList.add('open');
     }
-    
+
     function closeAchDetail(e, force) {
         if (force || e.target.id === 'modal-ach-detail-overlay') {
             document.getElementById('modal-ach-detail-overlay').classList.remove('open');
@@ -16069,6 +16167,13 @@
             onbFoundLikes.forEach(id => {
                 if (!favorites.includes(id)) {
                     favorites.push(id);
+                    
+                    // === ЗАЩИТА: Добавляем в защищенный список ===
+                    if (!protectedFavorites.includes(id)) {
+                        protectedFavorites.push(id);
+                    }
+                    // ============================================
+
                     blacklist = blacklist.filter(x => x !== id);
                     const item = data.find(x => x.id === id);
                     if (item) {
@@ -16078,6 +16183,8 @@
                 }
             });
             changed = true;
+            // Сохраняем защищенный список
+            localStorage.setItem('xch_protected_favorites', JSON.stringify(protectedFavorites));
         }
 
         if (typeof onbFoundDislikes !== 'undefined' && onbFoundDislikes.length > 0) {
@@ -16131,7 +16238,8 @@
                 'xch_wrapped_archive',    // Архив Wrapped
                 'xch_achievement_dates',  // Даты ачивок
                 'xch_viewed_tips',        // Прочитанные советы
-                'xch_last_archive_check'
+                'xch_last_archive_check',
+                'xch_protected_favorites'
             ];
             
             keysToRemove.forEach(k => localStorage.removeItem(k));
@@ -16144,6 +16252,7 @@
             favorites = [];
             watchLater = [];
             watchHistory = [];
+            protectedFavorites = [];
             
             // Важные сбросы
             permanentExplored = new Set(); // Сброс счетчика фетишей
@@ -18050,24 +18159,36 @@
         // Изменяем счет
         itemScores[id] += delta;
 
-        // Логика распределения по спискам
-        if (itemScores[id] > 0) {
+        // === ЛОГИКА ЗАЩИТЫ ===
+        // Если предмет пытается уйти в минус (дизлайк), но он защищен
+        if (itemScores[id] < 0 && protectedFavorites.includes(id)) {
+            // Принудительно держим баланс положительным, чтобы он оставался в Favorites
+            itemScores[id] = 10; 
+            console.log(`Item ${id} is protected. Preventing blacklist.`);
+            // Принудительно сохраняем в Favorites, если вдруг его там нет
+            if (!favorites.includes(id)) favorites.push(id);
+            // Удаляем из ЧС
+            blacklist = blacklist.filter(x => x !== id);
+        }
+        // =====================
+        
+        // Стандартная логика (else if, так как выше мы перехватили условие)
+        else if (itemScores[id] > 0) {
             // Баланс положительный -> В Избранное
             if (!favorites.includes(id)) favorites.push(id);
-            // Убираем из ЧС, если было
             blacklist = blacklist.filter(x => x !== id);
         } 
         else if (itemScores[id] < 0) {
             // Баланс отрицательный -> В ЧС
             if (!blacklist.includes(id)) blacklist.push(id);
-            // Убираем из Избранного, если было
             favorites = favorites.filter(x => x !== id);
         } 
         else {
-            // Баланс НОЛЬ -> Нейтрально (убираем отовсюду)
-            favorites = favorites.filter(x => x !== id);
+            // Баланс НОЛЬ -> Нейтрально (убираем отовсюду, если не защищен)
+            if (!protectedFavorites.includes(id)) {
+                favorites = favorites.filter(x => x !== id);
+            }
             blacklist = blacklist.filter(x => x !== id);
-            // Удаляем ключ, чтобы не засорять память
             delete itemScores[id];
         }
 
@@ -18903,23 +19024,23 @@
         let newName = null;
 
         // --- 1. ИЩЕМ ЛЮБИМОЕ (Для режима Pleasure) ---
-        const ignoreTags = ['general', 'specific', 'straight', 'male', 'female', 'adult', 'video', 'hd', 'kinky', 'fetish', 'fantasy', 'action', 'body-part'];
+        // ИСТОЧНИК: Только Избранное + История просмотров
         
-        const topTags = Object.entries(tagScores)
-            .filter(([tag, score]) => score > 10 && !ignoreTags.includes(tag))
-            .sort((a, b) => b[1] - a[1]) 
-            .slice(0, 5) 
-            .map(x => x[0]);
+        // Собираем ID из WatchHistory (последние 20)
+        const watchedIds = watchHistory.slice(0, 20).map(w => w.id);
+        
+        // Объединяем с Избранным и убираем дубликаты
+        const sourceIds = [...new Set([...favorites, ...watchedIds])];
+        
+        // Фильтруем: предмет должен существовать в базе и НЕ быть в ЧС
+        const validCandidates = data.filter(item => sourceIds.includes(item.id) && !blacklist.includes(item.id));
 
-        if (typeof data !== 'undefined' && topTags.length > 0) {
-            const randomTag = topTags[Math.floor(Math.random() * topTags.length)];
-            const candidates = data.filter(item => item.tags.includes(randomTag) && !blacklist.includes(item.id));
-
-            if (candidates.length > 0) {
-                const winnerItem = candidates[Math.floor(Math.random() * candidates.length)];
-                favName = getLocalizedName(winnerItem);
-                suggestedFavId = winnerItem.id; // СОХРАНЯЕМ ID
-            }
+        if (validCandidates.length > 0) {
+            // Выбираем случайный из проверенных
+            const winnerItem = validCandidates[Math.floor(Math.random() * validCandidates.length)];
+            favName = getLocalizedName(winnerItem);
+            suggestedFavId = winnerItem.id; 
+        } else {
         }
 
         // --- 2. ИЩЕМ НОВОЕ (Для режима Explore) ---
@@ -21584,6 +21705,106 @@
         setTimeout(() => {
             openTipsModal();
         }, 250);
+    }
+
+    function checkWrappedAlert() {
+        // 1. Не показываем, если уже видели в этой сессии (чтобы не надоедать при перезагрузке)
+        if (sessionStorage.getItem('xch_wrapped_alert_shown')) return;
+
+        // 2. Проверяем, нужно ли сгенерировать новый отчет (если наступил срок)
+        // (Используем логику из triggerWrappedBtn, но без открытия UI)
+        const isPaid = subscriptionLevel !== 'free';
+        const now = new Date();
+        let targetWrapped = null;
+
+        // A. Если есть НЕПРОЧИТАННЫЕ в архиве
+        const unread = wrappedArchive.filter(w => !w.viewed).sort((a,b) => b.timestamp - a.timestamp);
+        if (unread.length > 0) {
+            targetWrapped = unread[0];
+        } 
+        // B. Если ничего нет, но МОЖНО сгенерировать новый (Конец недели/дня)
+        else if (activeDaysSet.size >= 7 || (isPaid && !hasDailyForToday())) {
+            // Генерируем молча
+            const period = (activeDaysSet.size >= 7) ? 'weekly' : 'daily';
+            targetWrapped = generateAndSaveWrapped(period);
+            
+            // Если сгенерировали неделю - сбрасываем дни
+            if (targetWrapped && period === 'weekly') {
+                activeDaysSet.clear();
+                activeDaysSet.add(now.toISOString().split('T')[0]);
+                localStorage.setItem('xch_active_days', JSON.stringify([...activeDaysSet]));
+            }
+        }
+
+        // Если нашли или создали отчет — показываем окно
+        if (targetWrapped) {
+            showWrappedAlertModal(targetWrapped);
+            sessionStorage.setItem('xch_wrapped_alert_shown', 'true');
+        }
+    }
+
+    // Хелпер: был ли сегодня дейли?
+    function hasDailyForToday() {
+        const todayStr = new Date().toLocaleDateString();
+        return wrappedArchive.some(w => w.type === 'daily' && new Date(w.timestamp).toLocaleDateString() === todayStr);
+    }
+
+    function showWrappedAlertModal(wrappedObj) {
+        const modal = document.getElementById('modal-wrapped-alert');
+        const textEl = document.getElementById('wrapped-alert-text');
+        const btnWatch = document.getElementById('btn-wrapped-alert-watch');
+        const t = langData[currentLang] || langData['en'];
+
+        // 1. Определяем период (Название)
+        const badges = WRAPPED_CONFIG.badges[currentLang] || WRAPPED_CONFIG.badges['en'];
+        const periodName = badges[wrappedObj.type] || wrappedObj.type;
+
+        // 2. Определяем любимый тег
+        let topTag = "Secret";
+        if (wrappedObj.stats && wrappedObj.stats.topTags && wrappedObj.stats.topTags.length > 0) {
+            const rawTag = wrappedObj.stats.topTags[0];
+            const modMatch = modifiersData.find(m => m.key.toLowerCase() === rawTag.toLowerCase());
+            if (modMatch) {
+                if (currentLang === 'ru') topTag = modMatch.ru;
+                else if (currentLang === 'es') topTag = modMatch.es;
+                else if (currentLang === 'de') topTag = modMatch.de;
+                else topTag = modMatch.en;
+            } else {
+                topTag = rawTag.charAt(0).toUpperCase() + rawTag.slice(1);
+            }
+        }
+
+        // --- 3. ВЫБОР СЛУЧАЙНОЙ ФРАЗЫ ---
+        
+        // Берем массивы фраз (с фолбеком на старый стиль или английский)
+        const titles = t.alert_titles || ["Welcome back"];
+        const texts = t.alert_texts || ["Your report for {period} is ready."];
+
+        // Выбираем рандомный индекс
+        const randTitle = titles[Math.floor(Math.random() * titles.length)];
+        let randText = texts[Math.floor(Math.random() * texts.length)];
+
+        // Подставляем переменные
+        randText = randText.replace('{period}', periodName).replace('{tag}', topTag.toUpperCase());
+
+        // Вставляем HTML
+        textEl.innerHTML = `<strong style="font-size:18px; display:block; margin-bottom:12px; color:var(--text-main); line-height:1.2;">${randTitle}</strong>${randText}`;
+
+        // 4. Настраиваем кнопку
+        btnWatch.onclick = () => {
+            closeWrappedAlert();
+            openWrappedUI(wrappedObj);
+        };
+
+        // 5. Показываем с задержкой
+        setTimeout(() => {
+            modal.classList.add('open');
+            if(navigator.vibrate) navigator.vibrate([50, 50, 50]); 
+        }, 1500);
+    }
+
+    function closeWrappedAlert() {
+        document.getElementById('modal-wrapped-alert').classList.remove('open');
     }
 
 </script>
