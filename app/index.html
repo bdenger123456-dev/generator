@@ -5655,6 +5655,363 @@
             }
         }
 
+        /* --- STYLES FOR GENRE DETAILS (EXPLORED) --- */
+        .genre-detail-view {
+            display: none; /* Скрыто по умолчанию */
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .genre-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .genre-icon-large {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 10px;
+            
+            filter: invert(1) drop-shadow(0 0 15px rgba(255,255,255,0.2));
+            transition: filter 0.3s ease;
+        }
+
+        body.light-theme .genre-icon-large {
+            filter: invert(0) drop-shadow(0 0 15px rgba(0,0,0,0.1));
+        }
+
+        body[data-theme="old-money"] .genre-icon-large {
+            filter: invert(75%) sepia(26%) saturate(677%) hue-rotate(357deg) brightness(89%) contrast(88%) drop-shadow(0 2px 5px rgba(0,0,0,0.3)) !important;
+        }
+
+        .genre-desc-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 15px;
+            font-size: 13px;
+            line-height: 1.5;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .genre-samples-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .genre-samples-row {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 25px;
+            width: 100%;
+        }
+
+        .sample-tag {
+            background: var(--ios-card);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .achievement-section {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+        }
+
+        .ach-icon-img {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            margin-bottom: 10px;
+            opacity: 0.5; /* Полупрозрачная, пока не открыто */
+            filter: grayscale(1);
+            transition: all 0.5s ease;
+        }
+
+        .ach-icon-img.unlocked {
+            opacity: 1;
+            filter: grayscale(0) drop-shadow(0 0 20px var(--accent));
+        }
+
+        .ach-status-text {
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: var(--text-secondary);
+        }
+
+        .ach-status-text.unlocked {
+            color: var(--accent);
+        }
+
+        /* Скрываем сетку, когда активны детали */
+        .modal-body.show-details #explored-grid {
+            display: none;
+        }
+        .modal-body.show-details .genre-detail-view {
+            display: flex;
+        }
+
+        /* --- ACHIEVEMENTS SYSTEM --- */
+
+        /* Кнопка в профиле (под бенто-блоком подписки) */
+        .btn-achievements-trigger {
+            background: var(--ios-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .btn-achievements-trigger:active { transform: scale(0.98); background: var(--nav-bg); }
+
+        /* Сетка достижений (Grid) */
+        .ach-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3 колонки */
+            gap: 15px;
+            padding-bottom: 20px;
+        }
+
+        .ach-card {
+            background: var(--ios-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            opacity: 0.5; /* По умолчанию закрыто */
+            filter: grayscale(1);
+            transition: transform 0.2s;
+            min-height: 110px;
+        }
+
+        .ach-card.unlocked {
+            opacity: 1;
+            filter: grayscale(0);
+            border-color: var(--accent);
+            background: linear-gradient(165deg, var(--ios-card) 0%, rgba(255,255,255,0.05) 100%);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .ach-card:active { transform: scale(0.95); }
+
+        .ach-card-icon {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            margin-bottom: 8px;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2));
+        }
+
+        .ach-card-title {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-main);
+            line-height: 1.2;
+        }
+
+        /* Секция достижений в деталях жанра */
+        .genre-achievements-header {
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin: 15px 0 10px 0;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+            letter-spacing: 1px;
+        }
+
+        .genre-icons-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px; /* Отступ между двумя наградами */
+            margin-bottom: 10px;
+        }
+
+        .reward-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 90px;
+        }
+
+        .reward-display-img {
+            width: 70px;
+            height: 70px;
+            object-fit: contain; /* Чтобы картинка вписывалась */
+            margin-bottom: 8px;
+            transition: transform 0.2s;
+        }
+
+        /* Специфика для Иконки приложения (App Icon) */
+        .reward-display-img.app-icon-style {
+            border-radius: 15px; /* Скругление как у iOS иконки */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); /* Тень */
+            object-fit: cover; /* Иконка заполняет весь квадрат */
+        }
+
+        /* Специфика для Бейджа (Badge) */
+        .reward-display-img.badge-style {
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2)); /* Тень для прозрачного PNG */
+        }
+
+        /* Эффект нажатия (опционально) */
+        .reward-display-img:active {
+            transform: scale(0.95);
+        }
+
+        /* Второе достижение (Иконка темы) */
+        .theme-reward-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            margin-bottom: 5px;
+            /* Иконки тем обычно уже цветные, не инвертируем их */
+        }
+
+        /* --- DETAIL SHARING CARD (Скрытая карточка для экспорта) --- */
+        #achievement-share-card {
+            position: fixed; left: -9999px; top: 0;
+            width: 350px;
+            background: #12000b; /* Темный фон для картинки */
+            border: 1px solid #333;
+            border-radius: 24px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            font-family: sans-serif;
+            color: #fff;
+        }
+
+        .share-ach-icon {
+            width: 120px; height: 120px;
+            object-fit: contain;
+            margin: 20px 0;
+            filter: drop-shadow(0 0 20px rgba(255,255,255,0.3));
+        }
+
+        .share-ach-title {
+            font-size: 24px; font-weight: 900;
+            text-transform: uppercase; margin-bottom: 10px;
+            color: #ff00cc; /* Дефолтный акцент */
+        }
+
+        .share-ach-desc {
+            font-size: 14px; color: #aaa; line-height: 1.5; margin-bottom: 20px;
+        }
+
+        .share-ach-date {
+            background: rgba(255,255,255,0.1);
+            padding: 5px 15px; border-radius: 20px;
+            font-size: 12px; font-weight: 700; color: #fff;
+            margin-bottom: 20px;
+        }
+
+        .icons-section-header {
+            margin: 20px 0 10px 0;
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .icons-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding-bottom: 20px;
+        }
+
+        .app-icon-item {
+            width: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+            position: relative;
+        }
+
+        .app-icon-item:active { transform: scale(0.95); }
+
+        .app-icon-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            margin-bottom: 5px;
+            border: 2px solid transparent; /* Для активного состояния */
+            transition: all 0.2s;
+            object-fit: cover;
+        }
+
+        /* Активная иконка (выбрана) */
+        .app-icon-item.active .app-icon-img {
+            border-color: var(--accent);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--accent);
+        }
+
+        /* Закрытая иконка */
+        .app-icon-item.locked .app-icon-img {
+            filter: grayscale(1) brightness(0.7);
+            opacity: 0.6;
+        }
+
+        /* Замочек на закрытой */
+        .icon-lock-badge {
+            position: absolute;
+            top: -5px; right: -5px;
+            font-size: 12px;
+        }
+
+        .app-icon-label {
+            font-size: 9px;
+            color: var(--text-secondary);
+            text-align: center;
+            line-height: 1.1;
+            font-weight: 600;
+        }
+
         /* =========================================
         MACOS STYLE SIDEBAR (DESKTOP ONLY)
         ========================================= */
@@ -7046,6 +7403,10 @@
             <div class="theme-grid" id="theme-list-premium">
                 <!-- JS inserts themes here -->
             </div>
+            <div class="icons-section-header" style="margin-left:0;">App Icons (Rewards)</div>
+            <div class="icons-grid" id="theme-list-icons">
+                <!-- JS сюда вставит иконки достижений -->
+            </div>
         </div>
         <!-- Панель предпросмотра (Скрыта по умолчанию) -->
         <div id="theme-preview-bar" style="display:none; padding: 15px; border-top: 1px solid var(--border); background: var(--sidebar-bg); flex-direction: column; gap: 10px; align-items: center; text-align: center;">
@@ -7281,6 +7642,18 @@
                     </div>
                     <div id="sync-sub-value" style="font-size:32px; font-weight:900; letter-spacing:1px; margin-bottom:2px;">...</div>
                     <div id="sync-sub-desc" style="font-size:12px; opacity:0.7;">Checking...</div>
+                </div>
+
+                <!-- Кнопка Достижений -->
+                <div class="bento-box bento-wide clickable" onclick="openAchievementsModal()" style="flex-direction:row; align-items:center; justify-content:space-between; padding:15px;">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <span style="font-size:24px;">🏆</span>
+                        <div style="display:flex; flex-direction:column;">
+                            <span style="font-weight:700; font-size:15px; color:var(--text-main);" data-key="ach_title">Achievements</span>
+                            <span id="ach-total-progress" style="font-size:11px; color:var(--text-secondary);">0 / 26</span>
+                        </div>
+                    </div>
+                    <div class="chevron"></div>
                 </div>
 
                 <!-- 3. СЕТКА СТАТИСТИКИ -->
@@ -7674,17 +8047,71 @@
 <div class="modal-overlay" id="modal-explored-overlay" onclick="closeExploredModal(event)">
     <div class="modal">
         <div class="modal-header" style="border-bottom: none; padding-bottom: 5px;">
-            <span data-key="explored_label">Explored</span>
+            <!-- Кнопка НАЗАД (появляется только в деталях) -->
+            <div id="explored-back-btn" onclick="backToExploredGrid()" style="position:absolute; left:15px; font-size:24px; cursor:pointer; display:none;">←</div>
+            
+            <span id="explored-modal-title" data-key="explored_label">Explored</span>
             <span onclick="closeExploredModal(null, true)">✕</span>
         </div>
         
-        <div class="modal-subtitle" data-key="explored_subtitle" style="text-align: center; color: var(--text-secondary); font-size: 13px; padding: 0 20px 20px 20px; line-height: 1.4; font-weight: 500;">
+        <div id="explored-subtitle" class="modal-subtitle" data-key="explored_subtitle" style="text-align: center; color: var(--text-secondary); font-size: 13px; padding: 0 20px 20px 20px; line-height: 1.4; font-weight: 500;">
             Here are the achievements you need to get "Platinum" 😈
         </div>
         
-        <div class="modal-body" style="padding: 0 15px 20px 15px;">
-            <div id="explored-grid" class="explored-grid">
+        <div class="modal-body" id="explored-modal-body" style="padding: 0 15px 20px 15px;">
+            <!-- 1. СЕТКА (GRID) -->
+            <div id="explored-grid" class="explored-grid"></div>
+
+            <!-- 2. ДЕТАЛИ (DETAILS VIEW) -->
+            <div id="explored-details" class="genre-detail-view">
+                <!-- Контент генерируется через JS -->
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- ACHIEVEMENTS LIST MODAL -->
+<div class="modal-overlay" id="modal-achievements-overlay" onclick="closeAchievementsModal(event)">
+    <div class="modal">
+        <div class="modal-header">
+            <span data-key="ach_title">Achievements</span>
+            <span onclick="closeAchievementsModal(null, true)">✕</span>
+        </div>
+        <div class="modal-body" style="padding: 15px;">
+            <div id="achievements-grid" class="ach-grid">
+                <!-- JS вставит сюда карточки -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ACHIEVEMENT DETAIL MODAL (Для одного достижения) -->
+<div class="modal-overlay" id="modal-ach-detail-overlay" onclick="closeAchDetail(event)">
+    <div class="modal" style="max-width: 340px; text-align:center;">
+        <div class="modal-header" style="border:none;">
+            <span style="opacity:0;">.</span> <!-- Пустой заголовок для отступа -->
+            <span onclick="closeAchDetail(null, true)">✕</span>
+        </div>
+        
+        <div class="modal-body" style="padding-bottom:25px; display:flex; flex-direction:column; align-items:center;">
+            
+            <img id="detail-ach-icon" src="" style="width:120px; height:120px; object-fit:contain; margin-bottom:15px;">
+            
+            <div id="detail-ach-title" style="font-size:22px; font-weight:900; text-transform:uppercase; margin-bottom:10px; line-height:1.1;">
+                Title
+            </div>
+            
+            <div id="detail-ach-date" style="font-size:12px; font-weight:700; color:var(--accent); background:rgba(255,255,255,0.05); padding:4px 12px; border-radius:12px; margin-bottom:15px;">
+                Unlocked: 01.01.2025
+            </div>
+
+            <p id="detail-ach-desc" style="font-size:14px; color:var(--text-secondary); line-height:1.5; margin-bottom:25px;">
+                Description goes here.
+            </p>
+
+            <button class="btn-gen" onclick="shareAchievementCard()" style="width:100%; padding:12px;">
+                <span data-key="share_btn">Share</span>
+            </button>
         </div>
     </div>
 </div>
@@ -8640,102 +9067,142 @@
         'deco6.png', 'deco7.png', 'deco9.png', 'deco10.png', 'deco11.png'
     ];
 
+    // ОБНОВЛЕННЫЙ МАССИВ ДАННЫХ
     const EXPLORED_GROUPS = [
-        // 1. Основа
         { 
-            id: 'general', 
-            iconTag: 'general',
-            tags: ['general', 'specific', 'softcore', 'vanilla', 'romantic', 'sensual'] 
+            id: 'general', iconTag: 'general', tags: ['general', 'specific', 'softcore', 'vanilla', 'romantic', 'sensual'],
+            achIcon: 'ach_general.png', // Картинка достижения (большая)
+            appIcon: 'icon_app_general.png', // Награда: Иконка приложения (маленькая)
+            desc_en: "The absolute entire database of fetishes that we managed to find 😈.",
+            desc_ru: "Абсолютно вся база фетишей, которую удалось найти 😈.",
+            desc_es: "Toda la base de datos de fetiches que logramos encontrar 😈.",
+            desc_de: "Die absolut gesamte Datenbank an Fetischen, die wir finden konnten 😈."
         },
-        // 2. Соло и Руки
         { 
-            id: 'solo', 
-            iconTag: 'solo', 
-            tags: ['solo', 'masturbation', 'fingering', 'autofellatio', 'handjob', 'hands', 'suck-off'] 
+            id: 'solo', iconTag: 'solo', tags: ['solo', 'masturbation', 'fingering', 'autofellatio', 'handjob', 'hands', 'suck-off'],
+            achIcon: 'ach_solo.png',
+            desc_en: "Focus on the individual. Intimate moments alone.",
+            desc_ru: "Фокус на одном человеке. Интимные моменты наедине с собой.",
+            desc_es: "Enfoque en el individuo. Momentos íntimos a solas.",
+            desc_de: "Fokus auf das Individuum. Intime Momente allein."
         },
-        // 3. Анал
         { 
-            id: 'anal', 
-            iconTag: 'anal', 
-            tags: ['anal', 'ass', 'booty', 'gap', 'rimming', 'prostate-massage', 'anal-training', 'asshole', 'fisting', 'gaping', 'pegging'] 
+            id: 'anal', iconTag: 'anal', tags: ['anal', 'ass', 'booty', 'gap', 'rimming', 'prostate-massage', 'anal-training', 'asshole', 'fisting', 'gaping', 'pegging'],
+            achIcon: 'ach_anal.png',
+            desc_en: "Exploring the backdoor. From soft rimming to hardcore fisting.",
+            desc_ru: "Исследование черного хода. От нежного римминга до жесткого фистинга.",
+            desc_es: "Explorando la puerta trasera. Desde rimming suave hasta fisting duro.",
+            desc_de: "Erkundung der Hintertür. Von sanftem Rimming bis hin zu Hardcore-Fisting."
         },
-        // 4. Грудь и Молоко
         { 
-            id: 'breasts', 
-            iconTag: 'big-tits', 
-            tags: ['tits', 'big-tits', 'small-tits', 'nipples', 'lactation', 'breast-expansion', 'tit-fucking', 'breastfeeding'] 
+            id: 'breasts', iconTag: 'big-tits', tags: ['tits', 'big-tits', 'small-tits', 'nipples', 'lactation', 'breast-expansion', 'tit-fucking', 'breastfeeding'],
+            achIcon: 'ach_breasts.png',
+            desc_en: "Worship of the chest. Size, shape, and lactation play.",
+            desc_ru: "Поклонение груди. Размер, форма и игры с лактацией.",
+            desc_es: "Adoración del pecho. Tamaño, forma y juegos de lactancia.",
+            desc_de: "Verehrung der Brust. Größe, Form und Laktationsspiele."
         },
-        // 5. Оральный
         { 
-            id: 'oral', 
-            iconTag: 'oral', 
-            tags: ['oral', 'blowjob', 'cunnilingus', 'deepthroat', 'face-fucking', 'spitting', 'gagging', 'throat', 'licking', 'tongue'] 
+            id: 'oral', iconTag: 'oral', tags: ['oral', 'blowjob', 'cunnilingus', 'deepthroat', 'face-fucking', 'spitting', 'gagging', 'throat', 'licking', 'tongue'],
+            achIcon: 'ach_oral.png',
+            desc_en: "The art of oral pleasure. Skillful tongue and throat work.",
+            desc_ru: "Искусство орального удовольствия. Мастерская работа языком и горлом.",
+            desc_es: "El arte del placer oral. Trabajo hábil de lengua y garganta.",
+            desc_de: "Die Kunst der oralen Lust. Geschickte Zungen- und Rachenarbeit."
         },
-        // 6. Хардкор и БДСМ
         { 
-            id: 'hardcore', 
-            iconTag: 'bdsm', 
-            tags: ['hardcore', 'bdsm', 'kinky', 'rough', 'pain', 'choking', 'bondage', 'rope', 'slave', 'domination', 'submission', 'spanking', 'whip', 'torture', 'humiliation', 'femdom', 'cbt'] 
+            id: 'hardcore', iconTag: 'bdsm', tags: ['hardcore', 'bdsm', 'kinky', 'rough', 'pain', 'choking', 'bondage', 'rope', 'slave', 'domination', 'submission', 'spanking', 'whip', 'torture', 'humiliation', 'femdom', 'cbt'],
+            achIcon: 'ach_hardcore.png',
+            appIcon: 'icon_app_bdsm.png', // Иконка БДСМ
+            desc_en: "Power exchange and intensity. Pain, control, and submission.",
+            desc_ru: "Обмен властью и интенсивность. Боль, контроль и подчинение.",
+            desc_es: "Intercambio de poder e intensidad. Dolor, control y sumisión.",
+            desc_de: "Machtaustausch und Intensität. Schmerz, Kontrolle und Unterwerfung."
         },
-        // 7. ЛГБТ+ (Все вместе)
         { 
-            id: 'lgbt', 
-            iconTag: 'lesbian', 
-            tags: ['gay', 'lesbian', 'trans', 'bi', 'shemale', 'futanari', 'crossdresser', 't4t', 'ladyboy', 'sissy', 'trap', 'yuri', 'yaoi'] 
+            id: 'lgbt', iconTag: 'lesbian', tags: ['gay', 'lesbian', 'trans', 'bi', 'shemale', 'futanari', 'crossdresser', 't4t', 'ladyboy', 'sissy', 'trap', 'yuri', 'yaoi'],
+            achIcon: 'ach_lgbt.png',
+            appIcon: 'icon_app_lgbt.png', // Иконка ЛГБТ
+            desc_en: "Spectrum of sexuality. Same-sex and trans experiences.",
+            desc_ru: "Спектр сексуальности. Однополые отношения и транс-опыт.",
+            desc_es: "Espectro de la sexualidad. Experiencias del mismo sexo y trans.",
+            desc_de: "Spektrum der Sexualität. Gleichgeschlechtliche und Trans-Erfahrungen."
         },
-        // 8. Группа и Социум
         { 
-            id: 'group', 
-            iconTag: 'group', 
-            tags: ['group', 'threesome', 'gangbang', 'orgy', 'cuckold', 'sharing', 'swingers', 'double-penetration', 'bukkake'] 
+            id: 'group', iconTag: 'group', tags: ['group', 'threesome', 'gangbang', 'orgy', 'cuckold', 'sharing', 'swingers', 'double-penetration', 'bukkake'],
+            achIcon: 'ach_group.png',
+            desc_en: "The more the merrier. Multiple partners and shared pleasure.",
+            desc_ru: "Чем больше, тем веселее. Множество партнеров и общее удовольствие.",
+            desc_es: "Cuantos más, mejor. Múltiples parejas y placer compartido.",
+            desc_de: "Je mehr, desto besser. Mehrere Partner und gemeinsames Vergnügen."
         },
-        // 9. Ноги и Фут-фетиш
         { 
-            id: 'feet', 
-            iconTag: 'feet', 
-            tags: ['feet', 'foot-fetish', 'legs', 'toes', 'stockings', 'shoes', 'boots', 'socks', 'pantyhose', 'high-heels', 'soles'] 
+            id: 'feet', iconTag: 'feet', tags: ['feet', 'foot-fetish', 'legs', 'toes', 'stockings', 'shoes', 'boots', 'socks', 'pantyhose', 'high-heels', 'soles'],
+            achIcon: 'ach_feet.png',
+            appIcon: 'icon_app_feet.png', // Иконка Ноги
+            desc_en: "From toes to thighs. Appreciation of feet, legs, and footwear.",
+            desc_ru: "От пальчиков до бедер. Обожание ног, ступней и обуви.",
+            desc_es: "De los dedos a los muslos. Apreciación de pies, piernas y calzado.",
+            desc_de: "Von den Zehen bis zu den Oberschenkeln. Wertschätzung von Füßen, Beinen und Schuhwerk."
         },
-        // 10. Ролевые и Костюмы
         { 
-            id: 'roleplay', 
-            iconTag: 'roleplay', 
-            tags: ['roleplay', 'uniform', 'costume', 'teacher', 'nurse', 'cosplay', 'maid', 'cheerleader', 'police', 'military', 'office', 'secretary'] 
+            id: 'roleplay', iconTag: 'roleplay', tags: ['roleplay', 'uniform', 'costume', 'teacher', 'nurse', 'cosplay', 'maid', 'cheerleader', 'police', 'military', 'office', 'secretary'],
+            achIcon: 'ach_roleplay.png',
+            appIcon: 'icon_app_roleplay.png', // Иконка Ролплей
+            desc_en: "Acting out fantasies. Uniforms, costumes, and scenarios.",
+            desc_ru: "Воплощение фантазий. Униформа, костюмы и сценарии.",
+            desc_es: "Representando fantasías. Uniformes, disfraces y escenarios.",
+            desc_de: "Fantasien ausleben. Uniformen, Kostüme und Szenarien."
         },
-        // 11. Публичное и Табу
         { 
-            id: 'public', 
-            iconTag: 'public', 
-            tags: ['public', 'outdoor', 'risky', 'taboo', 'voyeur', 'exhibitionism', 'incest', 'family', 'step-mom', 'step-sister', 'car', 'beach'] 
+            id: 'public', iconTag: 'public', tags: ['public', 'outdoor', 'risky', 'taboo', 'voyeur', 'exhibitionism', 'incest', 'family', 'step-mom', 'step-sister', 'car', 'beach'],
+            achIcon: 'ach_public.png',
+            desc_en: "The thrill of getting caught. Outdoor acts and forbidden taboos.",
+            desc_ru: "Азарт быть пойманным. Секс на улице и запретные табу.",
+            desc_es: "La emoción de ser atrapado. Actos al aire libre y tabúes prohibidos.",
+            desc_de: "Der Nervenkitzel, erwischt zu werden. Outdoor-Akte und verbotene Tabus."
         },
-        // 12. Тело и Внешность
         { 
-            id: 'body', 
-            iconTag: 'body-part', 
-            tags: ['body-type', 'body-part', 'bbw', 'skinny', 'muscle', 'face', 'hair', 'tattoo', 'piercing', 'chubby', 'fat', 'hairy', 'redhead', 'blonde', 'brunette', 'milf', 'teen', 'interracial'] 
+            id: 'body', iconTag: 'body-part', tags: ['body-type', 'body-part', 'bbw', 'skinny', 'muscle', 'face', 'hair', 'tattoo', 'piercing', 'chubby', 'fat', 'hairy', 'redhead', 'blonde', 'brunette', 'milf', 'teen', 'interracial'],
+            achIcon: 'ach_body.png',
+            appIcon: 'icon_app_body.png', // Иконка Тело
+            desc_en: "Celebrating specific forms. Shapes, colors, and physical traits.",
+            desc_ru: "Восхищение формами. Фигуры, цвета и физические особенности.",
+            desc_es: "Celebrando formas específicas. Formas, colores y rasgos físicos.",
+            desc_de: "Feier spezifischer Formen. Formen, Farben und körperliche Merkmale."
         },
-        // 13. Игрушки и Машины
         { 
-            id: 'toys', 
-            iconTag: 'toys', 
-            tags: ['toys', 'dildo', 'vibrator', 'machine', 'plug', 'strap-on', 'sybian', 'doll'] 
+            id: 'toys', iconTag: 'toys', tags: ['toys', 'dildo', 'vibrator', 'machine', 'plug', 'strap-on', 'sybian', 'doll'],
+            achIcon: 'ach_toys.png',
+            desc_en: "Synthetic assistance. Gadgets and machines for pleasure.",
+            desc_ru: "Синтетическая помощь. Гаджеты и машины для удовольствия.",
+            desc_es: "Asistencia sintética. Gadgets y máquinas para el placer.",
+            desc_de: "Synthetische Unterstützung. Gadgets und Maschinen für das Vergnügen."
         },
-        // 14. Жидкости и Грязь
         { 
-            id: 'mess', 
-            iconTag: 'cum', 
-            tags: ['cum', 'creampie', 'mess', 'squirting', 'facial', 'wet', 'piss', 'scat', 'vomit', 'sweat', 'mud', 'oil', 'slime'] 
+            id: 'mess', iconTag: 'cum', tags: ['cum', 'creampie', 'mess', 'squirting', 'facial', 'wet', 'piss', 'scat', 'vomit', 'sweat', 'mud', 'oil', 'slime'],
+            achIcon: 'ach_mess.png',
+            desc_en: "Wet and wild. Body fluids, oil, and messy fun.",
+            desc_ru: "Мокро и грязно. Телесные жидкости, масло и беспорядок.",
+            desc_es: "Húmedo y salvaje. Fluidos corporales, aceite y diversión desordenada.",
+            desc_de: "Nass und wild. Körperflüssigkeiten, Öl und schmutziger Spaß."
         },
-        // 15. Фантазия и Арт
         { 
-            id: 'fantasy', 
-            iconTag: 'hentai', 
-            tags: ['fantasy', 'hentai', 'anime', 'art', 'visual', 'cartoon', 'monster', 'alien', 'giantess', 'vore', 'furry', 'transformation'] 
+            id: 'fantasy', iconTag: 'hentai', tags: ['fantasy', 'hentai', 'anime', 'art', 'visual', 'cartoon', 'monster', 'alien', 'giantess', 'vore', 'furry', 'transformation'],
+            achIcon: 'ach_fantasy.png',
+            appIcon: 'icon_app_fantasy.png', // Иконка Фантазия
+            desc_en: "Beyond reality. Animated, drawn, and supernatural desires.",
+            desc_ru: "За гранью реальности. Анимация, рисунки и сверхъестественное.",
+            desc_es: "Más allá de la realidad. Deseos animados, dibujados y sobrenaturales.",
+            desc_de: "Jenseits der Realität. Animierte, gezeichnete und übernatürliche Wünsche."
         },
-        // 16. Одежда и Материалы
         { 
-            id: 'clothing', 
-            iconTag: 'legs', // Чулки как символ одежды
-            tags: ['clothing', 'latex', 'leather', 'lingerie', 'spandex', 'nylon', 'satin', 'dress', 'skirt', 'underwear', 'panties', 'bikini'] 
+            id: 'clothing', iconTag: 'legs', tags: ['clothing', 'latex', 'leather', 'lingerie', 'spandex', 'nylon', 'satin', 'dress', 'skirt', 'underwear', 'panties', 'bikini'],
+            achIcon: 'ach_clothing.png',
+            desc_en: "Material fetishism. Fabric textures and specific outfits.",
+            desc_ru: "Фетишизм материалов. Текстуры тканей и специфические наряды.",
+            desc_es: "Fetichismo material. Texturas de telas y atuendos específicos.",
+            desc_de: "Materialfetischismus. Stofftexturen und spezifische Outfits."
         }
     ];
 
@@ -9186,6 +9653,12 @@
             expl_hist: "From Archives 📜",
             deco_label: "Show Decorations",
 
+            lbl_badge: "BADGE",
+            lbl_icon: "ICON",
+
+            ach_title: "Achievements",
+            theme_icons_header: "App Icons (Rewards)",
+
             mod_add_custom: "Add Custom Tag",
             mod_input_ph: "e.g. Redhead, Latex...",
             mod_add_btn: "Add",
@@ -9310,7 +9783,7 @@
 
             unlocked_on: "Unlocked:",
             explored_subtitle: "Here are the achievements you need to get 'Platinum' 😈",
-            cat_general: "General & Basic",
+            cat_general: "All Fetishes",
             cat_solo: "Solo & Hands",
             cat_anal: "Anal & Ass",
             cat_breasts: "Breasts & Milk",
@@ -9326,6 +9799,8 @@
             cat_mess: "Fluids & Mess",
             cat_fantasy: "Fantasy & Art",
             cat_clothing: "Clothing & Fetish",
+
+            lbl_includes: "Includes:",
 
             panic_active_phrases: ["Nothing suspicious here 😇", "Just a hobby", "Pure innocence", "Productivity boost 📈", "Stay hydrated 💧"],
 
@@ -9362,7 +9837,7 @@
 
             stats_no_data: "No data yet",
             wrapped_lock_title: "FETISH WRAPPED 🔒",
-            wrapped_lock_desc: "Make {n} more moves to unlock your personal summary",
+            wrapped_lock_desc: "Be active {n} more to open your personal summary",
             
             "theme_pink-dark": "Cyber",
             "theme_pink-light": "Sakura",
@@ -9865,6 +10340,12 @@
             expl_hist: "Из архивов 📜",
             deco_label: "Показывать декор",
 
+            lbl_badge: "ЗНАЧОК",
+            lbl_icon: "ИКОНКА",
+
+            ach_title: "Достижения",
+            theme_icons_header: "Иконки (Награды)",
+
             mod_add_custom: "Вписать своё",
             mod_input_ph: "напр. Рыжие, Чулки...",
             mod_add_btn: "Добавить",
@@ -9989,7 +10470,7 @@
 
             unlocked_on: "Получено:",
             explored_subtitle: "Вот тебе ачивки, которые нужно получить для достижения «Платины» 😈",
-            cat_general: "База",
+            cat_general: "Все фетиши",
             cat_solo: "Соло и Руки",
             cat_anal: "Анал и Попа",
             cat_breasts: "Грудь и Молоко",
@@ -10005,6 +10486,8 @@
             cat_mess: "Жидкости и Грязь",
             cat_fantasy: "Фантазия и Арт",
             cat_clothing: "Одежда и Латекс",
+
+            lbl_includes: "В жанр входят:", 
 
             panic_active_phrases: ["Ничего подозрительного 😇", "Просто хобби", "Сама невинность", "Минутка продуктивности 📈", "Пейте воду 💧"],
 
@@ -10042,7 +10525,7 @@
 
             stats_no_data: "Пока нет данных",
             wrapped_lock_title: "FETISH WRAPPED 🔒",
-            wrapped_lock_desc: "Сделай ещё {n} действий, чтобы открыть личную сводку",
+            wrapped_lock_desc: "Активничай ещё {n}, чтобы открыть личную сводку",
 
             "theme_pink-dark": "Кибер",
             "theme_pink-light": "Сакура",
@@ -10540,6 +11023,12 @@
             expl_hist: "De los archivos 📜",
             deco_label: "Mostrar decoración",
 
+            lbl_badge: "INSIGNIA",
+            lbl_icon: "ICONO",
+
+            ach_title: "Logros",
+            theme_icons_header: "Iconos (Recompensas)",
+
             mod_add_custom: "Añadir Propio",
             mod_input_ph: "ej. Pelirroja...",
             mod_add_btn: "Añadir",
@@ -10648,7 +11137,7 @@
 
             unlocked_on: "Desbloqueado:",
             explored_subtitle: "Aquí están los logros que necesitas para obtener el 'Platino' 😈",
-            cat_general: "General",
+            cat_general: "Todos los fetiches",
             cat_solo: "Solo y Manos",
             cat_anal: "Anal y Trasero",
             cat_breasts: "Pechos y Leche",
@@ -10664,6 +11153,8 @@
             cat_mess: "Fluidos y Desorden",
             cat_fantasy: "Fantasía y Arte",
             cat_clothing: "Ropa y Fetiche",
+
+            lbl_includes: "Incluye:",
 
             panic_active_phrases: ["Nada sospechoso aquí 😇", "Solo un hobby", "Pura inocencia", "Productividad 📈", "Bebe agua 💧"],
 
@@ -10700,7 +11191,7 @@
 
             stats_no_data: "Aún no hay datos",
             wrapped_lock_title: "FETISH WRAPPED 🔒",
-            wrapped_lock_desc: "Haz {n} movimientos más para desbloquear tu resumen",
+            wrapped_lock_desc: "Sea activo {n} más para abrir su resumen personal",
 
             "theme_pink-dark": "Cyber",
             "theme_pink-light": "Sakura",
@@ -11191,6 +11682,12 @@
             expl_hist: "Aus dem Archiv 📜",
             deco_label: "Dekoration anzeigen",
 
+            lbl_badge: "ABZEICHEN",
+            lbl_icon: "ICON",
+
+            ach_title: "Erfolge",
+            theme_icons_header: "App-Icons (Belohnungen)",
+
             mod_add_custom: "Eigenes hinzufügen",
             mod_input_ph: "z.B. Rothaarige...",
             mod_add_btn: "Hinzufügen",
@@ -11298,7 +11795,7 @@
 
             unlocked_on: "Freigeschaltet:",
             explored_subtitle: "Hier sind die Erfolge, die du für 'Platin' brauchst 😈",
-            cat_general: "Allgemein",
+            cat_general: "Alle Fetische",
             cat_solo: "Solo & Hände",
             cat_anal: "Anal & Po",
             cat_breasts: "Brüste & Milch",
@@ -11314,6 +11811,8 @@
             cat_mess: "Flüssigkeiten",
             cat_fantasy: "Fantasie & Kunst",
             cat_clothing: "Kleidung & Fetisch",
+
+            lbl_includes: "Beinhaltet:",
 
             panic_active_phrases: ["Nichts Verdächtiges 😇", "Nur ein Hobby", "Reine Unschuld", "Produktivität 📈", "Wasser trinken 💧"],
 
@@ -11349,7 +11848,7 @@
 
             stats_no_data: "Noch keine Daten",
             wrapped_lock_title: "FETISH WRAPPED 🔒",
-            wrapped_lock_desc: "Mache noch {n} Aktionen, um deine Zusammenfassung freizuschalten",
+            wrapped_lock_desc: "Seien Sie aktiv {n} mehr, um Ihre persönliche Zusammenfassung zu öffnen",
 
             "theme_pink-dark": "Cyber",
             "theme_pink-light": "Sakura",
@@ -12446,150 +12945,416 @@
         }
     }
 
-    // 2. Открытие модального окна и рендер карточек
+    // 1. Открытие модального окна (Сетка)
     function openExploredModal() {
+        const modal = document.getElementById('modal-explored-overlay');
         const grid = document.getElementById('explored-grid');
-        grid.innerHTML = '';
-        
-        const t = langData[currentLang] || langData['en'];
-        
-        const subTitleEl = document.querySelector('#modal-explored-overlay .modal-subtitle');
-        if (subTitleEl) {
-            subTitleEl.innerText = t.explored_subtitle || "Here are the achievements you need to get 'Platinum' 😈";
-        }
+        const details = document.getElementById('explored-details');
+        const title = document.getElementById('explored-modal-title');
+        const subtitle = document.getElementById('explored-subtitle');
+        const backBtn = document.getElementById('explored-back-btn');
+        const body = document.getElementById('explored-modal-body');
 
+        // Сброс состояния (показываем сетку, скрываем детали)
+        grid.style.display = 'grid';
+        details.style.display = 'none';
+        body.classList.remove('show-details');
+        backBtn.style.display = 'none';
+        
+        // Локализация заголовков
+        const t = langData[currentLang] || langData['en'];
+        title.innerText = t.explored_label || "Explored";
+        subtitle.style.display = 'block'; // Показываем подзаголовок в сетке
+        subtitle.innerText = t.explored_subtitle || "Here are the achievements you need to get 'Platinum' 😈";
+
+        // Рендер Сетки
+        grid.innerHTML = '';
         const exploredIds = permanentExplored; 
 
-        // ЭТАП 1: Подготовка данных (Считаем проценты и даты для всех групп)
+        // Подготовка данных (как и раньше)
         const groupsWithStats = EXPLORED_GROUPS.map(group => {
-            // 1. Ищем все видео группы
-            const groupItems = data.filter(item => 
-                item.tags.some(tag => group.tags.includes(tag))
-            );
-            
+            const groupItems = data.filter(item => item.tags.some(tag => group.tags.includes(tag)));
             const totalCount = groupItems.length;
-            // Если в группе нет видео (на всякий случай), возвращаем нули
-            if (totalCount === 0) return { ...group, percent: 0, count: 0, total: 0, dateTs: Infinity, dateStr: "" };
+            if (totalCount === 0) return { ...group, percent: 0, count: 0, total: 0 };
 
-            // 2. Считаем прогресс
             const exploredCount = groupItems.filter(item => exploredIds.has(item.id)).length;
             const percent = Math.round((exploredCount / totalCount) * 100);
             
-            // 3. Логика даты (для сортировки и отображения)
+            // Дата
             let dateStr = "";
-            let dateTs = Infinity; // По умолчанию "бесконечность", чтобы незавершенные были в конце при сортировке по дате
-
+            let dateTs = Infinity;
             if (percent === 100) {
-                // Пробуем достать дату из памяти
                 if (achievementDates[group.id]) {
                     dateStr = achievementDates[group.id];
                 } else {
-                    // Если даты нет, но 100% — сохраняем текущую
                     const now = new Date();
                     dateStr = now.toLocaleDateString();
                     achievementDates[group.id] = dateStr;
                     localStorage.setItem('xch_achievement_dates', JSON.stringify(achievementDates));
                 }
-
-                // Пытаемся превратить дату "DD.MM.YYYY" в число для правильной сортировки
-                // Если формат другой (зависит от локали), Date.parse может справиться или нет
-                // Для надежности пробуем разбить по точкам (формат RU/DE)
                 const parts = dateStr.split('.');
-                if (parts.length === 3) {
-                    // new Date(year, monthIndex, day)
-                    dateTs = new Date(parts[2], parts[1] - 1, parts[0]).getTime();
-                } else {
-                    // Фоллбэк на стандартный парсинг
-                    dateTs = Date.parse(dateStr) || Date.now();
-                }
+                dateTs = parts.length === 3 ? new Date(parts[2], parts[1]-1, parts[0]).getTime() : (Date.parse(dateStr) || Date.now());
             }
 
-            return {
-                ...group,
-                percent,
-                count: exploredCount,
-                total: totalCount,
-                dateStr,
-                dateTs
-            };
+            return { ...group, percent, count: exploredCount, total: totalCount, dateStr, dateTs };
         });
 
-        // ЭТАП 2: Сортировка
+        // Сортировка
         groupsWithStats.sort((a, b) => {
-            // Правило 1: "general" (База) ВСЕГДА первая
             if (a.id === 'general') return -1;
             if (b.id === 'general') return 1;
-
             const aDone = a.percent === 100;
             const bDone = b.percent === 100;
-
-            // Правило 2: Завершенные (100%) выше незавершенных
             if (aDone && !bDone) return -1;
             if (!aDone && bDone) return 1;
-
-            // Правило 3: Если ОБА завершены -> Сортируем по дате (кто раньше, тот выше)
-            if (aDone && bDone) {
-                return a.dateTs - b.dateTs; // От меньшего (старого) к большему (новому)
-            }
-
-            // Правило 4: Если ОБА НЕ завершены -> Сортируем по проценту (наиболее заполненные выше)
+            if (aDone && bDone) return a.dateTs - b.dateTs;
             return b.percent - a.percent;
         });
 
-        // ЭТАП 3: Отрисовка
+        // Рендер карточек
         groupsWithStats.forEach(stats => {
-            if (stats.total === 0) return; // Пропускаем пустые группы
+            if (stats.total === 0) return;
 
-            // Иконка
             let iconSrc = 'logo_icon.png';
-            if (TAG_ICONS[stats.iconTag] && TAG_ICONS[stats.iconTag][0]) {
-                iconSrc = TAG_ICONS[stats.iconTag][0];
-            } else if (TAG_ICONS['general'] && TAG_ICONS['general'][0]) {
-                iconSrc = TAG_ICONS['general'][0];
-            }
+            if (TAG_ICONS[stats.iconTag] && TAG_ICONS[stats.iconTag][0]) iconSrc = TAG_ICONS[stats.iconTag][0];
+            else if (TAG_ICONS['general']) iconSrc = TAG_ICONS['general'][0];
 
-            // Название
             const displayTitle = t['cat_' + stats.id] || stats.id.toUpperCase();
-            const unlockedLabel = t.unlocked_on || "Unlocked:"; 
+            const unlockedLabel = t.unlocked_on || "Unlocked:";
             const isCompleted = stats.percent === 100;
 
-            // HTML Карточки
             const card = document.createElement('div');
             card.className = `ex-card ${isCompleted ? 'completed' : ''}`;
             
             card.innerHTML = `
                 <img src="${iconSrc}" class="ex-card-icon" alt="${stats.id}">
                 <div class="ex-card-title">${displayTitle}</div>
-                
                 <div class="ex-progress-track">
                     <div class="ex-progress-fill" style="width: ${stats.percent}%"></div>
                 </div>
-                
-                <div class="ex-card-stats">
-                    ${stats.count} / ${stats.total} (${stats.percent}%)
-                </div>
-                
-                <!-- БЛОК С ДАТОЙ -->
-                <div class="ex-date">
-                    ${isCompleted ? `🏆 ${unlockedLabel} ${stats.dateStr}` : ''}
-                </div>
+                <div class="ex-card-stats">${stats.count} / ${stats.total} (${stats.percent}%)</div>
+                <div class="ex-date">${isCompleted ? `🏆 ${unlockedLabel} ${stats.dateStr}` : ''}</div>
             `;
             
-            card.onclick = () => {
-                closeExploredModal(null, true);
-                if (typeof searchByTag === 'function') searchByTag(stats.iconTag);
-            };
+            card.onclick = () => showGenreDetails(stats);
 
             grid.appendChild(card);
         });
 
-        document.getElementById('modal-explored-overlay').classList.add('open');
+        modal.classList.add('open');
+    }
+
+    // 2. Открытие детального просмотра (Внутри того же окна)
+    function showGenreDetails(groupData) {
+        // 1. Получение элементов
+        const grid = document.getElementById('explored-grid');
+        const details = document.getElementById('explored-details');
+        const modalBody = document.getElementById('explored-modal-body');
+        const title = document.getElementById('explored-modal-title');
+        const subtitle = document.getElementById('explored-subtitle');
+        const backBtn = document.getElementById('explored-back-btn');
+        const t = langData[currentLang] || langData['en'];
+
+        // 2. Переключение UI
+        grid.style.display = 'none';
+        subtitle.style.display = 'none';
+        details.style.display = 'flex';
+        modalBody.classList.add('show-details');
+        backBtn.style.display = 'block';
+
+        // 3. Данные
+        title.innerText = t['cat_' + groupData.id] || groupData.id.toUpperCase();
+
+        let iconSrc = 'logo_icon.png';
+        if (TAG_ICONS[groupData.iconTag]) iconSrc = TAG_ICONS[groupData.iconTag][0];
+
+        let desc = groupData.desc_en;
+        if (currentLang === 'ru') desc = groupData.desc_ru;
+        else if (currentLang === 'es') desc = groupData.desc_es;
+        else if (currentLang === 'de') desc = groupData.desc_de;
+
+        // Генерация примеров
+        let potentialSamples = data.filter(item => item.tags.some(tag => groupData.tags.includes(tag)));
+        if (potentialSamples.length > 3) {
+            potentialSamples.sort(() => 0.5 - Math.random());
+            potentialSamples = potentialSamples.slice(0, 3);
+        }
+        const samplesHtml = potentialSamples.map(item => `<div class="sample-tag">${getLocalizedName(item)}</div>`).join('');
+        const includesLabel = t.lbl_includes || "Includes:";
+
+        // Статусы
+        const isUnlocked = groupData.percent === 100;
+        const statusText = isUnlocked ? (t.unlocked_on || "UNLOCKED") : `${groupData.percent}%`;
+        const statusClass = isUnlocked ? "unlocked" : "";
+        const achImg = groupData.achIcon || "ach_placeholder.png";
+        const achHeader = t.ach_title || "Achievements";
+
+        const badgeLabel = t.lbl_badge || "BADGE";
+        const iconLabel = t.lbl_icon || "ICON";
+
+        // --- ЛОГИКА СТИЛЕЙ ДЛЯ БЕЙДЖА (ИСПРАВЛЕНИЕ) ---
+        // Если закрыто -> Ч/Б и прозрачность. Если открыто -> стили из CSS (тень и цвет)
+        const badgeStyle = isUnlocked ? '' : 'filter: grayscale(1); opacity: 0.5;';
+
+        // --- ЛОГИКА ВТОРОЙ ИКОНКИ (APP ICON) ---
+        let extraIconHtml = '';
+        if (groupData.appIcon) {
+            const appIconSrc = groupData.appIcon;
+            const appIconStyle = isUnlocked ? '' : 'filter: grayscale(1); opacity: 0.5;';
+            
+            extraIconHtml = `
+                <div class="reward-box">
+                    <img src="${appIconSrc}" class="reward-display-img app-icon-style" style="${appIconStyle}">
+                    <div class="ach-status-text ${statusClass}" style="font-size:9px;">${iconLabel}</div>
+                </div>
+            `;
+        }
+
+        // Рендер
+        details.innerHTML = `
+            <div class="genre-header">
+                <img src="${iconSrc}" class="genre-icon-large">
+                <div style="width:100%; max-width:200px; margin-bottom:5px;">
+                    <div class="ex-progress-track" style="height:8px; background:rgba(255,255,255,0.1);">
+                        <div class="ex-progress-fill" style="width: ${groupData.percent}%; background:var(--accent);"></div>
+                    </div>
+                    <div style="text-align:center; font-size:10px; color:var(--text-secondary); margin-top:3px;">
+                        ${groupData.count} / ${groupData.total}
+                    </div>
+                </div>
+            </div>
+
+            <div class="genre-desc-box">${desc}</div>
+
+            <div class="genre-samples-title">${includesLabel}</div>
+            <div class="genre-samples-row">${samplesHtml}</div>
+
+            <div class="genre-achievements-header">${achHeader}</div>
+            
+            <div class="genre-icons-row">
+                <!-- 1. Бейдж (Badge) с применением стиля -->
+                <div class="reward-box">
+                    <img src="${achImg}" class="reward-display-img badge-style" style="${badgeStyle}">
+                    <div class="ach-status-text ${statusClass}" style="font-size:9px;">${badgeLabel}</div>
+                </div>
+                
+                <!-- 2. Иконка (App Icon) -->
+                ${extraIconHtml}
+            </div>
+            
+            ${isUnlocked ? `<div style="text-align:center; font-size:10px; color:var(--text-secondary); margin-top:5px;">${groupData.dateStr}</div>` : ''}
+        `;
+    }
+
+    // 3. Возврат к сетке
+    function backToExploredGrid() {
+        const grid = document.getElementById('explored-grid');
+        const details = document.getElementById('explored-details');
+        const modalBody = document.getElementById('explored-modal-body');
+        const title = document.getElementById('explored-modal-title');
+        const subtitle = document.getElementById('explored-subtitle');
+        const backBtn = document.getElementById('explored-back-btn');
+        const t = langData[currentLang] || langData['en'];
+
+        details.style.display = 'none';
+        grid.style.display = 'grid';
+        modalBody.classList.remove('show-details');
+        backBtn.style.display = 'none';
+        
+        // Возвращаем исходный заголовок
+        title.innerText = t.explored_label || "Explored";
+        subtitle.style.display = 'block';
     }
 
     function closeExploredModal(e, force) {
         if (force || e.target.id === 'modal-explored-overlay') {
             document.getElementById('modal-explored-overlay').classList.remove('open');
         }
+    }
+
+    function openAchievementsModal() {
+        // Скрываем окно синхронизации, если открыто
+        closeSyncInfoModal(null, true);
+        
+        const grid = document.getElementById('achievements-grid');
+        grid.innerHTML = '';
+        const t = langData[currentLang] || langData['en'];
+        
+        const allAchievements = [];
+        const exploredIds = permanentExplored;
+
+        // 1. ЖАНРОВЫЕ ДОСТИЖЕНИЯ
+        EXPLORED_GROUPS.forEach(group => {
+            const groupItems = data.filter(item => item.tags.some(tag => group.tags.includes(tag)));
+            const total = groupItems.length;
+            if (total === 0) return;
+            
+            const count = groupItems.filter(item => exploredIds.has(item.id)).length;
+            const percent = Math.round((count / total) * 100);
+            const isUnlocked = percent === 100;
+            
+            // Дата получения
+            let dateStr = "";
+            if (isUnlocked && achievementDates[group.id]) dateStr = achievementDates[group.id];
+
+            let name = t['cat_' + group.id] || group.id;
+            let desc = group.desc_en; 
+            if(currentLang === 'ru') desc = group.desc_ru;
+            else if(currentLang === 'es') desc = group.desc_es;
+            else if(currentLang === 'de') desc = group.desc_de;
+
+            allAchievements.push({
+                id: 'genre_' + group.id,
+                title: name,
+                icon: group.achIcon || 'ach_placeholder.png',
+                desc: desc,
+                unlocked: isUnlocked,
+                date: dateStr,
+                type: 'genre'
+            });
+        });
+
+        // 2. ПСИХОТИПЫ (Из сохраненных Wrapped)
+        // Собираем уникальные психотипы, которые пользователь получал
+        const userPsychos = new Set();
+        const psychoDates = {};
+        
+        wrappedArchive.forEach(w => {
+            if(w.stats && w.stats.psychoCounts) {
+                const pt = calculatePsychotype(w.stats.psychoCounts);
+                // Исключаем "vanilla" из достижений, если хочешь
+                if (pt) {
+                    userPsychos.add(pt);
+                    // Сохраняем самую раннюю дату
+                    const d = new Date(w.timestamp).toLocaleDateString();
+                    if(!psychoDates[pt]) psychoDates[pt] = d;
+                }
+            }
+        });
+
+        // Проходим по всем возможным психотипам
+        for (const [key, val] of Object.entries(PSYCHO_TYPES)) {
+
+            const isUnlocked = userPsychos.has(key);
+            
+            allAchievements.push({
+                id: 'psycho_' + key,
+                title: val[currentLang] || val.en, // Имя ("Темный Лорд")
+                icon: 'ach_psycho.png',
+                desc: val['desc_' + (currentLang === 'ru' ? 'ru' : 'en')],
+                unlocked: isUnlocked,
+                date: psychoDates[key] || "",
+                type: 'psycho'
+            });
+        }
+
+        // 3. СОРТИРОВКА (Открытые сверху)
+        allAchievements.sort((a, b) => {
+            if (a.unlocked && !b.unlocked) return -1;
+            if (!a.unlocked && b.unlocked) return 1;
+            return 0;
+        });
+
+        // Обновляем счетчик в кнопке профиля (можно вынести отдельно)
+        const unlockedCount = allAchievements.filter(x => x.unlocked).length;
+        const totalCount = allAchievements.length;
+        const progressEl = document.getElementById('ach-total-progress');
+        if(progressEl) progressEl.innerText = `${unlockedCount} / ${totalCount}`;
+
+        // 4. РЕНДЕР
+        allAchievements.forEach(ach => {
+            const div = document.createElement('div');
+            div.className = `ach-card ${ach.unlocked ? 'unlocked' : ''}`;
+            div.onclick = () => showAchievementDetail(ach);
+            
+            div.innerHTML = `
+                <img src="${ach.icon}" class="ach-card-icon" onerror="this.src='ach_placeholder.png'">
+                <div class="ach-card-title">${ach.title}</div>
+            `;
+            grid.appendChild(div);
+        });
+
+        document.getElementById('modal-achievements-overlay').classList.add('open');
+    }
+
+    function closeAchievementsModal(e, force) {
+        if (force || e.target.id === 'modal-achievements-overlay') {
+            document.getElementById('modal-achievements-overlay').classList.remove('open');
+        }
+    }
+
+    let currentDetailAch = null; // Для шеринга
+
+    function showAchievementDetail(ach) {
+        currentDetailAch = ach;
+        
+        document.getElementById('detail-ach-icon').src = ach.icon;
+        document.getElementById('detail-ach-title').innerText = ach.title;
+        document.getElementById('detail-ach-desc').innerText = ach.desc;
+        
+        const dateEl = document.getElementById('detail-ach-date');
+        if (ach.unlocked) {
+            dateEl.style.display = 'block';
+            dateEl.innerText = `UNLOCKED: ${ach.date}`;
+        } else {
+            dateEl.style.display = 'block';
+            dateEl.innerText = "LOCKED 🔒";
+            dateEl.style.background = "rgba(255,255,255,0.1)";
+            dateEl.style.color = "var(--text-secondary)";
+        }
+
+        document.getElementById('modal-ach-detail-overlay').classList.add('open');
+    }
+
+    function closeAchDetail(e, force) {
+        if (force || e.target.id === 'modal-ach-detail-overlay') {
+            document.getElementById('modal-ach-detail-overlay').classList.remove('open');
+        }
+    }
+
+    // --- ШЕРИНГ ДОСТИЖЕНИЯ ---
+    function shareAchievementCard() {
+        if (!currentDetailAch) return;
+        
+        // Создаем скрытый контейнер
+        const container = document.createElement('div');
+        container.id = 'achievement-share-card';
+        document.body.appendChild(container);
+        
+        const t = langData[currentLang] || langData['en'];
+        const logoSrc = getThemeLogoSrc(localStorage.getItem('xch_theme_id') || 'dark');
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=0&data=${encodeURIComponent(window.location.origin)}`;
+
+        container.innerHTML = `
+            <div class="screenshot-header">
+                <div class="screenshot-logo-area">
+                    <div class="screenshot-logo">x<span>Fetish</span>Hub</div>
+                    <div class="screenshot-caption">ACHIEVEMENT UNLOCKED</div>
+                </div>
+                <div class="screenshot-qr"><img src="${qrUrl}" style="width:100%;"></div>
+            </div>
+            
+            <img src="${currentDetailAch.icon}" class="share-ach-icon">
+            <div class="share-ach-title">${currentDetailAch.title}</div>
+            
+            ${currentDetailAch.unlocked ? `<div class="share-ach-date">UNLOCKED: ${currentDetailAch.date}</div>` : ''}
+            
+            <div class="share-ach-desc">
+                ${currentDetailAch.desc}
+            </div>
+        `;
+
+        html2canvas(container, {
+            backgroundColor: null,
+            scale: 2,
+            useCORS: true
+        }).then(canvas => {
+            document.body.removeChild(container);
+            const link = document.createElement('a');
+            link.download = `achievement-${Date.now()}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        });
     }
 
     function adjustTagScoresByTags(tags, delta) {
@@ -15692,6 +16457,7 @@
     function renderThemes() {
         const basicCont = document.getElementById('theme-list-basic');
         const premCont = document.getElementById('theme-list-premium');
+        const iconsCont = document.getElementById('theme-list-icons'); 
         
         // Активная тема (если превью - показываем её, иначе сохраненную)
         const currentId = document.body.getAttribute('data-theme') || 'dark';
@@ -15744,6 +16510,59 @@
             if (theme.type === 'free') basicCont.appendChild(div);
             else premCont.appendChild(div);
         });
+        if (iconsCont) {
+            iconsCont.innerHTML = '';
+            
+            // 1. ПОЛУЧАЕМ ПЕРЕВОД ЗАГОЛОВКА
+            const iconsHeaderTitle = t.theme_icons_header || "App Icons (Rewards)";
+            
+            const headerEl = document.querySelector('#modal-theme-overlay .icons-section-header');
+            if (headerEl) {
+                headerEl.innerText = iconsHeaderTitle;
+            }
+
+            const savedIcon = localStorage.getItem('xch_custom_icon');
+            const exploredIds = permanentExplored;
+
+            // Фильтруем только те жанры, у которых есть appIcon
+            const iconGroups = EXPLORED_GROUPS.filter(g => g.appIcon);
+
+            iconGroups.forEach(group => {
+                // Проверка открытия
+                const groupItems = data.filter(item => item.tags.some(tag => group.tags.includes(tag)));
+                const unlockedCount = groupItems.filter(item => exploredIds.has(item.id)).length;
+                const isUnlocked = (unlockedCount === groupItems.length && groupItems.length > 0);
+                
+                const isActive = (savedIcon === group.appIcon);
+                const title = t['cat_' + group.id] || group.id;
+
+                const div = document.createElement('div');
+                div.className = `app-icon-item ${isActive ? 'active' : ''} ${!isUnlocked ? 'locked' : ''}`;
+                
+                div.innerHTML = `
+                    <img src="${group.appIcon}" class="app-icon-img">
+                    ${!isUnlocked ? '<span class="icon-lock-badge">🔒</span>' : ''}
+                    <div class="app-icon-label">${title}</div>
+                `;
+
+                div.onclick = () => {
+                    if (isUnlocked) {
+                        toggleCustomIcon(group.appIcon);
+                    } else {
+                        closeThemeModal(null, true); 
+                        const fakeGroupData = { 
+                            ...group, 
+                            percent: Math.round((unlockedCount / groupItems.length) * 100), 
+                            count: unlockedCount, 
+                            total: groupItems.length 
+                        };
+                        showGenreDetails(fakeGroupData);
+                    }
+                };
+
+                iconsCont.appendChild(div);
+            });
+        }
     }
 
     function selectTheme(theme) {
@@ -15879,29 +16698,57 @@
         return logoMap[themeId] || 'logo.png';
     }
 
+    function toggleCustomIcon(iconFilename) {
+        const currentIcon = localStorage.getItem('xch_custom_icon');
+        
+        if (currentIcon === iconFilename) {
+            // Если уже выбрана — убираем (возврат к иконке темы)
+            localStorage.removeItem('xch_custom_icon');
+        } else {
+            // Устанавливаем новую
+            localStorage.setItem('xch_custom_icon', iconFilename);
+        }
+        
+        // Применяем изменения
+        const currentThemeId = localStorage.getItem('xch_theme_id') || 'dark';
+        updateGlobalLogos(currentThemeId); // Эта функция сама проверит custom_icon
+        
+        // Перерисовываем список (чтобы обновить рамки)
+        renderThemes();
+    }
+
     function updateGlobalLogos(themeId) {
-        // Получаем правильную картинку через новую функцию
-        const newSrc = getThemeLogoSrc(themeId);
+        // 1. Проверяем, есть ли кастомная иконка
+        const customIcon = localStorage.getItem('xch_custom_icon');
+        
+        let newSrc;
+        if (customIcon) {
+            // Если пользователь выбрал достижение -> используем его
+            newSrc = customIcon;
+        } else {
+            // Иначе -> стандартная иконка темы
+            newSrc = getThemeLogoSrc(themeId);
+        }
 
         // --- 1. ОБНОВЛЕНИЕ ЛОГОТИПОВ ВНУТРИ САЙТА ---
         document.querySelectorAll('.logo-img').forEach(img => {
             img.src = newSrc;
         });
         
-        // Лого в окне установки приложения
+        // Лого в окне установки и wrapped
         const installLogo = document.querySelector('#modal-install-overlay img');
-        if (installLogo && installLogo.src.includes('logo')) {
-            installLogo.src = newSrc;
-        }
+        if (installLogo && installLogo.src.includes('logo')) installLogo.src = newSrc;
         
-        // Лого в финальной карточке Wrapped 
         const wrappedLogo = document.querySelector('.sum-logo-img');
-        if (wrappedLogo) {
-            wrappedLogo.src = newSrc;
-        }
+        if (wrappedLogo) wrappedLogo.src = newSrc;
 
         // --- 2. ОБНОВЛЕНИЕ ФАВИКОНОК ---
-        const faviconSrc = (themeId === 'dark' || themeId === 'light') ? 'logo_icon.png' : newSrc;
+        // Если тема дефолтная И нет кастомной иконки -> logo_icon.png
+        // Иначе -> newSrc (либо иконка темы, либо кастомная)
+        let faviconSrc = newSrc;
+        if (!customIcon && (themeId === 'dark' || themeId === 'light')) {
+            faviconSrc = 'logo_icon.png';
+        }
 
         let linkIcon = document.querySelector("link[rel~='icon']");
         if (!linkIcon) {
@@ -18707,7 +19554,7 @@
             container.appendChild(tagBtn);
         });
     }
-    
+
     function renderModifiers() {
         renderModifiersInCard();
     }
