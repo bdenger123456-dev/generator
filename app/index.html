@@ -7632,7 +7632,7 @@
             <div class="theme-grid" id="theme-list-premium">
                 <!-- JS inserts themes here -->
             </div>
-            <div class="icons-section-header" style="margin-left:0;">App Icons (Rewards)</div>
+            <div class="icons-section-header" style="margin-left:0;" data-key="theme_icons_header">App Icons (Rewards)</div>
             <div class="icons-grid" id="theme-list-icons">
                 <!-- JS сюда вставит иконки достижений -->
             </div>
@@ -17042,10 +17042,16 @@
         const currentId = document.body.getAttribute('data-theme') || 'dark';
         const t = langData[currentLang] || langData['en'];
         
+        // 1. ПРИНУДИТЕЛЬНЫЙ ПЕРЕВОД ЗАГОЛОВКА ИКОНОК
+        const headerEl = document.querySelector('#modal-theme-overlay .icons-section-header');
+        if (headerEl && t.theme_icons_header) {
+            headerEl.innerText = t.theme_icons_header;
+        }
+
         basicCont.innerHTML = '';
         premCont.innerHTML = '';
 
-        // 1. Рендер основных тем
+        // 2. РЕНДЕР ОСНОВНЫХ ТЕМ
         APP_THEMES.forEach(theme => {
             const isLocked = (theme.type === 'pro' && subscriptionLevel === 'free');
             const isActive = (currentId === theme.id);
@@ -17084,7 +17090,7 @@
             else premCont.appendChild(div);
         });
 
-        // 2. Рендер иконок достижений (App Icons)
+        // 3. РЕНДЕР ИКОНОК ПРИЛОЖЕНИЯ (App Icons)
         if (iconsCont) {
             iconsCont.innerHTML = '';
             const savedIcon = localStorage.getItem('xch_custom_icon');
@@ -17116,7 +17122,7 @@
             });
         }
 
-        // 3. БЛОК СЛУЧАЙНОЙ ТЕМЫ (Только для PRO)
+        // 4. БЛОК СЛУЧАЙНОЙ ТЕМЫ (Только для платных пользователей)
         const oldSettings = document.getElementById('theme-random-settings');
         if (oldSettings) oldSettings.remove();
 
@@ -17159,7 +17165,6 @@
         if (lightRow) {
             lightRow.style.display = enabled ? 'flex' : 'none';
         }
-        // Если включили, можно сразу инициировать смену или оставить до след. старта
         if(navigator.vibrate) navigator.vibrate(10);
     }
 
