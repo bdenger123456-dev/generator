@@ -1458,14 +1458,25 @@
 
             /* "Ручка" шторки (серая полоска) */
             .modal-header::before {
-                content: '';
+                content: "";
                 position: absolute;
-                top: 8px; left: 50%;
+                top: 8px;
+                left: 50%;
                 transform: translateX(-50%);
-                width: 40px; height: 4px;
-                background: rgba(128, 128, 128, 0.3);
+                width: 40px;
+                height: 4px;
+                background: rgba(128, 128, 128, 0.4);
                 border-radius: 10px;
-                pointer-events: none;
+            }
+            
+            /* Добавляем плавность для возврата шторки на место */
+            .modal.swiping {
+                transition: none !important; /* Отключаем анимацию во время перетаскивания */
+            }
+            
+            .modal {
+                transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1) !important;
+                will-change: transform;
             }
             
             /* Сдвигаем заголовок чуть ниже из-за ручки */
@@ -23102,6 +23113,98 @@
         // Открываем стандартное окно подписки (где есть кнопка Extend/Upgrade)
         openSubModal();
     }
+
+    // --- ЛОГИКА СВАЙПА ШТОРКИ ВНИЗ ---
+    (function initSwipeToClose() {
+        let startY = 0;
+        let currentY = 0;
+        let isDragging = false;
+        let activeModal = null;
+        let activeOverlay = null;
+
+        // Порог закрытия (если протащили больше 120px — закрываем)
+        const CLOSE_THRESHOLD = 120;
+
+        document.addEventListener('touchstart', (e) => {
+            // Ищем, находимся ли мы внутри открытой модалки
+            const modal = e.target.closest('.modal');
+            if (!modal || window.innerWidth > 768) return; // Только для мобильных
+
+            const modalBody = modal.querySelector('.modal-body');
+            
+            // ВАЖНО: Разрешаем свайп только если контент не прокручен (scrollTop === 0)
+            // Либо если мы тянем за хедер
+            const isAtTop = modalBody ? modalBody.scrollTop <= 0 : true;
+            const isHeader = e.target.closest('.modal-header');
+
+            if (isAtTop || isHeader) {
+                activeModal = modal;
+                activeOverlay = modal.closest('.modal-overlay');
+                startY = e.touches[0].clientY;
+                isDragging = true;
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!isDragging || !activeModal) return;
+
+            currentY = e.touches[0].clientY;
+            const deltaY = currentY - startY;
+
+            // Если тянем вниз (deltaY > 0)
+            if (deltaY > 0) {
+                // Блокируем стандартный скролл браузера, чтобы шторка не "залипала"
+                if (e.cancelable) e.preventDefault();
+                
+                activeModal.classList.add('swiping');
+                // Сдвигаем модалку вслед за пальцем
+                activeModal.style.transform = `translateY(${deltaY}px)`;
+                
+                // Немного приглушаем фон при утягивании
+                const opacity = 1 - (deltaY / 600);
+                activeOverlay.style.backgroundColor = `rgba(0, 0, 0, ${0.6 * opacity})`;
+            }
+        }, { passive: false });
+
+        document.addEventListener('touchend', () => {
+            if (!isDragging || !activeModal) return;
+
+            isDragging = false;
+            activeModal.classList.remove('swiping');
+            
+            const deltaY = currentY - startY;
+
+            if (deltaY > CLOSE_THRESHOLD) {
+                // ЗАКРЫВАЕМ
+                const overlayId = activeOverlay.id;
+                
+                // Вызываем закрытие через имитацию клика по оверлею или просто убираем класс
+                if (overlayId === 'modal-history-overlay') closeHistoryModal(null, true);
+                else if (overlayId === 'modal-stats-overlay') closeStats(null, true);
+                else if (overlayId === 'modal-sub-overlay') closeSubModal(null, true);
+                else if (overlayId === 'modal-overlay') closeList(null, true);
+                else if (overlayId === 'modal-blacklist-overlay') closeBlacklist(null, true);
+                else if (overlayId === 'modal-theme-overlay') closeThemeModal(null, true);
+                else if (overlayId === 'modal-mods-overlay') closeModifiersSettings(null, true);
+                else if (overlayId === 'modal-explored-overlay') closeExploredModal(null, true);
+                else if (overlayId === 'modal-achievements-overlay') closeAchievementsModal(null, true);
+                else {
+                    // Если функции нет, просто закрываем классом
+                    activeOverlay.classList.remove('open');
+                    document.body.classList.remove('modal-open');
+                }
+            } 
+            
+            // Возвращаем стили в исходное состояние (если не закрыли)
+            activeModal.style.transform = '';
+            activeOverlay.style.backgroundColor = '';
+            
+            activeModal = null;
+            activeOverlay = null;
+            startY = 0;
+            currentY = 0;
+        });
+    })();
 
 </script>
 
