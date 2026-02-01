@@ -6099,6 +6099,57 @@
             opacity: 0.5;
         }
 
+        /* Стили для скидочных цен */
+        .price-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .old-price {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-decoration: line-through;
+            margin-bottom: 2px;
+        }
+
+        .new-price-highlight {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--highlight-green) !important; /* Зеленый для выгоды */
+            animation: pulsePrice 2s infinite;
+        }
+
+        .discount-badge-card {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--highlight-red);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 6px;
+            z-index: 5;
+            box-shadow: 0 2px 10px rgba(231, 76, 60, 0.4);
+        }
+
+        @keyframes pulsePrice {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Стили для модалки лояльности */
+        .loyalty-avatar {
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+            border: 3px solid var(--accent);
+            padding: 3px;
+        }
+
         /* =========================================
         MACOS STYLE SIDEBAR (DESKTOP ONLY)
         ========================================= */
@@ -7742,6 +7793,33 @@
                 <button class="btn-gen" onclick="adminGiftSub()" style="padding:10px; font-size:14px; background:var(--accent); color:#000;">Activate</button>
             </div>
 
+            <!-- Discount Control -->
+            <div class="ios-group" style="padding:15px; margin-bottom: 20px; border: 1px solid var(--accent);">
+                <div style="font-weight:700; margin-bottom:10px; font-size:12px; text-transform:uppercase; color:var(--accent);">⚡ Manage Discounts</div>
+                
+                <div style="display:flex; gap:10px; margin-bottom:10px;">
+                    <select id="admin-disc-target" class="promo-input" style="flex:1;">
+                        <option value="all">All Plans</option>
+                        <option value="pro">Pro Only</option>
+                        <option value="beast">Beast Only</option>
+                        <option value="bestie">Bestie Only</option>
+                    </select>
+                    <select id="admin-disc-type" class="promo-input" style="width:100px;">
+                        <option value="percent">Percent %</option>
+                        <option value="fixed">Fixed $</option>
+                    </select>
+                </div>
+
+                <div style="display:flex; gap:10px; margin-bottom:10px;">
+                    <input type="number" id="admin-disc-value" class="promo-input" placeholder="Value (e.g. 50 or 2.99)" style="flex:1;">
+                    <input type="number" id="admin-disc-days" class="promo-input" placeholder="Days" value="3" style="width:80px;">
+                </div>
+
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-gen" onclick="adminSetDiscount()" style="font-size:13px; background:var(--highlight-green); color:#fff;">Apply</button>
+                    <button class="btn-gen secondary" onclick="adminRemoveDiscount()" style="font-size:13px; color:var(--highlight-red); border-color:var(--highlight-red);">Stop</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -8452,6 +8530,72 @@
     </div>
 </div>
 
+<!-- LOYALTY OFFER MODAL -->
+<div class="modal-overlay" id="modal-loyalty-overlay">
+    <div class="modal" style="max-width: 360px; text-align: center;">
+        <div class="modal-header">
+            <span style="color:var(--accent);">🎁 <span data-key="loyal_title">Special Offer</span></span>
+            <span onclick="closeLoyaltyModal()">✕</span>
+        </div>
+        
+        <div class="modal-body" style="padding-bottom: 25px;">
+            <img src="logo.png" class="loyalty-avatar">
+            
+            <h3 style="margin-bottom: 10px; color: var(--text-main);" data-key="loyal_hey">Hey! 👋</h3>
+            
+            <p style="font-size:14px; color:var(--text-secondary); line-height:1.5; margin-bottom:20px;" data-key="loyal_text">
+                I notice you've been here a few times. I really appreciate your engagement! Since you like the project, I want to offer you <b>Pro</b> for just <span id="loyal-price" style="color:var(--accent); font-weight:800;">$X.XX</span>. It helps keep the site alive 😊
+            </p>
+
+            <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; margin-bottom: 20px; border: 1px dashed var(--border);">
+                <div style="font-size:11px; text-transform:uppercase; color:var(--text-secondary);">Offer ends in:</div>
+                <div id="loyal-timer" style="font-size:16px; font-weight:700; font-family:monospace;">--:--:--</div>
+            </div>
+
+            <button class="btn-gen" onclick="acceptLoyaltyOffer()" style="width:100%; padding:14px; background: linear-gradient(45deg, var(--accent), #9b59b6); color:#fff; box-shadow: 0 5px 20px rgba(255,0,204,0.4);">
+                <span data-key="loyal_btn">Get Pro Offer</span>
+            </button>
+
+            <div style="text-align:center; margin-top:15px;">
+                <span style="font-size:12px; color:var(--text-secondary); text-decoration:underline; cursor:pointer; opacity: 0.6;" onclick="closeLoyaltyModal()" data-key="btn_close">Maybe later</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SUBSCRIPTION EXPIRY WARNING MODAL -->
+<div class="modal-overlay" id="modal-expiry-warning">
+    <div class="modal" style="max-width: 380px; text-align: center;">
+        <div class="modal-header">
+            <span style="color:var(--accent);">⏳ <span data-key="exp_header">Reminder</span></span>
+            <span onclick="closeExpiryModal()">✕</span>
+        </div>
+        
+        <div class="modal-body" style="padding-bottom: 25px;">
+            <!-- Иконка песочных часов -->
+            <div style="font-size: 50px; margin-bottom: 15px; animation: floatIcon 3s ease-in-out infinite;">⏳</div>
+            
+            <h3 style="margin-bottom: 10px; color: var(--text-main);" data-key="exp_title">
+                Time is running out!
+            </h3>
+            
+            <p id="expiry-text-content" style="font-size:14px; color:var(--text-secondary); line-height:1.5; margin-bottom:25px;">
+                <!-- Текст вставится через JS -->
+            </p>
+
+            <!-- Кнопка Продлить -->
+            <button class="btn-gen" onclick="renewFromExpiry()" style="width:100%; padding:14px; background: linear-gradient(45deg, #FF9900, var(--accent)); color:#fff; box-shadow: 0 5px 20px rgba(255,153,0,0.3);">
+                <span data-key="exp_btn_renew">Renew Subscription</span>
+            </button>
+
+            <!-- Кнопка Позже -->
+            <div style="text-align:center; margin-top:15px;">
+                <span style="font-size:13px; color:var(--text-secondary); text-decoration:underline; cursor:pointer; opacity: 0.7;" onclick="closeExpiryModal()" data-key="btn_close">Remind me later</span>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- THEME PREVIEW FLOATING BAR -->
 <div id="preview-floating-bar">
     
@@ -9092,6 +9236,8 @@
                 
                 window.unsavedChanges = false;
 
+                checkSubscriptionExpiry();
+
             } else {
                 // === СЦЕНАРИЙ: ДОКУМЕНТ УДАЛЕН (СБРОС ПОДПИСКИ) ===
                 console.log("User document not found in Cloud. Resetting subscription to Free.");
@@ -9615,6 +9761,8 @@
     let watchHistory = JSON.parse(localStorage.getItem(STORAGE.WATCH_HISTORY)) || [];
     let activityLog = JSON.parse(localStorage.getItem(STORAGE.ACTIVITY_LOG)) || [];
 
+    let activeDiscount = null;
+
     const modifiersData = [
         { key: 'Amateur', en: 'Amateur', ru: 'Любительское', es: 'Amateur', de: 'Amateur' },
         { key: 'POV', en: 'POV', ru: 'POV', es: 'POV', de: 'POV' },
@@ -9914,6 +10062,16 @@
             expl_undo: "Changed your mind? 😏",
             expl_hist: "From Archives 📜",
             deco_label: "Show Decorations",
+
+            exp_header: "Subscription Alert",
+            exp_title: "Don't lose your access!",
+            exp_text: "Glad you've been using the site so long! Just a heads up, your subscription ends in {n}. Time to renew to keep all benefits and support the site 😊",
+            exp_btn_renew: "Renew Subscription",
+
+            loyal_title: "Just for You",
+            loyal_hey: "Hey, friend! 👋",
+            loyal_text: "I see you're not here for the first time. I appreciate your engagement, so I want to offer you a <b>Pro subscription</b> for just <span class='new-price-highlight'>{price}</span>. This goes directly to keeping the site alive 😊",
+            loyal_btn: "Claim Offer",
 
             theme_random: "Random Theme on Start",
             theme_include_light: "Include Light Themes",
@@ -10626,6 +10784,16 @@
             expl_hist: "Из архивов 📜",
             deco_label: "Показывать декор",
 
+            exp_header: "Напоминание",
+            exp_title: "Не теряй доступ!",
+            exp_text: "Рад, что ты так долго пользуешься моим сайтом! Напоминаю, что через {n} твоя подписка закончится. Самое время её обновить, чтобы сохранить все фишки и поддержать проект 😊",
+            exp_btn_renew: "Продлить подписку",
+
+            loyal_title: "Специально для тебя",
+            loyal_hey: "Привет! 👋",
+            loyal_text: "Я смотрю, ты здесь уже не в первый раз. Ценю твою вовлечённость, поэтому предлагаю оформить <b>Pro подписку</b> всего за <span class='new-price-highlight'>{price}</span>. Это пойдет на поддержание сайта 😊",
+            loyal_btn: "Забрать скидку",
+
             theme_random: "Случайная тема при старте",
             theme_include_light: "Включая светлые",
 
@@ -11333,6 +11501,16 @@
             expl_hist: "De los archivos 📜",
             deco_label: "Mostrar decoración",
 
+            exp_header: "Recordatorio",
+            exp_title: "¡No pierdas acceso!",
+            exp_text: "¡Me alegra que uses el sitio! Te recuerdo que tu suscripción termina en {n}. Es hora de renovar para mantener los beneficios y apoyar el sitio 😊",
+            exp_btn_renew: "Renovar Suscripción",
+
+            loyal_title: "Solo para ti",
+            loyal_hey: "¡Hola! 👋",
+            loyal_text: "Veo que no es tu primera vez aquí. Aprecio tu interés, así que te ofrezco <b>Pro</b> por solo <span class='new-price-highlight'>{price}</span>. Esto ayuda a mantener el sitio 😊",
+            loyal_btn: "Obtener Oferta",
+
             theme_random: "Tema aleatorio al inicio",
             theme_include_light: "Incluir temas claros",
 
@@ -12013,6 +12191,16 @@
             expl_undo: "Meinung geändert? 😏",
             expl_hist: "Aus dem Archiv 📜",
             deco_label: "Dekoration anzeigen",
+
+            exp_header: "Erinnerung",
+            exp_title: "Verliere nicht den Zugang!",
+            exp_text: "Schön, dass du dabei bist! Deine Mitgliedschaft endet in {n}. Zeit zum Verlängern, um alle Vorteile zu behalten und die Seite zu unterstützen 😊",
+            exp_btn_renew: "Abo verlängern",
+
+            loyal_title: "Nur für dich",
+            loyal_hey: "Hey! 👋",
+            loyal_text: "Ich sehe, du bist öfter hier. Ich schätze das sehr und biete dir daher <b>Pro</b> für nur <span class='new-price-highlight'>{price}</span> an. Das hilft, die Seite am Leben zu halten 😊",
+            loyal_btn: "Angebot sichern",
 
             theme_random: "Zufälliges Design beim Start",
             theme_include_light: "Helle Designs einschließen",
@@ -16511,6 +16699,134 @@
         }
 
         document.getElementById('modal-sub-overlay').classList.add('open');
+        renderDiscountedPrices()
+    }
+
+    function calculateDiscountedPrice(originalPrice, planType) {
+        if (!activeDiscount) return null;
+        
+        // Проверяем, подходит ли скидка этому плану
+        const matches = activeDiscount.planTarget === 'all' || activeDiscount.planTarget === planType;
+        if (!matches) return null;
+
+        let newPrice = originalPrice;
+        if (activeDiscount.type === 'fixed') {
+            newPrice = activeDiscount.value;
+        } else {
+            newPrice = originalPrice * (1 - (activeDiscount.value / 100));
+        }
+        
+        return Math.round(newPrice * 100) / 100; // Округление
+    }
+
+    function renderDiscountedPrices() {
+        if (!activeDiscount) return;
+
+        const plans = [
+            { id: 'pro', base: 2.99, domId: 'price-pro', type: 'pro' },
+            { id: 'beast', base: 4.99, domId: 'price-beast', type: 'beast' }
+        ];
+
+        plans.forEach(p => {
+            const newPrice = calculateDiscountedPrice(p.base, p.type);
+            const el = document.getElementById(p.domId);
+            const card = el.closest('.plan-card');
+
+            if (newPrice !== null && newPrice < p.base) {
+                // Рендер скидки
+                el.innerHTML = `
+                    <div class="price-container">
+                        <span class="old-price">$${p.base}</span>
+                        <span class="new-price-highlight">$${newPrice} <span style="font-size:12px; color:var(--text-main); font-weight:400;">/ mo</span></span>
+                    </div>
+                `;
+                
+                // Добавляем бейдж
+                if (!card.querySelector('.discount-badge-card')) {
+                    const badge = document.createElement('div');
+                    badge.className = 'discount-badge-card';
+                    // Текст: -30% или SALE
+                    const text = activeDiscount.type === 'percent' ? `-${activeDiscount.value}%` : 'SALE 🔥';
+                    badge.innerText = text;
+                    card.appendChild(badge);
+                }
+            }
+        });
+    }
+
+    function checkLoyaltyStatus() {
+        // 1. Условия показа
+        const isFree = subscriptionLevel === 'free';
+        const activeDays = new Set(JSON.parse(localStorage.getItem('xch_active_days') || '[]')).size;
+        const hasSeenRecently = localStorage.getItem('xch_loyalty_shown_ts');
+        const now = Date.now();
+
+        // Показываем, если:
+        // - Есть активная скидка на PRO (или ALL)
+        // - Пользователь бесплатный
+        // - Заходил хотя бы в 3 разные дня (лояльный)
+        // - Не видел это окно последние 3 дня
+        
+        const isDiscountForPro = activeDiscount && (activeDiscount.planTarget === 'all' || activeDiscount.planTarget === 'pro');
+        
+        if (isDiscountForPro && isFree && activeDays >= 3) {
+            if (!hasSeenRecently || (now - parseInt(hasSeenRecently) > 3 * 24 * 60 * 60 * 1000)) {
+                openLoyaltyModal();
+            }
+        }
+    }
+
+    function openLoyaltyModal() {
+        const modal = document.getElementById('modal-loyalty-overlay');
+        const priceSpan = document.getElementById('loyal-price');
+        const textP = document.querySelector('[data-key="loyal_text"]');
+        
+        // Рассчитываем цену Pro
+        const newPrice = calculateDiscountedPrice(2.99, 'pro');
+        
+        // Формируем текст с ценой
+        const t = langData[currentLang] || langData['en'];
+        let rawText = t.loyal_text;
+        rawText = rawText.replace('{price}', `$${newPrice}`);
+        
+        textP.innerHTML = rawText;
+
+        // Запускаем таймер скидки
+        startLoyaltyTimer(activeDiscount.expiresAt);
+
+        modal.classList.add('open');
+        
+        // Записываем, что показали
+        localStorage.setItem('xch_loyalty_shown_ts', Date.now());
+    }
+
+    function closeLoyaltyModal() {
+        document.getElementById('modal-loyalty-overlay').classList.remove('open');
+    }
+
+    function acceptLoyaltyOffer() {
+        closeLoyaltyModal();
+        // Открываем окно оплаты сразу на Pro
+        openPaymentSelection('pro');
+    }
+
+    function startLoyaltyTimer(expiresAt) {
+        const el = document.getElementById('loyal-timer');
+        
+        const update = () => {
+            const diff = expiresAt - Date.now();
+            if (diff <= 0) {
+                el.innerText = "00:00:00";
+                return;
+            }
+            const h = Math.floor(diff / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            el.innerText = `${h}h ${m}m ${s}s`;
+        };
+        
+        update();
+        setInterval(update, 1000);
     }
 
     function toggleCryptoView(viewName) {
@@ -22094,6 +22410,141 @@
 
     function closeWrappedAlert() {
         document.getElementById('modal-wrapped-alert').classList.remove('open');
+    }
+
+    async function fetchActiveDiscount() {
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/active-discount`);
+            const json = await res.json();
+            if (json.active) {
+                activeDiscount = json;
+                console.log("🔥 Active Discount:", activeDiscount);
+                // Проверяем лояльность после загрузки скидки
+                checkLoyaltyStatus(); 
+            }
+        } catch (e) {
+            console.error("Discount fetch error", e);
+        }
+    }
+
+    // Запустить при старте
+    window.addEventListener('load', fetchActiveDiscount);
+
+    // --- АДМИНСКИЕ ФУНКЦИИ ---
+    async function adminSetDiscount() {
+        const target = document.getElementById('admin-disc-target').value;
+        const type = document.getElementById('admin-disc-type').value;
+        const value = document.getElementById('admin-disc-value').value;
+        const days = document.getElementById('admin-disc-days').value;
+
+        if(!value) return alert("Enter value");
+
+        // Вызываем бэкенд
+        try {
+            const user = window.auth.currentUser;
+            if (!user) return alert("Login first");
+
+            const res = await fetch(`${API_BASE_URL}/admin/set-discount`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    uid: user.uid,
+                    planTarget: target,
+                    type: type,
+                    value: value,
+                    days: days
+                })
+            });
+            
+            if(res.ok) {
+                alert("Discount Activated! Reload page to see.");
+                location.reload();
+            } else {
+                alert("Error");
+            }
+        } catch(e) { console.error(e); }
+    }
+
+    async function adminRemoveDiscount() {
+        const user = window.auth.currentUser;
+        if (!user) return;
+        await fetch(`${API_BASE_URL}/admin/remove-discount`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ uid: user.uid })
+        });
+        alert("Removed");
+        location.reload();
+    }
+
+    function checkSubscriptionExpiry() {
+        // 1. Проверяем, есть ли данные профиля и платная ли подписка
+        if (!cachedUserProfile || !cachedUserProfile.subscription || cachedUserProfile.subscription === 'free') return;
+        
+        // Бессрочные тарифы не трогаем
+        if (cachedUserProfile.subscription === 'bestie') return;
+
+        if (!cachedUserProfile.expiresAt) return;
+
+        // 2. Считаем дни
+        const now = new Date();
+        // Конвертируем Firestore Timestamp в Date
+        const expDate = cachedUserProfile.expiresAt.toDate ? cachedUserProfile.expiresAt.toDate() : new Date(cachedUserProfile.expiresAt);
+        
+        const diffMs = expDate - now;
+        const daysLeft = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+        // 3. Условие: Осталось 3 дня или меньше (но подписка еще активна)
+        if (daysLeft <= 3 && daysLeft > 0) {
+            
+            // 4. Проверка частоты показа (раз в 24 часа)
+            const lastShown = localStorage.getItem('xch_expiry_warn_ts');
+            const oneDayMs = 24 * 60 * 60 * 1000;
+
+            if (!lastShown || (now.getTime() - parseInt(lastShown) > oneDayMs)) {
+                openExpiryModal(daysLeft);
+            }
+        }
+    }
+
+    function openExpiryModal(days) {
+        const modal = document.getElementById('modal-expiry-warning');
+        const textEl = document.getElementById('expiry-text-content');
+        const t = langData[currentLang] || langData['en'];
+
+        // Формируем текст
+        let msg = t.exp_text || "Your subscription ends in {n} days.";
+        
+        // Правильное склонение дней для русского языка (день/дня/дней) - упрощенно
+        let dayWord = "days";
+        if (currentLang === 'ru') {
+            if (days === 1) dayWord = "день";
+            else if (days < 5) dayWord = "дня";
+            else dayWord = "дней";
+        } else if (currentLang === 'es') {
+            dayWord = days === 1 ? "día" : "días";
+        } else if (currentLang === 'de') {
+            dayWord = days === 1 ? "Tag" : "Tagen";
+        }
+
+        // Вставляем число
+        msg = msg.replace('{n}', `<b style="color:var(--accent); font-size:15px;">${days} ${dayWord}</b>`);
+        
+        textEl.innerHTML = msg;
+        modal.classList.add('open');
+
+        // Записываем время показа
+        localStorage.setItem('xch_expiry_warn_ts', Date.now());
+    }
+
+    function closeExpiryModal() {
+        document.getElementById('modal-expiry-warning').classList.remove('open');
+    }
+
+    function renewFromExpiry() {
+        closeExpiryModal();
+        // Открываем стандартное окно подписки (где есть кнопка Extend/Upgrade)
+        openSubModal();
     }
 
 </script>
