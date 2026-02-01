@@ -6391,6 +6391,18 @@
             }
         }
 
+        /* Плавный переход для всех элементов, которые могут быть размыты */
+        #slot-reel, #result-desc, #badge-wrapper, #related-block {
+            transition: filter 0.3s ease, opacity 0.3s ease;
+        }
+
+        /* Класс размытия контента */
+        .card-content-blur {
+            filter: blur(10px) !important;
+            opacity: 0.4;
+            pointer-events: none; /* Чтобы нельзя было кликнуть по размытым ссылкам */
+        }
+
         /* =========================================
         MACOS STYLE SIDEBAR (DESKTOP ONLY)
         ========================================= */
@@ -9880,9 +9892,23 @@
 
     // Слушатель возвращения на вкладку
     document.addEventListener("visibilitychange", () => {
-        // Если вкладка стала видимой И мы засекали время
-        if (document.visibilityState === "visible" && watchStartTime > 0) {
-            calculateWatchTime();
+        if (document.visibilityState === 'visible') {
+            // === ЛОГИКА ЗАКРЫТИЯ МОДИФИКАТОРОВ ПРИ ВОЗВРАТЕ ===
+            const capsule = document.getElementById('mods-capsule');
+            if (capsule && capsule.classList.contains('open')) {
+                // Просто вызываем функцию переключения, она сама снимет класс и блюр
+                toggleModifiers(); 
+            }
+
+            // Если вы засекали время просмотра видео, ваша существующая логика:
+            if (typeof watchStartTime !== 'undefined' && watchStartTime > 0) {
+                calculateWatchTime();
+            }
+        } else {
+            // Логика при уходе в фон (сохранение в облако и т.д.)
+            if (window.isUserLoggedIn && window.unsavedChanges) {
+                window.syncToCloud(true);
+            }
         }
     });
 
@@ -15496,12 +15522,35 @@
     }
 
     function toggleModifiers(e) {
+        // Если кликнули по самому тегу внутри, не закрываем меню
         if (e && e.target.classList.contains('tag')) return;
 
         const capsule = document.getElementById('mods-capsule');
-        capsule.classList.toggle('open');
+        if (!capsule) return;
+
+        const isOpen = capsule.classList.toggle('open');
         
-        // Вибрация
+        // Элементы для размытия
+        const blurTargets = [
+            document.getElementById('slot-reel'),
+            document.getElementById('result-desc'),
+            document.getElementById('badge-wrapper'),
+            document.getElementById('related-block')
+        ];
+
+        // Применяем размытие только на мобильных (экран <= 768px)
+        if (window.innerWidth <= 768) {
+            blurTargets.forEach(el => {
+                if (el) {
+                    if (isOpen) {
+                        el.classList.add('card-content-blur');
+                    } else {
+                        el.classList.remove('card-content-blur');
+                    }
+                }
+            });
+        }
+
         if(navigator.vibrate) navigator.vibrate(10);
     }
 
