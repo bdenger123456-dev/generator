@@ -10915,7 +10915,7 @@
             mod_title: "Modifiers",
             mod_active_sec: "Active (Visible)",
             mod_inactive_sec: "Inactive (Hidden)",
-            mod_limit_reached: "Limit reached (Max 10)!",
+            mod_limit_reached: "Limit reached (Max 6)!",
             add_genre: "Add to genre:",
             search_en_label: "Search EN",
             site_label: "Site",
@@ -11634,7 +11634,7 @@
             mod_title: "Модификаторы",
             mod_active_sec: "Активные (В карточке)",
             mod_inactive_sec: "Неактивные (Скрыты)",
-            mod_limit_reached: "Лимит достигнут (Макс 10)!",
+            mod_limit_reached: "Лимит достигнут (Макс 6)!",
             add_genre: "Добавить к жанру:",
             search_en_label: "Поиск на Англ.",
             site_label: "Сайт",
@@ -20762,9 +20762,9 @@
             userModifiersPool.splice(index, 1);
         } else {
             // Если нет -> добавляем, но проверяем лимит
-            if (userModifiersPool.length >= 10) {
+            if (userModifiersPool.length >= 6) {
                 const t = langData[currentLang] || langData['en'];
-                alert(t.mod_limit_reached || "Max 10 modifiers!");
+                alert(t.mod_limit_reached || "Max 6 modifiers!");
                 return;
             }
             userModifiersPool.push(key);
@@ -20789,10 +20789,10 @@
         activeContainer.innerHTML = '';
         inactiveContainer.innerHTML = '';
         
-        // 1. СЧЕТЧИК: Считает, сколько кнопок пользователь вывел на карточку (лимит 10)
+        // 1. СЧЕТЧИК: Считает, сколько кнопок пользователь вывел на карточку (лимит 6)
         if (counter) {
-            counter.innerText = `${userModifiersPool.length} / 10`;
-            counter.style.color = userModifiersPool.length >= 10 ? 'var(--highlight-red)' : 'var(--text-secondary)';
+            counter.innerText = `${userModifiersPool.length} / 6`;
+            counter.style.color = userModifiersPool.length >= 6? 'var(--highlight-red)' : 'var(--text-secondary)';
         }
 
         // 2. РЕНДЕРИМ АКТИВНЫЕ (Те, что в пуле и видны на карточке)
@@ -20832,7 +20832,7 @@
                 btn.innerText = mod[currentLang] || mod.en;
 
                 btn.onclick = () => {
-                    if (userModifiersPool.length >= 10) {
+                    if (userModifiersPool.length >= 6) {
                         alert(langData[currentLang].mod_limit_reached || "Limit reached!");
                         return;
                     }
@@ -20874,9 +20874,9 @@
         let val = input.value.trim();
         if (!val) return;
         
-        // Валидация
-        if (val.length > 10) {
-            alert("Too long! Max 10 chars.");
+        // --- Макс длина 20 символов ---
+        if (val.length > 20) {
+            alert("Too long! Max 20 chars.");
             return;
         }
         
@@ -20889,16 +20889,16 @@
             return;
         }
         
-        // Лимит
-        if (userModifiersPool.length >= 20) {
-            alert("Limit reached (Max 10). Delete some first.");
+        // --- Лимит пула 6 штук ---
+        if (userModifiersPool.length >= 6) {
+            alert("Limit reached (Max 6). Delete some first.");
             return;
         }
 
         // Добавляем в пул
         userModifiersPool.push(val);
         
-        // Сразу делаем активным для удобства пользователя
+        // Сразу делаем активным
         activeMods.add(val); 
         
         // Сохраняем в память
@@ -21014,7 +21014,7 @@
                 if (activeMods.has(modKey)) {
                     activeMods.delete(modKey);
                 } else {
-                    if (activeMods.size >= 10) return;
+                    if (activeMods.size >= 6) return;
                     activeMods.add(modKey);
                 }
                 
