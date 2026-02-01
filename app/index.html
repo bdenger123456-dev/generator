@@ -186,11 +186,52 @@
         body[data-theme="noir"] {
             --accent: #ffffff;
             --accent-light: #cccccc;
-            --highlight-green: #ffffff;
-            --highlight-red: #ffffff;
-            --text-secondary: #aaaaaa;
+            --accent-alt: #888888; 
+            
+            --highlight-green: #bbbbbb; /* Светло-серый вместо зеленого */
+            --highlight-red: #444444;   /* Темно-серый вместо красного */
             --ios-separator: #333333;
             --border: #333333;
+        }
+
+        body[data-theme="noir"] .mode-greeting-text b {
+            color: #ffffff !important; /* Названия категорий всегда белые */
+        }
+
+        /* Заменяем голубой цвет Bestie в нуарной теме */
+        body[data-theme="noir"] .plan-card.bestie {
+            border-color: #ffffff !important;
+            background: linear-gradient(165deg, #333 0%, #000 100%) !important;
+            box-shadow: 0 0 20px rgba(255,255,255,0.1) !important;
+        }
+
+        body[data-theme="noir"] .plan-card.bestie .plan-title,
+        body[data-theme="noir"] .bestie-badge {
+            background: #ffffff !important;
+            color: #000000 !important;
+            -webkit-background-clip: initial !important;
+            -webkit-text-fill-color: initial !important;
+        }
+
+        body[data-theme="noir"] .plan-btn.bestie-btn {
+            background: #ffffff !important;
+            color: #000000 !important;
+        }
+
+        /* Статус подписки в окне синхронизации */
+        body[data-theme="noir"] #sync-sub-value {
+            color: #ffffff !important;
+        }
+
+        body[data-theme="noir"] .limit-fill {
+            background: linear-gradient(90deg, #888, #fff) !important;
+            box-shadow: 0 0 10px #ffffff;
+        }
+
+        /* Градиент для кнопок в нуаре */
+        body[data-theme="noir"] .btn-start-capsule {
+            background: linear-gradient(to right, #666, #999) !important;
+            box-shadow: 0 10px 30px -5px rgba(255,255,255,0.2) !important;
         }
 
         /* 1. Кнопки управления (Tinder-style) */
@@ -20019,8 +20060,8 @@
             const template = templates[Math.floor(Math.random() * templates.length)];
             
             finalPhrase = template
-                .replace('{fav}', `<span style="color:var(--accent);">${favName}</span>`)
-                .replace('{new}', `<span style="color:#00d2ff;">${newName}</span>`);
+                .replace('{fav}', `<span style="color:var(--accent); font-weight:800;">${favName}</span>`)
+                .replace('{new}', `<span style="color:var(--accent-alt); font-weight:800;">${newName}</span>`);
         } 
         else {
             const phrases = Array.isArray(t.mode_greeting_hint) 
