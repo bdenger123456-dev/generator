@@ -8385,16 +8385,16 @@
             
             <!-- БЛОК ВВОДА (Скрыт по умолчанию) -->
             <div id="sponsor-input-container" style="display:none; margin-bottom: 20px; padding: 15px; background: rgba(0, 210, 255, 0.1); border: 1px solid #00d2ff; border-radius: 16px;">
-                <div style="font-size: 13px; font-weight: 700; color: #00d2ff; margin-bottom: 8px; text-transform: uppercase;">
+                <div style="font-size: 13px; font-weight: 700; color: #00d2ff; margin-bottom: 8px; text-transform: uppercase;" data-key="spon_header">
                     Bestie Privilege 💎
                 </div>
-                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.4;">
+                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.4;" data-key="spon_input_desc">
                     Write your name in history. It will be visible to everyone forever. <br><b>You can only do this once.</b>
                 </p>
                 <div style="display: flex; gap: 10px;">
                     <input type="text" id="sponsor-nickname-input" class="promo-input" placeholder="Your Nickname" maxlength="15" style="font-size: 14px; padding: 10px;">
                     <button class="btn-gen" onclick="submitSponsorName()" style="width: auto; padding: 0 20px; font-size: 13px; background: #00d2ff; color: #000;">
-                        Save
+                        <span data-key="spon_btn_save">Save</span>
                     </button>
                 </div>
             </div>
@@ -10484,6 +10484,11 @@
             expl_hist: "From Archives 📜",
             deco_label: "Show Decorations",
 
+            spon_header: "Bestie Privilege 💎",
+            spon_input_desc: "Write your name in history. It will be visible to everyone forever.<br><b>You can only do this once.</b>",
+            spon_placeholder: "Your Nickname",
+            spon_btn_save: "Save",
+
             exp_header: "Subscription Alert",
             exp_title: "Don't lose your access!",
             exp_text: "Glad you've been using the site so long! Just a heads up, your subscription ends in {n}. Time to renew to keep all benefits and support the site 😊",
@@ -11205,6 +11210,11 @@
             expl_hist: "Из архивов 📜",
             deco_label: "Показывать декор",
 
+            spon_header: "Привилегия Bestie 💎",
+            spon_input_desc: "Впиши своё имя в историю. Оно останется здесь навсегда.<br><b>Это можно сделать только один раз.</b>",
+            spon_placeholder: "Твой никнейм",
+            spon_btn_save: "Сохранить",
+
             exp_header: "Напоминание",
             exp_title: "Не теряй доступ!",
             exp_text: "Рад, что ты так долго пользуешься моим сайтом! Напоминаю, что через {n} твоя подписка закончится. Самое время её обновить, чтобы сохранить все фишки и поддержать проект 😊",
@@ -11922,6 +11932,11 @@
             expl_hist: "De los archivos 📜",
             deco_label: "Mostrar decoración",
 
+            spon_header: "Privilegio Bestie 💎",
+            spon_input_desc: "Escribe tu nombre en la historia. Será visible para siempre.<br><b>Solo puedes hacerlo una vez.</b>",
+            spon_placeholder: "Tu Apodo",
+            spon_btn_save: "Guardar",
+
             exp_header: "Recordatorio",
             exp_title: "¡No pierdas acceso!",
             exp_text: "¡Me alegra que uses el sitio! Te recuerdo que tu suscripción termina en {n}. Es hora de renovar para mantener los beneficios y apoyar el sitio 😊",
@@ -12612,6 +12627,11 @@
             expl_undo: "Meinung geändert? 😏",
             expl_hist: "Aus dem Archiv 📜",
             deco_label: "Dekoration anzeigen",
+
+            spon_header: "Bestie Privileg 💎",
+            spon_input_desc: "Schreibe deinen Namen in die Geschichte. Für immer sichtbar.<br><b>Du kannst dies nur einmal tun.</b>",
+            spon_placeholder: "Dein Spitzname",
+            spon_btn_save: "Speichern",
 
             exp_header: "Erinnerung",
             exp_title: "Verliere nicht den Zugang!",
@@ -15826,6 +15846,9 @@
 
         const promoInput = document.getElementById('promo-input-field');
         if(promoInput && t.pay_code_placeholder) promoInput.placeholder = t.pay_code_placeholder;
+
+        const sponInput = document.getElementById('sponsor-nickname-input');
+        if(sponInput && t.spon_placeholder) sponInput.placeholder = t.spon_placeholder;
         
         updateExploredCount();
         updateSubscriptionUI(); 
