@@ -8244,11 +8244,11 @@
                     <div class="bento-label" data-key="explored_label">Explored</div>
                 </div>
 
-                <!-- Disliked -->
-                <div class="bento-box bento-stat-large clickable" onclick="closeSyncInfoModal(null, true); openBlacklistCatalog();">
-                    <img src="disliked.png" class="bento-img-icon" alt="Ban">
-                    <div class="bento-val" id="cloud-ban-count">0</div>
-                    <div class="bento-label" data-key="blacklist_catalog">Disliked</div>
+                <!-- Minutes -->
+                <div class="bento-box bento-stat-large" style="cursor: default;">
+                    <img src="history.png" class="bento-img-icon" alt="Time">
+                    <div class="bento-val" id="cloud-ban-count">0m</div>
+                    <div class="bento-label" data-key="sync_minutes">Minutes</div>
                 </div>
 
                 <!-- 4. КНОПКА СИНХРОНИЗАЦИИ -->
@@ -9163,20 +9163,15 @@
         const emailEl = document.getElementById('sync-email-display');
         if(emailEl) emailEl.innerText = user.email;
 
-        // ID элементов, которые обновляем
         const subValue = document.getElementById('sync-sub-value');
         const subDesc = document.getElementById('sync-sub-desc');
         const subCard = document.getElementById('sync-sub-card');
 
-        // Сброс значений
-        const countIds = ['cloud-fav-count', 'cloud-wl-count', 'cloud-explored-count', 'cloud-ban-count'];
-        countIds.forEach(id => {
-            const el = document.getElementById(id);
-            if(el) el.innerText = "...";
-        });
-        if(subValue) subValue.innerText = "...";
+        // Сброс значений перед загрузкой
+        const ids = ['cloud-fav-count', 'cloud-wl-count', 'cloud-explored-count', 'cloud-ban-count'];
+        ids.forEach(id => { if(document.getElementById(id)) document.getElementById(id).innerText = "..."; });
 
-        // Загрузка данных (если кеш устарел)
+        // Загрузка данных
         const now = Date.now();
         let d = cachedUserProfile;
         if (!d || (now - lastProfileReadTime > PROFILE_CACHE_TTL)) {
@@ -9192,12 +9187,10 @@
             } catch (e) { console.error(e); }
         }
 
-        // Обновление UI
-        if(subCard) subCard.classList.remove('is-free', 'is-pro', 'is-beast', 'is-bestie');
         const t = langData[currentLang] || langData['en'];
 
         if (d) {
-            // Подписка
+            // 1. Подписка
             const plan = d.subscription || 'free';
             if(subValue) {
                 subValue.innerText = plan.toUpperCase();
@@ -9207,62 +9200,39 @@
                 else subValue.style.color = 'var(--text-main)';
             }
             if(subCard) {
-                if (plan !== 'free') subCard.classList.add('is-' + plan);
-                else subCard.classList.add('is-free');
-            }
-            if(subDesc) {
-                if (plan === 'free') subDesc.innerText = (currentLang === 'ru' ? "Нажми, чтобы улучшить" : "Tap to Upgrade");
-                else if (plan === 'bestie') subDesc.innerText = "♾️ Lifetime";
-                else subDesc.innerText = "Active";
+                subCard.classList.remove('is-free', 'is-pro', 'is-beast', 'is-bestie');
+                subCard.classList.add('is-' + plan);
             }
 
-            // Счетчики
-            if(document.getElementById('cloud-fav-count')) 
-                document.getElementById('cloud-fav-count').innerText = d.favorites ? d.favorites.length : 0;
+            // 2. Счетчики Избранного и WL
+            if(document.getElementById('cloud-fav-count')) document.getElementById('cloud-fav-count').innerText = d.favorites ? d.favorites.length : 0;
+            if(document.getElementById('cloud-wl-count')) document.getElementById('cloud-wl-count').innerText = d.watchLater ? d.watchLater.length : 0;
             
-            if(document.getElementById('cloud-wl-count')) 
-                document.getElementById('cloud-wl-count').innerText = d.watchLater ? d.watchLater.length : 0;
-            
-            // Explored
+            // 3. Открытые категории
             let exCount = d.exploredCount || 0;
-            if (exCount === 0 && d.activityLog) {
-                const unique = new Set(d.activityLog.map(i => i.id));
-                exCount = unique.size;
-            }
-            if(document.getElementById('cloud-explored-count'))
-                document.getElementById('cloud-explored-count').innerText = exCount;
+            if(document.getElementById('cloud-explored-count')) document.getElementById('cloud-explored-count').innerText = exCount;
 
-            // --- ВРЕМЯ ПРОСМОТРА ---
-            const banCountEl = document.getElementById('cloud-ban-count');
-            if(banCountEl) {
-                // Считаем общее время из истории просмотров
+            // --- 4. МИНУТЫ ПРОСМОТРА ---
+            const timeValEl = document.getElementById('cloud-ban-count');
+            if(timeValEl) {
+                // Считаем сумму секунд из истории просмотров
                 const wHistory = d.watchHistory || [];
                 const totalSeconds = wHistory.reduce((acc, item) => acc + (item.seconds || 0), 0);
                 const totalMinutes = Math.floor(totalSeconds / 60);
                 
-                banCountEl.innerText = totalMinutes + "m";
+                // Отображаем "125m" 
+                timeValEl.innerText = totalMinutes + "m";
                 
-                // Меняем подпись и иконку визуально
-                const parentBox = banCountEl.closest('.bento-box');
+                // Принудительно обновляем текст подписи в зависимости от языка
+                const parentBox = timeValEl.closest('.bento-box');
                 if(parentBox) {
-                    // Меняем лейбл
                     const label = parentBox.querySelector('.bento-label');
-                    if(label) label.innerText = (currentLang === 'ru' ? "Время" : "Time");
-                    
-                    // Меняем иконку (на часы)
-                    const icon = parentBox.querySelector('img');
-                    if(icon) {
-                        icon.src = "history.png"; 
-                        parentBox.onclick = null;
-                        parentBox.style.cursor = "default";
+                    if(label) {
+                        label.innerText = t.sync_minutes || "Minutes";
                     }
                 }
             }
 
-        } else {
-            // Новый юзер
-            if(subValue) subValue.innerText = "FREE";
-            if(subCard) subCard.classList.add('is-free');
         }
         
         applyLanguage();
@@ -10446,6 +10416,8 @@
             expl_hist: "From Archives 📜",
             deco_label: "Show Decorations",
 
+            sync_minutes: "Minutes",
+
             spon_header: "Bestie Privilege 💎",
             spon_input_desc: "Write your name in history. It will be visible to everyone forever.<br><b>You can only do this once.</b>",
             spon_placeholder: "Your Nickname",
@@ -11157,6 +11129,8 @@
             expl_hist: "Из архивов 📜",
             deco_label: "Показывать декор",
 
+            sync_minutes: "Минут",
+
             spon_header: "Привилегия Bestie 💎",
             spon_input_desc: "Впиши своё имя в историю. Оно останется здесь навсегда.<br><b>Это можно сделать только один раз.</b>",
             spon_placeholder: "Твой никнейм",
@@ -11864,6 +11838,8 @@
             expl_hist: "De los archivos 📜",
             deco_label: "Mostrar decoración",
 
+            sync_minutes: "Minutos",
+
             spon_header: "Privilegio Bestie 💎",
             spon_input_desc: "Escribe tu nombre en la historia. Será visible para siempre.<br><b>Solo puedes hacerlo una vez.</b>",
             spon_placeholder: "Tu Apodo",
@@ -12544,6 +12520,8 @@
             expl_undo: "Meinung geändert? 😏",
             expl_hist: "Aus dem Archiv 📜",
             deco_label: "Dekoration anzeigen",
+
+            sync_minutes: "Minuten",
 
             spon_header: "Bestie Privileg 💎",
             spon_input_desc: "Schreibe deinen Namen in die Geschichte. Für immer sichtbar.<br><b>Du kannst dies nur einmal tun.</b>",
