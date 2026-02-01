@@ -8897,24 +8897,10 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { 
-        getFirestore, 
-        doc, 
-        setDoc, 
-        addDoc, 
-        getDoc, 
-        getDocs, 
-        updateDoc, 
-        serverTimestamp, 
-        writeBatch, 
-        query, 
-        where, 
-        collection, 
-        deleteField, 
-        Timestamp, 
-        limit, 
-        orderBy, 
-        initializeFirestore, 
-        persistentLocalCache 
+        getFirestore, doc, setDoc, addDoc, getDoc, getDocs, updateDoc, 
+        serverTimestamp, writeBatch, query, where, collection, 
+        deleteField, Timestamp, limit, orderBy, 
+        initializeFirestore, persistentLocalCache 
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -8934,16 +8920,140 @@
     const db = initializeFirestore(app, {
         localCache: persistentLocalCache()
     });
+    let cachedUserProfile = null;
+    window.cachedUserProfile = null; 
+    let lastProfileReadTime = 0;
     const provider = new GoogleAuthProvider();
 
     let syncTimeout = null;
 
-    let cachedUserProfile = null;
-    let lastProfileReadTime = 0;
     const PROFILE_CACHE_TTL = 60000; 
 
     // Глобальное состояние входа
     window.isUserLoggedIn = false;
+
+    // --- ЛОГИКА СПОНСОРОВ (BESTIE) ---
+
+    window.openSponsorsModal = async function() {
+        const list = document.getElementById('sponsors-list');
+        const inputBlock = document.getElementById('sponsor-input-container');
+        
+        list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary);">Loading legends...</div>';
+        document.getElementById('modal-sponsors-overlay').classList.add('open');
+
+        // Проверяем, нужно ли показывать поле ввода
+        if (inputBlock) {
+            inputBlock.style.display = 'none';
+            
+            // Читаем подписку из localStorage (так надежнее для синхронного кода)
+            const currentSub = localStorage.getItem('xch_sub_level') || 'free';
+            
+            // Если Bestie и имя еще не установлено (проверяем глобальную переменную)
+            if (window.isUserLoggedIn && 
+                currentSub === 'bestie' && 
+                window.cachedUserProfile && !window.cachedUserProfile.sponsorNameSet) {
+                
+                inputBlock.style.display = 'block';
+            }
+        }
+
+        try {
+            // Запрос к базе (теперь query и collection доступны из импорта)
+            const q = query(collection(db, "sponsors_public"), orderBy("timestamp", "desc"), limit(100));
+            const querySnapshot = await getDocs(q);
+            
+            list.innerHTML = ''; 
+
+            // 1. Старые спонсоры (из массива в коде)
+            if (typeof earlySponsors !== 'undefined') {
+                earlySponsors.forEach(person => renderSponsorRow(list, person.name, person.date, true));
+            }
+
+            // 2. Новые спонсоры (из базы)
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                renderSponsorRow(list, data.name, data.date, false);
+            });
+
+        } catch (e) {
+            console.error("Error loading sponsors:", e);
+            list.innerHTML = '<div style="text-align:center; padding:20px; color:#e74c3c;">Error loading list. Check console.</div>';
+        }
+    };
+
+    window.submitSponsorName = async function() {
+        const input = document.getElementById('sponsor-nickname-input');
+        const name = input.value.trim();
+        const user = auth.currentUser;
+
+        if (!name) return alert("Please enter a name");
+        if (name.length > 15) return alert("Name is too long (max 15 chars)");
+        if (!user) return alert("Error: User not found");
+
+        const btn = document.querySelector('#sponsor-input-container button');
+        const originalText = btn.innerText;
+        btn.disabled = true;
+        btn.innerText = "Saving...";
+
+        try {
+            const dateObj = new Date();
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const dateStr = `${monthNames[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
+
+            const batch = writeBatch(db);
+
+            // 1. Создаем публичную запись
+            const publicRef = doc(collection(db, "sponsors_public"));
+            batch.set(publicRef, {
+                name: name,
+                date: dateStr,
+                uid: user.uid,
+                timestamp: serverTimestamp()
+            });
+
+            // 2. Обновляем профиль пользователя (чтобы скрыть поле)
+            const userRef = doc(db, "users", user.uid);
+            batch.update(userRef, {
+                sponsorNameSet: true,
+                sponsorNameValue: name
+            });
+
+            await batch.commit();
+
+            // Обновляем локальный кеш
+            if (window.cachedUserProfile) {
+                window.cachedUserProfile.sponsorNameSet = true;
+            }
+
+            document.getElementById('sponsor-input-container').style.display = 'none';
+            alert("Welcome to the Wall of Fame! ✨");
+            window.openSponsorsModal(); // Перезагружаем список
+
+        } catch (e) {
+            console.error("Error saving sponsor:", e);
+            alert("Error: " + e.message);
+            btn.disabled = false;
+            btn.innerText = originalText;
+        }
+    };
+
+    function renderSponsorRow(container, name, date, isVerified) {
+        const row = document.createElement('div');
+        row.className = 'ios-row';
+        row.style.cursor = 'default';
+        const icon = isVerified ? '💎' : '👑';
+        
+        const safeName = name.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+        row.innerHTML = `
+            <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-size:18px;">${icon}</span>
+                <span style="font-weight:600; color:var(--text-main);">${safeName}</span>
+            </div>
+            <span style="font-size:12px; color:var(--text-secondary); text-transform:uppercase;">${date}</span>
+        `;
+        container.appendChild(row);
+    }
 
     // === ФУНКЦИИ ВХОДА/ВЫХОДА (Доступны глобально) ===
     
@@ -9440,6 +9550,7 @@
             if (docSnap.exists()) {
                 const cloudData = docSnap.data();
                 cachedUserProfile = cloudData;
+                window.cachedUserProfile = cloudData;
                 lastProfileReadTime = Date.now();
                 
                 console.log("Cloud data received. Merging...");
@@ -19634,71 +19745,6 @@
         }
     }
 
-    // 1. ОТКРЫТИЕ МОДАЛКИ (Обновленная функция)
-    window.openSponsorsModal = async function() {
-        const list = document.getElementById('sponsors-list');
-        const inputBlock = document.getElementById('sponsor-input-container');
-        list.innerHTML = '<div style="text-align:center; padding:20px;">Loading legends...</div>';
-        
-        document.getElementById('modal-sponsors-overlay').classList.add('open');
-
-        // А. ПРОВЕРКА ПРАВ НА ВВОД (Bestie + Не вводил ранее)
-        if (inputBlock) {
-            inputBlock.style.display = 'none'; // Сначала скрываем
-            
-            // Проверяем: залогинен, тариф bestie, и (важно) еще не устанавливал имя
-            if (window.isUserLoggedIn && 
-                subscriptionLevel === 'bestie' && 
-                cachedUserProfile && !cachedUserProfile.sponsorNameSet) {
-                
-                inputBlock.style.display = 'block';
-            }
-        }
-
-        // Б. ЗАГРУЗКА СПИСКА ИЗ FIREBASE
-        try {
-            // Берем коллекцию 'sponsors_public'
-            const q = query(collection(db, "sponsors_public"), orderBy("timestamp", "desc"), limit(100));
-            const querySnapshot = await getDocs(q);
-            
-            list.innerHTML = ''; // Очищаем лоадер
-
-            // 1. Рендерим старых (хардкод) спонсоров (из вашего массива earlySponsors)
-            earlySponsors.forEach(person => {
-                renderSponsorRow(list, person.name, person.date, true); // true = verified icon
-            });
-
-            // 2. Рендерим новых из базы
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                renderSponsorRow(list, data.name, data.date, false);
-            });
-
-        } catch (e) {
-            console.error("Error loading sponsors:", e);
-            list.innerHTML = '<div style="text-align:center; color:red;">Error loading list</div>';
-        }
-    };
-
-    // Вспомогательная функция отрисовки строки
-    function renderSponsorRow(container, name, date, isVerified) {
-        const row = document.createElement('div');
-        row.className = 'ios-row';
-        row.style.cursor = 'default';
-        
-        // Иконка: Алмаз для старых, Корона для новых (Bestie)
-        const icon = isVerified ? '💎' : '👑';
-        
-        row.innerHTML = `
-            <div style="display:flex; align-items:center; gap:10px;">
-                <span style="font-size:18px;">${icon}</span>
-                <span style="font-weight:600; color:var(--text-main);">${escapeHtml(name)}</span>
-            </div>
-            <span style="font-size:12px; color:var(--text-secondary); text-transform:uppercase;">${date}</span>
-        `;
-        container.appendChild(row);
-    }
-
     // Защита от XSS (вставка HTML тегов в никнейм)
     function escapeHtml(text) {
         if (!text) return text;
@@ -19709,65 +19755,6 @@
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#039;");
     }
-
-    // 2. ОТПРАВКА ИМЕНИ (SAVE)
-    window.submitSponsorName = async function() {
-        const input = document.getElementById('sponsor-nickname-input');
-        const name = input.value.trim();
-        const user = auth.currentUser;
-
-        if (!name) return alert("Please enter a name");
-        if (name.length > 15) return alert("Name is too long (max 15 chars)");
-        if (!user) return alert("Error: User not found");
-
-        const btn = document.querySelector('#sponsor-input-container button');
-        const originalText = btn.innerText;
-        btn.disabled = true;
-        btn.innerText = "Saving...";
-
-        try {
-            // Формируем дату (напр. "Feb 2026")
-            const dateObj = new Date();
-            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-            const dateStr = `${monthNames[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
-
-            const batch = writeBatch(db);
-
-            // Операция 1: Запись в публичную коллекцию
-            const publicRef = doc(collection(db, "sponsors_public")); // Генерируем новый ID
-            batch.set(publicRef, {
-                name: name,
-                date: dateStr,
-                uid: user.uid,
-                timestamp: serverTimestamp()
-            });
-
-            // Операция 2: Пометка в профиле юзера, что он уже вписал имя (чтобы скрыть поле)
-            const userRef = doc(db, "users", user.uid);
-            batch.update(userRef, {
-                sponsorNameSet: true,
-                sponsorNameValue: name // На всякий случай сохраняем и в приватном профиле
-            });
-
-            await batch.commit();
-
-            // Обновляем локальный кеш профиля, чтобы поле исчезло мгновенно
-            if (cachedUserProfile) cachedUserProfile.sponsorNameSet = true;
-
-            // Успех
-            document.getElementById('sponsor-input-container').style.display = 'none';
-            alert("Welcome to the Wall of Fame! ✨");
-            
-            // Перезагружаем список, чтобы увидеть себя
-            openSponsorsModal();
-
-        } catch (e) {
-            console.error("Error saving sponsor:", e);
-            alert("Error saving: " + e.message);
-            btn.disabled = false;
-            btn.innerText = originalText;
-        }
-    };
 
     function openHistoryModal() {
         document.getElementById('modal-history-overlay').classList.add('open');
