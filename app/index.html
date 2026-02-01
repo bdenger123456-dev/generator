@@ -6174,6 +6174,100 @@
             min-height: 50px; /* Чтобы не прыгало при переключении */
         }
 
+        /* Стили для слайда Топ Категорий */
+        .top-cats-container {
+            width: 90%;
+            max-width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .cat-rank-row {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 15px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Анимация появления списка */
+        .cat-rank-row.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .cat-rank-num {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-secondary);
+            width: 25px;
+        }
+
+        .cat-rank-icon {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+            margin-right: 12px;
+        }
+
+        .cat-rank-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            flex: 1;
+            text-transform: uppercase;
+        }
+
+        .cat-rank-score {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        /* Особый стиль для ТОП-1 */
+        .cat-rank-row.rank-1 {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(0, 0, 0, 0) 100%);
+            border: 1px solid #ffd700;
+            padding: 15px;
+            margin-bottom: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Таймер интриги */
+        .rank-1-mask {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .rank-1-mask.revealed {
+            transform: translateY(-100%);
+        }
+
+        .countdown-number {
+            font-size: 40px;
+            font-weight: 900;
+            color: #fff;
+            animation: pulseCount 0.8s infinite;
+        }
+
+        @keyframes pulseCount {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
         /* =========================================
         MACOS STYLE SIDEBAR (DESKTOP ONLY)
         ========================================= */
@@ -20787,12 +20881,12 @@
         let dislikeCount = 0;  
         
         const tagCounts = {};
-        const itemCounts = {};
         
-        // --- НОВАЯ ЛОГИКА ДЛЯ ДИАГРАММЫ ---
+        // Карта очков для КОНКРЕТНЫХ предметов (ID)
+        const itemScores = {}; 
+        
         const psychoCounts = {};
         PSYCHO_AXES.forEach(key => psychoCounts[key] = 0);
-        // ----------------------------------
 
         const hours = new Array(24).fill(0);
         const IGNORED_TAGS = ['general', 'specific', 'straight', 'male', 'female', 'adult', 'video', 'hd'];
@@ -20808,25 +20902,29 @@
             if (l.type === 'like') likeCount++;
             else if (l.type === 'dislike' || l.type === 'pass') dislikeCount++;
 
-            // Вес действия для диаграммы
+            // Вес действия
             let weight = 1;
-            if (l.type === 'watch') weight = 3;      // Просмотр важнее
-            if (l.type === 'like') weight = 2;       // Лайк средний
-            if (l.type === 'dislike') weight = 0;    // Дизлайк не учитываем в профиле желаний
+            if (l.type === 'watch') weight = 5;      // Просмотр — высший балл
+            if (l.type === 'like') weight = 3;       // Лайк — средний
+            if (l.type === 'gen') weight = 1;        // Просто выпало — минимальный
+            if (l.type === 'dislike') weight = 0;    // Дизлайк не считаем
 
-            if (l.tags) {
+            // --- СЧЕТЧИК ТЕГОВ И ПСИХОТИПОВ ---
+            if (l.tags && weight > 0) {
                 l.tags.forEach(t => {
                     if (IGNORED_TAGS.includes(t)) return;
                     tagCounts[t] = (tagCounts[t] || 0) + 1;
 
-                    // --- ЗАПОЛНЕНИЕ ДИАГРАММЫ ---
-                    // Проверяем, входит ли тег в наши 10 осей
                     if (PSYCHO_AXES.includes(t)) {
                         psychoCounts[t] += weight;
                     }
                 });
             }
-            if (l.id) itemCounts[l.id] = (itemCounts[l.id] || 0) + 1;
+
+            // --- СЧЕТЧИК КОНКРЕТНЫХ ПРЕДМЕТОВ ---
+            if (l.id && weight > 0) {
+                itemScores[l.id] = (itemScores[l.id] || 0) + weight;
+            }
         });
 
         const totalWatchTime = watches.reduce((sum, w) => sum + w.seconds, 0);
@@ -20835,9 +20933,23 @@
             .sort((a,b) => b[1]-a[1])
             .slice(0, 10).map(x => x[0]);
         
-        const topItems = Object.entries(itemCounts)
-            .sort((a,b) => b[1]-a[1])
-            .slice(0, 3).map(x => x[0]);
+        // --- ФОРМИРОВАНИЕ ТОП-5 ФЕТИШЕЙ ---
+        // Превращаем ID и Очки в полноценные объекты данных
+        const topFetishes = Object.entries(itemScores)
+            .sort((a, b) => b[1] - a[1]) // Сортируем по очкам
+            .slice(0, 5)                 // Берем топ 5
+            .map(([id, score]) => {
+                // Находим реальный объект в базе данных
+                // itemScores хранит ID как строку, поэтому приводим типы
+                const realItem = data.find(x => x.id == id);
+                if (!realItem) return null;
+                return { 
+                    id: id, 
+                    score: score, 
+                    item: realItem 
+                };
+            })
+            .filter(x => x !== null); // Убираем, если вдруг ID удален из базы
 
         const morning = hours.slice(5, 12).reduce((a,b)=>a+b,0);
         const day = hours.slice(12, 20).reduce((a,b)=>a+b,0);
@@ -20863,8 +20975,9 @@
         return {
             totalActions, watchCount, swipeCount, totalWatchTime,
             likeCount, dislikeCount,
-            topTags, topItems, peakTime, achievement,
-            psychoCounts
+            topTags, peakTime, achievement,
+            psychoCounts, 
+            topFetishes 
         };
     }
 
@@ -21071,14 +21184,13 @@
         overlay.innerHTML = '';
         overlay.classList.add('active');
         
-        const slides = [];
         const stats = dataObj.stats;
         const type = dataObj.type;
         
-        // Определяем язык
+        // Определяем текущий язык
         const langKey = ['en','ru','es','de'].includes(currentLang) ? currentLang : 'en';
         
-        // --- 1. ПЕРЕВОДЫ ---
+        // --- 1. ПЕРЕВОДЫ (Локальный словарь для Wrapped) ---
         const TXT = {
             title: {en:"Fetish<br><span style='color:var(--accent)'>Wrapped</span>", ru:"Итоги<br><span style='color:var(--accent)'>Фетишей</span>", es:"Resumen<br><span style='color:var(--accent)'>Fetichista</span>", de:"Fetisch<br><span style='color:var(--accent)'>Rückblick</span>"},
             since: {en:"Since Last Time", ru:"С прошлого раза", es:"Desde la última vez", de:"Seit dem letzten Mal"},
@@ -21095,6 +21207,8 @@
             cmp_more: {en:"more", ru:"больше", es:"más", de:"mehr"},
             cmp_less: {en:"less", ru:"меньше", es:"menos", de:"weniger"},
             cmp_same: {en:"same", ru:"также", es:"igual", de:"gleich"},
+
+            top_fetishes_title: {en: "Your Top Fetishes", ru: "Твои Топ Фетиши", es: "Tus Fetiches Top", de: "Deine Top-Fetische"},
             
             // Финальная карточка
             sum_watch: {en:"Videos Watched", ru:"Видео просмотрено", es:"Videos vistos", de:"Angeschaut"},
@@ -21114,188 +21228,49 @@
             badge_up: {en:"UP", ru:"UP", es:"SUBIÓ", de:"HOCH"},
             badge_down: {en:"DOWN", ru:"DOWN", es:"BAJÓ", de:"RUNTER"}
         };
-        
-        const t = (k) => (TXT[k] && TXT[k][langKey]) ? TXT[k][langKey] : (TXT[k] ? TXT[k].en : "");
+            
 
+        // Хелпер для получения текста
+        const t = (k) => (TXT[k] && TXT[k][langKey]) ? TXT[k][langKey] : (langData[currentLang][k] || "");
+
+        // Подготовка данных
         const badgeText = WRAPPED_CONFIG.badges[langKey][type] || type.toUpperCase();
         const phrases = WRAPPED_CONFIG.phrases[type] || WRAPPED_CONFIG.phrases.daily;
         const introText = phrases[langKey][Math.floor(Math.random() * phrases[langKey].length)];
+        const logoSrc = getThemeLogoSrc(localStorage.getItem('xch_theme_id') || 'dark');
         const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=0&data=${encodeURIComponent(window.location.origin)}`;
 
+        // Психотип
         const psychoKey = calculatePsychotype(stats.psychoCounts);
         const psychoData = PSYCHO_TYPES[psychoKey] || PSYCHO_TYPES['vanilla'];
         const psychoName = psychoData[langKey].toUpperCase();
         const psychoDesc = psychoData['desc_' + langKey];
 
-        // --- СЛАЙД 1: ВСТУПЛЕНИЕ ---
-        slides.push(`
+        // ============================================
+        // 1. ФИКСИРОВАННЫЕ СЛАЙДЫ (Первый и Последний)
+        // ============================================
+
+        // --- ВСТУПЛЕНИЕ (Первый) ---
+        const introSlide = `
             <div class="wrapped-slide bg-dark active-slide">
                 <div class="w-badge ${type}" style="transform:scale(1.5); margin-bottom:30px; box-shadow:0 10px 30px rgba(0,0,0,0.5);">${badgeText}</div>
                 <div class="wrapped-big-text shimmer-text" style="font-size:46px;">${t('title')}</div>
                 <div class="wrapped-sub-text" style="opacity:0.8; margin-top:20px; font-family:monospace;">${dataObj.rangeStr}</div>
                 <div class="wrapped-sub-text" style="margin-top:40px; font-weight:700; max-width:80%;">${introText}</div>
             </div>
-        `);
+        `;
 
-        // --- СЛАЙД 2: СРАВНЕНИЕ ---
-        if (type !== 'daily' || Math.abs(stats.deltaActions) > 0) {
-        
-            // 1. Выбираем правильный заголовок
-            let periodHeader = t('period_' + type); 
-            if (!periodHeader) periodHeader = t('since'); // Фолбек
+        // --- ФИНАЛ (Последний) ---
+        // Определяем имя топ-жанра (берем первый тег)
+        let topGenreTag = stats.topTags[0] ? stats.topTags[0].toUpperCase() : '---';
+        const genreMatch = modifiersData.find(m => m.key.toLowerCase() === topGenreTag.toLowerCase());
+        if (genreMatch && genreMatch[langKey]) topGenreTag = genreMatch[langKey].toUpperCase();
 
-            // 2. Логика сравнения (vs prev)
-            const getTrendHTML = (delta, labelKey) => {
-                if (delta === 0) return `<span style="opacity:0.6">= ${t('cmp_same')}</span>`;
-                const isPos = delta > 0;
-                const color = isPos ? "#2ecc71" : "#e74c3c";
-                const sign = isPos ? "+" : "";
-                // Пример: "+50 больше, чем в прошлый раз"
-                // Для краткости просто: "+50 vs prev" или локализовать "vs prev"
-                return `<span style="color:${color}">${sign}${delta}</span> <span style="opacity:0.6">vs prev</span>`;
-            };
-
-            const htmlActTrend = getTrendHTML(stats.deltaActions);
-            const htmlTimeTrend = getTrendHTML(Math.round(stats.deltaWatchTime/60));
-
-            // Абсолютные значения
-            const absActions = stats.totalActions;
-            const absTimeMin = Math.round(stats.totalWatchTime / 60);
-
-            slides.push(`
-                <div class="wrapped-slide bg-fire">
-                    <!-- Динамический заголовок -->
-                    <div class="wrapped-sub-text" style="text-transform:uppercase; letter-spacing:2px; font-size:14px; margin-bottom:40px; font-weight:800; color:rgba(255,255,255,0.9); border-bottom:1px solid rgba(255,255,255,0.3); padding-bottom:10px;">
-                        ${periodHeader}
-                    </div>
-                    
-                    <!-- Блок 1: Действия -->
-                    <div style="margin-bottom:50px; width:100%; display:flex; flex-direction:column; align-items:center;">
-                        <div class="wrapped-big-text count-anim" data-target="${absActions}" style="font-size:80px; margin-bottom:0; line-height:1;">0</div>
-                        <div class="wrapped-sub-text" style="font-weight:700; margin-bottom:10px;">${t('act')}</div>
-                        
-                        <!-- Сравнение (выезжает) -->
-                        <div class="reveal-delayed delay-1500" style="background:rgba(0,0,0,0.3); padding:5px 15px; border-radius:20px; font-size:15px; font-weight:600; border:1px solid rgba(255,255,255,0.1);">
-                            ${htmlActTrend}
-                        </div>
-                    </div>
-
-                    <!-- Блок 2: Время -->
-                    <div style="border-top:1px solid rgba(255,255,255,0.1); padding-top:40px; width:80%; display:flex; flex-direction:column; align-items:center;">
-                        <div class="wrapped-big-text" style="font-size:80px; margin-bottom:0; line-height:1;">
-                            <span class="count-anim" data-target="${absTimeMin}">0</span><span style="font-size:30px">m</span>
-                        </div>
-                        <div class="wrapped-sub-text" style="font-weight:700; margin-bottom:10px;">${t('watch')}</div>
-                        
-                        <!-- Сравнение (выезжает) -->
-                        <div class="reveal-delayed delay-1500" style="background:rgba(0,0,0,0.3); padding:5px 15px; border-radius:20px; font-size:15px; font-weight:600; border:1px solid rgba(255,255,255,0.1);">
-                            ${htmlTimeTrend}
-                        </div>
-                    </div>
-                </div>
-            `);
-        }
-
-        // --- СЛАЙД 3: ЭВОЛЮЦИЯ ---
-        let hasEvolutionSlide = false;
-        if (stats.prevTopTags && stats.prevTopTags.length > 0) {
-            // Подготовка красивых названий
-            const formatTag = (t) => {
-                let display = t.toUpperCase();
-                const m = modifiersData.find(x => x.key.toLowerCase() === t.toLowerCase());
-                if(m && m[langKey]) display = m[langKey].toUpperCase();
-                return display;
-            };
-
-            const prevNames = stats.prevTopTags.slice(0, 5).map(formatTag);
-            const currNames = stats.topTags.slice(0, 5).map(formatTag);
-            
-            // JSON данные для скрипта анимации
-            const evoData = JSON.stringify({ prev: prevNames, curr: currNames }).replace(/"/g, '&quot;');
-
-            slides.push(`
-                <div class="wrapped-slide" style="background:linear-gradient(45deg, #1cb5e0 0%, #000851 100%);">
-                    <div class="wrapped-sub-text stagger-text stagger-delay-1" style="text-transform:uppercase; margin-bottom:10px;">${t('evol')}</div>
-                    <div class="wrapped-sub-text stagger-text stagger-delay-2" style="font-size:12px; opacity:0.6; margin-bottom:40px;">${t('evol_sub')}</div>
-                    
-                    <!-- Контейнер для скриптовой анимации -->
-                    <div class="evo-container" data-evo="${evoData}"></div>
-                </div>
-            `);
-            hasEvolutionSlide = true;
-        }
-
-        // === СЛАЙД 4: ПСИХОЛОГИЧЕСКИЙ ПОРТРЕТ (ДИАГРАММА) ===
-        const prevPsycho = stats.prevPsychoCounts || {}; 
-        const radarSVG = createRadarChartSVG(stats.psychoCounts, prevPsycho);
-
-        slides.push(`
-            <div class="wrapped-slide" style="background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%); justify-content: flex-start; padding-top: 60px;">
-                <div class="wrapped-sub-text" style="text-transform:uppercase; margin-bottom:30px; font-weight:800; letter-spacing:1px;">${t('radar_title')}</div>
-                
-                <!-- График -->
-                <div style="width:340px; height:340px; margin-bottom:30px; position:relative; flex-shrink:0;">
-                    ${radarSVG}
-                </div>
-
-                <!-- Легенда (Сразу видно) -->
-                <div style="display:flex; gap:20px; font-size:12px; font-weight:600; margin-bottom:30px;">
-                    <div style="display:flex; align-items:center; gap:6px;">
-                        <div style="width:10px; height:10px; background:var(--accent); border-radius:50%;"></div>
-                        <span style="color:var(--text-main)">${t('radar_curr')}</span>
-                    </div>
-                    <div style="display:flex; align-items:center; gap:6px;">
-                        <div style="width:10px; height:10px; background:rgba(255,255,255,0.3); border:1px dashed #fff; border-radius:50%;"></div>
-                        <span style="color:var(--text-secondary)">${t('radar_prev')}</span>
-                    </div>
-                </div>
-
-                <!-- ПСИХОТИП С ИНТРИГОЙ (Появляется через 3 секунды) -->
-                <div class="reveal-delayed delay-3000" style="text-align:center; width:90%; background:rgba(255,255,255,0.05); padding:20px; border-radius:20px; border:1px solid var(--accent); box-shadow: 0 0 30px rgba(255,0,204, 0.2);">
-                    <div style="font-size:12px; color:var(--text-secondary); text-transform:uppercase; margin-bottom:5px;">${t('sum_psycho')}</div>
-                    <div style="font-size:28px; font-weight:900; color:#fff; margin-bottom:5px; line-height:1.1; text-shadow: 0 0 10px var(--accent); text-transform:uppercase;">
-                        ${psychoName}
-                    </div>
-                    <div style="font-size:13px; font-style:italic; opacity:0.8;">
-                        "${psychoDesc}"
-                    </div>
-                </div>
-            </div>
-        `);
-
-        // --- СЛАЙД 5: ОДЕРЖИМОСТИ (Если эволюции не было) ---
-        if (!hasEvolutionSlide) {
-            const translatedTagsHtml = stats.topTags.slice(0, 5).map((t, i) => {
-                let displayTag = t.toUpperCase();
-                const modMatch = modifiersData.find(m => m.key.toLowerCase() === t.toLowerCase());
-                if (modMatch && modMatch[langKey]) displayTag = modMatch[langKey].toUpperCase();
-                return `<div style="font-size:${36 - i*4}px; font-weight:800; margin:10px 0; color:${i===0?'var(--accent)':'#fff'}; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">#${i+1} ${displayTag}</div>`;
-            }).join('');
-
-            slides.push(`
-                <div class="wrapped-slide" style="background:#111;">
-                    <div class="wrapped-sub-text" style="margin-bottom:40px; color:var(--text-secondary);">${t('obsess')}</div>
-                    ${translatedTagsHtml}
-                </div>
-            `);
-        }
-
-        // === СЛАЙД 6: ФИНАЛ (ОБНОВЛЕННЫЙ) ===
         const planColor = subscriptionLevel === 'free' ? '#fff' : '#9b59b6';
-        
-        // Определяем Топ Жанр
-        let topGenre = stats.topTags[0] ? stats.topTags[0].toUpperCase() : '---';
-        const genreMatch = modifiersData.find(m => m.key.toLowerCase() === topGenre.toLowerCase());
-        if (genreMatch && genreMatch[langKey]) topGenre = genreMatch[langKey].toUpperCase();
 
-        // Логотип
-        const currentThemeId = localStorage.getItem('xch_theme_id') || 'dark';
-        const logoSrc = getThemeLogoSrc(currentThemeId);
-
-        slides.push(`
+        const finalSlide = `
             <div class="wrapped-slide bg-dark">
                 <div class="sum-card-new" id="wrapped-summary-card">
-                    
                     <div class="sum-header">
                         <div class="sum-header-left">
                             <div class="sum-logo-row">
@@ -21318,7 +21293,7 @@
                     </div>
 
                     <div class="sum-grid" style="grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <!-- Ряд 1: Видео и Время -->
+                        <!-- Статистика -->
                         <div class="sum-stat-box">
                             <div class="sum-stat-val">${stats.watchCount}</div>
                             <div class="sum-stat-lbl">${t('sum_watch')}</div>
@@ -21327,8 +21302,7 @@
                             <div class="sum-stat-val">${Math.round(stats.totalWatchTime/60)}m</div>
                             <div class="sum-stat-lbl">${t('sum_time')}</div>
                         </div>
-
-                        <!-- Ряд 2: ПСИХОТИП (На всю ширину, заменяет лайки/дизлайки) -->
+                        <!-- Психотип -->
                         <div class="sum-stat-box" style="grid-column: 1 / -1; background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05)); border: 1px solid var(--accent); padding: 15px 10px;">
                             <div class="sum-stat-lbl" style="color:var(--accent); font-weight:800; letter-spacing:1px; margin-bottom:5px;">${t('sum_psycho')}</div>
                             <div style="font-size:22px; font-weight:900; color:#fff; text-transform:uppercase; line-height:1.1;">
@@ -21343,12 +21317,10 @@
                     <div style="text-align:center; margin-top:5px; border-top:1px solid rgba(255,255,255,0.1); padding-top:15px;">
                         <div class="sum-stat-lbl" style="margin-bottom:5px;">${t('top_genre')}</div>
                         <div style="font-size:24px; font-weight:900; color:var(--accent); letter-spacing:1px;">
-                            ${topGenre}
+                            ${topGenreTag}
                         </div>
                     </div>
                 </div>
-
-                <!-- Кнопки под карточкой -->
                 <div style="margin-top:30px; display:flex; gap:15px; align-items:center; z-index: 1000;">
                     <button onclick="closeWrapped()" class="btn-gen" style="width:auto; padding:12px 40px; font-size:16px; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); backdrop-filter:blur(10px);">
                         ${t('btn_done')}
@@ -21358,53 +21330,194 @@
                     </div>
                 </div>
             </div>
+        `;
+
+        // ============================================
+        // 2. СРЕДНИЕ СЛАЙДЫ (Для перемешивания)
+        // ============================================
+        const middleSlides = [];
+
+        // --- A. Слайд "Активность" (Actions vs Time) ---
+        // Показываем, если не Daily или если есть изменения
+        if (type !== 'daily' || Math.abs(stats.deltaActions) > 0) {
+            const getTrendHTML = (delta) => {
+                if (delta === 0) return `<span style="opacity:0.6">= ${t('cmp_same')}</span>`;
+                const isPos = delta > 0;
+                const color = isPos ? "#2ecc71" : "#e74c3c";
+                const sign = isPos ? "+" : "";
+                return `<span style="color:${color}">${sign}${delta}</span> <span style="opacity:0.6">vs prev</span>`;
+            };
+            const htmlActTrend = getTrendHTML(stats.deltaActions);
+            const htmlTimeTrend = getTrendHTML(Math.round(stats.deltaWatchTime/60));
+            let periodHeader = t('period_' + type) || t('since');
+
+            middleSlides.push(`
+                <div class="wrapped-slide bg-fire">
+                    <div class="wrapped-sub-text" style="text-transform:uppercase; letter-spacing:2px; font-size:14px; margin-bottom:40px; font-weight:800; color:rgba(255,255,255,0.9); border-bottom:1px solid rgba(255,255,255,0.3); padding-bottom:10px;">${periodHeader}</div>
+                    <div style="margin-bottom:50px; width:100%; display:flex; flex-direction:column; align-items:center;">
+                        <div class="wrapped-big-text count-anim" data-target="${stats.totalActions}" style="font-size:80px; margin-bottom:0; line-height:1;">0</div>
+                        <div class="wrapped-sub-text" style="font-weight:700; margin-bottom:10px;">${t('act')}</div>
+                        <div class="reveal-delayed delay-1500" style="background:rgba(0,0,0,0.3); padding:5px 15px; border-radius:20px; font-size:15px; font-weight:600; border:1px solid rgba(255,255,255,0.1);">${htmlActTrend}</div>
+                    </div>
+                    <div style="border-top:1px solid rgba(255,255,255,0.1); padding-top:40px; width:80%; display:flex; flex-direction:column; align-items:center;">
+                        <div class="wrapped-big-text" style="font-size:80px; margin-bottom:0; line-height:1;">
+                            <span class="count-anim" data-target="${Math.round(stats.totalWatchTime / 60)}">0</span><span style="font-size:30px">m</span>
+                        </div>
+                        <div class="wrapped-sub-text" style="font-weight:700; margin-bottom:10px;">${t('watch')}</div>
+                        <div class="reveal-delayed delay-1500" style="background:rgba(0,0,0,0.3); padding:5px 15px; border-radius:20px; font-size:15px; font-weight:600; border:1px solid rgba(255,255,255,0.1);">${htmlTimeTrend}</div>
+                    </div>
+                </div>
+            `);
+        }
+
+        // --- B. Слайд "Эволюция" (Evolution) ---
+        if (stats.prevTopTags && stats.prevTopTags.length > 0) {
+            const formatTag = (tag) => {
+                let display = tag.toUpperCase();
+                const m = modifiersData.find(x => x.key.toLowerCase() === tag.toLowerCase());
+                if(m && m[langKey]) display = m[langKey].toUpperCase();
+                return display;
+            };
+            const evoData = JSON.stringify({ 
+                prev: stats.prevTopTags.slice(0, 5).map(formatTag), 
+                curr: stats.topTags.slice(0, 5).map(formatTag) 
+            }).replace(/"/g, '&quot;');
+
+            middleSlides.push(`
+                <div class="wrapped-slide" style="background:linear-gradient(45deg, #1cb5e0 0%, #000851 100%);">
+                    <div class="wrapped-sub-text stagger-text stagger-delay-1" style="text-transform:uppercase; margin-bottom:10px;">${t('evol')}</div>
+                    <div class="wrapped-sub-text stagger-text stagger-delay-2" style="font-size:12px; opacity:0.6; margin-bottom:40px;">${t('evol_sub')}</div>
+                    <div class="evo-container" data-evo="${evoData}"></div>
+                </div>
+            `);
+        }
+
+        // --- C. Слайд "Радар" (Психотип) ---
+        const prevPsychoCounts = stats.prevPsychoCounts || {};
+        const radarSVG = createRadarChartSVG(stats.psychoCounts, prevPsychoCounts);
+        middleSlides.push(`
+            <div class="wrapped-slide" style="background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%); justify-content: flex-start; padding-top: 60px;">
+                <div class="wrapped-sub-text" style="text-transform:uppercase; margin-bottom:30px; font-weight:800; letter-spacing:1px;">${t('radar_title')}</div>
+                <div style="width:340px; height:340px; margin-bottom:30px; position:relative; flex-shrink:0;">${radarSVG}</div>
+                <div style="display:flex; gap:20px; font-size:12px; font-weight:600; margin-bottom:30px;">
+                    <div style="display:flex; align-items:center; gap:6px;"><div style="width:10px; height:10px; background:var(--accent); border-radius:50%;"></div><span style="color:var(--text-main)">${t('radar_curr')}</span></div>
+                    <div style="display:flex; align-items:center; gap:6px;"><div style="width:10px; height:10px; background:rgba(255,255,255,0.3); border:1px dashed #fff; border-radius:50%;"></div><span style="color:var(--text-secondary)">${t('radar_prev')}</span></div>
+                </div>
+                <div class="reveal-delayed delay-3000" style="text-align:center; width:90%; background:rgba(255,255,255,0.05); padding:20px; border-radius:20px; border:1px solid var(--accent); box-shadow: 0 0 30px rgba(255,0,204, 0.2);">
+                    <div style="font-size:12px; color:var(--text-secondary); text-transform:uppercase; margin-bottom:5px;">${t('sum_psycho')}</div>
+                    <div style="font-size:28px; font-weight:900; color:#fff; margin-bottom:5px; line-height:1.1; text-shadow: 0 0 10px var(--accent); text-transform:uppercase;">${psychoName}</div>
+                    <div style="font-size:13px; font-style:italic; opacity:0.8;">"${psychoDesc}"</div>
+                </div>
+            </div>
         `);
 
-        // Рендер прогресс-баров
+        // --- D. Слайд "ТОП ФЕТИШИ" (НОВЫЙ) ---
+        // Показываем только если НЕ Daily и есть данные
+        if (type !== 'daily' && stats.topFetishes && stats.topFetishes.length > 0) {
+            
+            let fetishesHTML = '';
+            stats.topFetishes.forEach((entry, index) => {
+                const rank = index + 1;
+                const item = entry.item; // Это реальный объект фетиша
+                const name = getLocalizedName(item); 
+                
+                // Получаем иконку: ищем первый тег предмета, для которого есть иконка
+                let iconSrc = 'logo_icon.png';
+                if (item.tags) {
+                    const iconTag = item.tags.find(t => TAG_ICONS[t]);
+                    if (iconTag) iconSrc = TAG_ICONS[iconTag][0];
+                }
+
+                if (rank === 1) {
+                    // ТОП-1: Особый стиль с маской-таймером
+                    fetishesHTML += `
+                        <div class="cat-rank-row rank-1" id="cat-rank-1">
+                            <!-- Маска таймера -->
+                            <div class="rank-1-mask" id="cat-mask">
+                                <div class="countdown-number" id="cat-countdown">3</div>
+                            </div>
+                            
+                            <!-- Скрытый контент -->
+                            <div class="cat-rank-num" style="color:#ffd700">#1</div>
+                            <img src="${iconSrc}" class="cat-rank-icon" style="filter:drop-shadow(0 0 5px gold);">
+                            <div class="cat-rank-name" style="color:#ffd700; font-size:18px;">${name}</div>
+                            <div class="cat-rank-score">🏆 WINNER</div>
+                        </div>
+                    `;
+                } else {
+                    // Места 2-5: Обычные строки
+                    // data-index не нужен, используем inline animation-delay
+                    const delay = (5 - index) * 0.1; // 0.4s, 0.3s...
+                    fetishesHTML += `
+                        <div class="cat-rank-row anim-list-item" style="animation-delay:${delay}s">
+                            <div class="cat-rank-num">#${rank}</div>
+                            <img src="${iconSrc}" class="cat-rank-icon">
+                            <div class="cat-rank-name">${name}</div>
+                            <div class="cat-rank-score">${entry.score} pts</div>
+                        </div>
+                    `;
+                }
+            });
+
+            const newSlide = `
+                <div class="wrapped-slide" style="background: linear-gradient(180deg, #141E30 0%, #243B55 100%);">
+                    <div class="wrapped-sub-text" style="margin-bottom:30px; font-weight:800; text-transform:uppercase; letter-spacing:1px;">
+                        ${t('top_fetishes_title')}
+                    </div>
+                    <div class="top-cats-container">
+                        ${fetishesHTML}
+                    </div>
+                </div>
+            `;
+            middleSlides.push(newSlide);
+        }
+
+        // ============================================
+        // 3. ПЕРЕМЕШИВАНИЕ И СБОРКА
+        // ============================================
+
+        // Перемешиваем средние слайды (Fisher-Yates)
+        for (let i = middleSlides.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [middleSlides[i], middleSlides[j]] = [middleSlides[j], middleSlides[i]];
+        }
+
+        // Собираем всё вместе
+        const allSlides = [introSlide, ...middleSlides, finalSlide];
+
+        // Генерируем HTML для прогресс-баров
         let barsHtml = '';
-        slides.forEach((_, i) => barsHtml += `<div class="wrapped-progress-bar"><div class="wrapped-progress-fill" id="bar-${i}"></div></div>`);
+        allSlides.forEach((_, i) => barsHtml += `<div class="wrapped-progress-bar"><div class="wrapped-progress-fill" id="bar-${i}"></div></div>`);
         
+        // Вставляем всё в DOM
         overlay.innerHTML = `
             <div class="wrapped-progress-container">${barsHtml}</div>
             <div class="wrapped-close" onclick="closeWrapped()">✕</div>
             <div class="wrapped-nav-area nav-left" onclick="prevSlide()"></div>
             <div class="wrapped-nav-area nav-right" onclick="nextSlide()"></div>
-            ${slides.join('')}
+            ${allSlides.join('')}
         `;
         
-        // Логика переключения
-        if (dataObj.viewed) {
-            currentSlideIndex = slides.length - 1;
-            // Если уже смотрели, сразу закрашиваем все бары
-            setTimeout(() => { 
-                for (let i = 0; i < slides.length; i++) { 
-                    const bar = document.getElementById('bar-' + i); 
-                    if(bar) { bar.style.width = '100%'; bar.style.transition = 'none'; }
-                } 
-            }, 50);
-        } else {
-            currentSlideIndex = 0;
-        }
+        // ============================================
+        // 4. ЗАПУСК
+        // ============================================
         
-        startSlideTimerNew(slides.length, 6000); 
+        // Инициализация
+        currentSlideIndex = 0;
+        startSlideTimerNew(allSlides.length, 6000); // 6 секунд на слайд
         
-        // Обработчики событий (пауза и клики)
-        const isInteractive = (e) => {
-            return e.target.closest('button') || 
-                e.target.closest('.wrapped-close') || 
-                e.target.closest('.btn-round-share') ||
-                e.target.closest('.wrapped-nav-area');
-        };
-
+        // Обработчики кликов/паузы
+        const isInteractive = (e) => e.target.closest('button') || e.target.closest('.wrapped-close') || e.target.closest('.btn-round-share') || e.target.closest('.wrapped-nav-area');
+        
         const handlePause = (e) => { 
-            if (isInteractive(e)) return;
+            if (isInteractive(e)) return; 
             if(e.cancelable) e.preventDefault(); 
             overlay.classList.add('paused'); 
             window.isWrappedPaused = true; 
         };
-
+        
         const handleResume = (e) => { 
-            if (isInteractive(e)) return;
+            if (isInteractive(e)) return; 
             if(e.cancelable) e.preventDefault(); 
             overlay.classList.remove('paused'); 
             window.isWrappedPaused = false; 
@@ -21416,12 +21529,17 @@
         overlay.addEventListener('touchend', handleResume, {passive: false});
         overlay.addEventListener('mouseleave', handleResume);
 
+        // Помечаем как просмотренное
         dataObj.viewed = true;
         localStorage.setItem('xch_wrapped_archive', JSON.stringify(wrappedArchive));
+        
+        // Обновляем бейдж в меню статистики
         openStatistics(); 
+        
+        // Показываем оверлей
         overlay.classList.add('active');
     }
-
+    
     // ТАЙМЕР (С поддержкой паузы)
     function startSlideTimerNew(total, duration = 6000) {
         clearInterval(slideInterval);
@@ -21518,6 +21636,39 @@
         if (evoContainer) {
             runEvolutionAnimation(evoContainer);
         }
+        // 4. АНИМАЦИЯ СПИСКА ФЕТИШЕЙ
+        const listItems = activeSlide.querySelectorAll('.anim-list-item');
+        listItems.forEach(el => {
+            el.classList.remove('visible');
+            void el.offsetWidth; 
+            setTimeout(() => el.classList.add('visible'), 100);
+        });
+
+        // 5. ТАЙМЕР ИНТРИГИ
+        const mask = activeSlide.querySelector('#cat-mask');
+        const countdownEl = activeSlide.querySelector('#cat-countdown');
+        const topRow = activeSlide.querySelector('#cat-rank-1');
+
+        if (mask && countdownEl) {
+            mask.classList.remove('revealed');
+            countdownEl.innerText = "3";
+            if(topRow) topRow.classList.remove('visible');
+
+            let count = 3;
+            const int = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    countdownEl.innerText = count;
+                    if(navigator.vibrate) navigator.vibrate(50);
+                } else {
+                    clearInterval(int);
+                    mask.classList.add('revealed');
+                    if(topRow) topRow.classList.add('visible');
+                    if(navigator.vibrate) navigator.vibrate([100, 50, 100]);
+                }
+            }, 800);
+        }
+
     }
 
     // Утилита для счета чисел
