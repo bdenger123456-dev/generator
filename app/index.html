@@ -3833,30 +3833,35 @@
         /* Базовый стиль чёлки */
         .card-notch {
             position: absolute;
-            top: 0;
+            top: 12px; /* Отступ от верхнего края карточки */
             left: 50%;
-            transform: translateX(-50%) translateY(-100%); /* Спрятана сверху */
+            /* В скрытом состоянии она чуть меньше и прозрачная */
+            transform: translateX(-50%) scale(0.8);
+            opacity: 0;
             
-            padding: 6px 16px;
-            border-radius: 0 0 14px 14px; /* Закругления только снизу */
+            padding: 4px 14px;
+            border-radius: 50px; /* Полная капсула */
             
-            font-size: 11px;
+            font-size: 10px; /* Чуть компактнее текст */
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
             color: #fff;
             
-            z-index: 40; /* Поверх бейджей */
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 40;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             
-            /* Пружинистая анимация появления */
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s;
-            pointer-events: none; /* Чтобы сквозь неё проходили клики */
+            /* Плавное появление (масштаб + прозрачность) */
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                        opacity 0.3s ease, 
+                        background-color 0.2s;
+            pointer-events: none;
         }
 
         /* Класс для показа чёлки */
         .card-notch.visible {
-            transform: translateX(-50%) translateY(0);
+            transform: translateX(-50%) scale(1);
+            opacity: 1;
         }
 
         /* --- ВАРИАНТ 1: WATCH LATER (Синий) --- */
@@ -3866,7 +3871,7 @@
         }
         .card.status-wl .card-notch {
             background: #3498db;
-            box-shadow: 0 5px 20px rgba(52, 152, 219, 0.4);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
         }
 
         /* --- ВАРИАНТ 2: FAVORITE (Зеленый) --- */
@@ -3876,7 +3881,7 @@
         }
         .card.status-fav .card-notch {
             background: #2ecc71;
-            box-shadow: 0 5px 20px rgba(46, 204, 113, 0.4);
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
         }
 
         /* --- ВАРИАНТ 3: DISLIKED (Красный) - на случай просмотра истории --- */
@@ -3886,7 +3891,7 @@
         }
         .card.status-ban .card-notch {
             background: #e74c3c;
-            box-shadow: 0 5px 20px rgba(231, 76, 60, 0.4);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
         }
 
         /* === 1. MODE CAPSULE (DROPDOWN STYLE) === */
