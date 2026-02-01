@@ -1364,17 +1364,13 @@
         .modal-header {
             display: flex !important;
             align-items: center !important;
-            justify-content: center !important; /* Заголовок по центру */
-            min-height: 60px !important;
-            padding: 15px 20px !important;
-            border-bottom: none !important;     /* Убираем разделитель */
+            justify-content: center !important; /* Заголовок остается по центру */
             position: relative !important;
-            
-            font-size: 18px !important;
-            font-weight: 800 !important;
-            color: var(--text-main) !important;
-            text-transform: uppercase !important;
+            min-height: 64px !important;
+            padding: 0 20px !important; /* Стандартный отступ окна */
         }
+
+
 
         /* Кнопка закрытия (Крестик) - Всегда справа */
         .modal-header > span:last-child {
@@ -5690,6 +5686,26 @@
             filter: invert(75%) sepia(26%) saturate(677%) hue-rotate(357deg) brightness(89%) contrast(88%) drop-shadow(0 2px 5px rgba(0,0,0,0.3)) !important;
         }
 
+        /* === СТИЛИ ДЛЯ РЕЖИМА ПАНИКИ (Green Theme) === */
+
+        /* Темная зеленая тема (По умолчанию в панике) -> Иконки БЕЛЫЕ */
+        body[data-theme="green-dark"] .settings-icon {
+            filter: invert(1);
+            opacity: 0.9;
+        }
+
+        /* Светлая зеленая тема -> Иконки ЧЕРНЫЕ */
+        body[data-theme="green-light"] .settings-icon {
+            filter: invert(0);
+            opacity: 0.7;
+        }
+
+        /* На всякий случай сбрасываем принудительные фильтры */
+        body[data-theme="green-dark"] .settings-icon,
+        body[data-theme="green-light"] .settings-icon {
+            transition: filter 0.3s ease;
+        }
+
         .genre-desc-box {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--border);
@@ -6266,6 +6282,95 @@
             0% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.2); opacity: 0.8; }
             100% { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-close-btn {
+            position: absolute !important;
+            left: 15px !important; /* На мобильных стрелка всегда слева */
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            z-index: 100 !important;
+            border: none !important;
+            background: transparent !important;
+        }
+
+        @media (min-width: 769px) {
+            .modal-close-btn {
+                width: 14px !important;
+                height: 14px !important;
+                background: #ff5f56 !important; /* Красная точка macOS */
+                border-radius: 50% !important;
+                left: 20px !important;
+            }
+            /* На ПК скрываем саму стрелку внутри красной точки */
+            .modal-close-icon {
+                display: none !important;
+            }
+
+            /* Символ крестика появляется только при наведении (эффект macOS) */
+            .modal-close-btn::after {
+                content: '×';
+                color: #4e0002;
+                font-size: 10px;
+                font-weight: 800;
+                opacity: 0;
+                transition: opacity 0.2s;
+                line-height: 1;
+            }
+            .modal-close-btn:hover::after {
+                opacity: 1;
+            }
+
+            .modal-close-btn:active {
+                filter: brightness(0.8);
+            }
+        }
+
+
+        .modal-close-btn:active {
+            background: rgba(142, 142, 147, 0.3);
+        }
+
+        /* Иконка стрелки для мобильных (CSS-рисованная или SVG) */
+        .modal-close-icon {
+            width: 10px;
+            height: 10px;
+            border-left: 2px solid var(--text-main);
+            border-bottom: 2px solid var(--text-main);
+            transform: rotate(45deg); 
+            display: block;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .modal-close-btn {
+                width: 36px !important;
+                height: 36px !important;
+                background: rgba(128, 128, 128, 0.15) !important; /* Круглый фон на мобильных */
+                border-radius: 50% !important;
+            }
+
+            .modal-close-icon {
+                width: 8px !important;
+                height: 8px !important;
+                border-top: 2px solid var(--text-main) !important;
+                border-left: 2px solid var(--text-main) !important;
+                /* Поворачиваем так, чтобы получилась стрелка влево */
+                transform: rotate(-45deg) !important; 
+                /* Оптическое центрирование (стрелки визуально кажутся правее, если их не сдвинуть чуть-чуть) */
+                margin-left: 2px !important; 
+                opacity: 0.8 !important;
+            }
+
+            .modal-close-btn:active {
+                transform: translateY(-50%) scale(0.9) !important;
+                background: rgba(128, 128, 128, 0.25) !important;
+            }
         }
 
         /* =========================================
@@ -7110,8 +7215,11 @@
 <div class="modal-overlay" id="modal-history-overlay" onclick="closeHistoryModal(event)">
     <div class="modal">
         <div class="modal-header">
+            <div class="modal-close-btn" onclick="closeHistoryModal(null, true)">
+                <div class="modal-close-icon"></div>
+            </div>
+            
             <span data-key="history_title">History</span>
-            <span onclick="closeHistoryModal(null, true)">✕</span>
         </div>
         
         <!-- Тело с контентом (скроллится) -->
@@ -7143,8 +7251,8 @@
 <div class="modal-overlay" id="modal-overlay" onclick="closeList(event)">
     <div class="modal">
         <div class="modal-header">
+            <div class="modal-close-btn" onclick="closeList(null, true)"><div class="modal-close-icon"></div></div>
             <span data-key="favorites_catalog">Liked</span>
-            <span onclick="closeList(null, true)">✕</span>
         </div>
         <div class="modal-body" id="modal-catalog-body">
             <!-- JS inserts content here -->
@@ -7156,8 +7264,8 @@
 <div class="modal-overlay" id="modal-blacklist-overlay" onclick="closeBlacklist(event)">
     <div class="modal">
         <div class="modal-header">
+            <div class="modal-close-btn" onclick="closeBlacklist(null, true)"><div class="modal-close-icon"></div></div>
             <span data-key="blacklist_catalog">Disliked</span>
-            <span onclick="closeBlacklist(null, true)">✕</span>
         </div>
         <div class="modal-body" id="modal-blacklist-body">
             <!-- JS inserts content here -->
@@ -7169,14 +7277,10 @@
 <div class="modal-overlay" id="modal-stats-overlay" onclick="closeStats(event)">
     <div class="modal">
         <div class="modal-header">
-            <!-- Заголовок по центру -->
+            <div class="modal-close-btn" onclick="closeStats(null, true)"><div class="modal-close-icon"></div></div>
             <span data-key="btn_stats">Statistics</span>
-            
-            <!-- Кнопка Share справа -->
             <div class="modal-header-actions">
-                <div class="icon-btn-round" onclick="shareStats()" title="Share">
-                    <img src="share.png" class="share-icon-img" alt="Share">
-                </div>
+                <div class="icon-btn-round" onclick="shareStats()"><img src="share.png" class="share-icon-img"></div>
             </div>
         </div>
 
@@ -7787,8 +7891,8 @@
 <div class="modal-overlay" id="modal-theme-overlay" onclick="closeThemeModal(event)">
     <div class="modal">
         <div class="modal-header">
+            <div class="modal-close-btn" onclick="closeThemeModal(null, true)"><div class="modal-close-icon"></div></div>
             <span data-key="theme_title">Choose Theme</span>
-            <span onclick="closeThemeModal(null, true)">✕</span>
         </div>
         
         <div class="modal-body">
@@ -7822,10 +7926,9 @@
 <div class="modal-overlay" id="modal-mods-overlay" onclick="closeModifiersSettings(event)">
     <div class="modal">
         <div class="modal-header">
+            <div class="modal-close-btn" onclick="closeModifiersSettings(null, true)"><div class="modal-close-icon"></div></div>
             <span data-key="mod_title">Modifiers</span>
-            <!-- Счетчик в углу заголовка -->
-            <span id="mods-counter" style="position: absolute; right: 50px; font-size:12px; color:var(--text-secondary); background:var(--ios-card); padding:2px 8px; border-radius:10px;">0/10</span>
-            <span onclick="closeModifiersSettings(null, true)">✕</span>
+            <span id="mods-counter" style="position: absolute; right: 20px; font-size:12px; color:var(--text-secondary);">0/10</span>
         </div>
         
         <div class="modal-body">
@@ -7854,8 +7957,8 @@
 <div class="modal-overlay" id="modal-legal-overlay" onclick="closeLegal(event)">
     <div class="modal">
         <div class="modal-header">
+            <div class="modal-close-btn" onclick="closeLegal(null, true)"><div class="modal-close-icon"></div></div>
             <span id="legal-modal-title">Document</span>
-            <span onclick="closeLegal(null, true)">✕</span>
         </div>
         
         <div class="modal-body">
@@ -7874,8 +7977,8 @@
 <div class="modal-overlay" id="modal-admin-overlay" onclick="closeAdminModal(event)">
     <div class="modal">
         <div class="modal-header">
-            <span style="color:#e74c3c;">Admin Control</span> 
-            <span onclick="closeAdminModal(null, true)">✕</span>
+            <div class="modal-close-btn" onclick="closeAdminModal(null, true)"><div class="modal-close-icon"></div></div>
+            <span style="color:#e74c3c;">Admin Control</span>
         </div>
 
         <div class="modal-body">
@@ -7946,6 +8049,7 @@
 <div class="modal-overlay" id="modal-install-overlay">
     <div class="modal">
         <div class="modal-header">
+            <div class="modal-close-btn" onclick="skipInstall()"><div class="modal-close-icon"></div></div>
             <span data-key="install_title">Install App</span>
         </div>
         
@@ -8000,8 +8104,8 @@
 <div class="modal-overlay" id="modal-login-overlay" onclick="closeLoginModal(event)">
     <div class="modal" style="max-width: 380px;">
         <div class="modal-header">
+            <div class="modal-close-btn" onclick="closeLoginModal(null, true)"><div class="modal-close-icon"></div></div>
             <span data-key="auth_title">Sync & Backup</span>
-            <span onclick="closeLoginModal(null, true)">✕</span>
         </div>
         
         <div class="modal-body">
@@ -8040,10 +8144,8 @@
 <div class="modal-overlay" id="modal-sync-info-overlay" onclick="closeSyncInfoModal(event)">
     <div class="modal">
         <div class="modal-header">
+            <div class="modal-close-btn" onclick="closeSyncInfoModal(null, true)"><div class="modal-close-icon"></div></div>
             <span data-key="sync_title">Cloud Storage</span>
-            <div class="modal-header-actions">
-                <div class="icon-btn-round" onclick="closeSyncInfoModal(null, true)">✕</div>
-            </div>
         </div>
         
         <div class="modal-body">
@@ -8136,8 +8238,8 @@
 <div class="modal-overlay" id="modal-roadmap-overlay" onclick="closeRoadmap(event)">
     <div class="modal">
         <div class="modal-header">
+            <div class="modal-close-btn" onclick="closeRoadmap(null, true)"><div class="modal-close-icon"></div></div>
             <span data-key="roadmap_title">Future Plans</span>
-            <span onclick="closeRoadmap(null, true)">✕</span>
         </div>
 
         <div class="modal-body">
@@ -8238,8 +8340,8 @@
 <div class="modal-overlay" id="modal-sponsors-overlay" onclick="closeSponsorsModal(event)">
     <div class="modal">
         <div class="modal-header">
+            <div class="modal-close-btn" onclick="closeSponsorsModal(null, true)"><div class="modal-close-icon"></div></div>
             <span data-key="sponsors_title">Early Sponsors</span>
-            <span onclick="closeSponsorsModal(null, true)">✕</span>
         </div>
         <div class="modal-body">
             <div style="text-align: center; color: var(--text-secondary); font-size: 13px; margin-bottom: 15px;" data-key="sponsors_desc">
@@ -8256,8 +8358,8 @@
     <div class="modal" style="text-align: center;">
         
         <div class="modal-header">
+            <div class="modal-close-btn" onclick="closeCryptoModal(null, true)"><div class="modal-close-icon"></div></div>
             <span data-key="pay_header">USDT Payment</span>
-            <span onclick="closeCryptoModal(null, true)">✕</span>
         </div>
 
         <div class="modal-body">
@@ -8370,8 +8472,8 @@
 <div class="modal-overlay" id="modal-panic-settings" onclick="closePanicSettings(event)">
     <div class="modal">
         <div class="modal-header">
+            <div class="modal-close-btn" onclick="closePanicSettings(null, true)"><div class="modal-close-icon"></div></div>
             <span data-key="panic_title">Emergency Mode</span>
-            <span onclick="closePanicSettings(null, true)">✕</span>
         </div>
         
         <div class="modal-body">
@@ -8431,8 +8533,8 @@
 <div class="modal-overlay" id="modal-tips-overlay" onclick="closeTipsModal(event)">
     <div class="modal">
         <div class="modal-header">
+            <div class="modal-close-btn" onclick="closeTipsModal(null, true)"><div class="modal-close-icon"></div></div>
             <span data-key="tips_title">Knowledge Base</span>
-            <span onclick="closeTipsModal(null, true)">✕</span>
         </div>
         
         <div class="modal-body" style="padding: 0 20px 30px 20px;">
@@ -8472,11 +8574,9 @@
 <div class="modal-overlay" id="modal-explored-overlay" onclick="closeExploredModal(event)">
     <div class="modal">
         <div class="modal-header" style="border-bottom: none; padding-bottom: 5px;">
-            <!-- Кнопка НАЗАД (появляется только в деталях) -->
-            <div id="explored-back-btn" onclick="backToExploredGrid()" style="position:absolute; left:15px; font-size:24px; cursor:pointer; display:none;">←</div>
-            
-            <span id="explored-modal-title" data-key="explored_label">Explored</span>
-            <span onclick="closeExploredModal(null, true)">✕</span>
+            <div class="modal-close-btn" id="explored-back-btn" onclick="backToExploredGrid()" style="display:none;"><div class="modal-close-icon"></div></div>
+            <div class="modal-close-btn" id="explored-main-close" onclick="closeExploredModal(null, true)"><div class="modal-close-icon"></div></div>
+            <span id="explored-modal-title" data-key="explored_label" style="margin-left: 40px;">Explored</span>
         </div>
         
         <div id="explored-subtitle" class="modal-subtitle" data-key="explored_subtitle" style="text-align: center; color: var(--text-secondary); font-size: 13px; padding: 0 20px 20px 20px; line-height: 1.4; font-weight: 500;">
@@ -8499,8 +8599,8 @@
 <div class="modal-overlay" id="modal-achievements-overlay" onclick="closeAchievementsModal(event)">
     <div class="modal">
         <div class="modal-header">
+            <div class="modal-close-btn" onclick="closeAchievementsModal(null, true)"><div class="modal-close-icon"></div></div>
             <span data-key="ach_title">Achievements</span>
-            <span onclick="closeAchievementsModal(null, true)">✕</span>
         </div>
         <div class="modal-body" style="padding: 15px;">
             <div id="achievements-grid" class="ach-grid">
@@ -8514,8 +8614,7 @@
 <div class="modal-overlay" id="modal-ach-detail-overlay" onclick="closeAchDetail(event)">
     <div class="modal" style="max-width: 340px; text-align:center;">
         <div class="modal-header" style="border:none;">
-            <span style="opacity:0;">.</span> <!-- Пустой заголовок для отступа -->
-            <span onclick="closeAchDetail(null, true)">✕</span>
+            <div class="modal-close-btn" onclick="closeAchDetail(null, true)"><div class="modal-close-icon"></div></div>
         </div>
         
         <div class="modal-body" style="padding-bottom:25px; display:flex; flex-direction:column; align-items:center;">
@@ -8544,7 +8643,6 @@
 <!-- LIMIT REACHED MODAL -->
 <div class="modal-overlay" id="modal-limit-overlay" onclick="closeLimitModal(event)">
     <div class="modal" style="max-width: 340px; text-align: center;">
-        <!-- Заголовок не нужен, используем крупную иконку -->
         <div class="modal-body" style="padding: 30px 20px 20px 20px; display: flex; flex-direction: column; align-items: center;">
             
             <div style="font-size: 50px; margin-bottom: 15px;">✋</div>
@@ -8580,8 +8678,8 @@
 <div class="modal-overlay" id="modal-changelog-overlay" onclick="closeChangelogModal(event)">
     <div class="modal">
         <div class="modal-header">
+            <div class="modal-close-btn" onclick="closeChangelogModal(null, true)"><div class="modal-close-icon"></div></div>
             <span data-key="changelog_title">What's New</span>
-            <span onclick="closeChangelogModal(null, true)">✕</span>
         </div>
         
         <div class="modal-body" id="changelog-container" style="padding: 20px 25px;">
@@ -13087,10 +13185,8 @@
 ];
     
     const TIPS_CATS = {
-        // Техническое: Приложение, оплата, баги, интерфейс, режимы
-        tech: ['install_guide', 'mods_guide', 'ads', 'video', 'pay', 'bug', 'panic', 'layout', 'modes', 'sites_guide'],
-        // Инфо: Алгоритмы, словари, психология, советы
-        info: ['algo_secrets', 'glossary', 'psychotypes', 'intensity']
+        tech: ['install_guide', 'mods_guide', 'ads', 'video', 'pay', 'bug', 'panic', 'layout', 'modes'],
+        info: ['sites_guide', 'algo_secrets', 'glossary', 'psychotypes', 'intensity']
     };
 
     // --- WRAPPED DATA & TEXTS ---
@@ -19704,7 +19800,26 @@
 
         // --- 2. ИЩЕМ НОВОЕ (Для режима Explore) ---
         if (typeof data !== 'undefined' && data.length > 0) {
-            const randomPool = data
+            
+            // ФИЛЬТРАЦИЯ ПО БЕЗОПАСНОСТИ
+            // Если интенсивность 1 (Safe) - убираем Spicy и Extreme
+            // Если интенсивность 2 (Spicy) - убираем Extreme
+            let safePool = data;
+
+            if (currentIntensity === 1) {
+                // Строгий фильтр для Safe Mode
+                safePool = data.filter(item => 
+                    !item.tags.some(t => EXTREME_TAGS.includes(t) || SPICY_TAGS.includes(t))
+                );
+            } else if (currentIntensity === 2) {
+                // Фильтр для Spicy Mode
+                safePool = data.filter(item => 
+                    !item.tags.some(t => EXTREME_TAGS.includes(t))
+                );
+            }
+
+            // Выбираем из безопасного пула
+            const randomPool = safePool
                 .sort(() => 0.5 - Math.random())
                 .slice(0, 50)
                 .filter(item => 
@@ -19717,6 +19832,10 @@
                 const randomNewItem = randomPool[0];
                 newName = getLocalizedName(randomNewItem);
                 suggestedNewId = randomNewItem.id; // СОХРАНЯЕМ ID
+            } else {
+                // Если вдруг ничего не нашлось (слишком жесткие фильтры), берем нейтральное
+                newName = "Vanilla";
+                suggestedNewId = null; // Сброс ID, чтобы открылся просто рандом
             }
         }
 
@@ -20337,6 +20456,13 @@
         
         document.getElementById('ai-input').value = '';
         document.getElementById('btn-ai-go').classList.remove('visible');
+    }
+
+    function closeAllModals() {
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.classList.remove('open');
+        });
+        document.body.classList.remove('modal-open');
     }
 
     function toggleVoiceInput() {
@@ -21918,6 +22044,7 @@
     let isPanicMode = false;
     let lastTapTime = 0;
     let lastEscTime = 0;
+    let prePanicSnapshot = null;
 
     // Инициализация тумблера при загрузке
     document.addEventListener("DOMContentLoaded", () => {
@@ -21943,6 +22070,113 @@
     ];
 
     // --- ФУНКЦИИ УПРАВЛЕНИЯ НАСТРОЙКАМИ ---
+
+    function updateSafeSettings(isSafe) {
+        const t = langData[currentLang] || langData['en'];
+        
+        // В карте настроек добавляем флаг isSpecial: true только для Интенсивности
+        const settingsMap = [
+                { 
+                    key: 'site_label', 
+                    safeTxt: 'safe_label_site', 
+                    normalIcon: 'site.png', 
+                    safeIcon: 'watched-later.png' 
+                },
+                { 
+                    key: 'ori_label', 
+                    safeTxt: 'safe_label_ori', 
+                    normalIcon: 'orientation.png', 
+                    safeIcon: 'roadmap.png'
+                },
+                { 
+                    key: 'exploration_mode', 
+                    safeTxt: 'safe_label_int', 
+                    normalIcon: null, 
+                    safeIcon: 'plan.png',
+                    isSpecial: true // <--- ВАЖНЫЙ ФЛАГ: Это строка Интенсивности
+                },
+                { 
+                    key: 'deco_label', 
+                    safeTxt: 'deco_label', 
+                    normalIcon: 'deco.png', 
+                    safeIcon: 'funny_deco.png'
+                },
+                { 
+                    key: 'lang_label', 
+                    safeTxt: 'lang_label', 
+                    normalIcon: 'language.png', 
+                    safeIcon: 'site.png'
+                }
+            ];
+
+        settingsMap.forEach(item => {
+            const textEl = document.querySelector(`[data-key="${item.key}"]`);
+            if (!textEl) return;
+
+            const parent = textEl.closest('.ios-row-left');
+            const img = parent ? parent.querySelector('img.settings-icon') : null;
+
+            if (isSafe) {
+                // === РЕЖИМ ПАНИКИ (ВКЛЮЧЕН) ===
+                
+                // 1. Меняем текст
+                if (item.safeTxt && t[item.safeTxt]) {
+                    textEl.innerText = t[item.safeTxt];
+                } else if (item.key === 'deco_label') {
+                    textEl.innerText = (currentLang === 'ru') ? "Интерфейс" : "Interface";
+                }
+
+                // 2. Меняем иконку
+                if (img && item.safeIcon) {
+                    img.src = item.safeIcon;
+                    
+                    // Сброс старых стилей (фильтры, трансформации)
+                    img.removeAttribute('style');
+
+                    // Базовые размеры
+                    img.style.width = "24px";
+                    img.style.height = "24px";
+                    img.style.objectFit = "contain";
+                    img.style.opacity = "0.9";
+                    
+                    // --- ИСПРАВЛЕНИЕ ОТСТУПОВ ---
+                    if (item.isSpecial) {
+                        // Для Интенсивности (Сложность):
+                        // Иконка лежит внутри div-контейнера, который уже имеет отступ.
+                        // Самой иконке отступы НЕ нужны, чтобы она стояла по центру контейнера.
+                        img.style.margin = "0px"; 
+                    } else {
+                        // Для Ориентации и остальных:
+                        // Иконка лежит прямо рядом с текстом. 
+                        // Ей НУЖЕН отступ справа, иначе она прилипнет или уедет влево.
+                        img.style.marginRight = "12px";
+                        img.style.marginLeft = "0px";
+                    }
+                }
+
+            } else {
+                // === ОБЫЧНЫЙ РЕЖИМ (ВЫКЛЮЧЕН) ===
+                
+                // 1. Возврат текста
+                if (t[item.key]) {
+                    textEl.innerText = t[item.key];
+                }
+
+                // 2. Возврат иконки
+                if (img) {
+                    if (item.key === 'exploration_mode') {
+                        // Интенсивность восстанавливается своей функцией (вернет слайдер/цвета)
+                        updateIntensity(currentIntensity);
+                    } 
+                    else if (item.normalIcon) {
+                        img.src = item.normalIcon;
+                        // Удаляем инлайн стили, чтобы вернулись стили из CSS-класса (.settings-icon)
+                        img.removeAttribute('style'); 
+                    }
+                }
+            }
+        });
+    }
 
     function openPanicSettings() {
         const modal = document.getElementById('modal-panic-settings');
@@ -22040,6 +22274,25 @@
         modal.classList.add('open');
     }
 
+    function getSafeItem() {
+        const langKey = ['en', 'ru', 'es', 'de'].includes(currentLang) ? currentLang : 'en';
+        const task = SAFE_TASKS[Math.floor(Math.random() * SAFE_TASKS.length)][langKey];
+        
+        return {
+            id: 'safe_' + Date.now(),
+            name: task.name,
+            name_ru: task.name, 
+            name_es: task.name,
+            name_de: task.name,
+            desc_en: task.desc,
+            desc_ru: task.desc,
+            desc_es: task.desc,
+            desc_de: task.desc,
+            tags: task.tags || ["Relax", "Safe"], // Теги для пузырьков
+            isPanicItem: true
+        };
+    }
+
     function closePanicSettings(e, force) {
         if (force || e.target.id === 'modal-panic-settings') {
             document.getElementById('modal-panic-settings').classList.remove('open');
@@ -22063,175 +22316,243 @@
         isPanicMode = !isPanicMode;
         
         const t = langData[currentLang] || langData['en'];
-        const langKey = ['en', 'ru', 'es', 'de'].includes(currentLang) ? currentLang : 'en';
         
+        // Элементы
         const logoTextDivs = document.querySelectorAll('.logo');
         const decoIcons = document.querySelectorAll('.deco-icon');
         const subtitles = document.querySelectorAll('.subtitle');
         const startBtnContainer = document.getElementById('start-btn-container');
+        
+        // Элементы карточки
+        const reel = document.getElementById('slot-reel');
+        const descEl = document.getElementById('result-desc');
+        const badgeWrap = document.getElementById('badge-wrapper');
         const relatedBlock = document.getElementById('related-block');
-        const relatedTitle = relatedBlock ? relatedBlock.querySelector('.related-title') : null;
+        const startOverlay = document.getElementById('mode-start-overlay');
+        const statusEl = document.getElementById('status-text');
 
-        const unsafeElements = [
-            document.getElementById('badge-wrapper'),
+        const uiToHide = [
+            document.getElementById('tinder-controls'),
             document.getElementById('mods-block'),
-            document.getElementById('mode-start-overlay'),
-            document.querySelector('.card-notch')
+            document.getElementById('card-notch')
         ];
 
         if (isPanicMode) {
-            // === 🚨 ВКЛЮЧЕНИЕ ПАНИКИ ===
+            // === 🚨 ВХОД В ПАНИКУ ===
             console.log("⚠️ PANIC MODE ACTIVATED");
 
+            // 1. Сохраняем состояние
+            prePanicSnapshot = {
+                currentItem: currentItem, // Сохраняем настоящий предмет!
+                titleHTML: reel.innerHTML,
+                descText: descEl.innerText,
+                descDisplay: descEl.style.display,
+                badgeHTML: badgeWrap.innerHTML,
+                wasStartScreen: !startOverlay.classList.contains('hidden'),
+                relatedDisplay: relatedBlock ? relatedBlock.style.display : 'none',
+                cardClasses: document.getElementById('card-block').className,
+                wasStartBtnVisible: startBtnContainer && !startBtnContainer.classList.contains('hidden-initial') && startBtnContainer.style.display !== 'none',
+                oldStatusText: statusEl ? statusEl.innerText : '',
+                oldStatusColor: statusEl ? statusEl.style.color : ''
+            };
+
+            // 2. Тема и Декор
             const isLight = document.body.classList.contains('light-theme');
             applyTheme(isLight ? 'green-light' : 'green-dark');
-
             decoIcons.forEach(el => el.style.display = 'none');
 
+            // 3. Логотип
             logoTextDivs.forEach(div => {
                 div.innerHTML = `<img src="funny_icon.png" class="logo-img" alt="F" style="height:45px; margin-right:5px;">FunnyHub`;
             });
+            subtitles.forEach(el => el.innerText = t.safe_subtitle || "Your safe place");
 
-            subtitles.forEach(el => el.innerText = t.safe_subtitle);
-
-            unsafeElements.forEach(el => {
-                if(el) { el.classList.add('panic-hidden'); el.style.setProperty('display', 'none', 'important'); }
+            // 4. Скрываем "опасный" UI
+            startOverlay.classList.add('hidden');
+            startOverlay.style.display = 'none';
+            
+            uiToHide.forEach(el => {
+                if(el) {
+                    el.classList.add('panic-hidden-temp');
+                    el.style.display = 'none';
+                }
             });
+            badgeWrap.innerHTML = '';
 
-            const controls = document.getElementById('tinder-controls');
-            if(controls) {
-                controls.classList.remove('hidden-initial');
-                controls.style.display = 'flex';
+            // 5. ПОДМЕНА КАРТОЧКИ И ОБЪЕКТА
+            const safeItem = getSafeItem();
+            currentItem = safeItem; // <-- ВАЖНО: Подменяем глобальный предмет
+
+            reel.innerHTML = `<div class="slot-item" style="font-size: 32px; font-weight: 800; color: var(--text-main);">${safeItem.name}</div>`;
+            if(descEl) {
+                descEl.style.display = 'block';
+                descEl.innerText = safeItem.desc_en; // или соответствующий язык из safeItem
+                descEl.style.color = "var(--text-secondary)";
+            }
+            
+            const card = document.getElementById('card-block');
+            if(card) card.className = 'card has-results';
+
+            // 6. ОТРИСОВКА БЕЗОПАСНЫХ "ПОХОЖИХ"
+            // Теперь renderRelatedItems увидит safeItem.tags (Кухня, Уборка)
+            if (relatedBlock) {
+                relatedBlock.style.display = 'flex'; // Показываем блок
+                renderRelatedItems(); // Перерисовываем теги
             }
 
+            // 7. Фраза сверху
+            if (statusEl) {
+                const safePhrases = t.panic_active_phrases || ["Nothing suspicious here 😇"];
+                statusEl.innerText = safePhrases[Math.floor(Math.random() * safePhrases.length)];
+                statusEl.style.color = "var(--text-secondary)";
+                statusEl.style.opacity = "1";
+            }
+
+            // 8. Кнопка выхода
             if (startBtnContainer) {
                 startBtnContainer.classList.remove('hidden-initial');
                 startBtnContainer.style.display = 'flex';
                 startBtnContainer.innerHTML = `
-                    <button class="btn-start-capsule" onclick="startGeneration('random')" style="background: linear-gradient(to right, #2ecc71, #27ae60); box-shadow: 0 10px 40px -5px #2ecc71;">
-                        <span style="font-size:20px; margin-right:8px;">🥗</span> ${t.safe_btn_start}
-                    </button>`;
+                    <button class="btn-start-capsule" onclick="togglePanicMode()" style="background: linear-gradient(to right, #2ecc71, #27ae60); box-shadow: 0 10px 40px -5px #2ecc71;">
+                        <span style="font-size:20px; margin-right:8px;">🧘</span>
+                        <span>${t.safe_btn_start || "Start Hobby"}</span>
+                    </button>
+                `;
             }
 
-            if (relatedTitle) {
-                relatedTitle.innerText = (langKey === 'ru') ? "Похожие хобби:" : "Similar hobbies:";
-            }
-
-            if (!currentItem || !currentItem.isPanicItem) {
-                generatePanicCard();
-            }
+            updateSafeSettings(true);
 
         } else {
-            // === ✅ ВЫКЛЮЧЕНИЕ ПАНИКИ (ВОЗВРАТ) ===
+            // === ✅ ВЫХОД ИЗ ПАНИКИ ===
             console.log("✅ PANIC MODE DEACTIVATED");
 
-            // 1. ВОЗВРАТ ТЕМЫ
-            // Берем сохраненный ID темы
             const themeToRestore = savedSettingsState.themeId || 'dark';
-            
-            // Применяем тему
             applyTheme(themeToRestore);
             
-            // Если пользователь бесплатный, а тема почему-то восстановилась премиумная, сбрасываем
-            const restoredThemeObj = APP_THEMES.find(th => th.id === themeToRestore);
-            if (subscriptionLevel === 'free' && restoredThemeObj && restoredThemeObj.type === 'pro') {
+            if (subscriptionLevel === 'free' && APP_THEMES.find(th => th.id === themeToRestore)?.type === 'pro') {
                 applyTheme('dark');
             }
 
-            // Возвращаем декорации
             decoIcons.forEach(el => el.style.display = '');
-
             const iconSrc = getThemeLogoSrc(themeToRestore);
-
-            // И вставляем эту картинку в HTML
             logoTextDivs.forEach(div => {
                 div.innerHTML = `<img src="${iconSrc}" alt="X" class="logo-img">x<span>Fetish</span>Hub`;
             });
-
             subtitles.forEach(el => el.innerText = t.subtitle);
 
-            if (startBtnContainer) {
-                if (sessionHistoryStack.length > 0) {
-                    startBtnContainer.style.display = 'none';
+            if (prePanicSnapshot) {
+                // ВОЗВРАЩАЕМ НАСТОЯЩИЙ ПРЕДМЕТ
+                currentItem = prePanicSnapshot.currentItem;
+
+                // Восстановление контента
+                reel.innerHTML = prePanicSnapshot.titleHTML;
+                if(descEl) {
+                    descEl.innerText = prePanicSnapshot.descText;
+                    descEl.style.display = prePanicSnapshot.descDisplay;
+                }
+                if(badgeWrap) badgeWrap.innerHTML = prePanicSnapshot.badgeHTML;
+                
+                const card = document.getElementById('card-block');
+                if(card) card.className = prePanicSnapshot.cardClasses;
+
+                document.querySelectorAll('.panic-hidden-temp').forEach(el => {
+                    el.classList.remove('panic-hidden-temp');
+                    el.style.display = '';
+                });
+
+                // Восстанавливаем блок "Похожее"
+                if(relatedBlock) {
+                    relatedBlock.style.display = prePanicSnapshot.relatedDisplay;
+                    // Если блок был видим, нужно перерисовать НАСТОЯЩИЕ похожие
+                    if (prePanicSnapshot.relatedDisplay !== 'none' && currentItem) {
+                        renderRelatedItems();
+                    }
+                }
+
+                // Восстановление кнопки
+                if (startBtnContainer) {
+                    startBtnContainer.innerHTML = `
+                        <button class="btn-start-capsule" onclick="startNewSession()">
+                            🔥 <span data-key="btn_start">${t.btn_start}</span>
+                        </button>
+                    `;
+                    if (!prePanicSnapshot.wasStartBtnVisible && !prePanicSnapshot.wasStartScreen) {
+                        startBtnContainer.style.display = 'none';
+                        startBtnContainer.classList.add('hidden-initial');
+                    } else if (prePanicSnapshot.wasStartScreen) {
+                        startBtnContainer.style.display = 'none';
+                        startBtnContainer.classList.add('hidden-initial');
+                    } else {
+                        startBtnContainer.style.display = 'flex';
+                        startBtnContainer.classList.remove('hidden-initial');
+                    }
+                }
+
+                // Восстановление экранов
+                if (prePanicSnapshot.wasStartScreen) {
+                    startOverlay.classList.remove('hidden');
+                    startOverlay.style.display = 'flex';
+                    const controls = document.getElementById('tinder-controls');
+                    if(controls) controls.style.display = 'none';
+                    const mods = document.getElementById('mods-block');
+                    if(mods) mods.style.display = 'none';
+                    randomizeModeGreeting();
                 } else {
-                    startBtnContainer.innerHTML = `<button class="btn-start-capsule" onclick="startNewSession()">🔥 <span data-key="btn_start">${t.btn_start}</span></button>`;
+                    startOverlay.classList.add('hidden');
+                    startOverlay.style.display = 'none';
+                    updateCardStatusVisuals();
+                }
+
+                // Восстановление фразы
+                if (statusEl) {
+                    const phrases = t.post_panic_phrases || ["That was close..."];
+                    statusEl.innerText = phrases[Math.floor(Math.random() * phrases.length)];
+                    statusEl.style.color = "var(--text-secondary)";
+                    
+                    if (!prePanicSnapshot.wasStartScreen) {
+                        setTimeout(() => {
+                            if (!isPanicMode) {
+                                statusEl.style.transition = "opacity 0.3s";
+                                statusEl.style.opacity = "0";
+                                setTimeout(() => {
+                                    statusEl.innerText = prePanicSnapshot.oldStatusText;
+                                    statusEl.style.color = prePanicSnapshot.oldStatusColor;
+                                    statusEl.style.opacity = "1";
+                                }, 300);
+                            }
+                        }, 1500);
+                    }
                 }
             }
 
-            unsafeElements.forEach(el => { 
-                if(el) { el.classList.remove('panic-hidden'); el.style.display = ''; } 
-            });
-
-            if (relatedTitle) relatedTitle.innerText = t.related_header;
-
-            const phrases = t.post_panic_phrases || ["That was close..."];
-            const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
-            
-            resetToHome();
-            setTimeout(() => {
-                const statusEl = document.getElementById('status-text');
-                if(statusEl) {
-                    statusEl.innerText = randomPhrase;
-                    statusEl.style.color = "var(--text-secondary)";
-                    statusEl.style.opacity = "1";
-                }
-            }, 400);
+            updateSafeSettings(false);
         }
     }
 
     function generatePanicCard(direction = 'next') {
-        const langKey = ['en', 'ru', 'es', 'de'].includes(currentLang) ? currentLang : 'en';
+        // Эта функция вызывается при клике на теги "Похожее" внутри паники
         
-        // Берем случайное задание
-        const task = SAFE_TASKS[Math.floor(Math.random() * SAFE_TASKS.length)][langKey];
+        // 1. Генерируем новый безопасный объект
+        const safeItem = getSafeItem();
+        currentItem = safeItem;
+
+        // 2. Мгновенно обновляем UI
+        const reel = document.getElementById('slot-reel');
+        const descEl = document.getElementById('result-desc');
         
-        // Создаем фейковый объект Item
-        const fakeItem = {
-            id: 'safe_' + Date.now(),
-            name: task.name,
-            name_ru: task.name, 
-            name_es: task.name,
-            name_de: task.name,
-            
-            // Описание
-            desc_en: task.desc,
-            desc_ru: task.desc,
-            desc_es: task.desc,
-            desc_de: task.desc,
-            
-            tags: task.tags || [],
-            isPanicItem: true // Флаг, чтобы отличать
-        };
+        reel.innerHTML = `<div class="slot-item" style="font-size: 32px; font-weight: 800; color: var(--text-main);">${safeItem.name}</div>`;
+        if(descEl) {
+            descEl.innerText = safeItem.desc_en; 
+            if (currentLang === 'ru') descEl.innerText = safeItem.desc_ru;
+            else if (currentLang === 'es') descEl.innerText = safeItem.desc_es;
+            else if (currentLang === 'de') descEl.innerText = safeItem.desc_de;
+        }
 
-        // Запускаем стандартную анимацию смены карточки
-        isGenerating = true;
+        // 3. Обновляем теги внизу
+        renderRelatedItems();
         
-        // Скрываем кнопку старта, если это первый клик
-        const startBtn = document.getElementById('start-btn-container');
-        if(startBtn) startBtn.style.display = 'none';
-
-        // Анимация вылета старой
-        const wrapper = document.getElementById('card-anim-wrapper');
-        if(wrapper) wrapper.style.opacity = '0';
-
-        setTimeout(() => {
-            // Вызываем финиш, но в режиме "panic"
-            finishGeneration(fakeItem, 'panic');
-            
-            if(wrapper) {
-                wrapper.style.transform = '';
-                void wrapper.offsetWidth; 
-                wrapper.style.opacity = '1';
-                
-                // Анимация влета
-                const animClass = (direction === 'dislike' || direction === 'entry-right') ? 'anim-fly-right' : 'anim-fly-left';
-                wrapper.classList.add(animClass);
-                
-                setTimeout(() => {
-                    wrapper.classList.remove('anim-fly-right', 'anim-fly-left');
-                }, 800);
-            }
-        }, 300); // Короткая задержка для смены
+        // 4. Вибрация (для ощущения смены)
+        if(navigator.vibrate) navigator.vibrate(10);
     }
 
     // Сохранение режима двойного нажатия
