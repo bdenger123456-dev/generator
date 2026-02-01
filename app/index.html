@@ -8015,69 +8015,70 @@
     <div class="modal">
         <div class="modal-header">
             <div class="modal-close-btn" onclick="closeAdminModal(null, true)"><div class="modal-close-icon"></div></div>
-            <span style="color:#e74c3c;">Admin Control</span>
+            <span style="color:#e74c3c;">Админ Панель</span>
         </div>
 
         <div class="modal-body">
             
-            <!-- Generate Code -->
+            <!-- 1. ВЫДАЧА ПОДПИСКИ (GIFT) -->
             <div class="ios-group" style="padding:15px; margin-bottom: 20px;">
-                <div style="font-weight:700; margin-bottom:10px; font-size:12px; text-transform:uppercase; color:var(--text-secondary);">Promo Generator</div>
-                <div style="display:flex; gap:10px; margin-bottom:10px;">
-                    <select id="admin-code-type" class="promo-input" style="flex:1;">
-                        <option value="pro">Pro</option>
-                        <option value="beast">Beast</option>
-                        <option value="bestie">Bestie</option>
-                    </select>
-                    <input type="number" id="admin-code-days" class="promo-input" style="width:80px;" value="30">
+                <div style="font-weight:700; margin-bottom:10px; font-size:12px; text-transform:uppercase; color:var(--text-secondary);">
+                    🎁 Выдать подписку
                 </div>
-                <button class="btn-gen secondary" onclick="adminGenerateCode()" style="padding:10px; font-size:14px;">Create Code</button>
-                <div id="admin-code-result" style="margin-top:15px; font-family:monospace; font-size:16px; color:#2ecc71; text-align:center; font-weight:800; min-height:20px;"></div>
-            </div>
-
-            <!-- Gift Sub -->
-            <div class="ios-group" style="padding:15px;">
-                <div style="font-weight:700; margin-bottom:10px; font-size:12px; text-transform:uppercase; color:var(--text-secondary);">Gift via Email</div>
-                <input type="text" id="admin-gift-email" class="promo-input" placeholder="User Email..." style="margin-bottom:10px;">
+                
+                <input type="text" id="admin-gift-email" class="promo-input" placeholder="Email или просто ник..." style="margin-bottom:10px; width: 100%;">
                 
                 <div style="display:flex; gap:10px; margin-bottom:10px;">
                     <select id="admin-gift-type" class="promo-input" style="flex:1;">
                         <option value="pro">Pro</option>
                         <option value="beast">Beast</option>
+                        <option value="bestie">Bestie</option>
                     </select>
-                    <input type="number" id="admin-gift-days" class="promo-input" style="width:80px;" value="30">
+                    <input type="number" id="admin-gift-days" class="promo-input" style="width:80px;" value="30" placeholder="Дней">
                 </div>
                 
-                <button class="btn-gen" onclick="adminGiftSub()" style="padding:10px; font-size:14px; background:var(--accent); color:#000;">Activate</button>
+                <button class="btn-gen" onclick="adminGiftSub()" style="padding:10px; font-size:14px; background:var(--accent); color:#000;">
+                    Активировать
+                </button>
             </div>
 
-            <!-- Discount Control -->
-            <div class="ios-group" style="padding:15px; margin-bottom: 20px; border: 1px solid var(--accent);">
-                <div style="font-weight:700; margin-bottom:10px; font-size:12px; text-transform:uppercase; color:var(--accent);">⚡ Manage Discounts</div>
+            <!-- 2. УПРАВЛЕНИЕ СКИДКАМИ (DISCOUNT) -->
+            <div class="ios-group" style="padding:15px; border: 1px solid rgba(255,255,255,0.1);">
+                <div style="font-weight:700; margin-bottom:15px; font-size:12px; text-transform:uppercase; color:var(--highlight-green);">
+                    ⚡ Активная Скидка
+                </div>
                 
+                <!-- Ряд 1: Цель и Тип -->
                 <div style="display:flex; gap:10px; margin-bottom:10px;">
-                    <select id="admin-disc-target" class="promo-input" style="flex:1;">
-                        <option value="all">All Plans</option>
-                        <option value="pro">Pro Only</option>
-                        <option value="beast">Beast Only</option>
-                        <option value="bestie">Bestie Only</option>
+                    <select id="admin-disc-target" class="promo-input" style="flex:1.5;">
+                        <option value="all">Все планы</option>
+                        <option value="pro">Только Pro</option>
+                        <option value="beast">Только Beast</option>
+                        <option value="bestie">Только Bestie</option>
                     </select>
-                    <select id="admin-disc-type" class="promo-input" style="width:100px;">
-                        <option value="percent">Percent %</option>
-                        <option value="fixed">Fixed $</option>
+                    <select id="admin-disc-type" class="promo-input" style="flex:1;">
+                        <option value="percent">Процент %</option>
+                        <option value="fixed">Фикс $</option>
                     </select>
                 </div>
 
-                <div style="display:flex; gap:10px; margin-bottom:10px;">
-                    <input type="number" id="admin-disc-value" class="promo-input" placeholder="Value (e.g. 50 or 2.99)" style="flex:1;">
-                    <input type="number" id="admin-disc-days" class="promo-input" placeholder="Days" value="3" style="width:80px;">
+                <!-- Ряд 2: Значение и Дни -->
+                <div style="display:flex; gap:10px; margin-bottom:15px;">
+                    <input type="number" id="admin-disc-value" class="promo-input" placeholder="Сумма (напр. 2.99)" style="flex:1;">
+                    <input type="number" id="admin-disc-days" class="promo-input" placeholder="Дней" value="3" style="width:80px;">
                 </div>
 
+                <!-- Ряд 3: Кнопки -->
                 <div style="display:flex; gap:10px;">
-                    <button class="btn-gen" onclick="adminSetDiscount()" style="font-size:13px; background:var(--highlight-green); color:#fff;">Apply</button>
-                    <button class="btn-gen secondary" onclick="adminRemoveDiscount()" style="font-size:13px; color:var(--highlight-red); border-color:var(--highlight-red);">Stop</button>
+                    <button class="btn-gen" onclick="adminSetDiscount()" style="font-size:13px; background:var(--highlight-green); color:#fff; flex:1;">
+                        Запустить
+                    </button>
+                    <button class="btn-gen secondary" onclick="adminRemoveDiscount()" style="font-size:13px; color:var(--highlight-red); border-color:var(--highlight-red); flex:1;">
+                        Отключить
+                    </button>
                 </div>
             </div>
+
         </div>
     </div>
 </div>
@@ -9380,46 +9381,29 @@
         }
     });
     
-    // 2. Генерация промокода
-    window.adminGenerateCode = async function() {
-        const user = auth.currentUser;
-        if (!user || user.uid !== ADMIN_UID) return;
-
-        const type = document.getElementById('admin-code-type').value;
-        const days = parseInt(document.getElementById('admin-code-days').value);
-        
-        // Генерируем читаемый код (XF-TYPE-XXXX)
-        const randomPart = Math.random().toString(36).substr(2, 5).toUpperCase();
-        const code = `XF-${type.toUpperCase()}-${randomPart}`;
-
-        try {
-            await setDoc(doc(db, "promocodes", code), {
-                active: true,
-                type: type,
-                days: days,
-                createdAt: serverTimestamp(),
-                createdBy: "admin_ui"
-            });
-            document.getElementById('admin-code-result').innerText = code;
-            alert(`Code created: ${code}`);
-        } catch (e) {
-            alert("Error: " + e.message);
-        }
-    };
-
-    // 3. Выдача подписки по Email
+    // 2. Выдача подписки по Email
     window.adminGiftSub = async function() {
         const user = auth.currentUser;
         if (!user || user.uid !== ADMIN_UID) return;
 
-        const targetEmail = document.getElementById('admin-gift-email').value.trim();
+        const emailInput = document.getElementById('admin-gift-email');
+        let targetEmail = emailInput.value.trim();
         const type = document.getElementById('admin-gift-type').value;
         const days = parseInt(document.getElementById('admin-gift-days').value);
 
-        if (!targetEmail) { alert("Enter email!"); return; }
+        if (!targetEmail) { alert("Введите email или ник!"); return; }
+
+        // --- ЛОГИКА ДОБАВЛЕНИЯ @GMAIL.COM ---
+        // Если в строке нет собаки (@), считаем это ником и добавляем домен
+        if (!targetEmail.includes('@')) {
+            targetEmail += '@gmail.com';
+            // Обновляем поле, чтобы админ видел, что произошло
+            emailInput.value = targetEmail; 
+        }
 
         const btn = event.target;
-        btn.innerText = "Searching...";
+        const oldText = btn.innerText;
+        btn.innerText = "Поиск...";
         btn.disabled = true;
 
         try {
@@ -9429,9 +9413,7 @@
             const querySnapshot = await getDocs(q);
 
             if (querySnapshot.empty) {
-                alert("User not found in Database. Ask them to Login/Sync first.");
-                btn.innerText = "Activate Sub";
-                btn.disabled = false;
+                alert(`Пользователь ${targetEmail} не найден в базе.\nПусть сначала нажмет 'Синхронизация'.`);
                 return;
             }
 
@@ -9439,7 +9421,7 @@
             let targetUserDoc = null;
             querySnapshot.forEach((doc) => { targetUserDoc = doc; });
 
-            // Вычисляем дату
+            // Вычисляем дату (если Bestie, дата не так важна, но пусть будет)
             const now = new Date();
             const expireDate = new Date(now.getTime() + (days * 24 * 60 * 60 * 1000));
 
@@ -9449,68 +9431,88 @@
                 expiresAt: Timestamp.fromDate(expireDate)
             });
 
-            alert(`Success! ${targetEmail} is now ${type} for ${days} days.`);
-            document.getElementById('admin-gift-email').value = "";
+            alert(`Успех! ${targetEmail} теперь ${type.toUpperCase()} на ${days} дн.`);
+            emailInput.value = "";
 
         } catch (e) {
             console.error(e);
-            alert("Error: " + e.message);
-        } finally {
-            btn.innerText = "Activate Sub";
-            btn.disabled = false;
-        }
-    };
-
-    // 4. Сброс подписки до FREE по Email
-    window.adminResetSub = async function() {
-        const user = auth.currentUser;
-        
-        if (!user || user.uid !== "Tqk5aauZ8JVzQ4Bs7Z0BCT5dZKf1") return; 
-
-        const targetEmail = document.getElementById('admin-reset-email').value.trim();
-
-        if (!targetEmail) { alert("Enter email!"); return; }
-        if (!confirm(`Are you sure you want to RESET subscription for ${targetEmail}?`)) return;
-
-        const btn = event.target;
-        const oldText = btn.innerText;
-        btn.innerText = "Processing...";
-        btn.disabled = true;
-
-        try {
-            // 1. Ищем пользователя по Email
-            const usersRef = collection(db, "users");
-            const q = query(usersRef, where("email", "==", targetEmail));
-            const querySnapshot = await getDocs(q);
-
-            if (querySnapshot.empty) {
-                alert("User not found via Email.");
-                return;
-            }
-
-            // Берем первого найденного
-            let targetUserDoc = null;
-            querySnapshot.forEach((doc) => { targetUserDoc = doc; });
-
-            // 2. Сбрасываем подписку (Удаляем поля)
-            await updateDoc(targetUserDoc.ref, {
-                subscription: "free",       // Явно ставим free
-                expiresAt: deleteField(),   // Удаляем поле даты окончания
-                lastPaymentId: deleteField() // Удаляем ID последнего платежа
-            });
-
-            alert(`Done! ${targetEmail} is now Free in Database.\nUser needs to click 'Synchronize' to see changes.`);
-            document.getElementById('admin-reset-email').value = "";
-
-        } catch (e) {
-            console.error(e);
-            alert("Error: " + e.message);
+            alert("Ошибка: " + e.message);
         } finally {
             btn.innerText = oldText;
             btn.disabled = false;
         }
     };
-    
+
+    // 3. Сброс подписки до FREE по Email
+    window.adminSetDiscount = async function() {
+        const target = document.getElementById('admin-disc-target').value;
+        const type = document.getElementById('admin-disc-type').value;
+        const value = document.getElementById('admin-disc-value').value;
+        const days = document.getElementById('admin-disc-days').value;
+
+        if(!value) return alert("Введите сумму/процент!");
+
+        const btn = event.target;
+        btn.disabled = true;
+        btn.innerText = "...";
+
+        try {
+            const user = window.auth.currentUser;
+            if (!user) return alert("Сначала войдите");
+
+            const res = await fetch(`${API_BASE_URL}/admin/set-discount`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    uid: user.uid,
+                    planTarget: target,
+                    type: type,
+                    value: value,
+                    days: days
+                })
+            });
+            
+            if(res.ok) {
+                alert("Скидка запущена! Перезагрузите страницу, чтобы увидеть.");
+                location.reload();
+            } else {
+                alert("Ошибка сервера");
+                btn.disabled = false;
+                btn.innerText = "Запустить";
+            }
+        } catch(e) { 
+            console.error(e);
+            alert("Ошибка сети");
+            btn.disabled = false;
+            btn.innerText = "Запустить";
+        }
+    }
+
+    window.adminRemoveDiscount = async function() {
+        const user = window.auth.currentUser;
+        if (!user) return;
+        
+        if(!confirm("Точно отключить текущую скидку?")) return;
+
+        const btn = event.target;
+        btn.disabled = true;
+        btn.innerText = "...";
+
+        try {
+            await fetch(`${API_BASE_URL}/admin/remove-discount`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ uid: user.uid })
+            });
+            alert("Скидка отключена.");
+            location.reload();
+        } catch (e) {
+            console.error(e);
+            btn.disabled = false;
+            btn.innerText = "Отключить";
+        }
+    }
+
     // Флаг: есть ли несохраненные изменения?
     window.unsavedChanges = false;
     let saveInterval = null;
