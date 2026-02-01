@@ -14500,10 +14500,7 @@
             useCORS: true
         }).then(canvas => {
             document.body.removeChild(container);
-            const link = document.createElement('a');
-            link.download = `achievement-${Date.now()}.png`;
-            link.href = canvas.toDataURL();
-            link.click();
+            shareCanvasImage(canvas, `achievement-${Date.now()}.png`);
         });
     }
 
@@ -16531,6 +16528,43 @@
         }
     }
 
+    function shareCanvasImage(canvas, filename) {
+        canvas.toBlob(async (blob) => {
+            const file = new File([blob], filename, { type: "image/png" });
+            const shareData = {
+                files: [file],
+                title: 'xFetishHub Stats',
+                text: 'Check my stats! 🔥'
+            };
+
+            // Проверяем, поддерживает ли браузер шеринг файлов
+            if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+                try {
+                    await navigator.share(shareData);
+                    console.log("Shared successfully");
+                } catch (err) {
+                    // Если пользователь просто нажал "Отмена" в меню, ничего не делаем
+                    if (err.name !== 'AbortError') {
+                        console.error("Share error:", err);
+                        // Если произошла реальная ошибка — скачиваем по старинке
+                        downloadFallback(canvas, filename);
+                    }
+                }
+            } else {
+                // Если браузер не умеет (например, ПК) — скачиваем файл
+                downloadFallback(canvas, filename);
+            }
+        });
+    }
+
+    // Старая логика скачивания (как запасной вариант)
+    function downloadFallback(canvas, filename) {
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    }
+
     function shareStats() {
         if(navigator.vibrate) navigator.vibrate(50);
 
@@ -16732,10 +16766,7 @@
             allowTaint: true
         }).then(canvas => {
             document.body.removeChild(exportContainer);
-            const link = document.createElement('a');
-            link.download = `xfetish-stats-${Date.now()}.png`;
-            link.href = canvas.toDataURL();
-            link.click();
+            shareCanvasImage(canvas, `xfetish-stats-${Date.now()}.png`);
         }).catch(e => {
             console.error(e);
             if(document.body.contains(exportContainer)) document.body.removeChild(exportContainer);
@@ -22267,14 +22298,8 @@
             allowTaint: true,
             logging: false
         }).then(canvas => {
-            // 5. Убираем клон
             document.body.removeChild(exportContainer);
-
-            // 6. Скачивание
-            const link = document.createElement('a');
-            link.download = `fetish-wrapped-${Date.now()}.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
+            shareCanvasImage(canvas, `fetish-wrapped-${Date.now()}.png`);
         }).catch(e => {
             console.error("Screenshot error:", e);
             if (document.body.contains(exportContainer)) document.body.removeChild(exportContainer);
