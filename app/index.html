@@ -16084,6 +16084,7 @@
                 return d.toLocaleDateString(currentLang, { day: 'numeric', month: 'numeric' });
             };
 
+            // 1. Сбор данных
             activityLog.forEach(log => {
                 if (log.ts < cutoffTime) return;
                 const key = getDateKey(log.ts);
@@ -16107,39 +16108,53 @@
             if (chartData.length === 0) {
                 html += `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-secondary);">${t.stats_no_data}</div>`;
             } else {
-                let maxGen = 0, maxWatch = 0, maxTime = 0;
+                // ===  ЛОГИКА МАСШТАБИРОВАНИЯ ===
+                
+                let globalMax = 0; // Ищем самое большое число среди ВСЕХ типов данных
+
+                // Предварительный проход для поиска максимума
                 chartData.forEach(d => {
-                    if (d.gen > maxGen) maxGen = d.gen;
-                    if (d.watch > maxWatch) maxWatch = d.watch;
-                    if (d.time > maxTime) maxTime = d.time;
+                    // Переводим время в минуты для сравнения
+                    const minutes = Math.round(d.time / 60);
+                    
+                    // Сравниваем Свайпы, Просмотры и Минуты. Кто больше — тот и задает высоту графика.
+                    const localMax = Math.max(d.gen, d.watch, minutes);
+                    if (localMax > globalMax) globalMax = localMax;
                 });
                 
-                if (maxGen < 5) maxGen = 5;
-                if (maxWatch < 3) maxWatch = 3; 
-                if (maxTime < 300) maxTime = 300; 
+                // Минимальный масштаб = 10 (чтобы график не выглядел гигантским при 1 свайпе)
+                if (globalMax < 10) globalMax = 10;
 
                 const gradGrey = `linear-gradient(180deg, #95a5a6 0%, #34495e 100%)`;
                 const gradAccent = `linear-gradient(180deg, var(--accent-light) 0%, var(--accent) 100%)`;
                 const gradPurple = `linear-gradient(180deg, #d2b4de 0%, #8e44ad 100%)`;
 
                 chartData.forEach((d, index) => {
-                    const hGen = (d.gen / maxGen) * 100;
-                    const hWatch = (d.watch / maxWatch) * 100;
-                    const hTime = (d.time / maxTime) * 100;
+                    // Переводим время в минуты
                     const timeMin = Math.round(d.time / 60);
+
+                    // Рассчитываем высоту относительно ОБЩЕГО максимума
+                    const hGen = (d.gen / globalMax) * 100;
+                    const hWatch = (d.watch / globalMax) * 100;
+                    const hTime = (timeMin / globalMax) * 100;
+                    
                     const delay = index * 0.05;
 
                     html += `
                         <div class="act-col">
                             <div class="act-bars-group">
+                                <!-- Свайпы (Серый) -->
                                 <div class="act-bar" style="background:${gradGrey}; height:0%; opacity:0.6; animation: growBarH${index} 0.6s forwards ${delay}s;"></div>
+                                <!-- Просмотры (Акцент) -->
                                 <div class="act-bar" style="background:${gradAccent}; height:0%; animation: growBarW${index} 0.6s forwards ${delay+0.1}s;"></div>
+                                <!-- Время (Фиолетовый) -->
                                 <div class="act-bar" style="background:${gradPurple}; height:0%; animation: growBarT${index} 0.6s forwards ${delay+0.2}s;"></div>
                             </div>
                             <style>
-                                @keyframes growBarH${index} { to { height: ${Math.max(5, hGen)}%; } }
-                                @keyframes growBarW${index} { to { height: ${Math.max(5, hWatch)}%; } }
-                                @keyframes growBarT${index} { to { height: ${Math.max(5, hTime)}%; } }
+                                /* Math.max(2, ...) гарантирует, что даже при 0 будет видна тонкая полоска (2%) или 0, если совсем пусто */
+                                @keyframes growBarH${index} { to { height: ${d.gen > 0 ? Math.max(4, hGen) : 0}%; } }
+                                @keyframes growBarW${index} { to { height: ${d.watch > 0 ? Math.max(4, hWatch) : 0}%; } }
+                                @keyframes growBarT${index} { to { height: ${timeMin > 0 ? Math.max(4, hTime) : 0}%; } }
                             </style>
 
                             <div class="act-values-row stagger-text" style="animation-delay:${delay + 0.3}s">
@@ -21539,7 +21554,7 @@
         // Показываем оверлей
         overlay.classList.add('active');
     }
-    
+
     // ТАЙМЕР (С поддержкой паузы)
     function startSlideTimerNew(total, duration = 6000) {
         clearInterval(slideInterval);
