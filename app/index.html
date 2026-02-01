@@ -9157,34 +9157,28 @@
         const user = auth.currentUser;
         if (!user) return;
 
-        // 1. Блокируем прокрутку фона и ставим класс
         document.body.classList.add('modal-open');
         document.getElementById('modal-sync-info-overlay').classList.add('open');
         
-        // 2. Заполняем Email
         const emailEl = document.getElementById('sync-email-display');
         if(emailEl) emailEl.innerText = user.email;
 
-        // 3. Сбрасываем значения на "..." перед загрузкой
-        const ids = ['cloud-fav-count', 'cloud-wl-count', 'cloud-explored-count', 'cloud-ban-count'];
+        // ID элементов, которые обновляем
         const subValue = document.getElementById('sync-sub-value');
         const subDesc = document.getElementById('sync-sub-desc');
         const subCard = document.getElementById('sync-sub-card');
 
-        if(subValue) subValue.innerText = "...";
-        if(subDesc) subDesc.innerText = "Checking...";
-        
-        ids.forEach(id => {
+        // Сброс значений
+        const countIds = ['cloud-fav-count', 'cloud-wl-count', 'cloud-explored-count', 'cloud-ban-count'];
+        countIds.forEach(id => {
             const el = document.getElementById(id);
             if(el) el.innerText = "...";
         });
+        if(subValue) subValue.innerText = "...";
 
-        // 4. Загрузка данных
+        // Загрузка данных (если кеш устарел)
         const now = Date.now();
         let d = cachedUserProfile;
-        const PROFILE_CACHE_TTL = 60000; 
-
-        // Грузим из сети, если кеш старый
         if (!d || (now - lastProfileReadTime > PROFILE_CACHE_TTL)) {
             try {
                 const userRef = doc(db, "users", user.uid);
@@ -9192,76 +9186,44 @@
                 if (docSnap.exists()) {
                     d = docSnap.data();
                     cachedUserProfile = d;
+                    window.cachedUserProfile = d;
                     lastProfileReadTime = now;
-                } else {
-                    d = null; 
                 }
-            } catch (e) {
-                console.error("Sync error:", e);
-                if(subValue) subValue.innerText = "Error";
-                return;
-            }
+            } catch (e) { console.error(e); }
         }
 
-        // 5. Отображение данных
+        // Обновление UI
         if(subCard) subCard.classList.remove('is-free', 'is-pro', 'is-beast', 'is-bestie');
-
-        const currentLang = localStorage.getItem('xch_lang') || 'en';
-        const t = (window.langData && window.langData[currentLang]) ? window.langData[currentLang] : (window.langData ? window.langData['en'] : {});
+        const t = langData[currentLang] || langData['en'];
 
         if (d) {
             // Подписка
             const plan = d.subscription || 'free';
             if(subValue) {
                 subValue.innerText = plan.toUpperCase();
-                
                 if (plan === 'pro') subValue.style.color = '#ff9900';
                 else if (plan === 'beast') subValue.style.color = '#9b59b6';
                 else if (plan === 'bestie') subValue.style.color = '#00d2ff';
                 else subValue.style.color = 'var(--text-main)';
             }
-
             if(subCard) {
-                if (plan === 'pro') subCard.classList.add('is-pro');
-                else if (plan === 'beast') subCard.classList.add('is-beast');
-                else if (plan === 'bestie') subCard.classList.add('is-bestie');
+                if (plan !== 'free') subCard.classList.add('is-' + plan);
                 else subCard.classList.add('is-free');
             }
-
             if(subDesc) {
-                if (plan === 'free') {
-                    subDesc.innerText = (currentLang === 'ru' ? "Нажми, чтобы улучшить" : "Tap to Upgrade");
-                    subDesc.style.color = "var(--accent)";
-                } else if (plan === 'bestie') {
-                    subDesc.innerHTML = "♾️ Lifetime Access";
-                    subDesc.style.color = "var(--text-secondary)";
-                } else {
-                    if (d.expiresAt) {
-                        const dateObj = d.expiresAt.toDate(); 
-                        const daysLeft = Math.ceil((dateObj - new Date()) / (1000 * 60 * 60 * 24));
-                        if (daysLeft > 0) {
-                            subDesc.innerText = `${t.sub_exp || "Exp:"} ${daysLeft}${t.time_d || "d"}`;
-                            subDesc.style.color = "var(--text-secondary)";
-                        } else {
-                            subDesc.innerText = t.sub_expired || "Expired"; 
-                            subDesc.style.color = "var(--highlight-red)";
-                        }
-                    } else {
-                        subDesc.innerText = "Active";
-                    }
-                }
+                if (plan === 'free') subDesc.innerText = (currentLang === 'ru' ? "Нажми, чтобы улучшить" : "Tap to Upgrade");
+                else if (plan === 'bestie') subDesc.innerText = "♾️ Lifetime";
+                else subDesc.innerText = "Active";
             }
 
-            // Счетчики (используем только innerText, чтобы не дублировать HTML)
+            // Счетчики
             if(document.getElementById('cloud-fav-count')) 
                 document.getElementById('cloud-fav-count').innerText = d.favorites ? d.favorites.length : 0;
             
             if(document.getElementById('cloud-wl-count')) 
                 document.getElementById('cloud-wl-count').innerText = d.watchLater ? d.watchLater.length : 0;
             
-            if(document.getElementById('cloud-ban-count')) 
-                document.getElementById('cloud-ban-count').innerText = d.blacklist ? d.blacklist.length : 0;
-            
+            // Explored
             let exCount = d.exploredCount || 0;
             if (exCount === 0 && d.activityLog) {
                 const unique = new Set(d.activityLog.map(i => i.id));
@@ -9270,16 +9232,37 @@
             if(document.getElementById('cloud-explored-count'))
                 document.getElementById('cloud-explored-count').innerText = exCount;
 
+            // --- ВРЕМЯ ПРОСМОТРА ---
+            const banCountEl = document.getElementById('cloud-ban-count');
+            if(banCountEl) {
+                // Считаем общее время из истории просмотров
+                const wHistory = d.watchHistory || [];
+                const totalSeconds = wHistory.reduce((acc, item) => acc + (item.seconds || 0), 0);
+                const totalMinutes = Math.floor(totalSeconds / 60);
+                
+                banCountEl.innerText = totalMinutes + "m";
+                
+                // Меняем подпись и иконку визуально
+                const parentBox = banCountEl.closest('.bento-box');
+                if(parentBox) {
+                    // Меняем лейбл
+                    const label = parentBox.querySelector('.bento-label');
+                    if(label) label.innerText = (currentLang === 'ru' ? "Время" : "Time");
+                    
+                    // Меняем иконку (на часы)
+                    const icon = parentBox.querySelector('img');
+                    if(icon) {
+                        icon.src = "history.png"; 
+                        parentBox.onclick = null;
+                        parentBox.style.cursor = "default";
+                    }
+                }
+            }
+
         } else {
             // Новый юзер
             if(subValue) subValue.innerText = "FREE";
             if(subCard) subCard.classList.add('is-free');
-            if(subDesc) subDesc.innerText = (currentLang === 'ru' ? "Нажми, чтобы улучшить" : "Tap to Upgrade");
-            
-            ids.forEach(id => {
-                const el = document.getElementById(id);
-                if(el) el.innerText = "0";
-            });
         }
         
         applyLanguage();
@@ -9551,81 +9534,75 @@
 
             if (docSnap.exists()) {
                 const cloudData = docSnap.data();
+                
+                // Глобальные переменные
                 cachedUserProfile = cloudData;
                 window.cachedUserProfile = cloudData;
                 lastProfileReadTime = Date.now();
                 
                 console.log("Cloud data received. Merging...");
 
-                // --- 1. СИНХРОНИЗАЦИЯ ПОДПИСКИ ---
+                // 1. ПОДПИСКА
                 const cloudSub = cloudData.subscription || 'free';
-                
-                // Перезаписываем локальные данные
                 localStorage.setItem('xch_sub_level', cloudSub);
-                subscriptionLevel = cloudSub; // Обновляем глобальную переменную
-                
-                // Мгновенно обновляем интерфейс (карточки планов)
+                if (typeof subscriptionLevel !== 'undefined') subscriptionLevel = cloudSub;
                 if (window.updateSubscriptionUI) window.updateSubscriptionUI();
 
-                // --- 2. СЛИЯНИЕ СПИСКОВ (Избранное, ЧС, Watch Later) ---
-                const localFav = JSON.parse(localStorage.getItem('xch_favorites')) || [];
-                const cloudFav = cloudData.favorites || [];
-                const mergedFav = [...new Set([...localFav, ...cloudFav])];
-
-                const localBan = JSON.parse(localStorage.getItem('xch_blacklist')) || [];
-                const cloudBan = cloudData.blacklist || [];
-                const mergedBan = [...new Set([...localBan, ...cloudBan])];
-
-                const localWL = JSON.parse(localStorage.getItem('xch_watch_later')) || [];
-                const cloudWL = cloudData.watchLater || [];
-                const mergedWL = [...new Set([...localWL, ...cloudWL])];
-
-                // --- 3. СЛИЯНИЕ ИСТОРИИ И ЛОГОВ ---
-                // История (топ-50)
-                const localHist = JSON.parse(localStorage.getItem('xch_history')) || [];
-                const cloudHist = cloudData.history || [];
-                const combinedHistMap = new Map();
-                [...localHist, ...cloudHist].forEach(item => combinedHistMap.set(item.id, item));
-                const mergedHistory = Array.from(combinedHistMap.values())
-                    .sort((a, b) => b.timestamp - a.timestamp)
-                    .slice(0, 50);
-
-                // Активность (для статистики)
-                const localLog = JSON.parse(localStorage.getItem('xch_activity_log')) || [];
-                const cloudLog = cloudData.activityLog || [];
-                const combinedLogMap = new Map();
-                // Ключ уникальности: ts + id
-                [...localLog, ...cloudLog].forEach(item => combinedLogMap.set((item.ts || 0) + "_" + item.id, item));
-                const mergedActivityLog = Array.from(combinedLogMap.values())
-                    .sort((a, b) => a.ts - b.ts)
-                    .slice(-5000);
-
-                // --- 4. ВЕСА ТЕГОВ ---
-                const localScores = JSON.parse(localStorage.getItem('xch_tag_scores')) || {};
-                const cloudScores = cloudData.tagScores || {};
-                const mergedScores = { ...cloudScores };
-                for (const [tag, score] of Object.entries(localScores)) {
-                    if (Math.abs(score) > Math.abs(mergedScores[tag] || 0)) {
-                        mergedScores[tag] = score;
-                    }
-                }
-
-                // --- 5. ПРИМЕНЕНИЕ (СОХРАНЕНИЕ В ПАМЯТЬ) ---
-                window.favorites = mergedFav;
-                window.blacklist = mergedBan;
-                window.watchLater = mergedWL;
-                window.historyData = mergedHistory;
-                window.activityLog = mergedActivityLog;
-                window.tagScores = mergedScores;
+                // 2. СПИСКИ (Избранное, ЧС, WL)
+                const mergeArrays = (local, cloud) => [...new Set([...local, ...cloud])];
+                
+                const mergedFav = mergeArrays(JSON.parse(localStorage.getItem('xch_favorites')) || [], cloudData.favorites || []);
+                const mergedBan = mergeArrays(JSON.parse(localStorage.getItem('xch_blacklist')) || [], cloudData.blacklist || []);
+                const mergedWL = mergeArrays(JSON.parse(localStorage.getItem('xch_watch_later')) || [], cloudData.watchLater || []);
 
                 localStorage.setItem('xch_favorites', JSON.stringify(mergedFav));
-                localStorage.setItem('xch_blacklist', JSON.stringify(mergedBan));
-                localStorage.setItem('xch_watch_later', JSON.stringify(mergedWL));
-                localStorage.setItem('xch_history', JSON.stringify(mergedHistory));
-                localStorage.setItem('xch_activity_log', JSON.stringify(mergedActivityLog));
-                localStorage.setItem('xch_tag_scores', JSON.stringify(mergedScores));
+                window.favorites = mergedFav;
 
-                // --- 6. ФИНАЛ ---
+                localStorage.setItem('xch_blacklist', JSON.stringify(mergedBan));
+                window.blacklist = mergedBan;
+
+                localStorage.setItem('xch_watch_later', JSON.stringify(mergedWL));
+                window.watchLater = mergedWL;
+
+                // 3. ИСТОРИЯ СВАЙПОВ (History)
+                const localHist = JSON.parse(localStorage.getItem('xch_history')) || [];
+                const cloudHist = cloudData.history || [];
+                // Объединяем по уникальности (ID + Timestamp), чтобы не потерять
+                const histMap = new Map();
+                [...localHist, ...cloudHist].forEach(item => histMap.set(item.id, item));
+                const mergedHistory = Array.from(histMap.values()).sort((a, b) => b.timestamp - a.timestamp).slice(0, 100);
+                
+                localStorage.setItem('xch_history', JSON.stringify(mergedHistory));
+                window.historyData = mergedHistory;
+
+                // 4. ИСТОРИЯ ПРОСМОТРОВ (ВРЕМЯ) - НОВАЯ ЛОГИКА
+                const localWatch = JSON.parse(localStorage.getItem('xch_watch_history')) || [];
+                const cloudWatch = cloudData.watchHistory || [];
+                
+                // Объединяем. Ключ уникальности: ID + Время просмотра (чтобы не дублировать один и тот же сеанс)
+                const watchMap = new Map();
+                [...localWatch, ...cloudWatch].forEach(item => {
+                    // Генерируем уникальный ключ для сеанса просмотра
+                    const key = `${item.id}_${item.timestamp}`;
+                    watchMap.set(key, item);
+                });
+                
+                const mergedWatch = Array.from(watchMap.values()).sort((a, b) => b.timestamp - a.timestamp).slice(0, 200); // Храним последние 200 просмотров
+                
+                localStorage.setItem('xch_watch_history', JSON.stringify(mergedWatch));
+                window.watchHistory = mergedWatch;
+
+                // 5. ЛОГИ АКТИВНОСТИ (Для графиков)
+                const localLog = JSON.parse(localStorage.getItem('xch_activity_log')) || [];
+                const cloudLog = cloudData.activityLog || [];
+                const logMap = new Map();
+                [...localLog, ...cloudLog].forEach(item => logMap.set((item.ts || 0) + "_" + item.id, item));
+                const mergedLog = Array.from(logMap.values()).sort((a, b) => a.ts - b.ts).slice(-5000);
+                
+                localStorage.setItem('xch_activity_log', JSON.stringify(mergedLog));
+                window.activityLog = mergedLog;
+
+                // --- ФИНАЛ ---
                 const now = Date.now();
                 localStorage.setItem('xch_last_sync_ts', now);
                 
@@ -9634,22 +9611,17 @@
                 if (typeof renderHistory === 'function') renderHistory();
                 if (typeof updateActionButtons === 'function') updateActionButtons();
                 
-                console.log(`Sync complete. Subscription is: ${cloudSub}`);
-                
-                window.unsavedChanges = false;
+                // Если открыто окно синхронизации, обновляем цифры сразу
+                if (document.getElementById('modal-sync-info-overlay').classList.contains('open')) {
+                    window.openSyncInfoModal();
+                }
 
-                checkSubscriptionExpiry();
+                console.log(`Sync complete. Watch history merged.`);
 
             } else {
-                // === СЦЕНАРИЙ: ДОКУМЕНТ УДАЛЕН (СБРОС ПОДПИСКИ) ===
-                console.log("User document not found in Cloud. Resetting subscription to Free.");
-                
-                // Сбрасываем подписку
+                console.log("User document not found. Creating new.");
                 localStorage.setItem('xch_sub_level', 'free');
-                subscriptionLevel = 'free';
                 if (window.updateSubscriptionUI) window.updateSubscriptionUI();
-
-                // Создаем новый чистый документ для юзера
                 window.syncToCloud(true);
             }
         } catch (error) {
@@ -9661,62 +9633,52 @@
     window.syncToCloud = async function(immediate = false) {
         const user = auth.currentUser;
         if (!user) return; 
-
-        // ОПТИМИЗАЦИЯ: Если это не принудительное сохранение И нет изменений, выходим
-        if (!immediate && !window.unsavedChanges) {
-            return;
-        }
+        if (!immediate && !window.unsavedChanges) return;
 
         const userRef = doc(db, "users", user.uid);
-        const currentPlatform = document.getElementById('platform') ? document.getElementById('platform').value : 'xh';
-        
-        // Берем только последние записи для экономии трафика
-        const fullLog = window.activityLog || [];
-        const fullHistory = window.historyData || [];
-        const cloudLog = fullLog.slice(-300); 
-        const cloudHistory = fullHistory.slice(-100);
+        const currentPlatform = localStorage.getItem('xch_platform') || 'xh';
+        const safeJSON = (key, def) => JSON.parse(localStorage.getItem(key)) || def;
+
+        // Берем актуальные данные из памяти (window) или из localStorage
+        const wHistory = window.watchHistory || safeJSON('xch_watch_history', []);
 
         const dataToSave = {
-            favorites: JSON.parse(localStorage.getItem('xch_favorites')) || [],
-            blacklist: JSON.parse(localStorage.getItem('xch_blacklist')) || [],
-            watchLater: JSON.parse(localStorage.getItem('xch_watch_later')) || [],
-            tagScores: JSON.parse(localStorage.getItem('xch_tag_scores')) || {},
+            favorites: window.favorites || safeJSON('xch_favorites', []),
+            blacklist: window.blacklist || safeJSON('xch_blacklist', []),
+            watchLater: window.watchLater || safeJSON('xch_watch_later', []),
+            tagScores: window.tagScores || safeJSON('xch_tag_scores', {}),
             
-            history: cloudHistory,
-            activityLog: cloudLog,
-            watchHistory: (window.watchHistory || []).slice(-100),
+            history: (window.historyData || safeJSON('xch_history', [])).slice(0, 100),
+            activityLog: (window.activityLog || safeJSON('xch_activity_log', [])).slice(-300),
+            
+            // ОТПРАВЛЯЕМ ОБЪЕДИНЕННУЮ ИСТОРИЮ ПРОСМОТРОВ
+            watchHistory: wHistory.slice(0, 200),
             
             platform: currentPlatform,
-            subscription: localStorage.getItem('xch_sub_level') || 'free', 
             email: user.email,
             lastUpdated: serverTimestamp(),
-            modifiersPool: window.userModifiersPool || [],
-            exploredCount: window.permanentExplored ? window.permanentExplored.size : 0
+            modifiersPool: window.userModifiersPool || safeJSON('xch_user_mods', []),
+            exploredCount: (window.permanentExplored ? window.permanentExplored.size : 0)
         };
 
         try {
-            // merge: true позволяет обновлять только измененные поля (экономия операций записи)
             await setDoc(userRef, dataToSave, { merge: true });
             
             const now = Date.now();
             localStorage.setItem('xch_last_sync_ts', now);
-            
-            // ВАЖНО: Сбрасываем флаг изменений после успешного сохранения
             window.unsavedChanges = false;
             
-            // Обновляем UI кнопки в настройках
             const btnText = document.getElementById('sync-btn-text');
             if(btnText) {
-                const originalText = btnText.innerText;
                 btnText.innerHTML = "✅ Saved";
                 setTimeout(() => { if(btnText) btnText.innerHTML = "🔄 Synchronize Device"; }, 2000);
             }
-            
-            console.log(`☁️ Cloud Save Success (Writes saved via batching!)`);
+            console.log(`☁️ Cloud Save Success`);
         } catch (e) {
             console.error("Auto-save error:", e);
         }
     };
+
 </script>
 
 <script>
@@ -11128,7 +11090,7 @@
                 <p>We have no control over, and assume no responsibility for, the content, privacy policies, or practices of any third-party websites. You acknowledge and agree that xFetishHub shall not be responsible or liable, directly or indirectly, for any damage or loss caused by your use of any third-party content.</p>
                 
                 <h3>4. User Accounts & Subscriptions</h3>
-                <p>Some features require a paid subscription ("Pro" or "Beast"). Payment processing is handled by third-party providers (e.g., Telegram Stars, Lava, Cryptomus). We do not store your payment credentials. We reserve the right to terminate accounts that violate these Terms.</p>
+                <p>Some features require a paid subscription ("Pro" or "Beast"). Payment processing is handled via direct Cryptocurrency transfer (USDT). We do not store your payment credentials. We reserve the right to terminate accounts that violate these Terms.</p>
                 
                 <h3>5. Disclaimer of Warranties</h3>
                 <p>The Service is provided on an "AS IS" and "AS AVAILABLE" basis. We do not warrant that the results generated will meet your requirements or be free of errors.</p>
@@ -11139,20 +11101,10 @@
                 <p>Your privacy is our priority. This policy explains how we handle your data. We aim to collect the absolute minimum amount of information required to provide our Service.</p>
                 
                 <h3>2. Data We Collect</h3>
-                <ul>
-                    <li><b>Authentication Data:</b> When you login via Google, we receive your email address and UID to synchronize your preferences. We do not see your password.</li>
-                    <li><b>Usage Data:</b> We store your generated history, favorite tags, and preferences ("liked" or "disliked" categories) locally on your device and encrypted in our database to provide the Service.</li>
-                    <li><b>Local Storage:</b> We use browser local storage to save your settings (theme, language, platform preference) without cookies.</li>
-                </ul>
+                <p><b>Authentication Data:</b> When you login via Google, we receive your email address and UID to synchronize your preferences. We do not see your password. <b>Usage Data:</b> We store your generated history, favorite tags, and preferences ("liked" or "disliked" categories) locally on your device and encrypted in our database to provide the Service. <b>Local Storage:</b> We use browser local storage to save your settings (theme, language, platform preference) without cookies.</p>
 
                 <h3>3. How We Use Data</h3>
-                <p>Your data is used solely to:</p>
-                <ul>
-                    <li>Synchronize your progress across devices.</li>
-                    <li>Verify your subscription status.</li>
-                    <li>Train the personalization algorithm to improve suggestions.</li>
-                </ul>
-                <p><b>We do not sell, trade, or rent your personal identification information to others.</b></p>
+                <p>Your data is used solely to synchronize your progress across devices, verify your subscription status, and train the personalization algorithm to improve suggestions. <b>We do not sell, trade, or rent your personal identification information to others.</b></p>
 
                 <h3>4. Data Deletion</h3>
                 <p>You may request full deletion of your account and data at any time by contacting support or using the "Reset Data" button within the app (for local data).</p>
@@ -11160,18 +11112,13 @@
 
             refund_text: `
                 <h3>1. Digital Goods Policy</h3>
-                <p>Due to the nature of digital content, all sales of activation codes and subscriptions for xFetishHub are generally <b>final and non-refundable</b> once the code has been delivered or the subscription activated.</p>
+                <p>Due to the nature of digital content, all sales of subscriptions for xFetishHub are generally <b>final and non-refundable</b> once the subscription has been activated.</p>
                 
                 <h3>2. Exceptions</h3>
-                <p>We may offer a refund or replacement at our sole discretion under the following circumstances:</p>
-                <ul>
-                    <li><b>Technical Error:</b> The activation code provided was invalid or defective.</li>
-                    <li><b>Non-Delivery:</b> You paid but did not receive the service/code within 24 hours.</li>
-                    <li><b>Double Billing:</b> You were charged twice for the same billing period due to a technical glitch.</li>
-                </ul>
+                <p>We may offer a refund or replacement at our sole discretion under specific circumstances: <b>Non-Delivery:</b> You paid but did not receive the service within 24 hours. <b>Double Billing:</b> You were charged twice for the same billing period due to a technical glitch.</p>
 
                 <h3>3. How to Request</h3>
-                <p>To request a refund, please contact support via the "Report Issue" button or email. Include your transaction ID and the date of purchase. Requests must be made within 14 days of purchase.</p>
+                <p>To request a refund, please contact support via the "Report Issue" button or email. Include your transaction ID (TxID) and the date of purchase. Requests must be made within 14 days of purchase.</p>
             `
         },
 
@@ -11854,7 +11801,7 @@
                 <p>Мы не несем ответственности за содержание, политику конфиденциальности или действия сторонних сайтов. Переходя по ссылкам, вы действуете на свой страх и риск. Мы не отвечаем за любой ущерб, связанный с использованием внешних ресурсов.</p>
                 
                 <h3>4. Аккаунты и Подписки</h3>
-                <p>Некоторые функции доступны по подписке ("Pro" или "Beast"). Обработка платежей производится сторонними шлюзами (Lava, Cryptomus и др.). Мы не храним данные ваших карт. Мы оставляем за собой право блокировать аккаунты при нарушении правил.</p>
+                <p>Некоторые функции доступны по подписке ("Pro" или "Beast"). Оплата производится посредством прямого перевода криптовалюты (USDT). Мы не храним ваши платежные данные. Мы оставляем за собой право блокировать аккаунты при нарушении правил.</p>
                 
                 <h3>5. Отказ от ответственности</h3>
                 <p>Сервис предоставляется по принципу "КАК ЕСТЬ". Мы не гарантируем, что результаты поиска будут всегда соответствовать вашим ожиданиям или работать без сбоев.</p>
@@ -11865,20 +11812,10 @@
                 <p>Конфиденциальность — наш приоритет. Мы собираем абсолютный минимум данных, необходимый для работы синхронизации.</p>
                 
                 <h3>2. Сбор данных</h3>
-                <ul>
-                    <li><b>Авторизация:</b> При входе через Google мы получаем ваш Email и UID для привязки настроек. Мы не видим ваш пароль.</li>
-                    <li><b>Данные использования:</b> Мы храним историю генераций, лайки, дизлайки и веса тегов. Это нужно исключительно для работы алгоритма рекомендаций.</li>
-                    <li><b>Локальное хранилище:</b> Мы используем LocalStorage браузера для сохранения темы и языка.</li>
-                </ul>
+                <p><b>Авторизация:</b> При входе через Google мы получаем ваш Email и UID для привязки настроек. Мы не видим ваш пароль. <b>Данные использования:</b> Мы храним историю генераций, лайки, дизлайки и веса тегов. Это нужно исключительно для работы алгоритма рекомендаций. <b>Локальное хранилище:</b> Мы используем LocalStorage браузера для сохранения темы и языка.</p>
 
                 <h3>3. Использование данных</h3>
-                <p>Ваши данные используются только для:</p>
-                <ul>
-                    <li>Синхронизации прогресса между устройствами.</li>
-                    <li>Проверки статуса подписки.</li>
-                    <li>Обучения алгоритма под ваши вкусы.</li>
-                </ul>
-                <p><b>Мы не продаем и не передаем ваши данные третьим лицам.</b></p>
+                <p>Ваши данные используются только для синхронизации прогресса между устройствами, проверки статуса подписки и обучения алгоритма под ваши вкусы. <b>Мы не продаем и не передаем ваши данные третьим лицам.</b></p>
 
                 <h3>4. Удаление данных</h3>
                 <p>Вы можете в любой момент сбросить данные в приложении ("Сброс данных") или написать в поддержку для полного удаления аккаунта с серверов.</p>
@@ -11886,18 +11823,13 @@
 
             refund_text: `
                 <h3>1. Политика цифровых товаров</h3>
-                <p>В связи с природой цифрового контента, все продажи кодов активации и подписок являются <b>окончательными и не подлежат возврату</b> после доставки кода или активации услуги.</p>
+                <p>В связи с природой цифрового контента, все продажи подписок являются <b>окончательными и не подлежат возврату</b> после активации услуги.</p>
                 
                 <h3>2. Исключения</h3>
-                <p>Мы можем рассмотреть возврат в индивидуальном порядке в следующих случаях:</p>
-                <ul>
-                    <li><b>Техническая ошибка:</b> Выданный код оказался нерабочим.</li>
-                    <li><b>Недоставка:</b> Вы оплатили, но услуга не была предоставлена в течение 24 часов.</li>
-                    <li><b>Двойное списание:</b> Из-за сбоя оплата прошла дважды.</li>
-                </ul>
+                <p>Мы можем рассмотреть возврат в индивидуальном порядке в следующих случаях: <b>Недоставка:</b> Вы оплатили, но услуга не была предоставлена в течение 24 часов. <b>Двойное списание:</b> Из-за технического сбоя оплата прошла дважды.</p>
 
                 <h3>3. Запрос возврата</h3>
-                <p>Для запроса свяжитесь с поддержкой через кнопку "Сообщить о проблеме" или по Email. Укажите ID транзакции. Запросы принимаются в течение 14 дней с момента покупки.</p>
+                <p>Для запроса свяжитесь с поддержкой через кнопку "Сообщить о проблеме" или по Email. Укажите ID транзакции (TxID). Запросы принимаются в течение 14 дней с момента покупки.</p>
             `
         },
 
@@ -12544,56 +12476,41 @@
                 <p>Al acceder y utilizar xFetishHub, confirma que tiene al menos 18 años de edad (o la mayoría de edad en su jurisdicción) y acepta estar sujeto a estos términos. Si no está de acuerdo, debe abandonar el servicio inmediatamente.</p>
                 
                 <h3>2. Naturaleza del Servicio</h3>
-                <p>xFetishHub es un agregador de búsqueda y motor de recomendaciones. <b>No alojamos, subimos ni controlamos ningún contenido de video.</b> Todos los enlaces generados conducen a sitios web de terceros (por ejemplo, xHamster, Pornhub). Servimos como un conducto para encontrar contenido disponible públicamente en Internet.</p>
+                <p>xFetishHub es un agregador de búsqueda y motor de recomendaciones. <b>No alojamos, subimos ni controlamos ningún contenido de video.</b> Todos los enlaces generados conducen a sitios web de terceros. Servimos como un conducto para encontrar contenido disponible públicamente en Internet.</p>
                 
                 <h3>3. Contenido de Terceros</h3>
-                <p>No tenemos control ni asumimos responsabilidad por el contenido, las políticas de privacidad o las prácticas de sitios web de terceros. Usted reconoce y acepta que xFetishHub no será responsable, directa o indirectamente, por ningún daño o pérdida causada por su uso de cualquier contenido de terceros.</p>
+                <p>No tenemos control ni asumimos responsabilidad por el contenido, las políticas de privacidad o las prácticas de sitios web de terceros. Usted reconoce y acepta que xFetishHub no será responsable por ningún daño o pérdida causada por su uso de cualquier contenido de terceros.</p>
                 
                 <h3>4. Cuentas y Suscripciones</h3>
-                <p>Algunas funciones requieren una suscripción paga ("Pro" o "Beast"). El procesamiento de pagos es manejado por proveedores externos. No almacenamos sus credenciales de pago. Nos reservamos el derecho de cancelar cuentas que violen estos términos.</p>
+                <p>Algunas funciones requieren una suscripción paga ("Pro" o "Beast"). El pago se realiza mediante transferencia directa de Criptomonedas (USDT). No almacenamos sus credenciales de pago. Nos reservamos el derecho de cancelar cuentas que violen estos términos.</p>
                 
                 <h3>5. Renuncia de Garantías</h3>
-                <p>El servicio se proporciona "TAL CUAL" y "SEGÚN DISPONIBILIDAD". No garantizamos que los resultados generados cumplan con sus requisitos o estén libres de errores.</p>
+                <p>El servicio se proporciona "TAL CUAL". No garantizamos que los resultados generados cumplan con sus requisitos o estén libres de errores.</p>
             `,
 
             privacy_text: `
                 <h3>1. Introducción</h3>
-                <p>Su privacidad es nuestra prioridad. Esta política explica cómo manejamos sus datos. Nuestro objetivo es recopilar la cantidad mínima absoluta de información requerida para proporcionar nuestro servicio.</p>
+                <p>Su privacidad es nuestra prioridad. Esta política explica cómo manejamos sus datos. Nuestro objetivo es recopilar la cantidad mínima absoluta de información requerida.</p>
                 
                 <h3>2. Datos que Recopilamos</h3>
-                <ul>
-                    <li><b>Datos de Autenticación:</b> Al iniciar sesión a través de Google, recibimos su correo electrónico y UID para sincronizar sus preferencias. No vemos su contraseña.</li>
-                    <li><b>Datos de Uso:</b> Almacenamos su historial generado, etiquetas favoritas y preferencias localmente en su dispositivo y encriptados en nuestra base de datos para el funcionamiento del algoritmo.</li>
-                    <li><b>Almacenamiento Local:</b> Utilizamos el almacenamiento local del navegador para guardar sus configuraciones (tema, idioma) sin cookies de rastreo.</li>
-                </ul>
+                <p><b>Autenticación:</b> Al iniciar sesión a través de Google, recibimos su correo electrónico y UID. No vemos su contraseña. <b>Uso:</b> Almacenamos su historial generado, etiquetas favoritas y preferencias localmente y encriptados en nuestra base de datos. <b>Almacenamiento Local:</b> Utilizamos el almacenamiento local del navegador para guardar sus configuraciones.</p>
 
                 <h3>3. Cómo Usamos los Datos</h3>
-                <p>Sus datos se utilizan únicamente para:</p>
-                <ul>
-                    <li>Sincronizar su progreso entre dispositivos.</li>
-                    <li>Verificar el estado de su suscripción.</li>
-                    <li>Entrenar el algoritmo de personalización para mejorar las sugerencias.</li>
-                </ul>
-                <p><b>No vendemos, intercambiamos ni alquilamos su información de identificación personal a terceros.</b></p>
+                <p>Sus datos se utilizan únicamente para sincronizar su progreso, verificar el estado de su suscripción y entrenar el algoritmo de personalización. <b>No vendemos, intercambiamos ni alquilamos su información personal a terceros.</b></p>
 
                 <h3>4. Eliminación de Datos</h3>
-                <p>Puede solicitar la eliminación completa de su cuenta y datos en cualquier momento contactando al soporte o utilizando el botón "Restablecer datos" dentro de la aplicación.</p>
+                <p>Puede solicitar la eliminación completa de su cuenta y datos en cualquier momento contactando al soporte o utilizando el botón "Restablecer datos".</p>
             `,
 
             refund_text: `
                 <h3>1. Política de Bienes Digitales</h3>
-                <p>Debido a la naturaleza del contenido digital, todas las ventas de códigos de activación y suscripciones para xFetishHub son generalmente <b>finales y no reembolsables</b> una vez que el código ha sido entregado o la suscripción activada.</p>
+                <p>Debido a la naturaleza del contenido digital, todas las ventas de suscripciones para xFetishHub son generalmente <b>finales y no reembolsables</b> una vez activada la suscripción.</p>
                 
                 <h3>2. Excepciones</h3>
-                <p>Podemos ofrecer un reembolso o reemplazo a nuestra entera discreción bajo las siguientes circunstancias:</p>
-                <ul>
-                    <li><b>Error Técnico:</b> El código de activación proporcionado no era válido o estaba defectuoso.</li>
-                    <li><b>No Entrega:</b> Pagó pero no recibió el servicio/código dentro de las 24 horas.</li>
-                    <li><b>Doble Facturación:</b> Se le cobró dos veces por el mismo período debido a un fallo técnico.</li>
-                </ul>
+                <p>Podemos ofrecer un reembolso a nuestra discreción en caso de: <b>No Entrega:</b> Pagó pero no recibió el servicio dentro de las 24 horas. <b>Doble Facturación:</b> Se le cobró dos veces por el mismo período debido a un fallo técnico.</p>
 
                 <h3>3. Cómo Solicitar</h3>
-                <p>Para solicitar un reembolso, contacte al soporte a través del botón "Reportar Problema". Incluya su ID de transacción y la fecha de compra. Las solicitudes deben realizarse dentro de los 14 días posteriores a la compra.</p>
+                <p>Para solicitar un reembolso, contacte al soporte a través del botón "Reportar Problema". Incluya su ID de transacción (TxID). Las solicitudes deben realizarse dentro de los 14 días posteriores a la compra.</p>
             `
         },
 
@@ -13232,59 +13149,44 @@
             
             terms_text: `
                 <h3>1. Annahme der Bedingungen</h3>
-                <p>Durch den Zugriff auf xFetishHub bestätigen Sie, dass Sie mindestens 18 Jahre alt sind (oder das gesetzliche Mindestalter in Ihrer Gerichtsbarkeit erreicht haben) und stimmen diesen Bedingungen zu. Wenn Sie nicht zustimmen, müssen Sie den Dienst sofort verlassen.</p>
+                <p>Durch den Zugriff auf xFetishHub bestätigen Sie, dass Sie mindestens 18 Jahre alt sind und stimmen diesen Bedingungen zu. Wenn Sie nicht zustimmen, müssen Sie den Dienst sofort verlassen.</p>
                 
                 <h3>2. Art des Dienstes</h3>
-                <p>xFetishHub ist ein Suchaggregator und eine Empfehlungsmaschine. <b>Wir hosten, laden hoch oder kontrollieren keine Videoinhalte.</b> Alle vom Dienst generierten Links führen zu Websites Dritter (z. B. xHamster, Pornhub). Wir dienen lediglich als Vermittler zum Auffinden von Inhalten, die öffentlich im Internet verfügbar sind.</p>
+                <p>xFetishHub ist ein Suchaggregator und eine Empfehlungsmaschine. <b>Wir hosten, laden hoch oder kontrollieren keine Videoinhalte.</b> Alle Links führen zu Websites Dritter. Wir dienen lediglich als Vermittler zum Auffinden von Inhalten, die öffentlich verfügbar sind.</p>
                 
                 <h3>3. Inhalte Dritter</h3>
-                <p>Wir haben keine Kontrolle über und übernehmen keine Verantwortung für die Inhalte, Datenschutzrichtlinien oder Praktiken von Websites Dritter. Sie erkennen an, dass xFetishHub weder direkt noch indirekt für Schäden oder Verluste haftbar gemacht werden kann, die durch Ihre Nutzung von Inhalten Dritter verursacht werden.</p>
+                <p>Wir haben keine Kontrolle über und übernehmen keine Verantwortung für die Inhalte oder Datenschutzrichtlinien von Websites Dritter. Sie erkennen an, dass xFetishHub nicht für Schäden haftbar gemacht werden kann, die durch Ihre Nutzung von Inhalten Dritter verursacht werden.</p>
                 
                 <h3>4. Benutzerkonten & Abonnements</h3>
-                <p>Einige Funktionen erfordern ein kostenpflichtiges Abonnement ("Pro" oder "Beast"). Die Zahlungsabwicklung erfolgt durch Drittanbieter. Wir speichern Ihre Zahlungsdaten nicht. Wir behalten uns das Recht vor, Konten zu kündigen, die gegen diese Bedingungen verstoßen.</p>
+                <p>Einige Funktionen erfordern ein kostenpflichtiges Abonnement ("Pro" oder "Beast"). Die Zahlung erfolgt per direkter Kryptowährungsüberweisung (USDT). Wir speichern keine Zahlungsdaten. Wir behalten uns das Recht vor, Konten zu kündigen, die gegen diese Bedingungen verstoßen.</p>
                 
                 <h3>5. Gewährleistungsausschluss</h3>
-                <p>Der Dienst wird "WIE BESEHEN" (AS IS) bereitgestellt. Wir garantieren nicht, dass die generierten Ergebnisse Ihren Anforderungen entsprechen oder fehlerfrei sind.</p>
+                <p>Der Dienst wird "WIE BESEHEN" bereitgestellt. Wir garantieren nicht, dass die Ergebnisse Ihren Anforderungen entsprechen oder fehlerfrei sind.</p>
             `,
 
             privacy_text: `
                 <h3>1. Einführung</h3>
-                <p>Ihre Privatsphäre ist unsere Priorität. Diese Richtlinie erklärt, wie wir mit Ihren Daten umgehen. Unser Ziel ist es, nur die absolut notwendigen Informationen zu sammeln, die für den Dienst erforderlich sind.</p>
+                <p>Ihre Privatsphäre ist unsere Priorität. Diese Richtlinie erklärt, wie wir mit Ihren Daten umgehen. Wir sammeln nur die absolut notwendigen Informationen.</p>
                 
                 <h3>2. Datenerfassung</h3>
-                <ul>
-                    <li><b>Authentifizierungsdaten:</b> Wenn Sie sich über Google anmelden, erhalten wir Ihre E-Mail-Adresse und UID, um Ihre Einstellungen zu synchronisieren. Wir sehen Ihr Passwort nicht.</li>
-                    <li><b>Nutzungsdaten:</b> Wir speichern Ihren generierten Verlauf, Favoriten und Präferenzen lokal auf Ihrem Gerät und verschlüsselt in unserer Datenbank, um den Algorithmus zu betreiben.</li>
-                    <li><b>Lokaler Speicher:</b> Wir verwenden den lokalen Browserspeicher, um Ihre Einstellungen (Thema, Sprache) ohne Tracking-Cookies zu speichern.</li>
-                </ul>
+                <p><b>Authentifizierung:</b> Wenn Sie sich über Google anmelden, erhalten wir Ihre E-Mail und UID. Wir sehen Ihr Passwort nicht. <b>Nutzung:</b> Wir speichern Ihren Verlauf, Favoriten und Präferenzen lokal und verschlüsselt in unserer Datenbank. <b>Lokaler Speicher:</b> Wir verwenden den lokalen Browserspeicher für Ihre Einstellungen.</p>
 
                 <h3>3. Verwendung der Daten</h3>
-                <p>Ihre Daten werden ausschließlich verwendet für:</p>
-                <ul>
-                    <li>Synchronisierung Ihres Fortschritts über Geräte hinweg.</li>
-                    <li>Überprüfung Ihres Abonnementstatus.</li>
-                    <li>Training des Personalisierungsalgorithmus zur Verbesserung von Vorschlägen.</li>
-                </ul>
-                <p><b>Wir verkaufen, handeln oder vermieten Ihre persönlichen Identifikationsdaten nicht an Dritte.</b></p>
+                <p>Ihre Daten werden ausschließlich verwendet für: Synchronisierung Ihres Fortschritts, Überprüfung Ihres Abonnementstatus und Training des Personalisierungsalgorithmus. <b>Wir verkaufen Ihre Daten nicht an Dritte.</b></p>
 
                 <h3>4. Datenlöschung</h3>
-                <p>Sie können jederzeit die vollständige Löschung Ihres Kontos und Ihrer Daten beantragen, indem Sie den Support kontaktieren oder die Schaltfläche "Daten zurücksetzen" in der App verwenden.</p>
+                <p>Sie können jederzeit die vollständige Löschung Ihres Kontos und Ihrer Daten beantragen, indem Sie den Support kontaktieren oder "Daten zurücksetzen" in der App verwenden.</p>
             `,
 
             refund_text: `
                 <h3>1. Richtlinie für digitale Güter</h3>
-                <p>Aufgrund der Natur digitaler Inhalte sind alle Verkäufe von Aktivierungscodes und Abonnements für xFetishHub in der Regel <b>endgültig und nicht erstattungsfähig</b>, sobald der Code geliefert oder das Abonnement aktiviert wurde.</p>
+                <p>Aufgrund der Natur digitaler Inhalte sind alle Verkäufe von Abonnements für xFetishHub in der Regel <b>endgültig und nicht erstattungsfähig</b>, sobald das Abonnement aktiviert wurde.</p>
                 
                 <h3>2. Ausnahmen</h3>
-                <p>Wir können nach eigenem Ermessen unter folgenden Umständen eine Rückerstattung oder einen Ersatz anbieten:</p>
-                <ul>
-                    <li><b>Technischer Fehler:</b> Der bereitgestellte Aktivierungscode war ungültig oder defekt.</li>
-                    <li><b>Nichtlieferung:</b> Sie haben bezahlt, aber den Dienst/Code nicht innerhalb von 24 Stunden erhalten.</li>
-                    <li><b>Doppelbuchung:</b> Aufgrund eines technischen Fehlers wurde Ihnen derselbe Zeitraum zweimal berechnet.</li>
-                </ul>
+                <p>Wir können unter folgenden Umständen eine Rückerstattung anbieten: <b>Nichtlieferung:</b> Sie haben bezahlt, aber den Dienst nicht innerhalb von 24 Stunden erhalten. <b>Doppelbuchung:</b> Ihnen wurde derselbe Zeitraum aufgrund eines Fehlers zweimal berechnet.</p>
 
                 <h3>3. Anforderung</h3>
-                <p>Um eine Rückerstattung zu beantragen, kontaktieren Sie bitte den Support über die Schaltfläche "Problem melden". Geben Sie Ihre Transaktions-ID und das Kaufdatum an. Anfragen müssen innerhalb von 14 Tagen nach dem Kauf gestellt werden.</p>
+                <p>Um eine Rückerstattung zu beantragen, kontaktieren Sie den Support. Geben Sie Ihre Transaktions-ID (TxID) an. Anfragen müssen innerhalb von 14 Tagen nach dem Kauf gestellt werden.</p>
             `
         }
     };
