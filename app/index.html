@@ -6362,19 +6362,26 @@
             .modal-close-btn {
                 width: 36px !important;
                 height: 36px !important;
-                background: rgba(128, 128, 128, 0.15) !important; /* Круглый фон на мобильных */
+                background: rgba(128, 128, 128, 0.15) !important;
                 border-radius: 50% !important;
             }
 
             .modal-close-icon {
+                /* 1. Сбрасываем ВСЕ границы, чтобы убрать наследство от десктопа */
+                border: none !important; 
+                
                 width: 8px !important;
                 height: 8px !important;
+                
+                /* 2. Рисуем только две нужные стороны для "уголка" стрелки */
                 border-top: 2px solid var(--text-main) !important;
                 border-left: 2px solid var(--text-main) !important;
-                /* Поворачиваем так, чтобы получилась стрелка влево */
+                
+                /* 3. Поворачиваем на -45 градусов, чтобы угол смотрел влево */
                 transform: rotate(-45deg) !important; 
-                /* Оптическое центрирование (стрелки визуально кажутся правее, если их не сдвинуть чуть-чуть) */
+                
                 margin-left: 2px !important; 
+                display: block !important;
                 opacity: 0.8 !important;
             }
 
