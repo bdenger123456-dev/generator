@@ -8392,7 +8392,7 @@
                     Write your name in history. It will be visible to everyone forever. <br><b>You can only do this once.</b>
                 </p>
                 <div style="display: flex; gap: 10px;">
-                    <input type="text" id="sponsor-nickname-input" class="promo-input" placeholder="Your Nickname" maxlength="15" style="font-size: 14px; padding: 10px;">
+                    <input type="text" id="sponsor-nickname-input" class="promo-input" placeholder="Your Nickname" maxlength="30" style="font-size: 14px; padding: 10px;">
                     <button class="btn-gen" onclick="submitSponsorName()" style="width: auto; padding: 0 20px; font-size: 13px; background: #00d2ff; color: #000;">
                         <span data-key="spon_btn_save">Save</span>
                     </button>
@@ -8988,7 +8988,7 @@
         const user = auth.currentUser;
 
         if (!name) return alert("Please enter a name");
-        if (name.length > 15) return alert("Name is too long (max 15 chars)");
+        if (name.length > 30) return alert("Name is too long (max 30 chars)");
         if (!user) return alert("Error: User not found");
 
         const btn = document.querySelector('#sponsor-input-container button');
@@ -15832,7 +15832,13 @@
         document.querySelectorAll('[data-key]').forEach(el => {
             const key = el.getAttribute('data-key');
             if(t[key]) {
-                if (key.startsWith('inst_') || key.startsWith('badge_') || key.startsWith('feat_') || key.startsWith('pay_') || key.startsWith('guide_') || key === 'sync_tip') {
+                if (key.startsWith('inst_') || 
+                    key.startsWith('badge_') || 
+                    key.startsWith('feat_') || 
+                    key.startsWith('pay_') || 
+                    key.startsWith('guide_') || 
+                    key.startsWith('spon_') || 
+                    key === 'sync_tip') {
                     el.innerHTML = t[key];
                 } else {
                     el.innerText = t[key];
