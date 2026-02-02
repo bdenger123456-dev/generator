@@ -7647,16 +7647,15 @@
                 </label>
             </div>
 
-            <div class="ios-header" data-key="header_notifications">Notifications</div>
-            <div class="ios-group">
-                <!-- Строка с кнопкой включения -->
-                <div class="ios-row clickable" onclick="enableNotifications()">
-                    <div class="ios-row-left">
-                        <img src="notification.png" class="settings-icon" alt="Badge"> 
-                        <span data-key="badge_indicator_label">Icon Badge Indicator</span>
-                    </div>
-                    <div class="chevron"></div>
+            <div class="ios-row">
+                <div class="ios-row-left">
+                    <img src="notification.png" class="settings-icon" alt="Badge">
+                    <span class="toggle-text" data-key="badge_indicator_label">Icon Badge Indicator</span>
                 </div>
+                <label class="switch">
+                    <input type="checkbox" id="badge-toggle" onchange="handleNotificationToggle(this.checked)">
+                    <span class="slider"></span>
+                </label>
             </div>
         </div>
     </div>
@@ -10525,7 +10524,7 @@
             deco_label: "Show Decorations",
 
             header_notifications: "Notifications",
-            badge_indicator_label: "Update Indicator (Red Dot)",
+            badge_indicator_label: "Notifications",
             badge_enabled_msg: "Indicator enabled! You will see a red dot on the app icon when Wrapped is ready or subscription is ending.",
             badge_denied_msg: "Permission denied. Please enable notifications in iOS Settings to use this feature.",
 
@@ -11258,7 +11257,7 @@
             deco_label: "Показывать декор",
 
             header_notifications: "Уведомления",
-            badge_indicator_label: "Точка на иконке (Обновления)",
+            badge_indicator_label: "Уведомления",
             badge_enabled_msg: "Индикатор включен! Ты увидишь красную точку на иконке приложения, когда будет готов Wrapped или заканчиваться подписка.",
             badge_denied_msg: "Доступ запрещен. Пожалуйста, включи уведомления в настройках iOS для этого приложения.",
 
@@ -11988,7 +11987,7 @@
             deco_label: "Mostrar decoración",
 
             header_notifications: "Notificaciones",
-            badge_indicator_label: "Punto en el icono (Actualizaciones)",
+            badge_indicator_label: "Notificaciones",
             badge_enabled_msg: "¡Indicador activado! Verás un punto rojo en el icono de la app cuando un Wrapped esté listo o tu suscripción esté terminando.",
             badge_denied_msg: "Permiso denegado. Por favor, activa las notificaciones en los Ajustes de iOS para usar esta función.",
             
@@ -12692,7 +12691,7 @@
             deco_label: "Dekoration anzeigen",
 
             header_notifications: "Benachrichtigungen",
-            badge_indicator_label: "Punkt am Icon (Updates)",
+            badge_indicator_label: "Benachrichtigungen",
             badge_enabled_msg: "Indikator aktiviert! Du siehst einen roten Punkt auf dem App-Icon, wenn ein Wrapped bereit ist oder dein Abo ausläuft.",
             badge_denied_msg: "Berechtigung verweigert. Bitte aktiviere die Benachrichtigungen in den iOS-Einstellungen, um diese Funktion zu nutzen.",
             
@@ -13957,6 +13956,7 @@
         }, 500); 
 
         updateAppBadge();
+        checkNotificationState();
     }
 
     window.onload = loadData;
@@ -17318,26 +17318,46 @@
         return Math.round(newPrice * 100) / 100; // Округление
     }
 
-    async function enableNotifications() {
+    async function handleNotificationToggle(isChecked) {
         const t = langData[currentLang] || langData['en'];
+        const toggle = document.getElementById('badge-toggle');
 
-        if (!("Notification" in window)) {
-            alert("This browser does not support notifications");
-            return;
-        }
-
-        const permission = await Notification.requestPermission();
-
-        if (permission === 'granted') {
-            if (typeof updateAppBadge === 'function') {
-                updateAppBadge();
+        if (isChecked) {
+            // Если включают
+            if (!("Notification" in window)) {
+                alert("This browser does not support notifications");
+                toggle.checked = false;
+                return;
             }
-            alert(t.badge_enabled_msg);
+
+            const permission = await Notification.requestPermission();
+
+            if (permission === 'granted') {
+                if (typeof updateAppBadge === 'function') {
+                    updateAppBadge();
+                }
+                // Можно не бесить алертом, а просто оставить свитч включенным
+                console.log("Notifications granted");
+            } else {
+                // Если отказал — выключаем свитч обратно
+                alert(t.badge_denied_msg);
+                toggle.checked = false;
+            }
         } else {
-            alert(t.badge_denied_msg); 
+            // Если выключают — просто очищаем бейдж
+            if ('clearAppBadge' in navigator) {
+                navigator.clearAppBadge();
+            }
         }
     }
-    
+
+    function checkNotificationState() {
+        const toggle = document.getElementById('badge-toggle');
+        if (toggle && Notification.permission === 'granted') {
+            toggle.checked = true;
+        }
+    }
+
     function checkLoyaltyStatus() {
         // 1. Условия показа
         const isFree = subscriptionLevel === 'free';
