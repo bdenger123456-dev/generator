@@ -20190,9 +20190,12 @@
         let favName = null;
         let newName = null;
 
-        // 1. Поиск данных (оставляем вашу логику)
+        // 1. Поиск данных (Любимое / Pleasure)
+        // Собираем ID из WatchHistory (последние 20)
         const watchedIds = watchHistory.slice(0, 20).map(w => w.id);
+        // Объединяем с Избранным и убираем дубликаты
         const sourceIds = [...new Set([...favorites, ...watchedIds])];
+        // Фильтруем: предмет должен существовать в базе и НЕ быть в ЧС
         const validCandidates = data.filter(item => sourceIds.includes(item.id) && !blacklist.includes(item.id));
 
         if (validCandidates.length > 0) {
@@ -20201,40 +20204,54 @@
             suggestedFavId = winnerItem.id; 
         }
 
+        // 2. Поиск данных (Новое / Explore)
         let safePool = data;
+        // Фильтрация по интенсивности
         if (currentIntensity === 1) {
             safePool = data.filter(item => !item.tags.some(t => EXTREME_TAGS.includes(t) || SPICY_TAGS.includes(t)));
         } else if (currentIntensity === 2) {
             safePool = data.filter(item => !item.tags.some(t => EXTREME_TAGS.includes(t)));
         }
 
-        const randomPool = safePool.sort(() => 0.5 - Math.random()).slice(0, 50).filter(item => !blacklist.includes(item.id) && !favorites.includes(item.id) && item.name !== favName);
+        // Выбираем из безопасного пула, исключая уже известное
+        const randomPool = safePool
+            .sort(() => 0.5 - Math.random())
+            .slice(0, 50)
+            .filter(item => 
+                !blacklist.includes(item.id) && 
+                !favorites.includes(item.id) && 
+                item.name !== favName
+            );
         
         if (randomPool.length > 0) {
             const randomNewItem = randomPool[0];
             newName = getLocalizedName(randomNewItem);
             suggestedNewId = randomNewItem.id;
+        } else {
+            // Если ничего не нашлось, заглушка
+            newName = "Vanilla";
+            suggestedNewId = null; 
         }
 
-        // --- ЛОГИКА ЦВЕТОВ ---
+        // --- ЛОГИКА ЦВЕТОВ (Исправленная) ---
         const currentTheme = document.body.getAttribute('data-theme') || 'dark';
         let colorFav, colorNew;
 
         if (currentTheme === 'noir') {
-            // Нуар: светло-серый и темно-серый
-            colorFav = "#ffffff"; // Белый/светло-серый
-            colorNew = "#666666"; // Глубокий серый
+            // Нуар: белый и темно-серый
+            colorFav = "#ffffff"; 
+            colorNew = "#666666"; 
         } else if (currentTheme === 'old-money') {
-            // Old Money: "Дорогие" оттенки
-            colorFav = "#7d8c7c"; // Винтажный оливково-зеленый (Sage)
-            colorNew = "#a67c7c"; // Приглушенный винный/красный (Dusty Rose)
+            // Old Money: оливковый и приглушенный красный
+            colorFav = "#7d8c7c"; 
+            colorNew = "#a67c7c"; 
         } else {
-            // Дефолт и остальные темы: стандартные Зеленый и Красный (цвета кнопок Like/Pass)
-            colorFav = "#2ecc71"; // Emerald Green
-            colorNew = "#e74c3c"; // Alizarin Red
+            // Дефолт: Зеленый и Красный
+            colorFav = "#2ecc71"; 
+            colorNew = "#e74c3c"; 
         }
 
-        // Формирование фразы
+        // --- 3. ФОРМИРУЕМ ФРАЗУ ---
         if (favName && newName && t.mode_greeting_dynamic) {
             const templates = t.mode_greeting_dynamic;
             const template = templates[Math.floor(Math.random() * templates.length)];
@@ -20243,13 +20260,14 @@
                 .replace('{fav}', `<span style="color:${colorFav}; font-weight:800;">${favName}</span>`)
                 .replace('{new}', `<span style="color:${colorNew}; font-weight:800;">${newName}</span>`);
         } else {
+            // Фолбек на обычные фразы
             const phrases = Array.isArray(t.mode_greeting_hint) ? t.mode_greeting_hint : [t.mode_greeting_hint];
             finalPhrase = phrases[Math.floor(Math.random() * phrases.length)];
         }
                 
         el.innerHTML = finalPhrase;
     }
-
+    
     function toggleModeDropdown(type) {
         const id = type === 'pc' ? 'mode-capsule-pc' : 'mode-capsule-mobile';
         const wrapper = document.getElementById(id);
