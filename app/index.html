@@ -8125,6 +8125,25 @@
                 </div>
             </div>
 
+            <!-- 3. СТАТИСТИКА ПОЛЬЗОВАТЕЛЕЙ-->
+            <div class="ios-group" style="padding:15px; margin-bottom: 20px; background: rgba(255,255,255,0.03);">
+                <div style="font-weight:700; margin-bottom:10px; font-size:12px; text-transform:uppercase; color:var(--accent);">
+                    📊 Общая статистика
+                </div>
+                <div id="admin-stats-container" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div class="sync-stat-item">
+                        <span class="sync-stat-val" id="stat-total-users">...</span>
+                        <span class="sync-stat-label">Юзеров</span>
+                    </div>
+                    <div class="sync-stat-item">
+                        <span class="sync-stat-val" id="stat-premium-users">...</span>
+                        <span class="sync-stat-label">Premium</span>
+                    </div>
+                </div>
+                <button class="btn-gen" onclick="refreshAdminStats()" style="margin-top:10px; padding:8px; font-size:12px; background: var(--nav-bg); color: var(--text-main);">
+                    Обновить данные
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -8947,7 +8966,7 @@
         getFirestore, doc, setDoc, addDoc, getDoc, getDocs, updateDoc, 
         serverTimestamp, writeBatch, query, where, collection, 
         deleteField, Timestamp, limit, orderBy, 
-        initializeFirestore, persistentLocalCache 
+        initializeFirestore, persistentLocalCache, getCountFromServer
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -9693,6 +9712,40 @@
         } catch (e) {
             console.error("Auto-save error:", e);
         }
+    };
+
+    window.refreshAdminStats = async function() {
+        const user = auth.currentUser;
+        if (!user || user.uid !== ADMIN_UID) return;
+
+        const btn = event.target;
+        const originalText = btn.innerText;
+        btn.innerText = "Загрузка...";
+
+        try {
+            const usersRef = collection(db, "users");
+
+            // 1. Общее кол-во пользователей
+            const totalSnapshot = await getCountFromServer(usersRef);
+            document.getElementById('stat-total-users').innerText = totalSnapshot.data().count;
+
+            // 2. Кол-во платных (где подписка не free)
+            const premiumQuery = query(usersRef, where("subscription", "!=", "free"));
+            const premiumSnapshot = await getCountFromServer(premiumQuery);
+            document.getElementById('stat-premium-users').innerText = premiumSnapshot.data().count;
+
+        } catch (e) {
+            console.error("Ошибка админ-статистики:", e);
+        } finally {
+            btn.innerText = originalText;
+        }
+    };
+
+    // Авто-запуск при открытии админки
+    const originalOpenAdminModal = window.openAdminModal;
+    window.openAdminModal = function() {
+        originalOpenAdminModal();
+        refreshAdminStats();
     };
 
 </script>
