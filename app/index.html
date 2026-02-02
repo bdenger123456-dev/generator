@@ -7646,6 +7646,18 @@
                     <span class="slider"></span>
                 </label>
             </div>
+
+            <div class="ios-header" data-key="header_notifications">Notifications</div>
+            <div class="ios-group">
+                <!-- Строка с кнопкой включения -->
+                <div class="ios-row clickable" onclick="enableNotifications()">
+                    <div class="ios-row-left">
+                        <img src="notification.png" class="settings-icon" alt="Badge"> 
+                        <span data-key="badge_indicator_label">Icon Badge Indicator</span>
+                    </div>
+                    <div class="chevron"></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -9546,6 +9558,8 @@
         }
     });
 
+
+
     // 2. Таймер: сохраняем раз в 3 минуты (180 секунд), если есть изменения
     if (saveInterval) clearInterval(saveInterval);
     saveInterval = setInterval(() => {
@@ -10510,6 +10524,26 @@
             expl_hist: "From Archives 📜",
             deco_label: "Show Decorations",
 
+            header_notifications: "Notifications",
+            badge_indicator_label: "Update Indicator (Red Dot)",
+            badge_enabled_msg: "Indicator enabled! You will see a red dot on the app icon when Wrapped is ready or subscription is ending.",
+            badge_denied_msg: "Permission denied. Please enable notifications in iOS Settings to use this feature.",
+
+            tip_badge_title: "Never miss a Wrapped",
+            tip_badge_desc: "Enable the red dot on the app icon",
+            tip_badge_text: `
+                <b>What is a Badge?</b><br>
+                It's a small red circle on the app icon (like in Telegram or Mail) that reminds you of something important without sending annoying text notifications.<br><br>
+                <b>When will it appear?</b><br>
+                1. <b>Fetish Wrapped:</b> When your personal summary for the day or week is ready.<br>
+                2. <b>Subscription:</b> If your Premium is about to expire (3 days left).<br><br>
+                <b>How to enable:</b><br>
+                1. Make sure you have <b>installed the App</b> on your home screen.<br>
+                2. Go to <b>Settings</b> inside xFetishHub.<br>
+                3. Find <b>"Update Indicator"</b> and tap it.<br>
+                4. When the system asks, click <b>"Allow"</b>.
+            `,
+
             sync_minutes: "Minutes",
 
             spon_header: "Bestie Privilege 💎",
@@ -11223,6 +11257,27 @@
             expl_hist: "Из архивов 📜",
             deco_label: "Показывать декор",
 
+            header_notifications: "Уведомления",
+            badge_indicator_label: "Точка на иконке (Обновления)",
+            badge_enabled_msg: "Индикатор включен! Ты увидишь красную точку на иконке приложения, когда будет готов Wrapped или заканчиваться подписка.",
+            badge_denied_msg: "Доступ запрещен. Пожалуйста, включи уведомления в настройках iOS для этого приложения.",
+
+            tip_badge_title: "Как не пропускать сводки?",
+            tip_badge_desc: "Включаем красный индикатор на иконке",
+            tip_badge_text: `
+                <b>Что такое бейдж?</b><br>
+                Это маленькая красная точка на иконке приложения (как в Telegram или почте). Она бесшумно напоминает о важном, не забивая твой экран блокировки лишним текстом.<br><br>
+                <b>Когда она появляется?</b><br>
+                1. <b>Fetish Wrapped:</b> Когда твоя личная подборка за день или неделю готова к просмотру.<br>
+                2. <b>Подписка:</b> Если твой Premium статус заканчивается (за 3 дня до конца).<br><br>
+                <b>Как включить:</b><br>
+                1. Убедись, что ты <b>установил сайт как приложение</b> (на экран Домой).<br>
+                2. Перейди в <b>Настройки</b> внутри xFetishHub.<br>
+                3. Найди пункт <b>"Точка на иконке"</b> и нажми на него.<br>
+                4. В системном окне iOS нажми <b>"Разрешить"</b>.<br><br>
+                <i>Это абсолютно анонимно: точка не показывает текст, её видишь только ты.</i>
+            `,
+
             sync_minutes: "Минут",
 
             spon_header: "Привилегия Bestie 💎",
@@ -11932,6 +11987,27 @@
             expl_hist: "De los archivos 📜",
             deco_label: "Mostrar decoración",
 
+            header_notifications: "Notificaciones",
+            badge_indicator_label: "Punto en el icono (Actualizaciones)",
+            badge_enabled_msg: "¡Indicador activado! Verás un punto rojo en el icono de la app cuando un Wrapped esté listo o tu suscripción esté terminando.",
+            badge_denied_msg: "Permiso denegado. Por favor, activa las notificaciones en los Ajustes de iOS para usar esta función.",
+            
+            tip_badge_title: "¿Cómo no perderse los informes?",
+            tip_badge_desc: "Activa el indicador rojo en el icono",
+            tip_badge_text: `
+                <b>¿Qué es un Badge?</b><br>
+                Es un pequeño círculo rojo sobre el icono de la aplicación (como en Telegram o Mail) que te recuerda algo importante sin enviar molestas notificaciones de texto.<br><br>
+                <b>¿Cuándo aparecerá?</b><br>
+                1. <b>Fetish Wrapped:</b> Cuando tu resumen personal del día o la semana esté listo.<br>
+                2. <b>Suscripción:</b> Si tu Premium está a punto de caducar (faltan 3 días).<br><br>
+                <b>Cómo activarlo:</b><br>
+                1. Asegúrate de haber <b>instalado la App</b> en tu pantalla de inicio.<br>
+                2. Ve a <b>Ajustes</b> dentro de xFetishHub.<br>
+                3. Busca <b>"Punto en el icono"</b> y tócalo.<br>
+                4. Cuando el sistema lo solicite, haz clic en <b>"Permitir"</b>.<br><br>
+                <i>Es totalmente anónimo: el punto no muestra texto, solo tú sabes lo que significa.</i>
+            `,
+
             sync_minutes: "Minutos",
 
             spon_header: "Privilegio Bestie 💎",
@@ -12614,6 +12690,27 @@
             expl_undo: "Meinung geändert? 😏",
             expl_hist: "Aus dem Archiv 📜",
             deco_label: "Dekoration anzeigen",
+
+            header_notifications: "Benachrichtigungen",
+            badge_indicator_label: "Punkt am Icon (Updates)",
+            badge_enabled_msg: "Indikator aktiviert! Du siehst einen roten Punkt auf dem App-Icon, wenn ein Wrapped bereit ist oder dein Abo ausläuft.",
+            badge_denied_msg: "Berechtigung verweigert. Bitte aktiviere die Benachrichtigungen in den iOS-Einstellungen, um diese Funktion zu nutzen.",
+            
+            tip_badge_title: "Keine Berichte verpassen?",
+            tip_badge_desc: "Roten Punkt am Icon aktivieren",
+            tip_badge_text: `
+                <b>Was ist ein Badge?</b><br>
+                Es ist ein kleiner roter Kreis auf dem App-Icon (wie bei Telegram oder Mail), der dich an etwas Wichtiges erinnert, ohne nervige Textnachrichten zu senden.<br><br>
+                <b>Wann erscheint er?</b><br>
+                1. <b>Fetish Wrapped:</b> Wenn deine persönliche Zusammenfassung für den Tag oder die Woche bereit ist.<br>
+                2. <b>Abonnement:</b> Wenn dein Premium-Status bald abläuft (noch 3 Tage).<br><br>
+                <b>So aktivierst du es:</b><br>
+                1. Stelle sicher, dass du die <b>App auf deinem Home-Bildschirm installiert</b> hast.<br>
+                2. Gehe in xFetishHub zu den <b>Einstellungen</b>.<br>
+                3. Suche <b>"Punkt am Icon"</b> und tippe darauf.<br>
+                4. Wenn das System fragt, klicke auf <b>"Erlauben"</b>.<br><br>
+                <i>Dies ist absolut anonym: Der Punkt zeigt keinen Text an, nur du weißt, was er bedeutet.</i>
+            `,
 
             sync_minutes: "Minuten",
 
@@ -13376,11 +13473,19 @@
         textKey: 'tip_mods_text',
         gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' // Фиолетовый
     },
+    { 
+        id: 'missing_wrapped', 
+        icon: '🔔', 
+        titleKey: 'tip_badge_title', 
+        descKey: 'tip_badge_desc', 
+        textKey: 'tip_badge_text',
+        gradient: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)' 
+    }
 ];
     
     const TIPS_CATS = {
         tech: ['install_guide', 'mods_guide', 'ads', 'video', 'pay', 'bug', 'panic', 'layout', 'modes'],
-        info: ['sites_guide', 'algo_secrets', 'glossary', 'psychotypes', 'intensity']
+        info: ['sites_guide', 'algo_secrets', 'glossary', 'psychotypes', 'intensity', 'missing_wrapped']
     };
 
     // --- WRAPPED DATA & TEXTS ---
@@ -13850,6 +13955,8 @@
         setTimeout(() => {
             document.getElementById('loading-overlay').classList.add('hidden');
         }, 500); 
+
+        updateAppBadge();
     }
 
     window.onload = loadData;
@@ -17211,6 +17318,25 @@
         return Math.round(newPrice * 100) / 100; // Округление
     }
 
+    async function enableNotifications() {
+        const t = langData[currentLang] || langData['en'];
+
+        if (!("Notification" in window)) {
+            alert("This browser does not support notifications");
+            return;
+        }
+
+        const permission = await Notification.requestPermission();
+
+        if (permission === 'granted') {
+            if (typeof updateAppBadge === 'function') {
+                updateAppBadge();
+            }
+            alert(t.badge_enabled_msg);
+        } else {
+            alert(t.badge_denied_msg); 
+        }
+    }
     
     function checkLoyaltyStatus() {
         // 1. Условия показа
@@ -19754,6 +19880,13 @@
         }
     });
 
+    document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === 'hidden') {
+                // Когда пользователь сворачивает приложение, мы делаем финальную проверку
+                updateAppBadge();
+            }
+        });
+
     function openSponsorsModal() {
         const list = document.getElementById('sponsors-list');
         list.innerHTML = '';
@@ -21941,6 +22074,8 @@
         // Помечаем как просмотренное
         dataObj.viewed = true;
         localStorage.setItem('xch_wrapped_archive', JSON.stringify(wrappedArchive));
+
+         updateAppBadge();
         
         // Обновляем бейдж в меню статистики
         openStatistics(); 
@@ -23464,6 +23599,47 @@
             activeOverlay = null;
         });
     })();
+
+    // Управление точкой (бейджем) на иконке
+    async function updateAppBadge() {
+        if (!('setAppBadge' in navigator)) return;
+
+        try {
+            const isPaid = subscriptionLevel !== 'free';
+            let badgeCount = 0;
+
+            // 1. Проверка Wrapped
+            const unreadWrapped = wrappedArchive.filter(w => !w.viewed).length;
+            if (unreadWrapped > 0) badgeCount++;
+
+            // 2. Проверка готовности нового Wrapped (если старые прочитаны)
+            if (unreadWrapped === 0) {
+                if (activeDaysSet.size >= 7 || (isPaid && !hasDailyForYesterday())) {
+                    badgeCount++;
+                }
+            }
+
+            // 3. Проверка подписки (если осталось меньше 3 дней)
+            if (cachedUserProfile && cachedUserProfile.expiresAt) {
+                const now = new Date();
+                const expDate = cachedUserProfile.expiresAt.toDate ? cachedUserProfile.expiresAt.toDate() : new Date(cachedUserProfile.expiresAt);
+                const diffDays = Math.ceil((expDate - now) / (1000 * 60 * 60 * 24));
+                
+                if (diffDays <= 3 && diffDays > 0) {
+                    badgeCount++;
+                }
+            }
+
+            // Применяем бейдж
+            if (badgeCount > 0) {
+                await navigator.setAppBadge(badgeCount);
+            } else {
+                await navigator.clearAppBadge();
+            }
+        } catch (error) {
+            console.error('Ошибка установки бейджа:', error);
+        }
+    }
 
 </script>
 
