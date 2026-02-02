@@ -7877,10 +7877,10 @@
 <div class="modal-overlay" id="modal-sub-overlay" onclick="closeSubModal(event)">
     <div class="modal">
         <div class="modal-header">
-            <span data-key="sub_title">Premium Access</span>
-            <div class="modal-header-actions">
-                <div class="icon-btn-round" onclick="closeSubModal(null, true)">✕</div>
+            <div class="modal-close-btn" onclick="closeSubModal(null, true)">
+                <div class="modal-close-icon"></div>
             </div>
+            <span data-key="sub_title">Premium Access</span>
         </div>
         
         <div class="modal-body">
@@ -9219,17 +9219,15 @@
         if(emailEl) emailEl.innerText = user.email;
 
         const subValue = document.getElementById('sync-sub-value');
-        const subDesc = document.getElementById('sync-sub-desc');
+        const subDesc = document.getElementById('sync-sub-desc'); // Поле, где висело "Checking..."
         const subCard = document.getElementById('sync-sub-card');
 
-        // Сброс значений перед загрузкой
-        const ids = ['cloud-fav-count', 'cloud-wl-count', 'cloud-explored-count', 'cloud-ban-count'];
-        ids.forEach(id => { if(document.getElementById(id)) document.getElementById(id).innerText = "..."; });
+        // Сброс значений перед загрузкой (ставим прочерки вместо Checking)
+        if(subDesc) subDesc.innerText = "..."; 
 
-        // Загрузка данных
         const now = Date.now();
         let d = cachedUserProfile;
-        if (!d || (now - lastProfileReadTime > PROFILE_CACHE_TTL)) {
+        if (!d || (now - lastProfileReadTime > 60000)) {
             try {
                 const userRef = doc(db, "users", user.uid);
                 const docSnap = await getDoc(userRef);
@@ -9245,15 +9243,22 @@
         const t = langData[currentLang] || langData['en'];
 
         if (d) {
-            // 1. Подписка
+            // 1. Статус подписки
             const plan = d.subscription || 'free';
-            if(subValue) {
-                subValue.innerText = plan.toUpperCase();
-                if (plan === 'pro') subValue.style.color = '#ff9900';
-                else if (plan === 'beast') subValue.style.color = '#9b59b6';
-                else if (plan === 'bestie') subValue.style.color = '#00d2ff';
-                else subValue.style.color = 'var(--text-main)';
+            if(subValue) subValue.innerText = plan.toUpperCase();
+            
+            // --- ИСПРАВЛЕНИЕ "Checking..." ---
+            if(subDesc) {
+                if (plan === 'bestie') {
+                    subDesc.innerText = t.feat_lifetime.replace('<b>','').replace('</b>',''); 
+                } else if (d.expiresAt && plan !== 'free') {
+                    const expDate = d.expiresAt.toDate ? d.expiresAt.toDate() : new Date(d.expiresAt);
+                    subDesc.innerText = `${t.sub_exp || 'Expires:'} ${expDate.toLocaleDateString()}`;
+                } else {
+                    subDesc.innerText = plan === 'free' ? "Standard Account" : "Active";
+                }
             }
+
             if(subCard) {
                 subCard.classList.remove('is-free', 'is-pro', 'is-beast', 'is-bestie');
                 subCard.classList.add('is-' + plan);
