@@ -16208,50 +16208,72 @@
 
         updateStatsLocks();
 
+        // === ЛОГИКА WRAPPED КНОПКИ И БЕЙДЖА ===
         const wBtn = document.getElementById('btn-wrapped-trigger');
         const isPaid = subscriptionLevel !== 'free';
-        
+        const daysActive = activeDaysSet.size;
+
+        // Удаляем старый прогресс-бар (лок), если он есть
+        const oldProgress = document.getElementById('wrapped-progress-ui');
+        if (oldProgress) oldProgress.remove();
+
+        // Очищаем старые интервалы
         if (wrappedTimerInterval) clearInterval(wrappedTimerInterval);
         if (wrappedRotationInterval) clearInterval(wrappedRotationInterval);
 
-        // Собираем очередь ротации
+        // 1. Проверяем, есть ли НЕПРОЧИТАННЫЕ (New)
         let rotationQueue = [];
         const unreadItems = wrappedArchive.filter(w => !w.viewed).sort((a,b) => b.timestamp - a.timestamp);
-        const badges = WRAPPED_CONFIG.badges[currentLang] || WRAPPED_CONFIG.badges['en'];
+        let hasNew = unreadItems.length > 0;
 
-        // 1. Непрочитанные (приоритет)
-        unreadItems.forEach(item => {
-            rotationQueue.push({
-                period: badges[item.type] || item.type,
-                badge: `<span style="background:var(--accent); color:#000; font-size:10px; font-weight:800; padding:3px 8px; border-radius:6px;">NEW</span>`
-            });
-        });
-
-        // 2. Готовность к генерации
-        const readyToGen = isPaid ? !hasDailyForYesterday() : activeDaysSet.size >= 7;
-        if (readyToGen) {
-            rotationQueue.push({
-                period: isPaid ? badges.daily : badges.weekly,
-                badge: `<span style="background:#2ecc71; color:#000; font-size:10px; font-weight:800; padding:3px 8px; border-radius:6px;">READY</span>`
-            });
+        // 2. Проверяем доступность НОВОГО отчета ПРЯМО СЕЙЧАС
+        let readyToGenerate = false;
+        if (isPaid) {
+            if (!hasDailyForYesterday()) readyToGenerate = true;
+        } else {
+            if (activeDaysSet.size >= 7) readyToGenerate = true;
         }
 
-        // 3. Таймеры и прогресс (всегда в очереди)
-        // Daily Timer
-        const now = new Date();
-        const nextDay = new Date(now); nextDay.setDate(now.getDate() + 1); nextDay.setHours(0,0,0,0);
-        rotationQueue.push({ period: badges.daily, isTimer: true, target: nextDay });
+        // РЕШАЕМ: Показывать кнопку или нет
+        const showButton = hasNew || readyToGenerate || wrappedArchive.length > 0;
+        const badges = WRAPPED_CONFIG.badges[currentLang] || WRAPPED_CONFIG.badges['en'];
 
-        // Weekly Progress
-        const daysWord = currentLang === 'ru' ? 'дн.' : 'd';
-        rotationQueue.push({ 
-            period: badges.weekly, 
-            badge: `<span style="background:rgba(255,255,255,0.15); color:#fff; font-size:10px; font-weight:700; padding:3px 8px; border-radius:6px;">${activeDaysSet.size}/7 ${daysWord}</span>` 
-        });
+        if (showButton) {
+            // === ВАРИАНТ 1: ПОКАЗЫВАЕМ КНОПКУ ===
+            if(wBtn) wBtn.style.display = 'flex';
 
-        if (rotationQueue.length > 0 && wBtn) {
-            wBtn.style.display = 'flex';
-            // Устанавливаем базовый скелет кнопки
+            // Собираем очередь текстов
+            unreadItems.forEach(item => {
+                rotationQueue.push({
+                    period: badges[item.type] || item.type,
+                    badge: `<span style="background:var(--accent); color:#000; font-size:10px; font-weight:800; padding:3px 8px; border-radius:6px;">NEW</span>`
+                });
+            });
+
+            if (readyToGen) {
+                const readyText = isPaid ? "DAILY READY" : "WEEKLY READY";
+                rotationQueue.push({
+                    period: isPaid ? badges.daily : badges.weekly,
+                    badge: `<span style="background:#2ecc71; color:#000; font-size:10px; font-weight:800; padding:3px 8px; border-radius:6px;">${readyText}</span>`
+                });
+            }
+
+            // Таймер/Прогресс
+            const now = Date.now();
+            if (isPaid) {
+                const nextDay = new Date(); 
+                nextDay.setDate(nextDay.getDate() + 1); 
+                nextDay.setHours(0,0,0,0);
+                rotationQueue.push({ period: badges.daily, isTimer: true, target: nextDay });
+            } else {
+                const daysWord = currentLang === 'ru' ? 'дн.' : 'd';
+                rotationQueue.push({ 
+                    period: badges.weekly, 
+                    badge: `<span style="background:rgba(255,255,255,0.15); color:#fff; font-size:10px; font-weight:700; padding:3px 8px; border-radius:6px;">${daysActive}/7 ${daysWord}</span>` 
+                });
+            }
+
+            // Рендер кнопки
             wBtn.innerHTML = `
                 <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
                     <span style="font-weight:800;">${t.wrapped_btn || "Fetish Wrapped ✨"}</span>
@@ -16263,6 +16285,7 @@
             let currentIndex = 0;
 
             const updateContent = (index) => {
+                if (!rotationQueue[index]) return;
                 const item = rotationQueue[index];
                 let badgeHTML = item.badge || "";
 
@@ -16280,32 +16303,59 @@
                 `;
             };
 
-            // Первый запуск
             updateContent(0);
 
-            // Интервал смены элементов (каждые 2.5 сек)
-            wrappedRotationInterval = setInterval(() => {
-                infoCont.classList.add('fade-out'); // Начинаем исчезновение
-                
-                setTimeout(() => {
-                    currentIndex = (currentIndex + 1) % rotationQueue.length;
-                    updateContent(currentIndex);
-                    infoCont.classList.remove('fade-out'); // Появляемся с новым текстом
-                }, 400); // Ждем пока закончится анимация прозрачности (0.4s)
-                
-            }, 2500);
+            // Запускаем ротацию
+            if (rotationQueue.length > 1) {
+                wrappedRotationInterval = setInterval(() => {
+                    infoCont.classList.add('fade-out');
+                    setTimeout(() => {
+                        currentIndex = (currentIndex + 1) % rotationQueue.length;
+                        updateContent(currentIndex);
+                        infoCont.classList.remove('fade-out');
+                    }, 400);
+                }, 2500);
+            }
 
-            // Внутренний секундный таймер для обновления цифр, если сейчас показывается таймер
+            // Запускаем таймер (секундный)
             wrappedTimerInterval = setInterval(() => {
-                if (rotationQueue[currentIndex].isTimer) {
+                if (rotationQueue[currentIndex] && rotationQueue[currentIndex].isTimer) {
                     updateContent(currentIndex);
                 }
             }, 1000);
+
+        } else {
+            // === ВАРИАНТ 2: КНОПКА СКРЫТА, ПОКАЗЫВАЕМ ПРОГРЕСС-БАР ===
+            if(wBtn) wBtn.style.display = 'none';
+            
+            const percent = Math.min(100, (daysActive / 7) * 100);
+            const left = 7 - daysActive;
+            const titleTxt = t.wrapped_lock_title || "FETISH WRAPPED 🔒";
+            
+            let daysWord = currentLang === 'ru' ? 'дней' : 'days';
+            const descTxt = (t.wrapped_lock_desc || "Activity needed: {n}").replace('{n}', `${left} ${daysWord}`);
+
+            const progressHTML = `
+                <div id="wrapped-progress-ui" class="wrapped-lock-container" style="margin: 0 10px 20px 10px;">
+                    <div class="wrapped-lock-title">${titleTxt}</div>
+                    <div class="wrapped-lock-desc">${descTxt}</div>
+                    <div class="w-progress-track">
+                        <div class="w-progress-fill" style="width: ${percent}%"></div>
+                    </div>
+                    <div class="w-progress-text">${daysActive} / 7 ${daysWord}</div>
+                </div>
+            `;
+            const modalBody = document.getElementById('modal-stats-body');
+            if(modalBody) modalBody.insertAdjacentHTML('beforebegin', progressHTML);
         }
 
         const modal = document.getElementById('modal-stats-overlay');
         if (modal) {
             modal.classList.add('open');
+            // Принудительно открываем статистику
+            if (currentStatsTimeframe !== 'week' && subscriptionLevel === 'free') {
+               currentStatsTimeframe = 'week';
+            }
             renderStatsContent();
         }
     }
@@ -18023,10 +18073,10 @@
         const currentId = document.body.getAttribute('data-theme') || 'dark';
         const isPaid = subscriptionLevel !== 'free';
 
-        // Очищаем всё тело модалки, чтобы выстроить элементы в нужном порядке
+        // 1. Очистка
         modalBody.innerHTML = '';
 
-        // --- 1. БАЗОВЫЕ ТЕМЫ ---
+        // 2. Заголовки и Сетки
         const basicHeader = document.createElement('div');
         basicHeader.className = 'ios-header';
         basicHeader.style.marginTop = '0';
@@ -18037,7 +18087,6 @@
         basicGrid.className = 'theme-grid';
         modalBody.appendChild(basicGrid);
 
-        // --- 2. ПРЕМИУМ ТЕМЫ ---
         const premiumHeader = document.createElement('div');
         premiumHeader.className = 'ios-header';
         premiumHeader.innerText = t.theme_premium;
@@ -18047,7 +18096,7 @@
         premiumGrid.className = 'theme-grid';
         modalBody.appendChild(premiumGrid);
 
-        // Рендерим карточки тем
+        // 3. Рендер карточек
         APP_THEMES.forEach(theme => {
             const isLocked = (theme.type === 'pro' && !isPaid);
             const isActive = (currentId === theme.id);
@@ -18072,7 +18121,7 @@
             else premiumGrid.appendChild(div);
         });
 
-        // --- 3. НАСТРОЙКИ СЛУЧАЙНОЙ ТЕМЫ (ТЕПЕРЬ ТУТ) ---
+        // 4. Настройки случайной темы (Только для Pro)
         if (isPaid) {
             const isRandom = localStorage.getItem('xch_random_theme') === 'true';
             const includeLight = localStorage.getItem('xch_random_include_light') === 'true';
@@ -18101,10 +18150,10 @@
             modalBody.appendChild(randomDiv);
         }
 
-        // --- 4. ИКОНКИ ПРИЛОЖЕНИЯ (НАГРАДЫ) ---
+        // 5. Иконки приложений (Награды)
         const iconsHeader = document.createElement('div');
-        iconsHeader.className = 'ios-header'; // Тот же класс, что у тем
-        iconsHeader.innerText = t.theme_icons_header || "ИКОНКИ (НАГРАДЫ)";
+        iconsHeader.className = 'ios-header';
+        iconsHeader.innerText = t.theme_icons_header || "App Icons";
         modalBody.appendChild(iconsHeader);
 
         const iconsGrid = document.createElement('div');
@@ -18138,7 +18187,7 @@
             iconsGrid.appendChild(div);
         });
     }
-
+    
     function toggleRandomTheme(enabled) {
         localStorage.setItem('xch_random_theme', enabled);
         const lightRow = document.getElementById('row-include-light');
@@ -20267,7 +20316,7 @@
                 
         el.innerHTML = finalPhrase;
     }
-    
+
     function toggleModeDropdown(type) {
         const id = type === 'pc' ? 'mode-capsule-pc' : 'mode-capsule-mobile';
         const wrapper = document.getElementById(id);
