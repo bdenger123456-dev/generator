@@ -7694,7 +7694,7 @@
             <div id="btn-admin-trigger" class="ios-row clickable" onclick="openAdminModal()" style="display:none;">
                 <div class="ios-row-left">
                     <img src="admin.png" class="settings-icon" alt="Admin">
-                    <span style="font-weight:700; color:#ff0000;">Admin Panel</span>
+                    <span style="font-weight:700; color:var(--text-secondary);">Admin Panel</span>
                 </div>
                 <div class="chevron"></div>
             </div>
@@ -8058,62 +8058,60 @@
 
 <!-- ADMIN MODAL -->
 <div class="modal-overlay" id="modal-admin-overlay" onclick="closeAdminModal(event)">
-    <div class="modal" style="max-width: 500px;">
+    <div class="modal">
         <div class="modal-header">
             <div class="modal-close-btn" onclick="closeAdminModal(null, true)">
                 <div class="modal-close-icon"></div>
             </div>
-            <span style="font-weight: 800; letter-spacing: 0.5px;">ADMIN PANEL</span>
+            <span>Admin Panel</span>
         </div>
 
-        <div class="modal-body" style="padding: 15px 20px;">
+        <div class="modal-body" style="padding: 10px 15px;">
             
-            <!-- СЕКЦИЯ 1: СТАТИСТИКА (Bento Style) -->
-            <div class="ios-header">📊 ОБЩАЯ СТАТИСТИКА</div>
-            <div class="sync-stats-grid" style="margin-bottom: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <div class="sync-stat-item" style="background: var(--nav-bg); border: 1px solid var(--border);">
-                    <span class="sync-stat-val" id="stat-total-users" style="color: var(--text-main);">...</span>
+            <!-- СЕКЦИЯ 1: СТАТИСТИКА (Компактно) -->
+            <div class="ios-header" style="margin-left: 5px;">📊 СТАТИСТИКА</div>
+            <div class="sync-stats-grid" style="margin-bottom: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="sync-stat-item" style="background: var(--nav-bg); border: 1px solid var(--border); padding: 12px;">
+                    <span class="sync-stat-val" id="stat-total-users" style="font-size: 24px;">...</span>
                     <span class="sync-stat-label">Юзеров</span>
                 </div>
-                <div class="sync-stat-item" style="background: var(--nav-bg); border: 1px solid var(--border);">
-                    <span class="sync-stat-val" id="stat-premium-users" style="color: var(--accent);">...</span>
+                <div class="sync-stat-item" style="background: var(--nav-bg); border: 1px solid var(--border); padding: 12px;">
+                    <span class="sync-stat-val" id="stat-premium-users" style="font-size: 24px; color: var(--accent);">...</span>
                     <span class="sync-stat-label">Premium</span>
                 </div>
             </div>
-            <button class="btn-gen secondary" onclick="refreshAdminStats()" style="width: 100%; padding: 10px; font-size: 12px; margin-bottom: 25px; border-radius: 12px;">
+            <button class="btn-gen secondary" onclick="refreshAdminStats()" style="width: 100%; padding: 10px; font-size: 11px; margin-bottom: 20px; border-radius: 12px; height: auto;">
                 Обновить данные
             </button>
 
-            <!-- СЕКЦИЯ 2: ВЫДАЧА ПОДПИСКИ -->
-            <div class="ios-header">🎁 ВЫДАТЬ ПОДПИСКУ</div>
-            <div class="ios-group" style="padding: 15px; margin-bottom: 25px;">
-                <input type="text" id="admin-gift-email" class="promo-input" placeholder="Email или ник..." style="margin-bottom: 12px; width: 100%;">
+            <!-- СЕКЦИЯ 2: ВЫДАЧА (С фиксом отступов) -->
+            <div class="ios-header" style="margin-left: 5px;">🎁 ВЫДАЧА ПОДПИСКИ</div>
+            <div class="ios-group" style="margin-left:0 !important; margin-right:0 !important; width: 100% !important; padding: 15px; margin-bottom: 20px;">
+                <input type="text" id="admin-gift-email" class="promo-input" placeholder="Email или ник..." style="margin-bottom: 10px; width: 100%;">
                 
-                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                    <div style="flex: 1; position: relative;">
-                        <select id="admin-gift-type" class="promo-input" style="width: 100%; appearance: none; -webkit-appearance: none;">
-                            <option value="pro">Plan: Pro</option>
-                            <option value="beast">Plan: Beast</option>
-                            <option value="bestie">Plan: Bestie</option>
-                        </select>
-                        <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; opacity: 0.5;">▼</span>
-                    </div>
-                    <input type="number" id="admin-gift-days" class="promo-input" style="width: 90px;" value="30" placeholder="Дни">
+                <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+                    <select id="admin-gift-type" class="promo-input" style="flex: 1; padding-right: 25px;">
+                        <option value="pro">Pro</option>
+                        <option value="beast">Beast</option>
+                        <option value="bestie">Bestie</option>
+                    </select>
+                    <input type="number" id="admin-gift-days" class="promo-input" style="width: 70px;" value="30">
                 </div>
                 
-                <button class="btn-gen" onclick="adminGiftSub()" style="width: 100%; background: var(--accent); color: #000; font-weight: 800;">
+                <button class="btn-gen" onclick="adminGiftSub()" style="width: 100%; background: var(--accent); color: #000; font-weight: 800; font-size: 14px;">
                     АКТИВИРОВАТЬ
                 </button>
             </div>
 
-            <!-- СЕКЦИЯ 3: СКИДКИ -->
-            <div class="ios-header">⚡ УПРАВЛЕНИЕ СКИДКОЙ</div>
-            <div class="ios-group" style="padding: 15px;">
-                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <!-- СЕКЦИЯ 3: СКИДКИ (С фиксом отступов) -->
+            <div class="ios-header" style="margin-left: 5px;">⚡ УПРАВЛЕНИЕ СКИДКОЙ</div>
+            <div class="ios-group" style="margin-left:0 !important; margin-right:0 !important; width: 100% !important; padding: 15px;">
+                <div style="display: flex; gap: 8px; margin-bottom: 10px;">
                     <select id="admin-disc-target" class="promo-input" style="flex: 1.5;">
                         <option value="all">Все планы</option>
-                        <option value="pro">Только Pro</option>
-                        <option value="beast">Только Beast</option>
+                        <option value="pro">Pro</option>
+                        <option value="beast">Beast</option>
+                        <option value="bestie">Bestie</option>
                     </select>
                     <select id="admin-disc-type" class="promo-input" style="flex: 1;">
                         <option value="percent">%</option>
@@ -8121,16 +8119,16 @@
                     </select>
                 </div>
 
-                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                    <input type="number" id="admin-disc-value" class="promo-input" placeholder="Значение" style="flex: 1;">
-                    <input type="number" id="admin-disc-days" class="promo-input" placeholder="Дни" value="3" style="width: 80px;">
+                <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+                    <input type="number" id="admin-disc-value" class="promo-input" placeholder="Сумма/Процент" style="flex: 1;">
+                    <input type="number" id="admin-disc-days" class="promo-input" placeholder="Дни" value="3" style="width: 70px;">
                 </div>
 
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn-gen" onclick="adminSetDiscount()" style="flex: 1; background: var(--highlight-green); color: #fff; font-size: 14px;">
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-gen" onclick="adminSetDiscount()" style="flex: 1; background: var(--highlight-green); color: #fff; font-size: 13px;">
                         ЗАПУСТИТЬ
                     </button>
-                    <button class="btn-gen secondary" onclick="adminRemoveDiscount()" style="flex: 1; color: var(--highlight-red); border-color: var(--highlight-red); font-size: 14px;">
+                    <button class="btn-gen secondary" onclick="adminRemoveDiscount()" style="flex: 1; color: var(--highlight-red); border-color: var(--highlight-red); font-size: 13px;">
                         ОТКЛЮЧИТЬ
                     </button>
                 </div>
