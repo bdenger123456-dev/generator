@@ -1486,8 +1486,7 @@
                 border-left: none !important;
                 border-right: none !important;
                 
-                /* Учет "челки" iPhone снизу */
-                padding-bottom: env(safe-area-inset-bottom) !important;
+                padding-bottom: 0 !important;
                 
                 /* Анимация: Выезд снизу */
                 transform: translateY(100%) !important;
@@ -1522,7 +1521,13 @@
             
             /* Сдвигаем заголовок чуть ниже из-за ручки */
             .modal-header {
-                padding-top: 25px !important;
+                /* Центрируем содержимое строго по вертикали и горизонтали */
+                padding-top: 0 !important; 
+                min-height: 60px !important;
+                height: 60px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
             }
         }
 
@@ -2896,6 +2901,31 @@
         .w-badge.weekly { background: #2ecc71; } /* Зеленый */
         .w-badge.monthly { background: #f1c40f; } /* Золотой */
         .w-badge.yearly { background: linear-gradient(45deg, #FF9900, #9B59B6); color: #fff; }
+
+        /* Контейнер для динамической инфы в кнопке */
+        #wrapped-dynamic-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Класс для момента смены (скрытие) */
+        #wrapped-dynamic-info.fade-out {
+            opacity: 0;
+            transform: translateX(10px); /* Легкое смещение вправо при уходе */
+        }
+
+        /* Общий стиль текста периода внутри кнопки */
+        .wrapped-period-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.6);
+            letter-spacing: 0.5px;
+        }
 
         /* ФИНАЛЬНАЯ КАРТОЧКА */
         .sum-card-new {
@@ -5234,6 +5264,15 @@
             text-shadow: 0 0 10px rgba(255,255,255,0.3);
         }
 
+        body[data-theme="noir"] .mode-greeting-text b,
+        body[data-theme="noir"] .mode-greeting-text span[style*="var(--accent)"] {
+            color: #ffffff !important;
+        }
+        /* В нуаре второй цвет сделаем светло-серым для контраста */
+        body[data-theme="noir"] .mode-greeting-text span[style*="#CB53F0"] {
+            color: #aaaaaa !important;
+        }
+
         /* --- 8. OLD MONEY (Mahogany) --- */
         body[data-theme="old-money"] .logo span,
         body[data-theme="old-money"] .sum-logo-text span.grad {
@@ -5408,16 +5447,12 @@
             }
         }
 
-        /* Закрепленный футер модального окна */
         .modal-footer {
-            flex-shrink: 0; /* Запрещаем сжиматься */
-            padding: 15px 20px;
-            background: var(--sidebar-bg); /* Цвет фона как у модалки */
-            border-top: 1px solid var(--border); /* Разделитель сверху */
+            flex-shrink: 0;
+            padding: 15px 20px; /* Оставляем обычный отступ 15px со всех сторон */
+            background: var(--sidebar-bg);
+            border-top: 1px solid var(--border);
             z-index: 10;
-            
-            /* Учет безопасной зоны на iPhone (чтобы не перекрывало полоску домой) */
-            padding-bottom: calc(15px + env(safe-area-inset-bottom));
         }
 
         /* Корректировка капсулы, чтобы она растягивалась красиво */
@@ -5425,6 +5460,8 @@
             margin-top: 0;
             width: 100%;
         }
+
+
 
         /* VERSION CAPSULE STYLE */
         .version-card {
@@ -6648,6 +6685,8 @@
             }
         }
 
+        
+
         .modal.swiping {
             transition: none !important;
         }
@@ -7566,7 +7605,7 @@
                 </div>
                 
                 <!-- Слайдер  -->
-                <div class="slider-container" style="margin-left: 24px; width: calc(100% - 20px); box-sizing: border-box; margin-bottom: 5px;">
+                <div class="slider-container" style="margin-left: 24px; width: calc(100% - 26px); box-sizing: border-box; margin-bottom: 5px;">
                     <input type="range" min="1" max="3" value="1" step="1" id="intensity-slider" oninput="updateIntensity(this.value)">
                 </div>
             </div>
@@ -16163,159 +16202,117 @@
         forceShowResult(selected, 'tag_click');
     }
 
+    let wrappedRotationInterval = null;
+
     function openStatistics() {
-        const t = langData[currentLang];
-        // Локализация табов
-        if (document.getElementById('tf-week')) document.getElementById('tf-week').innerText = t.tf_week;
-        if (document.getElementById('tf-month')) document.getElementById('tf-month').innerText = t.tf_month;
-        if (document.getElementById('tf-year')) document.getElementById('tf-year').innerText = t.tf_year;
-        if (document.getElementById('tf-all')) document.getElementById('tf-all').innerText = t.tf_all;
+        const t = langData[currentLang] || langData['en'];
+        
+        // Стандартная локализация табов
+        ['tf-week', 'tf-month', 'tf-year', 'tf-all'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.innerText = t[id.replace('-', '_')];
+        });
 
-        updateStatsLocks(); // Обновляем замочки на табах
+        updateStatsLocks();
 
-        // === ЛОГИКА WRAPPED КНОПКИ И БЕЙДЖА ===
         const wBtn = document.getElementById('btn-wrapped-trigger');
         const isPaid = subscriptionLevel !== 'free';
-        const daysActive = activeDaysSet.size;
         
-        // Удаляем старый прогресс-бар (лок), если он есть
-        const oldProgress = document.getElementById('wrapped-progress-ui');
-        if (oldProgress) oldProgress.remove();
-
-        // Очищаем старый интервал таймера
         if (wrappedTimerInterval) clearInterval(wrappedTimerInterval);
+        if (wrappedRotationInterval) clearInterval(wrappedRotationInterval);
 
-        // 1. Проверяем, есть ли НЕПРОЧИТАННЫЕ (New)
+        // Собираем очередь ротации
+        let rotationQueue = [];
         const unreadItems = wrappedArchive.filter(w => !w.viewed).sort((a,b) => b.timestamp - a.timestamp);
-        let hasNew = unreadItems.length > 0;
+        const badges = WRAPPED_CONFIG.badges[currentLang] || WRAPPED_CONFIG.badges['en'];
 
-        // 2. Проверяем доступность НОВОГО отчета ПРЯМО СЕЙЧАС
-        let readyToGenerate = false;
-        if (isPaid) {
-            // Готов к генерации, если за ВЧЕРА отчет еще не создан
-            if (!hasDailyForYesterday()) {
-                readyToGenerate = true;
-            }
-        } else {
-            // Для бесплатных — если накопилось 7 дней
-            if (activeDaysSet.size >= 7) readyToGenerate = true;
+        // 1. Непрочитанные (приоритет)
+        unreadItems.forEach(item => {
+            rotationQueue.push({
+                period: badges[item.type] || item.type,
+                badge: `<span style="background:var(--accent); color:#000; font-size:10px; font-weight:800; padding:3px 8px; border-radius:6px;">NEW</span>`
+            });
+        });
+
+        // 2. Готовность к генерации
+        const readyToGen = isPaid ? !hasDailyForYesterday() : activeDaysSet.size >= 7;
+        if (readyToGen) {
+            rotationQueue.push({
+                period: isPaid ? badges.daily : badges.weekly,
+                badge: `<span style="background:#2ecc71; color:#000; font-size:10px; font-weight:800; padding:3px 8px; border-radius:6px;">READY</span>`
+            });
         }
 
-        // РЕШАЕМ: Показывать кнопку или нет
-        // Кнопку показываем, если: Есть новые, Есть старые (Архив), или Готов новый к генерации
-        const showButton = hasNew || readyToGenerate || wrappedArchive.length > 0;
+        // 3. Таймеры и прогресс (всегда в очереди)
+        // Daily Timer
+        const now = new Date();
+        const nextDay = new Date(now); nextDay.setDate(now.getDate() + 1); nextDay.setHours(0,0,0,0);
+        rotationQueue.push({ period: badges.daily, isTimer: true, target: nextDay });
 
-        if (showButton) {
-            if(wBtn) wBtn.style.display = 'flex';
+        // Weekly Progress
+        const daysWord = currentLang === 'ru' ? 'дн.' : 'd';
+        rotationQueue.push({ 
+            period: badges.weekly, 
+            badge: `<span style="background:rgba(255,255,255,0.15); color:#fff; font-size:10px; font-weight:700; padding:3px 8px; border-radius:6px;">${activeDaysSet.size}/7 ${daysWord}</span>` 
+        });
 
-            // ОПРЕДЕЛЕНИЕ ТЕКСТА БЕЙДЖА (Справа)
-            let badgeHTML = "";
-
-            if (hasNew) {
-                // Если есть непрочитанное - приоритет NEW
-                const type = unreadItems[0].type;
-                const typeText = WRAPPED_CONFIG.badges[currentLang][type] || type.toUpperCase();
-                badgeHTML = `<span style="color:#fff; margin-right:4px;">●</span>
-                             <span style="background:var(--accent); color:#000; font-size:10px; font-weight:800; padding:3px 8px; border-radius:6px; text-transform:uppercase;">${typeText}</span>`;
-            } 
-            else if (readyToGenerate) {
-                // Если готово к генерации
-                const readyText = isPaid ? "DAILY READY" : "WEEKLY READY";
-                badgeHTML = `<span style="background:#2ecc71; color:#000; font-size:10px; font-weight:800; padding:3px 8px; border-radius:6px; text-transform:uppercase;">${readyText}</span>`;
-            } 
-            else {
-                // === РЕЖИМ ОЖИДАНИЯ (TIMER / PROGRESS) ===
-                // Отчет сгенерирован, ждем следующего периода
-                
-                // Создаем элемент для таймера
-                const timerId = 'wrapped-countdown-' + Date.now();
-                
-                if (isPaid) {
-                    // Платный: Таймер до полуночи
-                    badgeHTML = `<span id="${timerId}" style="background:rgba(255,255,255,0.15); color:#fff; font-size:10px; font-weight:700; padding:3px 8px; border-radius:6px; font-variant-numeric: tabular-nums;">--:--:--</span>`;
-                    
-                    // Запуск таймера
-                    const updateTimer = () => {
-                        const el = document.getElementById(timerId);
-                        if (!el) return;
-                        
-                        const now = new Date();
-                        const tomorrow = new Date(now);
-                        tomorrow.setDate(tomorrow.getDate() + 1);
-                        tomorrow.setHours(0, 0, 0, 0);
-                        
-                        const diff = tomorrow - now;
-                        if (diff <= 0) {
-                            // Время пришло -> перезапускаем окно
-                            openStatistics();
-                            return;
-                        }
-                        
-                        const h = Math.floor(diff / 3600000);
-                        const m = Math.floor((diff % 3600000) / 60000);
-                        const s = Math.floor((diff % 60000) / 1000);
-                        
-                        el.innerText = `${h}:${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
-                    };
-                    
-                    // Запускаем сразу и в интервал
-                    setTimeout(updateTimer, 0);
-                    wrappedTimerInterval = setInterval(updateTimer, 1000);
-                } 
-                else {
-                    // Бесплатный: Прогресс дней (3/7)
-                    // Используем перевод слова "days"
-                    const daysWord = currentLang === 'ru' ? 'дн.' : 'd';
-                    badgeHTML = `<span style="background:rgba(255,255,255,0.15); color:#fff; font-size:10px; font-weight:700; padding:3px 8px; border-radius:6px;">${daysActive} / 7 ${daysWord}</span>`;
-                }
-            }
-
-            const btnTitle = t.wrapped_btn || "Fetish Wrapped ✨";
-            
-            // Вставляем HTML в кнопку
+        if (rotationQueue.length > 0 && wBtn) {
+            wBtn.style.display = 'flex';
+            // Устанавливаем базовый скелет кнопки
             wBtn.innerHTML = `
                 <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
-                    <span>${btnTitle}</span>
-                    <div style="display:flex; align-items:center;">
-                        ${badgeHTML}
-                    </div>
+                    <span style="font-weight:800;">${t.wrapped_btn || "Fetish Wrapped ✨"}</span>
+                    <div id="wrapped-dynamic-info"></div>
                 </div>
             `;
 
-        } else {
-            // Если кнопка скрыта (совсем новичок Free) -> Показываем большой прогресс-бар
-            if(wBtn) wBtn.style.display = 'none';
-            
-            const percent = Math.min(100, (daysActive / 7) * 100);
-            const left = 7 - daysActive;
-            const titleTxt = t.wrapped_lock_title || "FETISH WRAPPED 🔒";
-            
-            let daysWord = currentLang === 'ru' ? 'дней' : 'days';
-            const descTxt = (t.wrapped_lock_desc || "Activity needed: {n}").replace('{n}', `${left} ${daysWord}`);
+            const infoCont = document.getElementById('wrapped-dynamic-info');
+            let currentIndex = 0;
 
-            const progressHTML = `
-                <div id="wrapped-progress-ui" class="wrapped-lock-container" style="margin: 0 10px 20px 10px;">
-                    <div class="wrapped-lock-title">${titleTxt}</div>
-                    <div class="wrapped-lock-desc">${descTxt}</div>
-                    <div class="w-progress-track">
-                        <div class="w-progress-fill" style="width: ${percent}%"></div>
-                    </div>
-                    <div class="w-progress-text">${daysActive} / 7 ${daysWord}</div>
-                </div>
-            `;
-            const modalBody = document.getElementById('modal-stats-body');
-            if(modalBody) modalBody.insertAdjacentHTML('beforebegin', progressHTML);
+            const updateContent = (index) => {
+                const item = rotationQueue[index];
+                let badgeHTML = item.badge || "";
+
+                if (item.isTimer) {
+                    const diff = item.target - Date.now();
+                    const h = Math.floor(diff / 3600000);
+                    const m = Math.floor((diff % 3600000) / 60000);
+                    const s = Math.floor((diff % 60000) / 1000);
+                    badgeHTML = `<span style="background:rgba(255,255,255,0.15); color:#fff; font-size:10px; font-weight:700; padding:3px 8px; border-radius:6px; font-variant-numeric: tabular-nums;">${h}:${m<10?'0'+m:m}:${s<10?'0'+s:s}</span>`;
+                }
+
+                infoCont.innerHTML = `
+                    <span class="wrapped-period-label">${item.period}</span>
+                    ${badgeHTML}
+                `;
+            };
+
+            // Первый запуск
+            updateContent(0);
+
+            // Интервал смены элементов (каждые 2.5 сек)
+            wrappedRotationInterval = setInterval(() => {
+                infoCont.classList.add('fade-out'); // Начинаем исчезновение
+                
+                setTimeout(() => {
+                    currentIndex = (currentIndex + 1) % rotationQueue.length;
+                    updateContent(currentIndex);
+                    infoCont.classList.remove('fade-out'); // Появляемся с новым текстом
+                }, 400); // Ждем пока закончится анимация прозрачности (0.4s)
+                
+            }, 2500);
+
+            // Внутренний секундный таймер для обновления цифр, если сейчас показывается таймер
+            wrappedTimerInterval = setInterval(() => {
+                if (rotationQueue[currentIndex].isTimer) {
+                    updateContent(currentIndex);
+                }
+            }, 1000);
         }
 
         const modal = document.getElementById('modal-stats-overlay');
         if (modal) {
             modal.classList.add('open');
-            currentStatsTimeframe = 'week'; 
-            currentStatsTab = 'tags';
-            document.querySelectorAll('.stats-tf-item').forEach(el => el.classList.remove('active'));
-            document.getElementById('tf-week').classList.add('active');
-            document.getElementById('stat-nav-tags').classList.add('active');
-            document.getElementById('stat-nav-activity').classList.remove('active');
             renderStatsContent();
         }
     }
@@ -18028,128 +18025,125 @@
     }
 
     function renderThemes() {
-        const basicCont = document.getElementById('theme-list-basic');
-        const premCont = document.getElementById('theme-list-premium');
-        const iconsCont = document.getElementById('theme-list-icons'); 
-        
-        const currentId = document.body.getAttribute('data-theme') || 'dark';
+        const modalBody = document.querySelector('#modal-theme-overlay .modal-body');
         const t = langData[currentLang] || langData['en'];
-        
-        // 1. ПРИНУДИТЕЛЬНЫЙ ПЕРЕВОД ЗАГОЛОВКА ИКОНОК
-        const headerEl = document.querySelector('#modal-theme-overlay .icons-section-header');
-        if (headerEl && t.theme_icons_header) {
-            headerEl.innerText = t.theme_icons_header;
-        }
+        const currentId = document.body.getAttribute('data-theme') || 'dark';
+        const isPaid = subscriptionLevel !== 'free';
 
-        basicCont.innerHTML = '';
-        premCont.innerHTML = '';
+        // Очищаем всё тело модалки, чтобы выстроить элементы в нужном порядке
+        modalBody.innerHTML = '';
 
-        // 2. РЕНДЕР ОСНОВНЫХ ТЕМ
+        // --- 1. БАЗОВЫЕ ТЕМЫ ---
+        const basicHeader = document.createElement('div');
+        basicHeader.className = 'ios-header';
+        basicHeader.style.marginTop = '0';
+        basicHeader.innerText = t.theme_basic;
+        modalBody.appendChild(basicHeader);
+
+        const basicGrid = document.createElement('div');
+        basicGrid.className = 'theme-grid';
+        modalBody.appendChild(basicGrid);
+
+        // --- 2. ПРЕМИУМ ТЕМЫ ---
+        const premiumHeader = document.createElement('div');
+        premiumHeader.className = 'ios-header';
+        premiumHeader.innerText = t.theme_premium;
+        modalBody.appendChild(premiumHeader);
+
+        const premiumGrid = document.createElement('div');
+        premiumGrid.className = 'theme-grid';
+        modalBody.appendChild(premiumGrid);
+
+        // Рендерим карточки тем
         APP_THEMES.forEach(theme => {
-            const isLocked = (theme.type === 'pro' && subscriptionLevel === 'free');
+            const isLocked = (theme.type === 'pro' && !isPaid);
             const isActive = (currentId === theme.id);
-            
-            const themeKey = 'theme_' + theme.id;
-            const localizedName = (t && t[themeKey]) ? t[themeKey] : theme.name;
-            
+            const localizedName = t['theme_' + theme.id] || theme.name;
             let typeText = theme.isLight ? 'Light' : 'Dark';
-
-            let statusIcon = '';
-            if (isActive) {
-                statusIcon = '<span class="lock-icon" style="color:var(--accent)">✓</span>';
-            } else if (isLocked) {
-                statusIcon = '<span class="pro-badge-icon">PRO</span>';
-            }
 
             const div = document.createElement('div');
             div.className = `theme-item ${isActive ? 'active' : ''}`;
-            
             div.innerHTML = `
                 <div class="theme-preview-box" style="background: ${theme.preview}; border: 1px solid var(--border);">
                     <span style="font-size:10px; font-weight:700; color:${theme.isLight ? '#000' : '#fff'}">Aa</span>
                 </div>
                 <div class="theme-info">
                     <span class="theme-name">${localizedName}</span>
-                    <span class="theme-type" style="color: ${theme.type==='pro' ? 'var(--accent)' : 'var(--text-secondary)'}">
-                        ${typeText}
-                    </span>
+                    <span class="theme-type" style="color: ${theme.type==='pro' ? 'var(--accent)' : 'var(--text-secondary)'}">${typeText}</span>
                 </div>
-                ${statusIcon}
+                ${isActive ? '<span class="lock-icon" style="color:var(--accent)">✓</span>' : (isLocked ? '<span class="pro-badge-icon">PRO</span>' : '')}
             `;
-
             div.onclick = () => selectTheme(theme);
             
-            if (theme.type === 'free') basicCont.appendChild(div);
-            else premCont.appendChild(div);
+            if (theme.type === 'free') basicGrid.appendChild(div);
+            else premiumGrid.appendChild(div);
         });
 
-        // 3. РЕНДЕР ИКОНОК ПРИЛОЖЕНИЯ (App Icons)
-        if (iconsCont) {
-            iconsCont.innerHTML = '';
-            const savedIcon = localStorage.getItem('xch_custom_icon');
-            const exploredIds = permanentExplored;
-            const iconGroups = EXPLORED_GROUPS.filter(g => g.appIcon);
-
-            iconGroups.forEach(group => {
-                const groupItems = data.filter(item => item.tags.some(tag => group.tags.includes(tag)));
-                const unlockedCount = groupItems.filter(item => exploredIds.has(item.id)).length;
-                const isUnlocked = (unlockedCount === groupItems.length && groupItems.length > 0);
-                const isActive = (savedIcon === group.appIcon);
-                const title = t['cat_' + group.id] || group.id;
-
-                const div = document.createElement('div');
-                div.className = `app-icon-item ${isActive ? 'active' : ''} ${!isUnlocked ? 'locked' : ''}`;
-                div.innerHTML = `
-                    <img src="${group.appIcon}" class="app-icon-img">
-                    ${!isUnlocked ? '<span class="icon-lock-badge">🔒</span>' : ''}
-                    <div class="app-icon-label">${title}</div>
-                `;
-                div.onclick = () => {
-                    if (isUnlocked) toggleCustomIcon(group.appIcon);
-                    else {
-                        closeThemeModal(null, true); 
-                        showGenreDetails({...group, percent: Math.round((unlockedCount/groupItems.length)*100), count: unlockedCount, total: groupItems.length});
-                    }
-                };
-                iconsCont.appendChild(div);
-            });
-        }
-
-        // 4. БЛОК СЛУЧАЙНОЙ ТЕМЫ (Только для платных пользователей)
-        const oldSettings = document.getElementById('theme-random-settings');
-        if (oldSettings) oldSettings.remove();
-
-        if (subscriptionLevel !== 'free') {
+        // --- 3. НАСТРОЙКИ СЛУЧАЙНОЙ ТЕМЫ (ТЕПЕРЬ ТУТ) ---
+        if (isPaid) {
             const isRandom = localStorage.getItem('xch_random_theme') === 'true';
             const includeLight = localStorage.getItem('xch_random_include_light') === 'true';
 
             const randomDiv = document.createElement('div');
             randomDiv.id = 'theme-random-settings';
-            randomDiv.style.marginTop = '25px';
+            randomDiv.style.marginTop = '20px';
             randomDiv.innerHTML = `
                 <div class="ios-group">
                     <div class="ios-row">
-                        <div class="ios-row-left">
-                            <span style="font-weight:600;">${t.theme_random}</span>
-                        </div>
+                        <div class="ios-row-left"><span>${t.theme_random}</span></div>
                         <label class="switch">
-                            <input type="checkbox" id="random-theme-toggle" ${isRandom ? 'checked' : ''} onchange="toggleRandomTheme(this.checked)">
+                            <input type="checkbox" ${isRandom ? 'checked' : ''} onchange="toggleRandomTheme(this.checked)">
                             <span class="slider"></span>
                         </label>
                     </div>
                     <div class="ios-row" id="row-include-light" style="display: ${isRandom ? 'flex' : 'none'}">
-                        <div class="ios-row-left">
-                            <span style="font-weight:600;">${t.theme_include_light}</span>
-                        </div>
+                        <div class="ios-row-left"><span>${t.theme_include_light}</span></div>
                         <label class="switch">
-                            <input type="checkbox" id="random-light-toggle" ${includeLight ? 'checked' : ''} onchange="toggleRandomIncludeLight(this.checked)">
+                            <input type="checkbox" ${includeLight ? 'checked' : ''} onchange="toggleRandomIncludeLight(this.checked)">
                             <span class="slider"></span>
                         </label>
                     </div>
                 </div>
             `;
-            document.querySelector('#modal-theme-overlay .modal-body').appendChild(randomDiv);
+            modalBody.appendChild(randomDiv);
         }
+
+        // --- 4. ИКОНКИ ПРИЛОЖЕНИЯ (НАГРАДЫ) ---
+        const iconsHeader = document.createElement('div');
+        iconsHeader.className = 'ios-header'; // Тот же класс, что у тем
+        iconsHeader.innerText = t.theme_icons_header || "ИКОНКИ (НАГРАДЫ)";
+        modalBody.appendChild(iconsHeader);
+
+        const iconsGrid = document.createElement('div');
+        iconsGrid.className = 'icons-grid';
+        modalBody.appendChild(iconsGrid);
+
+        const savedIcon = localStorage.getItem('xch_custom_icon');
+        const exploredIds = permanentExplored;
+        
+        EXPLORED_GROUPS.filter(g => g.appIcon).forEach(group => {
+            const groupItems = data.filter(item => item.tags.some(tag => group.tags.includes(tag)));
+            const unlockedCount = groupItems.filter(item => exploredIds.has(item.id)).length;
+            const isUnlocked = (unlockedCount === groupItems.length && groupItems.length > 0);
+            const isActive = (savedIcon === group.appIcon);
+            const title = t['cat_' + group.id] || group.id;
+
+            const div = document.createElement('div');
+            div.className = `app-icon-item ${isActive ? 'active' : ''} ${!isUnlocked ? 'locked' : ''}`;
+            div.innerHTML = `
+                <img src="${group.appIcon}" class="app-icon-img">
+                ${!isUnlocked ? '<span class="icon-lock-badge">🔒</span>' : ''}
+                <div class="app-icon-label">${title}</div>
+            `;
+            div.onclick = () => {
+                if (isUnlocked) toggleCustomIcon(group.appIcon);
+                else {
+                    closeThemeModal(null, true); 
+                    showGenreDetails({...group, percent: Math.round((unlockedCount/groupItems.length)*100), count: unlockedCount, total: groupItems.length});
+                }
+            };
+            iconsGrid.appendChild(div);
+        });
     }
 
     function toggleRandomTheme(enabled) {
@@ -20199,84 +20193,63 @@
         let favName = null;
         let newName = null;
 
-        // --- 1. ИЩЕМ ЛЮБИМОЕ (Для режима Pleasure) ---
-        // ИСТОЧНИК: Только Избранное + История просмотров
-        
-        // Собираем ID из WatchHistory (последние 20)
+        // 1. Поиск данных (оставляем вашу логику)
         const watchedIds = watchHistory.slice(0, 20).map(w => w.id);
-        
-        // Объединяем с Избранным и убираем дубликаты
         const sourceIds = [...new Set([...favorites, ...watchedIds])];
-        
-        // Фильтруем: предмет должен существовать в базе и НЕ быть в ЧС
         const validCandidates = data.filter(item => sourceIds.includes(item.id) && !blacklist.includes(item.id));
 
         if (validCandidates.length > 0) {
-            // Выбираем случайный из проверенных
             const winnerItem = validCandidates[Math.floor(Math.random() * validCandidates.length)];
             favName = getLocalizedName(winnerItem);
             suggestedFavId = winnerItem.id; 
+        }
+
+        let safePool = data;
+        if (currentIntensity === 1) {
+            safePool = data.filter(item => !item.tags.some(t => EXTREME_TAGS.includes(t) || SPICY_TAGS.includes(t)));
+        } else if (currentIntensity === 2) {
+            safePool = data.filter(item => !item.tags.some(t => EXTREME_TAGS.includes(t)));
+        }
+
+        const randomPool = safePool.sort(() => 0.5 - Math.random()).slice(0, 50).filter(item => !blacklist.includes(item.id) && !favorites.includes(item.id) && item.name !== favName);
+        
+        if (randomPool.length > 0) {
+            const randomNewItem = randomPool[0];
+            newName = getLocalizedName(randomNewItem);
+            suggestedNewId = randomNewItem.id;
+        }
+
+        // --- ЛОГИКА ЦВЕТОВ ---
+        const currentTheme = document.body.getAttribute('data-theme') || 'dark';
+        let colorFav, colorNew;
+
+        if (currentTheme === 'noir') {
+            // Нуар: светло-серый и темно-серый
+            colorFav = "#ffffff"; // Белый/светло-серый
+            colorNew = "#666666"; // Глубокий серый
+        } else if (currentTheme === 'old-money') {
+            // Old Money: "Дорогие" оттенки
+            colorFav = "#7d8c7c"; // Винтажный оливково-зеленый (Sage)
+            colorNew = "#a67c7c"; // Приглушенный винный/красный (Dusty Rose)
         } else {
+            // Дефолт и остальные темы: стандартные Зеленый и Красный (цвета кнопок Like/Pass)
+            colorFav = "#2ecc71"; // Emerald Green
+            colorNew = "#e74c3c"; // Alizarin Red
         }
 
-        // --- 2. ИЩЕМ НОВОЕ (Для режима Explore) ---
-        if (typeof data !== 'undefined' && data.length > 0) {
-            
-            // ФИЛЬТРАЦИЯ ПО БЕЗОПАСНОСТИ
-            // Если интенсивность 1 (Safe) - убираем Spicy и Extreme
-            // Если интенсивность 2 (Spicy) - убираем Extreme
-            let safePool = data;
-
-            if (currentIntensity === 1) {
-                // Строгий фильтр для Safe Mode
-                safePool = data.filter(item => 
-                    !item.tags.some(t => EXTREME_TAGS.includes(t) || SPICY_TAGS.includes(t))
-                );
-            } else if (currentIntensity === 2) {
-                // Фильтр для Spicy Mode
-                safePool = data.filter(item => 
-                    !item.tags.some(t => EXTREME_TAGS.includes(t))
-                );
-            }
-
-            // Выбираем из безопасного пула
-            const randomPool = safePool
-                .sort(() => 0.5 - Math.random())
-                .slice(0, 50)
-                .filter(item => 
-                    !blacklist.includes(item.id) && 
-                    !favorites.includes(item.id) && 
-                    item.name !== favName
-                );
-            
-            if (randomPool.length > 0) {
-                const randomNewItem = randomPool[0];
-                newName = getLocalizedName(randomNewItem);
-                suggestedNewId = randomNewItem.id; // СОХРАНЯЕМ ID
-            } else {
-                // Если вдруг ничего не нашлось (слишком жесткие фильтры), берем нейтральное
-                newName = "Vanilla";
-                suggestedNewId = null; // Сброс ID, чтобы открылся просто рандом
-            }
-        }
-
-        // --- 3. ФОРМИРУЕМ ФРАЗУ ---
-        if (favName && newName && t.mode_greeting_dynamic && t.mode_greeting_dynamic.length > 0) {
+        // Формирование фразы
+        if (favName && newName && t.mode_greeting_dynamic) {
             const templates = t.mode_greeting_dynamic;
             const template = templates[Math.floor(Math.random() * templates.length)];
             
             finalPhrase = template
-                .replace('{fav}', `<span style="color:var(--accent); font-weight:800;">${favName}</span>`)
-                .replace('{new}', `<span style="color:var(--accent-alt); font-weight:800;">${newName}</span>`);
-        } 
-        else {
-            const phrases = Array.isArray(t.mode_greeting_hint) 
-                ? t.mode_greeting_hint 
-                : [t.mode_greeting_hint];
+                .replace('{fav}', `<span style="color:${colorFav}; font-weight:800;">${favName}</span>`)
+                .replace('{new}', `<span style="color:${colorNew}; font-weight:800;">${newName}</span>`);
+        } else {
+            const phrases = Array.isArray(t.mode_greeting_hint) ? t.mode_greeting_hint : [t.mode_greeting_hint];
             finalPhrase = phrases[Math.floor(Math.random() * phrases.length)];
-            
         }
-            
+                
         el.innerHTML = finalPhrase;
     }
 
@@ -21991,30 +21964,21 @@
                 }
 
                 if (rank === 1) {
-                    // ТОП-1: Особый стиль с маской-таймером
                     fetishesHTML += `
-                        <div class="cat-rank-row rank-1" id="cat-rank-1">
-                            <!-- Маска таймера -->
-                            <div class="rank-1-mask" id="cat-mask">
-                                <div class="countdown-number" id="cat-countdown">3</div>
-                            </div>
-                            
-                            <!-- Скрытый контент -->
-                            <div class="cat-rank-num" style="color:#ffd700">#1</div>
-                            <img src="${iconSrc}" class="cat-rank-icon" style="filter:drop-shadow(0 0 5px gold);">
-                            <div class="cat-rank-name" style="color:#ffd700; font-size:18px;">${name}</div>
-                            <div class="cat-rank-score">🏆 WINNER</div>
+                        <div class="cat-rank-row ${rank === 1 ? 'rank-1' : 'anim-list-item'}" 
+                            style="${rank !== 1 ? `animation-delay:${(5-index)*0.1}s;` : ''}">
+                            ${rank === 1 ? `<div class="rank-1-mask" id="cat-mask"><div class="countdown-number" id="cat-countdown">3</div></div>` : ''}
+                            <div class="cat-rank-num" style="${rank === 1 ? 'color:#ffd700' : ''}">#${rank}</div>
+                            <div class="cat-rank-name" style="${rank === 1 ? 'color:#ffd700; font-size:18px;' : ''} margin-left: 10px;">${name}</div>
+                            <div class="cat-rank-score">${rank === 1 ? '🏆 WINNER' : entry.score + ' pts'}</div>
                         </div>
                     `;
                 } else {
-                    // Места 2-5: Обычные строки
-                    // data-index не нужен, используем inline animation-delay
-                    const delay = (5 - index) * 0.1; // 0.4s, 0.3s...
+                    const delay = (5 - index) * 0.1;
                     fetishesHTML += `
                         <div class="cat-rank-row anim-list-item" style="animation-delay:${delay}s">
                             <div class="cat-rank-num">#${rank}</div>
-                            <img src="${iconSrc}" class="cat-rank-icon">
-                            <div class="cat-rank-name">${name}</div>
+                            <div class="cat-rank-name" style="margin-left: 10px;">${name}</div>
                             <div class="cat-rank-score">${entry.score} pts</div>
                         </div>
                     `;
