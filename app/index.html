@@ -9788,13 +9788,6 @@
         }
     };
 
-    // Авто-запуск при открытии админки
-    const originalOpenAdminModal = window.openAdminModal;
-    window.openAdminModal = function() {
-        originalOpenAdminModal();
-        refreshAdminStats();
-    };
-
 </script>
 
 <script>
@@ -20131,6 +20124,10 @@
 
     window.openAdminModal = function() {
         document.getElementById('modal-admin-overlay').classList.add('open');
+        // Безопасный вызов обновления статистики
+        if (typeof window.refreshAdminStats === 'function') {
+            window.refreshAdminStats();
+        }
     };
 
     window.closeAdminModal = function(e, force) {
