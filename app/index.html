@@ -16935,21 +16935,51 @@
                 html += `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-secondary);">${t.stats_no_data}</div>`;
             } else {
                 const maxVal = Math.max(...sortedTags.map(x => x[1]));
+            
                 sortedTags.forEach(([tag, score], index) => {
-                    // Вычисляем высоту в процентах (от 10% до 90% для красоты)
                     const height = Math.max(10, (score / maxVal) * 90);
                     let displayTag = tag.charAt(0).toUpperCase() + tag.slice(1);
                     if (displayTag.length > 9) displayTag = displayTag.substring(0, 7) + '..';
 
-                    const delay = index * 0.05; 
+                    // --- ЛОГИКА ЗАДЕРЖЕК ---
+                    let delay = 0;
+                    if (index >= 5) {
+                        // Все что ниже ТОП-5 появляется почти сразу (с 0.1s до 0.3s)
+                        delay = 0.1 + (index * 0.02); 
+                    } else if (index === 4) {
+                        delay = 0.5; // ТОП-5
+                    } else if (index === 3) {
+                        delay = 0.7; // ТОП-4
+                    } else if (index === 2) {
+                        delay = 0.9; // ТОП-3
+                    } else if (index === 1) {
+                        delay = 1.1; // ТОП-2
+                    } else if (index === 0) {
+                        delay = 1.5; // ТОП-1 (Финальный аккорд)
+                    }
+
+                    // Особый стиль для ТОП-1
+                    const isTop1 = index === 0;
+                    const timingFunc = isTop1 ? 'cubic-bezier(0.34, 1.56, 0.64, 1)' : 'cubic-bezier(0.2, 0.8, 0.2, 1)';
 
                     html += `
                         <div class="pref-col">
-                            <div class="chart-value-y stagger-text" style="animation-delay:${delay}s">${score}</div>
-                            <!-- Здесь используем уникальное имя анимации growTag${index} -->
-                            <div class="chart-bar" style="height:0%; animation: growTag${index} 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards ${delay}s;"></div>
-                            <div class="chart-label-x stagger-text" title="${tag}" style="animation-delay:${delay}s">${displayTag}</div>
-                            <style>@keyframes growTag${index} { from { height: 0%; } to { height: ${height}%; } }</style>
+                            <div class="chart-value-y stagger-text" style="animation-delay:${delay}s; ${isTop1 ? 'color:var(--accent); font-weight:900;' : ''}">${score}</div>
+                            
+                            <div class="chart-bar" style="
+                                height:0%; 
+                                animation: growTag${index} 0.8s ${timingFunc} forwards ${delay}s;
+                                ${isTop1 ? 'box-shadow: 0 -4px 15px var(--accent);' : ''}
+                            "></div>
+                            
+                            <div class="chart-label-x stagger-text" title="${tag}" style="animation-delay:${delay}s; ${isTop1 ? 'color:var(--text-main); font-weight:700;' : ''}">${displayTag}</div>
+                            
+                            <style>
+                                @keyframes growTag${index} { 
+                                    from { height: 0%; opacity: 0; } 
+                                    to { height: ${height}%; opacity: 1; } 
+                                }
+                            </style>
                         </div>
                     `;
                 });
@@ -17081,6 +17111,19 @@
             `;
 
             body.innerHTML = html;
+        }
+        // Авто-скролл к последней дате для вкладки активности
+        if (currentStatsTab === 'activity') {
+            const scrollView = document.getElementById('chart-source-el');
+            if (scrollView) {
+                // Небольшая задержка, чтобы браузер успел отрисовать элементы и рассчитать ширину
+                setTimeout(() => {
+                    scrollView.scrollTo({
+                        left: scrollView.scrollWidth,
+                        behavior: 'smooth'
+                    });
+                }, 100);
+            }
         }
     }
 
@@ -24018,20 +24061,32 @@
         const CLOSE_THRESHOLD = 150;
 
         document.addEventListener('touchstart', (e) => {
-            // Ищем ближайшую модалку. Работает только на мобильных (< 768px)
             const modal = e.target.closest('.modal');
             if (!modal || window.innerWidth > 768) return;
 
             const modalBody = modal.querySelector('.modal-body');
-            
-            // Разрешаем тянуть, только если контент прокручен в самый верх
-            // или если пользователь схватился за хедер
-            const isAtTop = modalBody ? modalBody.scrollTop <= 0 : true;
-            const isHeader = e.target.closest('.modal-header');
+            const activeOverlay = modal.closest('.modal-overlay');
+            const overlayId = activeOverlay ? activeOverlay.id : null;
 
-            if (isAtTop || isHeader) {
+            // Список окон, где горизонтальный скролл конфликтует со свайпом вниз
+            const horizontalConflictModals = ['modal-stats-overlay', 'modal-tips-overlay'];
+            
+            const isHeader = e.target.closest('.modal-header');
+            const isAtTop = modalBody ? modalBody.scrollTop <= 0 : true;
+
+            let canStartDrag = false;
+
+            if (horizontalConflictModals.includes(overlayId)) {
+                // В этих окнах разрешаем свайп ТОЛЬКО за хедер
+                if (isHeader) canStartDrag = true;
+            } else {
+                // В остальных окнах (история, аккаунт и т.д.) разрешаем всё
+                if (isHeader || isAtTop) canStartDrag = true;
+            }
+
+            if (canStartDrag) {
                 activeModal = modal;
-                activeOverlay = modal.closest('.modal-overlay');
+                this.activeOverlay = activeOverlay; // Сохраняем ссылку для touchmove
                 startY = e.touches[0].clientY;
                 currentY = startY;
                 isDragging = true;
