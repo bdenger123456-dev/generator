@@ -1521,7 +1521,22 @@
             
             /* Сдвигаем заголовок чуть ниже из-за ручки */
             .modal-header {
-                padding-top: 25px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important; /* Строго по центру */
+                padding: 15px 20px !important;      /* Уменьшили отступ сверху */
+                min-height: 60px !important;
+                position: relative !important;
+                
+                /* Жирный текст */
+                font-weight: 900 !important; 
+                font-size: 18px !important;
+                color: var(--text-main) !important;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            .modal-header::before {
+                top: 6px !important; /* Чуть выше */
             }
         }
 
@@ -6409,10 +6424,15 @@
 
         @media (max-width: 768px) {
             .modal-close-btn {
-                width: 36px !important;
-                height: 36px !important;
-                background: rgba(128, 128, 128, 0.15) !important;
-                border-radius: 50% !important;
+                top: 50% !important;
+                transform: translateY(-50%) !important;
+                left: 20px !important;
+            }
+            
+            /* Если справа есть иконки (Share), их тоже центрируем */
+            .modal-header-actions {
+                top: 50% !important;
+                transform: translateY(-50%) !important;
             }
 
             .modal-close-icon {
@@ -16166,161 +16186,188 @@
         forceShowResult(selected, 'tag_click');
     }
 
+    let wrappedRotationInterval = null;
+
     function openStatistics() {
         const t = langData[currentLang];
+        
         // Локализация табов
         if (document.getElementById('tf-week')) document.getElementById('tf-week').innerText = t.tf_week;
         if (document.getElementById('tf-month')) document.getElementById('tf-month').innerText = t.tf_month;
         if (document.getElementById('tf-year')) document.getElementById('tf-year').innerText = t.tf_year;
         if (document.getElementById('tf-all')) document.getElementById('tf-all').innerText = t.tf_all;
 
-        updateStatsLocks(); // Обновляем замочки на табах
+        updateStatsLocks();
 
-        // === ЛОГИКА WRAPPED КНОПКИ И БЕЙДЖА ===
+        // === ЛОГИКА WRAPPED КНОПКИ ===
         const wBtn = document.getElementById('btn-wrapped-trigger');
         const isPaid = subscriptionLevel !== 'free';
         const daysActive = activeDaysSet.size;
         
-        // Удаляем старый прогресс-бар (лок), если он есть
+        // Очистка старых таймеров
+        if (wrappedTimerInterval) clearInterval(wrappedTimerInterval);
+        if (wrappedRotationInterval) clearInterval(wrappedRotationInterval);
+
+        // Удаляем прогресс-бар для совсем новичков (лок)
         const oldProgress = document.getElementById('wrapped-progress-ui');
         if (oldProgress) oldProgress.remove();
 
-        // Очищаем старый интервал таймера
-        if (wrappedTimerInterval) clearInterval(wrappedTimerInterval);
+        // 1. Собираем список статусов для ротации
+        let statuses = [];
+        const now = new Date();
 
-        // 1. Проверяем, есть ли НЕПРОЧИТАННЫЕ (New)
-        const unreadItems = wrappedArchive.filter(w => !w.viewed).sort((a,b) => b.timestamp - a.timestamp);
-        let hasNew = unreadItems.length > 0;
-
-        // 2. Проверяем доступность НОВОГО отчета ПРЯМО СЕЙЧАС
-        let readyToGenerate = false;
+        // A. DAILY (Только для платных)
         if (isPaid) {
-            // Готов к генерации, если за ВЧЕРА отчет еще не создан
             if (!hasDailyForYesterday()) {
-                readyToGenerate = true;
+                statuses.push({ type: 'ready', label: 'DAILY READY', color: '#2ecc71' });
+            } else {
+                // Таймер до завтра
+                const tomorrow = new Date(now);
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                tomorrow.setHours(0, 0, 0, 0);
+                statuses.push({ type: 'timer', label: 'DAILY', target: tomorrow.getTime() });
             }
-        } else {
-            // Для бесплатных — если накопилось 7 дней
-            if (activeDaysSet.size >= 7) readyToGenerate = true;
         }
 
-        // РЕШАЕМ: Показывать кнопку или нет
-        // Кнопку показываем, если: Есть новые, Есть старые (Архив), или Готов новый к генерации
-        const showButton = hasNew || readyToGenerate || wrappedArchive.length > 0;
-
-        if (showButton) {
-            if(wBtn) wBtn.style.display = 'flex';
-
-            // ОПРЕДЕЛЕНИЕ ТЕКСТА БЕЙДЖА (Справа)
-            let badgeHTML = "";
-
-            if (hasNew) {
-                // Если есть непрочитанное - приоритет NEW
-                const type = unreadItems[0].type;
-                const typeText = WRAPPED_CONFIG.badges[currentLang][type] || type.toUpperCase();
-                badgeHTML = `<span style="color:#fff; margin-right:4px;">●</span>
-                             <span style="background:var(--accent); color:#000; font-size:10px; font-weight:800; padding:3px 8px; border-radius:6px; text-transform:uppercase;">${typeText}</span>`;
-            } 
-            else if (readyToGenerate) {
-                // Если готово к генерации
-                const readyText = isPaid ? "DAILY READY" : "WEEKLY READY";
-                badgeHTML = `<span style="background:#2ecc71; color:#000; font-size:10px; font-weight:800; padding:3px 8px; border-radius:6px; text-transform:uppercase;">${readyText}</span>`;
-            } 
-            else {
-                // === РЕЖИМ ОЖИДАНИЯ (TIMER / PROGRESS) ===
-                // Отчет сгенерирован, ждем следующего периода
-                
-                // Создаем элемент для таймера
-                const timerId = 'wrapped-countdown-' + Date.now();
-                
-                if (isPaid) {
-                    // Платный: Таймер до полуночи
-                    badgeHTML = `<span id="${timerId}" style="background:rgba(255,255,255,0.15); color:#fff; font-size:10px; font-weight:700; padding:3px 8px; border-radius:6px; font-variant-numeric: tabular-nums;">--:--:--</span>`;
-                    
-                    // Запуск таймера
-                    const updateTimer = () => {
-                        const el = document.getElementById(timerId);
-                        if (!el) return;
-                        
-                        const now = new Date();
-                        const tomorrow = new Date(now);
-                        tomorrow.setDate(tomorrow.getDate() + 1);
-                        tomorrow.setHours(0, 0, 0, 0);
-                        
-                        const diff = tomorrow - now;
-                        if (diff <= 0) {
-                            // Время пришло -> перезапускаем окно
-                            openStatistics();
-                            return;
-                        }
-                        
-                        const h = Math.floor(diff / 3600000);
-                        const m = Math.floor((diff % 3600000) / 60000);
-                        const s = Math.floor((diff % 60000) / 1000);
-                        
-                        el.innerText = `${h}:${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
-                    };
-                    
-                    // Запускаем сразу и в интервал
-                    setTimeout(updateTimer, 0);
-                    wrappedTimerInterval = setInterval(updateTimer, 1000);
-                } 
-                else {
-                    // Бесплатный: Прогресс дней (3/7)
-                    // Используем перевод слова "days"
-                    const daysWord = currentLang === 'ru' ? 'дн.' : 'd';
-                    badgeHTML = `<span style="background:rgba(255,255,255,0.15); color:#fff; font-size:10px; font-weight:700; padding:3px 8px; border-radius:6px;">${daysActive} / 7 ${daysWord}</span>`;
-                }
+        // B. WEEKLY
+        if (daysActive >= 7) {
+            statuses.push({ type: 'ready', label: 'WEEKLY READY', color: '#2ecc71' });
+        } else {
+            // Сколько дней осталось (если меньше 3, добавляем в ротацию)
+            const left = 7 - daysActive;
+            if (left <= 3) {
+                const daysWord = currentLang === 'ru' ? 'дн.' : 'd';
+                statuses.push({ type: 'text', label: 'WEEKLY', text: `${left} ${daysWord}` });
             }
+        }
 
+        // C. MONTHLY (Примерная логика: конец месяца)
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        const daysToMonthEnd = Math.ceil((endOfMonth - now) / (1000 * 60 * 60 * 24));
+        if (daysToMonthEnd <= 3) {
+            const daysWord = currentLang === 'ru' ? 'дн.' : 'd';
+            statuses.push({ type: 'text', label: 'MONTHLY', text: `${daysToMonthEnd} ${daysWord}` });
+        }
+
+        // Если статусов нет (новичок Free), показываем общий прогресс
+        if (statuses.length === 0 && subscriptionLevel === 'free') {
+            const daysWord = currentLang === 'ru' ? 'дн.' : 'd';
+            statuses.push({ type: 'text', label: 'WEEKLY', text: `${daysActive}/7 ${daysWord}` });
+        }
+
+        // === РЕНДЕР КНОПКИ ===
+        // Показываем кнопку, если есть хоть какие-то статусы или архив
+        if (statuses.length > 0 || wrappedArchive.length > 0) {
+            if (wBtn) wBtn.style.display = 'flex';
+            
             const btnTitle = t.wrapped_btn || "Fetish Wrapped ✨";
             
-            // Вставляем HTML в кнопку
+            // Вставляем структуру: Слева заголовок, Справа контейнер для ротации
             wBtn.innerHTML = `
                 <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
                     <span>${btnTitle}</span>
-                    <div style="display:flex; align-items:center;">
-                        ${badgeHTML}
+                    <div id="wrapped-dynamic-badge" style="display:flex; align-items:center; justify-content:flex-end; min-width:80px;">
+                        <!-- Сюда JS будет вставлять контент -->
                     </div>
                 </div>
             `;
 
+            const badgeContainer = document.getElementById('wrapped-dynamic-badge');
+            let statusIndex = 0;
+
+            // Функция обновления бейджа
+            const updateBadgeUI = () => {
+                const state = statuses[statusIndex];
+                let html = '';
+
+                if (state.type === 'ready') {
+                    html = `<span style="background:${state.color}; color:#000; font-size:10px; font-weight:800; padding:3px 8px; border-radius:6px; text-transform:uppercase;">${state.label}</span>`;
+                } 
+                else if (state.type === 'text') {
+                    html = `
+                        <span style="font-size:9px; color:rgba(255,255,255,0.6); margin-right:5px; text-transform:uppercase; font-weight:700;">${state.label}</span>
+                        <span style="background:rgba(255,255,255,0.15); color:#fff; font-size:10px; font-weight:700; padding:3px 8px; border-radius:6px;">${state.text}</span>
+                    `;
+                } 
+                else if (state.type === 'timer') {
+                    // Вычисляем время
+                    const diff = state.target - Date.now();
+                    let timeStr = "--:--";
+                    if (diff > 0) {
+                        const h = Math.floor(diff / 3600000);
+                        const m = Math.floor((diff % 3600000) / 60000);
+                        timeStr = `${h}h ${m}m`; // Компактный вид: 12h 40m
+                    }
+                    html = `
+                        <span style="font-size:9px; color:rgba(255,255,255,0.6); margin-right:5px; text-transform:uppercase; font-weight:700;">${state.label}</span>
+                        <span style="background:rgba(255,255,255,0.15); color:#fff; font-size:10px; font-weight:700; padding:3px 8px; border-radius:6px; font-variant-numeric: tabular-nums;">${timeStr}</span>
+                    `;
+                }
+
+                // Плавная смена через прозрачность
+                badgeContainer.style.opacity = '0';
+                setTimeout(() => {
+                    badgeContainer.innerHTML = html;
+                    badgeContainer.style.opacity = '1';
+                }, 200);
+            };
+
+            // Запуск первого состояния
+            updateBadgeUI();
+
+            // Если статусов больше 1, запускаем ротацию каждые 2.5 секунды
+            if (statuses.length > 1) {
+                wrappedRotationInterval = setInterval(() => {
+                    statusIndex = (statusIndex + 1) % statuses.length;
+                    updateBadgeUI();
+                }, 2500);
+            }
+            // Если есть таймер, запускаем обновление каждую минуту (для обновления цифр)
+            if (statuses.some(s => s.type === 'timer')) {
+                wrappedTimerInterval = setInterval(() => {
+                    // Просто перерисовываем текущий, если он таймер
+                    if (statuses[statusIndex].type === 'timer') updateBadgeUI();
+                }, 60000);
+            }
+
         } else {
-            // Если кнопка скрыта (совсем новичок Free) -> Показываем большой прогресс-бар
-            if(wBtn) wBtn.style.display = 'none';
-            
-            const percent = Math.min(100, (daysActive / 7) * 100);
+            // Если совсем пусто (для Free без истории) -> Большая плашка
+            if (wBtn) wBtn.style.display = 'none';
             const left = 7 - daysActive;
-            const titleTxt = t.wrapped_lock_title || "FETISH WRAPPED 🔒";
-            
-            let daysWord = currentLang === 'ru' ? 'дней' : 'days';
-            const descTxt = (t.wrapped_lock_desc || "Activity needed: {n}").replace('{n}', `${left} ${daysWord}`);
+            const descTxt = (t.wrapped_lock_desc || "Activity needed: {n}").replace('{n}', `${left} days`);
+            const percent = Math.min(100, (daysActive / 7) * 100);
 
             const progressHTML = `
                 <div id="wrapped-progress-ui" class="wrapped-lock-container" style="margin: 0 10px 20px 10px;">
-                    <div class="wrapped-lock-title">${titleTxt}</div>
+                    <div class="wrapped-lock-title">${t.wrapped_lock_title}</div>
                     <div class="wrapped-lock-desc">${descTxt}</div>
-                    <div class="w-progress-track">
-                        <div class="w-progress-fill" style="width: ${percent}%"></div>
-                    </div>
-                    <div class="w-progress-text">${daysActive} / 7 ${daysWord}</div>
+                    <div class="w-progress-track"><div class="w-progress-fill" style="width: ${percent}%"></div></div>
                 </div>
             `;
             const modalBody = document.getElementById('modal-stats-body');
             if(modalBody) modalBody.insertAdjacentHTML('beforebegin', progressHTML);
         }
 
+        // Открытие модалки
         const modal = document.getElementById('modal-stats-overlay');
         if (modal) {
             modal.classList.add('open');
             currentStatsTimeframe = 'week'; 
             currentStatsTab = 'tags';
+            // Сброс табов UI
             document.querySelectorAll('.stats-tf-item').forEach(el => el.classList.remove('active'));
             document.getElementById('tf-week').classList.add('active');
             document.getElementById('stat-nav-tags').classList.add('active');
             document.getElementById('stat-nav-activity').classList.remove('active');
             renderStatsContent();
         }
+    }
+
+    // Добавляем очистку интервала при закрытии
+    const originalCloseStats = window.closeStats;
+    window.closeStats = function(e, force) {
+        if (wrappedRotationInterval) clearInterval(wrappedRotationInterval);
+        originalCloseStats(e, force);
     }
 
     function switchStatsTab(tab) {
@@ -20202,7 +20249,7 @@
         let favName = null;
         let newName = null;
 
-        // 1. Поиск данных (оставляем вашу логику)
+        // 1. Поиск кандидата из истории (Наслаждение)
         const watchedIds = watchHistory.slice(0, 20).map(w => w.id);
         const sourceIds = [...new Set([...favorites, ...watchedIds])];
         const validCandidates = data.filter(item => sourceIds.includes(item.id) && !blacklist.includes(item.id));
@@ -20213,6 +20260,7 @@
             suggestedFavId = winnerItem.id; 
         }
 
+        // 2. Поиск нового кандидата (Исследование)
         let safePool = data;
         if (currentIntensity === 1) {
             safePool = data.filter(item => !item.tags.some(t => EXTREME_TAGS.includes(t) || SPICY_TAGS.includes(t)));
@@ -20230,20 +20278,23 @@
 
         // --- ЛОГИКА ЦВЕТОВ ---
         const currentTheme = document.body.getAttribute('data-theme') || 'dark';
-        let colorFav, colorNew;
+        let colorPleasure, colorExplore;
 
         if (currentTheme === 'noir') {
-            // Нуар: светло-серый и темно-серый
-            colorFav = "#ffffff"; // Белый/светло-серый
-            colorNew = "#666666"; // Глубокий серый
-        } else if (currentTheme === 'old-money') {
-            // Old Money: "Дорогие" оттенки
-            colorFav = "#7d8c7c"; // Винтажный оливково-зеленый (Sage)
-            colorNew = "#a67c7c"; // Приглушенный винный/красный (Dusty Rose)
-        } else {
-            // Дефолт и остальные темы: стандартные Зеленый и Красный (цвета кнопок Like/Pass)
-            colorFav = "#2ecc71"; // Emerald Green
-            colorNew = "#e74c3c"; // Alizarin Red
+            // Нуар: Светло-серый (Pleasure) и Темно-серый (Explore)
+            colorPleasure = "#dddddd"; 
+            colorExplore = "#666666"; 
+        } 
+        else if (currentTheme === 'old-money') {
+            // Old Money: Sage Green (Pleasure) и Dusty Red (Explore)
+            colorPleasure = "#7d8c7c"; 
+            colorExplore = "#a67c7c"; 
+        } 
+        else {
+            // Дефолт и цветные темы: Зеленый (Pleasure) и Красный (Explore)
+            // Эти цвета совпадают с градиентами кнопок внизу
+            colorPleasure = "#2ecc71"; // Зеленый
+            colorExplore = "#e74c3c";  // Красный
         }
 
         // Формирование фразы
@@ -20251,9 +20302,11 @@
             const templates = t.mode_greeting_dynamic;
             const template = templates[Math.floor(Math.random() * templates.length)];
             
+            // {fav} -> Pleasure Mode -> colorPleasure
+            // {new} -> Explore Mode -> colorExplore
             finalPhrase = template
-                .replace('{fav}', `<span style="color:${colorFav}; font-weight:800;">${favName}</span>`)
-                .replace('{new}', `<span style="color:${colorNew}; font-weight:800;">${newName}</span>`);
+                .replace('{fav}', `<span style="color:${colorPleasure}; font-weight:900;">${favName}</span>`)
+                .replace('{new}', `<span style="color:${colorExplore}; font-weight:900;">${newName}</span>`);
         } else {
             const phrases = Array.isArray(t.mode_greeting_hint) ? t.mode_greeting_hint : [t.mode_greeting_hint];
             finalPhrase = phrases[Math.floor(Math.random() * phrases.length)];
@@ -21962,35 +22015,30 @@
             let fetishesHTML = '';
             stats.topFetishes.forEach((entry, index) => {
                 const rank = index + 1;
-                const item = entry.item; // Это реальный объект фетиша
+                const item = entry.item; 
                 const name = getLocalizedName(item); 
                 
-                // Получаем иконку: ищем первый тег предмета, для которого есть иконка
-                let iconSrc = 'logo_icon.png';
-                if (item.tags) {
-                    const iconTag = item.tags.find(t => TAG_ICONS[t]);
-                    if (iconTag) iconSrc = TAG_ICONS[iconTag][0];
-                }
 
                 if (rank === 1) {
-                    // ТОП-1: Особый стиль с маской-таймером
+                    // ТОП-1: Таймер + Текст по центру
                     fetishesHTML += `
                     <div class="cat-rank-row ${rank === 1 ? 'rank-1' : 'anim-list-item'}" style="${rank !== 1 ? `animation-delay:${(5-index)*0.1}s;` : ''}">
                         ${rank === 1 ? `<div class="rank-1-mask" id="cat-mask"><div class="countdown-number" id="cat-countdown">3</div></div>` : ''}
-                        <div class="cat-rank-num" style="${rank === 1 ? 'color:#ffd700' : ''}">#${rank}</div>
-                        <div class="cat-rank-name" style="${rank === 1 ? 'color:#ffd700; font-size:18px;' : ''} margin-left: 10px;">${name}</div>
-                        <div class="cat-rank-score">${rank === 1 ? '🏆 WINNER' : entry.score + ' pts'}</div>
+                        
+                        <div style="display:flex; align-items:center; width:100%;">
+                            <div class="cat-rank-num" style="color:#ffd700; min-width:30px;">#1</div>
+                            <div class="cat-rank-name" style="color:#ffd700; font-size:20px; text-align:left;">${name}</div>
+                            <div class="cat-rank-score">🏆 WINNER</div>
+                        </div>
                     </div>
                 `;
                 } else {
-                    // Места 2-5: Обычные строки
-                    // data-index не нужен, используем inline animation-delay
-                    const delay = (5 - index) * 0.1; // 0.4s, 0.3s...
+                    const delay = (5 - index) * 0.1;
                     fetishesHTML += `
                         <div class="cat-rank-row anim-list-item" style="animation-delay:${delay}s">
                             <div class="cat-rank-num">#${rank}</div>
-                            <img src="${iconSrc}" class="cat-rank-icon">
-                            <div class="cat-rank-name">${name}</div>
+                            <!-- ИКОНКА УБРАНА -->
+                            <div class="cat-rank-name" style="margin-left:0;">${name}</div>
                             <div class="cat-rank-score">${entry.score} pts</div>
                         </div>
                     `;
