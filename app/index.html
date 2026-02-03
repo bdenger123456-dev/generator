@@ -1569,6 +1569,8 @@
             }
         }
 
+
+
         modal-header .modal-close-btn,
         .modal-header #mods-counter,
         .modal-header > span:not(.modal-close-btn):not(.modal-header-actions) {
@@ -14339,6 +14341,7 @@
         const title = document.getElementById('explored-modal-title');
         const subtitle = document.getElementById('explored-subtitle');
         const backBtn = document.getElementById('explored-back-btn');
+        const mainCloseBtn = document.getElementById('explored-main-close'); 
         const t = langData[currentLang] || langData['en'];
 
         // 2. Переключение UI
@@ -14346,9 +14349,17 @@
         subtitle.style.display = 'none';
         details.style.display = 'flex';
         modalBody.classList.add('show-details');
-        backBtn.style.display = 'block';
+        
+        // Показываем кнопку "Назад", скрываем "Закрыть"
+        if (backBtn) backBtn.style.display = 'flex';
+        if (mainCloseBtn) mainCloseBtn.style.display = 'none';
 
-        // 3. Данные
+        // 3. Локализация слова "Открыто"
+        const labelExplored = (currentLang === 'ru') ? "Открыто" : 
+                            (currentLang === 'es') ? "Explorado" : 
+                            (currentLang === 'de') ? "Erforscht" : "Explored";
+
+        // 4. Данные
         title.innerText = t['cat_' + groupData.id] || groupData.id.toUpperCase();
 
         let iconSrc = 'logo_icon.png';
@@ -14370,27 +14381,19 @@
 
         // Статусы
         const isUnlocked = groupData.percent === 100;
-        const statusText = isUnlocked ? (t.unlocked_on || "UNLOCKED") : `${groupData.percent}%`;
         const statusClass = isUnlocked ? "unlocked" : "";
         const achImg = groupData.achIcon || "ach_placeholder.png";
         const achHeader = t.ach_title || "Achievements";
-
         const badgeLabel = t.lbl_badge || "BADGE";
         const iconLabel = t.lbl_icon || "ICON";
-
-        // --- ЛОГИКА СТИЛЕЙ ДЛЯ БЕЙДЖА (ИСПРАВЛЕНИЕ) ---
-        // Если закрыто -> Ч/Б и прозрачность. Если открыто -> стили из CSS (тень и цвет)
         const badgeStyle = isUnlocked ? '' : 'filter: grayscale(1); opacity: 0.5;';
 
-        // --- ЛОГИКА ВТОРОЙ ИКОНКИ (APP ICON) ---
         let extraIconHtml = '';
         if (groupData.appIcon) {
-            const appIconSrc = groupData.appIcon;
             const appIconStyle = isUnlocked ? '' : 'filter: grayscale(1); opacity: 0.5;';
-            
             extraIconHtml = `
                 <div class="reward-box">
-                    <img src="${appIconSrc}" class="reward-display-img app-icon-style" style="${appIconStyle}">
+                    <img src="${groupData.appIcon}" class="reward-display-img app-icon-style" style="${appIconStyle}">
                     <div class="ach-status-text ${statusClass}" style="font-size:9px;">${iconLabel}</div>
                 </div>
             `;
@@ -14404,8 +14407,9 @@
                     <div class="ex-progress-track" style="height:8px; background:rgba(255,255,255,0.1);">
                         <div class="ex-progress-fill" style="width: ${groupData.percent}%; background:var(--accent);"></div>
                     </div>
+                    <!-- ВОТ ЗДЕСЬ ИЗМЕНЕНО: Добавлено слово "Открыто" -->
                     <div style="text-align:center; font-size:10px; color:var(--text-secondary); margin-top:3px;">
-                        ${groupData.count} / ${groupData.total}
+                        ${labelExplored}: ${groupData.count} / ${groupData.total}
                     </div>
                 </div>
             </div>
@@ -14418,13 +14422,10 @@
             <div class="genre-achievements-header">${achHeader}</div>
             
             <div class="genre-icons-row">
-                <!-- 1. Бейдж (Badge) с применением стиля -->
                 <div class="reward-box">
                     <img src="${achImg}" class="reward-display-img badge-style" style="${badgeStyle}">
                     <div class="ach-status-text ${statusClass}" style="font-size:9px;">${badgeLabel}</div>
                 </div>
-                
-                <!-- 2. Иконка (App Icon) -->
                 ${extraIconHtml}
             </div>
             
@@ -14440,6 +14441,7 @@
         const title = document.getElementById('explored-modal-title');
         const subtitle = document.getElementById('explored-subtitle');
         const backBtn = document.getElementById('explored-back-btn');
+        if (mainCloseBtn) mainCloseBtn.style.display = 'flex';
         const t = langData[currentLang] || langData['en'];
 
         details.style.display = 'none';
@@ -18372,10 +18374,25 @@
                     <div class="app-icon-label">${title}</div>
                 `;
                 div.onclick = () => {
-                    if (isUnlocked) toggleCustomIcon(group.appIcon);
-                    else {
+                    if (isUnlocked) {
+                        toggleCustomIcon(group.appIcon);
+                    } else {
+                        // 1. Закрываем окно тем
                         closeThemeModal(null, true); 
-                        showGenreDetails({...group, percent: Math.round((unlockedCount/groupItems.length)*100), count: unlockedCount, total: groupItems.length});
+                        
+                        // 2. Открываем окно категорий (Explored)
+                        const exploredModal = document.getElementById('modal-explored-overlay');
+                        exploredModal.classList.add('open');
+                        document.body.classList.add('modal-open');
+
+                        // 3. Вызываем показ деталей конкретного жанра
+                        // Передаем объект с данными, включая расчет процентов
+                        showGenreDetails({
+                            ...group, 
+                            percent: Math.round((unlockedCount / groupItems.length) * 100), 
+                            count: unlockedCount, 
+                            total: groupItems.length
+                        });
                     }
                 };
                 iconsCont.appendChild(div);
