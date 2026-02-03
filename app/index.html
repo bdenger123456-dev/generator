@@ -1486,8 +1486,7 @@
                 border-left: none !important;
                 border-right: none !important;
                 
-                /* Учет "челки" iPhone снизу */
-                padding-bottom: env(safe-area-inset-bottom) !important;
+                padding-bottom: 0 !important;
                 
                 /* Анимация: Выезд снизу */
                 transform: translateY(100%) !important;
@@ -5415,9 +5414,6 @@
             background: var(--sidebar-bg); /* Цвет фона как у модалки */
             border-top: 1px solid var(--border); /* Разделитель сверху */
             z-index: 10;
-            
-            /* Учет безопасной зоны на iPhone (чтобы не перекрывало полоску домой) */
-            padding-bottom: calc(15px + env(safe-area-inset-bottom));
         }
 
         /* Корректировка капсулы, чтобы она растягивалась красиво */
