@@ -8382,7 +8382,21 @@
 
             <div class="roadmap-container">
                 
-                <!-- 1. Global Intelligence -->
+                <!-- 1. Community -->
+                <div class="roadmap-item">
+                    <div class="rm-visual-col">
+                        <div class="rm-icon-box" style="width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#ff00cc; background:rgba(255, 0, 204, 0.15); border:1px solid rgba(255, 0, 204, 0.3); z-index:2;">👥</div>
+                        <div class="rm-line"></div>
+                    </div>
+                    <div class="rm-content">
+                        <div class="rm-title" style="font-weight:700; margin-bottom:5px; font-size:15px;" data-key="rm_community_title">Fetish Community</div>
+                        <div class="rm-desc" style="font-size:13px; color:var(--text-secondary); line-height:1.4;" data-key="rm_community_desc">
+                            Anonymous social hub. Share your Wrapped, join psychotype groups, and discuss preferences with like-minded people.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Global Intelligence -->
                 <div class="roadmap-item">
                     <div class="rm-visual-col">
                         <div class="rm-icon-box" style="width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#9b59b6; background:rgba(155, 89, 182, 0.15); border:1px solid rgba(155, 89, 182, 0.3); z-index:2;">🌐</div>
@@ -8396,7 +8410,7 @@
                     </div>
                 </div>
 
-                <!-- 2. Co-op Mode -->
+                <!-- 3. Co-op Mode -->
                 <div class="roadmap-item">
                     <div class="rm-visual-col">
                         <div class="rm-icon-box" style="width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#2ecc71; background:rgba(46, 204, 113, 0.15); border:1px solid rgba(46, 204, 113, 0.3); z-index:2;">🤝</div>
@@ -8410,7 +8424,7 @@
                     </div>
                 </div>
 
-                <!-- 3. More Categories -->
+                <!-- 4. More Categories -->
                 <div class="roadmap-item">
                     <div class="rm-visual-col">
                         <div class="rm-icon-box" style="width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#ff9900; background:rgba(255, 153, 0, 0.15); border:1px solid rgba(255, 153, 0, 0.3); z-index:2;">📚</div>
@@ -8424,7 +8438,7 @@
                     </div>
                 </div>
 
-                <!-- 4. Actor Selector -->
+                <!-- 5. Actor Selector -->
                 <div class="roadmap-item">
                     <div class="rm-visual-col">
                         <div class="rm-icon-box" style="width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#3498db; background:rgba(52, 152, 219, 0.15); border:1px solid rgba(52, 152, 219, 0.3); z-index:2;">⭐</div>
@@ -8437,9 +8451,19 @@
                         </div>
                     </div>
                 </div>
-
+                <!-- 6. Localization -->
+                <div class="roadmap-item">
+                    <div class="rm-visual-col">
+                        <div class="rm-icon-box" style="width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#2ecc71; background:rgba(46, 204, 113, 0.15); border:1px solid rgba(46, 204, 113, 0.3); z-index:2;">🌍</div>
+                    </div>
+                    <div class="rm-content">
+                        <div class="rm-title" style="font-weight:700; margin-bottom:5px; font-size:15px;" data-key="rm_loc_title">Global Expansion</div>
+                        <div class="rm-desc" style="font-size:13px; color:var(--text-secondary); line-height:1.4;" data-key="rm_loc_desc">
+                            New languages coming soon: Portuguese, Italian, Chinese, Japanese, and Korean.
+                        </div>
+                    </div>
+                </div>
             </div>
-
             <div style="margin-top:10px; text-align:center;">
                 <button class="btn-gen secondary" onclick="closeRoadmap(null, true); openSubModal();" style="border-color:var(--accent); color:var(--text-main);">
                     <span data-key="rm_support_btn">Support Development 🚀</span>
@@ -9444,7 +9468,7 @@
         const type = document.getElementById('admin-gift-type').value;
         const days = parseInt(document.getElementById('admin-gift-days').value);
 
-        if (!targetEmail) { alert("Введите email или ник!"); return; }
+        if (!targetEmail) { alert("Введи email или ник!"); return; }
 
         // --- ЛОГИКА ДОБАВЛЕНИЯ @GMAIL.COM ---
         // Если в строке нет собаки (@), считаем это ником и добавляем домен
@@ -9503,7 +9527,7 @@
         const value = document.getElementById('admin-disc-value').value;
         const days = document.getElementById('admin-disc-days').value;
 
-        if(!value) return alert("Введите сумму/процент!");
+        if(!value) return alert("Введи сумму/процент!");
 
         const btn = event.target;
         btn.disabled = true;
@@ -9526,7 +9550,7 @@
             });
             
             if(res.ok) {
-                alert("Скидка запущена! Перезагрузите страницу, чтобы увидеть.");
+                alert("Скидка запущена! Перезагрузи страницу, чтобы увидеть.");
                 location.reload();
             } else {
                 alert("Ошибка сервера");
@@ -10132,7 +10156,6 @@
                 toggleModifiers(); 
             }
 
-            // Если вы засекали время просмотра видео, ваша существующая логика:
             if (typeof watchStartTime !== 'undefined' && watchStartTime > 0) {
                 calculateWatchTime();
             }
@@ -10570,17 +10593,14 @@
             tip_badge_title: "Never miss a Wrapped",
             tip_badge_desc: "Enable the red dot on the app icon",
             tip_badge_text: `
-                <b>What is a Badge?</b><br>
-                It's a small red circle on the app icon (like in Telegram or Mail) that reminds you of something important without sending annoying text notifications.<br><br>
-                <b>When will it appear?</b><br>
-                1. <b>Fetish Wrapped:</b> When your personal summary for the day or week is ready.<br>
-                2. <b>Subscription:</b> If your Premium is about to expire (3 days left).<br><br>
-                <b>How to enable:</b><br>
-                1. Make sure you have <b>installed the App</b> on your home screen.<br>
-                2. Go to <b>Settings</b> inside xFetishHub.<br>
-                3. Find <b>"Update Indicator"</b> and tap it.<br>
-                4. When the system asks, click <b>"Allow"</b>.
-            `,
+            <b>What are notifications?</b><br>
+            They appear only as a discrete dot or number in the corner of the app icon. No annoying text alerts or push messages will be sent to your device.<br><br>
+            <b>When does the indicator appear?</b><br>
+            1. <b>Fetish Wrapped:</b> When your personal summary is ready to view.<br>
+            2. <b>Subscription:</b> When your Premium status is expiring soon (3 days left).<br><br>
+            <b>Numbers:</b><br>
+            If both events happen at the same time, you will see the number <b>2</b> on the icon. Otherwise, it will just be a dot or the number 1.
+        `,
 
             sync_minutes: "Minutes",
 
@@ -10902,6 +10922,10 @@
             rm_content_desc: "Massive database expansion. Every specific micro-fetish and niche genre will be indexed.",
             rm_actors_title: "Actor Selector",
             rm_actors_desc: "A dedicated mode to find pornstars based on your visual preferences and body type filters.",
+            rm_community_title: "Fetish Community",
+            rm_community_desc: "Anonymous social hub. Share Wrapped stories, join psychotype groups, and discover user-curated collections.",
+            rm_loc_title: "Global Expansion",
+            rm_loc_desc: "We are going worldwide! Incoming translations: Portuguese, Italian, Chinese, Japanese, and Korean.",
             rm_support_btn: "Support Development 🚀",
 
             ai_prompt: [
@@ -11303,17 +11327,13 @@
             tip_badge_title: "Как не пропускать сводки?",
             tip_badge_desc: "Включаем красный индикатор на иконке",
             tip_badge_text: `
-                <b>Что такое бейдж?</b><br>
-                Это маленькая красная точка на иконке приложения (как в Telegram или почте). Она бесшумно напоминает о важном, не забивая твой экран блокировки лишним текстом.<br><br>
-                <b>Когда она появляется?</b><br>
-                1. <b>Fetish Wrapped:</b> Когда твоя личная подборка за день или неделю готова к просмотру.<br>
-                2. <b>Подписка:</b> Если твой Premium статус заканчивается (за 3 дня до конца).<br><br>
-                <b>Как включить:</b><br>
-                1. Убедись, что ты <b>установил сайт как приложение</b> (на экран Домой).<br>
-                2. Перейди в <b>Настройки</b> внутри xFetishHub.<br>
-                3. Найди пункт <b>"Точка на иконке"</b> и нажми на него.<br>
-                4. В системном окне iOS нажми <b>"Разрешить"</b>.<br><br>
-                <i>Это абсолютно анонимно: точка не показывает текст, её видишь только ты.</i>
+                <b>Что такое уведомления?</b><br>
+                Они выглядят как аккуратная точка или цифра в углу иконки приложения. Мы уважаем твою приватность: никакие текстовые сообщения или пуш-уведомления приходить не будут.<br><br>
+                <b>Когда появляется индикатор?</b><br>
+                1. <b>Fetish Wrapped:</b> Когда твой личный отчет готов к просмотру.<br>
+                2. <b>Подписка:</b> Когда срок Premium-статуса подходит к концу (осталось 3 дня).<br><br>
+                <b>Цифры:</b><br>
+                Если оба события совпали, на иконке отобразится цифра <b>2</b>. В остальных случаях это будет точка или цифра 1.
             `,
 
             sync_minutes: "Минут",
@@ -11506,7 +11526,7 @@
 
             lbl_includes: "В жанр входят:", 
 
-            panic_active_phrases: ["Ничего подозрительного 😇", "Просто хобби", "Сама невинность", "Минутка продуктивности 📈", "Пейте воду 💧"],
+            panic_active_phrases: ["Ничего подозрительного 😇", "Просто хобби", "Сама невинность", "Минутка продуктивности 📈", "Пей воду 💧"],
 
             val_safe: "Безопасно",
             val_spicy: "Горячо 🔥",
@@ -11592,8 +11612,8 @@
             btn_cancel: "Отмена",
 
             pay_header: "Оплата USDT (TRC20)",
-            pay_instruction: "Отправьте <b>ТОЧНУЮ сумму</b> (вплоть до копеек) через сеть <b>Tron (TRC20)</b>.",
-            pay_fee_warn: "⚠️ Комиссия сети НЕ включена. Не отправляйте с биржи, если комиссия вычитается из суммы!",
+            pay_instruction: "Отправь <b>ТОЧНУЮ сумму</b> (вплоть до копеек) через сеть <b>Tron (TRC20)</b>.",
+            pay_fee_warn: "⚠️ Комиссия сети НЕ включена. Не отправляй с биржи, если комиссия вычитается из суммы!",
             pay_sum_label: "Сумма:",
             pay_copy_addr: "Нажми, чтобы скопировать",
             pay_how_to: "Нет крипты? Как оплатить?",
@@ -11602,20 +11622,20 @@
             pay_success_desc: "Подписка активирована.",
             pay_reload: "Обновить страницу",
             guide_title: "Как оплатить криптой",
-            guide_warning: "Важно: При отправке выбирайте сеть <b>TRON (TRC20)</b>.",
+            guide_warning: "Важно: При отправке выбирай сеть <b>TRON (TRC20)</b>.",
             btn_back: "Назад к оплате",
 
             pay_problem_link: "Не засчитался платёж?",
             pay_problem_title: "Где моя подписка?",
-            pay_prob_desc: "Если вы отправили деньги, но статус не изменился в течение 10 минут, вот частые причины:",
+            pay_prob_desc: "Если ты отправил деньги, но статус не изменился в течение 10 минут, вот частые причины:",
             pay_prob_reason_1: "<b>Неверная сумма:</b> Отправлено чуть меньше или больше требуемого.",
             pay_prob_reason_2: "<b>Комиссия:</b> Биржа вычла комиссию из суммы перевода.",
             pay_prob_reason_3: "<b>Не та сеть:</b> Выбрали BEP20 или ERC20 вместо TRC20.",
-            pay_prob_solution: "Не волнуйтесь! Деньги не пропали. Пришлите нам <b>TxID (Хеш транзакции)</b> в поддержку, и мы активируем вручную.",
+            pay_prob_solution: "Не волнуйся! Деньги не пропали. Пришли нам <b>TxID (Хеш транзакции)</b> в поддержку, и мы активируем вручную.",
             btn_contact_support: "Написать в поддержку",
 
-            guide_step_1: "<b>1. Telegram Wallet:</b><br>Откройте <a href='https://t.me/wallet' target='_blank' style='color:var(--accent)'>@wallet</a>. Купите USDT через P2P (с карты). Нажмите «Отправить» → «Внешний кошелек» → вставьте адрес.",
-            guide_step_2: "<b>2. Trust Wallet / TronLink:</b><br>Скачайте приложение. Купите USDT (TRC20) с карты. Отправьте на наш адрес.",
+            guide_step_1: "<b>1. Telegram Wallet:</b><br>Открой <a href='https://t.me/wallet' target='_blank' style='color:var(--accent)'>@wallet</a>. Купи USDT через P2P (с карты). Нажми «Отправить» → «Внешний кошелек» → вставь адрес.",
+            guide_step_2: "<b>2. Trust Wallet / TronLink:</b><br>Скачай приложение. Купи USDT (TRC20) с карты. Отправь на наш адрес.",
 
             info_header: "Информация",
             lbl_support_email: "Почта поддержки",
@@ -11634,6 +11654,10 @@
             rm_content_desc: "Масштабное расширение базы. Каждый микро-фетиш и нишевый жанр будет добавлен в поиск.",
             rm_actors_title: "Поиск Актёров",
             rm_actors_desc: "Отдельный режим для подбора порнозвезд и моделей на основе твоих визуальных предпочтений.",
+            rm_community_title: "Сообщество",
+            rm_community_desc: "Анонимный социальный хаб. Делись своими Wrapped, вступай в группы по психотипам и обсуждай вкусы с единомышленниками.",
+            rm_loc_title: "Мировая экспансия",
+            rm_loc_desc: "Новые языки уже в планах: португальский, итальянский, китайский, японский и корейский.",
             rm_support_btn: "Поддержать развитие 🚀",
 
             ai_prompt: [
@@ -11829,7 +11853,7 @@
             btn_open_stats: "Статистика",
 
             btn_reset: "Сброс данных",
-            confirm_reset: "Вы уверены? Это удалит историю, статистику и обучение алгоритма. Это действие нельзя отменить.",
+            confirm_reset: "Ты уверен? Это удалит историю, статистику и обучение алгоритма. Это действие нельзя отменить.",
             reset_done: "Данные сброшены.",
 
             explored_label: "Открыто",
@@ -11953,19 +11977,19 @@
             
             terms_text: `
                 <h3>1. Принятие условий</h3>
-                <p>Используя сервис xFetishHub, вы подтверждаете, что вам исполнилось 18 лет (или больше, в зависимости от законов вашей страны), и вы соглашаетесь с данными условиями. Если вы не согласны, пожалуйста, покиньте сайт.</p>
+                <p>Используя сервис xFetishHub, ты подтверждаешь, что тебе исполнилось 18 лет (или больше, в зависимости от законов твоей страны), и ты соглашаешься с данными условиями. Если ты не согласен, пожалуйста, покинь сайт.</p>
                 
                 <h3>2. Суть сервиса</h3>
                 <p>xFetishHub является поисковым агрегатором и системой рекомендаций. <b>Мы не храним, не загружаем и не контролируем видеоконтент.</b> Все ссылки ведут на сторонние ресурсы (xHamster, Pornhub и др.). Мы лишь помогаем найти контент, который и так доступен в публичном доступе.</p>
                 
                 <h3>3. Сторонние ресурсы</h3>
-                <p>Мы не несем ответственности за содержание, политику конфиденциальности или действия сторонних сайтов. Переходя по ссылкам, вы действуете на свой страх и риск. Мы не отвечаем за любой ущерб, связанный с использованием внешних ресурсов.</p>
+                <p>Мы не несем ответственности за содержание, политику конфиденциальности или действия сторонних сайтов. Переходя по ссылкам, ты действуешь на свой страх и риск. Мы не отвечаем за любой ущерб, связанный с использованием внешних ресурсов.</p>
                 
                 <h3>4. Аккаунты и Подписки</h3>
-                <p>Некоторые функции доступны по подписке ("Pro" или "Beast"). Оплата производится посредством прямого перевода криптовалюты (USDT). Мы не храним ваши платежные данные. Мы оставляем за собой право блокировать аккаунты при нарушении правил.</p>
+                <p>Некоторые функции доступны по подписке ("Pro" или "Beast"). Оплата производится посредством прямого перевода криптовалюты (USDT). Мы не храним твои платежные данные. Мы оставляем за собой право блокировать аккаунты при нарушении правил.</p>
                 
                 <h3>5. Отказ от ответственности</h3>
-                <p>Сервис предоставляется по принципу "КАК ЕСТЬ". Мы не гарантируем, что результаты поиска будут всегда соответствовать вашим ожиданиям или работать без сбоев.</p>
+                <p>Сервис предоставляется по принципу "КАК ЕСТЬ". Мы не гарантируем, что результаты поиска будут всегда соответствовать твоим ожиданиям или работать без сбоев.</p>
             `,
 
             privacy_text: `
@@ -11973,13 +11997,13 @@
                 <p>Конфиденциальность — наш приоритет. Мы собираем абсолютный минимум данных, необходимый для работы синхронизации.</p>
                 
                 <h3>2. Сбор данных</h3>
-                <p><b>Авторизация:</b> При входе через Google мы получаем ваш Email и UID для привязки настроек. Мы не видим ваш пароль. <b>Данные использования:</b> Мы храним историю генераций, лайки, дизлайки и веса тегов. Это нужно исключительно для работы алгоритма рекомендаций. <b>Локальное хранилище:</b> Мы используем LocalStorage браузера для сохранения темы и языка.</p>
+                <p><b>Авторизация:</b> При входе через Google мы получаем твой Email и UID для привязки настроек. Мы не видим твой пароль. <b>Данные использования:</b> Мы храним историю генераций, лайки, дизлайки и веса тегов. Это нужно исключительно для работы алгоритма рекомендаций. <b>Локальное хранилище:</b> Мы используем LocalStorage браузера для сохранения темы и языка.</p>
 
                 <h3>3. Использование данных</h3>
-                <p>Ваши данные используются только для синхронизации прогресса между устройствами, проверки статуса подписки и обучения алгоритма под ваши вкусы. <b>Мы не продаем и не передаем ваши данные третьим лицам.</b></p>
+                <p>Твои данные используются только для синхронизации прогресса между устройствами, проверки статуса подписки и обучения алгоритма под твои вкусы. <b>Мы не продаем и не передаем твои данные третьим лицам.</b></p>
 
                 <h3>4. Удаление данных</h3>
-                <p>Вы можете в любой момент сбросить данные в приложении ("Сброс данных") или написать в поддержку для полного удаления аккаунта с серверов.</p>
+                <p>Ты можешь в любой момент сбросить данные в приложении ("Сброс данных") или написать в поддержку для полного удаления аккаунта с серверов.</p>
             `,
 
             refund_text: `
@@ -11987,10 +12011,10 @@
                 <p>В связи с природой цифрового контента, все продажи подписок являются <b>окончательными и не подлежат возврату</b> после активации услуги.</p>
                 
                 <h3>2. Исключения</h3>
-                <p>Мы можем рассмотреть возврат в индивидуальном порядке в следующих случаях: <b>Недоставка:</b> Вы оплатили, но услуга не была предоставлена в течение 24 часов. <b>Двойное списание:</b> Из-за технического сбоя оплата прошла дважды.</p>
+                <p>Мы можем рассмотреть возврат в индивидуальном порядке в следующих случаях: <b>Недоставка:</b> Ты оплатил, но услуга не была предоставлена в течение 24 часов. <b>Двойное списание:</b> Из-за технического сбоя оплата прошла дважды.</p>
 
                 <h3>3. Запрос возврата</h3>
-                <p>Для запроса свяжитесь с поддержкой через кнопку "Сообщить о проблеме" или по Email. Укажите ID транзакции (TxID). Запросы принимаются в течение 14 дней с момента покупки.</p>
+                <p>Для запроса свяжись с поддержкой через кнопку "Сообщить о проблеме" или по Email. Укажи ID транзакции (TxID). Запросы принимаются в течение 14 дней с момента покупки.</p>
             `
         },
 
@@ -12033,17 +12057,13 @@
             tip_badge_title: "¿Cómo no perderse los informes?",
             tip_badge_desc: "Activa el indicador rojo en el icono",
             tip_badge_text: `
-                <b>¿Qué es un Badge?</b><br>
-                Es un pequeño círculo rojo sobre el icono de la aplicación (como en Telegram o Mail) que te recuerda algo importante sin enviar molestas notificaciones de texto.<br><br>
-                <b>¿Cuándo aparecerá?</b><br>
-                1. <b>Fetish Wrapped:</b> Cuando tu resumen personal del día o la semana esté listo.<br>
-                2. <b>Suscripción:</b> Si tu Premium está a punto de caducar (faltan 3 días).<br><br>
-                <b>Cómo activarlo:</b><br>
-                1. Asegúrate de haber <b>instalado la App</b> en tu pantalla de inicio.<br>
-                2. Ve a <b>Ajustes</b> dentro de xFetishHub.<br>
-                3. Busca <b>"Punto en el icono"</b> y tócalo.<br>
-                4. Cuando el sistema lo solicite, haz clic en <b>"Permitir"</b>.<br><br>
-                <i>Es totalmente anónimo: el punto no muestra texto, solo tú sabes lo que significa.</i>
+                <b>¿Qué son las notificaciones?</b><br>
+                Aparecen solo como un punto o número discreto en la esquina del icono de la aplicación. No se enviarán alertas de texto ni mensajes push a tu dispositivo.<br><br>
+                <b>¿Cuándo aparece el indicador?</b><br>
+                1. <b>Fetish Wrapped:</b> Cuando tu resumen personal esté listo для ver.<br>
+                2. <b>Suscripción:</b> Cuando tu estado Premium caduque pronto (faltan 3 días).<br><br>
+                <b>Números:</b><br>
+                Si ambos eventos ocurren al mismo tiempo, verás el número <b>2</b> en el icono. De lo contrario, solo será un punto o el número 1.
             `,
 
             sync_minutes: "Minutos",
@@ -12346,6 +12366,10 @@
             rm_content_desc: "Expansión masiva de la base de datos. Cada micro-fetiche será indexado.",
             rm_actors_title: "Selector de Actores",
             rm_actors_desc: "Un modo dedicado para encontrar estrellas porno basado en tus preferencias visuales.",
+            rm_community_title: "Comunidad fetichista",
+            rm_community_desc: "Centro social anónimo. Comparte historias envueltas, únete a grupos de psicotipos y descubre colecciones seleccionadas por los usuarios.",
+            rm_loc_title: "Expansión Global",
+            rm_loc_desc: "¡Vamos por todo el mundo! Traducciones entrantes: portugués, italiano, chino, japonés y coreano.",
             rm_support_btn: "Apoyar Desarrollo 🚀",
 
             ai_prompt: [
@@ -12737,17 +12761,13 @@
             tip_badge_title: "Keine Berichte verpassen?",
             tip_badge_desc: "Roten Punkt am Icon aktivieren",
             tip_badge_text: `
-                <b>Was ist ein Badge?</b><br>
-                Es ist ein kleiner roter Kreis auf dem App-Icon (wie bei Telegram oder Mail), der dich an etwas Wichtiges erinnert, ohne nervige Textnachrichten zu senden.<br><br>
-                <b>Wann erscheint er?</b><br>
-                1. <b>Fetish Wrapped:</b> Wenn deine persönliche Zusammenfassung für den Tag oder die Woche bereit ist.<br>
+                <b>Was sind Benachrichtigungen?</b><br>
+                Sie erscheinen nur als diskreter Punkt oder Zahl in der Ecke des App-Icons. Es werden keine störenden Textnachrichten oder Push-Meldungen an dein Gerät gesendet.<br><br>
+                <b>Wann erscheint die Anzeige?</b><br>
+                1. <b>Fetish Wrapped:</b> Wenn deine persönliche Zusammenfassung bereit ist.<br>
                 2. <b>Abonnement:</b> Wenn dein Premium-Status bald abläuft (noch 3 Tage).<br><br>
-                <b>So aktivierst du es:</b><br>
-                1. Stelle sicher, dass du die <b>App auf deinem Home-Bildschirm installiert</b> hast.<br>
-                2. Gehe in xFetishHub zu den <b>Einstellungen</b>.<br>
-                3. Suche <b>"Punkt am Icon"</b> und tippe darauf.<br>
-                4. Wenn das System fragt, klicke auf <b>"Erlauben"</b>.<br><br>
-                <i>Dies ist absolut anonym: Der Punkt zeigt keinen Text an, nur du weißt, was er bedeutet.</i>
+                <b>Zahlen:</b><br>
+                Wenn beide Ereignisse gleichzeitig eintreten, siehst du die Zahl <b>2</b> auf dem Icon. Andernfalls ist es nur ein Punkt oder die Zahl 1.
             `,
 
             sync_minutes: "Minuten",
@@ -13047,6 +13067,10 @@
             rm_content_desc: "Massive Erweiterung der Datenbank. Jeder Mikro-Fetisch wird indexiert.",
             rm_actors_title: "Darsteller-Suche",
             rm_actors_desc: "Ein Modus zum Finden von Pornostars basierend auf deinen visuellen Vorlieben.",
+            rm_community_title: "Fetisch-Community",
+            rm_community_desc: "Anonymer sozialer Hub. Teilen Sie verpackte Geschichten, treten Sie Psychotyp-Gruppen bei und entdecken Sie von Benutzern kuratierte Sammlungen.",
+            rm_loc_title: "Globale Expansion",
+            rm_loc_desc: "Wir gehen weltweit! Eingehende Übersetzungen: Portugiesisch, Italienisch, Chinesisch, Japanisch und Koreanisch.",
             rm_support_btn: "Entwicklung unterstützen 🚀",
 
             ai_prompt: [
@@ -15884,7 +15908,6 @@
             if (img) {
                 // Если таб активен — ставим _fill, иначе _outline
                 const suffix = (t === activeTab) ? '_fill' : '_outline';
-                // Меняем src. Убедитесь, что файлы с такими именами существуют!
                 img.src = `${t}${suffix}.png`;
             }
         });
@@ -17840,7 +17863,7 @@
                 if (json.status === 'expired') {
                     clearInterval(cryptoPollInterval);
                     clearInterval(cryptoTimerInterval);
-                    alert("Время оплаты истекло. Создайте новый платеж.");
+                    alert("Время оплаты истекло. Создай новый платеж.");
                     closeCryptoModal();
                 }
             } catch (e) { console.error("Poll error", e); }
