@@ -7670,10 +7670,16 @@
                 </label>
             </div>
 
+            <!-- 10. NOTIFICATIONS -->
             <div class="ios-row">
                 <div class="ios-row-left">
                     <img src="notification.png" class="settings-icon" alt="Badge">
                     <span class="toggle-text" data-key="badge_indicator_label">Icon Badge Indicator</span>
+                    
+                    <img src="question.png" id="tip-icon-notifications" class="settings-icon" 
+                        onclick="openSpecificTip('missing_wrapped'); event.stopPropagation();" 
+                        alt="Info" 
+                        style="width:14px; height:14px; margin-left:6px; opacity:0.5; cursor:pointer; transition: opacity 0.3s ease;">
                 </div>
                 <label class="switch">
                     <input type="checkbox" id="badge-toggle" onchange="handleNotificationToggle(this.checked)">
@@ -9749,9 +9755,20 @@
         const user = auth.currentUser;
         if (!user || user.uid !== ADMIN_UID) return;
 
-        const btn = event.target;
-        const originalText = btn.innerText;
-        btn.innerText = "Загрузка...";
+        let btn = null;
+        let originalText = "";
+        
+        // Используем глобальный event
+        if (typeof event !== 'undefined' && event && event.target) {
+            // Ищем ближайшую кнопку или div
+            const target = event.target.closest('button');
+            if (target) {
+                btn = target;
+                originalText = btn.innerText;
+                btn.innerText = "Loading...";
+                btn.disabled = true;
+            }
+        }
 
         try {
             const usersRef = collection(db, "users");
@@ -9768,7 +9785,11 @@
         } catch (e) {
             console.error("Ошибка админ-статистики:", e);
         } finally {
-            btn.innerText = originalText;
+            // Возвращаем текст кнопки обратно
+            if (btn) {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
         }
     };
 
@@ -10377,32 +10398,27 @@
         de: "Schön, mehr Leute hier zu sehen 😏"
     };
 
+    let statusHideTimeout = null;
+
     function setWelcomeMessage() {
         const statusEl = document.getElementById('status-text');
         if(!statusEl) return;
         
-        // Проверяем первый вход через LocalStorage
-        const isReturningUser = localStorage.getItem('xch_has_visited');
+        // Сброс предыдущего таймера
+        if (statusHideTimeout) clearTimeout(statusHideTimeout);
         
-        let text = "";
-        
-        if (!isReturningUser) {
-            // ПЕРВЫЙ ВХОД
-            text = firstTimePhrase[currentLang] || firstTimePhrase.en;
-            // Запоминаем пользователя
-            localStorage.setItem('xch_has_visited', 'true');
-        } else {
-            // ПОВТОРНЫЙ ВХОД
-            const phrases = welcomePhrases[currentLang] || welcomePhrases.en;
-            text = phrases[Math.floor(Math.random() * phrases.length)];
-        }
-
-        // Устанавливаем текст и цвет
-        statusEl.innerText = text;
+        // Показываем текст
+        const phrases = welcomePhrases[currentLang] || welcomePhrases.en;
+        statusEl.innerText = phrases[Math.floor(Math.random() * phrases.length)];
         statusEl.style.color = "var(--accent)"; 
-        statusEl.style.fontWeight = "700";
+        statusEl.style.opacity = "1"; // Убеждаемся, что видно
+        
+        // Таймер на скрытие через 5 секунд
+        statusHideTimeout = setTimeout(() => {
+            statusEl.style.transition = "opacity 1s ease";
+            statusEl.style.opacity = "0";
+        }, 5000);
     }
-
     const wlReminderPhrases = {
         en: [
             "Seems like you wanted to watch this... 👀",
@@ -15632,6 +15648,7 @@
         }
     
     let intensityTextTimeout = null;
+    let intensityColorTimeout = null;
 
     function updateIntensity(val) {
         currentIntensity = parseInt(val);
@@ -15647,80 +15664,97 @@
 
         const t = langData[currentLang] || langData['en'];
         const isNoir = document.body.getAttribute('data-theme') === 'noir';
+        const isLight = document.body.classList.contains('light-theme');
         const colorBg = 'var(--border)'; 
         
+        // Нейтральный фильтр
+        const neutralFilter = isLight ? "invert(0) opacity(0.8)" : "invert(1) opacity(0.9)";
+
         // Конфигурация уровней
         let config = {};
         if (currentIntensity === 1) {
             config = {
                 icon: 'safe.png', key: 'val_safe', color: '#2ecc71', emoji: "🛡️",
                 bg: colorBg,
-                filter: isNoir ? (document.body.classList.contains('light-theme') ? "invert(0)" : "invert(1)") : "invert(68%) sepia(61%) saturate(452%) hue-rotate(97deg) brightness(89%) contrast(85%)"
+                activeFilter: "invert(68%) sepia(61%) saturate(452%) hue-rotate(97deg) brightness(89%) contrast(85%)"
             };
         } else if (currentIntensity === 2) {
             config = {
                 icon: 'spicy.png', key: 'val_spicy', color: isNoir ? '#ffffff' : '#f39c12', emoji: "🔥",
                 bg: `linear-gradient(to right, ${isNoir ? '#fff' : '#f39c12'} 0%, ${isNoir ? '#fff' : '#f39c12'} 50%, ${colorBg} 50%, ${colorBg} 100%)`,
-                filter: isNoir ? (document.body.classList.contains('light-theme') ? "invert(0)" : "invert(1)") : "invert(77%) sepia(33%) saturate(5427%) hue-rotate(357deg) brightness(101%) contrast(90%)"
+                activeFilter: "invert(77%) sepia(33%) saturate(5427%) hue-rotate(357deg) brightness(101%) contrast(90%)"
             };
         } else {
             config = {
                 icon: 'extreme.png', key: 'val_extreme', color: isNoir ? '#ffffff' : '#e74c3c', emoji: "💀",
                 bg: isNoir ? '#ffffff' : '#e74c3c',
-                filter: isNoir ? (document.body.classList.contains('light-theme') ? "invert(0)" : "invert(1)") : "invert(43%) sepia(97%) saturate(1874%) hue-rotate(338deg) brightness(96%) contrast(89%)"
+                activeFilter: "invert(43%) sepia(97%) saturate(1874%) hue-rotate(338deg) brightness(96%) contrast(89%)"
             };
         }
 
-        // 1. Иконка
-        if (mainIcon.src.indexOf(config.icon) === -1) {
-            mainIcon.style.transform = "scale(0.8)";
-            setTimeout(() => {
-                mainIcon.src = config.icon;
-                mainIcon.style.filter = config.filter;
-                mainIcon.style.transform = "scale(1.1)";
-                setTimeout(() => mainIcon.style.transform = "scale(1)", 150);
-            }, 100);
-        } else {
-            mainIcon.style.filter = config.filter;
+        if (isNoir) {
+            config.activeFilter = isLight ? "invert(0)" : "invert(1)";
         }
 
-        // 2. Слайдер
         slider.style.background = config.bg;
 
-        const infoIcon = document.getElementById('intensity-info-icon');
+        // --- ЛОГИКА АНИМАЦИИ ИКОНКИ ---
+        if (intensityColorTimeout) clearTimeout(intensityColorTimeout);
 
-        // 3. Обновляем текст
+        // 1. ФАЗА АКТИВАЦИИ (Быстрый удар)
+        mainIcon.style.transition = "transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.2s ease-out";
+        
+        // При смене картинки делаем "перезарядку"
+        if (mainIcon.src.indexOf(config.icon) === -1) {
+            mainIcon.style.transform = "scale(0.5)"; // Сжатие
+            setTimeout(() => {
+                mainIcon.src = config.icon;
+                mainIcon.style.filter = config.activeFilter; 
+                mainIcon.style.transform = "scale(1.25)"; // Сильное увеличение (Pop)
+                setTimeout(() => mainIcon.style.transform = "scale(1.1)", 150);
+            }, 100);
+        } else {
+            // Та же иконка — просто красим и увеличиваем
+            mainIcon.style.filter = config.activeFilter;
+            mainIcon.style.transform = "scale(1.2)";
+        }
+
+        // 2. ФАЗА ВОЗВРАТА (С "Прыжком")
+        intensityColorTimeout = setTimeout(() => {
+            mainIcon.style.transition = "filter 0.8s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)";
+            
+            mainIcon.style.filter = neutralFilter; 
+            mainIcon.style.transform = "scale(1)";
+        }, 1200);
+
+
+        // --- ЛОГИКА ТЕКСТА ---
+        const infoIcon = document.getElementById('intensity-info-icon');
         if (labelText) {
-            // Сбрасываем инлайн-стили
             labelText.style.opacity = "";
             labelText.style.transform = ""; 
             labelText.style.transition = ""; 
 
             if (intensityTextTimeout) clearTimeout(intensityTextTimeout);
 
-            // Формируем текст
             let rawText = t[config.key] || "Level " + currentIntensity;
             rawText = rawText.replace(config.emoji, '').trim(); 
             
             labelText.innerText = rawText + " " + config.emoji;
             labelText.style.color = config.color;
 
-            // ПОКАЗЫВАЕМ ТЕКСТ -> СКРЫВАЕМ ИКОНКУ
             requestAnimationFrame(() => {
                 labelText.classList.add('visible');
                 if(infoIcon) {
-                    infoIcon.style.opacity = '0'; // Исчезает
-                    infoIcon.style.pointerEvents = 'none'; // Нельзя нажать пока не видно
+                    infoIcon.style.opacity = '0';
+                    infoIcon.style.pointerEvents = 'none';
                 }
             });
 
-            // Таймер исчезновения
             intensityTextTimeout = setTimeout(() => {
                 labelText.classList.remove('visible');
-                
-                // СКРЫВАЕМ ТЕКСТ -> ПОКАЗЫВАЕМ ИКОНКУ
                 if(infoIcon) {
-                    infoIcon.style.opacity = '0.5'; // Возвращается (полупрозрачная)
+                    infoIcon.style.opacity = '0.5'; 
                     infoIcon.style.pointerEvents = 'auto';
                 }
             }, 1200);
@@ -19730,7 +19764,7 @@
         // Игнорируем меньше 5 сек
         if (diffInSeconds < 5) return;
 
-        // Если больше 30 минут (1800 сек), ставим заглушку
+        // ... (код расчета времени остается тем же) ...
         let timeString = "";
         const minLabel = currentLang === 'ru' ? 'мин' : 'min';
         const secLabel = currentLang === 'ru' ? 'сек' : 'sec';
@@ -19740,58 +19774,54 @@
         } else {
             const minutes = Math.floor(diffInSeconds / 60);
             const seconds = diffInSeconds % 60;
-            
-            if (minutes > 0) {
-                timeString = `${minutes} ${minLabel} ${seconds} ${secLabel}`;
-            } else {
-                timeString = `${seconds} ${secLabel}`;
-            }
+            if (minutes > 0) timeString = `${minutes} ${minLabel} ${seconds} ${secLabel}`;
+            else timeString = `${seconds} ${secLabel}`;
         }
 
-        // === СОХРАНЕНИЕ В ИСТОРИЮ ===
+        // Сохранение в историю 
         const historyEntry = {
             id: itemBeingWatched.id,
             timestamp: Date.now(),
             durationStr: timeString,
             seconds: diffInSeconds
         };
-        
-        // Добавляем в начало
         watchHistory.unshift(historyEntry);
-        // Храним последние 100 записей
         if (watchHistory.length > 100) watchHistory.pop();
-        
         localStorage.setItem(STORAGE.WATCH_HISTORY, JSON.stringify(watchHistory));
-        
-        // Обновляем облако
         if (window.markDirty) window.markDirty();
-        // ======================================
 
-        // Показ сообщения
+        // === ВЫВОД СООБЩЕНИЯ С ТАЙМЕРОМ ===
         const t = langData[currentLang] || langData['en'];
         let phraseTemplate = "";
         
-        // Если смотрел долго (или сработала заглушка 30+)
-        if (diffInSeconds > 1800) {
-             phraseTemplate = (currentLang === 'ru') ? "Долгое погружение... 🌊" : "Deep dive... 🌊";
-             // Перезаписываем timeString в шаблоне, если нужно, или просто выводим фразу
-        } else if (diffInSeconds < 40) {
-            phraseTemplate = t.return_phrase_short || "Only {t}...";
-        } else {
+        if (diffInSeconds > 1800) phraseTemplate = (currentLang === 'ru') ? "Долгое погружение... 🌊" : "Deep dive... 🌊";
+        else if (diffInSeconds < 40) phraseTemplate = t.return_phrase_short || "Only {t}...";
+        else {
             const phrases = t.return_phrases || ["{t} passed."];
             phraseTemplate = phrases[Math.floor(Math.random() * phrases.length)];
         }
         
-        // Если phraseTemplate не содержит {t}, просто выводим её
         const finalPhrase = phraseTemplate.includes("{t}") ? phraseTemplate.replace("{t}", timeString) : phraseTemplate;
 
         const statusEl = document.getElementById('status-text');
         if (statusEl) {
+            // Сброс старого таймера
+            if (statusHideTimeout) clearTimeout(statusHideTimeout);
+
+            statusEl.style.transition = "none";
             statusEl.style.opacity = '0';
+            
             setTimeout(() => {
                 statusEl.innerText = finalPhrase;
                 statusEl.style.color = "var(--text-main)";
+                statusEl.style.transition = "opacity 0.3s ease";
                 statusEl.style.opacity = '1';
+
+                // Новый таймер на 5 секунд
+                statusHideTimeout = setTimeout(() => {
+                    statusEl.style.transition = "opacity 1s ease";
+                    statusEl.style.opacity = "0";
+                }, 5000);
             }, 200);
         }
     }
@@ -23283,16 +23313,22 @@
     }
 
     function checkTipIcons() {
-        // 1. Иконка Интенсивности (существующая)
+        // 1. Иконка Интенсивности
         const intIcon = document.getElementById('intensity-info-icon');
         if (intIcon) {
             intIcon.style.display = viewedTips.includes('intensity') ? 'none' : 'block';
         }
 
-        // 2. Иконка Режимов (новая)
+        // 2. Иконка Режимов
         const modeIcon = document.getElementById('tip-icon-modes');
         if (modeIcon) {
             modeIcon.style.display = viewedTips.includes('modes') ? 'none' : 'block';
+        }
+
+        // 3. Иконка Уведомлений 
+        const notifyIcon = document.getElementById('tip-icon-notifications');
+        if (notifyIcon) {
+            notifyIcon.style.display = viewedTips.includes('missing_wrapped') ? 'none' : 'block';
         }
     }
 
