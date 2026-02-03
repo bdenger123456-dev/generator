@@ -1346,11 +1346,18 @@
             
             flex: 1; 
             height: 100%;
-            
             cursor: pointer; 
             transition: all 0.2s; 
-            z-index: 2; /* Текст поверх таблетки */
+            z-index: 2; 
             position: relative;
+
+            /* Отключает системное меню (копировать/сохранить) на iOS */
+            -webkit-touch-callout: none; 
+            /* Отключает выделение синим цветом */
+            -webkit-user-select: none;   
+            user-select: none;           
+            /* Убирает серую подсветку при тапе (если она не нужна) */
+            -webkit-tap-highlight-color: transparent; 
         }
         .nav-item.active { color: var(--text-main); }
         .nav-item.active .nav-icon { transform: translateY(-2px); color: var(--accent); }
@@ -1368,8 +1375,14 @@
             object-fit: contain;
             margin-bottom: 4px;
             transition: filter 0.3s, transform 0.2s;
-            
             filter: invert(1);
+
+            /* === ФИКС КАРТИНКИ === */
+            pointer-events: none; 
+            
+            /* Запрещает перетаскивание картинки (призрак) */
+            -webkit-user-drag: none; 
+            user-drag: none;
         }
 
         /* Светлая тема */
