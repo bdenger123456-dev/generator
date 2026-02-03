@@ -10021,6 +10021,8 @@
                 if (typeof updateCounts === 'function') updateCounts();
                 if (typeof renderHistory === 'function') renderHistory();
                 if (typeof updateActionButtons === 'function') updateActionButtons();
+
+                checkSubscriptionExpiry(); 
                 
                 // Если открыто окно синхронизации, обновляем цифры сразу
                 if (document.getElementById('modal-sync-info-overlay').classList.contains('open')) {
