@@ -16941,45 +16941,20 @@
                     let displayTag = tag.charAt(0).toUpperCase() + tag.slice(1);
                     if (displayTag.length > 9) displayTag = displayTag.substring(0, 7) + '..';
 
-                    // --- ЛОГИКА ЗАДЕРЖЕК ---
                     let delay = 0;
-                    if (index >= 5) {
-                        // Все что ниже ТОП-5 появляется почти сразу (с 0.1s до 0.3s)
-                        delay = 0.1 + (index * 0.02); 
-                    } else if (index === 4) {
-                        delay = 0.5; // ТОП-5
-                    } else if (index === 3) {
-                        delay = 0.7; // ТОП-4
-                    } else if (index === 2) {
-                        delay = 0.9; // ТОП-3
-                    } else if (index === 1) {
-                        delay = 1.1; // ТОП-2
-                    } else if (index === 0) {
-                        delay = 1.5; // ТОП-1 (Финальный аккорд)
-                    }
-
-                    // Особый стиль для ТОП-1
-                    const isTop1 = index === 0;
-                    const timingFunc = isTop1 ? 'cubic-bezier(0.34, 1.56, 0.64, 1)' : 'cubic-bezier(0.2, 0.8, 0.2, 1)';
+                    if (index >= 5) delay = 0.05 + (index * 0.01); 
+                    else if (index === 4) delay = 0.2;
+                    else if (index === 3) delay = 0.3;
+                    else if (index === 2) delay = 0.4;
+                    else if (index === 1) delay = 0.5;
+                    else if (index === 0) delay = 0.7; 
 
                     html += `
                         <div class="pref-col">
-                            <div class="chart-value-y stagger-text" style="animation-delay:${delay}s; ${isTop1 ? 'color:var(--accent); font-weight:900;' : ''}">${score}</div>
-                            
-                            <div class="chart-bar" style="
-                                height:0%; 
-                                animation: growTag${index} 0.8s ${timingFunc} forwards ${delay}s;
-                                ${isTop1 ? 'box-shadow: 0 -4px 15px var(--accent);' : ''}
-                            "></div>
-                            
-                            <div class="chart-label-x stagger-text" title="${tag}" style="animation-delay:${delay}s; ${isTop1 ? 'color:var(--text-main); font-weight:700;' : ''}">${displayTag}</div>
-                            
-                            <style>
-                                @keyframes growTag${index} { 
-                                    from { height: 0%; opacity: 0; } 
-                                    to { height: ${height}%; opacity: 1; } 
-                                }
-                            </style>
+                            <div class="chart-value-y stagger-text" style="animation-delay:${delay}s">${score}</div>
+                            <div class="chart-bar" style="height:0%; animation: growTag${index} 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards ${delay}s;"></div>
+                            <div class="chart-label-x stagger-text" title="${tag}" style="animation-delay:${delay}s">${displayTag}</div>
+                            <style>@keyframes growTag${index} { from { height: 0%; opacity: 0; } to { height: ${height}%; opacity: 1; } }</style>
                         </div>
                     `;
                 });
