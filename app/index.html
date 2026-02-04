@@ -7849,7 +7849,7 @@
                     <option value="xh">xHamster</option>
                     <option value="ph">Pornhub</option>
                     <option value="xv">xVideos</option>
-                    <option value="sb">SpankBang</option>
+                    <option value="xn">XNXX</option>
                     <option value="yp">YouPorn</option>
                     <option value="rt">RedTube</option>
                     <option value="random" data-key="site_random">Random</option>
@@ -8214,7 +8214,7 @@
                     <span data-key="btn_version">Version</span>
                 </div>
                 <div style="display:flex; align-items:center; gap:8px;">
-                    <span style="font-size:15px; color:var(--text-secondary); font-weight:500;">0.1</span>
+                    <span id="app-version-label" style="font-size:15px; color:var(--text-secondary); font-weight:500;">...</span>
                     <div class="chevron"></div>
                 </div>
             </div>
@@ -10445,6 +10445,16 @@
 
     const CHANGELOG_DATA = [
         {
+            ver: "0.2",
+            date: "Feb 2026",
+            changes: {
+                en: ["Achievements system added 🏆."],
+                ru: ["Добавлена система достижений 🏆."],
+                es: ["Sistema de logros añadido 🏆."],
+                de: ["Erfolgssystem hinzugefügt 🏆."]
+            }
+        },
+        {
             ver: "0.1",
             date: "Jan 2026",
             changes: {
@@ -10992,10 +11002,10 @@
                 ❌ <b>Cons:</b> Fewer professional studio videos.<br>
                 👉 <i>Best for "real" sex fans and VR.</i><br><br>
 
-                <b>SpankBang</b> — Connoisseur's Choice.<br>
-                ✅ <b>Pros:</b> Lots of free HD/4K, great "similar" algorithms, user playlists.<br>
-                ❌ <b>Cons:</b> Frequent duplicates, fewer categories.<br>
-                👉 <i>Best for high quality for free.</i><br><br>
+                <b>XNXX</b> — The Classic Tube.<br>\
+                ✅ <b>Pros:</b> Massive library, very fast loading, extremely popular worldwide.<br>\
+                ❌ <b>Cons:</b> Old-school design, many redirects and annoying ads.<br>\
+                👉 <i>Best for simple and fast browsing of massive variety.</i>
 
                 <b>YouPorn / RedTube</b> — The Classics.<br>
                 ✅ <b>Pros:</b> Stable quality, simple interface (part of PH network).<br>
@@ -11726,10 +11736,10 @@
                 ❌ <b>Минусы:</b> Чуть меньше профессиональных студийных роликов.<br>
                 👉 <i>Для фанатов "реального" секса и VR.</i><br><br>
 
-                <b>SpankBang</b> — Выбор гурманов.<br>
-                ✅ <b>Плюсы:</b> Много HD/4K бесплатно, отличные алгоритмы "похожего", пользовательские плейлисты.<br>
-                ❌ <b>Минусы:</b> Часто встречаются дубликаты, меньше категорий.<br>
-                👉 <i>Если нужно хорошее качество бесплатно.</i><br><br>
+                <b>XNXX</b> — Классика тубов.<br>\
+                ✅ <b>Плюсы:</b> Гигантская библиотека, грузится мгновенно, огромный выбор редких ниш.<br>\
+                ❌ <b>Минусы:</b> Устаревший дизайн, много агрессивной рекламы и редиректов.<br>\
+                👉 <i>Лучший выбор для простого и быстрого поиска всего подряд.</i>
 
                 <b>YouPorn / RedTube</b> — Классика.<br>
                 ✅ <b>Плюсы:</b> Стабильное качество, простой интерфейс (часть сети Pornhub).<br>
@@ -12439,25 +12449,30 @@
             tip_sites_title: "Guía de Sitios 2026",
             tip_sites_desc: "Pros, contras y cuál elegir",
             tip_sites_text: `
-                <b>xVideos</b> — La elección popular.<br>
-                ✅ <b>Pros:</b> Biblioteca enorme, carga rápido, mucho contenido amateur/nicho.<br>
-                ❌ <b>Contras:</b> Menor calidad, muchos anuncios.<br>
-                👉 <i>Para máxima variedad y rarezas.</i><br><br>
+                <b>xVideos</b> — La elección del pueblo.<br>
+                ✅ <b>Pros:</b> La biblioteca más grande, carga instantánea, muchísimos contenidos amateurs y de nicho.<br>
+                ❌ <b>Contras:</b> Menor calidad de video, muchos anuncios y spam.<br>
+                👉 <i>Ideal para máxima variedad y nichos raros.</i><br><br>
 
-                <b>Pornhub</b> — Experiencia Premium.<br>
-                ✅ <b>Pros:</b> Mejor interfaz, modelos verificadas, mucho 4K.<br>
-                ❌ <b>Contras:</b> Bloqueado en algunos lugares, muchos anuncios Premium.<br>
-                👉 <i>Para calidad y comodidad.</i><br><br>
+                <b>Pornhub</b> — Experiencia premium.<br>
+                ✅ <b>Pros:</b> La mejor interfaz, excelentes recomendaciones, modelos verificados, mucho contenido en 4K.<br>
+                ❌ <b>Contras:</b> Bloqueado en algunos estados de EE. UU. (se necesita VPN), anuncios agresivos de Premium.<br>
+                👉 <i>Ideal para calidad, comodidad y comunidad.</i><br><br>
 
-                <b>xHamster</b> — Paraíso Amateur.<br>
-                ✅ <b>Pros:</b> Diseño limpio, enfoque en amateur real y VR. Menos censura.<br>
-                ❌ <b>Contras:</b> Menos contenido de estudio profesional.<br>
-                👉 <i>Para fans del sexo "real".</i><br><br>
+                <b>xHamster</b> — El paraíso amateur.<br>
+                ✅ <b>Pros:</b> Diseño limpio, enfoque en videos amateur reales, fotos y cams. Menos censura.<br>
+                ❌ <b>Contras:</b> Menos videos de estudios profesionales.<br>
+                👉 <i>Ideal para fans del sexo “real” y VR.</i><br><br>
 
-                <b>SpankBang</b> — Elección experta.<br>
-                ✅ <b>Pros:</b> Mucho HD/4K gratis, grandes algoritmos, listas de usuarios.<br>
-                ❌ <b>Contras:</b> Duplicados frecuentes, menos categorías.<br>
-                👉 <i>Para alta calidad gratis.</i>
+                <b>XNXX</b> — El tubo clásico.<br>
+                ✅ <b>Pros:</b> Biblioteca masiva, carga muy rápida, extremadamente popular en todo el mundo.<br>
+                ❌ <b>Contras:</b> Diseño anticuado, muchos redireccionamientos y anuncios molestos.<br>
+                👉 <i>Ideal para navegar de forma simple y rápida entre una enorme variedad.</i><br><br>
+
+                <b>YouPorn / RedTube</b> — Los clásicos.<br>
+                ✅ <b>Pros:</b> Calidad estable, interfaz sencilla (parte de la red PH).<br>
+                ❌ <b>Contras:</b> Menos contenido único, básicamente los “hermanos menores” de PH.<br>
+                👉 <i>Alternativas simples sin sobrecarga.</i>
             `,
 
             tip_algo_title: "Cómo funciona el Algoritmo",
@@ -13144,24 +13159,29 @@
             tip_sites_desc: "Vor- & Nachteile im Vergleich",
             tip_sites_text: `
                 <b>xVideos</b> — Die Wahl des Volkes.<br>
-                ✅ <b>Vorteile:</b> Riesige Bibliothek, lädt sofort, viel Amateur/Nischen.<br>
-                ❌ <b>Nachteile:</b> Geringere Qualität, viel Werbung.<br>
-                👉 <i>Für maximale Vielfalt.</i><br><br>
+                ✅ <b>Pros:</b> Größte Mediathek, lädt sofort, viele Amateur- und Nischeninhalte.<br>
+                ❌ <b>Cons:</b> Geringere Videoqualität, viele Werbeanzeigen und Spam.<br>
+                👉 <i>Ideal für maximale Vielfalt und seltene Nischen.</i><br><br>
 
                 <b>Pornhub</b> — Premium-Erlebnis.<br>
-                ✅ <b>Vorteile:</b> Beste UI, verifizierte Modelle, viel 4K.<br>
-                ❌ <b>Nachteile:</b> Regionale Sperren, aggressive Premium-Werbung.<br>
-                👉 <i>Für Qualität und Komfort.</i><br><br>
+                ✅ <b>Pros:</b> Beste Benutzeroberfläche, starke Empfehlungen, verifizierte Models, viel 4K-Content.<br>
+                ❌ <b>Cons:</b> In einigen US-Bundesstaaten gesperrt (VPN erforderlich), aggressive Premium-Werbung.<br>
+                👉 <i>Ideal für Qualität, Komfort und Community.</i><br><br>
 
-                <b>xHamster</b> — Amateur-Himmel.<br>
-                ✅ <b>Vorteile:</b> Sauberes Design, Fokus auf echtes Amateur und VR.<br>
-                ❌ <b>Nachteile:</b> Weniger professionelle Studio-Videos.<br>
-                👉 <i>Für Fans von "echtem" Sex.</i><br><br>
+                <b>xHamster</b> — Das Amateur-Paradies.<br>
+                ✅ <b>Pros:</b> Sauberes Design, Fokus auf echte Amateurvideos, Fotos und Cams. Weniger Zensur.<br>
+                ❌ <b>Cons:</b> Weniger professionelle Studio-Videos.<br>
+                👉 <i>Ideal für Fans von „echtem“ Sex und VR.</i><br><br>
 
-                <b>SpankBang</b> — Kenner-Wahl.<br>
-                ✅ <b>Vorteile:</b> Viel HD/4K kostenlos, tolle Algorithmen.<br>
-                ❌ <b>Nachteile:</b> Häufige Duplikate, weniger Kategorien.<br>
-                👉 <i>Für hohe Qualität kostenlos.</i>
+                <b>XNXX</b> — Der klassische Tube.<br>
+                ✅ <b>Pros:</b> Riesige Mediathek, sehr schnelle Ladezeiten, weltweit extrem beliebt.<br>
+                ❌ <b>Cons:</b> Altmodisches Design, viele Weiterleitungen und nervige Werbung.<br>
+                👉 <i>Ideal für einfaches und schnelles Browsen durch eine riesige Vielfalt.</i><br><br>
+
+                <b>YouPorn / RedTube</b> — Die Klassiker.<br>
+                ✅ <b>Pros:</b> Stabile Qualität, einfache Oberfläche (Teil des PH-Netzwerks).<br>
+                ❌ <b>Cons:</b> Weniger einzigartige Inhalte, im Grunde die „kleinen Brüder“ von PH.<br>
+                👉 <i>Einfache Alternativen ohne Ballast.</i>
             `,
 
             tip_algo_title: "Wie der Algorithmus funktioniert",
@@ -14287,6 +14307,8 @@
         renderModifiers();
         renderHistory();
         updateCounts();
+
+        document.getElementById('app-version-label').innerText = CHANGELOG_DATA[0].ver;
         
         // Инициализация систем
         initAgeGate();
@@ -14541,6 +14563,9 @@
         const badgeLabel = t.lbl_badge || "BADGE";
         const iconLabel = t.lbl_icon || "ICON";
         const badgeStyle = isUnlocked ? '' : 'filter: grayscale(1); opacity: 0.5;';
+        const badgeOnClick = `onclick="closeExploredModal(null, true); openAchievementsModal(); showAchievementDetailByID('genre_${groupData.id}')"`;
+        const iconOnClick = `onclick="closeExploredModal(null, true); openThemeModal()"`;
+
 
         let extraIconHtml = '';
         if (groupData.appIcon) {
@@ -14576,16 +14601,47 @@
             <div class="genre-achievements-header">${achHeader}</div>
             
             <div class="genre-icons-row">
-                <div class="reward-box">
+                <div class="reward-box" ${badgeOnClick} style="cursor:pointer;">
                     <img src="${achImg}" class="reward-display-img badge-style" style="${badgeStyle}">
                     <div class="ach-status-text ${statusClass}" style="font-size:9px;">${badgeLabel}</div>
                 </div>
-                ${extraIconHtml}
+                ${groupData.appIcon ? `
+                <div class="reward-box" ${iconOnClick} style="cursor:pointer;">
+                    <img src="${groupData.appIcon}" class="reward-display-img app-icon-style" style="${isUnlocked ? '' : 'filter: grayscale(1); opacity: 0.5;'}">
+                    <div class="ach-status-text ${statusClass}" style="font-size:9px;">${iconLabel}</div>
+                </div>` : ''}
             </div>
             
             ${isUnlocked ? `<div style="text-align:center; font-size:10px; color:var(--text-secondary); margin-top:5px;">${groupData.dateStr}</div>` : ''}
         `;
     }
+
+    window.showAchievementDetailByID = function(achID) {
+        // 1. Собираем данные всех ачивок (логика как в openAchievementsModal)
+        // Это позволит нам найти нужный объект ачивки по его ID
+        const exploredIds = permanentExplored;
+        const t = langData[currentLang] || langData['en'];
+        
+        // Ищем среди жанровых
+        const group = EXPLORED_GROUPS.find(g => 'genre_' + g.id === achID);
+        if (group) {
+            const groupItems = data.filter(item => item.tags.some(tag => group.tags.includes(tag)));
+            const count = groupItems.filter(item => exploredIds.has(item.id)).length;
+            const percent = Math.round((count / groupItems.length) * 100);
+            
+            const achObj = {
+                id: achID,
+                title: t['cat_' + group.id] || group.id,
+                icon: group.achIcon || 'ach_placeholder.png',
+                desc: group['desc_' + currentLang] || group.desc_en,
+                unlocked: percent === 100,
+                date: achievementDates[group.id] || "",
+                type: 'genre',
+                stats: { count, total: groupItems.length, percent }
+            };
+            showAchievementDetail(achObj);
+        }
+    };
 
     // 3. Возврат к сетке
     function backToExploredGrid() {
@@ -14615,7 +14671,6 @@
     }
 
     function openAchievementsModal() {
-        // Скрываем окно синхронизации, если открыто
         closeSyncInfoModal(null, true);
         
         const grid = document.getElementById('achievements-grid');
@@ -14625,32 +14680,7 @@
         const allAchievements = [];
         const exploredIds = permanentExplored;
 
-        // --- КАРТА ЭМОДЗИ ДЛЯ ПСИХОТИПОВ ---
-        const PSYCHO_EMOJIS = {
-            'bdsm': '⛓️',
-            'roleplay': '🎭',
-            'humiliation': '🙇',
-            'public': '🏞️',
-            'clothing': '👠',
-            'sensory': '🧊',
-            'psychological': '🧠',
-            'taboo': '🔞',
-            'group': '👯‍♀️',
-            'body-part': '🦵',
-            
-            // Комбинации
-            'dark_lord': '👑',    // Темный Лорд
-            'performer': '🎪',    // Артист
-            'worshipper': '🛐',   // Идолопоклонник
-            'brainwasher': '🌀',  // Манипулятор
-            'risk_taker': '⚡',    // Адреналинщик
-            'orgy_master': '🍇',  // Калигула
-            'immersionist': '🤿', // Иммерсив
-            'collector': '🧩',    // Коллекционер
-            'vanilla': '🍦'       // Классик
-        };
-
-        // 1. ЖАНРОВЫЕ ДОСТИЖЕНИЯ (Картинки)
+        // 1. Только ЖАНРОВЫЕ ДОСТИЖЕНИЯ
         EXPLORED_GROUPS.forEach(group => {
             const groupItems = data.filter(item => item.tags.some(tag => group.tags.includes(tag)));
             const total = groupItems.length;
@@ -14664,10 +14694,7 @@
             if (isUnlocked && achievementDates[group.id]) dateStr = achievementDates[group.id];
 
             let name = t['cat_' + group.id] || group.id;
-            let desc = group.desc_en; 
-            if(currentLang === 'ru') desc = group.desc_ru;
-            else if(currentLang === 'es') desc = group.desc_es;
-            else if(currentLang === 'de') desc = group.desc_de;
+            let desc = group['desc_' + currentLang] || group.desc_en;
 
             allAchievements.push({
                 id: 'genre_' + group.id,
@@ -14677,79 +14704,26 @@
                 unlocked: isUnlocked,
                 date: dateStr,
                 type: 'genre',
-                stats: {
-                    count: count,
-                    total: total,
-                    percent: percent
-                }
+                stats: { count, total, percent }
             });
         });
 
-        // 2. ПСИХОТИПЫ (Эмодзи)
-        const userPsychos = new Set();
-        const psychoDates = {};
-        
-        wrappedArchive.forEach(w => {
-            if(w.stats && w.stats.psychoCounts) {
-                const pt = calculatePsychotype(w.stats.psychoCounts);
-                if (pt) {
-                    userPsychos.add(pt);
-                    const d = new Date(w.timestamp).toLocaleDateString();
-                    if(!psychoDates[pt]) psychoDates[pt] = d;
-                }
-            }
-        });
+        // 2. СОРТИРОВКА (Открытые сверху)
+        allAchievements.sort((a, b) => (b.unlocked - a.unlocked));
 
-        for (const [key, val] of Object.entries(PSYCHO_TYPES)) {
-            const isUnlocked = userPsychos.has(key);
-            
-            allAchievements.push({
-                id: 'psycho_' + key,
-                title: val[currentLang] || val.en,
-                // Берем эмодзи из карты или дефолтный вопрос
-                icon: PSYCHO_EMOJIS[key] || '❓', 
-                desc: val['desc_' + (currentLang === 'ru' ? 'ru' : 'en')],
-                unlocked: isUnlocked,
-                date: psychoDates[key] || "",
-                type: 'psycho' // Тип "Психо" -> Эмодзи
-            });
-        }
-
-        // 3. СОРТИРОВКА (Открытые сверху)
-        allAchievements.sort((a, b) => {
-            if (a.unlocked && !b.unlocked) return -1;
-            if (!a.unlocked && b.unlocked) return 1;
-            return 0;
-        });
-
+        // Обновляем общий счетчик 
         const unlockedCount = allAchievements.filter(x => x.unlocked).length;
-        const totalCount = allAchievements.length;
         const progressEl = document.getElementById('ach-total-progress');
-        if(progressEl) progressEl.innerText = `${unlockedCount} / ${totalCount}`;
+        if(progressEl) progressEl.innerText = `${unlockedCount} / ${allAchievements.length}`;
 
-        // 4. РЕНДЕР
+        // 3. РЕНДЕР
         allAchievements.forEach(ach => {
             const div = document.createElement('div');
             div.className = `ach-card ${ach.unlocked ? 'unlocked' : ''}`;
             div.onclick = () => showAchievementDetail(ach);
             
-            // Логика визуализации
-            let visualHTML = '';
-            
-            if (ach.type === 'genre') {
-                // ДЛЯ ЖАНРОВ (Картинки) - оставляем как было, но добавляем класс для унификации отступов
-                visualHTML = `<img src="${ach.icon}" class="ach-card-icon" onerror="this.src='ach_placeholder.png'" style="width:50px; height:50px; margin-bottom:8px;">`;
-            } else {
-                // ДЛЯ ПСИХОТИПОВ (Эмодзи в новом контейнере)
-                visualHTML = `
-                    <div class="ach-emoji-box">
-                        <div class="ach-emoji-content">${ach.icon}</div>
-                    </div>
-                `;
-            }
-
             div.innerHTML = `
-                ${visualHTML}
+                <img src="${ach.icon}" class="ach-card-icon" onerror="this.src='ach_placeholder.png'" style="width:50px; height:50px; margin-bottom:8px;">
                 <div class="ach-card-title">${ach.title}</div>
             `;
             grid.appendChild(div);
@@ -14767,138 +14741,75 @@
     let currentDetailAch = null; // Для шеринга
 
     function showAchievementDetail(ach) {
-        currentDetailAch = ach; // Сохраняем для шеринга
+        currentDetailAch = ach; 
         
         const modalBody = document.querySelector('#modal-ach-detail-overlay .modal-body');
         const modalHeader = document.querySelector('#modal-ach-detail-overlay .modal-header');
         const shareBtn = document.getElementById('btn-ach-share');
         const t = langData[currentLang] || langData['en'];
 
-        // --- 1. КНОПКА "НАЗАД" В ШАПКЕ ---
-        // Заменяем первый span (который был прозрачным) на стрелку
+        // 1. Кнопка Назад в шапке
         const backSpan = modalHeader.querySelector('span:first-child');
         if (backSpan) {
             backSpan.innerHTML = "←";
             backSpan.style.opacity = "1";
-            backSpan.style.fontSize = "24px";
             backSpan.style.cursor = "pointer";
             backSpan.onclick = () => {
-                // Закрываем детали, открываем сетку
                 closeAchDetail(null, true);
                 openAchievementsModal();
             };
         }
 
-        // --- 2. ВИЗУАЛ (ИКОНКА) ---
-        // Удаляем старый элемент
+        // 2. Очистка и установка Иконки
         const oldIcon = document.getElementById('detail-ach-icon');
         if (oldIcon) oldIcon.remove();
         
-        let newIconEl;
-
-        if (ach.type === 'genre') {
-            // КАРТИНКА
-            newIconEl = document.createElement('img');
-            newIconEl.src = ach.icon;
-            newIconEl.style.width = '120px';
-            newIconEl.style.height = '120px';
-            newIconEl.style.objectFit = 'contain';
-            newIconEl.style.marginBottom = '15px';
-            
-            if (!ach.unlocked) {
-                newIconEl.style.filter = 'grayscale(1) opacity(0.3)';
-            }
-        } else {
-            // ЭМОДЗИ
-            newIconEl = document.createElement('div');
-            newIconEl.className = `ach-emoji-box large ${!ach.unlocked ? 'locked' : ''}`;
-            newIconEl.innerHTML = `<div class="ach-emoji-content">${ach.icon}</div>`;
-            
-            if (ach.unlocked) {
-                newIconEl.style.borderColor = 'var(--accent)';
-                newIconEl.style.boxShadow = '0 0 30px rgba(255, 0, 204, 0.15), inset 0 0 20px rgba(255, 0, 204, 0.05)';
-            }
-        }
-        
+        const newIconEl = document.createElement('img');
         newIconEl.id = 'detail-ach-icon';
+        newIconEl.src = ach.icon;
+        newIconEl.style.cssText = 'width:120px; height:120px; object-fit:contain; margin-bottom:15px;';
+        if (!ach.unlocked) newIconEl.style.filter = 'grayscale(1) opacity(0.3)';
         
-        // Вставляем иконку
         const titleEl = document.getElementById('detail-ach-title');
         modalBody.insertBefore(newIconEl, titleEl);
 
-        // --- 3. ТЕКСТЫ ---
+        // 3. Тексты
         titleEl.innerText = ach.title;
         document.getElementById('detail-ach-desc').innerText = ach.desc;
         
         const dateEl = document.getElementById('detail-ach-date');
-        
-        // СБРОС СТИЛЕЙ ДАТЫ
-        dateEl.className = ''; 
-        dateEl.style = '';
-        dateEl.style.fontSize = "12px";
-        dateEl.style.fontWeight = "700";
-        dateEl.style.padding = "4px 12px";
-        dateEl.style.borderRadius = "12px";
-        dateEl.style.marginBottom = "15px";
-
         if (ach.unlocked) {
-            // ОТКРЫТО
             dateEl.innerText = `${t.unlocked_on} ${ach.date}`;
-            dateEl.style.background = "rgba(46, 204, 113, 0.15)";
-            dateEl.style.color = "#2ecc71";
+            dateEl.style.display = 'block';
             if (shareBtn) shareBtn.style.display = 'block';
         } else {
-            // ЗАКРЫТО
             dateEl.innerText = `${t.status_locked} 🔒`;
-            dateEl.style.background = "rgba(255,255,255,0.05)";
-            dateEl.style.color = "var(--text-secondary)";
             if (shareBtn) shareBtn.style.display = 'none';
         }
 
-        // --- 4. БЛОК ПРОГРЕССА И ИНСТРУКЦИИ (НОВОЕ) ---
-        
-        // Удаляем старый блок прогресса, если он есть
+        // 4. Шкала прогресса
         const oldProgress = document.getElementById('ach-progress-container');
         if (oldProgress) oldProgress.remove();
 
         const progressContainer = document.createElement('div');
         progressContainer.id = 'ach-progress-container';
         progressContainer.style.width = "100%";
-        progressContainer.style.marginTop = "10px";
-        progressContainer.style.marginBottom = "20px";
         progressContainer.style.textAlign = "left";
 
-        // HTML для подсказки
-        let hintText = ach.type === 'genre' ? t.ach_genre_hint : t.ach_psycho_hint;
-        
-        let barHTML = '';
-        
-        // Если это ЖАНР, рисуем бар
-        if (ach.type === 'genre' && ach.stats) {
-            barHTML = `
+        progressContainer.innerHTML = `
+            <div style="border-top:1px solid var(--border); padding-top:15px; margin-bottom:20px;">
+                <div style="font-size:12px; font-weight:800; color:var(--text-secondary); text-transform:uppercase; margin-bottom:5px;">${t.ach_how_to}</div>
+                <div style="font-size:13px; line-height:1.4; color:var(--text-main); opacity:0.8;">${t.ach_genre_hint}</div>
+                
                 <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-secondary); margin-bottom:5px; margin-top:15px;">
                     <span style="text-transform:uppercase; font-weight:700;">${t.ach_progress}</span>
                     <span>${ach.stats.count} / ${ach.stats.total} (${ach.stats.percent}%)</span>
                 </div>
                 <div style="width:100%; height:8px; background:rgba(255,255,255,0.1); border-radius:10px; overflow:hidden;">
-                    <div style="width:${ach.stats.percent}%; height:100%; background:var(--accent); transition:width 0.5s ease;"></div>
+                    <div style="width:${ach.stats.percent}%; height:100%; background:var(--accent); transition: width 0.5s ease;"></div>
                 </div>
-            `;
-        }
-
-        progressContainer.innerHTML = `
-            <div style="border-top:1px solid var(--border); padding-top:15px;">
-                <div style="font-size:12px; font-weight:800; color:var(--text-secondary); text-transform:uppercase; margin-bottom:5px;">
-                    ${t.ach_how_to}
-                </div>
-                <div style="font-size:13px; line-height:1.4; color:var(--text-main); opacity:0.8;">
-                    ${hintText}
-                </div>
-                ${barHTML}
             </div>
         `;
-
-        // Вставляем перед кнопкой (последний элемент body)
         modalBody.insertBefore(progressContainer, shareBtn || modalBody.lastElementChild);
 
         document.getElementById('modal-ach-detail-overlay').classList.add('open');
@@ -15827,14 +15738,13 @@
 
         // Цвета конкретных сайтов
         const colors = {
-            'xh': ['#9b59b6', '#b07cc6'],
+            'xh': ['#d81b60', '#8e24aa'], 
             'ph': ['#ff9900', '#ffbd55'],
             'xv': ['#de2828', '#ff6b6b'],
-            'sb': ['#ffd700', '#ffe666'],
+            'xn': ['#0055ff', '#00aaff'],
             'yp': ['#ff3366', '#ff668a'],
             'rt': ['#ff0000', '#ff4d4d'],
             'google': ['#4285F4', '#7aaafc'],
-            // Дефолтные цвета (App Brand Colors)
             'default': ['#ff00cc', '#CB53F0'] 
         };
         
@@ -15876,7 +15786,7 @@
                 case 'xh': url = `https://xhamster.com/search/${plusQuery}`; break;
                 case 'ph': url = `https://www.pornhub.com/video/search?search=${plusQuery}`; break;
                 case 'xv': url = `https://www.xvideos.com/?k=${plusQuery}`; break;
-                case 'sb': url = `https://spankbang.com/s/${plusQuery}/`; break;
+                case 'xn': url = `https://www.xnxx.com/search/${plusQuery}`; break;
                 case 'yp': url = `https://www.youporn.com/search/?query=${plusQuery}`; break;
                 case 'rt': url = `https://www.redtube.com/?search=${plusQuery}`; break;
                 default: url = `https://xhamster.com/search/${plusQuery}`; break;
@@ -16912,7 +16822,7 @@
                     let weight = 0;
                     if (log.type === 'watch') weight = 10;
                     else if (log.type === 'like' || log.type === 'similar') weight = 5;
-                    else if (log.type === 'dislike') weight = -5;
+                    else if (log.type === 'dislike') weight = -1.5;
 
                     if (weight !== 0) {
                         log.tags.forEach(tag => {
@@ -18601,16 +18511,11 @@
                     if (isUnlocked) {
                         toggleCustomIcon(group.appIcon);
                     } else {
-                        // 1. Закрываем окно тем
+                        // Если закрыто — ведем в детали жанра, чтобы юзер видел прогресс
                         closeThemeModal(null, true); 
+                        openExploredModal(); // Открываем модалку категорий
                         
-                        // 2. Открываем окно категорий (Explored)
-                        const exploredModal = document.getElementById('modal-explored-overlay');
-                        exploredModal.classList.add('open');
-                        document.body.classList.add('modal-open');
-
-                        // 3. Вызываем показ деталей конкретного жанра
-                        // Передаем объект с данными, включая расчет процентов
+                        // Сразу показываем детали этого конкретного жанра
                         showGenreDetails({
                             ...group, 
                             percent: Math.round((unlockedCount / groupItems.length) * 100), 
@@ -19897,7 +19802,7 @@
         const id = currentItem.id;
         
         // Добавляем +1 к карме видео
-        updateItemScore(id, 1);
+        updateItemScore(id, 3);
 
         if (!silent) {
             const fullTags = getCombinedTags(currentItem);
