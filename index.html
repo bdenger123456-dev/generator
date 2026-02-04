@@ -483,11 +483,10 @@
         }
 
         /* === SECTION: PRICING=== */
-        #pricing { 
-            background-color: var(--bg-sec); 
-            padding: 100px 0 200px; 
-            position: relative; 
-            z-index: 10;
+       #pricing {
+            background-color: var(--bg-sec);
+            padding: 100px 0 200px;
+            position: relative;
         }
 
         /* Сетка-контейнер */
@@ -582,6 +581,66 @@
         .tile-feat:hover .tf-icon { filter: grayscale(0%); transform: scale(1.1); }
         .tile-feat:hover span { color: #fff; }
 
+        /* === НОВЫЕ ПЕРЕХОДЫ (FIX) === */
+
+        /* 1. От FetishAI (Black) к Pricing (Gray) */
+        /* Мы делаем плавный наезд серого блока с прозрачностью сверху */
+        #pricing::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 150px;
+            /* От черного (#050505) к серому (#111111) */
+            background: linear-gradient(to bottom, var(--bg-main) 0%, var(--bg-sec) 100%);
+            z-index: 1;
+        }
+
+        /* 2. От Roadmap (Black) к Footer CTA (Aurora/Image) */
+        /* Нам нужен градиент от сплошного черного к прозрачному, чтобы проявилась картинка футера */
+        .divider-black-to-transp {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 250px; /* Длинный плавный фейд */
+            background: linear-gradient(to bottom, #050505 10%, rgba(5,5,5,0) 100%);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* 3. От Footer CTA (Aurora/Image) к FAQ (Gray) */
+        /* Нам нужен градиент от прозрачного (картинка) к серому (фон FAQ) */
+        .divider-transp-to-gray {
+            position: absolute;
+            top: -150px; /* Вытягиваем его ВВЕРХ из секции FAQ */
+            left: 0;
+            width: 100%;
+            height: 151px;
+            background: linear-gradient(to bottom, rgba(17,17,17,0) 0%, #111111 100%);
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        /* 4. От FAQ (Gray) к Legal Footer (Black) */
+        /* От серого к черному, чтобы слиться с низом страницы */
+        .divider-gray-to-black {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(to bottom, transparent 0%, #000000 100%);
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        /* Правка отступов для FAQ, чтобы он не наезжал на картинки */
+        #faq {
+            position: relative;
+            z-index: 20; /* Поверх футера */
+            border-top: none; /* Убираем границы если были */
+        }
 
         /* === ЦВЕТОВЫЕ ТЕМЫ (СВЯЗЬ ЦВЕТОМ) === */
 
@@ -823,18 +882,10 @@
         .bg-swipe { background: linear-gradient(135deg, rgba(142, 45, 226, 0.6), rgba(74, 0, 224, 0.4)); }
         .bg-ai { background: linear-gradient(135deg, rgba(54, 0, 51, 0.6), rgba(11, 135, 147, 0.4)); }
         .bg-sync { background: linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(67, 67, 67, 0.4)); }
-        .bg-custom { 
-            background: linear-gradient(-45deg, 
-                rgba(238, 119, 82, 0.1), 
-                rgba(231, 60, 126, 0.1), 
-                rgba(35, 166, 213, 0.1), 
-                rgba(35, 213, 171, 0.1)
-            );
-            background-size: 400% 400%;
-            animation: gradientBG 10s ease infinite; 
-            
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+        .bg-custom {
+            background: transparent !important;
+            animation: none !important;
+            border: none !important;
         }
         @keyframes gradientBG { 0% {background-position: 0% 50%} 50% {background-position: 100% 50%} 100% {background-position: 0% 50%} }
 
@@ -913,6 +964,8 @@
             /* Чуть уменьшаем шрифт на мобильных, чтобы влезало */
             .bento-label-bottom { font-size: 15px !important; } 
         }
+
+
 
         .final-action { margin-top: 50px; text-align: center; position: relative; z-index: 10; }
         .copyright { margin-top: 30px; font-size: 12px; }
@@ -1878,6 +1931,313 @@
             .grid-features { grid-template-columns: 1fr; }
         }
 
+        /* Контейнер карусели */
+        .pricing-carousel-wrapper {
+            position: relative;
+            max-width: 1000px;
+            margin: 0 auto;
+            height: 550px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 1500px;
+        }
+
+        .carousel-track {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #pricing .divider-top-fix {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 150px; /* Высота градиента */
+            background: linear-gradient(to bottom, var(--bg-main) 0%, var(--bg-sec) 100%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        #pricing .divider-top-fix {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 150px; /* Высота градиента */
+            background: linear-gradient(to bottom, var(--bg-main) 0%, var(--bg-sec) 100%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Карточка плана */
+        .price-card {
+            position: absolute;
+            width: 300px;
+            height: 380px;
+            border-radius: 30px;
+            padding: 30px;
+            background: rgba(15, 15, 15, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            opacity: 0;
+            pointer-events: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        /* Состояния */
+        .price-card.active {
+            justify-content: flex-start;
+            padding-top: 60px; 
+            height: 520px;
+            opacity: 1;
+            z-index: 10;
+            transform: translateX(0) scale(1.1);
+            pointer-events: auto;
+            border-color: rgba(203, 83, 240, 0.5);
+            box-shadow: 0 0 50px rgba(203, 83, 240, 0.2);
+            height: 480px;
+        }
+
+        .price-card.prev {
+            opacity: 0.4;
+            z-index: 5;
+            transform: translateX(-100%) scale(0.85) rotateY(20deg);
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        .price-card.next {
+            opacity: 0.4;
+            z-index: 5;
+            transform: translateX(100%) scale(0.85) rotateY(-20deg);
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        /* Контент внутри */
+        .pc-icon { font-size: 50px; margin-bottom: 10px; }
+        .plan-name { font-size: 24px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+        .pc-price { font-size: 40px; font-weight: 800; margin-bottom: 20px; }
+        .pc-price span { font-size: 16px; opacity: 0.5; }
+
+        .pc-features {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: 0.4s ease;
+        }
+
+        .price-card.active .pc-features {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .pc-features li {
+            font-size: 14px;
+            color: #aaa;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            width: 100%;
+        }
+
+        /* Цвета для планов (Акцент) */
+        .price-card[data-plan="pro"].active { border-color: #ff9900; box-shadow: 0 0 50px rgba(255, 153, 0, 0.2); }
+        .price-card[data-plan="beast"].active { border-color: #9b59b6; box-shadow: 0 0 50px rgba(155, 89, 182, 0.2); }
+        .price-card[data-plan="bestie"].active { border-color: #00d2ff; box-shadow: 0 0 50px rgba(0, 210, 255, 0.2); }
+
+        /* Бейдж для Bestie */
+        .pc-badge {
+            position: absolute;
+            top: -15px;
+            background: var(--gradient-text);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 900;
+            color: #fff;
+        }
+
+        /* Кнопки навигации */
+        .carousel-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 20;
+            transition: 0.3s;
+        }
+
+        .carousel-nav-btn:hover { background: rgba(255,255,255,0.1); scale: 1.1; }
+        .btn-prev { left: 0; }
+        .btn-next { right: 0; }
+
+        @media (max-width: 768px) {
+            .price-card.prev, .price-card.next { display: none; }
+            .price-card.active { width: 85%; }
+            .pricing-carousel-wrapper { height: 500px; }
+        }
+
+        /* --- ЦВЕТОВЫЕ СХЕМЫ ДЛЯ ПЛАНОВ --- */
+
+        /* 1. FREE - Серый / Нейтральный */
+        .price-card[data-plan="free"].active {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(5, 5, 5, 0.95));
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.05);
+        }
+
+        /* 2. PRO - Золотой / Оранжевый */
+        .price-card[data-plan="pro"].active {
+            background: linear-gradient(145deg, rgba(255, 153, 0, 0.15), rgba(10, 8, 0, 0.98));
+            border-color: rgba(255, 153, 0, 0.5);
+            box-shadow: 0 0 50px rgba(255, 153, 0, 0.2);
+        }
+        .price-card[data-plan="pro"].active .plan-name,
+        .price-card[data-plan="pro"].active .pc-price {
+            color: #ff9900;
+        }
+
+        /* 3. BEAST - Фиолетовый */
+        .price-card[data-plan="beast"].active {
+            background: linear-gradient(145deg, rgba(155, 89, 182, 0.15), rgba(8, 0, 15, 0.98));
+            border-color: rgba(155, 89, 182, 0.5);
+            box-shadow: 0 0 50px rgba(155, 89, 182, 0.2);
+        }
+        .price-card[data-plan="beast"].active .plan-name,
+        .price-card[data-plan="beast"].active .pc-price {
+            color: #9b59b6;
+        }
+
+        /* 4. BESTIE - Голубой (Cyan) */
+        .price-card[data-plan="bestie"].active {
+            background: linear-gradient(145deg, rgba(0, 210, 255, 0.15), rgba(0, 10, 15, 0.98));
+            border-color: rgba(0, 210, 255, 0.5);
+            box-shadow: 0 0 50px rgba(0, 210, 255, 0.2);
+        }
+        .price-card[data-plan="bestie"].active .plan-name,
+        .price-card[data-plan="bestie"].active .pc-price {
+            color: #00d2ff;
+        }
+
+        /* Эффект для неактивных карточек (приглушаем цвета) */
+        .price-card.prev, .price-card.next {
+            filter: grayscale(1) brightness(0.5);
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Анимация иконок (чтобы они тоже были цветными только когда активны) */
+        .pc-icon {
+            filter: grayscale(1);
+            transition: 0.6s;
+        }
+        .price-card.active .pc-icon {
+            filter: grayscale(0);
+            transform: scale(1.2);
+        }
+
+        /* Прячем цену, фичи и прогресс-бар у НЕАКТИВНЫХ карточек */
+        .price-card:not(.active) .pc-price,
+        .price-card:not(.active) .pc-features,
+        .price-card:not(.active) .limit-wrap {
+            opacity: 0;
+            visibility: hidden;
+            height: 0;
+            margin: 0;
+            overflow: hidden;
+            transform: translateY(10px);
+        }
+
+        .price-card.active .pc-price,
+        .price-card.active .pc-features,
+        .price-card.active .limit-wrap {
+            opacity: 1;
+            visibility: visible;
+            height: auto;
+            margin-top: 15px;
+            transform: translateY(0);
+        }
+
+        /* Убираем лишние отступы у иконок, чтобы центровка была точнее */
+        .pc-icon {
+            margin-bottom: 5px;
+            line-height: 1;
+        }
+
+        /* Стили прогресс-бара внутри карточки */
+        .limit-wrap {
+            margin-top: 20px;
+            width: 100%;
+            transition: 0.6s ease;
+        }
+
+        .limit-txt {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .limit-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .limit-fill {
+            width: 92%;
+            height: 100%;
+            background: linear-gradient(45deg, #00d2ff, #3a7bd5);
+            box-shadow: 0 0 10px #00d2ff;
+            animation: stripMove 1s linear infinite;
+            background-size: 20px 20px;
+        }
+
+        @keyframes stripMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 20px 20px; }
+        }
+
+        /* Пульсация бейджа для Bestie */
+        .pc-badge {
+            animation: pulseBadge 2s infinite;
+        }
+
+        @keyframes pulseBadge {
+            0% { box-shadow: 0 0 10px rgba(0, 210, 255, 0.4); transform: translateX(0) scale(1); }
+            50% { box-shadow: 0 0 20px rgba(0, 210, 255, 0.8); transform: translateX(0) scale(1.05); }
+            100% { box-shadow: 0 0 10px rgba(0, 210, 255, 0.4); transform: translateX(0) scale(1); }
+        }
+
+        /* Плавный переход для цены */
+        .pc-price {
+            transition: 0.4s ease 0.1s;
+        }
 
         /* === UPDATED ROADMAP ICONS === */
 
@@ -2021,6 +2381,39 @@
         }
         .loaded #intro-bubble {
             display: flex;
+        }
+
+        .footer-cta .bento-cell {
+            /* Простой темный фон (вместо blur) */
+            background: rgba(20, 20, 20, 0.95) !important;
+            
+            /* Тонкая рамка */
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            
+            /* Отключаем тени */
+            box-shadow: none !important;
+            
+            /* Ускорение рендера */
+            transform: translateZ(0);
+        }
+
+        .footer-cta .bg-hero {
+            background: rgba(255, 255, 255, 0.08) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        }
+
+        /* Стиль для нового текста "ALL DEVICES" */
+        .text-static-bold {
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #fff;
+            margin-top: 2px;
+            opacity: 0.9;
         }
 
         /* --- PERFORMANCE OPTIMIZATION --- */
@@ -2387,165 +2780,87 @@
                 </div>
 
             </div>
-            <div class="section-divider divider-black-gray"></div>
         </section>
 
         <!-- PRICING SECTION -->
-        <section id="pricing" class="bg-sec">
-            <div class="container">
-                <div style="text-align: center; margin-bottom: 60px;" class="fade-in">
+       <section id="pricing" class="bg-sec">
+            <div class="container" style="position: relative; z-index: 10;">
+                <div style="text-align: center; margin-bottom: 40px;" class="fade-in">
                     <h2 data-i18n="price_title">What is the price of pleasure?</h2>
                     <p style="color:var(--text-sec);" data-i18n="price_subtitle">If you want total freedom, here are my terms:</p>
                 </div>
-                <div class="pricing-grid fade-in">
-    
-                    <!-- === РЯД 1 === -->
 
-                    <!-- 1. FREE (Узкая стопка) -->
-                    <div class="plan-group span-1">
-                        <div class="layout-stack">
-                            <!-- Главный блок -->
-                            <div class="tile-main free">
-                                <div class="plan-name">Free</div>
-                                <div class="price-tag">$0</div>
-                            </div>
-                            
-                            <!-- Фичи (Dimmed) -->
-                            <div class="tile-feat">
-                                <span class="tf-icon">🎲</span>
-                                <span>50 Gens / day</span>
-                            </div>
-                            <div class="tile-feat">
-                                <span class="tf-icon">🚫</span>
-                                <span data-i18n="feat_no_ads_emoji">No Ads</span>
-                            </div>
-                            <div class="tile-feat">
-                                <span class="tf-icon">🔒</span>
-                                <span data-i18n="feat_privacy_list">Privacy</span>
+                <div class="pricing-carousel-wrapper fade-in">
+                    <button class="carousel-nav-btn btn-prev" onclick="movePricing(-1)">‹</button>
+                    
+                    <div class="carousel-track" id="pricing-track">
+                        <!-- План: FREE -->
+                        <div class="price-card active" data-plan="free">
+                            <div class="pc-icon">🎲</div>
+                            <h3 class="plan-name">Free</h3>
+                            <div class="pc-price">$0</div>
+                            <ul class="pc-features">
+                                <li data-i18n="feat_limit">50 Gens / day</li>
+                                <li data-i18n="feat_wrapped_limited">1 Fetish Wrapped / week</li>
+                                <li data-i18n="feat_stats_basic">Basic Statistics</li>
+                                <li data-i18n="feat_no_ads">No Ads</li>
+                                <li data-i18n="feat_privacy_list">Total Privacy</li>
+                            </ul>
+                        </div>
+
+                        <!-- План: PRO -->
+                        <div class="price-card next" data-plan="pro">
+                            <div class="pc-icon">🔥</div>
+                            <h3 class="plan-name">Pro</h3>
+                            <div class="pc-price">$1.99<span>/mo</span></div>
+                            <ul class="pc-features">
+                                <li data-i18n="feat_all_free">Everything in Free</li>
+                                <li data-i18n="feat_unlim">Unlimited Gens</li>
+                                <li data-i18n="feat_stats_adv">Adv. Stats & History</li>
+                                <li data-i18n="feat_wrapped_unlim">Unlimited Wrapped</li>
+                                <li data-i18n="feat_custom">Custom UI</li>
+                            </ul>
+                        </div>
+
+                        <!-- План: BEAST -->
+                        <div class="price-card" data-plan="beast">
+                            <div class="pc-icon">👑</div>
+                            <h3 class="plan-name">Beast</h3>
+                            <div class="pc-price">$4.99<span>/mo</span></div>
+                            <ul class="pc-features">
+                                <li data-i18n="feat_all_pro">All Pro Features</li>
+                                <li data-i18n="feat_discord">Discord (Dev Chat)</li>
+                                <li data-i18n="feat_vote">Voting Power</li>
+                            </ul>
+                        </div>
+
+                        <!-- План: BESTIE -->
+                        <div class="price-card prev" data-plan="bestie">
+                            <div class="pc-badge" data-i18n="badge_limited">LIMITED</div>
+                            <div class="pc-icon">💎</div>
+                            <h3 class="plan-name">Bestie</h3>
+                            <div class="pc-price">$49.99<span>/life</span></div>
+                            <ul class="pc-features">
+                                <li data-i18n="feat_lifetime">Lifetime Access</li>
+                                <li data-i18n="feat_all_beast">All Beast Features</li>
+                                <li data-i18n="feat_sponsors">Sponsors List</li>
+                            </ul>
+                            <div class="limit-wrap">
+                                <div class="limit-txt">
+                                    <span data-i18n="limit_burn">🔥 ALMOST GONE</span>
+                                    <span>92% CLAIMED</span>
+                                </div>
+                                <div class="limit-bar">
+                                    <div class="limit-fill"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 2. PRO (Широкая группа, Оранжевая тема) -->
-                    <div class="plan-group span-3 theme-pro">
-                        <div class="layout-center">
-                            
-                            <!-- Левые фичи -->
-                            <div class="feat-col">
-                                <div class="tile-feat">
-                                    <span class="tf-icon">🔥</span>
-                                    <span data-i18n="feat_unlim">Unlimited Gens</span>
-                                </div>
-                                <div class="tile-feat">
-                                    <span class="tf-icon">🎨</span>
-                                    <span data-i18n="feat_custom">Custom UI</span>
-                                </div>
-                            </div>
-
-                            <!-- ГЛАВНЫЙ БЛОК (Центр) -->
-                            <div class="tile-main">
-                                <div class="plan-name-lg" style="color: #ff9900;">PRO</div>
-                                <div class="price-tag-lg">$1.99</div>
-                                <div class="plan-period" data-i18n="per_mo">/ month</div>
-                            </div>
-
-                            <!-- Правые фичи -->
-                            <div class="feat-col">
-                                <div class="tile-feat">
-                                    <span class="tf-icon">📈</span>
-                                    <span data-i18n="feat_stats_adv">Adv. Stats</span>
-                                </div>
-                                <div class="tile-feat">
-                                    <span class="tf-icon">🎁</span>
-                                    <span data-i18n="feat_wrapped_unlim">Unlimited Wrapped</span>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <!-- === РЯД 2 === -->
-
-                    <!-- 3. BESTIE (Широкая группа, Голубая тема) -->
-                    <div class="plan-group span-3 theme-bestie">
-                        <div class="layout-center">
-                            
-                            <!-- Левые фичи -->
-                            <div class="feat-col">
-                                <div class="tile-feat">
-                                    <span class="tf-icon">♾️</span>
-                                    <span data-i18n="feat_lifetime_full">Lifetime</span>
-                                </div>
-                                <div class="tile-feat">
-                                    <span class="tf-icon">🚀</span>
-                                    <span data-i18n="feat_early">Early Access</span>
-                                </div>
-                            </div>
-
-                            <!-- ГЛАВНЫЙ БЛОК (Центр) -->
-                            <div class="tile-main">
-                                <!-- БЕЙДЖ СВЕРХУ -->
-                                <div class="badge-limited" data-i18n="badge_limited">LIMITED OFFER</div>
-                                
-                                <!-- Заголовок и Цена (с отступом сверху под бейдж) -->
-                                <div class="plan-name-lg text-grad-bestie" style="margin-top: 15px;">BESTIE</div>
-                                <div class="price-tag-lg">$49.99</div>
-                                <div class="plan-period" data-i18n="per_once">/ one-time payment</div>
-                                
-                                <!-- ЛИМИТ БАР -->
-                                <div class="limit-wrap">
-                                    <div class="limit-txt">
-                                        <span style="color: #ff4757;">🔥 ALMOST GONE</span> <!-- Красный текст для срочности -->
-                                        <span>92% CLAIMED</span>
-                                    </div>
-                                    <div class="limit-bar">
-                                        <div class="limit-fill"></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Правые фичи -->
-                            <div class="feat-col">
-                                <div class="tile-feat">
-                                    <span class="tf-icon">👑</span>
-                                    <span data-i18n="feat_all_beast">All Beast</span>
-                                </div>
-                                <div class="tile-feat">
-                                    <span class="tf-icon">💎</span>
-                                    <span data-i18n="feat_sponsors">Sponsors List</span>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <!-- 4. BEAST (Узкая стопка, Фиолетовая тема) -->
-                    <div class="plan-group span-1 theme-beast">
-                        <div class="layout-stack">
-                            <!-- Главный блок -->
-                            <div class="tile-main">
-                                <div class="plan-name" style="color: #9b59b6;">Beast</div>
-                                <div class="price-tag">$4.99</div>
-                            </div>
-                            
-                            <!-- Фичи -->
-                            <div class="tile-feat">
-                                <span class="tf-icon">👑</span>
-                                <span data-i18n="feat_all_pro">All Pro</span>
-                            </div>
-                            <div class="tile-feat">
-                                <span class="tf-icon">💬</span>
-                                <span data-i18n="feat_discord">Discord</span>
-                            </div>
-                            <div class="tile-feat">
-                                <span class="tf-icon">🗳️</span>
-                                <span data-i18n="feat_vote">Voting</span>
-                            </div>
-                        </div>
-                    </div>
-
+                    <button class="carousel-nav-btn btn-next" onclick="movePricing(1)">›</button>
                 </div>
             </div>
+            
             <div class="section-divider divider-gray-black"></div>
         </section>
 
@@ -2632,43 +2947,6 @@
                     </div>
                 </div>
             </div>
-            <div class="section-divider divider-black-gray"></div>
-        </section>
-
-        <!-- FAQ -->
-        <section id="faq" class="bg-sec">
-            <div class="container fade-in">
-                <div style="text-align: center; margin-bottom: 40px;">
-                    <h2><span data-i18n="faq_title">Frequently Asked <span class="gradient-text">Questions</span></span></h2>
-                    <!-- ПРАВКА 6: Подзаголовок -->
-                    <p style="color:var(--text-sec); margin-top: 10px; font-size: 16px;" data-i18n="faq_subtitle">
-                        In case you need clarification
-                    </p>
-                </div>
-                <div class="faq-grid">
-                    <details class="faq-item">
-                        <summary class="faq-question" data-i18n="q1">Is xFetishHub completely anonymous?</summary>
-                        <div class="faq-answer" data-i18n="a1">Yes. We prioritize your privacy above all else. xFetishHub operates as a secure sandbox. Your viewing history and generated statistics are stored in a secure, encrypted cloud environment to allow synchronization. When used as a PWA, your session is isolated from your main browser history.</div>
-                    </details>
-                    <details class="faq-item">
-                        <summary class="faq-question" data-i18n="q2">How does the recommendation algorithm work?</summary>
-                        <div class="faq-answer" data-i18n="a2">Think of it as "Tinder for Adult Content". Our AI analyzes the metadata of the videos you like versus those you dislike. Over time, it builds a vector profile of your tastes to suggest new genres you might enjoy but haven't discovered yet.</div>
-                    </details>
-                    <details class="faq-item">
-                        <summary class="faq-question" data-i18n="q3">Does it work on iPhone and Android?</summary>
-                        <div class="faq-answer" data-i18n="a3">Absolutely. xFetishHub is optimized for mobile use as a Progressive Web App (PWA). You can install it directly from Safari (iOS) or Chrome (Android) by selecting "Add to Home Screen". This creates an app icon that launches in full-screen mode, separate from your main browser history.</div>
-                    </details>
-                    <details class="faq-item">
-                        <summary class="faq-question" data-i18n="q4">Is the content hosted on your servers?</summary>
-                        <div class="faq-answer" data-i18n="a4">No. xFetishHub is an intelligent aggregator and analytics tool. We do not host video files. We provide a smart interface to discover content that is publicly available on major adult networks, acting as a sophisticated search engine for your preferences.</div>
-                    </details>
-                    <details class="faq-item">
-                        <summary class="faq-question" data-i18n="q5">What is included in the Free vs Pro plan?</summary>
-                        <div class="faq-answer" data-i18n="a5">The Free plan includes basic daily generations and privacy features. The Pro plan unlocks unlimited AI generations, detailed "Wrapped" style history reports, advanced filtering, and deeper customization options for the player interface.</div>
-                    </details>
-                </div>
-            </div>
-            <div class="section-divider divider-faq-footer" style="bottom: 0;"></div>
         </section>
     </main>
 
@@ -2687,8 +2965,7 @@
             <div class="footer-overlay" style="background: rgba(0,0,0,0.8);"></div>
         </div>
 
-        <!-- Black Fade Top -->
-        <div class="footer-static-fade"></div>
+        <div class="divider-black-to-transp"></div>
 
         <div class="container fade-in" style="z-index: 10; position: relative;">
             <div style="text-align: center; margin-bottom: 50px;">
@@ -2726,7 +3003,7 @@
 
                 <!-- 4. DEVICES (Glass) -->
                 <div class="bento-cell col-2 mob-full bg-glass-standard cell-center-perfect cell-text-top">
-                    <div id="device-text-anim" class="bento-label-bold" style="font-size: 11px; opacity: 0.6;">IPHONE</div>
+                    <div class="text-static-bold" data-i18n="dev_all">ALL DEVICES</div>
                     <img src="icon_devices.png" class="bento-icon-sm" alt="Devices">
                 </div>
 
@@ -2776,7 +3053,7 @@
                 </div>
 
                 <!-- 11. UI -->
-                <div class="bento-cell col-2 mob-6 bg-custom cell-center-perfect">
+                <div class="bento-cell col-2 mob-6 bg-glass-standard cell-center-perfect">
                     <img src="icon_palette.png" class="bento-icon-xs" alt="Custom">
                     <div class="bento-label-bold" data-i18n="bn_custom">UI</div>
                 </div>
@@ -2798,6 +3075,44 @@
                 </div>
             </div>
         </div>
+
+        <!-- FAQ -->
+        <section id="faq" class="bg-sec">
+            <div class="divider-transp-to-gray"></div>
+            <div class="container fade-in">
+                <div style="text-align: center; margin-bottom: 40px;">
+                    <h2><span data-i18n="faq_title">Frequently Asked <span class="gradient-text">Questions</span></span></h2>
+                    <!-- ПРАВКА 6: Подзаголовок -->
+                    <p style="color:var(--text-sec); margin-top: 10px; font-size: 16px;" data-i18n="faq_subtitle">
+                        In case you need clarification
+                    </p>
+                </div>
+                <div class="faq-grid">
+                    <details class="faq-item">
+                        <summary class="faq-question" data-i18n="q1">Is xFetishHub completely anonymous?</summary>
+                        <div class="faq-answer" data-i18n="a1">Yes. We prioritize your privacy above all else. xFetishHub operates as a secure sandbox. Your viewing history and generated statistics are stored in a secure, encrypted cloud environment to allow synchronization. When used as a PWA, your session is isolated from your main browser history.</div>
+                    </details>
+                    <details class="faq-item">
+                        <summary class="faq-question" data-i18n="q2">How does the recommendation algorithm work?</summary>
+                        <div class="faq-answer" data-i18n="a2">Think of it as "Tinder for Adult Content". Our AI analyzes the metadata of the videos you like versus those you dislike. Over time, it builds a vector profile of your tastes to suggest new genres you might enjoy but haven't discovered yet.</div>
+                    </details>
+                    <details class="faq-item">
+                        <summary class="faq-question" data-i18n="q3">Does it work on iPhone and Android?</summary>
+                        <div class="faq-answer" data-i18n="a3">Absolutely. xFetishHub is optimized for mobile use as a Progressive Web App (PWA). You can install it directly from Safari (iOS) or Chrome (Android) by selecting "Add to Home Screen". This creates an app icon that launches in full-screen mode, separate from your main browser history.</div>
+                    </details>
+                    <details class="faq-item">
+                        <summary class="faq-question" data-i18n="q4">Is the content hosted on your servers?</summary>
+                        <div class="faq-answer" data-i18n="a4">No. xFetishHub is an intelligent aggregator and analytics tool. We do not host video files. We provide a smart interface to discover content that is publicly available on major adult networks, acting as a sophisticated search engine for your preferences.</div>
+                    </details>
+                    <details class="faq-item">
+                        <summary class="faq-question" data-i18n="q5">What is included in the Free vs Pro plan?</summary>
+                        <div class="faq-answer" data-i18n="a5">The Free plan includes basic daily generations and privacy features. The Pro plan unlocks unlimited AI generations, detailed "Wrapped" style history reports, advanced filtering, and deeper customization options for the player interface.</div>
+                    </details>
+                </div>
+            </div>
+            <div class="divider-gray-to-black"></div>
+        </section>
+
         <div class="footer-legal-bar">
             <!-- Слева: Копирайт -->
             <div class="copyright-text">
@@ -2905,6 +3220,10 @@
                 lbl_madefor: "Made For",
                 dev_iphone: "iPhone", dev_android: "Android", dev_pc: "PC",
 
+                dev_all: "ALL DEVICES",
+
+                feat_all_free: "Everything in Free",
+
                 // --- HOW IT WORKS ---
                 hiw_title: "How <span class='gradient-text'>It Works</span>", hiw_sub: "Discovering your hidden interests is simpler than you think.",
                 step1_title: "Choose Your Path", step1_desc: "Select 'Explore', 'Pleasure' or tell the AI Agent what you desire. Then simply Swipe.",
@@ -2920,14 +3239,14 @@
 
                 // --- PRICING ---
                 price_title: "What is the price of pleasure?", price_subtitle: "If you want total freedom, here are my terms:",
-                feat_limit: "🎲 50 Generations / day", feat_wrapped_limited: "🎁 1 Fetish Wrapped / week", feat_stats_basic: "📊 Basic Statistics", feat_no_ads: "No Ads", feat_privacy_list: "🔒 Total Privacy",
+                feat_limit: "50 Generations / day", feat_wrapped_limited: "1 Fetish Wrapped / week", feat_stats_basic: "Basic Statistics", feat_no_ads: "No Ads", feat_privacy_list: "Total Privacy",
                 per_mo: "/ mo", per_once: "/ once",
-                feat_unlim: "🔥 <b>Unlimited</b> Generations", feat_stats_adv: "📈 Advanced Stats & History", feat_wrapped_unlim: "✨ <b>Unlimited</b> Fetish Wrapped", feat_custom: "🎨 Deep Customization",
-                feat_all_pro: "👑 <b>All Pro Features</b>", feat_discord: "💬 <b>Discord</b> (Dev Chat)", feat_vote: "🗳️ Impact on new functionality",
-                feat_lifetime_full: "♾️ <b>Lifetime Access</b>", feat_sponsors: "💎 Listed in 'Sponsors'", badge_limited: "LIMITED OFFER", feat_lifetime: "Lifetime", limit_burn: "🔥 ALMOST GONE", limit_claimed: "claimed",
-                feat_all_beast: "👑 <b>All Beast Features</b>",
+                feat_unlim: "<b>Unlimited</b> Generations", feat_stats_adv: "Advanced Stats & History", feat_wrapped_unlim: "<b>Unlimited</b> Fetish Wrapped", feat_custom: "Deep Customization",
+                feat_all_pro: " <b>All Pro Features</b>", feat_discord: "<b>Discord</b> (Dev Chat)", feat_vote: "Impact on new functionality",
+                feat_lifetime_full: "<b>Lifetime Access</b>", feat_sponsors: "Listed in 'Sponsors'", badge_limited: "LIMITED OFFER", feat_lifetime: "Lifetime", limit_burn: "ALMOST GONE", limit_claimed: "claimed",
+                feat_all_beast: "<b>All Beast Features</b>",
 
-                feat_no_ads_emoji: "🚫 No Ads",
+                feat_no_ads_emoji: "No Ads",
 
                 // --- ROADMAP ---
                 map_title: "Future <span class='gradient-text'>Plans</span>",
@@ -3021,6 +3340,10 @@
                 lbl_madefor: "Работает на",
                 dev_iphone: "iPhone", dev_android: "Android", dev_pc: "ПК",
 
+                dev_all: "ВСЕ УСТРОЙСТВА",
+
+                feat_all_free: "Всё, что во Free",
+
                 // --- HOW IT WORKS ---
                 hiw_title: "Как <span class='gradient-text'>Это Работает</span>", hiw_sub: "Найти свои скрытые интересы проще, чем кажется.",
                 step1_title: "Выбери Свой Путь", step1_desc: "Выбери 'Исследование', 'Наслаждение' или просто скажи ИИ, чего ты хочешь. Дальше просто свайпай.",
@@ -3036,14 +3359,14 @@
 
                 // --- PRICING ---
                 price_title: "Какова цена удовольствия?", price_subtitle: "Если хочешь полную свободу, то вот мои условия:",
-                feat_limit: "🎲 50 Генераций / день", feat_wrapped_limited: "🎁 1 Fetish Wrapped / неделю", feat_stats_basic: "📊 Базовая статистика", feat_no_ads: "Без рекламы", feat_privacy_list: "🔒 Полная приватность",
+                feat_limit: "50 Генераций / день", feat_wrapped_limited: "1 Fetish Wrapped / неделю", feat_stats_basic: "Базовая статистика", feat_no_ads: "Без рекламы", feat_privacy_list: "Полная приватность",
                 per_mo: "/ мес", per_once: "/ раз",
-                feat_unlim: "🔥 <b>Безлимитные</b> генерации", feat_stats_adv: "📈 Расширенные сводки", feat_wrapped_unlim: "✨ <b>Безлимитный</b> Wrapped", feat_custom: "🎨 Кастомизация",
-                feat_all_pro: "👑 <b>Все функции Pro</b>", feat_discord: "💬 <b>Discord</b> (Чат с девом)", feat_vote: "🗳️ Влияние на функционал",
-                feat_lifetime_full: "♾️ <b>Доступ навсегда</b>", feat_sponsors: "💎 В списке Спонсоров", badge_limited: "ОГРАНИЧЕНО", feat_lifetime: "Навсегда", limit_burn: "🔥 СКОРО РАЗБЕРУТ", limit_claimed: "забрали",
-                feat_all_beast: "👑 <b>Все функции Beast</b>",
+                feat_unlim: "<b>Безлимитные</b> генерации", feat_stats_adv: "Расширенные сводки", feat_wrapped_unlim: "<b>Безлимитный</b> Wrapped", feat_custom: "Кастомизация",
+                feat_all_pro: "<b>Все функции Pro</b>", feat_discord: "<b>Discord</b> (Чат с девом)", feat_vote: "Влияние на функционал",
+                feat_lifetime_full: "<b>Доступ навсегда</b>", feat_sponsors: "В списке Спонсоров", badge_limited: "ОГРАНИЧЕНО", feat_lifetime: "Навсегда", limit_burn: "СКОРО РАЗБЕРУТ", limit_claimed: "забрали",
+                feat_all_beast: "<b>Все функции Beast</b>",
 
-                feat_no_ads_emoji: "🚫 Без рекламы",
+                feat_no_ads_emoji: "Без рекламы",
 
                 // --- ROADMAP ---
                 map_title: "Планы <span class='gradient-text'>Развития</span>",
@@ -3135,6 +3458,10 @@
                 lbl_madefor: "Hecho para",
                 dev_iphone: "iPhone", dev_android: "Android", dev_pc: "PC",
 
+                dev_all: "DISPOSITIVOS",
+
+                feat_all_free: "Todo lo de Free",
+
                 // --- HOW IT WORKS ---
                 hiw_title: "Cómo <span class='gradient-text'>Funciona</span>", hiw_sub: "Descubrir tus intereses ocultos es más simple de lo que crees.",
                 step1_title: "Elige tu Camino", step1_desc: "Selecciona 'Explorar', 'Placer' o dile a la IA lo que deseas. Luego simplemente desliza.",
@@ -3150,14 +3477,14 @@
 
                 // --- PRICING ---
                 price_title: "¿Cuál es el precio del placer?", price_subtitle: "Si quieres libertad total, aquí están mis condiciones:",
-                feat_limit: "🎲 50 Generaciones / día", feat_wrapped_limited: "🎁 1 Fetish Wrapped / semana", feat_stats_basic: "📊 Estadísticas básicas", feat_no_ads: "Sin anuncios", feat_privacy_list: "🔒 Privacidad Total",
+                feat_limit: "50 Generaciones / día", feat_wrapped_limited: "1 Fetish Wrapped / semana", feat_stats_basic: "Estadísticas básicas", feat_no_ads: "Sin anuncios", feat_privacy_list: "Privacidad Total",
                 per_mo: "/ mes", per_once: "/ una vez",
-                feat_unlim: "🔥 Generaciones <b>Ilimitadas</b>", feat_stats_adv: "📈 Estadísticas Avanzadas", feat_wrapped_unlim: "✨ Fetish Wrapped <b>Ilimitado</b>", feat_custom: "🎨 Personalización Profunda",
-                feat_all_pro: "👑 <b>Todo de Pro</b>", feat_discord: "💬 <b>Discord</b> (Chat Dev)", feat_vote: "🗳️ Vota funciones nuevas",
-                feat_lifetime_full: "♾️ <b>Acceso de por vida</b>", feat_sponsors: "💎 En la lista de Patrocinadores", badge_limited: "OFERTA LIMITADA", feat_lifetime: "De por vida", limit_burn: "🔥 CASI AGOTADO", limit_claimed: "reclamados",
-                feat_all_beast: "👑 <b>Todo de Beast</b>",
+                feat_unlim: "Generaciones <b>Ilimitadas</b>", feat_stats_adv: "Estadísticas Avanzadas", feat_wrapped_unlim: "✨ Fetish Wrapped <b>Ilimitado</b>", feat_custom: "Personalización Profunda",
+                feat_all_pro: "<b>Todo de Pro</b>", feat_discord: "<b>Discord</b> (Chat Dev)", feat_vote: "Vota funciones nuevas",
+                feat_lifetime_full: "<b>Acceso de por vida</b>", feat_sponsors: "En la lista de Patrocinadores", badge_limited: "OFERTA LIMITADA", feat_lifetime: "De por vida", limit_burn: "CASI AGOTADO", limit_claimed: "reclamados",
+                feat_all_beast: "<b>Todo de Beast</b>",
 
-                feat_no_ads_emoji: "🚫 Sin anuncios",
+                feat_no_ads_emoji: "Sin anuncios",
 
                 // --- ROADMAP ---
                 map_title: "Planes <span class='gradient-text'>Futuros</span>",
@@ -3249,6 +3576,10 @@
                 lbl_madefor: "Gemacht für",
                 dev_iphone: "iPhone", dev_android: "Android", dev_pc: "PC",
 
+                dev_all: "ALLE GERÄTE",
+
+                feat_all_free: "Alles aus Free",
+
                 // --- HOW IT WORKS ---
                 hiw_title: "Wie <span class='gradient-text'>Es Funktioniert</span>", hiw_sub: "Deine versteckten Interessen zu entdecken ist einfacher als du denkst.",
                 step1_title: "Wähle deinen Weg", step1_desc: "Wähle 'Entdecken', 'Vergnügen' oder sag dem KI-Agenten, was du willst. Dann einfach swipen.",
@@ -3264,14 +3595,14 @@
 
                 // --- PRICING ---
                 price_title: "Was kostet das Vergnügen?", price_subtitle: "Wenn du totale Freiheit willst, hier sind meine Bedingungen:",
-                feat_limit: "🎲 50 Generierungen / Tag", feat_wrapped_limited: "🎁 1 Fetish Wrapped / Woche", feat_stats_basic: "📊 Basis-Statistiken", feat_no_ads: "Keine Werbung", feat_privacy_list: "🔒 Totale Privatsphäre",
+                feat_limit: "50 Generierungen / Tag", feat_wrapped_limited: "1 Fetish Wrapped / Woche", feat_stats_basic: "Basis-Statistiken", feat_no_ads: "Keine Werbung", feat_privacy_list: "Totale Privatsphäre",
                 per_mo: "/ Monat", per_once: "/ Einmalig",
-                feat_unlim: "🔥 <b>Unbegrenzte</b> Generierungen", feat_stats_adv: "📈 Erweiterte Statistik & Verlauf", feat_wrapped_unlim: "✨ <b>Unbegrenztes</b> Fetish Wrapped", feat_custom: "🎨 Tiefe Anpassung",
-                feat_all_pro: "👑 <b>Alle Pro-Funktionen</b>", feat_discord: "💬 <b>Discord</b> (Dev Chat)", feat_vote: "🗳️ Abstimmung über neue Funktionen",
-                feat_lifetime_full: "♾️ <b>Lebenslanger Zugriff</b>", feat_sponsors: "💎 In der Sponsorenliste", badge_limited: "BEGRENZTES ANGEBOT", feat_lifetime: "Lifetime", limit_burn: "🔥 FAST WEG", limit_claimed: "beansprucht",
-                feat_all_beast: "👑 <b>Alle Beast-Funktionen</b>",
+                feat_unlim: "<b>Unbegrenzte</b> Generierungen", feat_stats_adv: "Erweiterte Statistik & Verlauf", feat_wrapped_unlim: "✨ <b>Unbegrenztes</b> Fetish Wrapped", feat_custom: "Tiefe Anpassung",
+                feat_all_pro: "<b>Alle Pro-Funktionen</b>", feat_discord: "<b>Discord</b> (Dev Chat)", feat_vote: "Abstimmung über neue Funktionen",
+                feat_lifetime_full: "<b>Lebenslanger Zugriff</b>", feat_sponsors: "In der Sponsorenliste", badge_limited: "BEGRENZTES ANGEBOT", feat_lifetime: "Lifetime", limit_burn: "FAST WEG", limit_claimed: "beansprucht",
+                feat_all_beast: "<b>Alle Beast-Funktionen</b>",
 
-                feat_no_ads_emoji: "🚫 Keine Werbung",
+                feat_no_ads_emoji: "Keine Werbung",
 
                 // --- ROADMAP ---
                 map_title: "Zukunfts <span class='gradient-text'>pläne</span>",
@@ -3745,38 +4076,38 @@
             }, 2000);
         }
 
-        // 3. Device Text Cycle
-        function startDeviceTextCycle() {
-            const txtEl = document.getElementById('device-text-anim');
-            // Получаем переводы (упрощенно для примера, лучше брать из глобальной переменной)
-            const lang = localStorage.getItem('xfetishhub_lang') || 'en';
-            const t = translations[lang] || translations['en'];
-            const devices = [t.dev_iphone, t.dev_android, t.dev_pc];
-            let idx = 0;
-
-            return setInterval(() => {
-                txtEl.style.transform = 'translateY(15px)';
-                txtEl.style.opacity = '0';
-                setTimeout(() => {
-                    idx = (idx + 1) % devices.length;
-                    txtEl.innerText = devices[idx];
-                    txtEl.style.transition = 'none';
-                    txtEl.style.transform = 'translateY(-15px)';
-                    setTimeout(() => {
-                        txtEl.style.transition = 'all 0.3s ease';
-                        txtEl.style.transform = 'translateY(0)';
-                        txtEl.style.opacity = '1';
-                    }, 50);
-                }, 300);
-            }, 3000);
-        }
-
         // Инициализация с Observer'ами
         document.addEventListener('DOMContentLoaded', () => {
             // Вместо прямого вызова, оборачиваем в Observer
             createObserver('cycle-badge', startBadgeCycle);
             createObserver('modes-icon-anim', startModesCycle);
-            createObserver('device-text-anim', startDeviceTextCycle);
+        });
+
+        let currentPriceIndex = 0;
+        const priceCards = document.querySelectorAll('.price-card');
+
+        function movePricing(direction) {
+            // Убираем старые классы
+            priceCards.forEach(card => card.classList.remove('active', 'prev', 'next'));
+
+            // Считаем новый индекс
+            currentPriceIndex = (currentPriceIndex + direction + priceCards.length) % priceCards.length;
+
+            const prevIdx = (currentPriceIndex - 1 + priceCards.length) % priceCards.length;
+            const nextIdx = (currentPriceIndex + 1) % priceCards.length;
+
+            // Назначаем новые классы
+            priceCards[currentPriceIndex].classList.add('active');
+            priceCards[prevIdx].classList.add('prev');
+            priceCards[nextIdx].classList.add('next');
+        }
+
+        // Добавим возможность кликать на боковые карточки
+        priceCards.forEach((card, index) => {
+            card.addEventListener('click', () => {
+                if (card.classList.contains('next')) movePricing(1);
+                if (card.classList.contains('prev')) movePricing(-1);
+            });
         });
 
     </script>
