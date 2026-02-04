@@ -72,7 +72,7 @@
             --accent-end: #ff00cc;   
             --border: #2a2a2a;
             
-            --gradient-text: linear-gradient(90deg, var(--accent-start), var(--accent-end));
+            --gradient-text: linear-gradient(180deg, var(--accent-start), var(--accent-end));
             --font: 'Inter', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
         }
@@ -84,8 +84,6 @@
             -webkit-background-clip: text !important;
             -webkit-text-fill-color: transparent !important;
             background-clip: text !important;
-            color: transparent !important;
-            
             display: inline-block; 
         }
 
@@ -3884,25 +3882,29 @@
 
         // --- AGE VERIFICATION LOGIC ---
         
+        // Функция проверки возраста при загрузке
         async function checkAge() {
-            const isVerified = localStorage.getItem('xfetishhub_age_verified');
+            const isVerified = sessionStorage.getItem('xfetishhub_age_verified');
             const ageOverlay = document.getElementById('age-overlay');
             const introOverlay = document.getElementById('intro-overlay');
 
             if (!isVerified) {
+                // Если в этой сессии еще не подтверждали — показываем плашку
                 introOverlay.style.background = '#050505';
                 introOverlay.style.opacity = '1';
                 ageOverlay.style.display = 'flex';
                 document.body.style.overflow = 'hidden';
             } else {
+                // Если подтвердили в рамках текущей сессии — просто запускаем интро
                 ageOverlay.style.display = 'none';
-                // Если возраст подтвержден, ждем загрузку и запускаем интро
                 await prepareAndRunIntro();
             }
         }
 
+        // Функция нажатия на кнопку "Да, мне есть 18"
         async function confirmAge() {
-            localStorage.setItem('xfetishhub_age_verified', 'true');
+            sessionStorage.setItem('xfetishhub_age_verified', 'true');
+            
             const ageOverlay = document.getElementById('age-overlay');
             ageOverlay.style.opacity = '0';
             
