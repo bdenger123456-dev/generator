@@ -3916,26 +3916,27 @@
         
         // Функция проверки возраста при загрузке
         async function checkAge() {
-            const isVerified = sessionStorage.getItem('xfetishhub_age_verified');
+            // Используем localStorage и тот же ключ, что в приложении: xch_age_verified
+            const isVerified = localStorage.getItem('xch_age_verified');
             const ageOverlay = document.getElementById('age-overlay');
             const introOverlay = document.getElementById('intro-overlay');
 
             if (!isVerified) {
-                // Если в этой сессии еще не подтверждали — показываем плашку
+                // Если возраст не подтвержден в localStorage — показываем плашку
                 introOverlay.style.background = '#050505';
                 introOverlay.style.opacity = '1';
                 ageOverlay.style.display = 'flex';
                 document.body.style.overflow = 'hidden';
             } else {
-                // Если подтвердили в рамках текущей сессии — просто запускаем интро
+                // Если подтвердили ранее — просто запускаем интро
                 ageOverlay.style.display = 'none';
                 await prepareAndRunIntro();
             }
         }
 
-        // Функция нажатия на кнопку "Да, мне есть 18"
         async function confirmAge() {
-            sessionStorage.setItem('xfetishhub_age_verified', 'true');
+            // Сохраняем в localStorage, чтобы приложение увидело этот флаг
+            localStorage.setItem('xch_age_verified', 'true');
             
             const ageOverlay = document.getElementById('age-overlay');
             ageOverlay.style.opacity = '0';
