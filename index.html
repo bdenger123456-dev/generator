@@ -620,24 +620,65 @@
             pointer-events: none;
         }
 
-        /* 4. От FAQ (Gray) к Legal Footer (Black) */
-        /* От серого к черному, чтобы слиться с низом страницы */
         .divider-gray-to-black {
+            display: none !important;
+        }
+
+        #faq {
+            background-color: #050505 !important; 
+            padding-top: 60px !important;
+            padding-bottom: 20px !important; 
+            margin-bottom: 0 !important;
+            overflow: visible;
+            position: relative;
+            z-index: 100;
+        }
+
+        .divider-top-faq {
             position: absolute;
-            bottom: 0;
+            top: -200px; 
             left: 0;
             width: 100%;
-            height: 150px;
-            background: linear-gradient(to bottom, transparent 0%, #000000 100%);
-            z-index: 5;
+            height: 251px;
+            background: linear-gradient(to bottom, rgba(5, 5, 5, 0) 0%, #050505 100%) !important;
+            z-index: 10;
             pointer-events: none;
         }
 
-        /* Правка отступов для FAQ, чтобы он не наезжал на картинки */
-        #faq {
-            position: relative;
-            z-index: 20; /* Поверх футера */
-            border-top: none; /* Убираем границы если были */
+        .footer-legal-bar-new {
+            display: flex;                  
+            justify-content: space-between; 
+            align-items: center;           
+            margin-top: 40px;
+            padding-top: 20px;
+            padding-bottom: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .footer-legal-bar-new a {
+            margin-left: 20px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .footer-legal-bar-new a:hover {
+            color: #fff;
+        }
+
+        .footer-legal-bar {
+            display: none !important;
+        }
+
+        /* 5. Адаптив для мобилок (в столбик) */
+        @media (max-width: 900px) {
+            .footer-legal-bar-new {
+                flex-direction: column-reverse;
+                gap: 20px;
+                text-align: center;
+            }
+            .footer-legal-bar-new a {
+                margin: 0 10px;
+            }
         }
 
         /* === ЦВЕТОВЫЕ ТЕМЫ (СВЯЗЬ ЦВЕТОМ) === */
@@ -828,7 +869,7 @@
             background-color: transparent !important;
             position: relative; 
             overflow: hidden; 
-            min-height: 100vh;
+            min-height: auto !important;
             display: flex; 
             flex-direction: column; 
             justify-content: center; 
@@ -836,11 +877,9 @@
             /* Отступ сверху */
             padding-top: 100px; 
             
-            padding-bottom: 220px !important; 
-            
             z-index: 1;
         }
-        .footer-bg-wrapper { position: absolute; top: -30%; left: 0; width: 100%; height: 160%; z-index: 0; pointer-events: none; will-change: transform; }
+        .footer-bg-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; will-change: transform; }
         .footer-parallax-img { width: 100%; height: 100%; object-fit: cover; }
         .footer-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); z-index: 1; }
         .footer-static-fade { position: absolute; top: 0; left: 0; width: 100%; height: 250px; background: linear-gradient(to bottom, #000000 0%, rgba(0,0,0,0) 100%); z-index: 2; pointer-events: none; }
@@ -975,7 +1014,7 @@
             align-items: center;
             gap: 20px;
             margin-top: 40px;
-            margin-bottom: 80px; /* Отступ от кнопок до черной полосы */
+            margin-bottom: 250px; 
             flex-wrap: wrap;
         }
         
@@ -1007,6 +1046,16 @@
             .footer-btn-row .btn-secondary {
                 width: 100%;
                 min-width: unset;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .footer-btn-row {
+                margin-bottom: 150px !important; /* Чуть меньше для мобилок */
+            }
+            .divider-top-faq {
+                top: -150px;
+                height: 151px;
             }
         }
 
@@ -1044,10 +1093,6 @@
 
         /* Адаптив для мобилок */
        @media (max-width: 900px) {
-            .footer-cta {
-                padding-bottom: 260px !important;
-            }
-
             .footer-legal-bar {
                 flex-direction: column-reverse; /* Копирайт внизу, ссылки выше */
                 align-items: center;
@@ -3076,7 +3121,7 @@
 
         <!-- FAQ -->
         <section id="faq" class="bg-sec">
-            <div class="divider-transp-to-gray"></div>
+            <div class="divider-top-faq"></div>
             <div class="container fade-in">
                 <div style="text-align: center; margin-bottom: 40px;">
                     <h2><span data-i18n="faq_title">Frequently Asked <span class="gradient-text">Questions</span></span></h2>
@@ -3107,22 +3152,19 @@
                         <div class="faq-answer" data-i18n="a5">The Free plan includes basic daily generations and privacy features. The Pro plan unlocks unlimited AI generations, detailed "Wrapped" style history reports, advanced filtering, and deeper customization options for the player interface.</div>
                     </details>
                 </div>
+                <div class="footer-legal-bar-new">
+                    <div class="copyright-text">
+                        &copy; 2026 xFetishHub. All rights reserved.
+                    </div>
+                    <div class="legal-links">
+                        <a onclick="openModal('privacy-modal')" data-i18n="link_priv">Privacy Policy</a>
+                        <a onclick="openModal('terms-modal')" data-i18n="link_terms">Terms of Use</a>
+                    </div>
+                </div>
             </div>
             <div class="divider-gray-to-black"></div>
         </section>
 
-        <div class="footer-legal-bar">
-            <!-- Слева: Копирайт -->
-            <div class="copyright-text">
-                &copy; 2026 xFetishHub. All rights reserved.
-            </div>
-
-            <!-- Справа: Ссылки -->
-            <div class="legal-links">
-                <a onclick="openModal('privacy-modal')" data-i18n="link_priv">Privacy Policy</a>
-                <a onclick="openModal('terms-modal')" data-i18n="link_terms">Terms of Use</a>
-            </div>
-        </div>
     </footer>
 
     <!-- QR MODAL -->
@@ -3855,16 +3897,6 @@
             const heroImg = document.getElementById('hero-bg-img');
             if (heroImg) heroImg.style.transform = `translateY(${window.scrollY * 0.4}px)`;
             
-            const footer = document.querySelector('.footer-cta');
-            const footerWrapper = document.querySelector('.footer-bg-wrapper');
-            if (footer && footerWrapper) {
-                const footerTop = footer.offsetTop;
-                const scrollPos = window.scrollY + window.innerHeight;
-                if (scrollPos > footerTop) {
-                    const distance = scrollPos - footerTop;
-                    footerWrapper.style.transform = `translate3d(0, ${distance * 0.15}px, 0)`;
-                }
-            }
         });
         init();
 
