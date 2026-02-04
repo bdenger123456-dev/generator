@@ -3221,6 +3221,10 @@
     </div>
 
     <script>
+
+        const STORAGE_AGE_KEY = 'xch_age_verified';
+        const STORAGE_LANG_KEY = 'xch_lang';
+
         const translations = {
             en: {
                 // --- NAV & HERO ---
@@ -3912,9 +3916,6 @@
 
 
         // --- AGE VERIFICATION LOGIC ---
-
-        const STORAGE_AGE_KEY = 'xch_age_verified';
-        const STORAGE_LANG_KEY = 'xch_lang';
         
         // Функция проверки возраста при загрузке
         async function checkAge() {
