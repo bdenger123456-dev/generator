@@ -24126,5 +24126,14 @@
     </p>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>
+    eruda.init();
+    console.log("Eruda initialized");
+    window.onerror = function(msg, url, line) {
+        console.error("Ошибка JS: " + msg + " на строке " + line);
+    };
+</script>
+
 </body>
 </html>
