@@ -3764,20 +3764,19 @@
         }
 
         function init() {
-            const savedLang = localStorage.getItem('xfetishhub_lang');
+            const savedLang = localStorage.getItem(STORAGE_LANG_KEY);
             let lang = savedLang || navigator.language.slice(0, 2);
             if (!translations[lang]) lang = 'en'; 
             currentLang = lang;
             
             applyLang(lang);
             
-            // --- Обновляем текст в шапке ---
             const display = document.getElementById('current-lang-display');
             if(display) display.innerText = lang.toUpperCase();
-            // -------------------------------------
 
             checkAge(); 
         }
+
 
         // Переключалка видимости меню
         function toggleLangMenu() {
@@ -3798,8 +3797,8 @@
         });
 
         function changeLanguage(lang) {
-            localStorage.setItem('xfetishhub_lang', lang);
-            location.reload(); // Перезагрузка страницы, как вы просили
+            localStorage.setItem(STORAGE_LANG_KEY, lang);
+            location.reload();
         }
         
         function applyLang(lang) {
@@ -3913,30 +3912,29 @@
 
 
         // --- AGE VERIFICATION LOGIC ---
+
+        const STORAGE_AGE_KEY = 'xch_age_verified';
+        const STORAGE_LANG_KEY = 'xch_lang';
         
         // Функция проверки возраста при загрузке
         async function checkAge() {
-            // Используем localStorage и тот же ключ, что в приложении: xch_age_verified
-            const isVerified = localStorage.getItem('xch_age_verified');
+            const isVerified = localStorage.getItem(STORAGE_AGE_KEY);
             const ageOverlay = document.getElementById('age-overlay');
             const introOverlay = document.getElementById('intro-overlay');
 
-            if (!isVerified) {
-                // Если возраст не подтвержден в localStorage — показываем плашку
+            if (isVerified !== 'true') {
                 introOverlay.style.background = '#050505';
                 introOverlay.style.opacity = '1';
                 ageOverlay.style.display = 'flex';
                 document.body.style.overflow = 'hidden';
             } else {
-                // Если подтвердили ранее — просто запускаем интро
                 ageOverlay.style.display = 'none';
                 await prepareAndRunIntro();
             }
         }
 
         async function confirmAge() {
-            // Сохраняем в localStorage, чтобы приложение увидело этот флаг
-            localStorage.setItem('xch_age_verified', 'true');
+            localStorage.setItem(STORAGE_AGE_KEY, 'true');
             
             const ageOverlay = document.getElementById('age-overlay');
             ageOverlay.style.opacity = '0';
