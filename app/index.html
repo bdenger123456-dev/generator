@@ -9973,7 +9973,10 @@
                 // Объединяем по уникальности (ID + Timestamp), чтобы не потерять
                 const histMap = new Map();
                 [...localHist, ...cloudHist].forEach(item => histMap.set(item.id, item));
-                const mergedHistory = Array.from(histMap.values()).sort((a, b) => b.timestamp - a.timestamp).slice(0, 100);
+                const mergedHistory = Array.from(histMap.values())
+                    .filter(item => item && item.timestamp) // Проверка на валидность
+                    .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
+                    .slice(0, 100);
                 
                 localStorage.setItem('xch_history', JSON.stringify(mergedHistory));
                 window.historyData = mergedHistory;
@@ -10000,7 +10003,10 @@
                 const cloudLog = cloudData.activityLog || [];
                 const logMap = new Map();
                 [...localLog, ...cloudLog].forEach(item => logMap.set((item.ts || 0) + "_" + item.id, item));
-                const mergedLog = Array.from(logMap.values()).sort((a, b) => a.ts - b.ts).slice(-5000);
+                const mergedLog = Array.from(logMap.values())
+                    .filter(item => item && item.ts) // Проверка на валидность
+                    .sort((a, b) => (a.ts || 0) - (b.ts || 0))
+                    .slice(-5000);
                 
                 localStorage.setItem('xch_activity_log', JSON.stringify(mergedLog));
                 window.activityLog = mergedLog;
@@ -14346,7 +14352,10 @@
         
         document.body.classList.add('tab-home-active');
         setTimeout(() => {
-            document.getElementById('loading-overlay').classList.add('hidden');
+            const loader = document.getElementById('loading-overlay');
+            if (loader) {
+                loader.classList.add('hidden');
+            }
         }, 500); 
 
         updateAppBadge();
