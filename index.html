@@ -1992,6 +1992,37 @@
             }
         }
 
+        .loader {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(203, 83, 240, 0.2);
+            border-radius: 50%;
+            border-top-color: var(--accent-start);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 20px;
+            transition: opacity 0.3s ease;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Скрываем элементы интро, пока идет загрузка */
+        #intro-logo, #intro-bubble {
+            display: none; /* Будем включать через JS */
+        }
+
+        /* Состояние, когда загрузка окончена */
+        .loaded #intro-loader {
+            display: none;
+        }
+        .loaded #intro-logo {
+            display: block;
+        }
+        .loaded #intro-bubble {
+            display: flex;
+        }
+
         /* --- PERFORMANCE OPTIMIZATION --- */
 
         /* 1. Аппаратное ускорение для анимаций */
@@ -2067,8 +2098,13 @@
 
     <!-- INTRO OVERLAY -->
     <div id="intro-overlay">
-        <div class="intro-center-wrapper">
+        <div class="intro-center-wrapper" id="intro-wrapper">
+            <!-- Индикатор загрузки -->
+            <div id="intro-loader" class="loader"></div>
+            
+            <!-- Логотип, который подгрузится -->
             <img src="hero_logo.png" id="intro-logo" alt="Intro Logo">
+            
             <div id="intro-bubble" class="speech-bubble">
                 <span id="intro-bubble-text">...</span>
             </div>
@@ -3503,43 +3539,63 @@
         });
         init();
 
+        function waitForImage(imgElement) {
+            return new Promise((resolve) => {
+                if (imgElement.complete) {
+                    resolve();
+                } else {
+                    imgElement.onload = () => resolve();
+                    imgElement.onerror = () => resolve(); // Продолжаем даже при ошибке
+                }
+            });
+        }
+
+
         // --- AGE VERIFICATION LOGIC ---
         
-        function checkAge() {
+        async function checkAge() {
             const isVerified = localStorage.getItem('xfetishhub_age_verified');
             const ageOverlay = document.getElementById('age-overlay');
             const introOverlay = document.getElementById('intro-overlay');
 
             if (!isVerified) {
-                // 1. НЕ ПОДТВЕРЖДЕН:
-                // Показываем черный фон интро (без лого)
                 introOverlay.style.background = '#050505';
                 introOverlay.style.opacity = '1';
-                
-                // Показываем модалку возраста ПОВЕРХ черного фона
                 ageOverlay.style.display = 'flex';
                 document.body.style.overflow = 'hidden';
             } else {
-                // 2. ПОДТВЕРЖДЕН:
-                // Сразу запускаем анимацию входа
                 ageOverlay.style.display = 'none';
-                runIntroAnimation();
+                // Если возраст подтвержден, ждем загрузку и запускаем интро
+                await prepareAndRunIntro();
             }
         }
 
-        // Нажатие "Yes, I am 18+"
-        function confirmAge() {
+        async function confirmAge() {
             localStorage.setItem('xfetishhub_age_verified', 'true');
-            
-            // Скрываем модалку возраста
             const ageOverlay = document.getElementById('age-overlay');
             ageOverlay.style.opacity = '0';
             
-            setTimeout(() => {
+            setTimeout(async () => {
                 ageOverlay.style.display = 'none';
-                // ЗАПУСКАЕМ АНИМАЦИЮ
-                runIntroAnimation();
+                await prepareAndRunIntro();
             }, 300);
+        }
+
+        //  вспомогательная функция: ждет загрузки и запускает анимацию
+        async function prepareAndRunIntro() {
+            const introLogo = document.getElementById('intro-logo');
+            const introWrapper = document.getElementById('intro-wrapper');
+            
+            // 1. Ждем загрузки логотипа
+            await waitForImage(introLogo);
+            
+            // 2. Убираем лоадер и показываем логотип
+            introWrapper.classList.add('loaded');
+            
+            // 3. Небольшая задержка для плавности перед началом полета
+            setTimeout(() => {
+                runIntroAnimation();
+            }, 500);
         }
 
         function exitSite() {
@@ -3555,84 +3611,69 @@
             const heroBubble = document.getElementById('hero-bubble');
             const targetLogo = document.querySelector('.hero-logo-img');
             
-            // Ставим тексты
+            introLogo.style.display = 'block';
+            if(introBubble) introBubble.style.display = 'flex';
+
             setupIntroTexts();
-            
-            // Блок скролла
             document.body.style.overflow = 'hidden';
 
-            // Запоминаем ширину для scale
-            const startWidth = introLogo.offsetWidth || 150; 
+            const startWidth = 150; 
             
-            // === ТАЙМЛАЙН ===
-            
-            // 0ms: Появление Лого
+            // Появление
             requestAnimationFrame(() => {
                 introLogo.style.opacity = '1';
                 introLogo.style.transform = 'scale(1)';
                 introLogo.style.transition = 'transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s ease';
             });
 
-            // 400ms: Появление "Хей!"
+            // Появление баббла
             setTimeout(() => {
                 if(introBubble) introBubble.classList.add('visible');
             }, 400);
 
-            // 1600ms: Исчезновение "Хей!" + Антиципация
+            // Подготовка к полету
             const flightStartTime = 2000;
             setTimeout(() => {
                 if(introBubble) introBubble.classList.remove('visible');
-                
-                // Сжатие перед прыжком
                 introLogo.style.transition = 'transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
                 introLogo.style.transform = 'scale(0.9)';
             }, flightStartTime - 400);
 
-            // 2000ms: ПОЛЕТ
+            // Полет
             setTimeout(() => {
                 const targetRect = targetLogo.getBoundingClientRect();
-                
-                // Центр к Центру
-                const targetCenterX = targetRect.left + (targetRect.width / 2);
-                const targetCenterY = targetRect.top + (targetRect.height / 2);
                 const startCenterX = window.innerWidth / 2;
                 const startCenterY = window.innerHeight / 2;
+                const targetCenterX = targetRect.left + (targetRect.width / 2);
+                const targetCenterY = targetRect.top + (targetRect.height / 2);
 
                 const deltaX = targetCenterX - startCenterX;
                 const deltaY = targetCenterY - startCenterY;
                 const scale = targetRect.width / startWidth;
 
-                // Летим
                 introLogo.style.transition = 'transform 1.1s cubic-bezier(0.19, 1, 0.22, 1)'; 
                 introLogo.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(${scale})`;
-
-                // Фон уходит
                 introOverlay.style.background = 'transparent';
 
-                // Текст сайта выезжает
                 setTimeout(() => {
                     document.body.classList.add('animation-done');
                 }, 150);
-
             }, flightStartTime);
 
-            // 3100ms: ПРИЗЕМЛЕНИЕ (Подмена + Длинный баббл)
+            // Завершение
             setTimeout(() => {
                 document.body.classList.add('logo-landed');
                 introLogo.style.opacity = '0'; 
                 
-                // Убираем оверлей
                 setTimeout(() => {
                     introOverlay.style.display = 'none';
                     document.body.style.overflow = '';
                 }, 200);
                 
-                // Показываем баббл "Листай вниз..." (чуть с задержкой после посадки)
                 setTimeout(() => {
                     if(heroBubble) heroBubble.classList.add('visible');
                 }, 500);
                 
-                // Скрываем длинный баббл автоматически через 5 секунд
                 setTimeout(() => {
                     if(heroBubble) heroBubble.classList.remove('visible');
                 }, 5500);
