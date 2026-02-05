@@ -6999,6 +6999,70 @@
             border: none;
         }
 
+        /* --- SITES MODAL STYLES --- */
+
+        .smart-mode-container {
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            margin: 15px;
+            padding: 15px;
+            border-radius: 16px;
+            border: 1px solid var(--accent);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .site-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: var(--ios-card);
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .site-card:first-child { border-top-left-radius: 16px; border-top-right-radius: 16px; }
+        .site-card:last-child { border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; border-bottom: none; }
+
+        .site-card:active {
+            background: var(--nav-bg);
+        }
+
+        .site-card.selected {
+            background: rgba(46, 204, 113, 0.1); /* Зеленоватый фон для выбранного */
+        }
+
+        .site-card.selected .site-check {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .site-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .site-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 2px;
+        }
+
+        .site-desc {
+            font-size: 11px;
+            color: var(--text-secondary);
+            line-height: 1.2;
+        }
+
+        .site-check {
+            color: var(--accent);
+            font-size: 18px;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
         /* =========================================
         MACOS STYLE SIDEBAR (DESKTOP ONLY)
         ========================================= */
@@ -8132,20 +8196,15 @@
         <div class="ios-group">
             
             <!-- 1. Site -->
-            <div class="ios-row">
+            <div class="ios-row clickable" onclick="openSitesModal()">
                 <div class="ios-row-left">
                     <img src="site.png" class="settings-icon" alt="Site">
                     <span class="platform-label" data-key="site_label">Site</span>
                 </div>
-                <select id="platform" class="platform-select" onchange="savePlatform(this.value)" dir="rtl">
-                    <option value="xh">xHamster</option>
-                    <option value="ph">Pornhub</option>
-                    <option value="xv">xVideos</option>
-                    <option value="xn">XNXX</option>
-                    <option value="yp">YouPorn</option>
-                    <option value="rt">RedTube</option>
-                    <option value="random" data-key="site_random">Random</option>
-                </select>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span id="current-site-label" style="font-size:15px; color:var(--text-secondary); font-weight:600;">Pornhub</span>
+                    <div class="chevron"></div>
+                </div>
             </div>
 
             <!-- 2. Mode -->
@@ -8965,7 +9024,7 @@
                 <button class="bento-small-btn" onclick="window.logout()">
                     <span data-key="logout_text">Log Out</span>
                 </button>
-                <button class="bento-small-btn" onclick="resetAppHistory()" style="color:var(--highlight-red); border-color:rgba(231,76,60,0.3);">
+                <button class="bento-small-btn" onclick="openResetModal()" style="color:var(--highlight-red); border-color:rgba(231,76,60,0.3);">
                     <span data-key="btn_reset">Reset Data</span>
                 </button>
             </div>
@@ -9590,6 +9649,143 @@
             <!-- Кнопка Позже -->
             <div style="text-align:center; margin-top:15px;">
                 <span style="font-size:13px; color:var(--text-secondary); text-decoration:underline; cursor:pointer; opacity: 0.7;" onclick="closeExpiryModal()" data-key="btn_close">Remind me later</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- RESET DATA SELECTION MODAL -->
+<div class="modal-overlay" id="modal-reset-selection" onclick="closeResetModal(event)">
+    <div class="modal" style="max-width: 400px;">
+        <div class="modal-header">
+            <div class="modal-close-btn" onclick="closeResetModal(null, true)"><div class="modal-close-icon"></div></div>
+            <span data-key="reset_title_select">Select Data to Reset</span>
+        </div>
+        
+        <div class="modal-body">
+            <p style="font-size:13px; color:var(--text-secondary); text-align:center; margin-bottom:20px; line-height:1.4;" data-key="reset_desc_select">
+                Choose what you want to delete. This action cannot be undone.
+            </p>
+
+            <div class="ios-group">
+                <!-- 1. Лайки (Favorites) -->
+                <div class="ios-row">
+                    <div class="ios-row-left">
+                        <span>💚 <span data-key="favorites_catalog">Liked</span></span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="chk-reset-fav">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <!-- 2. Дизлайки (Blacklist) -->
+                <div class="ios-row">
+                    <div class="ios-row-left">
+                        <span>⛔ <span data-key="blacklist_catalog">Disliked</span></span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="chk-reset-ban">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <!-- 3. История (Просмотры + Свайпы) -->
+                <div class="ios-row">
+                    <div class="ios-row-left">
+                        <span>📜 <span data-key="history_title">History</span></span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="chk-reset-hist">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <!-- 4. Алгоритм (Веса тегов) -->
+                <div class="ios-row">
+                    <div class="ios-row-left">
+                        <span>🧠 <span data-key="reset_opt_algo">Algorithm & Weights</span></span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="chk-reset-algo">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <!-- 5. Открытые категории (Explored) -->
+                <div class="ios-row">
+                    <div class="ios-row-left">
+                        <span>🏆 <span data-key="explored_label">Explored</span></span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="chk-reset-expl">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Кнопка удаления -->
+            <button class="btn-gen" onclick="performPartialReset()" style="width:100%; margin-top:10px; background:var(--highlight-red); color:#fff; font-weight:800; border:none; box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);">
+                <span data-key="btn_delete_selected">Delete Selected</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- SITES SELECTION MODAL -->
+<div class="modal-overlay" id="modal-sites-overlay" onclick="closeSitesModal(event)">
+    <div class="modal" style="height: 85vh; max-height: 800px;">
+        <div class="modal-header">
+            <div class="modal-close-btn" onclick="closeSitesModal(null, true)"><div class="modal-close-icon"></div></div>
+            <span data-key="site_title">Choose Platform</span>
+        </div>
+        
+        <div class="modal-body" style="padding: 0;">
+            <!-- 1. SMART MODE -->
+            <div class="smart-mode-container" style="margin-bottom: 10px;">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:5px;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span style="font-size:20px;">🧠</span>
+                        <div>
+                            <div style="font-weight:700; color:var(--text-main); font-size:15px;" data-key="sm_title">Smart Mode</div>
+                            <div style="font-size:11px; color:var(--text-secondary);" data-key="sm_desc">Auto-select site based on tags</div>
+                        </div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="smart-site-toggle" onchange="toggleSmartSites(this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div style="font-size:10px; color:var(--text-secondary); opacity:0.7; line-height:1.3; margin-top:5px;" data-key="guide_sm_hint">
+                    e.g. Opens <b>Hentai Haven</b> for anime tags...
+                </div>
+            </div>
+
+            <!-- 2. RANDOM MODE  -->
+            <div class="smart-mode-container" style="margin-top: 0; border-color: var(--border);"> <!-- Отличный стиль, но без акцентной рамки -->
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:5px;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span style="font-size:20px;">🎲</span>
+                        <div>
+                            <div style="font-weight:700; color:var(--text-main); font-size:15px;" data-key="rnd_title">Random Mode</div>
+                            <div style="font-size:11px; color:var(--text-secondary);" data-key="rnd_desc">Surprise me every time</div>
+                        </div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="random-site-toggle" onchange="toggleRandomSites(this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div style="font-size:10px; color:var(--text-secondary); opacity:0.7; line-height:1.3; margin-top:5px;" data-key="guide_rnd_hint">
+                    Uses a different site for every video.
+                </div>
+            </div>
+
+            <div class="ios-header" style="margin-left:15px; margin-top:15px;" data-key="sites_all">All Sites</div>
+            
+            <!-- LIST -->
+            <div id="sites-list-container" class="ios-group" style="margin: 0 15px 30px 15px; background: transparent;">
+                <!-- JS вставит список -->
             </div>
         </div>
     </div>
@@ -10937,6 +11133,136 @@
         { key: 'Uncensored', en: 'Uncensored', ru: 'Без цензуры', es: 'Sin censura', de: 'Unzensiert' }
     ];
 
+    const SITES_DATA = [
+        // --- ТОП ГИГАНТЫ ---
+        { 
+            id: 'ph', name: 'Pornhub', 
+            url: 'https://www.pornhub.com/video/search?search={q}', sep: '+',
+            tags: ['general', 'high-quality', 'vr'],
+            desc: { en: "Universal choice. Trends, 4K.", ru: "Универсальный выбор. Тренды, 4K.", es: "Elección universal. Tendencias, 4K.", de: "Universelle Wahl. Trends, 4K." }
+        },
+        { 
+            id: 'xv', name: 'XVideos', 
+            url: 'https://www.xvideos.com/?k={q}', sep: '+',
+            tags: ['amateur', 'general', 'trans'],
+            desc: { en: "Largest library. Fast load.", ru: "Самая большая библиотека. Быстро.", es: "La biblioteca más grande. Rápido.", de: "Größte Bibliothek. Schnell." }
+        },
+        { 
+            id: 'xh', name: 'xHamster', 
+            url: 'https://xhamster.com/search/{q}', sep: '+',
+            tags: ['amateur', 'live', 'mature'],
+            desc: { en: "Amateur & User content.", ru: "Любительское и домашнее видео.", es: "Contenido amateur y de usuarios.", de: "Amateur- & Nutzerinhalte." }
+        },
+        { 
+            id: 'xn', name: 'XNXX', 
+            url: 'https://www.xnxx.com/search/{q}', sep: '+',
+            tags: ['general', 'old', 'rough'],
+            desc: { en: "Fast search, rare videos.", ru: "Быстрый поиск, редкие видео.", es: "Búsqueda rápida, videos raros.", de: "Schnelle Suche, seltene Videos." }
+        },
+        // --- КАЧЕСТВО & ДЛИННЫЕ ---
+        { 
+            id: 'sb', name: 'SpankBang', 
+            url: 'https://spankbang.com/s/{q}/', sep: '+',
+            tags: ['hd', 'full-length', '4k'],
+            desc: { en: "Full-length videos, no ads.", ru: "Полные видео без рекламы.", es: "Videos completos, sin anuncios.", de: "Videos in voller Länge, keine Werbung." }
+        },
+        { 
+            id: 'epo', name: 'Eporner', 
+            url: 'https://www.eporner.com/search/{q}/', sep: '-',
+            tags: ['4k', '60fps', 'hd'],
+            desc: { en: "High Quality 4K/60fps.", ru: "Высокое качество 4K/60fps.", es: "Alta calidad 4K/60fps.", de: "Hohe Qualität 4K/60fps." }
+        },
+        // --- КЛАССИКА TUBE ---
+        { 
+            id: 'yp', name: 'YouPorn', 
+            url: 'https://www.youporn.com/search/?query={q}', sep: '+',
+            tags: ['general', 'clean'],
+            desc: { en: "Clean interface, less ads.", ru: "Чистый интерфейс, меньше рекламы.", es: "Interfaz limpia, menos anuncios.", de: "Saubere Oberfläche, weniger Werbung." }
+        },
+        { 
+            id: 'rt', name: 'RedTube', 
+            url: 'https://www.redtube.com/?search={q}', sep: '+',
+            tags: ['classic', 'professional'],
+            desc: { en: "Classic, stable viewing.", ru: "Классика, стабильный просмотр.", es: "Clásico, visualización estable.", de: "Klassisch, stabile Wiedergabe." }
+        },
+        { 
+            id: 't8', name: 'Tube8', 
+            url: 'https://www.tube8.com/search/videos?q={q}', sep: '+',
+            tags: ['hardcore', 'long'],
+            desc: { en: "Long scenes, old hits.", ru: "Длинные сцены, старые хиты.", es: "Escenas largas, éxitos antiguos.", de: "Lange Szenen, alte Hits." }
+        },
+        { 
+            id: 'pcom', name: 'Porn.com', 
+            url: 'https://www.porn.com/videos/search?q={q}', sep: '+',
+            tags: ['general'],
+            desc: { en: "Simple category search.", ru: "Простой поиск по категориям.", es: "Búsqueda sencilla por categorías.", de: "Einfache Kategoriesuche." }
+        },
+        // --- УДОБНЫЕ / МОБИЛЬНЫЕ ---
+        { 
+            id: 'thumb', name: 'Thumbzilla', 
+            url: 'https://www.thumbzilla.com/video/search?q={q}', sep: '+',
+            tags: ['mobile', 'simple'],
+            desc: { en: "Minimalist, no distractions.", ru: "Минимализм, ничего лишнего.", es: "Minimalista, sin distracciones.", de: "Minimalistisch, keine Ablenkungen." }
+        },
+        { 
+            id: 'ixxx', name: 'IXXX', 
+            url: 'https://www.ixxx.com/search/{q}', sep: '-',
+            tags: ['mobile', 'fast'],
+            desc: { en: "Fast start, many categories.", ru: "Быстрый старт, много категорий.", es: "Inicio rápido, muchas categorías.", de: "Schnellstart, viele Kategorien." }
+        },
+        { 
+            id: 'pone', name: 'PornOne', 
+            url: 'https://pornone.com/?s={q}', sep: '+',
+            tags: ['general'],
+            desc: { en: "Classic tube, no signup.", ru: "Классический туб без регистрации.", es: "Tubo clásico, sin registro.", de: "Klassische Röhre, keine Anmeldung." }
+        },
+        { 
+            id: 'tna', name: 'TnaFlix', 
+            url: 'https://www.tnaflix.com/search.php?q={q}', sep: '+',
+            tags: ['retro', 'amateur'],
+            desc: { en: "Amateur & Retro content.", ru: "Любительское и ретро.", es: "Contenido amateur y retro.", de: "Amateur- & Retro-Inhalte." }
+        },
+        // --- JAV & ASIAN ---
+        { 
+            id: 'miss', name: 'MissAV', 
+            url: 'https://missav.com/search/{q}', sep: '-',
+            tags: ['jav', 'asian', 'uncensored'],
+            desc: { en: "Best JAV library (Subs).", ru: "Лучшая библиотека JAV (субтитры).", es: "Mejor biblioteca JAV (Subs).", de: "Beste JAV-Bibliothek (Untertitel)." }
+        },
+        { 
+            id: 'sup', name: 'SupJav', 
+            url: 'https://supjav.com/?s={q}', sep: '+',
+            tags: ['jav', 'asian', 'censored'],
+            desc: { en: "Huge JAV collection.", ru: "Огромный выбор японского порно.", es: "Enorme colección JAV.", de: "Riesige JAV-Sammlung." }
+        },
+        // --- HENTAI & TOON ---
+        { 
+            id: 'hh', name: 'Hentai Haven', 
+            url: 'https://hentaihaven.xxx/?s={q}', sep: '+',
+            tags: ['hentai', 'anime', 'cartoon', 'fantasy'],
+            desc: { en: "Anime porn & 3D.", ru: "Хентай и аниме порно.", es: "Porno anime y 3D.", de: "Anime-Porno & 3D." }
+        },
+        { 
+            id: 'r34', name: 'Rule34', 
+            url: 'https://rule34video.com/search/{q}/', sep: '+',
+            tags: ['rule34', '3d', 'sfm', 'overwatch'],
+            desc: { en: "Rule34 / Memes / Games.", ru: "Rule34 / Мемы / Игры.", es: "Rule34 / Memes / Juegos.", de: "Rule34 / Memes / Spiele." }
+        },
+        // --- EXTREME & SPECIFIC ---
+        { 
+            id: 'mom', name: 'Motherless', 
+            url: 'https://motherless.com/search/videos?q={q}', sep: '+',
+            tags: ['extreme', 'fetish', 'scat', 'piss', 'fisting'],
+            desc: { en: "Extreme, fetish, shock.", ru: "Экстрим, фетиш, шок-контент.", es: "Extremo, fetiche, shock.", de: "Extrem, Fetisch, Schock." }
+        },
+        { 
+            id: 'ero', name: 'EroMe', 
+            url: 'https://www.erome.com/search?q={q}', sep: '+',
+            tags: ['pics', 'short', 'albums'],
+            desc: { en: "Photos & Short clips.", ru: "Фото и короткие клипы.", es: "Fotos y clips cortos.", de: "Fotos & kurze Clips." }
+        }
+    ];
+
     // Дефолтный пул
     const DEFAULT_MODS_POOL = []; 
 
@@ -11212,6 +11538,21 @@
             expl_hist: "From Archives 📜",
             deco_label: "Show Decorations",
 
+            rnd_title: "Random Mode",
+            rnd_desc: "Different site every time",
+            guide_rnd_hint: "Ideally for exploring new libraries.",
+
+            site_title: "Choose Platform",
+            sm_title: "Smart Mode",
+            sm_desc: "Auto-select site based on tags",
+            guide_sm_hint: "e.g. Opens <b>Hentai Haven</b> for anime, <b>MissAV</b> for JAV, <b>Motherless</b> for extreme.",
+            sites_all: "All Sites",
+
+            reset_title_select: "Data Management",
+            reset_desc_select: "Select specific categories to wipe from memory.",
+            reset_opt_algo: "Algorithm (Recommendations)",
+            btn_delete_selected: "Delete Selected",
+
             picker_title: "Select Range",
             picker_from: "From",
             picker_to: "To",
@@ -11303,30 +11644,28 @@
             tip_sites_title: "Site Guide 2026",
             tip_sites_desc: "Pros, cons, and which to pick",
             tip_sites_text: `
-                <b>xVideos</b> — The People's Choice.<br>
-                ✅ <b>Pros:</b> Largest library, loads instantly, tons of amateur/niche content.<br>
-                ❌ <b>Cons:</b> Lower video quality, lots of ads and spam.<br>
-                👉 <i>Best for maximum variety and rare niches.</i><br><br>
+                Let's be real: you probably know the giants like Pornhub without my help 😈. But each site has its own superpower worth knowing.<br><br>
 
-                <b>Pornhub</b> — Premium Experience.<br>
-                ✅ <b>Pros:</b> Best UI, great recommendations, verified models, lots of 4K.<br>
-                ❌ <b>Cons:</b> Geo-blocked in some US states (VPN needed), aggressive Premium ads.<br>
-                👉 <i>Best for quality, convenience, and community.</i><br><br>
+                <b>🔥 The Classics</b><br>
+                <b>xHamster</b> is king for "real" and amateur vibes. <b>XVideos</b> and <b>XNXX</b> are the workhorses: they find everything and load instantly. And <b>Pornhub</b>... well, it's Pornhub: comments, trends, 4K, but a moody player.<br><br>
 
-                <b>xHamster</b> — Amateur Heaven.<br>
-                ✅ <b>Pros:</b> Clean design, focus on real amateur videos, photos, and cams. Less censorship.<br>
-                ❌ <b>Cons:</b> Fewer professional studio videos.<br>
-                👉 <i>Best for "real" sex fans and VR.</i><br><br>
+                <b>✨ For Aesthetes</b><br>
+                Tired of short clips? <b>SpankBang</b> and <b>Tube8</b> often host full scenes. If you are a visual perfectionist needing 60fps, go to <b>Eporner</b>.<br><br>
 
-                <b>XNXX</b> — The Classic Tube.<br>\
-                ✅ <b>Pros:</b> Massive library, very fast loading, extremely popular worldwide.<br>\
-                ❌ <b>Cons:</b> Old-school design, many redirects and annoying ads.<br>\
-                👉 <i>Best for simple and fast browsing of massive variety.</i>
+                <b>📱 Minimalist</b><br>
+                <b>Thumbzilla</b>, <b>PornOne</b>, and <b>IXXX</b> are for those who hate clutter. Click and watch. <b>YouPorn</b> and <b>RedTube</b> are the stable old school.<br><br>
 
-                <b>YouPorn / RedTube</b> — The Classics.<br>
-                ✅ <b>Pros:</b> Stable quality, simple interface (part of PH network).<br>
-                ❌ <b>Cons:</b> Less unique content, essentially PH's "little brothers".<br>
-                👉 <i>Simple alternatives without clutter.</i>
+                <b>🎎 Asian & Anime</b><br>
+                <b>MissAV</b> is the best for Japanese (JAV) because it has subtitles (plot matters!). <b>SupJav</b> for quantity. 2D fans live on <b>Hentai Haven</b> and <b>Rule34</b>.<br><br>
+
+                <b>💀 The Deep End</b><br>
+                Seen it all? <b>Motherless</b> will surprise you with near-zero censorship (extreme, shock). <b>EroMe</b> is for photo lovers. <b>TnaFlix</b> for retro.<br><br>
+
+                <div style="background:rgba(255,255,255,0.1); padding:10px; border-radius:10px; border-left: 3px solid var(--accent); margin-top:15px;">
+                    <b>👨‍💻 Developer's Choice:</b><br>
+                    If you are using the App, I highly recommend sticking to <b>xHamster</b> or <b>XVideos</b>. They are stable and fast.<br><br>
+                    Why not Pornhub? It often gives a black screen inside the app due to protection scripts. Sites like SpankBang annoy with age gates. Save your nerves — start with xHamster, explore others only if bored.
+                </div>
             `,
 
             // 1. ALGORITHM
@@ -11961,6 +12300,21 @@
             expl_hist: "Из архивов 📜",
             deco_label: "Показывать декор",
 
+            rnd_title: "Случайный режим",
+            rnd_desc: "Разные сайты каждый раз",
+            guide_rnd_hint: "Идеально для изучения новых библиотек.",
+
+            site_title: "Выбор платформы",
+            sm_title: "Умный режим",
+            sm_desc: "Авто-выбор сайта по тегам",
+            guide_sm_hint: "Например: <b>Hentai Haven</b> для аниме, <b>MissAV</b> для JAV, <b>Motherless</b> для жести.",
+            sites_all: "Все сайты",
+
+            reset_title_select: "Управление данными",
+            reset_desc_select: "Выберите категории для удаления из памяти.",
+            reset_opt_algo: "Алгоритм (Рекомендации)",
+            btn_delete_selected: "Удалить выбранное",
+
             picker_title: "Выбор периода",
             picker_from: "От",
             picker_to: "До",
@@ -12052,30 +12406,28 @@
             tip_sites_title: "Гид по сайтам 2026",
             tip_sites_desc: "Плюсы, минусы и кого выбрать",
             tip_sites_text: `
-                <b>xVideos</b> — Народный выбор.<br>
-                ✅ <b>Плюсы:</b> Самая большая библиотека, грузится мгновенно даже с плохим интернетом, много любительского и нишевого контента.<br>
-                ❌ <b>Минусы:</b> Качество видео часто ниже среднего, много рекламы и спама.<br>
-                👉 <i>Для тех, кто ищет максимальное разнообразие и редкости.</i><br><br>
+                Давай честно: про гигантов вроде Pornhub ты и без меня знаешь 😈. Но у каждого сайта есть свои фишки, о которых стоит знать.<br><br>
 
-                <b>Pornhub</b> — Премиум опыт.<br>
-                ✅ <b>Плюсы:</b> Лучший интерфейс, отличные рекомендации, верифицированные модели, много 4K.<br>
-                ❌ <b>Минусы:</b> Блокировки в США (нужен VPN), агрессивная реклама Premium.<br>
-                👉 <i>Для ценителей удобства, качества и живого сообщества.</i><br><br>
+                <b>🔥 Классика (База)</b><br>
+                <b>xHamster</b> — король «живого» и любительского контента. <b>XVideos</b> и <b>XNXX</b> — безотказные рабочие лошадки: находят всё, грузятся везде. А <b>Pornhub</b>... ну, это Pornhub: комментарии, тренды, 4K, но капризный плеер.<br><br>
 
-                <b>xHamster</b> — Любительский рай.<br>
-                ✅ <b>Плюсы:</b> Чистый дизайн, фокус на реальных любительских видео, фото и камерах. Меньше цензуры.<br>
-                ❌ <b>Минусы:</b> Чуть меньше профессиональных студийных роликов.<br>
-                👉 <i>Для фанатов "реального" секса и VR.</i><br><br>
+                <b>✨ Для Эстетов</b><br>
+                Устал от обрезков? На <b>SpankBang</b> и <b>Tube8</b> часто лежат полные сцены. Если ты визуал и хочешь 60fps, тебе на <b>Eporner</b>.<br><br>
 
-                <b>XNXX</b> — Классика тубов.<br>\
-                ✅ <b>Плюсы:</b> Гигантская библиотека, грузится мгновенно, огромный выбор редких ниш.<br>\
-                ❌ <b>Минусы:</b> Устаревший дизайн, много агрессивной рекламы и редиректов.<br>\
-                👉 <i>Лучший выбор для простого и быстрого поиска всего подряд.</i>
+                <b>📱 Минимализм</b><br>
+                <b>Thumbzilla</b>, <b>PornOne</b> и <b>IXXX</b> — для тех, кто не хочет копаться в меню. Зашел, нажал, смотришь. <b>YouPorn</b> и <b>RedTube</b> — старая добрая школа без лишних баннеров.<br><br>
 
-                <b>YouPorn / RedTube</b> — Классика.<br>
-                ✅ <b>Плюсы:</b> Стабильное качество, простой интерфейс (часть сети Pornhub).<br>
-                ❌ <b>Минусы:</b> Меньше уникального контента, по сути "младшие братья" PH.<br>
-                👉 <i>Простая альтернатива без лишних наворотов.</i>
+                <b>🎎 Азия и Аниме</b><br>
+                <b>MissAV</b> — топ для японского порно (JAV), потому что там есть субтитры (сюжет важен!). <b>SupJav</b> для количества. Фанаты 2D живут на <b>Hentai Haven</b> и <b>Rule34</b>.<br><br>
+
+                <b>💀 Для искушенных</b><br>
+                Видел всё? <b>Motherless</b> удивит отсутствием цензуры (экстрим, шок). <b>EroMe</b> — для любителей фото-сетов. <b>TnaFlix</b> — ретро.<br><br>
+
+                <div style="background:rgba(255,255,255,0.1); padding:10px; border-radius:10px; border-left: 3px solid var(--accent); margin-top:15px;">
+                    <b>👨‍💻 Совет Разработчика:</b><br>
+                    Если ты сидишь через приложение, я настоятельно рекомендую использовать <b>xHamster</b> или <b>XVideos</b>. Они работают стабильно.<br><br>
+                    Почему не Pornhub? У него сложная защита, из-за чего внутри приложения часто бывает черный экран. А сайты вроде SpankBang мучают проверкой возраста. Побереги нервы — начни с xHamster, а остальное пробуй, если станет скучно.
+                </div>
             `,
 
             // 1. АЛГОРИТМ
@@ -12706,6 +13058,21 @@
             expl_hist: "De los archivos 📜",
             deco_label: "Mostrar decoración",
 
+            rnd_title: "Modo Aleatorio",
+            rnd_desc: "Sitio diferente cada vez",
+            guide_rnd_hint: "Ideal para explorar nuevas bibliotecas.",
+
+            site_title: "Elegir Plataforma",
+            sm_title: "Modo Inteligente",
+            sm_desc: "Selección auto según etiquetas",
+            guide_sm_hint: "Ej. abre <b>Hentai Haven</b> para anime, <b>MissAV</b> para JAV, <b>Motherless</b> para extremo.",
+            sites_all: "Todos los sitios",
+
+            reset_title_select: "Gestión de Datos",
+            reset_desc_select: "Selecciona categorías para borrar.",
+            reset_opt_algo: "Algoritmo (Recomendaciones)",
+            btn_delete_selected: "Borrar Seleccionados",
+
             picker_title: "Seleccionar rango",
             picker_from: "Desde",
             picker_to: "Hasta",
@@ -12796,30 +13163,28 @@
             tip_sites_title: "Guía de Sitios 2026",
             tip_sites_desc: "Pros, contras y cuál elegir",
             tip_sites_text: `
-                <b>xVideos</b> — La elección del pueblo.<br>
-                ✅ <b>Pros:</b> La biblioteca más grande, carga instantánea, muchísimos contenidos amateurs y de nicho.<br>
-                ❌ <b>Contras:</b> Menor calidad de video, muchos anuncios y spam.<br>
-                👉 <i>Ideal para máxima variedad y nichos raros.</i><br><br>
+                Seamos honestos: probablemente ya conoces a gigantes como Pornhub sin mi ayuda 😈. Pero cada sitio tiene su superpoder.<br><br>
 
-                <b>Pornhub</b> — Experiencia premium.<br>
-                ✅ <b>Pros:</b> La mejor interfaz, excelentes recomendaciones, modelos verificados, mucho contenido en 4K.<br>
-                ❌ <b>Contras:</b> Bloqueado en algunos estados de EE. UU. (se necesita VPN), anuncios agresivos de Premium.<br>
-                👉 <i>Ideal para calidad, comodidad y comunidad.</i><br><br>
+                <b>🔥 Los Clásicos</b><br>
+                <b>xHamster</b> es el rey de lo amateur y "real". <b>XVideos</b> y <b>XNXX</b> son los caballos de batalla: encuentran todo y cargan rápido. Y <b>Pornhub</b>... bueno, es Pornhub: tendencias, 4K, pero un reproductor caprichoso.<br><br>
 
-                <b>xHamster</b> — El paraíso amateur.<br>
-                ✅ <b>Pros:</b> Diseño limpio, enfoque en videos amateur reales, fotos y cams. Menos censura.<br>
-                ❌ <b>Contras:</b> Menos videos de estudios profesionales.<br>
-                👉 <i>Ideal para fans del sexo “real” y VR.</i><br><br>
+                <b>✨ Para Estetas</b><br>
+                ¿Cansado de clips cortos? <b>SpankBang</b> y <b>Tube8</b> suelen tener escenas completas. Si buscas 60fps, ve a <b>Eporner</b>.<br><br>
 
-                <b>XNXX</b> — El tubo clásico.<br>
-                ✅ <b>Pros:</b> Biblioteca masiva, carga muy rápida, extremadamente popular en todo el mundo.<br>
-                ❌ <b>Contras:</b> Diseño anticuado, muchos redireccionamientos y anuncios molestos.<br>
-                👉 <i>Ideal para navegar de forma simple y rápida entre una enorme variedad.</i><br><br>
+                <b>📱 Minimalistas</b><br>
+                <b>Thumbzilla</b>, <b>PornOne</b> e <b>IXXX</b> son para quienes odian el desorden. Clic y ver. <b>YouPorn</b> y <b>RedTube</b> son la vieja escuela estable.<br><br>
 
-                <b>YouPorn / RedTube</b> — Los clásicos.<br>
-                ✅ <b>Pros:</b> Calidad estable, interfaz sencilla (parte de la red PH).<br>
-                ❌ <b>Contras:</b> Menos contenido único, básicamente los “hermanos menores” de PH.<br>
-                👉 <i>Alternativas simples sin sobrecarga.</i>
+                <b>🎎 Asia y Anime</b><br>
+                <b>MissAV</b> es lo mejor para JAV (Japonés) porque tiene subtítulos (¡la trama importa!). <b>SupJav</b> para cantidad. Los fans del 2D viven en <b>Hentai Haven</b> y <b>Rule34</b>.<br><br>
+
+                <b>💀 Profundidad</b><br>
+                ¿Lo has visto todo? <b>Motherless</b> te sorprenderá con cero censura (extremo, shock). <b>EroMe</b> para amantes de fotos. <b>TnaFlix</b> para retro.<br><br>
+
+                <div style="background:rgba(255,255,255,0.1); padding:10px; border-radius:10px; border-left: 3px solid var(--accent); margin-top:15px;">
+                    <b>👨‍💻 Opinión del Desarrollador:</b><br>
+                    Si usas la App, recomiendo encarecidamente <b>xHamster</b> o <b>XVideos</b>. Son estables.<br><br>
+                    ¿Por qué no Pornhub? A menudo da pantalla negra en la app por sus scripts. Sitios como SpankBang molestan con la edad. Ahorra nervios: empieza con xHamster, prueba otros si te aburres.
+                </div>
             `,
 
             tip_algo_title: "Cómo funciona el Algoritmo",
@@ -13431,6 +13796,21 @@
             expl_hist: "Aus dem Archiv 📜",
             deco_label: "Dekoration anzeigen",
 
+            rnd_title: "Zufallsmodus",
+            rnd_desc: "Jedes Mal eine andere Seite",
+            guide_rnd_hint: "Ideal zum Entdecken neuer Bibliotheken.",
+
+            site_title: "Plattform wählen",
+            sm_title: "Smart-Modus",
+            sm_desc: "Auto-Auswahl basierend auf Tags",
+            guide_sm_hint: "Z.B. öffnet <b>Hentai Haven</b> für Anime, <b>MissAV</b> für JAV, <b>Motherless</b> für Extremes.",
+            sites_all: "Alle Seiten",
+
+            reset_title_select: "Datenverwaltung",
+            reset_desc_select: "Wählen Sie Kategorien zum Löschen.",
+            reset_opt_algo: "Algorithmus (Empfehlungen)",
+            btn_delete_selected: "Ausgewählte löschen",
+
             picker_title: "Zeitraum wählen",
             picker_from: "Von",
             picker_to: "Bis",
@@ -13521,30 +13901,28 @@
             tip_sites_title: "Seiten-Guide 2026",
             tip_sites_desc: "Vor- & Nachteile im Vergleich",
             tip_sites_text: `
-                <b>xVideos</b> — Die Wahl des Volkes.<br>
-                ✅ <b>Pros:</b> Größte Mediathek, lädt sofort, viele Amateur- und Nischeninhalte.<br>
-                ❌ <b>Cons:</b> Geringere Videoqualität, viele Werbeanzeigen und Spam.<br>
-                👉 <i>Ideal für maximale Vielfalt und seltene Nischen.</i><br><br>
+                Seien wir ehrlich: Giganten wie Pornhub kennst du wahrscheinlich auch ohne mich 😈. Aber jede Seite hat ihre eigene Superkraft.<br><br>
 
-                <b>Pornhub</b> — Premium-Erlebnis.<br>
-                ✅ <b>Pros:</b> Beste Benutzeroberfläche, starke Empfehlungen, verifizierte Models, viel 4K-Content.<br>
-                ❌ <b>Cons:</b> In einigen US-Bundesstaaten gesperrt (VPN erforderlich), aggressive Premium-Werbung.<br>
-                👉 <i>Ideal für Qualität, Komfort und Community.</i><br><br>
+                <b>🔥 Die Klassiker</b><br>
+                <b>xHamster</b> ist der König des Amateur-Contents. <b>XVideos</b> und <b>XNXX</b> sind die Arbeitstiere: finden alles, laden sofort. Und <b>Pornhub</b>... nun, ist Pornhub: Trends, 4K, aber ein launischer Player.<br><br>
 
-                <b>xHamster</b> — Das Amateur-Paradies.<br>
-                ✅ <b>Pros:</b> Sauberes Design, Fokus auf echte Amateurvideos, Fotos und Cams. Weniger Zensur.<br>
-                ❌ <b>Cons:</b> Weniger professionelle Studio-Videos.<br>
-                👉 <i>Ideal für Fans von „echtem“ Sex und VR.</i><br><br>
+                <b>✨ Für Ästheten</b><br>
+                Genervt von kurzen Clips? <b>SpankBang</b> und <b>Tube8</b> haben oft volle Szenen. Wenn du 60fps willst, geh zu <b>Eporner</b>.<br><br>
 
-                <b>XNXX</b> — Der klassische Tube.<br>
-                ✅ <b>Pros:</b> Riesige Mediathek, sehr schnelle Ladezeiten, weltweit extrem beliebt.<br>
-                ❌ <b>Cons:</b> Altmodisches Design, viele Weiterleitungen und nervige Werbung.<br>
-                👉 <i>Ideal für einfaches und schnelles Browsen durch eine riesige Vielfalt.</i><br><br>
+                <b>📱 Minimalistisch</b><br>
+                <b>Thumbzilla</b>, <b>PornOne</b> und <b>IXXX</b> sind für alle, die Chaos hassen. Klick und schau. <b>YouPorn</b> und <b>RedTube</b> sind die stabile alte Schule.<br><br>
 
-                <b>YouPorn / RedTube</b> — Die Klassiker.<br>
-                ✅ <b>Pros:</b> Stabile Qualität, einfache Oberfläche (Teil des PH-Netzwerks).<br>
-                ❌ <b>Cons:</b> Weniger einzigartige Inhalte, im Grunde die „kleinen Brüder“ von PH.<br>
-                👉 <i>Einfache Alternativen ohne Ballast.</i>
+                <b>🎎 Asien & Anime</b><br>
+                <b>MissAV</b> ist top für JAV (Japanisch) wegen Untertiteln (Handlung zählt!). <b>SupJav</b> für Menge. 2D-Fans leben auf <b>Hentai Haven</b> und <b>Rule34</b>.<br><br>
+
+                <b>💀 Das tiefe Ende</b><br>
+                Alles gesehen? <b>Motherless</b> überrascht mit null Zensur (Extrem, Schock). <b>EroMe</b> für Foto-Liebhaber. <b>TnaFlix</b> für Retro.<br><br>
+
+                <div style="background:rgba(255,255,255,0.1); padding:10px; border-radius:10px; border-left: 3px solid var(--accent); margin-top:15px;">
+                    <b>👨‍💻 Tipp des Entwicklers:</b><br>
+                    Wenn du die App nutzt, empfehle ich <b>xHamster</b> oder <b>XVideos</b>. Sie laufen stabil.<br><br>
+                    Warum nicht Pornhub? Es zeigt in der App oft einen schwarzen Bildschirm. Seiten wie SpankBang nerven mit Altersprüfung. Spar dir die Nerven: Starte mit xHamster, probiere andere nur bei Langeweile.
+                </div>
             `,
 
             tip_algo_title: "Wie der Algorithmus funktioniert",
@@ -14717,6 +15095,7 @@
         renderModifiers();
         renderHistory();
         updateCounts();
+        updateSiteLabelUI()
 
         document.getElementById('app-version-label').innerText = CHANGELOG_DATA[0].ver;
         
@@ -16120,94 +16499,178 @@
         if (descEl) descEl.innerText = desc || "";
     }
 
+    function openSitesModal() {
+        renderSitesList();
+        
+        const isSmart = localStorage.getItem('xch_smart_sites') === 'true';
+        const isRandom = localStorage.getItem('xch_random_sites') === 'true';
+        
+        document.getElementById('smart-site-toggle').checked = isSmart;
+        document.getElementById('random-site-toggle').checked = isRandom;
+
+        document.getElementById('modal-sites-overlay').classList.add('open');
+    }
+
+    function closeSitesModal(e, force) {
+        if (force || e.target.id === 'modal-sites-overlay') {
+            document.getElementById('modal-sites-overlay').classList.remove('open');
+        }
+    }
+
+    // 2. РЕНДЕР СПИСКА
+    function renderSitesList() {
+        const container = document.getElementById('sites-list-container');
+        container.innerHTML = '';
+        
+        const currentSiteId = localStorage.getItem('xch_platform') || 'xh';
+        const lang = ['en','ru','es','de'].includes(currentLang) ? currentLang : 'en';
+
+        SITES_DATA.forEach(site => {
+            const isSelected = (site.id === currentSiteId);
+            const desc = site.desc[lang] || site.desc.en;
+
+            const div = document.createElement('div');
+            div.className = `site-card ${isSelected ? 'selected' : ''}`;
+            div.onclick = () => selectGlobalSite(site.id);
+
+            div.innerHTML = `
+                <div class="site-info">
+                    <div class="site-name">${site.name}</div>
+                    <div class="site-desc">${desc}</div>
+                </div>
+                <div class="site-check">✓</div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    // 3. ВЫБОР САЙТА (Глобально)
+    function selectGlobalSite(id) {
+        localStorage.setItem('xch_platform', id);
+        
+        // Если выбрали конкретный сайт — выключаем автоматику
+        localStorage.setItem('xch_smart_sites', 'false');
+        localStorage.setItem('xch_random_sites', 'false');
+        
+        // Визуально обновляем переключатели, если окно открыто
+        const smToggle = document.getElementById('smart-site-toggle');
+        const rndToggle = document.getElementById('random-site-toggle');
+        if(smToggle) smToggle.checked = false;
+        if(rndToggle) rndToggle.checked = false;
+
+        renderSitesList(); 
+        updateSiteLabelUI();
+        updateLink(); 
+        
+        if(navigator.vibrate) navigator.vibrate(10);
+        setTimeout(() => {
+            document.getElementById('modal-sites-overlay').classList.remove('open');
+        }, 200);
+    }
+
+    // 4. ПЕРЕКЛЮЧЕНИЕ РЕЖИМОВ ДЛЯ САЙТОВ
+    function toggleSmartSites(enabled) {
+        localStorage.setItem('xch_smart_sites', enabled);
+        if (enabled) {
+            localStorage.setItem('xch_random_sites', 'false');
+            document.getElementById('random-site-toggle').checked = false;
+        }
+        updateSiteLabelUI();
+        updateLink();
+    }
+
+    function toggleRandomSites(enabled) {
+        localStorage.setItem('xch_random_sites', enabled);
+        if (enabled) {
+            localStorage.setItem('xch_smart_sites', 'false');
+            document.getElementById('smart-site-toggle').checked = false;
+        }
+        updateSiteLabelUI();
+        updateLink();
+    }
+
+    // 5. ОБНОВЛЕНИЕ ТЕКСТА В НАСТРОЙКАХ
+    function updateSiteLabelUI() {
+        const label = document.getElementById('current-site-label');
+        if (!label) return;
+
+        const currentId = localStorage.getItem('xch_platform') || 'xh';
+        const isSmart = localStorage.getItem('xch_smart_sites') === 'true';
+        const isRandom = localStorage.getItem('xch_random_sites') === 'true';
+        
+        const siteObj = SITES_DATA.find(s => s.id === currentId);
+        let text = siteObj ? siteObj.name : 'xHamster';
+
+        if (isSmart) {
+            text = `🧠 Smart / ${text}`; // Показываем Smart + (Fallback сайт)
+        } else if (isRandom) {
+            text = `🎲 Random`;
+        }
+
+        label.innerText = text;
+    }
+
     function updateLink() {
         const btnWatch = document.getElementById('btn-t-watch');
-        
         if (isPanicMode) {
-            if(btnWatch) {
-                btnWatch.removeAttribute('href');
-                btnWatch.removeAttribute('target');
-            }
+            if(btnWatch) { btnWatch.removeAttribute('href'); btnWatch.removeAttribute('target'); }
             return;
         }
 
-        // 1. Получаем то, что выбрал ПОЛЬЗОВАТЕЛЬ в настройках
-        const userSelectedPlatform = document.getElementById('platform') ? document.getElementById('platform').value : 'xh';
-        
-        // 2. Определяем реальную платформу для ссылки (внутренняя логика)
-        let targetPlatform = userSelectedPlatform;
-
-        // Если стоит "Random", но у предмета уже есть закрепленный сайт -> используем его для ССЫЛКИ
-        if (userSelectedPlatform === 'random' && currentItem && currentItem.assignedPlatform) {
-            targetPlatform = currentItem.assignedPlatform;
-        }
-        else if (userSelectedPlatform === 'random') {
-            targetPlatform = 'xh'; // Фолбек
-        }
-
-        const root = document.documentElement;
-        const currentThemeId = localStorage.getItem('xch_theme_id') || 'dark';
-        const currentTheme = APP_THEMES.find(t => t.id === currentThemeId);
-
-        // Цвета конкретных сайтов
-        const colors = {
-            'xh': ['#d81b60', '#8e24aa'], 
-            'ph': ['#ff9900', '#ffbd55'],
-            'xv': ['#de2828', '#ff6b6b'],
-            'xn': ['#0055ff', '#00aaff'],
-            'yp': ['#ff3366', '#ff668a'],
-            'rt': ['#ff0000', '#ff4d4d'],
-            'google': ['#4285F4', '#7aaafc'],
-            'default': ['#ff00cc', '#CB53F0'] 
-        };
-        
-        // Если пользователь выбрал "Random", мы показываем ДЕФОЛТНЫЕ цвета, чтобы не палить контору.
-        // Если выбран конкретный сайт, показываем цвета сайта.
-        let colorKey = (userSelectedPlatform === 'random') ? 'default' : targetPlatform;
-        
-        const [platMain, platLight] = colors[colorKey] || colors['xh'];
-
-        // Применяем цвета, только если тема не имеет своих жестких акцентов (как в премиум темах)
-        if (!currentTheme || !currentTheme.accent) {
-            root.style.setProperty('--accent', platMain);
-            root.style.setProperty('--accent-light', platLight);
-        }
-
         if(!currentItem) return;
+
+        // 1. Получаем настройки
+        const userSiteId = localStorage.getItem('xch_platform') || 'xh';
+        const isSmart = localStorage.getItem('xch_smart_sites') === 'true';
+        const isRandom = localStorage.getItem('xch_random_sites') === 'true';
+        const forceEn = document.getElementById('force-en') ? document.getElementById('force-en').checked : false;
         
-        const forceEn = document.getElementById('force-en').checked;
+        let targetSiteId = userSiteId;
+
+        // 2. ПРИОРИТЕТ 1: RANDOM MODE
+        if (isRandom) {
+            // Выбираем случайный сайт из списка SITES_DATA
+            const randomSite = SITES_DATA[Math.floor(Math.random() * SITES_DATA.length)];
+            targetSiteId = randomSite.id;
+        }
+        // 3. ПРИОРИТЕТ 2: SMART MODE
+        else if (isSmart) {
+            const itemTags = currentItem.tags;
+            const matches = (tags) => itemTags.some(t => tags.includes(t));
+
+            if (matches(['jav'])) targetSiteId = 'miss'; 
+            else if (matches(['hentai', 'anime', 'cartoon'])) targetSiteId = 'hh'; 
+            else if (matches(['rule34', '3d', 'sfm', 'overwatch'])) targetSiteId = 'r34';
+            else if (matches(['extreme', 'scat', 'piss', 'vomit', 'fetish'])) targetSiteId = 'mom'; 
+            else if (matches(['pics', 'albums'])) targetSiteId = 'ero';
+            else if (matches(['amateur', 'homemade', 'real']) && userSiteId !== 'xv') targetSiteId = 'xh';
+            else if (matches(['hd', '4k']) && userSiteId !== 'epo') targetSiteId = 'sb';
+        }
+
+        // 4. Получаем объект сайта
+        const targetSite = SITES_DATA.find(s => s.id === targetSiteId) || SITES_DATA[0];
+
+        // 5. Формируем запрос
         const useRu = (currentLang === 'ru' && !forceEn);
-        
         let queryName = useRu ? (currentItem.name_ru || currentItem.name) : currentItem.name;
+        
         let queryParts = [queryName];
         
         if (typeof activeMods !== 'undefined') {
             activeMods.forEach(key => {
                 const mod = modifiersData.find(m => m.key === key);
-                queryParts.push(useRu ? mod.ru : mod.en);
+                if (mod) queryParts.push(useRu ? mod.ru : mod.en);
+                else queryParts.push(key);
             });
         }
+
+        const sep = targetSite.sep || '+';
+        const q = queryParts.join(sep).toLowerCase();
         
-        let plusQuery = queryParts.join("+").toLowerCase();
-        let url = "";
-        
-        // Генерируем ссылку на основе РЕАЛЬНОЙ платформы (targetPlatform)
-        if (targetPlatform === 'google') {
-            url = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(queryParts.join(" ") + " porn")}`;
-        } else {
-            switch(targetPlatform) {
-                case 'xh': url = `https://xhamster.com/search/${plusQuery}`; break;
-                case 'ph': url = `https://www.pornhub.com/video/search?search=${plusQuery}`; break;
-                case 'xv': url = `https://www.xvideos.com/?k=${plusQuery}`; break;
-                case 'xn': url = `https://www.xnxx.com/search/${plusQuery}`; break;
-                case 'yp': url = `https://www.youporn.com/search/?query=${plusQuery}`; break;
-                case 'rt': url = `https://www.redtube.com/?search=${plusQuery}`; break;
-                default: url = `https://xhamster.com/search/${plusQuery}`; break;
-            }
-        }
-        
+        const finalUrl = targetSite.url.replace('{q}', q);
+
         if(btnWatch) {
-            btnWatch.href = url;
+            btnWatch.href = finalUrl;
             btnWatch.target = "_blank";
         }
     }
@@ -17461,7 +17924,7 @@
             }
         });
     }
-    
+
     function applyCustomRange() {
         const t = langData[currentLang] || langData['en'];
         
@@ -18366,6 +18829,125 @@
             }
             
             alert(t.reset_done);
+        }
+    }
+
+    function openResetModal() {
+        // Сбрасываем чекбоксы при открытии (для безопасности)
+        document.getElementById('chk-reset-fav').checked = false;
+        document.getElementById('chk-reset-ban').checked = false;
+        document.getElementById('chk-reset-hist').checked = false;
+        document.getElementById('chk-reset-algo').checked = false;
+        document.getElementById('chk-reset-expl').checked = false;
+        
+        // Скрываем предыдущее модальное окно (если открыто окно синхронизации)
+        closeSyncInfoModal(null, true);
+        
+        document.getElementById('modal-reset-selection').classList.add('open');
+    }
+
+    function closeResetModal(e, force) {
+        if (force || e.target.id === 'modal-reset-selection') {
+            document.getElementById('modal-reset-selection').classList.remove('open');
+        }
+    }
+
+    async function performPartialReset() {
+        const resetFav = document.getElementById('chk-reset-fav').checked;
+        const resetBan = document.getElementById('chk-reset-ban').checked;
+        const resetHist = document.getElementById('chk-reset-hist').checked;
+        const resetAlgo = document.getElementById('chk-reset-algo').checked;
+        const resetExpl = document.getElementById('chk-reset-expl').checked;
+
+        // Если ничего не выбрано
+        if (!resetFav && !resetBan && !resetHist && !resetAlgo && !resetExpl) {
+            return;
+        }
+
+        const t = langData[currentLang] || langData['en'];
+        
+        if (!confirm(t.confirm_reset || "Are you sure?")) return;
+
+        // 1. ЛАЙКИ
+        if (resetFav) {
+            favorites = favorites.filter(id => protectedFavorites.includes(id)); 
+            favorites = []; 
+            localStorage.setItem(STORAGE.FAVORITES, JSON.stringify(favorites));
+            
+            for (const id in itemScores) {
+                if (itemScores[id] > 0) delete itemScores[id];
+            }
+            localStorage.setItem('xch_item_scores', JSON.stringify(itemScores));
+        }
+
+        // 2. ДИЗЛАЙКИ
+        if (resetBan) {
+            blacklist = [];
+            localStorage.setItem(STORAGE.BLACKLIST, JSON.stringify(blacklist));
+            
+            // Очистка очков < 0
+            for (const id in itemScores) {
+                if (itemScores[id] < 0) delete itemScores[id];
+            }
+            localStorage.setItem('xch_item_scores', JSON.stringify(itemScores));
+        }
+
+        // 3. ИСТОРИЯ (Свайпы + Просмотры + Wrapped)
+        if (resetHist) {
+            historyData = [];
+            watchHistory = [];
+            activityLog = [];
+            wrappedArchive = [];
+            
+            localStorage.setItem(STORAGE.HISTORY, JSON.stringify([]));
+            localStorage.setItem(STORAGE.WATCH_HISTORY, JSON.stringify([]));
+            localStorage.setItem(STORAGE.ACTIVITY_LOG, JSON.stringify([]));
+            localStorage.setItem('xch_wrapped_archive', JSON.stringify([]));
+            localStorage.setItem('xch_active_days', JSON.stringify([]));
+            
+            // Сбрасываем кнопку Wrapped
+            const wBtn = document.getElementById('btn-wrapped-trigger');
+            if (wBtn) wBtn.style.display = 'none';
+        }
+
+        // 4. АЛГОРИТМ (Веса тегов)
+        if (resetAlgo) {
+            tagScores = {};
+            localStorage.setItem(STORAGE.TAG_SCORES, JSON.stringify({}));
+        }
+
+        // 5. ОТКРЫТЫЕ ФЕТИШИ (Explored)
+        if (resetExpl) {
+            permanentExplored = new Set();
+            achievementDates = {};
+            localStorage.setItem('xch_permanent_explored', JSON.stringify([]));
+            localStorage.setItem('xch_achievement_dates', JSON.stringify({}));
+        }
+
+        // ОБНОВЛЕНИЕ UI
+        updateCounts();
+        updateExploredCount();
+        renderHistory();
+        updateActionButtons(); // Если текущая карточка была лайкнута, кнопка должна стать серой
+        
+        // Синхронизация с облаком (если залогинен)
+        if (window.isUserLoggedIn) {
+            const btn = document.querySelector('#modal-reset-selection .btn-gen');
+            const oldText = btn.innerText;
+            btn.innerText = "Syncing...";
+            
+            await window.syncToCloud(true); // Принудительная отправка
+            
+            btn.innerText = oldText;
+        }
+
+        closeResetModal(null, true);
+        alert(t.reset_done || "Done.");
+        
+        // Если сбросили алгоритм или историю — лучше перезагрузить страницу, 
+        // чтобы слоты генератора обновились
+        if (resetAlgo || resetHist) {
+            location.reload();
         }
     }
 
