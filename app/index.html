@@ -6836,83 +6836,112 @@
 
         /* --- УЛУЧШЕННЫЙ ДИЗАЙН КАЛЕНДАРЯ --- */
 
-        /* Контейнер для капсул ввода */
         .date-capsule-row {
             display: flex;
             gap: 15px;
             padding: 20px 20px 10px 20px;
-            background: transparent !important; /* Убираем фон */
-            border-bottom: none !important; /* Убираем разделитель */
-            flex-shrink: 0;
+            background: transparent !important;
+            flex-shrink: 0; /* Чтобы шапка не сжималась при скролле */
+            z-index: 10;
         }
 
-        /* Сами капсулы (Начало / Конец) */
+        /* Капсула (теперь с relative для позиционирования инпута) */
         .date-capsule {
             flex: 1;
             background: var(--ios-card);
             border: 1px solid var(--border);
-            border-radius: 50px; /* Полная капсула */
-            padding: 12px;
-            text-align: center;
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-secondary);
-            transition: all 0.2s ease;
+            border-radius: 50px;
+            padding: 0; /* Убираем паддинг, чтобы инпут занял всё место */
+            height: 46px;
+            position: relative; /* Важно! */
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 44px;
+            transition: all 0.2s ease;
         }
 
-        /* Активное состояние капсулы (когда дата выбрана) */
-        .date-capsule.filled {
-            color: var(--text-main);
-            border-color: var(--accent);
-            background: var(--nav-bg);
-        }
-
+        /* Текст внутри капсулы */
         .date-capsule span {
-            pointer-events: none;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            pointer-events: none; /* Клики проходят сквозь текст на инпут */
+            z-index: 1;
+        }
+
+        /* СКРЫТЫЙ ИНПУТ ПОВЕРХ КАПСУЛЫ */
+        /* Это позволяет открывать нативный календарь телефона при нажатии */
+        .date-capsule-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0; /* Делаем невидимым */
+            cursor: pointer;
+            z-index: 2; /* Лежит поверх всего */
+        }
+
+        .date-capsule.filled {
+            background: var(--nav-bg);
+            border-color: var(--accent);
+        }
+        .date-capsule.filled span {
+            color: var(--text-main);
+        }
+
+        /* Контейнер скролла */
+        #calendar-scroll-container {
+            flex: 1;
+            overflow-y: auto;
+            /* Важно для iOS: инерционный скролл */
+            -webkit-overflow-scrolling: touch; 
+            padding: 10px 15px 100px 15px; /* Большой отступ снизу, чтобы кнопка не перекрывала */
+            background: transparent;
+            position: relative;
+            z-index: 5;
         }
 
         /* Карточка месяца */
         .calendar-month-card {
             background: var(--ios-card);
-            border-radius: 24px; /* Крупные закругления */
+            border-radius: 24px;
             padding: 20px;
-            margin-bottom: 15px; /* Отступ между месяцами */
+            margin-bottom: 15px;
             border: 1px solid var(--border);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
         }
 
         .calendar-month-title {
             font-size: 15px !important;
-            text-transform: capitalize !important; /* Первая буква заглавная */
-            letter-spacing: 0.5px;
+            text-transform: capitalize !important;
             margin-bottom: 15px !important;
             color: var(--text-main) !important;
-            opacity: 0.9;
+            text-align: center;
+            font-weight: 800;
         }
 
-        /* Сетка дней */
         .calendar-grid {
             display: grid; 
             grid-template-columns: repeat(7, 1fr); 
-            gap: 8px; /* Больше воздуха между днями */
+            gap: 8px; 
         }
 
-        /* Круглые дни */
+        /* Дни-кружочки */
         .calendar-day {
             width: 100%;
-            aspect-ratio: 1 / 1; /* Строгий квадрат для круга */
-            border-radius: 50% !important; /* Круг */
+            aspect-ratio: 1 / 1;
+            border-radius: 50% !important;
             font-size: 13px !important;
             font-weight: 500;
-            background: transparent;
-            border: 1px solid transparent; /* Чтобы не прыгало при выделении */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            cursor: pointer;
         }
 
-        /* Выбранные дни */
+        .calendar-day.disabled { opacity: 0.2; pointer-events: none; }
+
         .calendar-day.selected {
             background: var(--accent) !important;
             color: #000 !important;
@@ -6920,41 +6949,37 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
-        /* Диапазон (между началом и концом) */
         .calendar-day.in-range {
-            background: rgba(255, 0, 204, 0.15) !important; /* Легкий фон */
+            background: rgba(255, 0, 204, 0.15) !important;
             color: var(--accent) !important;
-            border-radius: 50% !important; /* Все равно круги */
             font-weight: 700;
         }
 
-        /* Кнопка подтверждения (плавающая) */
+        /* Плавающая кнопка (Градиент снизу) */
         .confirm-floating-container {
-            padding: 20px;
-            background: transparent !important; /* Убираем фон */
-            border-top: none !important; /* Убираем линию */
             position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            pointer-events: none; /* Чтобы клики проходили сквозь пустоту */
+            bottom: 0; left: 0; width: 100%;
+            padding: 20px 20px 30px 20px; /* Отступ снизу для iPhone (Home bar) */
+            background: linear-gradient(to top, var(--bg-color) 40%, transparent 100%) !important;
             display: flex;
             justify-content: center;
-            background: linear-gradient(to top, var(--bg-color) 20%, transparent 100%) !important; /* Градиент внизу для красоты */
+            pointer-events: none; /* Пропускает клики сквозь градиент */
+            z-index: 20;
         }
 
         .btn-confirm-capsule {
-            pointer-events: auto; /* Возвращаем клики кнопке */
-            width: 90% !important;
-            max-width: 300px;
-            padding: 14px !important;
+            pointer-events: auto; /* Сама кнопка кликабельна */
+            width: 100% !important;
+            max-width: 320px;
+            padding: 16px !important;
             border-radius: 50px !important;
             font-size: 16px !important;
             font-weight: 800 !important;
             text-transform: uppercase;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3) !important;
             background: var(--text-main) !important;
             color: var(--bg-color) !important;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4) !important;
+            border: none;
         }
 
         /* =========================================
@@ -7948,31 +7973,35 @@
 
 <!-- RANGE PICKER -->
 <div class="modal-overlay" id="modal-date-picker" onclick="closeDatePicker(event)">
-    <div class="modal" style="height: 85vh; max-height: 700px; background: var(--bg-color) !important;">
+    <div class="modal" style="height: 90vh; height: 90dvh; max-height: 800px; background: var(--bg-color) !important; border-radius: 24px 24px 0 0 !important;">
+        
         <div class="modal-header">
             <div class="modal-close-btn" onclick="closeDatePicker(null, true)"><div class="modal-close-icon"></div></div>
             <span data-key="picker_title">Select Range</span>
         </div>
         
-        <div class="modal-body" style="display:flex; flex-direction:column; padding:0; overflow: hidden; position: relative;">
+        <div class="modal-body" style="display:flex; flex-direction:column; padding:0; overflow: hidden; position: relative; height: 100%;">
             
-            <!-- 1. Капсулы дат (Начало / Конец) -->
+            <!-- 1. Капсулы дат -->
             <div class="date-capsule-row">
                 <div id="capsule-start" class="date-capsule">
                     <span id="capsule-start-text">Start</span>
+                    <input type="date" id="native-start" class="date-capsule-input" onchange="handleManualDate('start', this.value)">
                 </div>
-                <div style="display:flex; align-items:center; opacity:0.3;">➝</div>
+                
+                <div style="display:flex; align-items:center; opacity:0.3; font-size: 18px;">➝</div>
+                
                 <div id="capsule-end" class="date-capsule">
                     <span id="capsule-end-text">End</span>
+                    <input type="date" id="native-end" class="date-capsule-input" onchange="handleManualDate('end', this.value)">
                 </div>
             </div>
 
             <!-- 2. Скролл календаря -->
-            <div id="calendar-scroll-container" style="flex:1; overflow-y:auto; padding:10px 15px 100px 15px; background: transparent;">
-                <!-- JS генерирует месяцы здесь -->
+            <div id="calendar-scroll-container">
             </div>
 
-            <!-- 3. Плавающая кнопка подтверждения -->
+            <!-- 3. Плавающая кнопка -->
             <div class="confirm-floating-container">
                 <button class="btn-gen btn-confirm-capsule" onclick="applyCustomRange()" data-key="picker_confirm">
                     Confirm
@@ -17248,65 +17277,110 @@
         updateCalendarSelection();
     }
 
+    function handleManualDate(type, value) {
+        if (!value) return;
+        
+        // value приходит в формате "YYYY-MM-DD"
+        const dateParts = value.split('-');
+        const dateObj = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+        
+        if (type === 'start') {
+            customRangeStart = dateObj;
+            // Если конец меньше начала, сбрасываем конец
+            if (customRangeEnd && customRangeEnd < customRangeStart) {
+                customRangeEnd = null;
+            }
+        } else {
+            customRangeEnd = dateObj;
+            // Если начало не выбрано, ставим его таким же
+            if (!customRangeStart) {
+                customRangeStart = dateObj;
+            } 
+            // Если конец меньше начала, меняем их местами
+            else if (customRangeEnd < customRangeStart) {
+                const temp = customRangeStart;
+                customRangeStart = customRangeEnd;
+                customRangeEnd = temp;
+            }
+        }
+        
+        updateCalendarSelection();
+        renderCalendarList(); 
+    }
+
     function updateCalendarSelection() {
         const days = document.querySelectorAll('.calendar-day');
         
-        // Элементы капсул
         const startCapsule = document.getElementById('capsule-start');
         const endCapsule = document.getElementById('capsule-end');
         const startText = document.getElementById('capsule-start-text');
         const endText = document.getElementById('capsule-end-text');
+        
+        // Инпуты для синхронизации значения (чтобы в пикере открывалась выбранная дата)
+        const startInput = document.getElementById('native-start');
+        const endInput = document.getElementById('native-end');
 
-        // Локализация слов "Начало" и "Конец"
+        // Локализация
         const t = {
             start: { en: "Start", ru: "Начало", es: "Inicio", de: "Start" },
             end:   { en: "End", ru: "Конец", es: "Fin", de: "Ende" }
         };
         const lang = ['en','ru','es','de'].includes(currentLang) ? currentLang : 'en';
 
-        // Форматирование даты
-        const fmt = (d) => {
+        // Форматтера для текста в капсуле (DD.MM.YY)
+        const fmtDisplay = (d) => {
             if (!d) return null;
             const dd = String(d.getDate()).padStart(2, '0');
             const mm = String(d.getMonth() + 1).padStart(2, '0');
-            const yy = String(d.getFullYear()).slice(-2); // Берем последние 2 цифры года
+            const yy = String(d.getFullYear()).slice(-2);
             return `${dd}.${mm}.${yy}`;
         };
 
-        // Обновляем текст и стили капсул
+        // Форматтер для value инпута (YYYY-MM-DD)
+        const fmtInput = (d) => {
+            if (!d) return "";
+            const dd = String(d.getDate()).padStart(2, '0');
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const yyyy = d.getFullYear();
+            return `${yyyy}-${mm}-${dd}`;
+        };
+
+        // Обновляем НАЧАЛО
         if (customRangeStart) {
-            startText.innerText = fmt(customRangeStart);
+            startText.innerText = fmtDisplay(customRangeStart);
             startCapsule.classList.add('filled');
+            if(startInput) startInput.value = fmtInput(customRangeStart);
         } else {
             startText.innerText = t.start[lang];
             startCapsule.classList.remove('filled');
+            if(startInput) startInput.value = "";
         }
 
+        // Обновляем КОНЕЦ
         if (customRangeEnd) {
-            endText.innerText = fmt(customRangeEnd);
+            endText.innerText = fmtDisplay(customRangeEnd);
             endCapsule.classList.add('filled');
+            if(endInput) endInput.value = fmtInput(customRangeEnd);
         } else {
             endText.innerText = t.end[lang];
             endCapsule.classList.remove('filled');
+            if(endInput) endInput.value = "";
         }
 
-        // Обновляем визуальное состояние дней в календаре
+        // Подсветка дней в календаре
         days.forEach(day => {
             const dStr = day.dataset.date;
             if (!dStr) return;
             
             const d = new Date(dStr);
-            // Сбрасываем время для корректного сравнения
             d.setHours(0,0,0,0);
-            
-            // Получаем timestamp для сравнения
             const dTime = d.getTime();
+            
             const sTime = customRangeStart ? customRangeStart.getTime() : null;
             const eTime = customRangeEnd ? customRangeEnd.getTime() : null;
 
             day.classList.remove('selected', 'in-range');
             
-            // Логика выделения
             if (sTime && dTime === sTime) day.classList.add('selected');
             if (eTime && dTime === eTime) day.classList.add('selected');
             
