@@ -9334,7 +9334,7 @@
         getFirestore, doc, setDoc, addDoc, getDoc, getDocs, updateDoc, 
         serverTimestamp, writeBatch, query, where, collection, 
         deleteField, Timestamp, limit, orderBy, 
-        initializeFirestore, persistentLocalCache, getCountFromServer
+        initializeFirestore, persistentLocalCache, getCountFromServer, persistentMultipleTabManager
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -9352,7 +9352,9 @@
     const auth = getAuth(app);
     window.auth = auth;
     const db = initializeFirestore(app, {
-        localCache: persistentLocalCache()
+        localCache: persistentLocalCache({
+            tabManager: persistentMultipleTabManager() 
+        })
     });
     let cachedUserProfile = null;
     window.cachedUserProfile = null; 
@@ -9628,7 +9630,9 @@
                 if (plan === 'bestie') {
                     subDesc.innerText = t.feat_lifetime.replace('<b>','').replace('</b>',''); 
                 } else if (d.expiresAt && plan !== 'free') {
-                    const expDate = d.expiresAt.toDate ? d.expiresAt.toDate() : new Date(d.expiresAt);
+                    const expDate = (d.expiresAt && typeof d.expiresAt.toDate === 'function') 
+                        ? d.expiresAt.toDate() 
+                        : new Date(d.expiresAt || Date.now());
                     subDesc.innerText = `${t.sub_exp || 'Expires:'} ${expDate.toLocaleDateString()}`;
                 } else {
                     subDesc.innerText = plan === 'free' ? "Standard Account" : "Active";
@@ -9974,8 +9978,12 @@
                 const histMap = new Map();
                 [...localHist, ...cloudHist].forEach(item => histMap.set(item.id, item));
                 const mergedHistory = Array.from(histMap.values())
-                    .filter(item => item && item.timestamp) // Проверка на валидность
-                    .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
+                    .filter(item => item && (item.timestamp || item.ts))
+                    .sort((a, b) => {
+                        const tA = a.timestamp?.seconds || a.timestamp || 0;
+                        const tB = b.timestamp?.seconds || b.timestamp || 0;
+                        return tB - tA;
+                    })
                     .slice(0, 100);
                 
                 localStorage.setItem('xch_history', JSON.stringify(mergedHistory));
@@ -9987,11 +9995,13 @@
                 
                 // Объединяем. Ключ уникальности: ID + Время просмотра (чтобы не дублировать один и тот же сеанс)
                 const watchMap = new Map();
-                [...localWatch, ...cloudWatch].forEach(item => {
-                    // Генерируем уникальный ключ для сеанса просмотра
-                    const key = `${item.id}_${item.timestamp}`;
-                    watchMap.set(key, item);
-                });
+                    [...localWatch, ...cloudWatch].forEach(item => {
+                        if (item && item.id) { // Защита от null
+                            const ts = item.timestamp?.seconds || item.timestamp || 0;
+                            const key = `${item.id}_${ts}`;
+                            watchMap.set(key, item);
+                        }
+                    });
                 
                 const mergedWatch = Array.from(watchMap.values()).sort((a, b) => b.timestamp - a.timestamp).slice(0, 200); // Храним последние 200 просмотров
                 
@@ -24134,15 +24144,6 @@
         Whether you are looking for a <strong>porn history tracker</strong>, a safe way to explore new kinks, or simply a better way to browse adult content, xFetishHub is your private home for digital intimacy.
     </p>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>
-    eruda.init();
-    console.log("Eruda initialized");
-    window.onerror = function(msg, url, line) {
-        console.error("Ошибка JS: " + msg + " на строке " + line);
-    };
-</script>
 
 </body>
 </html>
