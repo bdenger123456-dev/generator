@@ -6851,13 +6851,12 @@
             background: var(--ios-card);
             border: 1px solid var(--border);
             border-radius: 50px;
-            padding: 0; /* Убираем паддинг, чтобы инпут занял всё место */
             height: 46px;
-            position: relative; /* Важно! */
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s ease;
+            overflow: hidden; /* Чтобы каретка не вылезала */
         }
 
         /* Текст внутри капсулы */
@@ -6869,17 +6868,35 @@
             z-index: 1;
         }
 
-        /* СКРЫТЫЙ ИНПУТ ПОВЕРХ КАПСУЛЫ */
-        /* Это позволяет открывать нативный календарь телефона при нажатии */
         .date-capsule-input {
-            position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
-            opacity: 0; /* Делаем невидимым */
-            cursor: pointer;
-            z-index: 2; /* Лежит поверх всего */
+            background: transparent;
+            border: none;
+            outline: none;
+            text-align: center;
+            
+            font-family: var(--font-main);
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-secondary); 
+            
+            padding: 0 10px;
+            border-radius: 50px;
+        }
+
+        .date-capsule-input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.5;
+            font-weight: 600;
+        }
+
+        .date-capsule.filled .date-capsule-input {
+            color: var(--text-main); 
+        }
+
+        .date-capsule-input:focus {
+            background: rgba(255,255,255,0.05);
         }
 
         .date-capsule.filled {
@@ -7982,23 +7999,22 @@
         
         <div class="modal-body" style="display:flex; flex-direction:column; padding:0; overflow: hidden; position: relative; height: 100%;">
             
-            <!-- 1. Капсулы дат -->
+            <!-- 1. Капсулы с РУЧНЫМ вводом -->
             <div class="date-capsule-row">
                 <div id="capsule-start" class="date-capsule">
-                    <span id="capsule-start-text">Start</span>
-                    <input type="date" id="native-start" class="date-capsule-input" onchange="handleManualDate('start', this.value)">
+                    <input type="tel" id="input-start" class="date-capsule-input" placeholder="Start" maxlength="10" autocomplete="off">
                 </div>
                 
                 <div style="display:flex; align-items:center; opacity:0.3; font-size: 18px;">➝</div>
                 
                 <div id="capsule-end" class="date-capsule">
-                    <span id="capsule-end-text">End</span>
-                    <input type="date" id="native-end" class="date-capsule-input" onchange="handleManualDate('end', this.value)">
+                    <input type="tel" id="input-end" class="date-capsule-input" placeholder="End" maxlength="10" autocomplete="off">
                 </div>
             </div>
 
             <!-- 2. Скролл календаря -->
             <div id="calendar-scroll-container">
+                <!-- JS генерирует месяцы здесь -->
             </div>
 
             <!-- 3. Плавающая кнопка -->
@@ -17173,14 +17189,87 @@
     let customRangeEnd = null;
 
     function openDatePicker() {
-        // Проверка подписки
         if (subscriptionLevel === 'free') {
             openSubModal();
             return;
         }
-
+        
         renderCalendarList();
+        
+        // Навешиваем слушатели на инпуты
+        initDateInputListeners();
+        
+        // Локализация плейсхолдеров
+        const t = { start: { en: "Start", ru: "Начало" }, end: { en: "End", ru: "Конец" } };
+        const lang = ['ru'].includes(currentLang) ? 'ru' : 'en';
+        
+        document.getElementById('input-start').placeholder = t.start[lang];
+        document.getElementById('input-end').placeholder = t.end[lang];
+
         document.getElementById('modal-date-picker').classList.add('open');
+    }
+
+    function initDateInputListeners() {
+        const startInput = document.getElementById('input-start');
+        const endInput = document.getElementById('input-end');
+
+        // Функция обработки ввода
+        const handleInput = (e, type) => {
+            let val = e.target.value.replace(/\D/g, ''); // Удаляем всё кроме цифр
+            
+            // Ограничиваем длину (DDMMYYYY = 8 цифр)
+            if (val.length > 8) val = val.slice(0, 8);
+
+            // Добавляем точки: 06.02.2026
+            let formatted = val;
+            if (val.length >= 5) {
+                formatted = val.slice(0, 2) + '.' + val.slice(2, 4) + '.' + val.slice(4);
+            } else if (val.length >= 3) {
+                formatted = val.slice(0, 2) + '.' + val.slice(2);
+            }
+            
+            e.target.value = formatted; // Возвращаем в поле
+
+            // Если дата введена полностью (10 символов: 01.01.2000)
+            if (formatted.length === 10) {
+                parseAndApplyDate(formatted, type);
+            }
+        };
+
+        // Навешиваем (удаляя старые чтобы не дублировать)
+        startInput.oninput = (e) => handleInput(e, 'start');
+        endInput.oninput = (e) => handleInput(e, 'end');
+    }
+
+    function parseAndApplyDate(str, type) {
+        const parts = str.split('.');
+        if (parts.length !== 3) return;
+
+        const day = parseInt(parts[0]);
+        const month = parseInt(parts[1]) - 1; 
+        const year = parseInt(parts[2]);
+
+        const date = new Date(year, month, day);
+
+        // Простая проверка валидности
+        if (date.getFullYear() === year && date.getMonth() === month && date.getDate() === day) {
+            
+            if (type === 'start') {
+                customRangeStart = date;
+                if (customRangeEnd && customRangeEnd < customRangeStart) customRangeEnd = null;
+            } else {
+                customRangeEnd = date;
+                if (!customRangeStart) customRangeStart = date;
+                // Если конец раньше начала — меняем местами
+                else if (customRangeEnd < customRangeStart) {
+                    const temp = customRangeStart;
+                    customRangeStart = customRangeEnd;
+                    customRangeEnd = temp;
+                }
+            }
+            // Обновляем календарь (подсветку кружочков)
+            updateCalendarSelection(false); 
+        }
     }
 
     function closeDatePicker(e, force) {
@@ -17308,66 +17397,47 @@
         renderCalendarList(); 
     }
 
-    function updateCalendarSelection() {
+    function updateCalendarSelection(updateInputs = true) {
         const days = document.querySelectorAll('.calendar-day');
         
         const startCapsule = document.getElementById('capsule-start');
         const endCapsule = document.getElementById('capsule-end');
-        const startText = document.getElementById('capsule-start-text');
-        const endText = document.getElementById('capsule-end-text');
-        
-        // Инпуты для синхронизации значения (чтобы в пикере открывалась выбранная дата)
-        const startInput = document.getElementById('native-start');
-        const endInput = document.getElementById('native-end');
+        const startInput = document.getElementById('input-start');
+        const endInput = document.getElementById('input-end');
 
-        // Локализация
-        const t = {
-            start: { en: "Start", ru: "Начало", es: "Inicio", de: "Start" },
-            end:   { en: "End", ru: "Конец", es: "Fin", de: "Ende" }
-        };
-        const lang = ['en','ru','es','de'].includes(currentLang) ? currentLang : 'en';
-
-        // Форматтера для текста в капсуле (DD.MM.YY)
-        const fmtDisplay = (d) => {
-            if (!d) return null;
-            const dd = String(d.getDate()).padStart(2, '0');
-            const mm = String(d.getMonth() + 1).padStart(2, '0');
-            const yy = String(d.getFullYear()).slice(-2);
-            return `${dd}.${mm}.${yy}`;
-        };
-
-        // Форматтер для value инпута (YYYY-MM-DD)
-        const fmtInput = (d) => {
+        // Форматтер DD.MM.YYYY
+        const fmt = (d) => {
             if (!d) return "";
             const dd = String(d.getDate()).padStart(2, '0');
             const mm = String(d.getMonth() + 1).padStart(2, '0');
             const yyyy = d.getFullYear();
-            return `${yyyy}-${mm}-${dd}`;
+            return `${dd}.${mm}.${yyyy}`;
         };
 
-        // Обновляем НАЧАЛО
-        if (customRangeStart) {
-            startText.innerText = fmtDisplay(customRangeStart);
-            startCapsule.classList.add('filled');
-            if(startInput) startInput.value = fmtInput(customRangeStart);
+        // 1. Обновляем ИНПУТЫ (только если это не ручной ввод)
+        if (updateInputs) {
+            if (customRangeStart) {
+                startInput.value = fmt(customRangeStart);
+                startCapsule.classList.add('filled');
+            } else {
+                startInput.value = "";
+                startCapsule.classList.remove('filled');
+            }
+
+            if (customRangeEnd) {
+                endInput.value = fmt(customRangeEnd);
+                endCapsule.classList.add('filled');
+            } else {
+                endInput.value = "";
+                endCapsule.classList.remove('filled');
+            }
         } else {
-            startText.innerText = t.start[lang];
-            startCapsule.classList.remove('filled');
-            if(startInput) startInput.value = "";
+            // Если ручной ввод — просто обновляем цвет капсулы
+            if (customRangeStart) startCapsule.classList.add('filled');
+            if (customRangeEnd) endCapsule.classList.add('filled');
         }
 
-        // Обновляем КОНЕЦ
-        if (customRangeEnd) {
-            endText.innerText = fmtDisplay(customRangeEnd);
-            endCapsule.classList.add('filled');
-            if(endInput) endInput.value = fmtInput(customRangeEnd);
-        } else {
-            endText.innerText = t.end[lang];
-            endCapsule.classList.remove('filled');
-            if(endInput) endInput.value = "";
-        }
-
-        // Подсветка дней в календаре
+        // 2. Обновляем КАЛЕНДАРЬ (Кружочки)
         days.forEach(day => {
             const dStr = day.dataset.date;
             if (!dStr) return;
@@ -17381,9 +17451,11 @@
 
             day.classList.remove('selected', 'in-range');
             
+            // Начало и Конец (Темный круг)
             if (sTime && dTime === sTime) day.classList.add('selected');
             if (eTime && dTime === eTime) day.classList.add('selected');
             
+            // Диапазон (Светлый фон)
             if (sTime && eTime && dTime > sTime && dTime < eTime) {
                 day.classList.add('in-range');
             }
