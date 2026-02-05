@@ -10948,6 +10948,16 @@
             expl_hist: "From Archives 📜",
             deco_label: "Show Decorations",
 
+            loyalty_title: "Loyalty Check",
+            loyalty_old_label: "Old Hits",
+            loyalty_new_label: "New Horizons",
+            loyalty_title_cons: "The Conservator",
+            loyalty_title_pioneer: "The Pioneer",
+            loyalty_title_balanced: "Balanced Soul",
+            loyalty_desc_cons: "You know what you like, and you stick to it. Respect.",
+            loyalty_desc_pioneer: "Always chasing the next thrill. A true explorer.",
+            loyalty_desc_balanced: "A bit of old, a bit of new. You've found the perfect mix.",
+
             header_notifications: "Notifications",
             badge_indicator_label: "Notifications",
             badge_enabled_msg: "Indicator enabled! You will see a red dot on the app icon when Wrapped is ready or subscription is ending.",
@@ -10956,14 +10966,14 @@
             tip_badge_title: "Never miss a Wrapped",
             tip_badge_desc: "Enable the red dot on the app icon",
             tip_badge_text: `
-            <b>What are notifications?</b><br>
-            They appear only as a discrete dot or number in the corner of the app icon. No annoying text alerts or push messages will be sent to your device.<br><br>
-            <b>When does the indicator appear?</b><br>
-            1. <b>Fetish Wrapped:</b> When your personal summary is ready to view.<br>
-            2. <b>Subscription:</b> When your Premium status is expiring soon (3 days left).<br><br>
-            <b>Numbers:</b><br>
-            If both events happen at the same time, you will see the number <b>2</b> on the icon. Otherwise, it will just be a dot or the number 1.
-        `,
+                <b>What are notifications?</b><br>
+                They appear only as a discrete dot or number in the corner of the app icon. No annoying text alerts or push messages will be sent to your device.<br><br>
+                <b>When does the indicator appear?</b><br>
+                1. <b>Fetish Wrapped:</b> When your personal summary is ready to view.<br>
+                2. <b>Subscription:</b> When your Premium status is expiring soon (3 days left).<br><br>
+                <b>Numbers:</b><br>
+                If both events happen at the same time, you will see the number <b>2</b> on the icon. Otherwise, it will just be a dot or the number 1.
+            `,
 
             sync_minutes: "Minutes",
 
@@ -11681,6 +11691,16 @@
             expl_undo: "Передумал? 😏",
             expl_hist: "Из архивов 📜",
             deco_label: "Показывать декор",
+
+            loyalty_title: "Проверка верности",
+            loyalty_old_label: "Старые хиты",
+            loyalty_new_label: "Новые горизонты",
+            loyalty_title_cons: "Консерватор",
+            loyalty_title_pioneer: "Первооткрыватель",
+            loyalty_title_balanced: "Баланс сил",
+            loyalty_desc_cons: "Ты точно знаешь, чего хочешь. Верность вкусу — это стиль.",
+            loyalty_desc_pioneer: "Вечно в погоне за новым. Твое любопытство не знает границ.",
+            loyalty_desc_balanced: "Немного старого, немного нового. Идеальное сочетание.",
 
             header_notifications: "Уведомления",
             badge_indicator_label: "Уведомления",
@@ -12412,6 +12432,17 @@
             expl_hist: "De los archivos 📜",
             deco_label: "Mostrar decoración",
 
+            loyalty_title: "Chequeo de Lealtad",
+            loyalty_old_label: "Clásicos",
+            loyalty_new_label: "Nuevos Horizontes",
+            loyalty_title_cons: "El Conservador",
+            loyalty_title_pioneer: "El Pionero",
+            loyalty_title_balanced: "Alma Equilibrada",
+            loyalty_desc_cons: "Sabes lo que te gusta y te mantienes fiel a ello. Respeto.",
+            loyalty_desc_pioneer: "Siempre en busca de la próxima emoción. Un verdadero explorador.",
+            loyalty_desc_balanced: "Un poco de lo antiguo, un poco de lo nuevo. Has encontrado la mezcla perfecta.",
+
+
             header_notifications: "Notificaciones",
             badge_indicator_label: "Notificaciones",
             badge_enabled_msg: "¡Indicador activado! Verás un punto rojo en el icono de la app cuando un Wrapped esté listo o tu suscripción esté terminando.",
@@ -13120,6 +13151,17 @@
             expl_undo: "Meinung geändert? 😏",
             expl_hist: "Aus dem Archiv 📜",
             deco_label: "Dekoration anzeigen",
+
+            loyalty_title: "Loyalitäts-Check",
+            loyalty_old_label: "Klassiker",
+            loyalty_new_label: "Neue Horizonte",
+            loyalty_title_cons: "Der Bewahrer",
+            loyalty_title_pioneer: "Der Pionier",
+            loyalty_title_balanced: "Ausgewogene Seele",
+            loyalty_desc_cons: "Du weißt, was dir gefällt, und bleibst dabei. Respekt.",
+            loyalty_desc_pioneer: "Immer auf der Jagd nach dem nächsten Kick. Ein echter Entdecker.",
+            loyalty_desc_balanced: "Ein bisschen alt, ein bisschen neu. Du hast die perfekte Mischung gefunden.",
+
 
             header_notifications: "Benachrichtigungen",
             badge_indicator_label: "Benachrichtigungen",
@@ -21963,9 +22005,29 @@
         let watchCount = 0;
         let swipeCount = 0;
         let likeCount = 0;     
-        let dislikeCount = 0;  
+        let dislikeCount = 0; 
+        let oldWatchCount = 0;
+        let newWatchCount = 0; 
         
         const tagCounts = {};
+        const exploredBefore = new Set(permanentExplored);
+
+        watches.forEach(w => {
+            // Если предмет был в избранном до этого периода (или просто уже знаком)
+            if (favorites.includes(w.id)) {
+                oldWatchCount++;
+            } else {
+                newWatchCount++;
+            }
+        });
+
+        const totalW = oldWatchCount + newWatchCount || 1;
+        const loyaltyPct = Math.round((oldWatchCount / totalW) * 100);
+        const curiosityPct = 100 - loyaltyPct;
+
+        let loyaltyStatus = 'balanced';
+        if (loyaltyPct > 65) loyaltyStatus = 'cons';
+        if (curiosityPct > 65) loyaltyStatus = 'pioneer';
         
         // Карта очков для КОНКРЕТНЫХ предметов (ID)
         const itemScores = {}; 
@@ -22062,7 +22124,10 @@
             likeCount, dislikeCount,
             topTags, peakTime, achievement,
             psychoCounts, 
-            topFetishes 
+            topFetishes,
+            loyaltyPct, 
+            curiosityPct,
+            loyaltyStatus 
         };
     }
 
@@ -22496,7 +22561,7 @@
             </div>
         `);
 
-        // --- D. Слайд "ТОП ФЕТИШИ" (НОВЫЙ) ---
+        // --- D. Слайд "ТОП ФЕТИШИ" ---
         // Показываем только если НЕ Daily и есть данные
         if (type !== 'daily' && stats.topFetishes && stats.topFetishes.length > 0) {
             
@@ -22545,6 +22610,46 @@
             `;
             middleSlides.push(newSlide);
         }
+
+        // --- Слайд "Loyalty Check" ---
+        const loyaltySlide = `
+            <div class="wrapped-slide" style="background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%); overflow: hidden;">
+                <div class="wrapped-sub-text" style="text-transform:uppercase; letter-spacing:2px; margin-bottom:20px;">${t('loyalty_title')}</div>
+                
+                <div style="position: relative; width: 100%; height: 300px; margin: 40px 0;">
+                    <!-- Лево Верх: Старое -->
+                    <div id="loy-old-box" class="loyalty-box" style="position:absolute; top:0; left:20px; text-align:left; transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                        <div style="font-size:60px;">🥰</div>
+                        <div style="font-size:14px; font-weight:800; color:rgba(255,255,255,0.6);">${t('loyalty_old_label')}</div>
+                        <div style="font-size:32px; font-weight:900;">${stats.loyaltyPct}%</div>
+                    </div>
+
+                    <!-- VS по центру -->
+                    <div id="loy-vs" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); font-size:40px; font-weight:900; font-style:italic; color:var(--accent); text-shadow: 0 0 20px var(--accent); transition: all 0.5s;">VS</div>
+
+                    <!-- Право Низ: Новое -->
+                    <div id="loy-new-box" class="loyalty-box" style="position:absolute; bottom:0; right:20px; text-align:right; transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                        <div style="font-size:60px;">🔭</div>
+                        <div style="font-size:14px; font-weight:800; color:rgba(255,255,255,0.6);">${t('loyalty_new_label')}</div>
+                        <div style="font-size:32px; font-weight:900;">${stats.curiosityPct}%</div>
+                    </div>
+                </div>
+
+                <!-- Титул и описание (появляются после анимации) -->
+                <div id="loy-result" class="reveal-delayed" style="text-align:center; opacity:0; transform:translateY(20px); transition: all 0.6s ease 1.5s;">
+                    <div style="font-size:12px; color:var(--accent); font-weight:800; text-transform:uppercase; margin-bottom:5px;">${t('vibe')}</div>
+                    <div style="font-size:32px; font-weight:900; text-transform:uppercase; color:#fff; margin-bottom:10px;">${t('loyalty_title_' + stats.loyaltyStatus)}</div>
+                    <div style="font-size:15px; opacity:0.8; max-width:280px; margin: 0 auto; line-height:1.4;">${t('loyalty_desc_' + stats.loyaltyStatus)}</div>
+                </div>
+
+                <style>
+                    .winner-side { transform: scale(1.3) translate(0, 0) !important; z-index: 10; }
+                    .loser-side { opacity: 0.2; transform: scale(0.8); filter: blur(2px); }
+                    .vs-hidden { opacity: 0; transform: translate(-50%, -50%) scale(0); }
+                </style>
+            </div>
+        `;
+        middleSlides.push(loyaltySlide);
 
         // ============================================
         // 3. ПЕРЕМЕШИВАНИЕ И СБОРКА
@@ -22745,6 +22850,46 @@
             }, 800);
         }
 
+        // 6. LOYALTY CHECK
+        const status = stats.loyaltyStatus;
+
+        const oldBox = activeSlide.querySelector('#loy-old-box');
+        const newBox = activeSlide.querySelector('#loy-new-box');
+        const vs = activeSlide.querySelector('#loy-vs');
+        const result = activeSlide.querySelector('#loy-result');
+
+        if (oldBox && newBox && vs) {
+            // Сброс позиций
+            oldBox.className = "loyalty-box";
+            newBox.className = "loyalty-box";
+            vs.className = "";
+            result.style.opacity = "0";
+
+            // Запускаем анимацию через секунду
+            setTimeout(() => {
+                vs.classList.add('vs-hidden');
+                
+                if (status === 'cons') {
+                    oldBox.style.left = "50%";
+                    oldBox.style.top = "40%";
+                    oldBox.style.transform = "translate(-50%, -50%) scale(1.4)";
+                    newBox.classList.add('loser-side');
+                } else if (status === 'pioneer') {
+                    newBox.style.right = "50%";
+                    newBox.style.bottom = "50%";
+                    newBox.style.transform = "translate(50%, 50%) scale(1.4)";
+                    oldBox.classList.add('loser-side');
+                } else {
+                    // Balanced: Сдвигаем оба ближе к центру
+                    oldBox.style.transform = "scale(1.1)";
+                    newBox.style.transform = "scale(1.1)";
+                }
+                
+                // Показываем текст результата
+                result.style.opacity = "1";
+                result.style.transform = "translateY(0)";
+            }, 1200);
+        }
     }
 
     // Утилита для счета чисел
