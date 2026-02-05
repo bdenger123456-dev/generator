@@ -6834,6 +6834,129 @@
             border-radius: 10px;
         }
 
+        /* --- УЛУЧШЕННЫЙ ДИЗАЙН КАЛЕНДАРЯ --- */
+
+        /* Контейнер для капсул ввода */
+        .date-capsule-row {
+            display: flex;
+            gap: 15px;
+            padding: 20px 20px 10px 20px;
+            background: transparent !important; /* Убираем фон */
+            border-bottom: none !important; /* Убираем разделитель */
+            flex-shrink: 0;
+        }
+
+        /* Сами капсулы (Начало / Конец) */
+        .date-capsule {
+            flex: 1;
+            background: var(--ios-card);
+            border: 1px solid var(--border);
+            border-radius: 50px; /* Полная капсула */
+            padding: 12px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 44px;
+        }
+
+        /* Активное состояние капсулы (когда дата выбрана) */
+        .date-capsule.filled {
+            color: var(--text-main);
+            border-color: var(--accent);
+            background: var(--nav-bg);
+        }
+
+        .date-capsule span {
+            pointer-events: none;
+        }
+
+        /* Карточка месяца */
+        .calendar-month-card {
+            background: var(--ios-card);
+            border-radius: 24px; /* Крупные закругления */
+            padding: 20px;
+            margin-bottom: 15px; /* Отступ между месяцами */
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        }
+
+        .calendar-month-title {
+            font-size: 15px !important;
+            text-transform: capitalize !important; /* Первая буква заглавная */
+            letter-spacing: 0.5px;
+            margin-bottom: 15px !important;
+            color: var(--text-main) !important;
+            opacity: 0.9;
+        }
+
+        /* Сетка дней */
+        .calendar-grid {
+            display: grid; 
+            grid-template-columns: repeat(7, 1fr); 
+            gap: 8px; /* Больше воздуха между днями */
+        }
+
+        /* Круглые дни */
+        .calendar-day {
+            width: 100%;
+            aspect-ratio: 1 / 1; /* Строгий квадрат для круга */
+            border-radius: 50% !important; /* Круг */
+            font-size: 13px !important;
+            font-weight: 500;
+            background: transparent;
+            border: 1px solid transparent; /* Чтобы не прыгало при выделении */
+        }
+
+        /* Выбранные дни */
+        .calendar-day.selected {
+            background: var(--accent) !important;
+            color: #000 !important;
+            font-weight: 800 !important;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        /* Диапазон (между началом и концом) */
+        .calendar-day.in-range {
+            background: rgba(255, 0, 204, 0.15) !important; /* Легкий фон */
+            color: var(--accent) !important;
+            border-radius: 50% !important; /* Все равно круги */
+            font-weight: 700;
+        }
+
+        /* Кнопка подтверждения (плавающая) */
+        .confirm-floating-container {
+            padding: 20px;
+            background: transparent !important; /* Убираем фон */
+            border-top: none !important; /* Убираем линию */
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            pointer-events: none; /* Чтобы клики проходили сквозь пустоту */
+            display: flex;
+            justify-content: center;
+            background: linear-gradient(to top, var(--bg-color) 20%, transparent 100%) !important; /* Градиент внизу для красоты */
+        }
+
+        .btn-confirm-capsule {
+            pointer-events: auto; /* Возвращаем клики кнопке */
+            width: 90% !important;
+            max-width: 300px;
+            padding: 14px !important;
+            border-radius: 50px !important;
+            font-size: 16px !important;
+            font-weight: 800 !important;
+            text-transform: uppercase;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3) !important;
+            background: var(--text-main) !important;
+            color: var(--bg-color) !important;
+        }
+
         /* =========================================
         MACOS STYLE SIDEBAR (DESKTOP ONLY)
         ========================================= */
@@ -7825,29 +7948,35 @@
 
 <!-- RANGE PICKER -->
 <div class="modal-overlay" id="modal-date-picker" onclick="closeDatePicker(event)">
-    <div class="modal" style="height: 80vh; max-height: 600px;">
+    <div class="modal" style="height: 85vh; max-height: 700px; background: var(--bg-color) !important;">
         <div class="modal-header">
             <div class="modal-close-btn" onclick="closeDatePicker(null, true)"><div class="modal-close-icon"></div></div>
             <span data-key="picker_title">Select Range</span>
         </div>
-        <div class="modal-body" style="display:flex; flex-direction:column; padding:0; overflow: hidden;">
-            <div style="display:flex; gap:10px; padding:15px; background:var(--ios-card); border-bottom:1px solid var(--border); flex-shrink: 0;">
-                <div style="flex:1;">
-                    <div style="font-size:10px; color:var(--text-secondary); text-transform:uppercase; margin-bottom:4px;" data-key="picker_from">From</div>
-                    <input type="text" id="range-start-input" readonly placeholder="DD.MM.YYYY" 
-                        style="width:100%; background:var(--bg-color); border:1px solid var(--border); color:var(--text-main); padding:8px; border-radius:8px; font-size:14px; text-align:center;">
+        
+        <div class="modal-body" style="display:flex; flex-direction:column; padding:0; overflow: hidden; position: relative;">
+            
+            <!-- 1. Капсулы дат (Начало / Конец) -->
+            <div class="date-capsule-row">
+                <div id="capsule-start" class="date-capsule">
+                    <span id="capsule-start-text">Start</span>
                 </div>
-                <div style="flex:1;">
-                    <div style="font-size:10px; color:var(--text-secondary); text-transform:uppercase; margin-bottom:4px;" data-key="picker_to">To</div>
-                    <input type="text" id="range-end-input" readonly placeholder="DD.MM.YYYY" 
-                        style="width:100%; background:var(--bg-color); border:1px solid var(--border); color:var(--text-main); padding:8px; border-radius:8px; font-size:14px; text-align:center;">
+                <div style="display:flex; align-items:center; opacity:0.3;">➝</div>
+                <div id="capsule-end" class="date-capsule">
+                    <span id="capsule-end-text">End</span>
                 </div>
             </div>
 
-            <div id="calendar-scroll-container" style="flex:1; overflow-y:auto; padding:10px; background: var(--bg-color);">
+            <!-- 2. Скролл календаря -->
+            <div id="calendar-scroll-container" style="flex:1; overflow-y:auto; padding:10px 15px 100px 15px; background: transparent;">
+                <!-- JS генерирует месяцы здесь -->
             </div>
-            <div style="padding:15px; background:var(--ios-card); border-top:1px solid var(--border); flex-shrink: 0;">
-                <button class="btn-gen" onclick="applyCustomRange()" style="width:100%; padding:12px;" data-key="picker_confirm">Confirm</button>
+
+            <!-- 3. Плавающая кнопка подтверждения -->
+            <div class="confirm-floating-container">
+                <button class="btn-gen btn-confirm-capsule" onclick="applyCustomRange()" data-key="picker_confirm">
+                    Confirm
+                </button>
             </div>
         </div>
     </div>
@@ -17034,12 +17163,10 @@
     function renderCalendarList() {
         const container = document.getElementById('calendar-scroll-container');
         container.innerHTML = '';
-        
-        // Сбрасываем направление флекса, чтобы не путаться
         container.style.display = 'block'; 
         
         const now = new Date();
-        const monthsToGenerate = 24; // Генерируем 2 года истории
+        const monthsToGenerate = 24; 
 
         // Генерируем от "24 месяца назад" до "сегодня"
         for (let i = monthsToGenerate; i >= 0; i--) {
@@ -17048,13 +17175,10 @@
             container.appendChild(monthEl);
         }
         
-        // скроллим ВНИЗ только после того, как браузер отрисовал элементы
+        // Скроллим вниз
         requestAnimationFrame(() => {
             container.scrollTop = container.scrollHeight;
-            // Повторный скролл через небольшую паузу для надежности в PWA
-            setTimeout(() => {
-                container.scrollTop = container.scrollHeight;
-            }, 50);
+            setTimeout(() => { container.scrollTop = container.scrollHeight; }, 50);
         });
 
         updateCalendarSelection();
@@ -17062,7 +17186,7 @@
 
     function createMonthElement(year, month) {
         const wrapper = document.createElement('div');
-        wrapper.className = 'calendar-month';
+        wrapper.className = 'calendar-month-card'; 
         
         const monthName = new Date(year, month).toLocaleString(currentLang, { month: 'long', year: 'numeric' });
         wrapper.innerHTML = `<div class="calendar-month-title">${monthName}</div>`;
@@ -17070,16 +17194,19 @@
         const grid = document.createElement('div');
         grid.className = 'calendar-grid';
         
-        // Заголовки дней
-        const days = currentLang === 'ru' ? ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'] : ['Mo','Tu','We','Th','Fr','Sa','Su'];
-        days.forEach(d => grid.innerHTML += `<div class="calendar-day-label">${d}</div>`);
+        // Дни недели
+        const days = currentLang === 'ru' ? ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'] : 
+                     (currentLang === 'es' ? ['Lu','Ma','Mi','Ju','Vi','Sa','Do'] : 
+                     (currentLang === 'de' ? ['Mo','Di','Mi','Do','Fr','Sa','So'] : ['Mo','Tu','We','Th','Fr','Sa','Su']));
+                     
+        days.forEach(d => grid.innerHTML += `<div class="calendar-day-label" style="font-weight:700; opacity:0.5;">${d}</div>`);
         
-        // Пустые ячейки для начала месяца
+        // Пустые ячейки
         let firstDay = new Date(year, month, 1).getDay();
-        firstDay = firstDay === 0 ? 6 : firstDay - 1; // Коррекция для Пн как начала недели
+        firstDay = firstDay === 0 ? 6 : firstDay - 1; 
         for (let i = 0; i < firstDay; i++) grid.innerHTML += `<div></div>`;
         
-        // Дни месяца
+        // Дни
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const today = new Date();
         today.setHours(0,0,0,0);
@@ -17093,14 +17220,19 @@
             dayEl.className = `calendar-day ${isFuture ? 'disabled' : ''}`;
             dayEl.dataset.date = dateStr;
             dayEl.innerText = d;
-            dayEl.onclick = () => selectDate(currentIterDate);
+            
+            // Если дата в будущем — убираем клик
+            if(!isFuture) {
+                dayEl.onclick = () => selectDate(currentIterDate);
+            }
+            
             grid.appendChild(dayEl);
         }
         
         wrapper.appendChild(grid);
         return wrapper;
     }
-
+    
     function selectDate(date) {
         if (!customRangeStart || (customRangeStart && customRangeEnd)) {
             customRangeStart = date;
@@ -17118,26 +17250,72 @@
 
     function updateCalendarSelection() {
         const days = document.querySelectorAll('.calendar-day');
-        const startInput = document.getElementById('range-start-input');
-        const endInput = document.getElementById('range-end-input');
+        
+        // Элементы капсул
+        const startCapsule = document.getElementById('capsule-start');
+        const endCapsule = document.getElementById('capsule-end');
+        const startText = document.getElementById('capsule-start-text');
+        const endText = document.getElementById('capsule-end-text');
 
-        const fmt = (d) => d ? d.toLocaleDateString() : "";
-        startInput.value = fmt(customRangeStart);
-        endInput.value = fmt(customRangeEnd);
+        // Локализация слов "Начало" и "Конец"
+        const t = {
+            start: { en: "Start", ru: "Начало", es: "Inicio", de: "Start" },
+            end:   { en: "End", ru: "Конец", es: "Fin", de: "Ende" }
+        };
+        const lang = ['en','ru','es','de'].includes(currentLang) ? currentLang : 'en';
 
+        // Форматирование даты
+        const fmt = (d) => {
+            if (!d) return null;
+            const dd = String(d.getDate()).padStart(2, '0');
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const yy = String(d.getFullYear()).slice(-2); // Берем последние 2 цифры года
+            return `${dd}.${mm}.${yy}`;
+        };
+
+        // Обновляем текст и стили капсул
+        if (customRangeStart) {
+            startText.innerText = fmt(customRangeStart);
+            startCapsule.classList.add('filled');
+        } else {
+            startText.innerText = t.start[lang];
+            startCapsule.classList.remove('filled');
+        }
+
+        if (customRangeEnd) {
+            endText.innerText = fmt(customRangeEnd);
+            endCapsule.classList.add('filled');
+        } else {
+            endText.innerText = t.end[lang];
+            endCapsule.classList.remove('filled');
+        }
+
+        // Обновляем визуальное состояние дней в календаре
         days.forEach(day => {
-            const d = new Date(day.dataset.date);
+            const dStr = day.dataset.date;
+            if (!dStr) return;
+            
+            const d = new Date(dStr);
+            // Сбрасываем время для корректного сравнения
+            d.setHours(0,0,0,0);
+            
+            // Получаем timestamp для сравнения
+            const dTime = d.getTime();
+            const sTime = customRangeStart ? customRangeStart.getTime() : null;
+            const eTime = customRangeEnd ? customRangeEnd.getTime() : null;
+
             day.classList.remove('selected', 'in-range');
             
-            if (customRangeStart && d.getTime() === customRangeStart.getTime()) day.classList.add('selected');
-            if (customRangeEnd && d.getTime() === customRangeEnd.getTime()) day.classList.add('selected');
+            // Логика выделения
+            if (sTime && dTime === sTime) day.classList.add('selected');
+            if (eTime && dTime === eTime) day.classList.add('selected');
             
-            if (customRangeStart && customRangeEnd && d > customRangeStart && d < customRangeEnd) {
+            if (sTime && eTime && dTime > sTime && dTime < eTime) {
                 day.classList.add('in-range');
             }
         });
     }
-
+    
     function applyCustomRange() {
         const t = langData[currentLang] || langData['en'];
         
