@@ -6821,9 +6821,17 @@
 
         #calendar-scroll-container {
             display: flex;
-            flex-direction: column; /* Месяцы идут друг за другом */
+            flex-direction: column; 
             gap: 20px;
             overflow-y: auto;
+        }
+
+        #calendar-scroll-container::-webkit-scrollbar {
+            width: 4px;
+        }
+        #calendar-scroll-container::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
         }
 
         /* =========================================
@@ -7822,8 +7830,8 @@
             <div class="modal-close-btn" onclick="closeDatePicker(null, true)"><div class="modal-close-icon"></div></div>
             <span data-key="picker_title">Select Range</span>
         </div>
-        <div class="modal-body" style="display:flex; flex-direction:column; padding:0;">
-            <div style="display:flex; gap:10px; padding:15px; background:var(--ios-card); border-bottom:1px solid var(--border);">
+        <div class="modal-body" style="display:flex; flex-direction:column; padding:0; overflow: hidden;">
+            <div style="display:flex; gap:10px; padding:15px; background:var(--ios-card); border-bottom:1px solid var(--border); flex-shrink: 0;">
                 <div style="flex:1;">
                     <div style="font-size:10px; color:var(--text-secondary); text-transform:uppercase; margin-bottom:4px;" data-key="picker_from">From</div>
                     <input type="text" id="range-start-input" readonly placeholder="DD.MM.YYYY" 
@@ -7835,7 +7843,10 @@
                         style="width:100%; background:var(--bg-color); border:1px solid var(--border); color:var(--text-main); padding:8px; border-radius:8px; font-size:14px; text-align:center;">
                 </div>
             </div>
-            <div style="padding:15px; background:var(--ios-card); border-top:1px solid var(--border);">
+
+            <div id="calendar-scroll-container" style="flex:1; overflow-y:auto; padding:10px; background: var(--bg-color);">
+            </div>
+            <div style="padding:15px; background:var(--ios-card); border-top:1px solid var(--border); flex-shrink: 0;">
                 <button class="btn-gen" onclick="applyCustomRange()" style="width:100%; padding:12px;" data-key="picker_confirm">Confirm</button>
             </div>
         </div>
