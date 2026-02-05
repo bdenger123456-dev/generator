@@ -7289,6 +7289,34 @@
 </head>
 <body>
 
+<!-- FORCE INSTALL OVERLAY -->
+<div id="force-install-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#050505; z-index:1000000; flex-direction:column; align-items:center; justify-content:center; padding:30px; text-align:center; box-sizing:border-box; color:#fff; font-family:-apple-system, system-ui, sans-serif;">
+    <img src="logo_icon.png" style="width:80px; height:80px; border-radius:20px; margin-bottom:20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+    
+    <h2 id="fio-title" style="margin-bottom:15px; font-weight:800; font-size:24px; text-transform:uppercase;">Install Required</h2>
+    
+    <p id="fio-desc" style="font-size:15px; color:#aaa; line-height:1.5; margin-bottom:25px;">
+        To provide a secure and private experience on mobile devices, xFetishHub must be installed as an App.
+    </p>
+
+    <!-- Видео -->
+    <div style="width:100%; max-width:300px; background:#111; border-radius:15px; overflow:hidden; border:1px solid #333; margin-bottom:25px;">
+        <img src="pwa.webm" alt="How to install" style="width:100%; display:block;">
+    </div>
+
+    <!-- Инструкция для iOS -->
+    <div id="fio-instr-ios" style="display:none; font-size:14px; background:rgba(255,255,255,0.05); padding:15px; border-radius:12px; width:100%;">
+        1. Tap <b>Share</b> ( <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMjAgMzRWMTBNMjAgMTBMMTIuNSAxNy41TTIwIDEwTDI3LjUgMTcuNU0xMCAyNEgxMGMtMS42NTY4NSAwLTMtMS4zNDMxLTMtM1YxMGMwLTEuNjU2ODUgMS4zNDMxLTMgMy0zaDIwYzEuNjU2OSAwIDMgMS4zNDMxIDMgM3YxMWMwIDEuNjU2OS0xLjM0MzEgMy0zIDNoMCIgc3Ryb2tlPSIjMDBkNTRmIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjwvc3ZnPg==" style="width:20px; vertical-align:middle;"> )<br>
+        2. Select <b>"Add to Home Screen"</b>
+    </div>
+
+    <!-- Инструкция для Android -->
+    <div id="fio-instr-android" style="display:none; font-size:14px; background:rgba(255,255,255,0.05); padding:15px; border-radius:12px; width:100%;">
+        1. Tap <b>Menu</b> (3 dots in top right)<br>
+        2. Select <b>"Install App"</b> or <b>"Add to Home"</b>
+    </div>
+</div>
+
 <!-- EKRAN ZAGRUZKI -->
 <div id="loading-overlay">
     <img src="icon_light.png" class="loader-logo" alt="Loading...">
@@ -14284,6 +14312,53 @@
             }
         }, 600);
     };
+
+    function isPWA() {
+    return (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone === true);
+}
+
+    function isMobile() {
+        return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth < 768;
+    }
+
+    // ПЕРЕХВАТ ЗАГРУЗКИ
+    const originalLoadData = window.loadData;
+
+    window.loadData = async function() {
+        if (isMobile() && !isPWA()) {
+            showForceInstallOverlay();
+            console.log("Blocked: Mobile browser detected. PWA installation required.");
+            return; // ПРЕРЫВАЕМ выполнение, основной код не запустится
+        }
+        
+        // Если всё ок (ПК или PWA), запускаем основную загрузку
+        if (originalLoadData) originalLoadData();
+    };
+
+    function showForceInstallOverlay() {
+        const overlay = document.getElementById('force-install-overlay');
+        const iosInstr = document.getElementById('fio-instr-ios');
+        const andInstr = document.getElementById('fio-instr-android');
+        const title = document.getElementById('fio-title');
+        const desc = document.getElementById('fio-desc');
+
+        // Детекция языка (из localStorage или по умолчанию)
+        const lang = localStorage.getItem('xch_lang') || 'en';
+        
+        if (lang === 'ru') {
+            title.innerText = "Нужна установка";
+            desc.innerText = "Для безопасности и приватности на мобильных устройствах, xFetishHub работает только через приложение (PWA).";
+        }
+
+        overlay.style.display = 'flex';
+
+        // Показываем инструкцию в зависимости от ОС
+        if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+            iosInstr.style.display = 'block';
+        } else {
+            andInstr.style.display = 'block';
+        }
+    }
 
     async function loadData() {
         try {
