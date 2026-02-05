@@ -1759,6 +1759,20 @@
         .stats-nav-capsule { height: 50px; }
         .stats-tf-item, .stats-nav-item { flex: 1; display: flex; align-items: center; justify-content: center; border-radius: 40px; font-size: 11px; font-weight: 700; color: var(--text-secondary); cursor: pointer; text-transform: uppercase; }
         .stats-tf-item.active, .stats-nav-item.active { background: var(--nav-bg); color: var(--text-main); }
+        .stats-tf-item {
+            position: relative !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            overflow: visible !important;
+        }
+
+        .tf-anchor {
+            position: relative !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
 
         /* =========================================
         10. SUBSCRIPTION MODAL (RESPONSIVE)
@@ -2336,6 +2350,17 @@
             padding: 5px 10px; border-radius: 12px;
             font-weight: 800; font-size: 12px; text-transform: uppercase;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .lock-badge-custom {
+            position: absolute !important;
+            top: 50% !important;
+            right: -14px !important; 
+            transform: translateY(-60%) !important; 
+            
+            font-size: 10px !important;
+            line-height: 1 !important;
+            pointer-events: none !important;
+            opacity: 0.9;
         }
 
         /* === WRAPPED / SUMMARY UI (Spotify Style) === */
@@ -6776,6 +6801,31 @@
             }
         }
 
+        /* Календарная сетка */
+        .calendar-month { margin-bottom: 30px; }
+        .calendar-month-title { text-align: center; font-weight: 800; margin-bottom: 10px; text-transform: uppercase; color: var(--accent); }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+        .calendar-day-label { text-align: center; font-size: 10px; color: var(--text-secondary); padding: 5px 0; }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; border-radius: 8px; cursor: pointer;
+            transition: background 0.2s; color: var(--text-main);
+        }
+
+        .calendar-day.disabled { opacity: 0.2; pointer-events: none; }
+        .calendar-day.selected { background: var(--accent) !important; color: #000 !important; font-weight: 800; }
+        .calendar-day.in-range { background: rgba(255, 0, 204, 0.2); border-radius: 0; }
+        .calendar-day:not(.disabled):hover { background: rgba(255,255,255,0.1); }
+
+        #calendar-scroll-container {
+            display: flex;
+            flex-direction: column; /* Месяцы идут друг за другом */
+            gap: 20px;
+            overflow-y: auto;
+        }
+
         /* =========================================
         MACOS STYLE SIDEBAR (DESKTOP ONLY)
         ========================================= */
@@ -7748,7 +7798,9 @@
                     <div class="stats-tf-item active" id="tf-week" onclick="switchTimeframe('week')">Week</div>
                     <div class="stats-tf-item" id="tf-month" onclick="switchTimeframe('month')">Month</div>
                     <div class="stats-tf-item" id="tf-year" onclick="switchTimeframe('year')">Year</div>
-                    <div class="stats-tf-item" id="tf-all" onclick="switchTimeframe('all')">All</div>
+                    <div class="stats-tf-item" id="tf-custom" onclick="openDatePicker()">
+                        <img src="calendar.png" style="width:16px; height:16px; filter:invert(1); opacity:0.8;">
+                    </div>
                 </div>
                 <div class="stats-nav-capsule" style="margin-top: 8px;">
                     <div class="stats-nav-item active" id="stat-nav-tags" onclick="switchStatsTab('tags')">
@@ -7758,6 +7810,33 @@
                         <span data-key="stats_activity">Activity</span>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- RANGE PICKER -->
+<div class="modal-overlay" id="modal-date-picker" onclick="closeDatePicker(event)">
+    <div class="modal" style="height: 80vh; max-height: 600px;">
+        <div class="modal-header">
+            <div class="modal-close-btn" onclick="closeDatePicker(null, true)"><div class="modal-close-icon"></div></div>
+            <span data-key="picker_title">Select Range</span>
+        </div>
+        <div class="modal-body" style="display:flex; flex-direction:column; padding:0;">
+            <div style="display:flex; gap:10px; padding:15px; background:var(--ios-card); border-bottom:1px solid var(--border);">
+                <div style="flex:1;">
+                    <div style="font-size:10px; color:var(--text-secondary); text-transform:uppercase; margin-bottom:4px;" data-key="picker_from">From</div>
+                    <input type="text" id="range-start-input" readonly placeholder="DD.MM.YYYY" 
+                        style="width:100%; background:var(--bg-color); border:1px solid var(--border); color:var(--text-main); padding:8px; border-radius:8px; font-size:14px; text-align:center;">
+                </div>
+                <div style="flex:1;">
+                    <div style="font-size:10px; color:var(--text-secondary); text-transform:uppercase; margin-bottom:4px;" data-key="picker_to">To</div>
+                    <input type="text" id="range-end-input" readonly placeholder="DD.MM.YYYY" 
+                        style="width:100%; background:var(--bg-color); border:1px solid var(--border); color:var(--text-main); padding:8px; border-radius:8px; font-size:14px; text-align:center;">
+                </div>
+            </div>
+            <div style="padding:15px; background:var(--ios-card); border-top:1px solid var(--border);">
+                <button class="btn-gen" onclick="applyCustomRange()" style="width:100%; padding:12px;" data-key="picker_confirm">Confirm</button>
             </div>
         </div>
     </div>
@@ -10948,6 +11027,11 @@
             expl_hist: "From Archives 📜",
             deco_label: "Show Decorations",
 
+            picker_title: "Select Range",
+            picker_from: "From",
+            picker_to: "To",
+            picker_confirm: "Confirm",
+
             loyalty_title: "Loyalty Check",
             loyalty_old_label: "Old Hits",
             loyalty_new_label: "New Horizons",
@@ -11692,6 +11776,11 @@
             expl_hist: "Из архивов 📜",
             deco_label: "Показывать декор",
 
+            picker_title: "Выбор периода",
+            picker_from: "От",
+            picker_to: "До",
+            picker_confirm: "Подтвердить",
+
             loyalty_title: "Проверка верности",
             loyalty_old_label: "Старые хиты",
             loyalty_new_label: "Новые горизонты",
@@ -12432,6 +12521,11 @@
             expl_hist: "De los archivos 📜",
             deco_label: "Mostrar decoración",
 
+            picker_title: "Seleccionar rango",
+            picker_from: "Desde",
+            picker_to: "Hasta",
+            picker_confirm: "Confirmar",
+
             loyalty_title: "Chequeo de Lealtad",
             loyalty_old_label: "Clásicos",
             loyalty_new_label: "Nuevos Horizontes",
@@ -13151,6 +13245,11 @@
             expl_undo: "Meinung geändert? 😏",
             expl_hist: "Aus dem Archiv 📜",
             deco_label: "Dekoration anzeigen",
+
+            picker_title: "Zeitraum wählen",
+            picker_from: "Von",
+            picker_to: "Bis",
+            picker_confirm: "Bestätigen",
 
             loyalty_title: "Loyalitäts-Check",
             loyalty_old_label: "Klassiker",
@@ -16865,69 +16964,239 @@
 
     function updateStatsLocks() {
         const isFree = subscriptionLevel === 'free';
-        
-        const idsToLock = ['tf-month', 'tf-year', 'tf-all'];
-        
+        const idsToLock = ['tf-month', 'tf-year', 'tf-custom']; 
+
         idsToLock.forEach(id => {
             const el = document.getElementById(id);
             if(!el) return;
+
+            // 1. Полная очистка перед рендером
+            const oldLock = el.querySelector('.lock-badge-custom');
+            if (oldLock) oldLock.remove();
             
-            // Сначала чистим старые замки
-            const existingLock = el.querySelector('.lock-icon-small');
-            if (existingLock) existingLock.remove();
-            
-            // Сбрасываем прозрачность
-            el.style.opacity = '1';
-            
-            // Если тариф бесплатный — добавляем замок и прозрачность
+            const anchor = el.querySelector('.tf-anchor');
+            if (anchor) {
+                // Возвращаем контент в исходный вид
+                const originalContent = anchor.innerHTML.replace('<span class="lock-badge-custom">🔒</span>', '');
+                el.innerHTML = originalContent;
+            }
+
             if (isFree) {
-                el.style.opacity = '0.6';
-                const lockSpan = document.createElement('span');
-                lockSpan.className = 'lock-icon-small';
-                lockSpan.innerText = ' 🔒';
-                lockSpan.style.fontSize = '10px';
-                el.appendChild(lockSpan);
+                el.style.opacity = '0.5';
+
+                // 2. Берем текущий контент (текст или <img>)
+                const content = el.innerHTML;
+                
+                // 3. Перезаписываем с новой структурой: Контент + Замок внутри одного якоря
+                el.innerHTML = `
+                    <span class="tf-anchor">
+                        ${content}
+                        <span class="lock-badge-custom">🔒</span>
+                    </span>
+                `;
+            } else {
+                el.style.opacity = '1';
             }
         });
-        
-        const actBtn = document.getElementById('stat-nav-activity');
-        if (actBtn) {
-            const lock = actBtn.querySelector('.lock-icon-small');
-            if(lock) lock.remove();
-            actBtn.style.opacity = '1';
+    }
+
+    let customRangeStart = null;
+    let customRangeEnd = null;
+
+    function openDatePicker() {
+        // Проверка подписки
+        if (subscriptionLevel === 'free') {
+            openSubModal();
+            return;
         }
+
+        renderCalendarList();
+        document.getElementById('modal-date-picker').classList.add('open');
+    }
+
+    function closeDatePicker(e, force) {
+        if (force || e.target.id === 'modal-date-picker') {
+            document.getElementById('modal-date-picker').classList.remove('open');
+        }
+    }
+
+    function renderCalendarList() {
+        const container = document.getElementById('calendar-scroll-container');
+        container.innerHTML = '';
+        
+        // Сбрасываем направление флекса, чтобы не путаться
+        container.style.display = 'block'; 
+        
+        const now = new Date();
+        const monthsToGenerate = 24; // Генерируем 2 года истории
+
+        // Генерируем от "24 месяца назад" до "сегодня"
+        for (let i = monthsToGenerate; i >= 0; i--) {
+            const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            const monthEl = createMonthElement(date.getFullYear(), date.getMonth());
+            container.appendChild(monthEl);
+        }
+        
+        // скроллим ВНИЗ только после того, как браузер отрисовал элементы
+        requestAnimationFrame(() => {
+            container.scrollTop = container.scrollHeight;
+            // Повторный скролл через небольшую паузу для надежности в PWA
+            setTimeout(() => {
+                container.scrollTop = container.scrollHeight;
+            }, 50);
+        });
+
+        updateCalendarSelection();
+    }
+
+    function createMonthElement(year, month) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'calendar-month';
+        
+        const monthName = new Date(year, month).toLocaleString(currentLang, { month: 'long', year: 'numeric' });
+        wrapper.innerHTML = `<div class="calendar-month-title">${monthName}</div>`;
+        
+        const grid = document.createElement('div');
+        grid.className = 'calendar-grid';
+        
+        // Заголовки дней
+        const days = currentLang === 'ru' ? ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'] : ['Mo','Tu','We','Th','Fr','Sa','Su'];
+        days.forEach(d => grid.innerHTML += `<div class="calendar-day-label">${d}</div>`);
+        
+        // Пустые ячейки для начала месяца
+        let firstDay = new Date(year, month, 1).getDay();
+        firstDay = firstDay === 0 ? 6 : firstDay - 1; // Коррекция для Пн как начала недели
+        for (let i = 0; i < firstDay; i++) grid.innerHTML += `<div></div>`;
+        
+        // Дни месяца
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const today = new Date();
+        today.setHours(0,0,0,0);
+
+        for (let d = 1; d <= daysInMonth; d++) {
+            const currentIterDate = new Date(year, month, d);
+            const isFuture = currentIterDate > today;
+            const dateStr = currentIterDate.toISOString().split('T')[0];
+            
+            const dayEl = document.createElement('div');
+            dayEl.className = `calendar-day ${isFuture ? 'disabled' : ''}`;
+            dayEl.dataset.date = dateStr;
+            dayEl.innerText = d;
+            dayEl.onclick = () => selectDate(currentIterDate);
+            grid.appendChild(dayEl);
+        }
+        
+        wrapper.appendChild(grid);
+        return wrapper;
+    }
+
+    function selectDate(date) {
+        if (!customRangeStart || (customRangeStart && customRangeEnd)) {
+            customRangeStart = date;
+            customRangeEnd = null;
+        } else {
+            if (date < customRangeStart) {
+                customRangeEnd = customRangeStart;
+                customRangeStart = date;
+            } else {
+                customRangeEnd = date;
+            }
+        }
+        updateCalendarSelection();
+    }
+
+    function updateCalendarSelection() {
+        const days = document.querySelectorAll('.calendar-day');
+        const startInput = document.getElementById('range-start-input');
+        const endInput = document.getElementById('range-end-input');
+
+        const fmt = (d) => d ? d.toLocaleDateString() : "";
+        startInput.value = fmt(customRangeStart);
+        endInput.value = fmt(customRangeEnd);
+
+        days.forEach(day => {
+            const d = new Date(day.dataset.date);
+            day.classList.remove('selected', 'in-range');
+            
+            if (customRangeStart && d.getTime() === customRangeStart.getTime()) day.classList.add('selected');
+            if (customRangeEnd && d.getTime() === customRangeEnd.getTime()) day.classList.add('selected');
+            
+            if (customRangeStart && customRangeEnd && d > customRangeStart && d < customRangeEnd) {
+                day.classList.add('in-range');
+            }
+        });
+    }
+
+    function applyCustomRange() {
+        const t = langData[currentLang] || langData['en'];
+        
+        if (!customRangeStart) {
+            alert(currentLang === 'ru' ? "Выберите дату начала" : "Select start date");
+            return;
+        }
+        
+        if (!customRangeEnd) customRangeEnd = new Date(customRangeStart);
+        
+        currentStatsTimeframe = 'custom';
+        
+        document.querySelectorAll('.stats-tf-item').forEach(el => el.classList.remove('active'));
+        document.getElementById('tf-custom').classList.add('active');
+        
+        closeDatePicker(null, true);
+        renderStatsContent();
+        
+        if(navigator.vibrate) navigator.vibrate(10);
     }
 
     function renderStatsContent() {
         const body = document.getElementById('modal-stats-body');
         body.innerHTML = '';
-        const t = langData[currentLang];
+        const t = langData[currentLang] || langData['en'];
 
         // 1. ОПРЕДЕЛЕНИЕ ВРЕМЕННОГО ДИАПАЗОНА
         const now = new Date();
         const nowTs = now.getTime();
         const oneDay = 86400000;
-        let cutoffTime = 0;
+        
+        let cutoffTime = 0;   // Начало периода
+        let endTime = nowTs;   // Конец периода (по умолчанию - сейчас)
         let rangeText = "";
 
-        if (currentStatsTimeframe === 'week') cutoffTime = nowTs - (7 * oneDay);
-        else if (currentStatsTimeframe === 'month') cutoffTime = nowTs - (30 * oneDay);
-        else if (currentStatsTimeframe === 'year') cutoffTime = nowTs - (365 * oneDay);
-        else cutoffTime = 0;
+        // Логика выбора границ времени
+        if (currentStatsTimeframe === 'custom' && customRangeStart) {
+            // Режим календаря
+            cutoffTime = customRangeStart.getTime();
+            // Устанавливаем конец дня для выбранной конечной даты (или начальной, если выбрана одна)
+            const end = new Date(customRangeEnd || customRangeStart);
+            end.setHours(23, 59, 59, 999);
+            endTime = end.getTime();
+        } else {
+            // Стандартные пресеты
+            if (currentStatsTimeframe === 'week') cutoffTime = nowTs - (7 * oneDay);
+            else if (currentStatsTimeframe === 'month') cutoffTime = nowTs - (30 * oneDay);
+            else if (currentStatsTimeframe === 'year') cutoffTime = nowTs - (365 * oneDay);
+            else cutoffTime = 0; // "Всё время" (если вдруг осталось)
+        }
 
+        // Хелпер для красивого вывода даты под заголовком
         const formatDate = (ts) => {
             const d = new Date(ts);
-            return `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}`;
+            const day = d.getDate().toString().padStart(2, '0');
+            const month = (d.getMonth() + 1).toString().padStart(2, '0');
+            const year = d.getFullYear();
+            return `${day}.${month}.${year}`;
         };
 
-        if (currentStatsTimeframe === 'all') {
-            rangeText = (currentLang === 'ru') ? "За всё время" : "All Time History";
+        // Формируем текст диапазона для заголовка модалки
+        if (currentStatsTimeframe === 'all' && !customRangeStart) {
+            rangeText = t.tf_all || "All Time";
         } else {
-            const startStr = formatDate(cutoffTime > 0 ? cutoffTime : activityLog[0]?.ts || Date.now());
-            const endStr = formatDate(nowTs);
+            const startStr = formatDate(cutoffTime > 0 ? cutoffTime : (activityLog.length > 0 ? activityLog[0].ts : nowTs));
+            const endStr = formatDate(endTime);
             rangeText = `${startStr} — ${endStr}`;
         }
 
+        // Обновляем плашку с датами сверху
         let dateHeader = document.getElementById('stats-date-display');
         if (!dateHeader) {
             body.insertAdjacentHTML('beforebegin', `<div id="stats-date-display" class="stats-date-range"></div>`);
@@ -16935,17 +17204,17 @@
         }
         dateHeader.innerText = rangeText;
         dateHeader.style.animation = 'none';
-        dateHeader.offsetHeight; 
+        dateHeader.offsetHeight; // trigger reflow
         dateHeader.style.animation = 'fadeInUp 0.3s forwards';
-
 
         // --- ВАРИАНТ А: ТЕГИ (PREFERENCES) ---
         if (currentStatsTab === 'tags') {
             const tempScores = {};
             const IGNORED_TAGS = ['general', 'specific', 'straight', 'male', 'female', 'adult', 'video', 'hd'];
             
+            // Фильтруем логи строго по выбранному диапазону
             activityLog.forEach(log => {
-                if (log.ts < cutoffTime) return;
+                if (log.ts < cutoffTime || log.ts > endTime) return;
 
                 if (log.tags) {
                     let weight = 0;
@@ -16962,6 +17231,7 @@
                     }
                 }
             });
+
 
             const sortedTags = Object.entries(tempScores)
                 .sort((a, b) => b[1] - a[1])
@@ -17192,7 +17462,6 @@
         });
     }
 
-    // Старая логика скачивания (как запасной вариант)
     function downloadFallback(canvas, filename) {
         const link = document.createElement('a');
         link.download = filename;
