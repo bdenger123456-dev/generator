@@ -823,6 +823,35 @@
             animation: none !important;
         }
 
+        /* === 1. СКРЫВАЕМ ШАПКУ НА ГЛАВНОЙ === */
+        body.tab-home-active .mobile-header {
+            display: none !important; /* Полностью убираем */
+        }
+
+        /* Корректируем отступ контента на главной */
+        body.tab-home-active #tab-home {
+            /* Оставляем отступ только под статус-бар/челку телефона */
+            padding-top: max(20px, env(safe-area-inset-top)) !important; 
+        }
+
+        /* === 2. ЧЕРНЫЙ ЭКРАН ПРИВАТНОСТИ (PWA) === */
+        #pwa-privacy-screen {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            /* Используем цвет фона темы, чтобы не резало глаза, или чисто черный */
+            background-color: var(--bg-color); 
+            z-index: 2147483647; /* Максимальный Z-index */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            
+            /* Важно для мгновенного появления */
+            transform: translateZ(0); 
+            will-change: opacity;
+        }
+
         /* =========================================
         4. GENERATOR CARD & SLOT MACHINE
         ========================================= */
@@ -25533,39 +25562,27 @@
         }
     }
 
+    // === PWA PRIVACY PROTECTION ===
     (function() {
         const privacyScreen = document.getElementById('pwa-privacy-screen');
-
-        function showPrivacy() {
-            // Показываем экран при сворачивании
-            privacyScreen.style.display = 'flex';
-            // Дополнительно можно заблюрить основной контент для надежности
-            document.querySelector('.app-layout').style.filter = 'blur(20px)';
-        }
-
-        function hidePrivacy() {
-            // Убираем экран, когда пользователь вернулся
-            privacyScreen.style.display = 'none';
-            document.querySelector('.app-layout').style.filter = 'none';
-        }
-
-        // Событие изменения видимости (сворачивание браузера/приложения)
+        
+        // Событие: Страница скрывается (сворачивание, переключение вкладок, многозадачность)
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'hidden') {
-                showPrivacy();
+                // Мгновенно включаем черный экран
+                privacyScreen.style.display = 'flex';
             } else {
-                // Небольшая задержка при возврате, чтобы контент не моргнул
-                setTimeout(hidePrivacy, 100);
+                // Когда вернулись — убираем с небольшой задержкой (чтобы не моргало)
+                setTimeout(() => {
+                    privacyScreen.style.display = 'none';
+                }, 50);
             }
         });
 
-        // Событие потери фокуса (когда открывается панель многозадачности на iOS/Android)
-        window.addEventListener('blur', showPrivacy);
-        window.addEventListener('focus', hidePrivacy);
-
-        // Для Safari на iOS иногда лучше работает pagehide
-        window.addEventListener('pagehide', showPrivacy);
-        window.addEventListener('pageshow', hidePrivacy);
+        // Для Safari на iOS
+        window.addEventListener('pagehide', () => {
+            privacyScreen.style.display = 'flex';
+        });
     })();
 
 </script>
@@ -25597,20 +25614,15 @@
     </p>
 </div>
 
-<!-- Экран приватности для PWA -->
-<div id="pwa-privacy-screen" style="
-    display: none; 
-    position: fixed; 
-    top: 0; left: 0; 
-    width: 100%; height: 100%; 
-    background: var(--bg-color, #12000b); 
-    z-index: 9999999; 
-    backdrop-filter: blur(20px); 
-    -webkit-backdrop-filter: blur(20px);
-    align-items: center; 
-    justify-content: center;
-">
-    <img src="logo_icon.png" style="width: 80px; height: 80px; opacity: 0.5;">
+<!-- PRIVACY SCREEN FOR MULTITASKING -->
+<div id="pwa-privacy-screen">
+    <img src="logo.png" style="width: 80px; height: auto; margin-bottom: 20px;">
+    <div style="font-weight: 800; font-size: 24px; color: var(--text-main); text-transform: uppercase;">
+        xFetishHub
+    </div>
+    <div style="color: var(--text-secondary); font-size: 12px; margin-top: 5px;">
+        Locked
+    </div>
 </div>
 
 </body>
