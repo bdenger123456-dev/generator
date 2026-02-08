@@ -4022,7 +4022,7 @@
         .limit-fill {
             height: 100%;
             background: linear-gradient(90deg, #00d2ff, #3a7bd5);
-            width: 96%; /* 48 из 50 */
+            width: 94%; /* 47 из 50 */
             box-shadow: 0 0 10px #00d2ff;
             animation: pulseBar 2s infinite;
         }
@@ -8658,7 +8658,7 @@
                     <div class="limit-container" style="background:rgba(0,0,0,0.2); padding:8px; border-radius:8px; margin-bottom:10px;">
                         <div class="limit-labels" style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:4px;">
                             <span style="color:#ff6b6b; font-weight:700;" data-key="limit_burn">🔥 ALMOST GONE</span>
-                            <span style="color:#fff;">48 / 50</span>
+                            <span style="color:#fff;">47 / 50</span>
                         </div>
                         <div style="width:100%; height:4px; background:rgba(255,255,255,0.1); border-radius:2px;"><div style="width:96%; height:100%; background:#00d2ff;"></div></div>
                     </div>
@@ -10429,16 +10429,33 @@
 
             if (docSnap.exists()) {
                 const cloudData = docSnap.data();
+                const now = new Date();
                 
-                // Глобальные переменные
-                cachedUserProfile = cloudData;
-                window.cachedUserProfile = cloudData;
+                // --- ПРОВЕРКА ИСТЕЧЕНИЯ ПОДПИСКИ ---
+                let cloudSub = cloudData.subscription || 'free';
+                
+                // Если подписка не вечная (bestie) и не бесплатная, проверяем дату
+                if (cloudSub !== 'free' && cloudSub !== 'bestie' && cloudData.expiresAt) {
+                    // Конвертируем Timestamp Firebase в объект Date
+                    const expDate = cloudData.expiresAt.toDate ? cloudData.expiresAt.toDate() : new Date(cloudData.expiresAt);
+                    
+                    if (now > expDate) {
+                        console.log("🚨 Subscription expired! Resetting user to FREE.");
+                        cloudSub = 'free';
+                        
+                        // Обновляем статус в облаке немедленно
+                        await updateDoc(userRef, {
+                            subscription: 'free'
+                        });
+                    }
+                }
+
+                // Глобальные переменные (обновляем с учетом проверки)
+                cachedUserProfile = { ...cloudData, subscription: cloudSub };
+                window.cachedUserProfile = cachedUserProfile;
                 lastProfileReadTime = Date.now();
                 
-                console.log("Cloud data received. Merging...");
-
-                // 1. ПОДПИСКА
-                const cloudSub = cloudData.subscription || 'free';
+                // 1. ПРИМЕНЯЕМ ПОДПИСКУ
                 localStorage.setItem('xch_sub_level', cloudSub);
                 if (typeof subscriptionLevel !== 'undefined') subscriptionLevel = cloudSub;
                 if (window.updateSubscriptionUI) window.updateSubscriptionUI();
@@ -10452,83 +10469,67 @@
 
                 localStorage.setItem('xch_favorites', JSON.stringify(mergedFav));
                 window.favorites = mergedFav;
-
                 localStorage.setItem('xch_blacklist', JSON.stringify(mergedBan));
                 window.blacklist = mergedBan;
-
                 localStorage.setItem('xch_watch_later', JSON.stringify(mergedWL));
                 window.watchLater = mergedWL;
 
-                // 3. ИСТОРИЯ СВАЙПОВ (History)
+                // 3. ИСТОРИЯ СВАЙПОВ
                 const localHist = JSON.parse(localStorage.getItem('xch_history')) || [];
                 const cloudHist = cloudData.history || [];
-                // Объединяем по уникальности (ID + Timestamp), чтобы не потерять
                 const histMap = new Map();
                 [...localHist, ...cloudHist].forEach(item => histMap.set(item.id, item));
                 const mergedHistory = Array.from(histMap.values())
                     .filter(item => item && (item.timestamp || item.ts))
-                    .sort((a, b) => {
-                        const tA = a.timestamp?.seconds || a.timestamp || 0;
-                        const tB = b.timestamp?.seconds || b.timestamp || 0;
-                        return tB - tA;
-                    })
+                    .sort((a, b) => (b.timestamp?.seconds || b.timestamp) - (a.timestamp?.seconds || a.timestamp))
                     .slice(0, 100);
                 
                 localStorage.setItem('xch_history', JSON.stringify(mergedHistory));
                 window.historyData = mergedHistory;
 
-                // 4. ИСТОРИЯ ПРОСМОТРОВ (ВРЕМЯ) - НОВАЯ ЛОГИКА
+                // 4. ИСТОРИЯ ПРОСМОТРОВ
                 const localWatch = JSON.parse(localStorage.getItem('xch_watch_history')) || [];
                 const cloudWatch = cloudData.watchHistory || [];
-                
-                // Объединяем. Ключ уникальности: ID + Время просмотра (чтобы не дублировать один и тот же сеанс)
                 const watchMap = new Map();
-                    [...localWatch, ...cloudWatch].forEach(item => {
-                        if (item && item.id) { // Защита от null
-                            const ts = item.timestamp?.seconds || item.timestamp || 0;
-                            const key = `${item.id}_${ts}`;
-                            watchMap.set(key, item);
-                        }
-                    });
-                
-                const mergedWatch = Array.from(watchMap.values()).sort((a, b) => b.timestamp - a.timestamp).slice(0, 200); // Храним последние 200 просмотров
+                [...localWatch, ...cloudWatch].forEach(item => {
+                    if (item && item.id) {
+                        const ts = item.timestamp?.seconds || item.timestamp || 0;
+                        watchMap.set(`${item.id}_${ts}`, item);
+                    }
+                });
+                const mergedWatch = Array.from(watchMap.values()).sort((a, b) => b.timestamp - a.timestamp).slice(0, 200);
                 
                 localStorage.setItem('xch_watch_history', JSON.stringify(mergedWatch));
                 window.watchHistory = mergedWatch;
 
-                // 5. ЛОГИ АКТИВНОСТИ (Для графиков)
+                // 5. ЛОГИ АКТИВНОСТИ
                 const localLog = JSON.parse(localStorage.getItem('xch_activity_log')) || [];
                 const cloudLog = cloudData.activityLog || [];
                 const logMap = new Map();
                 [...localLog, ...cloudLog].forEach(item => logMap.set((item.ts || 0) + "_" + item.id, item));
                 const mergedLog = Array.from(logMap.values())
-                    .filter(item => item && item.ts) // Проверка на валидность
+                    .filter(item => item && item.ts)
                     .sort((a, b) => (a.ts || 0) - (b.ts || 0))
                     .slice(-5000);
                 
                 localStorage.setItem('xch_activity_log', JSON.stringify(mergedLog));
                 window.activityLog = mergedLog;
 
-                // --- ФИНАЛ ---
-                const now = Date.now();
-                localStorage.setItem('xch_last_sync_ts', now);
-                
+                // ФИНАЛ
+                localStorage.setItem('xch_last_sync_ts', Date.now());
                 if (window.updateLastSyncUI) window.updateLastSyncUI();
                 if (typeof updateCounts === 'function') updateCounts();
                 if (typeof renderHistory === 'function') renderHistory();
                 if (typeof updateActionButtons === 'function') updateActionButtons();
 
+                // Проверка алертов об окончании (за 3 дня)
                 checkSubscriptionExpiry(); 
-                
-                // Если открыто окно синхронизации, обновляем цифры сразу
+
                 if (document.getElementById('modal-sync-info-overlay').classList.contains('open')) {
                     window.openSyncInfoModal();
                 }
 
-                console.log(`Sync complete. Watch history merged.`);
-
             } else {
-                console.log("User document not found. Creating new.");
                 localStorage.setItem('xch_sub_level', 'free');
                 if (window.updateSubscriptionUI) window.updateSubscriptionUI();
                 window.syncToCloud(true);
@@ -25300,29 +25301,39 @@
     }
 
     function checkSubscriptionExpiry() {
-        // 1. Проверяем, есть ли данные профиля и платная ли подписка
+        // 1. Базовые проверки
         if (!cachedUserProfile || !cachedUserProfile.subscription || cachedUserProfile.subscription === 'free') return;
-        
-        // Бессрочные тарифы не трогаем
-        if (cachedUserProfile.subscription === 'bestie') return;
-
+        if (cachedUserProfile.subscription === 'bestie') return; // Bestie навсегда
         if (!cachedUserProfile.expiresAt) return;
 
-        // 2. Считаем дни
         const now = new Date();
-        // Конвертируем Firestore Timestamp в Date
+        // Конвертируем дату из любого формата (Firestore Timestamp или строка ISO)
         const expDate = cachedUserProfile.expiresAt.toDate ? cachedUserProfile.expiresAt.toDate() : new Date(cachedUserProfile.expiresAt);
         
+        // 2. ПРОВЕРКА: Если время вышло прямо сейчас
+        if (now > expDate) {
+            console.log("💳 Subscription just expired. Reverting to free mode.");
+            
+            subscriptionLevel = 'free';
+            localStorage.setItem('xch_sub_level', 'free');
+            
+            // Обновляем UI
+            if (typeof updateSubscriptionUI === 'function') updateSubscriptionUI();
+            
+            // Опционально: уведомляем пользователя
+            alert(currentLang === 'ru' ? "Срок действия вашей подписки истек." : "Your subscription has expired.");
+            return;
+        }
+
+        // 3. ПРЕДУПРЕЖДЕНИЕ: Если осталось 3 дня или меньше
         const diffMs = expDate - now;
         const daysLeft = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 
-        // 3. Условие: Осталось 3 дня или меньше (но подписка еще активна)
         if (daysLeft <= 3 && daysLeft > 0) {
-            
-            // 4. Проверка частоты показа (раз в 24 часа)
             const lastShown = localStorage.getItem('xch_expiry_warn_ts');
             const oneDayMs = 24 * 60 * 60 * 1000;
 
+            // Показываем модалку не чаще раза в сутки
             if (!lastShown || (now.getTime() - parseInt(lastShown) > oneDayMs)) {
                 openExpiryModal(daysLeft);
             }
@@ -25522,6 +25533,41 @@
         }
     }
 
+    (function() {
+        const privacyScreen = document.getElementById('pwa-privacy-screen');
+
+        function showPrivacy() {
+            // Показываем экран при сворачивании
+            privacyScreen.style.display = 'flex';
+            // Дополнительно можно заблюрить основной контент для надежности
+            document.querySelector('.app-layout').style.filter = 'blur(20px)';
+        }
+
+        function hidePrivacy() {
+            // Убираем экран, когда пользователь вернулся
+            privacyScreen.style.display = 'none';
+            document.querySelector('.app-layout').style.filter = 'none';
+        }
+
+        // Событие изменения видимости (сворачивание браузера/приложения)
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') {
+                showPrivacy();
+            } else {
+                // Небольшая задержка при возврате, чтобы контент не моргнул
+                setTimeout(hidePrivacy, 100);
+            }
+        });
+
+        // Событие потери фокуса (когда открывается панель многозадачности на iOS/Android)
+        window.addEventListener('blur', showPrivacy);
+        window.addEventListener('focus', hidePrivacy);
+
+        // Для Safari на iOS иногда лучше работает pagehide
+        window.addEventListener('pagehide', showPrivacy);
+        window.addEventListener('pageshow', hidePrivacy);
+    })();
+
 </script>
 
 <!-- SEO CONTEXT BLOCK -->
@@ -25549,6 +25595,22 @@
     <p>
         Whether you are looking for a <strong>porn history tracker</strong>, a safe way to explore new kinks, or simply a better way to browse adult content, xFetishHub is your private home for digital intimacy.
     </p>
+</div>
+
+<!-- Экран приватности для PWA -->
+<div id="pwa-privacy-screen" style="
+    display: none; 
+    position: fixed; 
+    top: 0; left: 0; 
+    width: 100%; height: 100%; 
+    background: var(--bg-color, #12000b); 
+    z-index: 9999999; 
+    backdrop-filter: blur(20px); 
+    -webkit-backdrop-filter: blur(20px);
+    align-items: center; 
+    justify-content: center;
+">
+    <img src="logo_icon.png" style="width: 80px; height: 80px; opacity: 0.5;">
 </div>
 
 </body>
