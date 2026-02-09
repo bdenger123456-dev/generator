@@ -7682,13 +7682,11 @@
             line-height: 1.3;
         }
 
-        /* Анимация появления для Мобильных (сверху вниз) */
         @keyframes slideInMobile {
             from { transform: translateY(-150%); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
 
-        /* Анимация появления для ПК (справа налево) */
         @keyframes slideInPC {
             from { transform: translateX(150%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
@@ -7707,6 +7705,26 @@
         .toast-animate-out {
             opacity: 0 !important;
             transform: scale(0.9) !important;
+        }
+
+        @keyframes slideOutMobile {
+            from { transform: translateY(0); opacity: 1; }
+            to { transform: translateY(-150%); opacity: 0; }
+        }
+
+        @keyframes slideOutPC {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(150%); opacity: 0; }
+        }
+
+        .toast-animate-out {
+            animation: slideOutMobile 0.4s cubic-bezier(0.32, 0.725, 0.0, 1) forwards !important;
+        }
+
+        @media (min-width: 769px) {
+            .toast-animate-out {
+                animation: slideOutPC 0.4s cubic-bezier(0.32, 0.725, 0.0, 1) forwards !important;
+            }
         }
 
         .seo-context {
@@ -19779,14 +19797,12 @@
             if (window.isUserLoggedIn) {
                 // Если залогинен: "Account • PRO"
                 const planLabel = subscriptionLevel.toUpperCase();
-                // Цвет для плана
-                let colorStyle = 'color:var(--text-secondary);';
-                if (subscriptionLevel === 'pro') colorStyle = 'color:#ff9900; font-weight:800;';
-                if (subscriptionLevel === 'beast') colorStyle = 'color:#9b59b6; font-weight:800;';
-                if (subscriptionLevel === 'bestie') colorStyle = 'color:#00d2ff; font-weight:800;';
+                
+                // Используем var(--text-secondary), как у стрелочек и дат
+                let colorStyle = 'color:var(--text-secondary); font-weight:500;';
 
                 const accText = t.personal_account || "Personal Account";
-                loginBtnText.innerHTML = `${accText} <span style="font-size:13px; margin-left:6px; ${colorStyle}">• ${planLabel}</span>`;
+                loginBtnText.innerHTML = `${accText} <span style="font-size:15px; margin-left:6px; ${colorStyle}">${planLabel}</span>`;
             } else {
                 // Если не залогинен: "Sync / Login"
                 loginBtnText.innerText = t.login_text || "Sync / Login";
@@ -25716,8 +25732,14 @@
 
     function removeToast(toast) {
         if (!toast) return;
-        toast.classList.add('toast-animate-out');
-        setTimeout(() => toast.remove(), 300);
+        toast.classList.remove('toast-animate-in'); 
+        toast.classList.add('toast-animate-out');  
+        
+        setTimeout(() => {
+            if (toast && toast.parentNode) {
+                toast.remove();
+            }
+        }, 400); 
     }
 
     // === PWA PRIVACY PROTECTION ===
