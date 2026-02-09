@@ -839,17 +839,24 @@
             display: none;
             position: fixed;
             top: 0; left: 0;
-            width: 100%; height: 100%;
-            /* Используем цвет фона темы, чтобы не резало глаза, или чисто черный */
+            width: 100vw; height: 100vh; /* Используем vw/vh для гарантии */
             background-color: var(--bg-color); 
-            z-index: 2147483647; /* Максимальный Z-index */
+            z-index: 2147483647 !important; /* Максимальный Z-index с приоритетом */
             flex-direction: column;
             align-items: center;
             justify-content: center;
             
-            /* Важно для мгновенного появления */
-            transform: translateZ(0); 
-            will-change: opacity;
+            /* Оптимизация рендеринга для iOS */
+            transform: translate3d(0, 0, 0); 
+            -webkit-transform: translate3d(0, 0, 0);
+            will-change: opacity, display;
+            pointer-events: none; /* Чтобы не мешал кликам, когда скрыт (если display глючит) */
+        }
+
+        /* Класс для мгновенного показа */
+        #pwa-privacy-screen.active {
+            display: flex !important;
+            pointer-events: auto;
         }
 
         /* =========================================
@@ -7209,6 +7216,11 @@
             #block-prefs {
                 margin-top: 15px !important;
             }
+
+            body.tab-home-active .top-gradient-mask {
+                display: none !important;
+            }
+            
             
         }
 
@@ -7586,6 +7598,115 @@
 
         @keyframes fadeInUp {
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* === IN-APP PUSH NOTIFICATIONS === */
+        #notification-container {
+            position: fixed;
+            z-index: 999999;
+            pointer-events: none; /* Чтобы не мешал кликам, когда пуст */
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Стили для мобильных (сверху по центру) */
+        @media (max-width: 768px) {
+            #notification-container {
+                top: calc(10px + env(safe-area-inset-top));
+                left: 0;
+                width: 100%;
+                padding: 0 15px;
+                align-items: center;
+            }
+        }
+
+        /* Стили для ПК (справа сверху) */
+        @media (min-width: 769px) {
+            #notification-container {
+                top: 20px;
+                right: 20px;
+                width: 350px;
+                align-items: flex-end;
+            }
+        }
+
+        .toast-push {
+            pointer-events: auto; /* Делаем само уведомление кликабельным */
+            background: rgba(28, 28, 30, 0.9);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            padding: 12px 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            max-width: 360px;
+            cursor: pointer;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            will-change: transform, opacity;
+        }
+
+        /* Светлая тема */
+        body.light-theme .toast-push {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .toast-push-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .toast-push-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .toast-push-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-main);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .toast-push-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.3;
+        }
+
+        /* Анимация появления для Мобильных (сверху вниз) */
+        @keyframes slideInMobile {
+            from { transform: translateY(-150%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Анимация появления для ПК (справа налево) */
+        @keyframes slideInPC {
+            from { transform: translateX(150%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .toast-animate-in {
+            animation: slideInMobile 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @media (min-width: 769px) {
+            .toast-animate-in {
+                animation: slideInPC 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            }
+        }
+
+        .toast-animate-out {
+            opacity: 0 !important;
+            transform: scale(0.9) !important;
         }
 
         .seo-context {
@@ -8968,7 +9089,7 @@
     </div>
 </div>
 
-<!-- SYNC INFO MODAL (BENTO GRID VERSION) -->
+<!-- SYNC INFO MODAL -->
 <div class="modal-overlay" id="modal-sync-info-overlay" onclick="closeSyncInfoModal(event)">
     <div class="modal">
         <div class="modal-header">
@@ -9482,7 +9603,7 @@
     </div>
 </div>
 
-<!-- ACHIEVEMENT DETAIL MODAL (Для одного достижения) -->
+<!-- ACHIEVEMENT DETAIL MODAL -->
 <div class="modal-overlay" id="modal-ach-detail-overlay" onclick="closeAchDetail(event)">
     <div class="modal" style="max-width: 340px; text-align:center;">
         <div class="modal-header" style="border:none;">
@@ -9586,43 +9707,16 @@
     </div>
 </div>
 
-<!-- WRAPPED ALERT MODAL -->
-<div class="modal-overlay" id="modal-wrapped-alert" style="z-index: 25000;">
-    <div class="modal" style="max-width: 340px; text-align: center;">
-        <div class="modal-body" style="padding: 50px 20px 25px 20px; display: flex; flex-direction: column; align-items: center;">
-            
-            <div style="font-size: 55px; margin-top: 10px; margin-bottom: 20px; filter: drop-shadow(0 0 15px rgba(255, 0, 204, 0.4)); line-height: 1;">🎁</div>
-            
-            <!-- Заголовок -->
-            <h3 style="margin-bottom: 10px; color: var(--text-main); text-transform: uppercase; font-weight: 900; letter-spacing: 1px;">
-                Fetish Wrapped
-            </h3>
-
-            <!-- Текст с тизером -->
-            <p id="wrapped-alert-text" style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 25px;">
-                <!-- JS вставит текст сюда -->
-            </p>
-
-            <!-- Кнопка Посмотреть -->
-            <button class="btn-gen" id="btn-wrapped-alert-watch" style="width: 100%; margin-bottom: 10px; background: linear-gradient(45deg, #FF9900, #9B59B6); color: #fff; box-shadow: 0 5px 20px rgba(155, 89, 182, 0.4); border:none;">
-                <span data-key="btn_watch_now">Watch Now</span>
-            </button>
-
-            <!-- Кнопка Пропустить -->
-            <div style="padding: 10px; cursor: pointer; font-size: 13px; color: var(--text-secondary); opacity: 0.7; text-decoration: underline;" onclick="closeWrappedAlert()">
-                <span data-key="onb_skip">Skip</span>
-            </div>
-
-        </div>
-    </div>
-</div>
 
 <!-- LOYALTY OFFER MODAL -->
 <div class="modal-overlay" id="modal-loyalty-overlay">
     <div class="modal" style="max-width: 360px; text-align: center;">
         <div class="modal-header">
-            <span style="color:var(--accent);">🎁 <span data-key="loyal_title">Special Offer</span></span>
-            <span onclick="closeLoyaltyModal()">✕</span>
+            <!-- Кнопка закрытия слева -->
+            <div class="modal-close-btn" onclick="closeLoyaltyModal()">
+                <div class="modal-close-icon"></div>
+            </div>
+            <span style="color:var(--accent);" data-key="loyal_title">Special Offer</span>
         </div>
         
         <div class="modal-body" style="padding-bottom: 25px;">
@@ -9631,7 +9725,7 @@
             <h3 style="margin-bottom: 10px; color: var(--text-main);" data-key="loyal_hey">Hey! 👋</h3>
             
             <p style="font-size:14px; color:var(--text-secondary); line-height:1.5; margin-bottom:20px;" data-key="loyal_text">
-                I notice you've been here a few times. I really appreciate your engagement! Since you like the project, I want to offer you <b>Pro</b> for just <span id="loyal-price" style="color:var(--accent); font-weight:800;">$X.XX</span>. It helps keep the site alive 😊
+                ...
             </p>
 
             <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; margin-bottom: 20px; border: 1px dashed var(--border);">
@@ -9645,39 +9739,6 @@
 
             <div style="text-align:center; margin-top:15px;">
                 <span style="font-size:12px; color:var(--text-secondary); text-decoration:underline; cursor:pointer; opacity: 0.6;" onclick="closeLoyaltyModal()" data-key="btn_close">Maybe later</span>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- SUBSCRIPTION EXPIRY WARNING MODAL -->
-<div class="modal-overlay" id="modal-expiry-warning">
-    <div class="modal" style="max-width: 380px; text-align: center;">
-        <div class="modal-header">
-            <span style="color:var(--accent);">⏳ <span data-key="exp_header">Reminder</span></span>
-            <span onclick="closeExpiryModal()">✕</span>
-        </div>
-        
-        <div class="modal-body" style="padding-bottom: 25px;">
-            <!-- Иконка песочных часов -->
-            <div style="font-size: 50px; margin-bottom: 15px; animation: floatIcon 3s ease-in-out infinite;">⏳</div>
-            
-            <h3 style="margin-bottom: 10px; color: var(--text-main);" data-key="exp_title">
-                Time is running out!
-            </h3>
-            
-            <p id="expiry-text-content" style="font-size:14px; color:var(--text-secondary); line-height:1.5; margin-bottom:25px;">
-                <!-- Текст вставится через JS -->
-            </p>
-
-            <!-- Кнопка Продлить -->
-            <button class="btn-gen" onclick="renewFromExpiry()" style="width:100%; padding:14px; background: linear-gradient(45deg, #FF9900, var(--accent)); color:#fff; box-shadow: 0 5px 20px rgba(255,153,0,0.3);">
-                <span data-key="exp_btn_renew">Renew Subscription</span>
-            </button>
-
-            <!-- Кнопка Позже -->
-            <div style="text-align:center; margin-top:15px;">
-                <span style="font-size:13px; color:var(--text-secondary); text-decoration:underline; cursor:pointer; opacity: 0.7;" onclick="closeExpiryModal()" data-key="btn_close">Remind me later</span>
             </div>
         </div>
     </div>
@@ -9763,59 +9824,124 @@
 
 <!-- SITES SELECTION MODAL -->
 <div class="modal-overlay" id="modal-sites-overlay" onclick="closeSitesModal(event)">
+    
+    <style>
+        /* === ГЛАВНЫЙ КОНТЕЙНЕР БЛОКОВ === */
+        #modal-sites-overlay .sites-fixed-group {
+            background: var(--ios-card) !important;
+            border: none !important;
+            border-radius: 12px !important; 
+            margin: 2px 2px !important;
+            overflow: hidden !important;
+            position: relative;
+        }
+
+        /* --- Внутренние стили строк --- */
+        #modal-sites-overlay .sites-mode-row {
+            padding: 12px 16px 4px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: transparent;
+        }
+
+        #modal-sites-overlay .sites-mode-desc {
+            padding: 0 16px 12px 52px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            opacity: 0.8;
+            line-height: 1.3;
+            background: transparent;
+        }
+
+        /* Разделитель внутри блока режимов */
+        #modal-sites-overlay .sites-separator {
+            height: 1px;
+            background-color: var(--ios-separator);
+            margin-left: 52px;
+            margin-right: 0;
+            transform: scaleY(0.5);
+        }
+
+        /* --- СТИЛИ СПИСКА САЙТОВ --- */
+        
+        #sites-list-container .site-card {
+            border: none !important; 
+            border-radius: 0 !important;
+            margin: 0 !important;
+            background: transparent !important;
+            border-bottom: 1px solid var(--ios-separator) !important;
+        }
+
+        #sites-list-container .site-card:last-child {
+            border-bottom: none !important;
+        }
+
+        /* Эффект нажатия */
+        #sites-list-container .site-card:active,
+        #sites-list-container .site-card:hover {
+            background: var(--nav-bg) !important;
+        }
+
+    </style>
+
     <div class="modal" style="height: 85vh; max-height: 800px;">
         <div class="modal-header">
-            <div class="modal-close-btn" onclick="closeSitesModal(null, true)"><div class="modal-close-icon"></div></div>
+            <div class="modal-close-btn" onclick="closeSitesModal(null, true)">
+                <div class="modal-close-icon"></div>
+            </div>
             <span data-key="site_title">Choose Platform</span>
         </div>
         
-        <div class="modal-body" style="padding: 0;">
-            <!-- 1. SMART MODE -->
-            <div class="smart-mode-container" style="margin-bottom: 10px;">
-                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:5px;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span style="font-size:20px;">🧠</span>
-                        <div>
-                            <div style="font-weight:700; color:var(--text-main); font-size:15px;" data-key="sm_title">Smart Mode</div>
-                            <div style="font-size:11px; color:var(--text-secondary);" data-key="sm_desc">Auto-select site based on tags</div>
-                        </div>
+        <div class="modal-body" style="padding: 0; background: var(--bg-color);">
+            
+            <!-- БЛОК РЕЖИМОВ -->
+            <div class="sites-fixed-group">
+                
+                <!-- 1. SMART MODE -->
+                <div class="sites-mode-row">
+                    <div style="display:flex; align-items:center;">
+                        <div style="font-size:22px; width:24px; text-align:center; margin-right:12px;">🧠</div>
+                        <span style="font-weight:600; font-size:16px; color:var(--text-main);" data-key="sm_title">Smart Mode</span>
                     </div>
                     <label class="switch">
                         <input type="checkbox" id="smart-site-toggle" onchange="toggleSmartSites(this.checked)">
                         <span class="slider"></span>
                     </label>
                 </div>
-                <div style="font-size:10px; color:var(--text-secondary); opacity:0.7; line-height:1.3; margin-top:5px;" data-key="guide_sm_hint">
-                    e.g. Opens <b>Hentai Haven</b> for anime tags...
+                <div class="sites-mode-desc" data-key="sm_desc">
+                    Auto-select site based on tags
                 </div>
-            </div>
 
-            <!-- 2. RANDOM MODE  -->
-            <div class="smart-mode-container" style="margin-top: 0; border-color: var(--border);"> <!-- Отличный стиль, но без акцентной рамки -->
-                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:5px;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span style="font-size:20px;">🎲</span>
-                        <div>
-                            <div style="font-weight:700; color:var(--text-main); font-size:15px;" data-key="rnd_title">Random Mode</div>
-                            <div style="font-size:11px; color:var(--text-secondary);" data-key="rnd_desc">Surprise me every time</div>
-                        </div>
+                <!-- РАЗДЕЛИТЕЛЬ -->
+                <div class="sites-separator"></div>
+
+                <!-- 2. RANDOM MODE -->
+                <div class="sites-mode-row">
+                    <div style="display:flex; align-items:center;">
+                        <div style="font-size:22px; width:24px; text-align:center; margin-right:12px;">🎲</div>
+                        <span style="font-weight:600; font-size:16px; color:var(--text-main);" data-key="rnd_title">Random Mode</span>
                     </div>
                     <label class="switch">
                         <input type="checkbox" id="random-site-toggle" onchange="toggleRandomSites(this.checked)">
                         <span class="slider"></span>
                     </label>
                 </div>
-                <div style="font-size:10px; color:var(--text-secondary); opacity:0.7; line-height:1.3; margin-top:5px;" data-key="guide_rnd_hint">
-                    Uses a different site for every video.
+                <div class="sites-mode-desc" data-key="rnd_desc">
+                    Surprise me every time
                 </div>
             </div>
 
-            <div class="ios-header" style="margin-left:15px; margin-top:15px;" data-key="sites_all">All Sites</div>
+            <!-- ЗАГОЛОВОК СПИСКА -->
+            <div class="ios-header" style="margin-left:25px; margin-bottom: 5px; margin-top: 5px;" data-key="sites_all">All Sites</div>
             
-            <!-- LIST -->
-            <div id="sites-list-container" class="ios-group" style="margin: 0 15px 30px 15px; background: transparent;">
+            <!-- СПИСОК САЙТОВ -->
+            <div id="sites-list-container" class="sites-fixed-group">
                 <!-- JS вставит список -->
             </div>
+            
+            <!-- Безопасная зона снизу -->
+            <div style="height: 30px;"></div>
         </div>
     </div>
 </div>
@@ -9842,6 +9968,8 @@
 </div>
 
 <div id="wrapped-mount" class="wrapped-overlay"></div>
+
+<div id="notification-container"></div>
 
 <!-- FIREBASE INTEGRATION -->
 <script type="module">
@@ -25206,62 +25334,51 @@
         return wrappedArchive.some(w => w.type === 'daily' && w.targetDate === dateKey);
     }
 
-    function showWrappedAlertModal(wrappedObj) {
-        const modal = document.getElementById('modal-wrapped-alert');
-        const textEl = document.getElementById('wrapped-alert-text');
-        const btnWatch = document.getElementById('btn-wrapped-alert-watch');
-        const t = langData[currentLang] || langData['en'];
+    function getDayWord(days, lang) {
+        if (lang === 'ru') {
+            let lastDigit = days % 10;
+            let lastTwoDigits = days % 100;
+            if (lastTwoDigits >= 11 && lastTwoDigits <= 19) return "дней";
+            if (lastDigit === 1) return "день";
+            if (lastDigit >= 2 && lastDigit <= 4) return "дня";
+            return "дней";
+        }
+        if (lang === 'es') return days === 1 ? "día" : "días";
+        if (lang === 'de') return days === 1 ? "Tag" : "Tagen";
+        return days === 1 ? "day" : "days"; // EN
+    }
 
-        // 1. Определяем период (Название)
+    function showWrappedAlertModal(wrappedObj) {
         const badges = WRAPPED_CONFIG.badges[currentLang] || WRAPPED_CONFIG.badges['en'];
         const periodName = badges[wrappedObj.type] || wrappedObj.type;
 
-        // 2. Определяем любимый тег
-        let topTag = "Secret";
-        if (wrappedObj.stats && wrappedObj.stats.topTags && wrappedObj.stats.topTags.length > 0) {
-            const rawTag = wrappedObj.stats.topTags[0];
-            const modMatch = modifiersData.find(m => m.key.toLowerCase() === rawTag.toLowerCase());
-            if (modMatch) {
-                if (currentLang === 'ru') topTag = modMatch.ru;
-                else if (currentLang === 'es') topTag = modMatch.es;
-                else if (currentLang === 'de') topTag = modMatch.de;
-                else topTag = modMatch.en;
-            } else {
-                topTag = rawTag.charAt(0).toUpperCase() + rawTag.slice(1);
-            }
-        }
-
-        // --- 3. ВЫБОР СЛУЧАЙНОЙ ФРАЗЫ ---
-        
-        // Берем массивы фраз (с фолбеком на старый стиль или английский)
-        const titles = t.alert_titles || ["Welcome back"];
-        const texts = t.alert_texts || ["Your report for {period} is ready."];
-
-        // Выбираем рандомный индекс
-        const randTitle = titles[Math.floor(Math.random() * titles.length)];
-        let randText = texts[Math.floor(Math.random() * texts.length)];
-
-        // Подставляем переменные
-        randText = randText.replace('{period}', periodName).replace('{tag}', topTag.toUpperCase());
-
-        // Вставляем HTML
-        textEl.innerHTML = `<strong style="font-size:18px; display:block; margin-bottom:12px; color:var(--text-main); line-height:1.2;">${randTitle}</strong>${randText}`;
-
-        // 4. Настраиваем кнопку
-        btnWatch.onclick = () => {
-            closeWrappedAlert();
-            openWrappedUI(wrappedObj);
+        const titles = {
+            en: "Fetish Wrapped",
+            ru: "Итоги фетишей",
+            es: "Resumen Fetichista",
+            de: "Fetisch Rückblick"
         };
 
-        // 5. Показываем с задержкой
-        setTimeout(() => {
-            modal.classList.add('open');
-            if(navigator.vibrate) navigator.vibrate([50, 50, 50]); 
-        }, 1500);
+        const descs = {
+            en: `Your ${periodName} summary is ready! Tap to view.`,
+            ru: `Твой отчет за ${periodName} готов! Нажми, чтобы посмотреть.`,
+            es: `¡Tu resumen de ${periodName} está listo! Toca para ver.`,
+            de: `Dein ${periodName} Rückblick ist bereit! Ansehen.`
+        };
+
+        showPushNotification({
+            title: titles[currentLang] || titles.en,
+            desc: descs[currentLang] || descs.en,
+            icon: "🎁",
+            onClick: () => {
+                openWrappedUI(wrappedObj);
+            }
+        });
     }
 
     function closeWrappedAlert() {
-        document.getElementById('modal-wrapped-alert').classList.remove('open');
+        const activeToast = document.querySelector('.toast-push');
+        if (activeToast) removeToast(activeToast);
     }
 
     async function fetchActiveDiscount() {
@@ -25370,37 +25487,38 @@
     }
 
     function openExpiryModal(days) {
-        const modal = document.getElementById('modal-expiry-warning');
-        const textEl = document.getElementById('expiry-text-content');
         const t = langData[currentLang] || langData['en'];
+        const dayWord = getDayWord(days, currentLang);
 
-        // Формируем текст
-        let msg = t.exp_text || "Your subscription ends in {n} days.";
-        
-        // Правильное склонение дней для русского языка (день/дня/дней) - упрощенно
-        let dayWord = "days";
-        if (currentLang === 'ru') {
-            if (days === 1) dayWord = "день";
-            else if (days < 5) dayWord = "дня";
-            else dayWord = "дней";
-        } else if (currentLang === 'es') {
-            dayWord = days === 1 ? "día" : "días";
-        } else if (currentLang === 'de') {
-            dayWord = days === 1 ? "Tag" : "Tagen";
-        }
+        const titles = {
+            en: "Subscription",
+            ru: "Подписка",
+            es: "Suscripción",
+            de: "Abonnement"
+        };
 
-        // Вставляем число
-        msg = msg.replace('{n}', `<b style="color:var(--accent); font-size:15px;">${days} ${dayWord}</b>`);
-        
-        textEl.innerHTML = msg;
-        modal.classList.add('open');
+        const descs = {
+            en: `Expires in ${days} ${dayWord}. Tap to renew.`,
+            ru: `Истекает через ${days} ${dayWord}. Нажми для продления.`,
+            es: `Expira en ${days} ${dayWord}. Toca para renovar.`,
+            de: `Läuft in ${days} ${dayWord} ab. Zum Verlängern tippen.`
+        };
 
-        // Записываем время показа
+        showPushNotification({
+            title: titles[currentLang] || titles.en,
+            desc: descs[currentLang] || descs.en,
+            icon: "⏳",
+            onClick: () => {
+                openSubModal();
+            }
+        });
+
         localStorage.setItem('xch_expiry_warn_ts', Date.now());
     }
 
     function closeExpiryModal() {
-        document.getElementById('modal-expiry-warning').classList.remove('open');
+        const activeToast = document.querySelector('.toast-push');
+        if (activeToast) removeToast(activeToast);
     }
 
     function renewFromExpiry() {
@@ -25562,27 +25680,91 @@
         }
     }
 
+    function showPushNotification(options) {
+        const isMobile = window.innerWidth <= 768;
+        const activeTab = document.querySelector('.tab-content.active')?.id;
+        
+        // На мобильных показываем ТОЛЬКО во вкладке аккаунта
+        if (isMobile && activeTab !== 'tab-account') {
+            return;
+        }
+
+        const container = document.getElementById('notification-container');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = 'toast-push toast-animate-in';
+        
+        toast.innerHTML = `
+            <div class="toast-push-icon">${options.icon || '🔔'}</div>
+            <div class="toast-push-content">
+                <div class="toast-push-title">${options.title}</div>
+                <div class="toast-push-desc">${options.desc}</div>
+            </div>
+        `;
+
+        toast.onclick = () => {
+            if (options.onClick) options.onClick();
+            removeToast(toast);
+        };
+
+        container.appendChild(toast);
+
+        // Удаление через 3.5 сек
+        setTimeout(() => removeToast(toast), 3500);
+    }
+
+    function removeToast(toast) {
+        if (!toast) return;
+        toast.classList.add('toast-animate-out');
+        setTimeout(() => toast.remove(), 300);
+    }
+
     // === PWA PRIVACY PROTECTION ===
     (function() {
         const privacyScreen = document.getElementById('pwa-privacy-screen');
         
-        // Событие: Страница скрывается (сворачивание, переключение вкладок, многозадачность)
+        // Функция показа (мгновенная)
+        const showPrivacy = () => {
+            privacyScreen.classList.add('active');
+            // Принудительная перерисовка для iOS, чтобы он успел захватить кадр
+            void privacyScreen.offsetWidth; 
+        };
+
+        // Функция скрытия (с задержкой для плавности)
+        const hidePrivacy = () => {
+            setTimeout(() => {
+                privacyScreen.classList.remove('active');
+            }, 100); // 100мс задержка, чтобы не моргало при возврате
+        };
+
+        // 1. VISIBILITY CHANGE (Стандарт для Android/PC)
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'hidden') {
-                // Мгновенно включаем черный экран
-                privacyScreen.style.display = 'flex';
+                showPrivacy();
             } else {
-                // Когда вернулись — убираем с небольшой задержкой (чтобы не моргало)
-                setTimeout(() => {
-                    privacyScreen.style.display = 'none';
-                }, 50);
+                hidePrivacy();
             }
         });
 
-        // Для Safari на iOS
-        window.addEventListener('pagehide', () => {
-            privacyScreen.style.display = 'flex';
+        // 2. PAGEHIDE (Для старых iOS)
+        window.addEventListener('pagehide', showPrivacy);
+
+        // 3. BLUR & FOCUS (Критично для iOS App Switcher)
+        window.addEventListener('blur', () => {
+            // Проверяем, не является ли это просто кликом по iframe или инпуту
+            if (document.activeElement && (document.activeElement.tagName === 'IFRAME' || document.activeElement.tagName === 'INPUT')) {
+                return;
+            }
+            showPrivacy();
         });
+
+        window.addEventListener('focus', hidePrivacy);
+
+        // 4. FREEZE (Для жизненного цикла iOS PWA)
+        document.addEventListener('freeze', showPrivacy);
+        document.addEventListener('resume', hidePrivacy);
+
     })();
 
 </script>
