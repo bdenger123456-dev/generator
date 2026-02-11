@@ -7791,6 +7791,19 @@
             border-radius: 5px;
         }
 
+        /* Список инструкции */
+        #modal-add-site-overlay ol li {
+            margin-bottom: 8px;
+        }
+        /* Стиль для кнопки удаления кастомного сайта */
+        .site-card .site-delete {
+            padding: 8px 12px;
+            background: rgba(255,0,0,0.1);
+            color: var(--highlight-red);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
         .seo-context {
             position: absolute;
             width: 1px;
@@ -8863,6 +8876,7 @@
                         <li style="color:var(--text-main)" data-key="feat_unlim">🔥 <b>Unlimited</b> Gens</li>
                         <li data-key="feat_stats_adv">📈 Advanced Stats</li>
                         <li data-key="feat_wrapped_unlim">✨ <b>Unlimited</b> Wrapped</li>
+                        <li data-key="feat_custom_sites">🌐 <b>Add Custom</b> Sites</li> 
                         <li data-key="feat_custom">🎨 Deep Customization</li>
                     </ul>
                     <button class="plan-btn pro-btn" onclick="openPaymentSelection('pro')" data-key="btn_get_pro" style="background:#ff9900; color:#000;">Get Pro</button>
@@ -10024,6 +10038,46 @@
             
             <!-- Безопасная зона снизу -->
             <div style="height: 30px;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ADD CUSTOM SITE MODAL -->
+<div class="modal-overlay" id="modal-add-site-overlay" onclick="closeAddSiteModal(event)">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-close-btn" onclick="closeAddSiteModal(null, true)">
+                <div class="modal-close-icon"></div>
+            </div>
+            <span data-key="add_site_title">Add New Site</span>
+        </div>
+        
+        <div class="modal-body">
+            <!-- Инструкция -->
+            <div style="background: rgba(255,255,255,0.05); border-radius: 16px; padding: 15px; margin-bottom: 20px; border: 1px solid var(--border);">
+                <div style="font-weight: 700; color: var(--accent); margin-bottom: 10px; font-size: 13px;" data-key="add_site_instr_title">INSTRUCTIONS:</div>
+                <ol style="font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin: 0; padding-left: 20px;">
+                    <li data-key="add_site_step_1">Go to the 18+ site you want to add.</li>
+                    <li data-key="add_site_step_2">In the search bar, type exactly <b>test</b> and hit search.</li>
+                    <li data-key="add_site_step_3">Copy the resulting URL from your browser address bar and paste it below.</li>
+                </ol>
+            </div>
+
+            <!-- Поля ввода -->
+            <div class="ios-group" style="padding: 15px; width: 100% !important; margin: 0;">
+                <label style="font-size: 11px; color: var(--text-secondary); font-weight: 700; margin-bottom: 5px; display: block;" data-key="lbl_site_name">NAME</label>
+                <input type="text" id="custom-site-name" class="promo-input" placeholder="e.g. My Favorite Site" style="margin-bottom: 15px; width: 100%;">
+
+                <label style="font-size: 11px; color: var(--text-secondary); font-weight: 700; margin-bottom: 5px; display: block;" data-key="lbl_site_url">URL (With 'test')</label>
+                <input type="url" id="custom-site-url" class="promo-input" placeholder="https://site.com/search?q=test" style="margin-bottom: 15px; width: 100%;">
+
+                <label style="font-size: 11px; color: var(--text-secondary); font-weight: 700; margin-bottom: 5px; display: block;" data-key="lbl_site_desc">DESCRIPTION</label>
+                <input type="text" id="custom-site-desc" class="promo-input" placeholder="Best for VR..." style="margin-bottom: 10px; width: 100%;">
+            </div>
+
+            <button class="btn-gen" onclick="saveCustomSite()" style="width: 100%; margin-top: 15px;">
+                <span data-key="btn_save">Save Site</span>
+            </button>
         </div>
     </div>
 </div>
@@ -11384,6 +11438,7 @@
     let historyData = JSON.parse(localStorage.getItem(STORAGE.HISTORY)) || [];
     let watchHistory = JSON.parse(localStorage.getItem(STORAGE.WATCH_HISTORY)) || [];
     let activityLog = JSON.parse(localStorage.getItem(STORAGE.ACTIVITY_LOG)) || [];
+    let customSites = JSON.parse(localStorage.getItem('xch_custom_sites')) || [];
 
     let activeDiscount = null;
 
@@ -11461,13 +11516,13 @@
         },
         { 
             id: 't8', name: 'Tube8', 
-            url: 'https://www.tube8.com/search/videos?q={q}', sep: '+',
+            url: 'https://www.tube8.com/searches.html/?q={q}', sep: '+',
             tags: ['hardcore', 'long'],
             desc: { en: "Long scenes, old hits.", ru: "Длинные сцены, старые хиты.", es: "Escenas largas, éxitos antiguos.", de: "Lange Szenen, alte Hits." }
         },
         { 
             id: 'pcom', name: 'Porn.com', 
-            url: 'https://www.porn.com/videos/search?q={q}', sep: '+',
+            url: 'https://www.porn.com/search?sq={q}', sep: '-',
             tags: ['general'],
             desc: { en: "Simple category search.", ru: "Простой поиск по категориям.", es: "Búsqueda sencilla por categorías.", de: "Einfache Kategoriesuche." }
         },
@@ -11486,13 +11541,13 @@
         },
         { 
             id: 'pone', name: 'PornOne', 
-            url: 'https://pornone.com/?s={q}', sep: '+',
+            url: 'https://pornone.com/search?q={q}', sep: '+', 
             tags: ['general'],
             desc: { en: "Classic tube, no signup.", ru: "Классический туб без регистрации.", es: "Tubo clásico, sin registro.", de: "Klassische Röhre, keine Anmeldung." }
         },
         { 
             id: 'tna', name: 'TnaFlix', 
-            url: 'https://www.tnaflix.com/search.php?q={q}', sep: '+',
+            url: 'https://www.tnaflix.com/search?what={q}', sep: '+', 
             tags: ['retro', 'amateur'],
             desc: { en: "Amateur & Retro content.", ru: "Любительское и ретро.", es: "Contenido amateur y retro.", de: "Amateur- & Retro-Inhalte." }
         },
@@ -11821,6 +11876,18 @@
             expl_hist: "From Archives 📜",
             deco_label: "Show Decorations",
 
+            add_site_btn: "Add Custom Site",
+            add_site_title: "Add New Site",
+            add_site_instr_title: "INSTRUCTION:",
+            add_site_step_1: "Go to the site you want to add.",
+            add_site_step_2: "Search for the word <b>test</b>.",
+            add_site_step_3: "Copy the result URL and paste below.",
+            lbl_site_name: "NAME",
+            lbl_site_url: "URL RESULT",
+            lbl_site_desc: "DESCRIPTION",
+            btn_save: "Save",
+            btn_delete: "Delete",
+
             reward_days: "{n} Days",
             reward_claimed_status: "Claimed",
 
@@ -11971,15 +12038,28 @@
             tip_dict_title: "Fetish Glossary",
             tip_dict_desc: "POV, PMV, JOI and others",
             tip_dict_text: `
-                Confused by acronyms? Here is a breakdown of the most popular ones:<br><br>
-                <b>POV (Point Of View):</b> Filmed from the first-person perspective. You see through the actor's eyes.<br>
-                <b>PMV (Porn Music Video):</b> Clips edited to music. Aesthetic and rhythmic.<br>
-                <b>JOI (Jerk Off Instruction):</b> The model tells you exactly what to do and when.<br>
-                <b>BBW (Big Beautiful Woman):</b> Plus-size women. More than just "chubby".<br>
-                <b>PAWG (Phat Ass White Girl):</b> Self-explanatory. A cult favorite.<br>
-                <b>SPH (Small Penis Humiliation):</b> A popular niche involving teasing sizes.<br>
-                <b>CBT (Cock and Ball Torture):</b> Hardcore fetish involving pain to genitals.<br>
-                <b>Creampie:</b> Finishing inside. A timeless classic.
+                <b>🎥 Formats & Styles</b><br>
+                <b>POV (Point of View):</b> Filmed through the actor's eyes. You are the protagonist.<br>
+                <b>PMV (Porn Music Video):</b> Clips edited to the rhythm of music.<br>
+                <b>Gonzo:</b> Raw, unscripted action where the cameraperson interacts.<br>
+                <b>JOI (Jerk Off Instruction):</b> The model tells you exactly how and when to touch yourself.<br>
+                <b>ASMR:</b> Whispers and sounds for brain-tingling relaxation.<br><br>
+
+                <b>👥 Body Types</b><br>
+                <b>MILF / GILF:</b> Experienced Moms / Grandmas.<br>
+                <b>BBW:</b> Big Beautiful Women (Plus-size).<br>
+                <b>SSBBW:</b> Super Size BBW. Even bigger and softer.<br>
+                <b>PAWG:</b> Phat Ass White Girl.<br>
+                <b>Futanari:</b> Anime girls with a penis (best of both worlds).<br><br>
+
+                <b>⛓️ Kink & Hardcore</b><br>
+                <b>BDSM:</b> Bondage, Dominance, Sadism, Masochism.<br>
+                <b>CNC (Consensual Non-Consent):</b> Roleplay involving forced scenarios (Safe & Sane).<br>
+                <b>CBT (Cock and Ball Torture):</b> Painful play with male genitals.<br>
+                <b>SPH (Small Penis Humiliation):</b> Mocking size for pleasure.<br>
+                <b>A2M (Ass to Mouth):</b> Going straight from the backdoor to the mouth.<br>
+                <b>Creampie:</b> Finishing inside. A timeless classic.<br>
+                <b>Shibari:</b> The artistic Japanese form of rope bondage.
             `,
 
             // 3. PSYCHOTYPES
@@ -12018,6 +12098,23 @@
                 You got "Anal".<br>
                 You add the modifier "Mia Khalifa".<br>
                 Result: You see videos with Mia Khalifa and Anal 😏.
+            `,
+
+            tip_vpn_region_title: "Best VPN Region for 18+",
+            tip_vpn_region_desc: "Where to connect for zero blocks",
+            tip_vpn_region_text: `
+                Choosing the right server is key to avoiding "Access Denied" screens or annoying ID verifications.<br><br>
+                
+                <b>🇳🇱 Netherlands (The Gold Standard)</b><br>
+                The best region for adult content. All major networks (Aylo/Pornhub, XVideos, xHamster) and niche sites are 100% accessible without restrictions.<br><br>
+                
+                <b>🇺🇸 USA (The "Red State" Problem)</b><br>
+                Unstable. 23+ states (like Texas, Virginia, Utah) have passed age-verification laws. If your VPN lands there, Pornhub and others will simply <b>block access</b>. Avoid USA servers if you want a smooth experience.<br><br>
+                
+                <b>🇮🇳 India & 🇦🇪 Middle East</b><br>
+                Strict censorship. Almost all mainstream and niche adult sites are blocked at the ISP level. Do not use these regions.<br><br>
+                
+                <b>💡 Pro Tip:</b> Set your VPN to <b>Netherlands, Switzerland, or Canada</b> for the most reliable and private access.
             `,
 
             pt_title: "Did you know?",
@@ -12331,6 +12428,8 @@
             feat_wrapped_limited: "🎁 1 Fetish Wrapped / week",
             feat_wrapped_unlim: "✨ <b>Unlimited</b> Fetish Wrapped",
 
+            feat_custom_sites: "🌐 <b>Add Custom</b> Sites",
+
             lbl_subscription: "Subscription",
             limit_text_full: "🎲 50 Generations / day (left: {n}/50)",
 
@@ -12586,6 +12685,18 @@
             expl_hist: "Из архивов 📜",
             deco_label: "Показывать декор",
 
+            add_site_btn: "Добавить свой сайт",
+            add_site_title: "Новый сайт",
+            add_site_instr_title: "ИНСТРУКЦИЯ:",
+            add_site_step_1: "Зайди на сайт, который хочешь добавить.",
+            add_site_step_2: "В поиске напиши слово <b>test</b> и нажми найти.",
+            add_site_step_3: "Скопируй ссылку из браузера с результатами и вставь ниже.",
+            lbl_site_name: "НАЗВАНИЕ",
+            lbl_site_url: "ССЫЛКА (с 'test')",
+            lbl_site_desc: "ОПИСАНИЕ",
+            btn_save: "Сохранить",
+            btn_delete: "Удалить",
+
             reward_days: "{n} дн.",
             reward_claimed_status: "Забрано",
 
@@ -12736,15 +12847,28 @@
             tip_dict_title: "Словарь терминов",
             tip_dict_desc: "POV, PMV, JOI и другие",
             tip_dict_text: `
-                Часто встречаешь непонятные аббревиатуры? Вот расшифровка самых популярных:<br><br>
-                <b>POV (Point Of View):</b> Съемка от первого лица. Ты видишь всё глазами актера.<br>
-                <b>PMV (Porn Music Video):</b> Нарезка кадров под музыку. Эстетично и ритмично.<br>
-                <b>JOI (Jerk Off Instruction):</b> Инструкции для мастурбации. Модель говорит тебе, что и как делать.<br>
-                <b>BBW (Big Beautiful Woman):</b> Пышные дамы. Больше, чем просто "толстушка".<br>
-                <b>PAWG (Phat Ass White Girl):</b> Белая девушка с очень большой попой.<br>
-                <b>SPH (Small Penis Humiliation):</b> Унижение маленького члена. Популярный фетиш.<br>
-                <b>CBT (Cock and Ball Torture):</b> Пытки гениталий. Жесткий фетиш для любителей боли.<br>
-                <b>Creampie:</b> Финал внутрь. Классика.
+                <b>🎥 Форматы и стили</b><br>
+                <b>POV (точка зрения):</b> Снято глазами актера. Вы — главный герой.<br>
+                <b>PMV (порно-музыкальное видео):</b> Клипы, смонтированные в ритме музыки.<br>
+                <b>Gonzo:</b> Неотредактированное действие без сценария, в котором участвует оператор.<br>
+                <b>JOI (Jerk Off Instruction):</b> Модель точно говорит вам, как и когда трогать себя.<br>
+                <b>ASMR:</b> Шепот и звуки для расслабляющего воздействия на мозг.<br><br>
+
+                <b>👥 Типы телосложения</b><br>
+                <b>MILF / GILF:</b> Опытные мамы / бабушки.<br>
+                <b>BBW:</b> Красивые полные женщины (плюс-сайз).<br>
+                <b>SSBBW:</b> Супер-размерные BBW. Еще больше и мягче.<br>
+                <b>PAWG:</b> белые девушки с большими задницами.<br>
+                <b>Futanari:</b> аниме-девушки с пенисом (лучшее из обоих миров).<br><br>
+
+                <b>⛓️ Кинк и хардкор</b><br>
+                <b>BDSM:</b> бондаж, доминирование, садизм, мазохизм.<br>
+                <b>CNC (Consensual Non-Consent):</b> Ролевые игры с принудительными сценариями (безопасными и разумными).<br>
+                <b>CBT (Cock and Ball Torture):</b> Болезненные игры с мужскими гениталиями.<br>
+                <b>SPH (Small Penis Humiliation):</b> Издевательства над размером для удовольствия.<br>
+                <b>A2M (Ass to Mouth):</b> Переход прямо из заднего прохода в рот.<br>
+                <b>Creampie:</b> Завершение внутри. Вечная классика.<br>
+                <b>Shibari:</b> Художественная японская форма связывания веревками.
             `,
 
             // 3. ПСИХОТИПЫ
@@ -12783,6 +12907,23 @@
                 Тебе выпал "Анал".<br>
                 Ты добавляешь модификатор "Mia Khalifa".<br>
                 Итог: Тебе показываются видео с Mia Khalifa и Анал 😏.
+            `,
+
+            tip_vpn_region_title: "Лучший VPN регион для 18+",
+            tip_vpn_region_desc: "Куда подключаться для доступа без границ",
+            tip_vpn_region_text: `
+                Выбор правильного сервера — это разница между «Видео доступно» и экраном блокировки или требованием паспорта.<br><br>
+                
+                <b>🇳🇱 Нидерланды (Золотой стандарт)</b><br>
+                Лучший выбор для взрослого контента. Все крупные сети (Pornhub, XVideos, xHamster) и нишевые сайты доступны на 100% без ограничений.<br><br>
+                
+                <b>🇺🇸 США (Проблема штатов)</b><br>
+                Нестабильно. Более 23 штатов (Техас, Вирджиния, Юта и др.) ввели законы о проверке возраста. Если ваш VPN выдаст IP такого штата, Pornhub просто <b>закроет доступ</b>. Избегайте серверов США.<br><br>
+                
+                <b>🇮🇳 Индия и 🇦🇪 Ближний Восток</b><br>
+                Жесткая цензура. Почти все сайты (Mainstream, Hentai, Niche) заблокированы на уровне провайдеров. Эти регионы бесполезны.<br><br>
+                
+                <b>💡 Совет:</b> Всегда выбирайте <b>Нидерланды, Швейцарию или Румынию</b> для самого быстрого и свободного доступа.
             `,
 
             pt_title: "Ты знал?",
@@ -13094,6 +13235,8 @@
             feat_wrapped_limited: "🎁 1 Fetish Wrapped / неделю",
             feat_wrapped_unlim: "✨ <b>Безлимитный</b> Wrapped",
 
+            feat_custom_sites: "🌐 <b>Свои</b> Сайты",
+
             lbl_subscription: "Подписка",
             limit_text_full: "🎲 50 Генераций / день (осталось: {n}/50)",
 
@@ -13347,6 +13490,18 @@
             expl_hist: "De los archivos 📜",
             deco_label: "Mostrar decoración",
 
+            add_site_btn: "Añadir sitio personalizado",
+            add_site_title: "Añadir nuevo sitio",
+            add_site_instr_title: "INSTRUCTION:",
+            add_site_step_1: "Vaya al sitio que desea añadir.",
+            add_site_step_2: "Busque la palabra <b>test</b>.",
+            add_site_step_3: "Copie la URL resultante y péguela a continuación.",
+            lbl_site_name: "NAME",
+            lbl_site_url: "URL RESULTADO",
+            lbl_site_desc: "DESCRIPTION",
+            btn_save: "Guardar",
+            btn_delete: "Borrar",
+
             reward_days: "{n} días",
             reward_claimed_status: "Recibido",
 
@@ -13490,12 +13645,28 @@
             tip_dict_title: "Glosario Fetiche",
             tip_dict_desc: "Qué significa POV, BBW, etc.",
             tip_dict_text: `
-                <b>POV:</b> Punto de vista (primera persona).<br>
-                <b>PMV:</b> Video musical porno.<br>
-                <b>JOI:</b> Instrucciones de masturbación.<br>
-                <b>BBW:</b> Mujeres grandes y hermosas.<br>
-                <b>PAWG:</b> Chica blanca con trasero grande.<br>
-                <b>CBT:</b> Tortura genital (Hardcore).
+                <b>🎥 Formatos y estilos</b><br>
+                <b>POV (punto de vista):</b> Filmado a través de los ojos del actor. Tú eres el protagonista.<br>
+                <b>PMV (vídeo musical porno):</b> Clips editados al ritmo de la música.<br>
+                <b>Gonzo:</b> Acción cruda y sin guion en la que el cámara interactúa.<br>
+                <b>JOI (Jerk Off Instruction):</b> La modelo te dice exactamente cómo y cuándo tocarte.<br>
+                <b>ASMR:</b> Susurros y sonidos para una relajación que te hará vibrar el cerebro.<br><br>
+
+                <b>👥 Tipos de cuerpo</b><br>
+                <b>MILF / GILF:</b> Madres / abuelas con experiencia.<br>
+                <b>BBW:</b> Mujeres grandes y hermosas (talla grande).<br>
+                <b>SSBBW:</b> BBW de talla extragrande. Aún más grandes y suaves.<br>
+                <b>PAWG:</b> Chicas blancas con culos grandes.<br>
+                <b>Futanari:</b> Chicas de anime con pene (lo mejor de ambos mundos).<br><br>
+
+                <b>⛓️ Kink y hardcore</b><br>
+                <b>BDSM:</b> Bondage, dominación, sadismo, masoquismo.<br>
+                <b>CNC (Consensual Non-Consent):</b> Juego de rol que implica situaciones forzadas (seguro y sensato).<br>
+                <b>CBT (Cock and Ball Torture):</b> Juego doloroso con los genitales masculinos.<br>
+                <b>SPH (Small Penis Humiliation):</b> Burlarse del tamaño para obtener placer.<br>
+                <b>A2M (del culo a la boca):</b> Pasar directamente de la puerta trasera a la boca.<br>
+                <b>Creampie:</b> Correrse dentro. Un clásico atemporal.<br>
+                <b>Shibari:</b> La forma artística japonesa de bondage con cuerdas.
             `,
 
             tip_psycho_title: "Todos los Psicotipos",
@@ -13531,6 +13702,23 @@
                 Obtuviste "Anal".<br>
                 Añades el modificador "Mia Khalifa".<br>
                 Resultado: Se te muestran videos de Mia Khalifa y Anal 😏.
+            `,
+
+            tip_vpn_region_title: "Mejor Región VPN para +18",
+            tip_vpn_region_desc: "Dónde conectarse para evitar bloqueos",
+            tip_vpn_region_text: `
+                Elegir el servidor adecuado es clave para evitar pantallas de "Acceso denegado" o verificaciones de identidad.<br><br>
+                
+                <b>🇳🇱 Países Bajos (El Estándar de Oro)</b><br>
+                La mejor región para contenido adulto. Todas las redes (Pornhub, XVideos, xHamster) y sitios de nicho son 100% accesibles sin restricciones.<br><br>
+                
+                <b>🇺🇸 EE. UU. (Problemas de Verificación)</b><br>
+                Inestable. Más de 23 estados (como Texas o Utah) exigen verificación de edad. Si tu VPN te asigna allí, sitios como Pornhub <b>bloquearán el acceso</b>. Evita los servidores de EE. UU.<br><br>
+                
+                <b>🇮🇳 India y 🇦🇪 Medio Oriente</b><br>
+                Censura estricta. Casi todos los sitios mainstream y de Hentai están bloqueados por los proveedores de internet. No uses estas regiones.<br><br>
+                
+                <b>💡 Pro Tip:</b> Configura tu VPN en <b>Países Bajos, Suiza o Rumania</b> para el acceso más confiable.
             `,
 
             pt_title: "¿Sabías qué?",
@@ -13854,6 +14042,8 @@
             feat_wrapped_limited: "🎁 1 Fetish Wrapped / semana",
             feat_wrapped_unlim: "✨ Fetish Wrapped <b>Ilimitado</b>",
 
+            feat_custom_sites: "🌐 Sitios <b>Propios</b>",
+
             lbl_subscription: "Suscripción",
             limit_text_full: "🎲 50 Generaciones / día (quedan: {n}/50)",
 
@@ -14088,6 +14278,18 @@
             expl_hist: "Aus dem Archiv 📜",
             deco_label: "Dekoration anzeigen",
 
+            add_site_btn: "Benutzerdefinierte Website hinzufügen",
+            add_site_title: "Neue Website hinzufügen",
+            add_site_instr_title: "INSTR_title:",
+            add_site_step_1: "Gehen Sie zu der Website, die Sie hinzufügen möchten.",
+            add_site_step_2: "Suchen Sie nach dem Wort <b>test</b>.",
+            add_site_step_3: "Kopieren Sie die Ergebnis-URL und fügen Sie sie unten ein.",
+            lbl_site_name: "NAME",
+            lbl_site_url: "URL RESULT",
+            lbl_site_desc: "DESCRIPTION",
+            btn_save: "Speichern",
+            btn_delete: "Löschen",
+
             reward_days: "{n} Tage",
             reward_claimed_status: "Erhalten",
 
@@ -14231,12 +14433,28 @@
             tip_dict_title: "Fetisch-Glossar",
             tip_dict_desc: "POV, BBW und mehr erklärt",
             tip_dict_text: `
-                <b>POV:</b> Perspektive der ersten Person.<br>
-                <b>PMV:</b> Porno-Musikvideo.<br>
-                <b>JOI:</b> Wichsanleitung.<br>
-                <b>BBW:</b> Große schöne Frauen.<br>
-                <b>PAWG:</b> Weiße Frau mit großem Hintern.<br>
-                <b>CBT:</b> Genitalfolter (Hardcore).
+                <b>🎥 Formate & Stile</b><br>
+                <b>POV (Point of View):</b> Aus der Perspektive des Darstellers gefilmt. Du bist der Protagonist.<br>
+                <b>PMV (Porn Music Video):</b> Clips, die zum Rhythmus der Musik geschnitten sind.<br>
+                <b>Gonzo:</b> Ungeschönte, improvisierte Action, bei der der Kameramann mitwirkt.<br>
+                <b>JOI (Jerk Off Instruction):</b> Das Model sagt Ihnen genau, wie und wann Sie sich selbst berühren sollen.<br>
+                <b>ASMR:</b> Flüstern und Geräusche für eine entspannende, prickelnde Erfahrung.<br><br>
+
+                <b>👥 Körpertypen</b><br>
+                <b>MILF / GILF:</b> Erfahrene Mütter / Großmütter.<br>
+                <b>BBW:</b> Große, schöne Frauen (Plus-Size).<br>
+                <b>SSBBW:</b> Super Size BBW. Noch größer und weicher.<br>
+                <b>PAWG:</b> Phat Ass White Girl (weiße Mädchen mit dickem Hintern).<br>
+                <b>Futanari:</b> Anime-Mädchen mit Penis (das Beste aus beiden Welten).<br><br>
+
+                <b>⛓️ Kink & Hardcore</b><br>
+                <b>BDSM:</b> Bondage, Dominanz, Sadismus, Masochismus.<br>
+                <b>CNC (Consensual Non-Consent):</b> Rollenspiel mit Zwangsszenarien (Safe & Sane).<br>
+                <b>CBT (Cock and Ball Torture):</b> Schmerzhaftes Spiel mit männlichen Genitalien.<br>
+                <b>SPH (Small Penis Humiliation):</b> Verspottung der Größe zum Vergnügen.<br>
+                <b>A2M (Ass to Mouth):</b> Direkt vom Hintereingang zum Mund. <br>
+                <b>Creampie:</b> Im Inneren zum Höhepunkt kommen. Ein zeitloser Klassiker. <br>
+                <b>Shibari:</b> Die künstlerische japanische Form der Seilfesselung.
             `,
 
             tip_psycho_title: "Alle Psychotypen",
@@ -14272,6 +14490,23 @@
                 Du hast "Anal" erhalten.<br>
                 Du fügst den Modifikator "Mia Khalifa" hinzu.<br>
                 Ergebnis: Dir werden Videos mit Mia Khalifa und Anal angezeigt 😏.
+            `,
+
+            tip_vpn_region_title: "Beste VPN-Region für 18+",
+            tip_vpn_region_desc: "Die besten Standorte für freien Zugang",
+            tip_vpn_region_text: `
+                Die Wahl des richtigen Servers ist entscheidend, um Sperren oder nervige Ausweisprüfungen zu vermeiden.<br><br>
+                
+                <b>🇳🇱 Niederlande (Der Goldstandard)</b><br>
+                Die beste Region für Ü18-Inhalte. Alle großen Netzwerke (Pornhub, XVideos, xHamster) und Nischenseiten sind zu 100% ohne Einschränkungen zugänglich.<br><br>
+                
+                <b>🇺🇸 USA (Altersverifizierungsprobleme)</b><br>
+                Instabil. Über 23 Bundesstaaten (wie Texas, Utah) haben Gesetze zur Altersprüfung erlassen. Wenn deine VPN dort landet, <b>blockieren</b> Pornhub und andere den Zugriff komplett. Vermeide USA-Server.<br><br>
+                
+                <b>🇮🇳 Indien & 🇦🇪 Naher Osten</b><br>
+                Strenge Zensur. Fast alle Mainstream-, Hentai- und Nischenseiten sind auf ISP-Ebene gesperrt. Diese Regionen sind für 18+ Surfen unbrauchbar.<br><br>
+                
+                <b>💡 Pro-Tipp:</b> Stelle deine VPN auf <b>Niederlande, Schweiz oder Rumänien</b> ein, um den sichersten Zugang zu erhalten.
             `,
 
             pt_title: "Wusstest du?",
@@ -14584,6 +14819,8 @@
             btn_current: "Aktueller Plan",
             feat_wrapped_limited: "🎁 1 Fetish Wrapped / Woche",
             feat_wrapped_unlim: "✨ <b>Unbegrenztes</b> Wrapped",
+
+            feat_custom_sites: "🌐 <b>Eigene</b> Seiten",
 
             lbl_subscription: "Abonnement",
             limit_text_full: "🎲 50 Generationen / Tag (übrig: {n}/50)",
@@ -14914,12 +15151,20 @@
         descKey: 'tip_badge_desc', 
         textKey: 'tip_badge_text',
         gradient: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)' 
+    },
+    { 
+        id: 'vpn_region', 
+        icon: '🌍', 
+        titleKey: 'tip_vpn_region_title', 
+        descKey: 'tip_vpn_region_desc', 
+        textKey: 'tip_vpn_region_text',
+        gradient: 'linear-gradient(135deg, #6366f1 0%, #4338ca 100%)' 
     }
 ];
     
     const TIPS_CATS = {
         tech: ['install_guide', 'mods_guide', 'ads', 'video', 'pay', 'bug', 'panic', 'layout', 'modes'],
-        info: ['sites_guide', 'algo_secrets', 'glossary', 'psychotypes', 'intensity', 'missing_wrapped']
+        info: ['sites_guide', 'vpn_region', 'algo_secrets', 'glossary', 'psychotypes', 'intensity', 'missing_wrapped']
     };
 
     // --- WRAPPED DATA & TEXTS ---
@@ -16883,7 +17128,9 @@
         
         const currentSiteId = localStorage.getItem('xch_platform') || 'xh';
         const lang = ['en','ru','es','de'].includes(currentLang) ? currentLang : 'en';
+        const t = langData[currentLang] || langData['en'];
 
+        // 1. Рендер стандартных сайтов
         SITES_DATA.forEach(site => {
             const isSelected = (site.id === currentSiteId);
             const desc = site.desc[lang] || site.desc.en;
@@ -16901,6 +17148,72 @@
             `;
             container.appendChild(div);
         });
+
+        // 2. Рендер кастомных сайтов
+        if (customSites.length > 0) {
+            // Разделитель
+            const sep = document.createElement('div');
+            sep.className = 'ios-header';
+            sep.style.marginTop = '15px';
+            sep.innerText = "MY SITES";
+            container.appendChild(sep);
+
+            customSites.forEach(site => {
+                const isSelected = (site.id === currentSiteId);
+                const desc = site.desc[lang];
+
+                const div = document.createElement('div');
+                div.className = `site-card ${isSelected ? 'selected' : ''}`;
+                // Добавляем padding справа для кнопки удаления
+                div.style.paddingRight = "10px";
+                
+                // Клик по карточке выбирает сайт
+                div.onclick = () => selectGlobalSite(site.id);
+
+                div.innerHTML = `
+                    <div class="site-info" style="max-width: 75%;">
+                        <div class="site-name" style="color:var(--accent);">${site.name}</div>
+                        <div class="site-desc">${desc}</div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <div class="site-check" style="${isSelected ? 'opacity:1; transform:scale(1);' : ''}">✓</div>
+                        <div onclick="deleteCustomSite('${site.id}', event)" style="padding:8px; background:rgba(231,76,60,0.1); border-radius:8px; color:var(--highlight-red); font-size:12px;">✕</div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // 3. Кнопка "Добавить" в конце
+        const isPaid = subscriptionLevel !== 'free';
+        
+        const addBtn = document.createElement('div');
+        addBtn.className = 'site-card';
+        addBtn.style.justifyContent = 'center';
+        addBtn.style.marginTop = '15px';
+        addBtn.style.borderTop = '1px solid var(--border)';
+        addBtn.style.color = isPaid ? 'var(--text-main)' : 'var(--text-secondary)';
+        addBtn.style.opacity = isPaid ? '1' : '0.6';
+        
+        // Иконка замка или плюса
+        const icon = isPaid ? '+' : '🔒';
+        const text = t.add_site_btn || "Add Custom Site";
+
+        addBtn.innerHTML = `<span style="font-weight:700; font-size:14px;">${icon} ${text}</span>`;
+
+        addBtn.onclick = () => {
+            if (isPaid) {
+                // Закрываем текущее окно выбора и открываем добавление
+                closeSitesModal(null, true);
+                openAddSiteModal();
+            } else {
+                // Предлагаем купить подписку
+                closeSitesModal(null, true);
+                openSubModal();
+            }
+        };
+
+        container.appendChild(addBtn);
     }
 
     // 3. ВЫБОР САЙТА (Глобально)
@@ -16957,11 +17270,14 @@
         const isSmart = localStorage.getItem('xch_smart_sites') === 'true';
         const isRandom = localStorage.getItem('xch_random_sites') === 'true';
         
-        const siteObj = SITES_DATA.find(s => s.id === currentId);
+        // Ищем в обоих массивах
+        const allSites = [...SITES_DATA, ...customSites];
+        const siteObj = allSites.find(s => s.id === currentId);
+        
         let text = siteObj ? siteObj.name : 'xHamster';
 
         if (isSmart) {
-            text = `🧠 Smart / ${text}`; // Показываем Smart + (Fallback сайт)
+            text = `🧠 Smart / ${text}`;
         } else if (isRandom) {
             text = `🎲 Random`;
         }
@@ -17007,7 +17323,8 @@
         }
 
         // 4. Получаем объект сайта
-        const targetSite = SITES_DATA.find(s => s.id === targetSiteId) || SITES_DATA[0];
+        const allSites = [...SITES_DATA, ...customSites];
+        const targetSite = allSites.find(s => s.id === targetSiteId) || SITES_DATA[0];
 
         // 5. Формируем запрос
         const useRu = (currentLang === 'ru' && !forceEn);
@@ -26064,6 +26381,80 @@
         
         // Закрываем окно и обновляем список
         openExploredModal(); 
+    }
+
+    // Открытие модалки добавления
+    function openAddSiteModal() {
+        // Очистка полей
+        document.getElementById('custom-site-name').value = '';
+        document.getElementById('custom-site-url').value = '';
+        document.getElementById('custom-site-desc').value = '';
+        
+        document.getElementById('modal-add-site-overlay').classList.add('open');
+    }
+
+    function closeAddSiteModal(e, force) {
+        if (force || e.target.id === 'modal-add-site-overlay') {
+            document.getElementById('modal-add-site-overlay').classList.remove('open');
+        }
+    }
+
+    // Сохранение сайта
+    function saveCustomSite() {
+        const name = document.getElementById('custom-site-name').value.trim();
+        let url = document.getElementById('custom-site-url').value.trim();
+        const desc = document.getElementById('custom-site-desc').value.trim();
+
+        if (!name || !url) {
+            alert("Please fill Name and URL!");
+            return;
+        }
+
+        // Проверка и замена 'test' на '{q}'
+        // Мы ищем 'test' в разных вариациях (test, Test, TEST)
+        if (url.toLowerCase().includes('test')) {
+            // Регулярка заменяет test (регистронезависимо) на {q}
+            url = url.replace(/test/i, '{q}');
+        } else {
+            // Если пользователь не вставил ссылку с поиском
+            alert(currentLang === 'ru' ? 
+                "Ссылка должна содержать слово 'test' в месте запроса!" : 
+                "URL must contain 'test' as the search query!");
+            return;
+        }
+
+        const newSite = {
+            id: 'custom_' + Date.now(), // Уникальный ID
+            name: name,
+            url: url,
+            sep: '+', // Дефолтный разделитель пробелов
+            isCustom: true,
+            tags: ['custom'],
+            desc: { en: desc, ru: desc, es: desc, de: desc } // Одинаковое описание для всех языков
+        };
+
+        customSites.push(newSite);
+        localStorage.setItem('xch_custom_sites', JSON.stringify(customSites));
+
+        closeAddSiteModal(null, true);
+        renderSitesList(); // Перерисовываем список
+    }
+
+    // Удаление сайта
+    function deleteCustomSite(id, e) {
+        e.stopPropagation(); // Чтобы не сработал клик выбора сайта
+        
+        if(!confirm("Delete this site?")) return;
+
+        customSites = customSites.filter(s => s.id !== id);
+        localStorage.setItem('xch_custom_sites', JSON.stringify(customSites));
+        
+        // Если удаленный сайт был выбран, сбрасываем на xHamster
+        if (localStorage.getItem('xch_platform') === id) {
+            selectGlobalSite('xh');
+        } else {
+            renderSitesList();
+        }
     }
 
     // === PWA PRIVACY PROTECTION ===
