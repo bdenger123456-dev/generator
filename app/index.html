@@ -14819,7 +14819,6 @@
             btn_current: "Aktueller Plan",
             feat_wrapped_limited: "🎁 1 Fetish Wrapped / Woche",
             feat_wrapped_unlim: "✨ <b>Unbegrenztes</b> Wrapped",
-
             feat_custom_sites: "🌐 <b>Eigene</b> Seiten",
 
             lbl_subscription: "Abonnement",
@@ -17864,7 +17863,9 @@
                     key.startsWith('pay_') || 
                     key.startsWith('guide_') || 
                     key.startsWith('spon_') || 
-                    key === 'sync_tip') {
+                    key.startsWith('add_site_') || 
+                    key === 'sync_tip' ||
+                    key === 'vpn_text_pwa') {
                     el.innerHTML = t[key];
                 } else {
                     el.innerText = t[key];
