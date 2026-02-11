@@ -21,24 +21,24 @@
     <meta name="age-rating" content="18">
 
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://www.xfetishhub.site/">
+    <link rel="canonical" href="https://www.xfetishhub.site/app/">
 
     <!-- Open Graph -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://www.xfetishhub.site/">
+    <meta property="og:url" content="https://www.xfetishhub.site/app/">
     <meta property="og:title" content="xFetishHub — Your Intelligent Adult Guide">
     <meta property="og:description" content="Analyze your tastes, track history, and discover new desires in a secure, private environment.">
-    <meta property="og:image" content="https://www.xfetishhub.site/og-image.jpg">
+    <meta property="og:image" content="https://www.xfetishhub.site/app/og-image.jpg">
     <meta property="og:site_name" content="xFetishHub">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://www.xfetishhub.site/">
+    <meta property="twitter:url" content="https://www.xfetishhub.site/app/">
     <meta property="twitter:title" content="xFetishHub — Discover Your Desires">
     <meta property="twitter:description" content="The all-in-one platform for adult discovery, statistics, and private viewing.">
-    <meta property="twitter:image" content="https://www.xfetishhub.site/og-image.jpg">
+    <meta property="twitter:image" content="https://www.xfetishhub.site/app/og-image.jpg">
 
     <!-- PWA Manifest & Icons -->
     <link rel="manifest" href="manifest.json">
@@ -51,13 +51,13 @@
 
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
-    <!-- SCHEMA.ORG: Позиционируем как ПРИЛОЖЕНИЕ (SoftwareApplication), а не просто веб-страницу -->
+    <!-- SCHEMA.ORG-->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       "name": "xFetishHub",
-      "url": "https://www.xfetishhub.site/",
+      "url": "https://www.xfetishhub.site/app/",
       "description": "An intelligent platform for tracking adult preferences, analyzing sexual statistics, and discovering new content categories securely.",
       "applicationCategory": "LifestyleApplication",
       "operatingSystem": "Web, iOS, Android",
@@ -15262,6 +15262,42 @@
         }
     }
 
+    let inactivityTimer;
+    const INACTIVITY_DELAY = 30 * 60 * 1000; // 30 минут в миллисекундах
+
+    function resetInactivityTimer() {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(() => {
+            // Проверяем, не находимся ли мы уже на стартовом экране
+            const startBtn = document.getElementById('start-btn-container');
+            const isHidden = startBtn && startBtn.classList.contains('hidden-initial');
+            const isModeSelect = document.getElementById('mode-start-overlay') && !document.getElementById('mode-start-overlay').classList.contains('hidden');
+
+            // Сбрасываем только если пользователь что-то делал (кнопка старта скрыта) 
+            if (isHidden || isModeSelect) {
+                console.log("User inactive for 30m. Resetting to home.");
+                
+                // Если открыты какие-то модалки - закрываем их
+                closeAllModals();
+                
+                // Переключаемся на главную
+                switchTab('home');
+                
+                // Сбрасываем генератор
+                resetToHome();
+            }
+        }, INACTIVITY_DELAY);
+    }
+
+    // Запускаем слушатели событий
+    function initInactivityListeners() {
+        const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+        events.forEach(event => {
+            document.addEventListener(event, resetInactivityTimer, true);
+        });
+        resetInactivityTimer(); // Запуск таймера при загрузке
+    }
+
     function initApp() {
         // Инициализация данных
         initLanguage();
@@ -15326,6 +15362,7 @@
 
         updateAppBadge();
         checkNotificationState();
+        initInactivityListeners();
     }
 
     window.onload = loadData;
@@ -25698,12 +25735,6 @@
 
     function showPushNotification(options) {
         const isMobile = window.innerWidth <= 768;
-        const activeTab = document.querySelector('.tab-content.active')?.id;
-        
-        // На мобильных показываем ТОЛЬКО во вкладке аккаунта
-        if (isMobile && activeTab !== 'tab-account') {
-            return;
-        }
 
         const container = document.getElementById('notification-container');
         if (!container) return;
@@ -25711,6 +25742,12 @@
         const toast = document.createElement('div');
         toast.className = 'toast-push toast-animate-in';
         
+        // Добавляем обработку для мобильных, чтобы уведомление не перекрывало хедер, если мы на главной
+        if (isMobile) {
+            // Убеждаемся, что контейнер кликабелен
+            container.style.pointerEvents = 'auto'; 
+        }
+
         toast.innerHTML = `
             <div class="toast-push-icon">${options.icon || '🔔'}</div>
             <div class="toast-push-content">
@@ -25726,8 +25763,8 @@
 
         container.appendChild(toast);
 
-        // Удаление через 3.5 сек
-        setTimeout(() => removeToast(toast), 3500);
+        // Удаление через 4.5 сек (чуть дольше, чтобы успели заметить)
+        setTimeout(() => removeToast(toast), 4500);
     }
 
     function removeToast(toast) {
