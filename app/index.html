@@ -4080,25 +4080,22 @@
         /* Базовый стиль чёлки */
         .card-notch {
             position: absolute;
-            top: 12px; /* Отступ от верхнего края карточки */
+            top: 12px;
             left: 50%;
-            /* В скрытом состоянии она чуть меньше и прозрачная */
             transform: translateX(-50%) scale(0.8);
             opacity: 0;
             
             padding: 4px 14px;
-            border-radius: 50px; /* Полная капсула */
+            border-radius: 50px;
             
-            font-size: 10px; /* Чуть компактнее текст */
+            font-size: 10px;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.8px;
             color: #fff;
             
             z-index: 40;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            
-            /* Плавное появление (масштаб + прозрачность) */
+            /* Плавное появление */
             transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), 
                         opacity 0.3s ease, 
                         background-color 0.2s;
@@ -7852,6 +7849,60 @@
 
         #row-mode-select.hidden-row::after {
             display: none !important;
+        }
+
+        .card.status-wl,
+        .card.status-fav,
+        .card.status-ban {
+            border: 1px solid var(--border) !important;
+            box-shadow: none !important;
+        }
+
+        /* --- ВАРИАНТ 1: WATCH LATER (Синяя капсула) --- */
+        .card.status-wl .card-notch {
+            background: #3498db;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        /* --- ВАРИАНТ 2: FAVORITE (Зеленая капсула) --- */
+        .card.status-fav .card-notch {
+            background: #2ecc71;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+        }
+
+        /* --- ВАРИАНТ 3: DISLIKED (Красная капсула) --- */
+        .card.status-ban .card-notch {
+            background: #e74c3c;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        .card-notch {
+            display: flex !important;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 10px 6px 14px !important; /* Уменьшаем отступ справа для кнопки */
+            pointer-events: auto !important; /* Чтобы кнопка внутри была кликабельной */
+        }
+
+        /* Кнопка удаления внутри чёлки */
+        .notch-close-btn {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            flex-shrink: 0;
+        }
+
+        .notch-close-btn:active {
+            transform: scale(0.9);
+            background: rgba(255, 255, 255, 0.4);
         }
 
         .seo-context {
@@ -21299,56 +21350,53 @@
     }
 
     function undoLastAction() {
-        // 1. Если стек пуст — возврат на главную (улетает влево)
-        if (sessionHistoryStack.length === 0) {
-            resetToHome('left'); 
-            return;
-        }
+        if (isGenerating) return;
 
-        // 2. Берем данные
-        const prevItem = sessionHistoryStack.pop();
         const wrapper = document.getElementById('card-anim-wrapper');
         const undoBtn = document.getElementById('btn-t-undo');
 
-        // 3. ПОДГОТОВКА: Мгновенно убираем старую карточку
-        if (wrapper) {
-            // Удаляем все анимации, чтобы они не конфликтовали
-            wrapper.classList.remove('anim-fly-left', 'anim-fly-right', 'anim-initial-pop');
-            
-            // Жестко скрываем карточку и ставим в начальную позицию (слева)
-            wrapper.style.transition = 'none';
-            wrapper.style.opacity = '0';
-            // -150% — это та же позиция, откуда вылетает flyInLeft
-            wrapper.style.transform = 'translateX(-150%) rotate(-15deg)'; 
+        if (sessionHistoryStack.length === 0) {
+            // Если история пуста, плавно возвращаемся на главный экран
+            if (wrapper) {
+                wrapper.style.transition = 'transform 0.3s ease-in, opacity 0.3s';
+                wrapper.style.transform = 'translateX(100%) rotate(10deg)';
+                wrapper.style.opacity = '0';
+            }
+            setTimeout(() => {
+                resetToHome('left'); // Вызываем сброс
+            }, 300);
+            return;
         }
 
-        // 4. ОБНОВЛЕНИЕ КОНТЕНТА
-        // Делаем это внутри timeout, чтобы браузер успел отрисовать скрытие
+        // Логика возврата к предыдущему предмету
+        if (wrapper) {
+            wrapper.style.transition = 'transform 0.3s ease-in, opacity 0.3s';
+            wrapper.style.transform = 'translateX(-150%) rotate(-10deg)';
+            wrapper.style.opacity = '0';
+        }
+
         setTimeout(() => {
-            forceShowResult(prevItem, 'undo'); 
-
-            // 5. ЗАПУСК АНИМАЦИИ (Та же, что и везде)
+            const prevItem = sessionHistoryStack.pop();
             if (wrapper) {
-                // Принудительный Reflow (пересчет геометрии), чтобы анимация перезапустилась с начала
-                void wrapper.offsetWidth; 
+                wrapper.style.transition = 'none';
+                wrapper.style.transform = 'translateX(150%) rotate(10deg)';
                 
-                // Возвращаем стили, чтобы CSS-класс мог ими управлять
-                wrapper.style.transition = '';
-                wrapper.style.transform = '';
-                wrapper.style.opacity = '';
+                forceShowResult(prevItem, 'undo'); 
 
-                // Добавляем стандартный класс
-                wrapper.classList.add('anim-fly-left');
-
-                // Очистка класса после завершения (1с — с запасом)
                 setTimeout(() => {
-                    wrapper.classList.remove('anim-fly-left');
-                }, 1000);
-            }
-        }, 20); // Минимальная задержка для глаз
+                    void wrapper.offsetWidth; 
+                    wrapper.style.transition = ''; 
+                    wrapper.style.opacity = '1';
+                    wrapper.classList.remove('anim-fly-left', 'anim-fly-right');
+                    wrapper.classList.add('anim-fly-right');
 
-        // Кнопка остается активной
-        if(undoBtn) undoBtn.disabled = false;
+                    setTimeout(() => {
+                        wrapper.classList.remove('anim-fly-right');
+                        wrapper.style.transform = '';
+                    }, 800);
+                }, 20);
+            }
+        }, 300);
     }
 
     function startGeneration(mode, direction = 'next', specificId = null) {
@@ -21651,13 +21699,6 @@
     function updateCardStatusVisuals() {
         const card = document.getElementById('card-block');
         const notch = document.getElementById('card-notch');
-        if (card) card.classList.remove('status-wl', 'status-fav', 'status-ban');
-        if (notch) notch.classList.remove('visible');
-
-        // В панике выходим сразу, не проверяя списки
-        if (isPanicMode || !currentItem) return;
-
-        const notchText = document.getElementById('card-notch-text');
         
         if (!card || !notch || !currentItem) return;
 
@@ -21667,33 +21708,78 @@
 
         const t = langData[currentLang];
         let activeStatus = null;
+        let label = "";
 
-        // Проверяем статус (приоритет: Бан -> Лайк -> WL)
-        // Но обычно WL и Лайк не пересекаются, так что порядок не критичен.
-        
+        // Определяем статус
         if (blacklist.includes(currentItem.id)) {
             activeStatus = 'ban';
-            notchText.innerText = t.status_ban;
+            label = t.status_ban;
         } 
         else if (favorites.includes(currentItem.id)) {
             activeStatus = 'fav';
-            notchText.innerText = t.status_fav;
+            label = t.status_fav;
         }
         else if (watchLater.includes(currentItem.id)) {
             activeStatus = 'wl';
-            notchText.innerText = t.status_wl;
+            label = t.status_wl;
         }
 
-        // Применяем
         if (activeStatus) {
+            // Формируем внутренний HTML с текстом и крестиком
+            notch.innerHTML = `
+                <span id="card-notch-text">${label}</span>
+                <div class="notch-close-btn" onclick="removeCurrentStatus(event)">✕</div>
+            `;
+
             card.classList.add('status-' + activeStatus);
             
-            // Небольшая задержка для чёлки, чтобы она выезжала после появления карточки
-            // Если это первый рендер
+            // Плавное появление
             setTimeout(() => {
-                notch.classList.add('visible');
+                if (currentItem) notch.classList.add('visible');
             }, 50);
         }
+    }
+
+    function removeCurrentStatus(e) {
+        // Останавливаем всплытие, чтобы не сработал клик по карточке (если он есть)
+        if (e) e.stopPropagation();
+        
+        if (!currentItem) return;
+        const id = currentItem.id;
+
+        // 1. Удаляем из всех массивов
+        favorites = favorites.filter(x => x !== id);
+        blacklist = blacklist.filter(x => x !== id);
+        watchLater = watchLater.filter(x => x !== id);
+        
+        // 2. Если используется itemScores (карма), сбрасываем её для этого ID
+        if (typeof itemScores !== 'undefined' && itemScores[id]) {
+            delete itemScores[id];
+            localStorage.setItem('xch_item_scores', JSON.stringify(itemScores));
+        }
+
+        // 3. Сохраняем обновленные списки
+        localStorage.setItem('xch_favorites', JSON.stringify(favorites));
+        localStorage.setItem('xch_blacklist', JSON.stringify(blacklist));
+        localStorage.setItem('xch_watch_later', JSON.stringify(watchLater));
+
+        // 4. Визуальное обновление
+        const notch = document.getElementById('card-notch');
+        const card = document.getElementById('card-block');
+        
+        if (notch) notch.classList.remove('visible'); // Плавное исчезновение через CSS
+        
+        // Убираем подсветку бордера через небольшую паузу (после исчезновения капсулы)
+        setTimeout(() => {
+            if (card) card.classList.remove('status-wl', 'status-fav', 'status-ban');
+        }, 300);
+
+        // 5. Синхронизируем остальные элементы UI
+        updateCounts();         // Обновить счетчики в меню
+        updateActionButtons();  // Обновить кнопки (Лайк/Дизлайк/WL)
+        
+        if (window.markDirty) window.markDirty(); // Пометка для синхронизации с облаком
+        if (navigator.vibrate) navigator.vibrate(10); // Легкая вибрация
     }
 
     function renderResultUI(item, mode, customReason = null) {
@@ -22307,143 +22393,108 @@
         }
     }
 
-    function resetToHome(exitDirection = 'left') {
+    function resetToHome(entryDirection = 'left') {
         const homeTab = document.getElementById('tab-home');
         if (!homeTab || !homeTab.classList.contains('active')) {
             switchTab('home'); 
         }
 
-        if (isGenerating) return;
-
         const wrapper = document.getElementById('card-anim-wrapper');
         const card = document.getElementById('card-block');
         
-        // 1. АНИМАЦИЯ УХОДА ТЕКУЩЕЙ КАРТОЧКИ
-        if (wrapper && card.classList.contains('has-results')) {
-            wrapper.style.transition = 'transform 0.4s ease-in, opacity 0.4s';
-            
-            // ЛОГИКА НАПРАВЛЕНИЯ:
-            // Если 'right' -> 150 (улетает вправо)
-            // Если 'left' -> -150 (улетает влево)
-            const moveX = exitDirection === 'right' ? 150 : -150;
-            const rotate = exitDirection === 'right' ? 10 : -10;
-            
-            wrapper.style.transform = `translateX(${moveX}%) rotate(${rotate}deg)`;
-            wrapper.style.opacity = '0';
+        // 1. СБРОС ДАННЫХ
+        currentItem = null;
+        lastGeneratedItem = null;
+        isFirstGen = true; 
+        sessionHistoryStack = []; 
+        isGenerating = false; // Важно сбросить флаг генерации
+
+        // 2. СБРОС ИНТЕРФЕЙСА
+        const uiToHide = ['result-desc', 'tinder-controls', 'mods-block', 'related-block'];
+        uiToHide.forEach(id => {
+            const el = document.getElementById(id);
+            if(el) { 
+                el.classList.add('hidden-initial'); 
+                el.style.display = 'none'; 
+            }
+        });
+
+        document.getElementById('badge-wrapper').innerHTML = '';
+        const statusEl = document.getElementById('status-text');
+        if(statusEl) statusEl.innerText = ''; 
+        toggleModeSettingsRow(false);
+
+        if(card) {
+            card.classList.remove('has-results', 'flash-active', 'status-wl', 'status-fav', 'status-ban');
+            const notch = document.getElementById('card-notch');
+            if(notch) notch.classList.remove('visible');
+            card.style.transform = ''; // Очистка трансформаций
         }
 
-        setTimeout(() => {
-            // 2. СБРОС ДАННЫХ
-            currentItem = null;
-            lastGeneratedItem = null;
-            isFirstGen = true; 
-            sessionHistoryStack = []; 
+        initIdleSlot();
+        randomizeDecorations();
 
-            // 3. СБРОС ИНТЕРФЕЙСА
-            const uiToHide = ['result-desc', 'tinder-controls', 'mods-block', 'related-block'];
-            uiToHide.forEach(id => {
-                const el = document.getElementById(id);
-                if(el) {
-                    el.classList.add('hidden-initial'); 
-                    el.style.display = 'none'; 
-                }
-            });
+        // 3. ВОССТАНОВЛЕНИЕ СТАРТОВОГО ЭКРАНА
+        const totalInteractions = favorites.length + blacklist.length;
+        const startBtn = document.getElementById('start-btn-container');
+        const overlay = document.getElementById('mode-start-overlay');
+        
+        // Сброс UI ассистента под корень
+        const assistantUI = document.getElementById('assistant-ui');
+        const thinkingUI = document.getElementById('thinking-ui');
+        const startText = document.getElementById('mode-start-text');
+        const modeBtns = document.getElementById('mode-buttons-container');
 
-            document.getElementById('badge-wrapper').innerHTML = '';
-            const statusEl = document.getElementById('status-text');
-            if(statusEl) statusEl.innerText = ''; 
+        if(assistantUI) assistantUI.classList.remove('visible');
+        if(thinkingUI) thinkingUI.style.display = 'none';
+        if(startText) startText.classList.remove('fade-out-up'); // Возвращаем видимость текста
+        if(modeBtns) modeBtns.classList.remove('fade-out-up');   // Возвращаем видимость кнопок
 
-            if(card) {
-                card.classList.remove('has-results', 'flash-active', 'status-wl', 'status-fav', 'status-ban');
-                card.style.transform = ''; 
-                card.style.filter = 'none';
-                const notch = document.getElementById('card-notch');
-                if(notch) notch.classList.remove('visible');
+        if (totalInteractions >= 10) {
+            if(overlay) {
+                overlay.classList.remove('hidden');
+                overlay.style.display = 'flex';
+                overlay.style.opacity = '1';
+                overlay.style.pointerEvents = 'auto'; // ГАРАНТИРУЕМ кликабельность
             }
+            isModeSelectionActive = true; 
+            if(startBtn) startBtn.style.display = 'none';
+            randomizeModeGreeting(true); 
+        } else {
+            if(overlay) { 
+                overlay.classList.add('hidden'); 
+                overlay.style.display = 'none'; 
+                overlay.style.pointerEvents = 'none';
+            }
+            isModeSelectionActive = false;
+            if(startBtn) { 
+                startBtn.style.display = 'flex'; 
+                startBtn.classList.remove('hidden-initial'); 
+            }
+            setWelcomeMessage();
+        }
 
-            toggleModeSettingsRow(false);
-
-            initIdleSlot();
-            randomizeDecorations();
-
-            const iconLeft = document.querySelector('.icon-left');
-            const iconRight = document.querySelector('.icon-right');
-            [iconLeft, iconRight].forEach(icon => {
-                if(icon) {
-                    icon.style.transition = 'none';
-                    icon.style.opacity = '';
-                    icon.style.transform = '';
-                    icon.style.animation = ''; 
-                }
-            });
-
-            // === 4. ВОССТАНОВЛЕНИЕ НАЧАЛЬНОГО ЭКРАНА ===
-            const totalInteractions = favorites.length + blacklist.length;
-            const startBtn = document.getElementById('start-btn-container');
-            const overlay = document.getElementById('mode-start-overlay');
+        // 4. ПОЯВЛЕНИЕ (АНИМАЦИЯ)
+        if (wrapper) {
+            wrapper.style.transition = 'none';
+            const startX = entryDirection === 'right' ? 150 : -150;
+            const startRot = entryDirection === 'right' ? 10 : -10;
             
-            document.getElementById('assistant-ui').classList.remove('visible');
-            document.getElementById('thinking-ui').style.display = 'none';
-            document.getElementById('ai-input').value = '';
-
-            const startText = document.getElementById('mode-start-text');
-            const modeBtns = document.getElementById('mode-buttons-container');
-
-            if(startText) {
-                startText.classList.remove('fade-out-up');
-                startText.style.opacity = '1';
-                startText.style.display = 'block';
-                startText.style.transform = 'translate(0,0)';
-                startText.style.pointerEvents = 'auto';
-            }
+            wrapper.style.transform = `translateX(${startX}%) rotate(${startRot}deg)`;
+            wrapper.style.opacity = '0';
             
-            if(modeBtns) {
-                modeBtns.classList.remove('fade-out-up');
-                modeBtns.style.opacity = '1';
-                modeBtns.style.display = 'flex';
-                modeBtns.style.transform = 'translate(0,0)';
-                modeBtns.style.pointerEvents = 'auto';
-            }
+            void wrapper.offsetWidth; 
 
-            if (totalInteractions >= 10) {
-                if(overlay) {
-                    overlay.classList.remove('hidden');
-                    overlay.style.display = 'flex'; 
-                    overlay.style.opacity = '1';
-                    overlay.style.pointerEvents = 'auto';
-                    overlay.style.transform = 'scale(1)';
-                }
-                isModeSelectionActive = true; 
-                if(startBtn) {
-                    startBtn.classList.add('hidden-initial');
-                    startBtn.style.display = 'none';
-                }
-                randomizeModeGreeting(true); 
-            } else {
-                if(overlay) {
-                    overlay.classList.add('hidden');
-                    overlay.style.display = 'none';
-                }
-                isModeSelectionActive = false;
-                if(startBtn) {
-                    startBtn.classList.remove('hidden-initial');
-                    startBtn.style.display = 'flex';
-                    startBtn.style.opacity = '1';
-                }
-                setWelcomeMessage();
-            }
-
-            // 5. ВОЗВРАЩЕНИЕ КАРТОЧКИ (Эффект появления)
-            if (wrapper) {
-                wrapper.style.transition = 'none';
-                wrapper.style.transform = 'scale(0.95)'; 
-                void wrapper.offsetWidth; 
-                wrapper.style.transition = 'opacity 0.5s ease, transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-                wrapper.style.opacity = '1';
-                wrapper.style.transform = 'scale(1)';
-            }
-
-        }, 350);
+            wrapper.style.transition = 'opacity 0.5s ease, transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            wrapper.style.opacity = '1';
+            wrapper.style.transform = 'translateX(0) rotate(0)';
+            
+            setTimeout(() => {
+                wrapper.style.transition = '';
+                // После анимации еще раз проверяем pointer-events
+                if (overlay && isModeSelectionActive) overlay.style.pointerEvents = 'auto';
+            }, 600);
+        }
     }
 
     document.addEventListener("visibilitychange", () => {
