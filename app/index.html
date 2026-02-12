@@ -10384,9 +10384,9 @@
         const subDesc = document.getElementById('sync-sub-desc');
         const subCard = document.getElementById('sync-sub-card');
 
-        if(subDesc) subDesc.innerText = "..."; 
+        if(subDesc) subDesc.innerText = "Checking..."; 
 
-        // Кэширование профиля (как и было)
+        // Кэширование профиля
         const now = Date.now();
         let d = cachedUserProfile;
         if (!d || (now - lastProfileReadTime > 60000)) {
@@ -10404,8 +10404,8 @@
 
         const t = langData[currentLang] || langData['en'];
 
+        // === 1. ОБНОВЛЕНИЕ ДАННЫХ ПОДПИСКИ (Если есть профиль) ===
         if (d) {
-            // Подписка
             const plan = d.subscription || 'free';
             if(subValue) subValue.innerText = plan.toUpperCase();
             
@@ -10426,47 +10426,54 @@
                 subCard.classList.remove('is-free', 'is-pro', 'is-beast', 'is-bestie');
                 subCard.classList.add('is-' + plan);
             }
+        }
 
-            // 2. СЧЕТЧИКИ (ИЗБРАННОЕ / WL)
-            if(document.getElementById('cloud-fav-count')) document.getElementById('cloud-fav-count').innerText = window.favorites.length;
-            if(document.getElementById('cloud-wl-count')) document.getElementById('cloud-wl-count').innerText = window.watchLater.length;
-            
-            // --- 3. ОТКРЫТЫЕ ФЕТИШИ (EXPLORED) ---
-            
-            // Если сет пустой, но есть история активности -> восстанавливаем сет
-            if (window.permanentExplored.size === 0 && window.activityLog.length > 0) {
-                window.activityLog.forEach(log => {
-                    if (log.id) window.permanentExplored.add(log.id);
-                });
-                // Сохраняем восстановленное
-                localStorage.setItem('xch_permanent_explored', JSON.stringify([...window.permanentExplored]));
-            }
+        // === 2. ОБНОВЛЕНИЕ СТАТИСТИКИ ===
+        
+        // А. Счетчики Избранного и WL
+        if(document.getElementById('cloud-fav-count')) {
+            document.getElementById('cloud-fav-count').innerText = (window.favorites || []).length;
+        }
+        if(document.getElementById('cloud-wl-count')) {
+            document.getElementById('cloud-wl-count').innerText = (window.watchLater || []).length;
+        }
+        
+        // Б. ОТКРЫТЫЕ ФЕТИШИ 
+        if ((!window.permanentExplored || window.permanentExplored.size === 0) && window.activityLog && window.activityLog.length > 0) {
+            if (!window.permanentExplored) window.permanentExplored = new Set();
+            window.activityLog.forEach(log => {
+                if (log.id) window.permanentExplored.add(log.id);
+            });
+            // Сохраняем восстановленное, чтобы в следующий раз не пересчитывать
+            localStorage.setItem('xch_permanent_explored', JSON.stringify([...window.permanentExplored]));
+        }
 
-            // Теперь берем актуальный размер
-            let exCount = window.permanentExplored.size;
+        let exCount = window.permanentExplored ? window.permanentExplored.size : 0;
+        
+        if(document.getElementById('cloud-explored-count')) {
+            document.getElementById('cloud-explored-count').innerText = exCount;
+        }
+        
+        // В. МИНУТЫ ПРОСМОТРА 
+        const timeValEl = document.getElementById('cloud-ban-count');
+        if(timeValEl) {
+            const wHistory = window.watchHistory || [];
             
-            // Обновляем UI в модалке
-            if(document.getElementById('cloud-explored-count')) {
-                document.getElementById('cloud-explored-count').innerText = exCount;
-            }
+            // Считаем сумму секунд
+            const totalSeconds = wHistory.reduce((acc, item) => {
+                // Защита от кривых данных: parseInt гарантирует число
+                return acc + (parseInt(item.seconds) || 0);
+            }, 0);
             
-            // Обновляем UI на главной кнопке (на всякий случай)
-            updateExploredCount();
-
-            // 4. МИНУТЫ ПРОСМОТРА
-            const timeValEl = document.getElementById('cloud-ban-count');
-            if(timeValEl) {
-                const wHistory = window.watchHistory || [];
-                const totalSeconds = wHistory.reduce((acc, item) => acc + (item.seconds || 0), 0);
-                const totalMinutes = Math.floor(totalSeconds / 60);
-                
-                timeValEl.innerText = totalMinutes + "m";
-                
-                const parentBox = timeValEl.closest('.bento-box');
-                if(parentBox) {
-                    const label = parentBox.querySelector('.bento-label');
-                    if(label) label.innerText = t.sync_minutes || "Minutes";
-                }
+            const totalMinutes = Math.floor(totalSeconds / 60);
+            
+            timeValEl.innerText = totalMinutes + "m";
+            
+            // Локализация подписи "Minutes"
+            const parentBox = timeValEl.closest('.bento-box');
+            if(parentBox) {
+                const label = parentBox.querySelector('.bento-label');
+                if(label) label.innerText = t.sync_minutes || "Minutes";
             }
         }
         
