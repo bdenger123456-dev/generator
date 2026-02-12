@@ -7804,6 +7804,56 @@
             font-size: 14px;
         }
 
+        @keyframes softUndoFlyIn {
+            0% {
+                opacity: 0;
+                /* Карточка летит слева, немного повернута и уменьшена */
+                transform: translateX(-120%) rotate(-15deg) scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                /* Встает ровно на место */
+                transform: translateX(0) rotate(0) scale(1);
+            }
+        }
+
+        .anim-undo-soft {
+            animation: softUndoFlyIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+        }
+
+        #row-mode-select {
+            transition: 
+                max-height 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+                min-height 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+                opacity 0.4s ease,
+                margin 0.4s ease,
+                padding 0.4s ease;
+                
+            overflow: hidden;
+            
+            max-height: 70px; 
+            opacity: 1;
+        }
+
+        #row-mode-select.hidden-row {
+            min-height: 0 !important; 
+            max-height: 0 !important;
+            
+            opacity: 0 !important;
+            
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            
+            border: none !important;
+            pointer-events: none;
+        }
+
+        #row-mode-select.hidden-row::after {
+            display: none !important;
+        }
+
         .seo-context {
             position: absolute;
             width: 1px;
@@ -8453,7 +8503,7 @@
             </div>
 
             <!-- 2. Mode -->
-            <div class="ios-row">
+            <div class="ios-row" id="row-mode-select">
                 <div class="ios-row-left">
                     <img src="modes.png" class="settings-icon" alt="Mode">
                     <span class="platform-label" data-key="mode_label">Mode</span>
@@ -10842,6 +10892,18 @@
                     localStorage.setItem('xch_permanent_explored', JSON.stringify([...window.permanentExplored]));
                 }
 
+                // 6. КАСТОМНЫЕ САЙТЫ 
+                const localSites = JSON.parse(localStorage.getItem('xch_custom_sites')) || [];
+                const cloudSites = cloudData.customSites || [];
+                
+                // Объединяем по ID, чтобы избежать дубликатов
+                const siteMap = new Map();
+                [...localSites, ...cloudSites].forEach(s => siteMap.set(s.id, s));
+                const mergedSites = Array.from(siteMap.values());
+
+                localStorage.setItem('xch_custom_sites', JSON.stringify(mergedSites));
+                window.customSites = mergedSites;
+
                 // ФИНАЛ
                 localStorage.setItem('xch_last_sync_ts', Date.now());
                 if (window.updateLastSyncUI) window.updateLastSyncUI();
@@ -10887,9 +10949,9 @@
             
             history: (window.historyData || safeJSON('xch_history', [])).slice(0, 100),
             activityLog: (window.activityLog || safeJSON('xch_activity_log', [])).slice(-300),
-            
-            // ОТПРАВЛЯЕМ ОБЪЕДИНЕННУЮ ИСТОРИЮ ПРОСМОТРОВ
             watchHistory: wHistory.slice(0, 200),
+
+            customSites: window.customSites || safeJSON('xch_custom_sites', []),
             
             platform: currentPlatform,
             email: user.email,
@@ -15678,6 +15740,7 @@
         renderHistory();
         updateCounts();
         updateSiteLabelUI()
+        toggleModeSettingsRow(false); 
 
         document.getElementById('app-version-label').innerText = CHANGELOG_DATA[0].ver;
         
@@ -16572,6 +16635,8 @@
         if(card) {
             card.classList.add('has-results');
         }
+
+        toggleModeSettingsRow(true);
 
         renderResultUI(item, mode);
     }
@@ -21234,31 +21299,55 @@
     }
 
     function undoLastAction() {
-        // Если стек пуст, возвращаемся на стартовый экран
+        // 1. Если стек пуст — возврат на главную (улетает влево)
         if (sessionHistoryStack.length === 0) {
-            resetToHome();
+            resetToHome('left'); 
             return;
         }
 
-        // Иначе выполняем стандартный откат
+        // 2. Берем данные
         const prevItem = sessionHistoryStack.pop();
-        const card = document.getElementById('card-block');
-        
-        card.classList.remove('restore-anim', 'anim-fly-left', 'anim-fly-right');
-        card.style.transform = 'none';
-        void card.offsetWidth; 
-        
-        card.classList.add('has-results');
-        card.classList.add('anim-fly-right');
+        const wrapper = document.getElementById('card-anim-wrapper');
+        const undoBtn = document.getElementById('btn-t-undo');
 
+        // 3. ПОДГОТОВКА: Мгновенно убираем старую карточку
+        if (wrapper) {
+            // Удаляем все анимации, чтобы они не конфликтовали
+            wrapper.classList.remove('anim-fly-left', 'anim-fly-right', 'anim-initial-pop');
+            
+            // Жестко скрываем карточку и ставим в начальную позицию (слева)
+            wrapper.style.transition = 'none';
+            wrapper.style.opacity = '0';
+            // -150% — это та же позиция, откуда вылетает flyInLeft
+            wrapper.style.transform = 'translateX(-150%) rotate(-15deg)'; 
+        }
+
+        // 4. ОБНОВЛЕНИЕ КОНТЕНТА
+        // Делаем это внутри timeout, чтобы браузер успел отрисовать скрытие
         setTimeout(() => {
             forceShowResult(prevItem, 'undo'); 
-            setTimeout(() => card.classList.remove('anim-fly-right'), 700);
-        }, 50);
 
-        // После отката проверяем кнопку снова (визуально можно сделать её ярче или тусклее, 
-        // но теперь она всегда активна, т.к. ведет домой)
-        const undoBtn = document.getElementById('btn-t-undo');
+            // 5. ЗАПУСК АНИМАЦИИ (Та же, что и везде)
+            if (wrapper) {
+                // Принудительный Reflow (пересчет геометрии), чтобы анимация перезапустилась с начала
+                void wrapper.offsetWidth; 
+                
+                // Возвращаем стили, чтобы CSS-класс мог ими управлять
+                wrapper.style.transition = '';
+                wrapper.style.transform = '';
+                wrapper.style.opacity = '';
+
+                // Добавляем стандартный класс
+                wrapper.classList.add('anim-fly-left');
+
+                // Очистка класса после завершения (1с — с запасом)
+                setTimeout(() => {
+                    wrapper.classList.remove('anim-fly-left');
+                }, 1000);
+            }
+        }, 20); // Минимальная задержка для глаз
+
+        // Кнопка остается активной
         if(undoBtn) undoBtn.disabled = false;
     }
 
@@ -21745,13 +21834,9 @@
         // 7. Кнопка Undo
         const btnUndo = document.getElementById('btn-t-undo');
         if (btnUndo) {
-            if (sessionHistoryStack && sessionHistoryStack.length > 0) {
-                btnUndo.disabled = false;
-                btnUndo.style.opacity = "1";
-            } else {
-                btnUndo.disabled = true;
-                btnUndo.style.opacity = "0.3";
-            }
+            btnUndo.disabled = false;
+            btnUndo.style.opacity = "1";
+            
         }
 
         updateLink();
@@ -22222,27 +22307,31 @@
         }
     }
 
-    function resetToHome() {
-
+    function resetToHome(exitDirection = 'left') {
         const homeTab = document.getElementById('tab-home');
         if (!homeTab || !homeTab.classList.contains('active')) {
-            return; 
+            switchTab('home'); 
         }
 
-        // Если идет генерация — не прерываем
         if (isGenerating) return;
 
         const wrapper = document.getElementById('card-anim-wrapper');
         const card = document.getElementById('card-block');
         
         // 1. АНИМАЦИЯ УХОДА ТЕКУЩЕЙ КАРТОЧКИ
-        if (wrapper) {
+        if (wrapper && card.classList.contains('has-results')) {
             wrapper.style.transition = 'transform 0.4s ease-in, opacity 0.4s';
-            wrapper.style.transform = 'translateX(-150%) rotate(-10deg)';
+            
+            // ЛОГИКА НАПРАВЛЕНИЯ:
+            // Если 'right' -> 150 (улетает вправо)
+            // Если 'left' -> -150 (улетает влево)
+            const moveX = exitDirection === 'right' ? 150 : -150;
+            const rotate = exitDirection === 'right' ? 10 : -10;
+            
+            wrapper.style.transform = `translateX(${moveX}%) rotate(${rotate}deg)`;
             wrapper.style.opacity = '0';
         }
 
-        // Ждем окончания анимации (350мс)
         setTimeout(() => {
             // 2. СБРОС ДАННЫХ
             currentItem = null;
@@ -22250,7 +22339,7 @@
             isFirstGen = true; 
             sessionHistoryStack = []; 
 
-            // 3. СБРОС ИНТЕРФЕЙСА РЕЗУЛЬТАТОВ
+            // 3. СБРОС ИНТЕРФЕЙСА
             const uiToHide = ['result-desc', 'tinder-controls', 'mods-block', 'related-block'];
             uiToHide.forEach(id => {
                 const el = document.getElementById(id);
@@ -22260,25 +22349,23 @@
                 }
             });
 
-            // Очищаем бейджи и статус
             document.getElementById('badge-wrapper').innerHTML = '';
             const statusEl = document.getElementById('status-text');
             if(statusEl) statusEl.innerText = ''; 
 
-            // Сброс классов карточки
             if(card) {
                 card.classList.remove('has-results', 'flash-active', 'status-wl', 'status-fav', 'status-ban');
                 card.style.transform = ''; 
                 card.style.filter = 'none';
-                
                 const notch = document.getElementById('card-notch');
                 if(notch) notch.classList.remove('visible');
             }
 
+            toggleModeSettingsRow(false);
+
             initIdleSlot();
             randomizeDecorations();
 
-            // Сброс декоративных иконок
             const iconLeft = document.querySelector('.icon-left');
             const iconRight = document.querySelector('.icon-right');
             [iconLeft, iconRight].forEach(icon => {
@@ -22290,38 +22377,35 @@
                 }
             });
 
-            // === 4. ВОССТАНОВЛЕНИЕ НАЧАЛЬНОГО ЭКРАНА (FIXED) ===
+            // === 4. ВОССТАНОВЛЕНИЕ НАЧАЛЬНОГО ЭКРАНА ===
             const totalInteractions = favorites.length + blacklist.length;
             const startBtn = document.getElementById('start-btn-container');
             const overlay = document.getElementById('mode-start-overlay');
             
-            // Сброс UI ассистента
             document.getElementById('assistant-ui').classList.remove('visible');
             document.getElementById('thinking-ui').style.display = 'none';
             document.getElementById('ai-input').value = '';
 
-            // Элементы внутри оверлея
             const startText = document.getElementById('mode-start-text');
             const modeBtns = document.getElementById('mode-buttons-container');
 
-            // ПРИНУДИТЕЛЬНЫЙ СБРОС СТИЛЕЙ (Убираем последствия анимаций)
             if(startText) {
                 startText.classList.remove('fade-out-up');
                 startText.style.opacity = '1';
                 startText.style.display = 'block';
                 startText.style.transform = 'translate(0,0)';
+                startText.style.pointerEvents = 'auto';
             }
+            
             if(modeBtns) {
                 modeBtns.classList.remove('fade-out-up');
                 modeBtns.style.opacity = '1';
-                modeBtns.style.pointerEvents = 'auto';
                 modeBtns.style.display = 'flex';
                 modeBtns.style.transform = 'translate(0,0)';
+                modeBtns.style.pointerEvents = 'auto';
             }
 
             if (totalInteractions >= 10) {
-                // Опытный: Показываем оверлей режимов
-
                 if(overlay) {
                     overlay.classList.remove('hidden');
                     overlay.style.display = 'flex'; 
@@ -22329,31 +22413,27 @@
                     overlay.style.pointerEvents = 'auto';
                     overlay.style.transform = 'scale(1)';
                 }
-                
                 isModeSelectionActive = true; 
-                
                 if(startBtn) {
                     startBtn.classList.add('hidden-initial');
                     startBtn.style.display = 'none';
                 }
                 randomizeModeGreeting(true); 
-
             } else {
-                // Новичок: Показываем кнопку "Let's Go"
                 if(overlay) {
                     overlay.classList.add('hidden');
                     overlay.style.display = 'none';
                 }
                 isModeSelectionActive = false;
-
                 if(startBtn) {
                     startBtn.classList.remove('hidden-initial');
                     startBtn.style.display = 'flex';
                     startBtn.style.opacity = '1';
                 }
+                setWelcomeMessage();
             }
 
-            // 5. ВОЗВРАЩЕНИЕ КАРТОЧКИ
+            // 5. ВОЗВРАЩЕНИЕ КАРТОЧКИ (Эффект появления)
             if (wrapper) {
                 wrapper.style.transition = 'none';
                 wrapper.style.transform = 'scale(0.95)'; 
@@ -25610,6 +25690,17 @@
         localStorage.setItem('xch_panic_is_double', isChecked);
     }
 
+    function toggleModeSettingsRow(show) {
+        const row = document.getElementById('row-mode-select');
+        if (!row) return;
+        
+        if (show) {
+            row.classList.remove('hidden-row');
+        } else {
+            row.classList.add('hidden-row');
+        }
+    }
+
     // Старт записи клавиши
     function startKeyRecording() {
         const box = document.getElementById('panic-key-box');
@@ -26418,13 +26509,9 @@
             return;
         }
 
-        // Проверка и замена 'test' на '{q}'
-        // Мы ищем 'test' в разных вариациях (test, Test, TEST)
         if (url.toLowerCase().includes('test')) {
-            // Регулярка заменяет test (регистронезависимо) на {q}
             url = url.replace(/test/i, '{q}');
         } else {
-            // Если пользователь не вставил ссылку с поиском
             alert(currentLang === 'ru' ? 
                 "Ссылка должна содержать слово 'test' в месте запроса!" : 
                 "URL must contain 'test' as the search query!");
@@ -26432,36 +26519,45 @@
         }
 
         const newSite = {
-            id: 'custom_' + Date.now(), // Уникальный ID
+            id: 'custom_' + Date.now(),
             name: name,
             url: url,
-            sep: '+', // Дефолтный разделитель пробелов
+            sep: '+',
             isCustom: true,
             tags: ['custom'],
-            desc: { en: desc, ru: desc, es: desc, de: desc } // Одинаковое описание для всех языков
+            desc: { en: desc, ru: desc, es: desc, de: desc }
         };
 
         customSites.push(newSite);
         localStorage.setItem('xch_custom_sites', JSON.stringify(customSites));
 
         closeAddSiteModal(null, true);
-        renderSitesList(); // Перерисовываем список
+        renderSitesList();
+
+        // --- Синхронизация с облаком ---
+        if (window.isUserLoggedIn && window.syncToCloud) {
+            window.syncToCloud(true);
+        }
     }
 
     // Удаление сайта
     function deleteCustomSite(id, e) {
-        e.stopPropagation(); // Чтобы не сработал клик выбора сайта
+        e.stopPropagation();
         
         if(!confirm("Delete this site?")) return;
 
         customSites = customSites.filter(s => s.id !== id);
         localStorage.setItem('xch_custom_sites', JSON.stringify(customSites));
         
-        // Если удаленный сайт был выбран, сбрасываем на xHamster
         if (localStorage.getItem('xch_platform') === id) {
             selectGlobalSite('xh');
         } else {
             renderSitesList();
+        }
+
+        // --- Синхронизация с облаком ---
+        if (window.isUserLoggedIn && window.syncToCloud) {
+            window.syncToCloud(true);
         }
     }
 
