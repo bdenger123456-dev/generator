@@ -18894,13 +18894,13 @@
         body.innerHTML = '';
         const t = langData[currentLang] || langData['en'];
 
-        // 1. ОПРЕДЕЛЕНИЕ ВРЕМЕННОГО ДИАПАЗОНА
+        // --- 1. ОПРЕДЕЛЕНИЕ ВРЕМЕНИ ---
         const now = new Date();
         const nowTs = now.getTime();
         const oneDay = 86400000;
         
-        let cutoffTime = 0;   // Начало периода
-        let endTime = nowTs;   // Конец периода
+        let cutoffTime = 0;
+        let endTime = nowTs;
         let rangeText = "";
 
         if (currentStatsTimeframe === 'custom' && customRangeStart) {
@@ -18941,14 +18941,32 @@
         dateHeader.offsetHeight; 
         dateHeader.style.animation = 'fadeInUp 0.3s forwards';
 
-        // --- ВАРИАНТ А: ТЕГИ (PREFERENCES) ---
+        // === ОБЩИЕ СТИЛИ ДЛЯ СКРОЛЛ-КОНТЕЙНЕРА  ===
+    
+        const scrollContainerStyle = `
+            display: flex;
+            overflow-x: auto;
+            overflow-y: hidden;
+            align-items: flex-end;
+            height: 100%;
+            width: calc(100% + 40px); 
+            margin-left: -20px;      
+            margin-right: -20px;     
+            padding-left: 20px;      
+            padding-right: 20px;      
+            padding-bottom: 40px;    
+            box-sizing: border-box;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        `;
+
+        // --- ВАРИАНТ А: ПРЕДПОЧТЕНИЯ (PREFERENCES) ---
         if (currentStatsTab === 'tags') {
             const tempScores = {};
             const IGNORED_TAGS = ['general', 'specific', 'straight', 'male', 'female', 'adult', 'video', 'hd'];
             
             activityLog.forEach(log => {
                 if (log.ts < cutoffTime || log.ts > endTime) return;
-
                 if (log.tags) {
                     let weight = 0;
                     if (log.type === 'watch') weight = 10;
@@ -18957,9 +18975,7 @@
 
                     if (weight !== 0) {
                         log.tags.forEach(tag => {
-                            if(!IGNORED_TAGS.includes(tag)) {
-                                tempScores[tag] = (tempScores[tag] || 0) + weight;
-                            }
+                            if(!IGNORED_TAGS.includes(tag)) tempScores[tag] = (tempScores[tag] || 0) + weight;
                         });
                     }
                 }
@@ -18970,32 +18986,27 @@
                 .filter(x => x[1] > 0)
                 .slice(0, 15); 
             
-            let html = `<div class="chart-wrapper fade-visible" style="animation: fadeInUp 0.5s ease;"><div class="chart-scroll-view" id="chart-source-el" style="padding-bottom: 25px; padding-right: 20px;">`;
+            let html = `<div class="chart-wrapper fade-visible" style="animation: fadeInUp 0.5s ease; height: 280px !important;">
+                <div class="chart-scroll-view" id="chart-source-el" style="${scrollContainerStyle}">`;
 
             if(sortedTags.length === 0) {
-                html += `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-secondary);">${t.stats_no_data}</div>`;
+                html += `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-secondary); margin-left: 20px;">${t.stats_no_data}</div>`;
             } else {
                 const maxVal = Math.max(...sortedTags.map(x => x[1]));
             
                 sortedTags.forEach(([tag, score], index) => {
-                    const height = Math.max(10, (score / maxVal) * 80);
+                    const height = Math.max(10, (score / maxVal) * 75);
                     
                     let displayTag = tag.charAt(0).toUpperCase() + tag.slice(1);
                     if (displayTag.length > 9) displayTag = displayTag.substring(0, 7) + '..';
 
-                    let delay = 0;
-                    if (index >= 5) delay = 0.05 + (index * 0.01); 
-                    else if (index === 4) delay = 0.2;
-                    else if (index === 3) delay = 0.3;
-                    else if (index === 2) delay = 0.4;
-                    else if (index === 1) delay = 0.5;
-                    else if (index === 0) delay = 0.7; 
+                    let delay = index < 5 ? (0.7 - index * 0.1) : 0.05; 
 
                     html += `
-                        <div class="pref-col">
-                            <div class="chart-value-y stagger-text" style="animation-delay:${delay}s">${Math.round(score)}</div>
+                        <div class="pref-col" style="min-width: 55px; margin-right: 8px;">
+                            <div class="chart-value-y stagger-text" style="animation-delay:${delay}s; font-size:10px; margin-bottom:4px;">${Math.round(score)}</div>
                             <div class="chart-bar" style="height:0%; animation: growTag${index} 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards ${delay}s;"></div>
-                            <div class="chart-label-x stagger-text" title="${tag}" style="animation-delay:${delay}s; margin-top:6px;">${displayTag}</div>
+                            <div class="chart-label-x stagger-text" title="${tag}" style="animation-delay:${delay}s; margin-top:8px; font-size:10px; white-space:nowrap;">${displayTag}</div>
                             <style>@keyframes growTag${index} { from { height: 0%; opacity: 0; } to { height: ${height}%; opacity: 1; } }</style>
                         </div>
                     `;
@@ -19063,10 +19074,11 @@
 
             const chartData = Object.values(aggregated).sort((a, b) => a.sort - b.sort);
             
-            let html = `<div class="chart-wrapper fade-visible"><div class="chart-scroll-view" id="chart-source-el" style="justify-content: flex-start; padding-left: 5px; padding-bottom: 25px; padding-right: 20px;">`;
+            let html = `<div class="chart-wrapper fade-visible" style="height: 280px !important;">
+                <div class="chart-scroll-view" id="chart-source-el" style="${scrollContainerStyle}">`;
 
             if (chartData.length === 0) {
-                html += `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-secondary);">${t.stats_no_data}</div>`;
+                html += `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-secondary); margin-left: 20px;">${t.stats_no_data}</div>`;
             } else {
                 let globalMax = 0;
                 chartData.forEach(d => {
@@ -19082,15 +19094,16 @@
 
                 chartData.forEach((d, index) => {
                     const timeMin = Math.round(d.time / 60);
-                    const hNew = (d.newItems / globalMax) * 80;
-                    const hWatch = (d.watch / globalMax) * 80;
-                    const hTime = (timeMin / globalMax) * 80;
+                    
+                    const hNew = (d.newItems / globalMax) * 75;
+                    const hWatch = (d.watch / globalMax) * 75;
+                    const hTime = (timeMin / globalMax) * 75;
                     
                     const delay = index * 0.05;
 
                     html += `
-                        <div class="act-col" style="min-width: 85px; margin-right: 5px;">
-                            <div class="act-bars-group">
+                        <div class="act-col" style="min-width: 85px; margin-right: 15px;">
+                            <div class="act-bars-group" style="height: 100%; align-items: flex-end;">
                                 <div class="act-bar" style="background:${gradGrey}; height:0%; opacity:0.8; animation: growBarH${index} 0.6s forwards ${delay}s;"></div>
                                 <div class="act-bar" style="background:${gradAccent}; height:0%; animation: growBarW${index} 0.6s forwards ${delay+0.1}s;"></div>
                                 <div class="act-bar" style="background:${gradPurple}; height:0%; animation: growBarT${index} 0.6s forwards ${delay+0.2}s;"></div>
@@ -19101,7 +19114,7 @@
                                 @keyframes growBarT${index} { to { height: ${timeMin > 0 ? Math.max(4, hTime) : 0}%; } }
                             </style>
 
-                            <div class="act-values-row stagger-text" style="animation-delay:${delay + 0.3}s">
+                            <div class="act-values-row stagger-text" style="animation-delay:${delay + 0.3}s; margin-top: 5px;">
                                 <span class="act-val" style="color:var(--text-secondary); font-weight:700;">${d.newItems}</span>
                                 <span class="act-val" style="color:var(--text-main);">${d.watch}</span>
                                 <span class="act-val" style="color:#9b59b6;">${timeMin}</span>
@@ -19126,9 +19139,8 @@
             `;
 
             body.innerHTML = html;
-        }
-        
-        if (currentStatsTab === 'activity') {
+            
+            // Автоскролл к концу
             const scrollView = document.getElementById('chart-source-el');
             if (scrollView) {
                 setTimeout(() => {
