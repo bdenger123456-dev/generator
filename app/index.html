@@ -7331,13 +7331,28 @@
             overflow-x: auto;
             overflow-y: visible; /* Чтобы тени не обрезались */
             gap: 15px;
-            padding: 20px 20px 40px 20px; /* Отступы по бокам + снизу для теней */
             
-            /* Убираем жесткий snap, чтобы скролл был плавным как в Instagram/AppStore */
-            /* scroll-snap-type: x mandatory; <- УДАЛЕНО, чтобы не конфликтовало */
+            margin-left: -20px; 
+            margin-right: -20px;
+            width: calc(100% + 40px);
             
+            /* 2. Добавляем внутренний отступ, чтобы первая и последняя карточка не прилипали к краю */
+            padding: 20px 20px 40px 20px; 
+            
+            /* Скрываем скроллбар */
             scrollbar-width: none;
             -ms-overflow-style: none;
+        }
+
+        @media (max-width: 768px) {
+            .tips-scroll-row {
+                /* Если у body padding 15px, корректируем */
+                margin-left: -20px !important;
+                margin-right: -20px !important;
+                width: calc(100% + 40px) !important;
+                padding-left: 20px !important;
+                padding-right: 20px !important;
+            }
         }
         .tips-scroll-row::-webkit-scrollbar { display: none; }
 
@@ -7903,6 +7918,86 @@
         .notch-close-btn:active {
             transform: scale(0.9);
             background: rgba(255, 255, 255, 0.4);
+        }
+
+        /* =========================================================
+        RE-DESIGN START SCREEN 
+        ========================================================= */
+
+        /* 1. БОКОВЫЕ КНОПКИ (Explore / Pleasure)  */
+        .mode-circle-btn.side-btn {
+            width: 82px !important;      
+            height: 82px !important;
+            border-radius: 50% !important;
+            z-index: 10 !important;       
+            
+            /* Добавляем жирную обводку для контраста */
+            border: 3px solid rgba(255, 255, 255, 0.3) !important;
+            
+            /* Мощная тень */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4), inset 0 0 10px rgba(255,255,255,0.2) !important;
+            
+            /* Анимация пульсации  */
+            animation: sidePulse 2s infinite ease-in-out !important;
+        }
+
+        /* Иконки внутри боковых кнопок тоже увеличиваем */
+        .side-icon-img {
+            width: 38px !important; 
+            height: 38px !important;
+        }
+
+        /* Анимация пульсации для боковых кнопок */
+        @keyframes sidePulse {
+            0% { transform: scale(1); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 15px 40px rgba(0,0,0,0.5); }
+            100% { transform: scale(1); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+        }
+
+        /* 2. ЦЕНТРАЛЬНАЯ КНОПКА (AI) */
+        .mode-circle-btn.center-btn.ai-assist {
+            width: 50px !important;      
+            height: 50px !important;
+            z-index: 5 !important;
+            
+            background: rgba(255, 255, 255, 0.1) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            box-shadow: none !important;
+            
+            animation: none !important;
+            
+            margin-top: 15px; 
+        }
+
+        .ai-icon-img {
+            width: 24px !important; 
+            height: 24px !important;
+            filter: invert(1) !important; 
+            opacity: 0.8;
+        }
+
+        /* При нажатии на AI кнопку */
+        .mode-circle-btn.center-btn.ai-assist:active {
+            background: rgba(255, 255, 255, 0.2) !important;
+            transform: scale(0.95);
+        }
+
+        /* 3. АДАПТАЦИЯ ДЛЯ ТЕМЫ NOIR (ЧЕРНО-БЕЛАЯ) */
+        body[data-theme="noir"] .mode-circle-btn.side-btn {
+            background: #000 !important;
+            border: 3px solid #fff !important;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3) !important;
+        }
+
+        body[data-theme="noir"] .mode-circle-btn.center-btn.ai-assist {
+            background: transparent !important;
+            border: 1px solid #666 !important;
+        }
+
+        /* 4. КОРРЕКЦИЯ ОТСТУПОВ КОНТЕЙНЕРА */
+        .mode-buttons-row {
+            gap: 15px !important; 
+            align-items: flex-start !important; 
         }
 
         .seo-context {
@@ -26668,6 +26763,20 @@
         document.addEventListener('resume', hidePrivacy);
 
     })();
+
+    // === Блокировка прохождения кликов сквозь модальные окна ===
+    document.addEventListener('DOMContentLoaded', () => {
+        // Находим все окна
+        const modals = document.querySelectorAll('.modal');
+        
+        modals.forEach(modal => {
+            ['click', 'touchstart', 'touchend', 'mousedown', 'mouseup'].forEach(evt => {
+                modal.addEventListener(evt, (e) => {
+                    e.stopPropagation();
+                }, { passive: false });
+            });
+        });
+    });
 
 </script>
 
