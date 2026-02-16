@@ -354,40 +354,100 @@
 
         /* === SECTION: WHAT IS (Black) === */
         #what-is { background-color: var(--bg-main); padding: 100px 0 180px; position: relative; z-index: 10; }
-        .unique-bento-grid { display: grid; grid-template-columns: 0.9fr 1.1fr; grid-template-rows: 1fr 1fr; gap: 24px; max-width: 1000px; margin: 0 auto; min-height: 520px; }
         
-        .glass-card {
-            background: #0a0a0a; border-radius: 30px; position: relative; overflow: hidden;
-            display: flex; flex-direction: column; padding: 40px;
-            border: 1px solid rgba(255,255,255,0.06); box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            transition: transform 0.4s, border-color 0.4s;
+        /* НОВАЯ СЕТКА (3 колонки) */
+        .wi-grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 24px; 
+            max-width: 1000px; 
+            margin: 0 auto; 
         }
+
+        /* Ширина блоков */
+        .wi-span-2 { grid-column: span 2; }
+        .wi-span-1 { grid-column: span 1; }
+
+        /* Базовый стиль карточки */
+        .glass-card {
+            background: #0a0a0a; 
+            border-radius: 30px; 
+            position: relative; 
+            overflow: hidden;
+            display: flex; 
+            flex-direction: column; 
+            padding: 35px;
+            border: 1px solid rgba(255,255,255,0.06); 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            transition: transform 0.4s, border-color 0.4s;
+            min-height: 300px; /* Фиксированная высота для ровности */
+            justify-content: space-between;
+        }
+        
         .glass-card:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.15); }
         
-        .glass-card h3 { font-size: 28px; font-weight: 800; margin-bottom: 15px; color: #fff; position: relative; z-index: 5; }
-        .glass-card p { font-size: 16px; color: #888; max-width: 90%; position: relative; z-index: 5; }
+        .glass-card h3 { font-size: 28px; font-weight: 800; margin-bottom: 15px; color: #fff; position: relative; z-index: 5; line-height: 1.1; }
+        .glass-card p { font-size: 16px; color: #888; max-width: 90%; position: relative; z-index: 5; line-height: 1.5; }
         
-        .bento-img-3d { position: absolute; width: 140px; height: 140px; object-fit: contain; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.4)); z-index: 3; transition: all 0.6s; }
-        .icon-glow-bg { position: absolute; width: 180px; height: 180px; border-radius: 50%; filter: blur(60px); opacity: 0.15; z-index: 2; transition: opacity 0.4s; }
+        /* Иконки */
+        .bento-img-3d { 
+            position: absolute; 
+            width: 130px; height: 130px; 
+            object-fit: contain; 
+            filter: drop-shadow(0 15px 30px rgba(0,0,0,0.4)); 
+            z-index: 3; 
+            transition: all 0.6s; 
+            bottom: -20px; right: -20px; /* По умолчанию справа снизу */
+        }
+        
+        .icon-glow-bg { 
+            position: absolute; 
+            width: 180px; height: 180px; 
+            border-radius: 50%; 
+            filter: blur(60px); 
+            opacity: 0.15; 
+            z-index: 2; 
+            transition: opacity 0.4s;
+            bottom: -30px; right: -30px; 
+        }
+        
         .glass-card:hover .icon-glow-bg { opacity: 0.3; }
+        .glass-card:hover .bento-img-3d { transform: scale(1.1) rotate(-5deg); }
 
+        /* СПЕЦИФИЧНЫЕ СТИЛИ ДЛЯ КАРТОЧЕК */
 
+        /* 1. Карточки шириной 2 (Choose, Discover) */
+        .wi-span-2 .bento-img-3d {
+            width: 160px; height: 160px;
+        }
 
-        .cell-tall { grid-row: span 2; justify-content: space-between; }
-        .cell-tall .bento-img-3d { bottom: -20px; right: -20px; transform: rotate(-10deg); }
-        .cell-tall .icon-glow-bg { background: var(--accent-start); bottom: -30px; right: -30px; }
-        .cell-tall:hover .bento-img-3d { bottom: 10px; right: 10px; transform: rotate(0deg) scale(1.1); }
+        /* 2. Карточки шириной 1 (Sources, Relax) */
+        .wi-span-1 {
+             background: linear-gradient(145deg, #0a0a0a, #111);
+        }
+        .wi-span-1 h3 { font-size: 24px; }
+        .wi-span-1 p { font-size: 14px; }
+        .wi-span-1 .bento-img-3d {
+            width: 110px; height: 110px;
+            bottom: -15px; right: -15px;
+        }
 
-        .cell-wide { grid-column: 2; justify-content: center; }
-        .cell-wide .bento-img-3d { right: 10px; top: 50%; width: 110px; height: 110px; transform: translateY(-50%) rotate(5deg); }
-        .cell-wide .icon-glow-bg { background: #00ff88; right: 0; top: 50%; transform: translateY(-50%); }
-        .cell-wide:hover .bento-img-3d { transform: translateY(-50%) rotate(-5deg) scale(1.15) translateX(-10px); }
-        .cell-wide.evolve .icon-glow-bg { background: #00d2ff; }
+        /* ЦВЕТА СВЕЧЕНИЯ */
+        .glow-purple { background: var(--accent-start); }
+        .glow-blue { background: #00d2ff; }
+        .glow-green { background: #00ff88; }
+        .glow-orange { background: #ff9900; }
 
+        /* МОБИЛЬНЫЙ АДАПТИВ */
         @media (max-width: 900px) {
-            .unique-bento-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
-            .cell-tall { grid-row: span 1; min-height: 280px; }
-            .cell-wide { grid-column: span 1; min-height: 200px; }
+            .wi-grid { grid-template-columns: 1fr; gap: 15px; }
+            .wi-span-2, .wi-span-1 { grid-column: span 1; min-height: 240px; }
+            
+            .glass-card { padding: 25px; min-height: auto; }
+            .bento-img-3d { width: 90px !important; height: 90px !important; }
+            
+            /* Делаем иконки чуть виднее на мобилках */
+            .glass-card p { max-width: 65%; } 
         }
 
         /* === SECTION: FEATURES (Gray) === */
@@ -761,60 +821,6 @@
             100% { box-shadow: 0 0 15px rgba(0, 210, 255, 0.6); transform: translateX(-50%) scale(1); }
         }
 
-        /* Прогресс бар */
-        .limit-wrap {
-            margin-top: 25px;
-            width: 100%;
-            max-width: 220px; /* Ограничиваем ширину, чтобы было аккуратно */
-            
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(0, 210, 255, 0.3); /* Цветная рамка */
-            padding: 8px 10px;
-            border-radius: 10px;
-        }
-        .limit-txt {
-            display: flex;
-            justify-content: space-between;
-            font-size: 10px;
-            font-weight: 800;
-            color: #fff;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Сама полоска */
-        .limit-bar {
-            width: 100%;
-            height: 6px; /* Чуть толще */
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* Заливка с анимацией полосок */
-        .limit-fill {
-            width: 92%; /* Процент заполнения */
-            height: 100%;
-            background: linear-gradient(45deg, 
-                #00d2ff 25%, 
-                #3a7bd5 25%, 
-                #3a7bd5 50%, 
-                #00d2ff 50%, 
-                #00d2ff 75%, 
-                #3a7bd5 75%, 
-                #3a7bd5 100%
-            );
-            background-size: 20px 20px;
-            box-shadow: 0 0 10px #00d2ff;
-            animation: stripMove 1s linear infinite; /* Движущиеся полоски */
-        }
-
-        @keyframes stripMove {
-            0% { background-position: 0 0; }
-            100% { background-position: 20px 20px; }
-        }
 
         /* === МОБИЛЬНЫЙ АДАПТИВ === */
         @media (max-width: 900px) {
@@ -1310,51 +1316,68 @@
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: #000; /* Глубокая подложка */
+            background: #050505; 
             overflow: hidden;
             z-index: 0;
         }
 
-        /* Общий слой размытия для слияния красок */
-        .aurora-blur-layer {
+        .hero-aurora .aurora-blur-layer {
             position: absolute;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            filter: blur(100px); /* Экстремальное размытие для мягкости */
-            opacity: 0.6;
+            border-radius: 50%;
+            opacity: 0.75; 
+            mix-blend-mode: screen; 
+            will-change: transform;
+            filter: blur(30px) saturate(2.0); 
         }
 
-        /* --- HERO: Фиолетовый / Неон / Синий --- */
+        /* СЛОЙ 1: Насыщенный Фиолетовый */
         .hero-aurora .layer-1 {
-            background: conic-gradient(
-                from 0deg,
-                #240046, 
-                #7b2cbf, 
-                #3a0ca3, 
-                #4cc9f0, 
-                #7b2cbf, 
-                #240046
-            );
-            animation: auroraSpin 30s linear infinite;
-            opacity: 0.7;
+            background: radial-gradient(circle, #8a2be2 0%, rgba(138, 43, 226, 0) 70%);
+            width: 90vw; height: 90vw;
+            top: -30%; left: -20%;
+            animation: auroraFloat1 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
         }
         
+        /* СЛОЙ 2: Неоновая Маджента (Розовый) */
         .hero-aurora .layer-2 {
-            background: radial-gradient(ellipse at center, rgba(203, 83, 240, 0.8), transparent 70%);
-            width: 150%; height: 150%;
-            top: -25%; left: -25%;
-            mix-blend-mode: screen; /* Осветление */
-            animation: auroraPulse 10s ease-in-out infinite alternate;
+            background: radial-gradient(circle, #ff00cc 0%, rgba(255, 0, 204, 0) 70%);
+            width: 80vw; height: 80vw;
+            bottom: -20%; right: -20%;
+            top: auto; left: auto;
+            animation: auroraFloat2 15s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        /* СЛОЙ 3: Яркий Циан (Голубой) */
         .hero-aurora .layer-3 {
-            background: linear-gradient(120deg, transparent 30%, rgba(76, 201, 240, 0.4) 50%, transparent 70%);
-            width: 200%; height: 200%;
-            top: -50%; left: -50%;
-            mix-blend-mode: overlay;
-            animation: auroraWave 20s ease-in-out infinite;
+            background: radial-gradient(circle, #00ffff 0%, rgba(0, 255, 255, 0) 70%);
+            width: 60vw; height: 60vw;
+            top: 40%; left: 30%;
+            opacity: 0.5; 
+            animation: auroraFloat3 18s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        @keyframes auroraFloat1 {
+            0% { transform: translate3d(0, 0, 0) scale(1); }
+            100% { transform: translate3d(10%, 10%, 0) scale(1.15); }
+        }
+
+        @keyframes auroraFloat2 {
+            0% { transform: translate3d(0, 0, 0) scale(1); }
+            100% { transform: translate3d(-15%, -10%, 0) scale(1.25); }
+        }
+
+        @keyframes auroraFloat3 {
+            0% { transform: translate3d(0, 0, 0) scale(1); }
+            50% { transform: translate3d(20%, -20%, 0) scale(0.85); }
+            100% { transform: translate3d(-10%, 20%, 0) scale(1.1); }
+        }
+
+        @media (max-width: 900px) {
+            .hero-aurora .aurora-blur-layer {
+                filter: saturate(1.5);
+                opacity: 0.6;
+            }
+        }
 
         /* --- FOOTER: Бирюза / Маджента / Глубина --- */
         .footer-aurora .layer-1 {
@@ -1979,7 +2002,7 @@
             position: relative;
             max-width: 1000px;
             margin: 0 auto;
-            height: 550px;
+            height: 620px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -2021,7 +2044,7 @@
         .price-card {
             position: absolute;
             width: 300px;
-            height: 380px;
+            height: 400px;
             border-radius: 30px;
             padding: 30px;
             background: rgba(15, 15, 15, 0.95);
@@ -2040,16 +2063,17 @@
 
         /* Состояния */
         .price-card.active {
-            justify-content: flex-start;
-            padding-top: 60px; 
-            height: 520px;
+            justify-content: flex-start; 
+            padding-top: 40px; 
+            padding-bottom: 30px; 
+            
+            height: auto; 
+            min-height: 560px; 
+            
             opacity: 1;
             z-index: 10;
             transform: translateX(0) scale(1.1);
             pointer-events: auto;
-            border-color: rgba(203, 83, 240, 0.5);
-            box-shadow: 0 0 50px rgba(203, 83, 240, 0.2);
-            height: 480px;
         }
 
         .price-card.prev {
@@ -2066,6 +2090,12 @@
             transform: translateX(100%) scale(0.85) rotateY(-20deg);
             pointer-events: auto;
             cursor: pointer;
+        }
+
+        .pc-features li:last-child {
+            border-bottom: none !important;
+            margin-bottom: 0;
+            padding-bottom: 0;
         }
 
         /* Контент внутри */
@@ -2089,7 +2119,7 @@
         }
 
         .pc-features li {
-            font-size: 14px;
+            font-size: 13px;
             color: #aaa;
             margin-bottom: 8px;
             padding-bottom: 8px;
@@ -2105,7 +2135,7 @@
         /* Бейдж для Bestie */
         .pc-badge {
             position: absolute;
-            top: -15px;
+            top: 20px;
             background: var(--gradient-text);
             padding: 5px 15px;
             border-radius: 20px;
@@ -2118,22 +2148,64 @@
         .carousel-nav-btn {
             position: absolute;
             top: 50%;
-            transform: translateY(-50%);
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: white;
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            font-size: 24px;
             cursor: pointer;
             z-index: 20;
-            transition: 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            
+            background: rgba(255, 255, 255, 0.1) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 0;
+            outline: none;
         }
 
-        .carousel-nav-btn:hover { background: rgba(255,255,255,0.1); scale: 1.1; }
-        .btn-prev { left: 0; }
-        .btn-next { right: 0; }
+        .carousel-nav-btn::before {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background-image: url('right-arrow.png');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            
+            filter: invert(1) brightness(2);
+            transition: all 0.3s ease;
+        }
+
+        /* ЛЕВАЯ КНОПКА (Отражаем правую стрелку) */
+        .btn-prev { 
+            left: 0; 
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        /* ПРАВАЯ КНОПКА (Обычная) */
+        .btn-next { 
+            right: 0; 
+            transform: translateY(-50%);
+        }
+
+        /* ХОВЕР ЭФФЕКТЫ (С сохранением поворота) */
+        .btn-prev:hover {
+            background-color: rgba(255,255,255,0.15);
+            transform: translateY(-50%) rotate(180deg) scale(1.1);
+            border-color: #fff;
+        }
+
+        .btn-next:hover {
+            background-color: rgba(255,255,255,0.15);
+            transform: translateY(-50%) scale(1.1);
+            border-color: #fff;
+        }
 
         @media (max-width: 768px) {
             .price-card.prev, .price-card.next { display: none; }
@@ -2221,49 +2293,82 @@
             transform: translateY(0);
         }
 
-        /* Убираем лишние отступы у иконок, чтобы центровка была точнее */
         .pc-icon {
             margin-bottom: 5px;
             line-height: 1;
         }
 
-        /* Стили прогресс-бара внутри карточки */
+        .pc-icon-img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 20px;
+            
+            filter: invert(1) opacity(0.3);
+            transform: scale(0.9);
+            
+            transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        /* 2. ОБЩЕЕ АКТИВНОЕ СОСТОЯНИЕ */
+        .price-card.active .pc-icon-img {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
         .limit-wrap {
-            margin-top: 20px;
+            margin-top: 25px;
             width: 100%;
-            transition: 0.6s ease;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            padding: 4px; 
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.1);
         }
 
         .limit-txt {
             display: flex;
             justify-content: space-between;
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 800;
             color: #fff;
             margin-bottom: 6px;
             text-transform: uppercase;
+            padding: 0 4px;
         }
 
         .limit-bar {
             width: 100%;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
             overflow: hidden;
+            position: relative;
         }
 
         .limit-fill {
-            width: 92%;
+            width: 92%; 
             height: 100%;
-            background: linear-gradient(45deg, #00d2ff, #3a7bd5);
-            box-shadow: 0 0 10px #00d2ff;
-            animation: stripMove 1s linear infinite;
-            background-size: 20px 20px;
+            border-radius: 6px;
+            
+            background: repeating-linear-gradient(
+                45deg,
+                #00d2ff,
+                #00d2ff 10px,
+                #0077ff 10px,
+                #0077ff 20px
+            );
+            
+            background-size: 28px 28px;
+            
+            animation: smoothStripes 1s linear infinite;
+            
+            box-shadow: 0 0 10px rgba(0, 210, 255, 0.6);
         }
 
-        @keyframes stripMove {
+        @keyframes smoothStripes {
             0% { background-position: 0 0; }
-            100% { background-position: 20px 20px; }
+            100% { background-position: 28px 0; } 
         }
 
         /* Пульсация бейджа для Bestie */
@@ -2282,7 +2387,50 @@
             transition: 0.4s ease 0.1s;
         }
 
-        /* === UPDATED ROADMAP ICONS === */
+        .price-card[data-plan="free"].active .pc-icon-img {
+            
+            filter: invert(1) 
+                    drop-shadow(0 0 10px rgba(255, 255, 255, 0.8)) 
+                    drop-shadow(0 0 20px rgba(255, 255, 255, 0.4));
+            
+            animation: ghostFloat 3s ease-in-out infinite;
+        }
+
+        /* --- PRO: ОРАНЖЕВЫЙ (Fire) --- */
+        .price-card[data-plan="pro"].active .pc-icon-img {
+            
+            filter: invert(66%) sepia(80%) saturate(4000%) hue-rotate(1deg) brightness(103%) contrast(105%)
+                    drop-shadow(0 0 15px rgba(255, 69, 0, 0.8));
+            
+            animation: firePulse 2s ease-in-out infinite alternate;
+        }
+
+        /* --- BESTIE: ГОЛУБОЙ (Diamond) --- */
+        .price-card[data-plan="bestie"].active .pc-icon-img {
+            
+            filter: invert(76%) sepia(61%) saturate(5400%) hue-rotate(160deg) brightness(103%) contrast(101%)
+                    drop-shadow(0 0 15px rgba(0, 210, 255, 0.8));
+            
+            animation: diamondShine 4s ease-in-out infinite;
+        }
+
+        @keyframes ghostFloat {
+            0%, 100% { transform: scale(1.1) translateY(0); }
+            50% { transform: scale(1.1) translateY(-8px); }
+        }
+
+        @keyframes firePulse {
+            0% { transform: scale(1.1); }
+            100% { transform: scale(1.15); }
+        }
+
+        @keyframes diamondShine {
+            0%, 100% { transform: scale(1.1) rotate(0deg); }
+            25% { transform: scale(1.1) rotate(-3deg); }
+            75% { transform: scale(1.1) rotate(3deg); }
+        }
+
+        /* === ROADMAP ICONS === */
 
         .roadmap-icon-box {
             width: 80px;
@@ -2656,42 +2804,45 @@
                     </h2>
                 </div>
                 
-                <div class="unique-bento-grid">
+                <div class="wi-grid">
                     
-                    <!-- 1. CHOOSE (Tall) -> Иконка СПРАВА СНИЗУ -->
-                    <div class="glass-card cell-tall">
+                    <!-- 1. CHOOSE (Большой - 2 колонки) -->
+                    <div class="glass-card wi-span-2">
                         <div class="card-content">
                             <h3 data-i18n="wi_p1_head">Choose</h3>
                             <p data-i18n="wi_p1_desc">Think you're tired of watching the same old thing. We give you a choice...</p>
                         </div>
-                        <div class="icon-glow-bg"></div>
-                        <img src="icon_brain.png" 
-                            alt="Choose" 
-                            class="bento-img-3d" 
-                            width="94" height="94" 
-                            loading="lazy" 
-                            decoding="async">
+                        <div class="icon-glow-bg glow-purple"></div>
+                        <img src="icon_brain.png" alt="Choose" class="bento-img-3d">
                     </div>
 
-                    <!-- 2. RELAX (Wide) -> Иконка СЛЕВА (Зиг-Заг) -->
-                    <div class="glass-card cell-wide left-icon">
+                    <!-- 2. SOURCES (Средний - 1 колонка) -->
+                    <div class="glass-card wi-span-1">
+                        <div class="card-content">
+                            <h3 data-i18n="wi_sources_head">Don't Limit Yourself</h3>
+                            <p data-i18n="wi_sources_desc">Why watch videos on one site when you can access 20+? The chance of seeing the same thing drops dramatically 🫦.</p>
+                        </div>
+                        <div class="icon-glow-bg glow-orange"></div>
+                        <img src="icon_globe.png" alt="Sources" class="bento-img-3d">
+                    </div>
+
+                    <!-- 3. RELAX (Средний - 1 колонка) -->
+                    <div class="glass-card wi-span-1">
                         <div class="card-content">
                             <h3 data-i18n="wi_p2_head">Relax</h3>
                             <p data-i18n="wi_p2_desc">Store all your data locally or encrypted in the cloud...</p>
                         </div>
-                        <div class="icon-glow-bg"></div>
-                        <!-- Иконка замка -->
+                        <div class="icon-glow-bg glow-blue"></div>
                         <img src="icon_lock.png" alt="Relax" class="bento-img-3d">
                     </div>
 
-                    <!-- 3. DISCOVER (Wide) -> Иконка СПРАВА -->
-                    <div class="glass-card cell-wide right-icon">
+                    <!-- 4. DISCOVER (Большой - 2 колонки) -->
+                    <div class="glass-card wi-span-2">
                         <div class="card-content">
                             <h3 data-i18n="wi_p3_head">Discover</h3>
                             <p data-i18n="wi_p3_desc">Think you know every genre? With our collection...</p>
                         </div>
-                        <div class="icon-glow-bg"></div>
-                        <!-- Иконка компаса -->
+                        <div class="icon-glow-bg glow-green"></div>
                         <img src="icon_compass.png" alt="Discover" class="bento-img-3d">
                     </div>
 
@@ -2834,12 +2985,13 @@
                 </div>
 
                 <div class="pricing-carousel-wrapper fade-in">
-                    <button class="carousel-nav-btn btn-prev" onclick="movePricing(-1)">‹</button>
+                    <button class="carousel-nav-btn btn-prev" onclick="movePricing(-1)"></button>
                     
                     <div class="carousel-track" id="pricing-track">
-                        <!-- План: FREE -->
-                        <div class="price-card active" data-plan="free">
-                            <div class="pc-icon">🎲</div>
+                        
+                        <!-- План: FREE (Слева / Prev) -->
+                        <div class="price-card prev" data-plan="free">
+                            <img src="free.png" class="pc-icon-img" alt="Free Icon">
                             <h3 class="plan-name">Free</h3>
                             <div class="pc-price">$0</div>
                             <ul class="pc-features">
@@ -2851,9 +3003,9 @@
                             </ul>
                         </div>
 
-                        <!-- План: PRO -->
-                        <div class="price-card next" data-plan="pro">
-                            <div class="pc-icon">🔥</div>
+                        <!-- План: PRO (Центр / Active) -->
+                        <div class="price-card active" data-plan="pro">
+                            <img src="pro.png" class="pc-icon-img" alt="Pro Icon">
                             <h3 class="plan-name">Pro</h3>
                             <div class="pc-price">$1.99<span>/mo</span></div>
                             <ul class="pc-features">
@@ -2865,29 +3017,21 @@
                             </ul>
                         </div>
 
-                        <!-- План: BEAST -->
-                        <div class="price-card" data-plan="beast">
-                            <div class="pc-icon">👑</div>
-                            <h3 class="plan-name">Beast</h3>
-                            <div class="pc-price">$4.99<span>/mo</span></div>
-                            <ul class="pc-features">
-                                <li data-i18n="feat_all_pro">All Pro Features</li>
-                                <li data-i18n="feat_discord">Discord (Dev Chat)</li>
-                                <li data-i18n="feat_vote">Voting Power</li>
-                            </ul>
-                        </div>
-
-                        <!-- План: BESTIE -->
-                        <div class="price-card prev" data-plan="bestie">
+                        <!-- План: BESTIE (Справа / Next) -->
+                        <div class="price-card next" data-plan="bestie">
                             <div class="pc-badge" data-i18n="badge_limited">LIMITED</div>
-                            <div class="pc-icon">💎</div>
+                            <img src="bestie.png" class="pc-icon-img" alt="Bestie Icon">
                             <h3 class="plan-name">Bestie</h3>
-                            <div class="pc-price">$49.99<span>/life</span></div>
+                            
+                            <div class="pc-price">$19.99<span>/life</span></div>
+                            
                             <ul class="pc-features">
                                 <li data-i18n="feat_lifetime">Lifetime Access</li>
-                                <li data-i18n="feat_all_beast">All Beast Features</li>
+                                <li data-i18n="feat_all_pro">All Pro Features</li> 
                                 <li data-i18n="feat_sponsors">Sponsors List</li>
                             </ul>
+                            
+                            <!--  прогресс-бар -->
                             <div class="limit-wrap">
                                 <div class="limit-txt">
                                     <span data-i18n="limit_burn">🔥 ALMOST GONE</span>
@@ -2898,9 +3042,10 @@
                                 </div>
                             </div>
                         </div>
+
                     </div>
 
-                    <button class="carousel-nav-btn btn-next" onclick="movePricing(1)">›</button>
+                    <button class="carousel-nav-btn btn-next" onclick="movePricing(1)"></button>
                 </div>
             </div>
             
@@ -2921,6 +3066,23 @@
                     <div class="roadmap-card">
                         <div class="roadmap-row">
                             <div class="roadmap-icon-box">
+                                <img src="community.png" class="rm-img" alt="Community">
+                            </div>
+                            
+                            <div class="roadmap-content">
+                                <h4 data-i18n="rm_comm_head">Community</h4>
+                                <p data-i18n="rm_comm_desc">Search for people with similar tastes and share your achievements with them...</p>
+                            </div>
+                            
+                            <!-- Статус: В процессе -->
+                            <div class="roadmap-status status-progress" data-i18n="st_progress">In Progress</div>
+                        </div>
+                    </div>
+
+                    <!-- Item 2 -->
+                    <div class="roadmap-card">
+                        <div class="roadmap-row">
+                            <div class="roadmap-icon-box">
                                 <img src="icon_network.png" class="rm-img" alt="Global">
                             </div>
                             
@@ -2933,7 +3095,7 @@
                         </div>
                     </div>
                     
-                    <!-- Item 2 -->
+                    <!-- Item 3 -->
                     <div class="roadmap-card">
                         <div class="roadmap-row">
                             <div class="roadmap-icon-box">
@@ -2942,20 +3104,6 @@
                             <div class="roadmap-content">
                                 <h4 data-i18n="rm_2_head">Co-op Mode</h4>
                                 <p data-i18n="rm_2_desc">Connect partner to your session to choose a "movie" together...</p>
-                            </div>
-                            <div class="roadmap-status status-planned" data-i18n="st_plan">Planned</div>
-                        </div>
-                    </div>
-                    
-                    <!-- Item 3 -->
-                    <div class="roadmap-card">
-                        <div class="roadmap-row">
-                            <div class="roadmap-icon-box">
-                                <img src="icon_database.png" class="rm-img" alt="Database">
-                            </div>
-                            <div class="roadmap-content">
-                                <h4 data-i18n="rm_3_head">Database Expansion</h4>
-                                <p data-i18n="rm_3_desc">Expanding the base up to 5000 tags...</p>
                             </div>
                             <div class="roadmap-status status-planned" data-i18n="st_plan">Planned</div>
                         </div>
@@ -3041,7 +3189,7 @@
                 <!-- 3. 3 MODES (Glass) -->
                 <div class="bento-cell col-2 mob-6 bg-glass-standard cell-center-perfect cell-text-top">
                     <h3 class="text-label-caps" data-i18n="bn_modes">3 MODES</h3>
-                    <img id="modes-icon-anim" src="icon_discovery.png" class="bento-icon-sm" alt="Modes">
+                    <img src="icon_aimode.png" class="bento-icon-sm" alt="AI Mode">
                 </div>
 
                 <!-- 4. DEVICES (Glass) -->
@@ -3250,6 +3398,9 @@
                 wi_p3_head: "Discover", 
                 wi_p3_desc: "Think you already know all 18+ genres? With our collection of 1200+ tags, you will constantly learn something new for yourself for years to come 🔭.",
                
+                wi_sources_head: "Don't Limit Yourself",
+                wi_sources_desc: "Why watch videos on one site when you can access 20+? The chance of seeing the same thing drops dramatically 🫦.",
+
                 map_subtitle: "With your support, we will become legends 😎",
                 faq_subtitle: "In case you need clarification", 
 
@@ -3296,19 +3447,22 @@
                 map_title: "Future <span class='gradient-text'>Plans</span>",
                 rm_phase_1: "Phase 1: Intelligence", 
                 rm_1_head: "Global Intelligence", 
-                rm_1_desc: "Find out the most loved and hated genres worldwide, and get recommendations based on people close to your psychotype 🤯.",
+                rm_1_desc: "Find out the most loved and hated genres worldwide, and get recommendations based on people close to your psychotype 🤯",
                 rm_phase_2: "Phase 2: Connection", 
                 rm_2_head: "Co-op Mode", 
-                rm_2_desc: "Don't know how to entertain yourself with a partner tonight? Connect them to your session to choose a 'movie' together 😈.",
+                rm_2_desc: "Don't know how to entertain yourself with a partner tonight? Connect them to your session to choose a 'movie' together 😈",
                 rm_phase_3: "Phase 3: Expansion", 
                 rm_3_head: "Database Expansion", 
-                rm_3_desc: "Although you won't unlock all 1200+ fetishes soon, for the truly dedicated, we plan to expand to 5000 to close every gap that might appear 🌚.",
+                rm_3_desc: "Although you won't unlock all 1200+ fetishes soon, for the truly dedicated, we plan to expand to 5000 to close every gap that might appear 🌚",
                 rm_actors_head: "Actor Mode", 
-                rm_actors_desc: "A separate mode that will allow you to select favorite actors based on your preferences for further immersion into their lives 😁.",
+                rm_actors_desc: "A separate mode that will allow you to select favorite actors based on your preferences for further immersion into their lives 😁",
                 st_progress: "In Progress", st_plan: "Planned",
                 rm_q1: "Q1 2026", rm_q2: "Q2 2026", rm_q3: "Q3 2026",
                 rm_loc_head: "World Localization", 
-                rm_loc_desc: "Adding Portuguese, Chinese, Japanese, Korean, Italian, Arabic and maybe even more 🤓.",
+                rm_loc_desc: "Adding Portuguese, Chinese, Japanese, Korean, Italian, Arabic and maybe even more 🤓",
+
+                rm_comm_head: "Community",
+                rm_comm_desc: "Search for people with similar tastes and share your achievements with them 🤝",
 
                 // --- FAQ ---
                 faq_title: "Frequently Asked <span class='gradient-text'>Questions</span>",
@@ -3370,6 +3524,9 @@
                 wi_p3_head: "Открывай", 
                 wi_p3_desc: "Думаешь, что уже знаешь про все 18+ жанры? С нашей коллекцией 1200+ предпочтений ты будешь постоянно узнавать о чём-то новом для себя на протяжении нескольких лет 🔭.",
 
+                wi_sources_head: "Не ограничивай себя",
+                wi_sources_desc: "Зачем смотреть видео на одном сайте, когда можно на 20+? Шанс просмотра одного и того же резко снижается 🫦.",
+
                 map_subtitle: "С твоей поддержкой мы станем легендами 😎",
                 faq_subtitle: "Если вдруг нужны уточнения",
 
@@ -3415,17 +3572,20 @@
                 // --- ROADMAP ---
                 map_title: "Планы <span class='gradient-text'>Развития</span>",
                 rm_phase_1: "Этап 1: Интеллект", rm_1_head: "Глобальный Разум", 
-                rm_1_desc: "Узнаешь какие самые любимые и ненавистные жанры у людей по всему миру, а также будешь получать рекомендации на основе людей, близких к твоему психотипу 🤯.",
+                rm_1_desc: "Узнаешь какие самые любимые и ненавистные жанры у людей по всему миру, а также будешь получать рекомендации на основе людей, близких к твоему психотипу 🤯",
                 rm_phase_2: "Этап 2: Связь", rm_2_head: "Совместный Режим", 
-                rm_2_desc: "Если не знаешь чем развлечься с партнёром этим вечером, то сможешь подключить его к своей сессии, чтобы вместе выбрать 'фильм' на просмотр 😈.",
+                rm_2_desc: "Если не знаешь чем развлечься с партнёром этим вечером, то сможешь подключить его к своей сессии, чтобы вместе выбрать 'фильм' на просмотр 😈",
                 rm_phase_3: "Этап 3: Экспансия", rm_3_head: "Расширение базы данных", 
-                rm_3_desc: "Хоть все 1200+ фетишей ты откроешь не скоро, но для особо преданных планируется расширение базы вплоть до 5000, чтобы закрыть каждую щель, которая могла бы появиться 🌚.",
+                rm_3_desc: "Хоть все 1200+ фетишей ты откроешь не скоро, но для особо преданных планируется расширение базы вплоть до 5000, чтобы закрыть каждую щель, которая могла бы появиться 🌚",
                 rm_actors_head: "Режим с актёрами", 
-                rm_actors_desc: "Отдельный режим, который позволит на основе твоих предпочтений подобрать любимых актёров, для дальнейшего углубления в их жизнь 😁.",
+                rm_actors_desc: "Отдельный режим, который позволит на основе твоих предпочтений подобрать любимых актёров, для дальнейшего углубления в их жизнь 😁",
                 st_progress: "В работе", st_plan: "В планах",
                 rm_q1: "Q1 2026", rm_q2: "Q2 2026", rm_q3: "Q3 2026",
                 rm_loc_head: "Мировая локализация", 
-                rm_loc_desc: "В добавок к уже имеющимся 4 языкам будет добавлен португальский, китайский, японский, корейский, итальянский, арабский и может даже больше 🤓.",
+                rm_loc_desc: "В добавок к уже имеющимся 4 языкам будет добавлен португальский, китайский, японский, корейский, итальянский, арабский и может даже больше 🤓",
+
+                rm_comm_head: "Сообщество",
+                rm_comm_desc: "Ищи людей с похожими вкусами и делись с ними своими достижениями 🤝",
 
                 // --- FAQ ---
                 faq_title: "Частые <span class='gradient-text'>Вопросы</span>",
@@ -3488,6 +3648,9 @@
                 wi_p3_head: "Descubre", 
                 wi_p3_desc: "¿Crees que ya conoces todos los géneros 18+? Con nuestra colección de 1200+ preferencias, descubrirás algo nuevo constantemente durante años 🔭.",
 
+                wi_sources_head: "No te limites",
+                wi_sources_desc: "¿Por qué ver videos en un solo sitio cuando puedes hacerlo en más de 20? La posibilidad de ver lo mismo disminuye drásticamente 🫦.",
+
                 map_subtitle: "Con tu apoyo nos convertiremos en leyendas 😎",
                 faq_subtitle: "En caso de que necesites aclaraciones",
 
@@ -3533,17 +3696,20 @@
                 // --- ROADMAP ---
                 map_title: "Planes <span class='gradient-text'>Futuros</span>",
                 rm_phase_1: "Fase 1: Inteligencia", rm_1_head: "Inteligencia Global", 
-                rm_1_desc: "Descubre los géneros más amados y odiados en todo el mundo y recibe recomendaciones basadas en personas con tu mismo psicotipo 🤯.",
+                rm_1_desc: "Descubre los géneros más amados y odiados en todo el mundo y recibe recomendaciones basadas en personas con tu mismo psicotipo 🤯",
                 rm_phase_2: "Fase 2: Conexión", rm_2_head: "Modo Cooperativo", 
-                rm_2_desc: "¿No sabes cómo entretenerte con tu pareja esta noche? Conéctala a tu sesión para elegir juntos una 'película' para ver 😈.",
+                rm_2_desc: "¿No sabes cómo entretenerte con tu pareja esta noche? Conéctala a tu sesión para elegir juntos una 'película' para ver 😈",
                 rm_phase_3: "Fase 3: Expansión", rm_3_head: "Expansión de Base de Datos", 
-                rm_3_desc: "Aunque no desbloquearás los 1200+ fetiches pronto, planeamos expandirnos a 5000 para cubrir cada hueco que pueda aparecer 🌚.",
+                rm_3_desc: "Aunque no desbloquearás los 1200+ fetiches pronto, planeamos expandirnos a 5000 para cubrir cada hueco que pueda aparecer 🌚",
                 rm_actors_head: "Modo Actor", 
-                rm_actors_desc: "Un modo separado que te permitirá seleccionar actores favoritos basados en tus preferencias para una mayor inmersión 😁.",
+                rm_actors_desc: "Un modo separado que te permitirá seleccionar actores favoritos basados en tus preferencias para una mayor inmersión 😁",
                 st_progress: "En Progreso", st_plan: "Planeado",
                 rm_q1: "T1 2026", rm_q2: "T2 2026", rm_q3: "T3 2026",
                 rm_loc_head: "Localización Mundial", 
-                rm_loc_desc: "Añadiendo portugués, chino, japonés, coreano, italiano, árabe y quizás más 🤓.",
+                rm_loc_desc: "Añadiendo portugués, chino, japonés, coreano, italiano, árabe y quizás más 🤓",
+
+                rm_comm_head: "Comunidad",
+                rm_comm_desc: "Busca personas con gustos similares y comparte tus logros con ellos 🤝",
 
                 // --- FAQ ---
                 faq_title: "Preguntas <span class='gradient-text'>Frecuentes</span>",
@@ -3606,6 +3772,9 @@
                 wi_p3_head: "Entdecke", 
                 wi_p3_desc: "Glaubst du, du kennst schon alle 18+ Genres? Mit unserer Sammlung von 1200+ Vorlieben wirst du jahrelang ständig etwas Neues über dich lernen 🔭.",
 
+                wi_sources_head: "Begrenze dich nicht",
+                wi_sources_desc: "Warum Videos auf einer Seite schauen, wenn du Zugriff auf 20+ hast? Die Chance, das Gleiche zu sehen, sinkt dramatisch 🫦.",
+
                 map_subtitle: "Mit deiner Unterstützung werden wir Legenden 😎",
                 faq_subtitle: "Falls du Klärung brauchst",
 
@@ -3651,18 +3820,21 @@
                 // --- ROADMAP ---
                 map_title: "Zukunfts <span class='gradient-text'>pläne</span>",
                 rm_phase_1: "Phase 1: Intelligenz", rm_1_head: "Globale Intelligenz", 
-                rm_1_desc: "Finde heraus, welche Genres weltweit am beliebtesten und verhasstesten sind, und erhalte Empfehlungen basierend auf deinem Psychotyp 🤯.",
+                rm_1_desc: "Finde heraus, welche Genres weltweit am beliebtesten und verhasstesten sind, und erhalte Empfehlungen basierend auf deinem Psychotyp 🤯",
                 rm_phase_2: "Phase 2: Verbindung", rm_2_head: "Koop-Modus", 
-                rm_2_desc: "Weißt du nicht, was du heute Abend mit deinem Partner schauen sollst? Verbinde ihn mit deiner Sitzung, um gemeinsam einen 'Film' auszuwählen 😈.",
+                rm_2_desc: "Weißt du nicht, was du heute Abend mit deinem Partner schauen sollst? Verbinde ihn mit deiner Sitzung, um gemeinsam einen 'Film' auszuwählen 😈",
                 rm_phase_3: "Phase 3: Expansion", rm_3_head: "Datenbank-Erweiterung", 
-                rm_3_desc: "Obwohl du die 1200+ Fetische nicht so schnell freischalten wirst, planen wir eine Erweiterung auf 5000, um jede Lücke zu schließen 🌚.",
+                rm_3_desc: "Obwohl du die 1200+ Fetische nicht so schnell freischalten wirst, planen wir eine Erweiterung auf 5000, um jede Lücke zu schließen 🌚",
                 rm_actors_head: "Darsteller-Modus", 
-                rm_actors_desc: "Ein separater Modus, der es dir ermöglicht, Lieblingsdarsteller basierend auf deinen Vorlieben auszuwählen 😁.",
+                rm_actors_desc: "Ein separater Modus, der es dir ermöglicht, Lieblingsdarsteller basierend auf deinen Vorlieben auszuwählen 😁",
                 st_progress: "In Arbeit", st_plan: "Geplant",
                 rm_q1: "Q1 2026", rm_q2: "Q2 2026", rm_q3: "Q3 2026",
 
                 rm_loc_head: "Weltweite Lokalisierung", 
-                rm_loc_desc: "Hinzufügung von Portugiesisch, Chinesisch, Japanisch, Koreanisch, Italienisch, Arabisch und vielleicht noch mehr 🤓.",
+                rm_loc_desc: "Hinzufügung von Portugiesisch, Chinesisch, Japanisch, Koreanisch, Italienisch, Arabisch und vielleicht noch mehr 🤓",
+
+                rm_comm_head: "Community",
+                rm_comm_desc: "Suche nach Menschen mit ähnlichem Geschmack und teile deine Erfolge mit ihnen 🤝",
 
                 // --- FAQ ---
                 faq_title: "Häufige <span class='gradient-text'>Fragen</span>",
@@ -4092,32 +4264,12 @@
             }, 2500);
         }
 
-        // 2. Modes Cycle (Icons)
-        function startModesCycle() {
-            const imgEl = document.getElementById('modes-icon-anim');
-            const icons = ['icon_discovery.png', 'icon_pleasure.png', 'icon_aimode.png'];
-            let idx = 0;
-
-            return setInterval(() => {
-                imgEl.style.transform = 'scale(0.5) rotate(-20deg)';
-                imgEl.style.opacity = '0';
-                setTimeout(() => {
-                    idx = (idx + 1) % icons.length;
-                    imgEl.src = icons[idx];
-                    imgEl.style.transform = 'scale(1) rotate(0deg)';
-                    imgEl.style.opacity = '1';
-                }, 400);
-            }, 2000);
-        }
-
         // Инициализация с Observer'ами
         document.addEventListener('DOMContentLoaded', () => {
-            // Вместо прямого вызова, оборачиваем в Observer
             createObserver('cycle-badge', startBadgeCycle);
-            createObserver('modes-icon-anim', startModesCycle);
         });
 
-        let currentPriceIndex = 0;
+        let currentPriceIndex = 1;
         const priceCards = document.querySelectorAll('.price-card');
 
         function movePricing(direction) {
