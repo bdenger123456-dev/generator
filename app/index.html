@@ -9072,9 +9072,10 @@
                         <li style="color:var(--text-main)" data-key="feat_unlim">🔥 <b>Unlimited</b> Gens</li>
                         <li data-key="feat_stats_adv">📈 Advanced Stats</li>
                         <li data-key="feat_wrapped_unlim">✨ <b>Unlimited</b> Wrapped</li>
-                        <li data-key="feat_custom_sites">🌐 <b>Add Custom</b> Sites</li> 
+                        <li data-key="feat_custom_sites">🌐 <b>Add Custom</b> Sites</li>
+                        <li data-key="feat_export">💾 Data Export (JSON)</li> 
                         <li data-key="feat_custom">🎨 Deep Customization</li>
-                    </ul>
+                    </ul>  
                     <button class="plan-btn pro-btn" onclick="openPaymentSelection('pro')" data-key="btn_get_pro" style="background:#ff9900; color:#000;">Get Pro</button>
                 </div>
 
@@ -9461,13 +9462,18 @@
 
             </div>
 
-            <!-- Футер (Выход) -->
-            <div class="bento-footer-actions">
-                <button class="bento-small-btn" onclick="window.logout()">
-                    <span data-key="logout_text">Log Out</span>
+            <!-- Футер-->
+             <div class="bento-footer-actions">
+                <button class="bento-small-btn" onclick="openExportModal()" style="color:var(--accent); border-color:var(--border);">
+                    <span data-key="btn_export">Export Data</span>
                 </button>
                 <button class="bento-small-btn" onclick="openResetModal()" style="color:var(--highlight-red); border-color:rgba(231,76,60,0.3);">
                     <span data-key="btn_reset">Reset Data</span>
+                </button>
+            </div>
+            <div class="bento-footer-actions" style="margin-top: 10px;">
+                <button class="bento-small-btn" onclick="window.logout()" style="width: 100%;">
+                    <span data-key="logout_text">Log Out</span>
                 </button>
             </div>
 
@@ -10109,6 +10115,73 @@
             <!-- Кнопка удаления -->
             <button class="btn-gen" onclick="performPartialReset()" style="width:100%; margin-top:10px; background:var(--highlight-red); color:#fff; font-weight:800; border:none; box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);">
                 <span data-key="btn_delete_selected">Delete Selected</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- EXPORT DATA SELECTION MODAL -->
+<div class="modal-overlay" id="modal-export-selection" onclick="closeExportModal(event)">
+    <div class="modal" style="max-width: 400px;">
+        <div class="modal-header">
+            <div class="modal-close-btn" onclick="closeExportModal(null, true)"><div class="modal-close-icon"></div></div>
+            <span data-key="export_title_select">Export Data</span>
+        </div>
+        
+        <div class="modal-body">
+            <p style="font-size:13px; color:var(--text-secondary); text-align:center; margin-bottom:20px; line-height:1.4;" data-key="export_desc_select">
+                Select data to export as a JSON file. Ideal for AI analysis. (Premium Only)
+            </p>
+
+            <div class="ios-group">
+                <!-- 1. Списки (Лайки, Дизлайки, Позже) -->
+                <div class="ios-row">
+                    <div class="ios-row-left">
+                        <span>💚/⛔ <span data-key="export_opt_lists">Lists (Liked/Disliked)</span></span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="chk-exp-lists" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <!-- 2. История и время -->
+                <div class="ios-row">
+                    <div class="ios-row-left">
+                        <span>📜 <span data-key="export_opt_hist">History & Watch Time</span></span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="chk-exp-hist" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <!-- 3. Активность (Свайпы) -->
+                <div class="ios-row">
+                    <div class="ios-row-left">
+                        <span>📊 <span data-key="export_opt_activity">Detailed Activity Log</span></span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="chk-exp-activity" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <!-- 4. Открытые фетиши -->
+                <div class="ios-row">
+                    <div class="ios-row-left">
+                        <span>🏆 <span data-key="explored_label">Explored</span></span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="chk-exp-expl" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Кнопка скачивания -->
+            <button class="btn-gen" onclick="performExport()" style="width:100%; margin-top:10px; background:var(--accent); color:#000; font-weight:800; border:none; box-shadow: 0 4px 15px rgba(255, 0, 204, 0.3);">
+                <span data-key="btn_export_selected">Download JSON</span>
             </button>
         </div>
     </div>
@@ -12436,6 +12509,14 @@
             feat_onetime: "💸 One-time payment",
             btn_get_bestie: "Get Forever",
 
+            btn_export: "Export Data",
+            export_title_select: "Export Data",
+            export_desc_select: "Select data to export as a JSON file for AI analysis. (Premium Only)",
+            export_opt_lists: "Lists (Liked/Disliked)",
+            export_opt_hist: "History & Watch Time",
+            export_opt_activity: "Detailed Activity Log",
+            btn_export_selected: "Download JSON",
+
             // --- Sponsors ---
             btn_early_sponsors: "Early Sponsors",
             sponsors_title: "Wall of Fame",
@@ -12686,6 +12767,22 @@
 
             lbl_current_plan: "Current Plan",
             login_alert: "Please log in to manage subscriptions!",
+
+            feat_export: "💾 Data Export (JSON)",
+            
+            tip_export_title: "Export & AI Analysis",
+            tip_export_desc: "Analyze your tastes with ChatGPT",
+            tip_export_text: `
+                Did you know you can export your entire browsing history and feed it to an AI? Our JSON export is formatted specifically for neural networks to understand.<br><br>
+                <b>How to do it:</b><br>
+                1. Go to the <b>Account</b> tab and click 'Sync Data' (the cloud icon).<br>
+                2. Click the <b>Export Data</b> button (Premium feature).<br>
+                3. Choose what to export and download the JSON file.<br><br>
+                <b>What's next?</b><br>
+                Upload this file to ChatGPT or Claude and prompt:<br>
+                <i style="color:var(--text-secondary);">"Analyze my viewing history and swipes. What are my hidden psychological preferences? What specific fetish should I try next based on these patterns?"</i><br><br>
+                The AI will perfectly process your actions and tags, giving you a detailed psychoanalysis of your kinks!
+            `,
 
             // --- 4. Account & Data ---
             login_text: "Sync / Login",
@@ -13245,6 +13342,14 @@
             feat_onetime: "💸 Разовый платёж",
             btn_get_bestie: "Купить навсегда",
 
+            btn_export: "Экспорт данных",
+            export_title_select: "Экспорт данных",
+            export_desc_select: "Выберите данные для выгрузки в формате JSON. Идеально для нейросетей. (Только Premium)",
+            export_opt_lists: "Списки (Лайки/Дизлайки)",
+            export_opt_hist: "История и Время просмотра",
+            export_opt_activity: "Лог активности (свайпы)",
+            btn_export_selected: "Скачать JSON",
+
             // --- Sponsors ---
             btn_early_sponsors: "Ранние спонсоры",
             sponsors_title: "Зал Славы",
@@ -13492,6 +13597,22 @@
 
             lbl_current_plan: "Текущий план",
             login_alert: "Пожалуйста, войди в аккаунт для управления подпиской!",
+
+            feat_export: "💾 Экспорт данных (JSON)",
+            
+            tip_export_title: "Экспорт и нейросети",
+            tip_export_desc: "Анализ своих вкусов через ChatGPT",
+            tip_export_text: `
+                Знаешь ли ты, что можешь выгрузить всю свою историю и скормить её нейросети? Наш файл выгрузки отформатирован так, чтобы ИИ понял каждое твое действие.<br><br>
+                <b>Как это сделать:</b><br>
+                1. Зайди во вкладку <b>Аккаунт</b> и нажми на блок Личного кабинета (с облаком).<br>
+                2. Нажми <b>Экспорт данных</b> (Доступно в Premium).<br>
+                3. Выбери нужные пункты и скачай JSON файл.<br><br>
+                <b>Что дальше?</b><br>
+                Загрузи этот файл в ChatGPT или Claude и напиши:<br>
+                <i style="color:var(--text-secondary);">"Проанализируй мою историю просмотров и лайков. Какие у меня скрытые психологические предпочтения? Какой новый фетиш мне стоит попробовать на основе этих данных?"</i><br><br>
+                Нейросеть отлично понимает этот формат данных и выдаст тебе подробнейший психоанализ твоих предпочтений!
+            `,
 
             // --- 4. Аккаунт и Данные ---
             login_text: "Вход / Синхронизация",
@@ -14040,6 +14161,14 @@
             feat_onetime: "💸 Pago único",
             btn_get_bestie: "Obtener para siempre",
 
+            btn_export: "Exportar Datos",
+            export_title_select: "Exportar Datos",
+            export_desc_select: "Selecciona datos para exportar como JSON para análisis de IA. (Solo Premium)",
+            export_opt_lists: "Listas (Me gusta/No me gusta)",
+            export_opt_hist: "Historial y Tiempo",
+            export_opt_activity: "Registro de Actividad",
+            btn_export_selected: "Descargar JSON",
+
             // --- Sponsors ---
             btn_early_sponsors: "Patrocinadores",
             sponsors_title: "Muro de la Fama",
@@ -14300,6 +14429,22 @@
 
             lbl_current_plan: "Plan Actual",
             login_alert: "¡Inicia sesión para gestionar suscripciones!",
+
+            feat_export: "💾 Exportar Datos (JSON)",
+            
+            tip_export_title: "Exportación y Análisis de IA",
+            tip_export_desc: "Analiza tus gustos con ChatGPT",
+            tip_export_text: `
+                ¿Sabías que puedes exportar todo tu historial y dárselo a una IA? Nuestro archivo JSON está formateado específicamente para que las redes neuronales lo entiendan.<br><br>
+                <b>Cómo hacerlo:</b><br>
+                1. Ve a la pestaña <b>Cuenta</b> y toca tu cuenta (icono de nube).<br>
+                2. Toca <b>Exportar Datos</b> (Función Premium).<br>
+                3. Selecciona lo que deseas y descarga el archivo JSON.<br><br>
+                <b>¿Qué sigue?</b><br>
+                Sube este archivo a ChatGPT o Claude y pregunta:<br>
+                <i style="color:var(--text-secondary);">"Analiza mi historial y me gusta. ¿Cuáles son mis preferencias psicológicas ocultas? ¿Qué fetiche específico debería probar basándote en esto?"</i><br><br>
+                ¡La IA procesará perfectamente tus acciones y etiquetas, dándote un psicoanálisis detallado!
+            `,
 
             // --- Account ---
             login_text: "Entrar / Sincronizar",
@@ -14826,6 +14971,14 @@
             feat_onetime: "💸 Einmalzahlung",
             btn_get_bestie: "Für immer holen",
 
+            btn_export: "Daten exportieren",
+            export_title_select: "Daten exportieren",
+            export_desc_select: "Wählen Sie Daten für den JSON-Export zur KI-Analyse. (Nur Premium)",
+            export_opt_lists: "Listen (Likes/Dislikes)",
+            export_opt_hist: "Verlauf & Zeit",
+            export_opt_activity: "Aktivitätsprotokoll",
+            btn_export_selected: "JSON Herunterladen",
+
             // --- Sponsors ---
             btn_early_sponsors: "Frühe Sponsoren",
             sponsors_title: "Ruhmeshalle",
@@ -15077,6 +15230,22 @@
 
             lbl_current_plan: "Aktueller Plan",
             login_alert: "Bitte anmelden, um Abos zu verwalten!",
+
+            feat_export: "💾 Datenexport (JSON)",
+            
+            tip_export_title: "Export & KI-Analyse",
+            tip_export_desc: "Deinen Geschmack mit ChatGPT analysieren",
+            tip_export_text: `
+                Wusstest du, dass du deinen gesamten Verlauf exportieren und an eine KI verfüttern kannst? Unser JSON-Export ist speziell so formatiert, dass neuronale Netze ihn verstehen.<br><br>
+                <b>Wie es geht:</b><br>
+                1. Gehe zum Tab <b>Konto</b> und tippe auf dein Profil (Wolken-Symbol).<br>
+                2. Tippe auf <b>Daten exportieren</b> (Premium-Funktion).<br>
+                3. Wähle die gewünschten Daten und lade die JSON-Datei herunter.<br><br>
+                <b>Was dann?</b><br>
+                Lade diese Datei bei ChatGPT oder Claude hoch und frage:<br>
+                <i style="color:var(--text-secondary);">"Analysiere meinen Verlauf und meine Likes. Was sind meine verborgenen psychologischen Vorlieben? Welchen Fetisch sollte ich als Nächstes ausprobieren?"</i><br><br>
+                Die KI wird deine Aktionen und Tags perfekt verarbeiten und dir eine detaillierte Psychoanalyse deiner Fetische geben!
+            `,
 
             // --- Account ---
             login_text: "Anmelden / Sync",
@@ -15383,11 +15552,19 @@
         descKey: 'tip_vpn_region_desc', 
         textKey: 'tip_vpn_region_text',
         gradient: 'linear-gradient(135deg, #6366f1 0%, #4338ca 100%)' 
+    },
+    { 
+        id: 'export_ai', 
+        icon: '🤖', 
+        titleKey: 'tip_export_title', 
+        descKey: 'tip_export_desc', 
+        textKey: 'tip_export_text',
+        gradient: 'linear-gradient(135deg, #10b981 0%, #047857 100%)' // Изумрудный нейро-градиент
     }
 ];
     
     const TIPS_CATS = {
-        tech: ['install_guide', 'mods_guide', 'ads', 'video', 'pay', 'bug', 'panic', 'layout', 'modes'],
+        tech: ['install_guide', 'mods_guide', 'ads', 'video', 'pay', 'bug', 'panic', 'layout', 'modes', 'export_ai'],
         info: ['sites_guide', 'vpn_region', 'algo_secrets', 'glossary', 'psychotypes', 'intensity', 'missing_wrapped']
     };
 
@@ -19868,6 +20045,112 @@
         if (resetAlgo || resetHist) {
             location.reload();
         }
+    }
+
+    // === ЛОГИКА ЭКСПОРТА ДАННЫХ ДЛЯ НЕЙРОСЕТЕЙ ===
+    function openExportModal() {
+        // Проверка на Premium
+        if (subscriptionLevel === 'free') {
+            closeSyncInfoModal(null, true);
+            openSubModal();
+            return;
+        }
+        
+        closeSyncInfoModal(null, true);
+        document.getElementById('modal-export-selection').classList.add('open');
+    }
+
+    function closeExportModal(e, force) {
+        if (force || e.target.id === 'modal-export-selection') {
+            document.getElementById('modal-export-selection').classList.remove('open');
+        }
+    }
+
+    function performExport() {
+        const expLists = document.getElementById('chk-exp-lists').checked;
+        const expHist = document.getElementById('chk-exp-hist').checked;
+        const expActivity = document.getElementById('chk-exp-activity').checked;
+        const expExpl = document.getElementById('chk-exp-expl').checked;
+
+        if (!expLists && !expHist && !expActivity && !expExpl) return;
+
+        // Вспомогательная функция для обогащения ID данными из базы (чтобы AI понял о чем речь)
+        const getFullItemData = (id) => {
+            const item = data.find(x => x.id === id);
+            if (!item) return { id: id, status: "removed_from_database" };
+            return {
+                id: item.id,
+                name_en: item.name,
+                name_ru: item.name_ru || null,
+                tags: item.tags
+            };
+        };
+
+        const exportObj = {
+            metadata: {
+                exportedAt: new Date().toISOString(),
+                app: "xFetishHub",
+                version: document.getElementById('app-version-label').innerText || "unknown"
+            },
+            data: {}
+        };
+
+        // 1. Списки (Лайки, дизлайки, посмотреть позже)
+        if (expLists) {
+            exportObj.data.lists = {
+                liked: favorites.map(getFullItemData),
+                disliked: blacklist.map(getFullItemData),
+                savedForLater: watchLater.map(getFullItemData)
+            };
+        }
+
+        // 2. История и время просмотра
+        if (expHist) {
+            exportObj.data.history = historyData.map(h => ({
+                ...getFullItemData(h.id),
+                timestamp: h.timestamp,
+                dateStr: new Date(h.timestamp).toISOString()
+            }));
+
+            exportObj.data.watchTime = watchHistory.map(w => ({
+                ...getFullItemData(w.id),
+                timestamp: w.timestamp,
+                dateStr: new Date(w.timestamp).toISOString(),
+                durationSeconds: w.seconds,
+                durationFormatted: w.durationStr
+            }));
+        }
+
+        // 3. Детальный лог активности (Свайпы)
+        if (expActivity) {
+            exportObj.data.activityLog = activityLog.map(a => ({
+                actionType: a.type, // 'like', 'dislike', 'watch', 'gen'
+                timestamp: a.ts,
+                dateStr: new Date(a.ts).toISOString(),
+                targetItem: a.id ? getFullItemData(a.id) : null,
+                activeTags: a.tags || []
+            }));
+        }
+
+        // 4. Открытые фетиши (Explored)
+        if (expExpl) {
+            exportObj.data.exploredFetishes = Array.from(permanentExplored).map(getFullItemData);
+        }
+
+        // Генерируем файл и скачиваем
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        
+        // Формируем красивое имя файла
+        const dateStr = new Date().toISOString().split('T')[0];
+        downloadAnchorNode.setAttribute("download", `xfetishhub_export_${dateStr}.json`);
+        
+        document.body.appendChild(downloadAnchorNode); // Требуется для Firefox
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+
+        closeExportModal(null, true);
     }
 
     function openSubModal() {
