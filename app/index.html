@@ -10130,8 +10130,21 @@
         
         <div class="modal-body">
             <p style="font-size:13px; color:var(--text-secondary); text-align:center; margin-bottom:20px; line-height:1.4;" data-key="export_desc_select">
-                Select data to export as a JSON file. Ideal for AI analysis. (Premium Only)
+                Select data to export as a JSON file. Ideal for AI analysis.
             </p>
+
+            <!-- ВЫБОР ПЕРИОДА ЭКСПОРТА -->
+            <div class="ios-group" style="margin-bottom: 15px;">
+                <div class="ios-row clickable" onclick="openDatePicker('export')">
+                    <div class="ios-row-left">
+                        <span>📅 <span data-key="export_period">Period</span></span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span id="export-period-label" style="font-size:13px; color:var(--text-secondary); font-weight:600;">...</span>
+                        <div class="chevron"></div>
+                    </div>
+                </div>
+            </div>
 
             <div class="ios-group">
                 <!-- 1. Списки (Лайки, Дизлайки, Позже) -->
@@ -12177,6 +12190,8 @@
             expl_hist: "From Archives 📜",
             deco_label: "Show Decorations",
 
+            export_period: "Period",
+
             add_site_btn: "Add Custom Site",
             add_site_title: "Add New Site",
             add_site_instr_title: "INSTRUCTION:",
@@ -12514,7 +12529,7 @@
 
             btn_export: "Export Data",
             export_title_select: "Export Data",
-            export_desc_select: "Select data to export as a JSON file for AI analysis. (Premium Only)",
+            export_desc_select: "Select data to export as a JSON file for AI analysis.",
             export_opt_lists: "Lists (Liked/Disliked)",
             export_opt_hist: "History & Watch Time",
             export_opt_activity: "Detailed Activity Log",
@@ -13010,6 +13025,8 @@
             expl_hist: "Из архивов 📜",
             deco_label: "Показывать декор",
 
+            export_period: "Период",
+
             add_site_btn: "Добавить свой сайт",
             add_site_title: "Новый сайт",
             add_site_instr_title: "ИНСТРУКЦИЯ:",
@@ -13347,7 +13364,7 @@
 
             btn_export: "Экспорт данных",
             export_title_select: "Экспорт данных",
-            export_desc_select: "Выберите данные для выгрузки в формате JSON. Идеально для нейросетей. (Только Premium)",
+            export_desc_select: "Выберите данные для выгрузки в формате JSON. Идеально для нейросетей.",
             export_opt_lists: "Списки (Лайки/Дизлайки)",
             export_opt_hist: "История и Время просмотра",
             export_opt_activity: "Лог активности (свайпы)",
@@ -13839,6 +13856,8 @@
             expl_hist: "De los archivos 📜",
             deco_label: "Mostrar decoración",
 
+            export_period: "Período",
+
             add_site_btn: "Añadir sitio personalizado",
             add_site_title: "Añadir nuevo sitio",
             add_site_instr_title: "INSTRUCTION:",
@@ -14166,7 +14185,7 @@
 
             btn_export: "Exportar Datos",
             export_title_select: "Exportar Datos",
-            export_desc_select: "Selecciona datos para exportar como JSON para análisis de IA. (Solo Premium)",
+            export_desc_select: "Selecciona datos para exportar como JSON para análisis de IA.",
             export_opt_lists: "Listas (Me gusta/No me gusta)",
             export_opt_hist: "Historial y Tiempo",
             export_opt_activity: "Registro de Actividad",
@@ -14651,6 +14670,8 @@
             expl_hist: "Aus dem Archiv 📜",
             deco_label: "Dekoration anzeigen",
 
+            export_period: "Zeitraum",
+
             add_site_btn: "Benutzerdefinierte Website hinzufügen",
             add_site_title: "Neue Website hinzufügen",
             add_site_instr_title: "INSTR_title:",
@@ -14976,7 +14997,7 @@
 
             btn_export: "Daten exportieren",
             export_title_select: "Daten exportieren",
-            export_desc_select: "Wählen Sie Daten für den JSON-Export zur KI-Analyse. (Nur Premium)",
+            export_desc_select: "Wählen Sie Daten für den JSON-Export zur KI-Analyse.",
             export_opt_lists: "Listen (Likes/Dislikes)",
             export_opt_hist: "Verlauf & Zeit",
             export_opt_activity: "Aktivitätsprotokoll",
@@ -18758,7 +18779,7 @@
     }
 
     function switchTimeframe(tf) {
-        // NERF: Блокируем всё кроме "Week" для бесплатных
+        // Блокируем всё кроме "Week" для бесплатных
         if (tf !== 'week' && subscriptionLevel === 'free') {
             openSubModal();
             return;
@@ -18768,6 +18789,205 @@
         document.querySelectorAll('.stats-tf-item').forEach(el => el.classList.remove('active'));
         document.getElementById('tf-' + tf).classList.add('active');
         renderStatsContent();
+    }
+
+    // === ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ КАЛЕНДАРЯ И ЭКСПОРТА ===
+    let datePickerTarget = 'stats'; // Может быть 'stats' или 'export'
+    let exportRangeStart = null;
+    let exportRangeEnd = null;
+
+    let customRangeStart = null;
+    let customRangeEnd = null;
+
+    function updateExportPeriodLabel() {
+        const label = document.getElementById('export-period-label');
+        if (!label) return;
+        const pad = (n) => n.toString().padStart(2, '0');
+        const fmt = (d) => `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}`;
+
+        if (!exportRangeStart) {
+            const t = langData[currentLang] || langData['en'];
+            label.innerText = t.tf_all || "All Time";
+        } else {
+            label.innerText = `${fmt(exportRangeStart)} — ${fmt(exportRangeEnd || exportRangeStart)}`;
+        }
+    }
+
+    function openDatePicker(target = 'stats') {
+        if (subscriptionLevel === 'free') {
+            closeExportModal(null, true);
+            closeStats(null, true);
+            openSubModal();
+            return;
+        }
+        
+        datePickerTarget = target;
+        
+        // Подгружаем даты в календарь в зависимости от цели
+        if (target === 'export') {
+            customRangeStart = exportRangeStart ? new Date(exportRangeStart) : null;
+            customRangeEnd = exportRangeEnd ? new Date(exportRangeEnd) : null;
+        }
+        
+        renderCalendarList();
+        initDateInputListeners();
+        
+        const t = { start: { en: "Start", ru: "Начало" }, end: { en: "End", ru: "Конец" } };
+        const lang = ['ru'].includes(currentLang) ? 'ru' : 'en';
+        
+        document.getElementById('input-start').placeholder = t.start[lang];
+        document.getElementById('input-end').placeholder = t.end[lang];
+
+        document.getElementById('modal-date-picker').classList.add('open');
+    }
+
+    function applyCustomRange() {
+        const t = langData[currentLang] || langData['en'];
+        
+        if (!customRangeStart) {
+            alert(currentLang === 'ru' ? "Выберите дату начала" : "Select start date");
+            return;
+        }
+        
+        if (!customRangeEnd) customRangeEnd = new Date(customRangeStart);
+        
+        closeDatePicker(null, true);
+
+        // Разветвление логики кнопки "Подтвердить"
+        if (datePickerTarget === 'stats') {
+            currentStatsTimeframe = 'custom';
+            document.querySelectorAll('.stats-tf-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('tf-custom').classList.add('active');
+            renderStatsContent();
+        } else if (datePickerTarget === 'export') {
+            exportRangeStart = new Date(customRangeStart);
+            exportRangeEnd = new Date(customRangeEnd);
+            updateExportPeriodLabel();
+            // Календарь закрывается, окно экспорта остается (т.к. оно под ним)
+        }
+        
+        if(navigator.vibrate) navigator.vibrate(10);
+    }
+
+    function openExportModal() {
+        if (subscriptionLevel === 'free') {
+            closeSyncInfoModal(null, true);
+            openSubModal();
+            return;
+        }
+        
+        // Устанавливаем дефолтный период (от первой активности до сегодня)
+        if (!exportRangeStart) {
+            let firstTs = Date.now();
+            if (activityLog.length > 0) firstTs = Math.min(firstTs, activityLog[0].ts);
+            if (watchHistory.length > 0) firstTs = Math.min(firstTs, watchHistory[watchHistory.length - 1].timestamp);
+            
+            exportRangeStart = new Date(firstTs);
+            exportRangeStart.setHours(0, 0, 0, 0);
+            
+            exportRangeEnd = new Date();
+            exportRangeEnd.setHours(23, 59, 59, 999);
+        }
+        
+        updateExportPeriodLabel();
+
+        closeSyncInfoModal(null, true);
+        document.getElementById('modal-export-selection').classList.add('open');
+    }
+
+    function closeExportModal(e, force) {
+        if (force || e.target.id === 'modal-export-selection') {
+            document.getElementById('modal-export-selection').classList.remove('open');
+        }
+    }
+
+    function performExport() {
+        const expLists = document.getElementById('chk-exp-lists').checked;
+        const expHist = document.getElementById('chk-exp-hist').checked;
+        const expActivity = document.getElementById('chk-exp-activity').checked;
+        const expExpl = document.getElementById('chk-exp-expl').checked;
+
+        if (!expLists && !expHist && !expActivity && !expExpl) return;
+
+        // Определяем границы выбранного времени
+        let finalStartTs = exportRangeStart ? exportRangeStart.getTime() : 0;
+        let finalEndTs = Infinity;
+        if (exportRangeEnd) {
+            const e = new Date(exportRangeEnd);
+            e.setHours(23, 59, 59, 999); // Конец выбранного дня
+            finalEndTs = e.getTime();
+        }
+
+        const getName = (id) => {
+            const item = data.find(x => x.id === id);
+            return item ? item.name : "Unknown";
+        };
+
+        const exportObj = {
+            metadata: {
+                exportedAt: new Date().toISOString().split('T')[0],
+                app: "xFetishHub",
+                periodStart: exportRangeStart ? new Date(finalStartTs).toISOString().split('T')[0] : "all",
+                periodEnd: exportRangeEnd ? new Date(finalEndTs).toISOString().split('T')[0] : "all"
+            },
+            data: {}
+        };
+
+        // 1. Списки (Они глобальные, отдаем как есть)
+        if (expLists) {
+            exportObj.data.lists = {
+                liked: favorites.map(getName).filter(x => x !== "Unknown"),
+                disliked: blacklist.map(getName).filter(x => x !== "Unknown"),
+                savedForLater: watchLater.map(getName).filter(x => x !== "Unknown")
+            };
+        }
+
+        // 2. История и время (Фильтруем по датам)
+        if (expHist) {
+            exportObj.data.history = historyData
+                .filter(h => h.timestamp >= finalStartTs && h.timestamp <= finalEndTs)
+                .map(h => ({
+                    name_en: getName(h.id),
+                    dateStr: new Date(h.timestamp).toISOString()
+                }));
+
+            exportObj.data.watchTime = watchHistory
+                .filter(w => w.timestamp >= finalStartTs && w.timestamp <= finalEndTs)
+                .map(w => ({
+                    name_en: getName(w.id),
+                    dateStr: new Date(w.timestamp).toISOString(),
+                    durationFormatted: w.durationStr
+                }));
+        }
+
+        // 3. Активность (Свайпы, фильтруем по датам)
+        if (expActivity) {
+            exportObj.data.activityLog = activityLog
+                .filter(a => a.ts >= finalStartTs && a.ts <= finalEndTs)
+                .map(a => ({
+                    actionType: a.type,
+                    name_en: getName(a.id),
+                    dateStr: new Date(a.ts).toISOString()
+                }));
+        }
+
+        // 4. Открытые фетиши (Глобальный массив)
+        if (expExpl) {
+            exportObj.data.exploredFetishes = Array.from(permanentExplored).map(getName).filter(x => x !== "Unknown");
+        }
+
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        
+        const dateStr = new Date().toISOString().split('T')[0];
+        downloadAnchorNode.setAttribute("download", `xfetishhub_export_${dateStr}.json`);
+        
+        document.body.appendChild(downloadAnchorNode); 
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+
+        closeExportModal(null, true);
     }
 
     function updateStatsLocks() {
@@ -18806,30 +19026,6 @@
                 el.style.opacity = '1';
             }
         });
-    }
-
-    let customRangeStart = null;
-    let customRangeEnd = null;
-
-    function openDatePicker() {
-        if (subscriptionLevel === 'free') {
-            openSubModal();
-            return;
-        }
-        
-        renderCalendarList();
-        
-        // Навешиваем слушатели на инпуты
-        initDateInputListeners();
-        
-        // Локализация плейсхолдеров
-        const t = { start: { en: "Start", ru: "Начало" }, end: { en: "End", ru: "Конец" } };
-        const lang = ['ru'].includes(currentLang) ? 'ru' : 'en';
-        
-        document.getElementById('input-start').placeholder = t.start[lang];
-        document.getElementById('input-end').placeholder = t.end[lang];
-
-        document.getElementById('modal-date-picker').classList.add('open');
     }
 
     function initDateInputListeners() {
@@ -19083,27 +19279,6 @@
                 day.classList.add('in-range');
             }
         });
-    }
-
-    function applyCustomRange() {
-        const t = langData[currentLang] || langData['en'];
-        
-        if (!customRangeStart) {
-            alert(currentLang === 'ru' ? "Выберите дату начала" : "Select start date");
-            return;
-        }
-        
-        if (!customRangeEnd) customRangeEnd = new Date(customRangeStart);
-        
-        currentStatsTimeframe = 'custom';
-        
-        document.querySelectorAll('.stats-tf-item').forEach(el => el.classList.remove('active'));
-        document.getElementById('tf-custom').classList.add('active');
-        
-        closeDatePicker(null, true);
-        renderStatsContent();
-        
-        if(navigator.vibrate) navigator.vibrate(10);
     }
 
     function renderStatsContent() {
@@ -20085,98 +20260,6 @@
         if (resetAlgo || resetHist) {
             location.reload();
         }
-    }
-
-    // === ЛОГИКА ЭКСПОРТА ДАННЫХ ДЛЯ НЕЙРОСЕТЕЙ ===
-    function openExportModal() {
-        // Проверка на Premium
-        if (subscriptionLevel === 'free') {
-            closeSyncInfoModal(null, true);
-            openSubModal();
-            return;
-        }
-        
-        closeSyncInfoModal(null, true);
-        document.getElementById('modal-export-selection').classList.add('open');
-    }
-
-    function closeExportModal(e, force) {
-        if (force || e.target.id === 'modal-export-selection') {
-            document.getElementById('modal-export-selection').classList.remove('open');
-        }
-    }
-
-    function performExport() {
-        const expLists = document.getElementById('chk-exp-lists').checked;
-        const expHist = document.getElementById('chk-exp-hist').checked;
-        const expActivity = document.getElementById('chk-exp-activity').checked;
-        const expExpl = document.getElementById('chk-exp-expl').checked;
-
-        if (!expLists && !expHist && !expActivity && !expExpl) return;
-
-        // Вспомогательная функция: отдает только английское название
-        const getName = (id) => {
-            const item = data.find(x => x.id === id);
-            return item ? item.name : "Unknown";
-        };
-
-        const exportObj = {
-            metadata: {
-                exportedAt: new Date().toISOString().split('T')[0],
-                app: "xFetishHub"
-            },
-            data: {}
-        };
-
-        // 1. Списки (Простые массивы названий)
-        if (expLists) {
-            exportObj.data.lists = {
-                liked: favorites.map(getName).filter(x => x !== "Unknown"),
-                disliked: blacklist.map(getName).filter(x => x !== "Unknown"),
-                savedForLater: watchLater.map(getName).filter(x => x !== "Unknown")
-            };
-        }
-
-        // 2. История и время (Только Название, Дата и Длительность)
-        if (expHist) {
-            exportObj.data.history = historyData.map(h => ({
-                name_en: getName(h.id),
-                dateStr: new Date(h.timestamp).toISOString()
-            }));
-
-            exportObj.data.watchTime = watchHistory.map(w => ({
-                name_en: getName(w.id),
-                dateStr: new Date(w.timestamp).toISOString(),
-                durationFormatted: w.durationStr
-            }));
-        }
-
-        // 3. Активность (Свайпы)
-        if (expActivity) {
-            exportObj.data.activityLog = activityLog.map(a => ({
-                actionType: a.type,
-                name_en: getName(a.id),
-                dateStr: new Date(a.ts).toISOString()
-            }));
-        }
-
-        // 4. Открытые фетиши (Простой массив названий)
-        if (expExpl) {
-            exportObj.data.exploredFetishes = Array.from(permanentExplored).map(getName).filter(x => x !== "Unknown");
-        }
-
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
-        const downloadAnchorNode = document.createElement('a');
-        downloadAnchorNode.setAttribute("href", dataStr);
-        
-        const dateStr = new Date().toISOString().split('T')[0];
-        downloadAnchorNode.setAttribute("download", `xfetishhub_export_${dateStr}.json`);
-        
-        document.body.appendChild(downloadAnchorNode); 
-        downloadAnchorNode.click();
-        downloadAnchorNode.remove();
-
-        closeExportModal(null, true);
     }
 
     function openSubModal() {
