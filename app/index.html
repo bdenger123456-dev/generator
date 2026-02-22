@@ -11051,9 +11051,12 @@
                 // 2. СПИСКИ (Избранное, ЧС, WL)
                 const mergeArrays = (local, cloud) => [...new Set([...local, ...cloud])];
                 
-                const mergedFav = mergeArrays(JSON.parse(localStorage.getItem('xch_favorites')) || [], cloudData.favorites || []);
-                const mergedBan = mergeArrays(JSON.parse(localStorage.getItem('xch_blacklist')) || [], cloudData.blacklist || []);
+                let mergedFav = mergeArrays(JSON.parse(localStorage.getItem('xch_favorites')) || [], cloudData.favorites || []);
+                let mergedBan = mergeArrays(JSON.parse(localStorage.getItem('xch_blacklist')) || [], cloudData.blacklist || []);
                 const mergedWL = mergeArrays(JSON.parse(localStorage.getItem('xch_watch_later')) || [], cloudData.watchLater || []);
+
+                // Если после объединения фетиш оказался и в Лайках и в Блэклисте - выкидываем из Блэклиста
+                mergedBan = mergedBan.filter(id => !mergedFav.includes(id));
 
                 localStorage.setItem('xch_favorites', JSON.stringify(mergedFav));
                 window.favorites = mergedFav;
@@ -16063,8 +16066,45 @@
         resetInactivityTimer(); // Запуск таймера при загрузке
     }
 
+    function enforceDataIntegrity() {
+        // 1. Убираем дубликаты внутри самих списков
+        favorites = [...new Set(favorites)];
+        blacklist = [...new Set(blacklist)];
+        watchLater = [...new Set(watchLater)];
+
+        // 2. Взаимоисключение: Если есть в Лайках, жестко удаляем из Дизлайков (Лайки в приоритете)
+        blacklist = blacklist.filter(id => !favorites.includes(id));
+
+        // 3. Очистка от удаленных из базы фетишей (если ты менял data.json)
+        favorites = favorites.filter(id => data.some(x => x.id === id));
+        blacklist = blacklist.filter(id => data.some(x => x.id === id));
+        watchLater = watchLater.filter(id => data.some(x => x.id === id));
+
+        // 4. Чиним счетчик "Открытых" (Explored). Если ты ставил лайк/дизлайк или смотрел - значит ты это "открыл"
+        if (!permanentExplored) permanentExplored = new Set();
+        favorites.forEach(id => permanentExplored.add(id));
+        blacklist.forEach(id => permanentExplored.add(id));
+        watchHistory.forEach(w => permanentExplored.add(w.id));
+        historyData.forEach(h => permanentExplored.add(h.id));
+        activityLog.forEach(a => { if(a.id) permanentExplored.add(a.id); });
+
+        // Очистка Explored от "мертвых" ID
+        const validExplored = new Set();
+        permanentExplored.forEach(id => {
+            if (data.some(x => x.id === id)) validExplored.add(id);
+        });
+        permanentExplored = validExplored;
+
+        // Сохраняем почищенные данные обратно
+        localStorage.setItem(STORAGE.FAVORITES, JSON.stringify(favorites));
+        localStorage.setItem(STORAGE.BLACKLIST, JSON.stringify(blacklist));
+        localStorage.setItem(STORAGE.WATCH_LATER, JSON.stringify(watchLater));
+        localStorage.setItem('xch_permanent_explored', JSON.stringify([...permanentExplored]));
+    }
+
     function initApp() {
         // Инициализация данных
+        enforceDataIntegrity();
         initLanguage();
         initTheme();
         initIntensity();
@@ -20074,79 +20114,65 @@
 
         if (!expLists && !expHist && !expActivity && !expExpl) return;
 
-        // Вспомогательная функция для обогащения ID данными из базы (чтобы AI понял о чем речь)
-        const getFullItemData = (id) => {
+        // Вспомогательная функция: отдает только английское название
+        const getName = (id) => {
             const item = data.find(x => x.id === id);
-            if (!item) return { id: id, status: "removed_from_database" };
-            return {
-                id: item.id,
-                name_en: item.name,
-                name_ru: item.name_ru || null,
-                tags: item.tags
-            };
+            return item ? item.name : "Unknown";
         };
 
         const exportObj = {
             metadata: {
-                exportedAt: new Date().toISOString(),
-                app: "xFetishHub",
-                version: document.getElementById('app-version-label').innerText || "unknown"
+                exportedAt: new Date().toISOString().split('T')[0],
+                app: "xFetishHub"
             },
             data: {}
         };
 
-        // 1. Списки (Лайки, дизлайки, посмотреть позже)
+        // 1. Списки (Простые массивы названий)
         if (expLists) {
             exportObj.data.lists = {
-                liked: favorites.map(getFullItemData),
-                disliked: blacklist.map(getFullItemData),
-                savedForLater: watchLater.map(getFullItemData)
+                liked: favorites.map(getName).filter(x => x !== "Unknown"),
+                disliked: blacklist.map(getName).filter(x => x !== "Unknown"),
+                savedForLater: watchLater.map(getName).filter(x => x !== "Unknown")
             };
         }
 
-        // 2. История и время просмотра
+        // 2. История и время (Только Название, Дата и Длительность)
         if (expHist) {
             exportObj.data.history = historyData.map(h => ({
-                ...getFullItemData(h.id),
-                timestamp: h.timestamp,
+                name_en: getName(h.id),
                 dateStr: new Date(h.timestamp).toISOString()
             }));
 
             exportObj.data.watchTime = watchHistory.map(w => ({
-                ...getFullItemData(w.id),
-                timestamp: w.timestamp,
+                name_en: getName(w.id),
                 dateStr: new Date(w.timestamp).toISOString(),
-                durationSeconds: w.seconds,
                 durationFormatted: w.durationStr
             }));
         }
 
-        // 3. Детальный лог активности (Свайпы)
+        // 3. Активность (Свайпы)
         if (expActivity) {
             exportObj.data.activityLog = activityLog.map(a => ({
-                actionType: a.type, // 'like', 'dislike', 'watch', 'gen'
-                timestamp: a.ts,
-                dateStr: new Date(a.ts).toISOString(),
-                targetItem: a.id ? getFullItemData(a.id) : null,
-                activeTags: a.tags || []
+                actionType: a.type,
+                name_en: getName(a.id),
+                dateStr: new Date(a.ts).toISOString()
             }));
         }
 
-        // 4. Открытые фетиши (Explored)
+        // 4. Открытые фетиши (Простой массив названий)
         if (expExpl) {
-            exportObj.data.exploredFetishes = Array.from(permanentExplored).map(getFullItemData);
+            exportObj.data.exploredFetishes = Array.from(permanentExplored).map(getName).filter(x => x !== "Unknown");
         }
 
-        // Генерируем файл и скачиваем
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
         const downloadAnchorNode = document.createElement('a');
         downloadAnchorNode.setAttribute("href", dataStr);
         
-        // Формируем красивое имя файла
         const dateStr = new Date().toISOString().split('T')[0];
         downloadAnchorNode.setAttribute("download", `xfetishhub_export_${dateStr}.json`);
         
-        document.body.appendChild(downloadAnchorNode); // Требуется для Firefox
+        document.body.appendChild(downloadAnchorNode); 
         downloadAnchorNode.click();
         downloadAnchorNode.remove();
 
