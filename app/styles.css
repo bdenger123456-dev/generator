@@ -1167,7 +1167,7 @@ body.light-theme .ai-icon-img {
     font-size: 15px;
     color: var(--text-secondary);
 }
-/* Цвет для PRO/BEAST */
+/* Цвет для PRO*/
 #settings-plan-status.premium {
     color: var(--accent) !important;
     font-weight: 800;
@@ -1762,11 +1762,9 @@ modal-header .modal-close-btn,
     box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important;
 }
 .plan-card.pro { border-color: #ff9900; box-shadow: 0 0 20px rgba(255, 153, 0, 0.1); }
-.plan-card.beast { border-color: #9b59b6; background: linear-gradient(135deg, rgba(155, 89, 182, 0.1), transparent); box-shadow: 0 0 20px rgba(155, 89, 182, 0.15); }
 
 .plan-title { font-size: 22px; font-weight: 900; text-transform: uppercase; margin-bottom: 5px; }
 .plan-card.pro .plan-title { color: #ff9900; }
-.plan-card.beast .plan-title { color: #9b59b6; }
 .plan-price { font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 15px; }
 
 .plan-features { list-style: none; padding: 0; margin: 0 0 20px 0; }
@@ -1776,7 +1774,6 @@ modal-header .modal-close-btn,
 .plan-btn { width: 100%; padding: 12px; border-radius: 12px; font-weight: 800; border: none; cursor: pointer; text-transform: uppercase; font-size: 14px; margin-top: auto; }
 .plan-btn.current { background: var(--nav-bg); color: var(--text-secondary); opacity: 0.7; }
 .plan-btn.pro-btn { background: #ff9900; color: #000; box-shadow: 0 4px 15px rgba(255, 153, 0, 0.3); }
-.plan-btn.beast-btn { background: #9b59b6; color: #fff; box-shadow: 0 4px 15px rgba(155, 89, 182, 0.3); }
 
 /* Mobile Default Layout for Plans */
 .plans-container {
@@ -5702,7 +5699,6 @@ body:not([data-theme^="blue"]):not([data-theme^="green"]):not([data-theme^="red"
 /* Цветовые модификаторы для подписки */
 .bento-sub.is-free { border-color: var(--border); }
 .bento-sub.is-pro { border-color: #ff9900; background: linear-gradient(135deg, rgba(255, 153, 0, 0.1), transparent); }
-.bento-sub.is-beast { border-color: #9b59b6; background: linear-gradient(135deg, rgba(155, 89, 182, 0.1), transparent); }
 .bento-sub.is-bestie { border-color: #00d2ff; background: linear-gradient(135deg, rgba(0, 210, 255, 0.1), transparent); }
 
 /* 3. Квадратные статы (Apple Watch style) */

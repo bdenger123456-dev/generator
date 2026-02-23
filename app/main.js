@@ -32,8 +32,7 @@ const earlySponsors = [
 ];
 
 const BASE_PRICES = {
-    pro: { monthly: 2.99, yearly: 29.99 },
-    beast: { monthly: 4.99, yearly: 49.99 }
+    pro: { monthly: 2.99, yearly: 29.99 }
 };
 
 const TAG_ICONS = {
@@ -1292,7 +1291,7 @@ const langData = {
 
         auth_title: "Sync & Backup",
         auth_p1: "Store history and preferences on all devices",
-        auth_p2: "Activate Pro / Beast status",
+        auth_p2: "Activate Pro status",
         auth_p3: "Anonymous storage on Google servers",
         btn_google_signin: "Continue with Google",
         auth_security_note: "The developer doesn't have access to the data. But if you're worried, you can use a second account. 😏",
@@ -1497,11 +1496,9 @@ const langData = {
         btn_get_pro: "Get Pro",
 
         feat_all_pro: "👑 All Pro Features",
-        feat_all_beast: "🦁 <b>All Beast Features</b>",
         feat_sponsors: "💎 Listed in Sponsors",
         feat_discord: "💬 Discord with Developer",
         feat_vote: "🗳️ Vote on Roadmap",
-        btn_get_beast: "Unleash Beast",
 
         bill_monthly: "Monthly",
         bill_yearly: "Yearly",
@@ -1691,7 +1688,7 @@ const langData = {
             <p>We have no control over, and assume no responsibility for, the content, privacy policies, or practices of any third-party websites. You acknowledge and agree that xFetishHub shall not be responsible or liable, directly or indirectly, for any damage or loss caused by your use of any third-party content.</p>
             
             <h3>4. User Accounts & Subscriptions</h3>
-            <p>Some features require a paid subscription ("Pro" or "Beast"). Payment processing is handled via direct Cryptocurrency transfer (USDT). We do not store your payment credentials. We reserve the right to terminate accounts that violate these Terms.</p>
+            <p>Some features require a paid subscription ("Pro"). Payment processing is handled via direct Cryptocurrency transfer (USDT). We do not store your payment credentials. We reserve the right to terminate accounts that violate these Terms.</p>
             
             <h3>5. Disclaimer of Warranties</h3>
             <p>The Service is provided on an "AS IS" and "AS AVAILABLE" basis. We do not warrant that the results generated will meet your requirements or be free of errors.</p>
@@ -2127,7 +2124,7 @@ const langData = {
 
         auth_title: "Синхронизация",
         auth_p1: "Хранение истории и предпочтений на всех устройствах",
-        auth_p2: "Активация Pro / Beast статуса",
+        auth_p2: "Активация Pro статуса",
         auth_p3: "Анонимное хранение на серверах Google",
         btn_google_signin: "Войти через Google",
         auth_security_note: "Разработчик не имеет доступа к данным. Но если боишься, то можешь использовать второй аккаунт. 😏",
@@ -2330,11 +2327,9 @@ const langData = {
         btn_get_pro: "Купить Pro",
 
         feat_all_pro: "👑 Всё, что есть в Pro",
-        feat_all_beast: "🦁 <b>Всё, что есть в Beast</b>",
         feat_sponsors: "💎 Имя во вкладке Спонсоры",
         feat_discord: "💬 Discord с разработчиком",
         feat_vote: "🗳️ Влияние на развитие",
-        btn_get_beast: "Стать Зверем",
 
         bill_monthly: "Ежемесячно",
         bill_yearly: "Ежегодно",
@@ -2526,7 +2521,7 @@ const langData = {
             <p>Мы не несем ответственности за содержание, политику конфиденциальности или действия сторонних сайтов. Переходя по ссылкам, ты действуешь на свой страх и риск. Мы не отвечаем за любой ущерб, связанный с использованием внешних ресурсов.</p>
             
             <h3>4. Аккаунты и Подписки</h3>
-            <p>Некоторые функции доступны по подписке ("Pro" или "Beast"). Оплата производится посредством прямого перевода криптовалюты (USDT). Мы не храним твои платежные данные. Мы оставляем за собой право блокировать аккаунты при нарушении правил.</p>
+            <p>Некоторые функции доступны по подписке ("Pro"). Оплата производится посредством прямого перевода криптовалюты (USDT). Мы не храним твои платежные данные. Мы оставляем за собой право блокировать аккаунты при нарушении правил.</p>
             
             <h3>5. Отказ от ответственности</h3>
             <p>Сервис предоставляется по принципу "КАК ЕСТЬ". Мы не гарантируем, что результаты поиска будут всегда соответствовать твоим ожиданиям или работать без сбоев.</p>
@@ -2948,7 +2943,7 @@ const langData = {
 
         auth_title: "Sincronización",
         auth_p1: "Historial y preferencias en todos los dispositivos",
-        auth_p2: "Activar estado Pro / Beast",
+        auth_p2: "Activar estado Pro",
         auth_p3: "Almacenamiento anónimo en servidores de Google",
         btn_google_signin: "Continuar con Google",
         auth_security_note: "El desarrollador no tiene acceso a los datos. Pero si te preocupa, puedes usar una segunda cuenta. 😏",
@@ -3163,11 +3158,9 @@ const langData = {
         btn_get_pro: "Obtener Pro",
 
         feat_all_pro: "👑 Todo lo de Pro",
-        feat_all_beast: "🦁 <b>Todo lo de Beast</b>",
         feat_sponsors: "💎 En Patrocinadores",
         feat_discord: "💬 Discord con el desarrollador",
         feat_vote: "🗳️ Votar Futuro",
-        btn_get_beast: "Modo Bestia",
 
         bill_monthly: "Mensual",
         bill_yearly: "Anual",
@@ -3340,7 +3333,7 @@ const langData = {
             <p>No tenemos control ni asumimos responsabilidad por el contenido, las políticas de privacidad o las prácticas de sitios web de terceros. Usted reconoce y acepta que xFetishHub no será responsable por ningún daño o pérdida causada por su uso de cualquier contenido de terceros.</p>
             
             <h3>4. Cuentas y Suscripciones</h3>
-            <p>Algunas funciones requieren una suscripción paga ("Pro" o "Beast"). El pago se realiza mediante transferencia directa de Criptomonedas (USDT). No almacenamos sus credenciales de pago. Nos reservamos el derecho de cancelar cuentas que violen estos términos.</p>
+            <p>Algunas funciones requieren una suscripción paga ("Pro"). El pago se realiza mediante transferencia directa de Criptomonedas (USDT). No almacenamos sus credenciales de pago. Nos reservamos el derecho de cancelar cuentas que violen estos términos.</p>
             
             <h3>5. Renuncia de Garantías</h3>
             <p>El servicio se proporciona "TAL CUAL". No garantizamos que los resultados generados cumplan con sus requisitos o estén libres de errores.</p>
@@ -3760,7 +3753,7 @@ const langData = {
 
         auth_title: "Synchronisierung",
         auth_p1: "Verlauf und Vorlieben auf allen Geräten speichern",
-        auth_p2: "Pro / Beast Status aktivieren",
+        auth_p2: "Pro / Bestie Status aktivieren",
         auth_p3: "Anonyme Speicherung auf Google-Servern",
         btn_google_signin: "Weiter mit Google",
         auth_security_note: "Der Entwickler hat keinen Zugriff auf die Daten. Falls Sie dennoch Bedenken haben, können Sie ein zweites Konto verwenden. 😏",
@@ -3966,11 +3959,9 @@ const langData = {
         btn_get_pro: "Pro holen",
 
         feat_all_pro: "👑 Alle Pro-Funktionen",
-        feat_all_beast: "🦁 <b>Alle Beast-Funktionen</b>",
         feat_sponsors: "💎 In Sponsorenliste",
         feat_discord: "💬 Discord mit dem Entwickler",
         feat_vote: "🗳️ Abstimmung",
-        btn_get_beast: "Beast werden",
 
         bill_monthly: "Monatlich",
         bill_yearly: "Jährlich",
@@ -4148,7 +4139,7 @@ const langData = {
             <p>Wir haben keine Kontrolle über und übernehmen keine Verantwortung für die Inhalte oder Datenschutzrichtlinien von Websites Dritter. Sie erkennen an, dass xFetishHub nicht für Schäden haftbar gemacht werden kann, die durch Ihre Nutzung von Inhalten Dritter verursacht werden.</p>
             
             <h3>4. Benutzerkonten & Abonnements</h3>
-            <p>Einige Funktionen erfordern ein kostenpflichtiges Abonnement ("Pro" oder "Beast"). Die Zahlung erfolgt per direkter Kryptowährungsüberweisung (USDT). Wir speichern keine Zahlungsdaten. Wir behalten uns das Recht vor, Konten zu kündigen, die gegen diese Bedingungen verstoßen.</p>
+            <p>Einige Funktionen erfordern ein kostenpflichtiges Abonnement ("Pro"). Die Zahlung erfolgt per direkter Kryptowährungsüberweisung (USDT). Wir speichern keine Zahlungsdaten. Wir behalten uns das Recht vor, Konten zu kündigen, die gegen diese Bedingungen verstoßen.</p>
             
             <h3>5. Gewährleistungsausschluss</h3>
             <p>Der Dienst wird "WIE BESEHEN" bereitgestellt. Wir garantieren nicht, dass die Ergebnisse Ihren Anforderungen entsprechen oder fehlerfrei sind.</p>
@@ -4716,7 +4707,7 @@ window.onload = async () => {
 };
 
 function isPWA() {
-return (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone === true);
+    return (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone === true);
 }
 
 function isMobile() {
@@ -8996,92 +8987,69 @@ async function performPartialReset() {
 }
 
 function openSubModal() {
-    // 1. Находим кнопки
     const btnFree = document.querySelector('.plan-card:nth-child(1) .plan-btn'); 
     const btnPro = document.querySelector('.plan-card.pro .plan-btn');
-    const btnBeast = document.querySelector('.plan-card.beast .plan-btn');
     const btnBestie = document.querySelector('.plan-card.bestie .plan-btn');
 
-    // 2. Получаем переводы
     const t = langData[currentLang] || langData['en'];
 
     const tCurrent = t.btn_current || "Current Plan";
-    const tExtend = currentLang === 'ru' ? "Продлить" : "Extend"; // Текст для продления
-    const tUpgrade = currentLang === 'ru' ? "Улучшить" : "Upgrade"; // Текст для апгрейда
+    const tExtend = currentLang === 'ru' ? "Продлить" : "Extend"; 
+    const tUpgrade = currentLang === 'ru' ? "Улучшить" : "Upgrade";
     
     const tPro = t.btn_get_pro || "Get Pro";
-    const tBeast = t.btn_get_beast || "Unleash Beast";
     const tBestie = t.btn_get_bestie || "Get Forever"; 
 
-    // Helper: Настройка кнопки
     const configureBtn = (btn, state, buyText, planType) => {
         if (!btn) return; 
         btn.onclick = null;
-        btn.classList.remove('current', 'pro-btn', 'beast-btn', 'bestie-btn');
-        btn.disabled = false; // По умолчанию активна
+        btn.classList.remove('current', 'pro-btn', 'bestie-btn');
+        btn.disabled = false; 
         
         if (state === 'current') {
-            // ТЕПЕРЬ ТЕКУЩИЙ ПЛАН МОЖНО ПРОДЛИТЬ
-            // (Кроме Bestie, он навсегда)
             if (planType === 'bestie') {
                 btn.disabled = true;
                 btn.classList.add('current');
                 btn.innerText = "Purchased";
             } else {
-                // Это Pro или Beast — даем продлить
                 if (btn.closest('.pro')) btn.classList.add('pro-btn');
-                if (btn.closest('.beast')) btn.classList.add('beast-btn');
-                btn.innerText = tExtend; // "Extend"
+                btn.innerText = tExtend; 
                 btn.onclick = () => openPaymentSelection(planType);
             }
         } 
         else if (state === 'lower') {
             btn.disabled = true;
             btn.classList.add('current'); 
-            btn.innerText = "Included"; // Или галочка       
+            btn.innerText = "Included";      
         } 
-        else { // 'buy' или 'upgrade'
+        else { 
             if (btn.closest('.pro')) btn.classList.add('pro-btn');
-            if (btn.closest('.beast')) btn.classList.add('beast-btn');
             if (btn.closest('.bestie')) btn.classList.add('bestie-btn');
             
-            // Если это апгрейд, пишем Upgrade, иначе стандартный текст
             btn.innerText = state === 'upgrade' ? tUpgrade : buyText;
             btn.onclick = () => openPaymentSelection(planType);
         }
     };
 
-    // ЛОГИКА ОТОБРАЖЕНИЯ
     if (subscriptionLevel === 'bestie') {
         configureBtn(btnFree, 'lower', null, null);
         configureBtn(btnPro, 'lower', null, null);
-        configureBtn(btnBeast, 'lower', null, null);
         configureBtn(btnBestie, 'current', null, 'bestie');
-    }
-    else if (subscriptionLevel === 'beast') {
-        configureBtn(btnFree, 'lower', null, null);
-        configureBtn(btnPro, 'lower', null, null);
-        configureBtn(btnBeast, 'current', null, 'beast'); // Можно продлить
-        configureBtn(btnBestie, 'upgrade', tBestie, 'bestie'); 
     } 
     else if (subscriptionLevel === 'pro') {
         configureBtn(btnFree, 'lower', null, null);
-        configureBtn(btnPro, 'current', null, 'pro'); // Можно продлить
-        configureBtn(btnBeast, 'upgrade', tBeast, 'beast'); // Апгрейд
+        configureBtn(btnPro, 'current', null, 'pro'); 
         configureBtn(btnBestie, 'upgrade', tBestie, 'bestie');
     } 
     else {
-        // Free user
         configureBtn(btnFree, 'current', null, null);
         if(btnFree) { btnFree.disabled = true; btnFree.innerText = tCurrent; }
 
         configureBtn(btnPro, 'buy', tPro, 'pro');
-        configureBtn(btnBeast, 'buy', tBeast, 'beast');
         configureBtn(btnBestie, 'buy', tBestie, 'bestie');
     }
 
     renderDiscountedPrices(); 
-
     document.getElementById('modal-sub-overlay').classList.add('open');
 }
 
@@ -9262,7 +9230,7 @@ function switchBilling(cycle) {
 // ===  УМНЫЙ РЕНДЕР ЦЕН (СКИДКИ + ТАЙМЕР + ПЕРИОД) ===
 function renderDiscountedPrices() {
     // Если скидок нет или они не загрузились, рендерим базы
-    const plans = ['pro', 'beast'];
+    const plans = ['pro'];
     const suffix = currentBillingCycle === '1' ? '/ mo' : '/ year';
     const periodKey = currentBillingCycle === '1' ? 'monthly' : 'yearly';
 
@@ -9658,7 +9626,7 @@ function updateSubscriptionUI() {
     subscriptionLevel = localStorage.getItem('xch_sub_level') || 'free';
     const t = langData[currentLang] || langData['en'];
 
-    // --- ОБНОВЛЕНИЕ КНОПКИ В С АЙДБАРЕ ---
+    // --- КНОПКИ В САЙДБАРЕ ---
     const loginBtnText = document.getElementById('login-btn-text');
     
     if (loginBtnText) {
@@ -9694,11 +9662,11 @@ function updateSubscriptionUI() {
         }
     }
 
-    // --- НАСТРОЙКА КНОПОК ПОКУПКИ (Pro/Beast/Bestie) ---
+    // --- НАСТРОЙКА КНОПОК ПОКУПКИ (Pro/Bestie) ---
     const configureBtn = (btn, state, buyText, planType) => {
         if (!btn) return;
         btn.onclick = null;
-        btn.classList.remove('current', 'pro-btn', 'beast-btn', 'bestie-btn');
+        btn.classList.remove('current', 'pro-btn', 'bestie-btn');
         btn.disabled = false;
         btn.style.opacity = "1";
 
@@ -9712,7 +9680,6 @@ function updateSubscriptionUI() {
                 btn.disabled = true; btn.classList.add('current'); btn.innerText = "Purchased";
             } else {
                 if (btn.closest('.pro')) btn.classList.add('pro-btn');
-                if (btn.closest('.beast')) btn.classList.add('beast-btn');
                 btn.innerText = tExtend; 
                 btn.onclick = () => openPaymentSelection(planType);
             }
@@ -9725,7 +9692,6 @@ function updateSubscriptionUI() {
             btn.style.opacity = "0.6";
         } else { 
             if (btn.closest('.pro')) btn.classList.add('pro-btn');
-            if (btn.closest('.beast')) btn.classList.add('beast-btn');
             if (btn.closest('.bestie')) btn.classList.add('bestie-btn');
             btn.innerText = state === 'upgrade' ? tUpgrade : buyText;
             btn.onclick = () => openPaymentSelection(planType);
@@ -9734,21 +9700,17 @@ function updateSubscriptionUI() {
 
     const btnFree = document.querySelector('.plan-card:nth-child(1) .plan-btn'); 
     const btnPro = document.querySelector('.plan-card.pro .plan-btn');
-    const btnBeast = document.querySelector('.plan-card.beast .plan-btn');
     const btnBestie = document.querySelector('.plan-card.bestie .plan-btn');
     const tPro = t.btn_get_pro || "Get Pro";
-    const tBeast = t.btn_get_beast || "Unleash Beast";
     const tBestie = t.btn_get_bestie || "Get Forever"; 
 
     if (subscriptionLevel === 'bestie') {
-        configureBtn(btnFree, 'lower'); configureBtn(btnPro, 'lower'); configureBtn(btnBeast, 'lower'); configureBtn(btnBestie, 'current', null, 'bestie');
-    } else if (subscriptionLevel === 'beast') {
-        configureBtn(btnFree, 'lower'); configureBtn(btnPro, 'lower'); configureBtn(btnBeast, 'current', null, 'beast'); configureBtn(btnBestie, 'upgrade', tBestie, 'bestie');
+        configureBtn(btnFree, 'lower'); configureBtn(btnPro, 'lower'); configureBtn(btnBestie, 'current', null, 'bestie');
     } else if (subscriptionLevel === 'pro') {
-        configureBtn(btnFree, 'lower'); configureBtn(btnPro, 'current', null, 'pro'); configureBtn(btnBeast, 'upgrade', tBeast, 'beast'); configureBtn(btnBestie, 'upgrade', tBestie, 'bestie');
+        configureBtn(btnFree, 'lower'); configureBtn(btnPro, 'current', null, 'pro'); configureBtn(btnBestie, 'upgrade', tBestie, 'bestie');
     } else {
         configureBtn(btnFree, 'current'); if(btnFree){btnFree.disabled=true; btnFree.innerText=t.btn_current;}
-        configureBtn(btnPro, 'buy', tPro, 'pro'); configureBtn(btnBeast, 'buy', tBeast, 'beast'); configureBtn(btnBestie, 'buy', tBestie, 'bestie');
+        configureBtn(btnPro, 'buy', tPro, 'pro'); configureBtn(btnBestie, 'buy', tBestie, 'bestie');
     }
 }
 
@@ -15615,7 +15577,7 @@ async function claimAchievementReward(groupId, days) {
     
     const newExpire = new Date(Math.max(Date.now(), currentExpire) + (days * 24 * 60 * 60 * 1000));
 
-    // 2. Обновляем статус (только если не Beast/Bestie)
+    // 2. Обновляем статус (только если не Bestie)
     if (subscriptionLevel === 'free' || subscriptionLevel === 'pro') {
         subscriptionLevel = 'pro';
         localStorage.setItem('xch_sub_level', 'pro');

@@ -1099,27 +1099,15 @@
                 </p>
             </div>
 
-            <!-- Toggle -->
-            <div class="billing-toggle-container" style="display:flex; justify-content:center; margin-bottom: 20px;">
-                <div class="stats-nav-capsule" style="width: auto; min-width: 200px;">
-                    <div id="btn-billing-monthly" class="stats-nav-item active" onclick="switchBilling('monthly')" data-key="bill_monthly">
-                        Monthly
-                    </div>
-                    <div id="btn-billing-yearly" class="stats-nav-item" onclick="switchBilling('yearly')">
-                        <span data-key="bill_yearly">Yearly</span> <span style="font-size:10px; color:var(--accent); margin-left:3px;">-20%</span>
-                    </div>
-                </div>
-            </div>
-
             <!-- PLANS GRID -->
             <div class="plans-container">
-                
+    
                 <!-- 1. FREE -->
                 <div class="plan-card">
                     <div class="plan-title" style="font-size:20px; font-weight:800; margin-bottom:5px;">Free</div>
                     <div class="plan-price" style="font-size:18px; font-weight:700; margin-bottom:15px;">$0</div>
                     <ul class="plan-features">
-                        <li id="free-limit-row">🎲 15 Generations / day</li>
+                        <li id="free-limit-row">🎲 25 Generations / day</li>
                         <li data-key="feat_wrapped_limited">🎁 1 Fetish Wrapped / week</li>
                         <li data-key="feat_stats_basic">📊 Basic Statistics</li>
                     </ul>
@@ -1128,7 +1116,18 @@
 
                 <!-- 2. PRO -->
                 <div class="plan-card pro" style="border-color:#ff9900;">
-                    <div class="plan-title" style="font-size:20px; font-weight:800; margin-bottom:5px; color:#ff9900;">Pro</div>
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div class="plan-title" style="font-size:20px; font-weight:800; margin-bottom:5px; color:#ff9900;">Pro</div>
+                        
+                        <!-- Компактный переключатель внутри карточки -->
+                        <div class="stats-nav-capsule" style="width: auto; min-width: 110px; height: 28px; padding: 2px;">
+                            <div id="btn-billing-monthly" class="stats-nav-item active" onclick="switchBilling('monthly')" data-key="bill_monthly" style="font-size: 10px;">Mo</div>
+                            <div id="btn-billing-yearly" class="stats-nav-item" onclick="switchBilling('yearly')" style="font-size: 10px;">
+                                <span data-key="bill_yearly">Yr</span> <span style="font-size:8px; color:var(--accent); margin-left:2px;">-20%</span>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="plan-price" id="price-pro" style="font-size:18px; font-weight:700; margin-bottom:15px;">$2.99 <span style="font-size:12px">/ mo</span></div>
                     <ul class="plan-features">
                         <li style="color:var(--text-main)" data-key="feat_unlim">🔥 <b>Unlimited</b> Gens</li>
@@ -1141,24 +1140,12 @@
                     <button class="plan-btn pro-btn" onclick="openPaymentSelection('pro')" data-key="btn_get_pro" style="background:#ff9900; color:#000;">Get Pro</button>
                 </div>
 
-                <!-- 3. BEAST -->
-                <div class="plan-card beast" style="border-color:#9b59b6;">
-                    <div class="plan-title" style="font-size:20px; font-weight:800; margin-bottom:5px; color:#9b59b6;">Beast</div>
-                    <div class="plan-price" id="price-beast" style="font-size:18px; font-weight:700; margin-bottom:15px;">$4.99 <span style="font-size:12px">/ mo</span></div>
-                    <ul class="plan-features">
-                        <li style="color:var(--text-main)" data-key="feat_all_pro">👑 <b>All Pro Features</b></li>
-                        <li data-key="feat_discord">💬 <b>Discord</b> (Dev Chat)</li>
-                        <li data-key="feat_vote">🗳️ Vote on Roadmap</li>
-                    </ul>
-                    <button class="plan-btn beast-btn" onclick="openPaymentSelection('beast')" data-key="btn_get_beast" style="background:#9b59b6; color:#fff;">Unleash Beast</button>
-                </div>
-
-                <!-- 4. BESTIE  -->
+                <!-- 3. BESTIE -->
                 <div class="plan-card bestie" style="border: 2px solid #00d2ff; background: linear-gradient(165deg, rgba(0, 210, 255, 0.1), transparent); position: relative;">
                     <div class="bestie-badge" style="background:#00d2ff; color:#000; font-size:10px; font-weight:800; padding:4px 8px; position:absolute; top:0; right:0; border-radius:0 0 0 10px; z-index:5;" data-key="badge_limited">LIMITED</div>
                     
                     <div class="plan-title" style="font-size:20px; font-weight:800; margin-bottom:5px; color:#00d2ff;">Bestie</div>
-                    <div class="plan-price" style="font-size:18px; font-weight:700; margin-bottom:15px;">$49.99 <span style="font-size:12px">/ once</span></div>
+                    <div class="plan-price" style="font-size:18px; font-weight:700; margin-bottom:15px;">$19.99 <span style="font-size:12px">/ once</span></div>
                     
                     <div class="limit-container" style="background:rgba(0,0,0,0.2); padding:8px; border-radius:8px; margin-bottom:10px;">
                         <div class="limit-labels" style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:4px;">
@@ -1169,13 +1156,14 @@
                     </div>
 
                     <ul class="plan-features">
+                        <li style="color:var(--text-main)" data-key="feat_all_pro">👑 <b>All Pro Features</b></li>
                         <li style="color:var(--text-main)" data-key="feat_lifetime">♾️ <b>Lifetime Access</b></li>
-                        <li data-key="feat_all_beast">🦁 <b>All Beast Features</b></li> 
+                        <li data-key="feat_discord">💬 <b>Discord</b> (Dev Chat)</li>
+                        <li data-key="feat_vote">🗳️ Vote on Roadmap</li>
                         <li data-key="feat_sponsors">💎 In Sponsors List</li>
                     </ul>
                     <button class="plan-btn bestie-btn" onclick="openPaymentSelection('bestie')" data-key="btn_get_bestie" style="background:linear-gradient(90deg, #00d2ff, #3a7bd5); color:#fff;">Get Forever</button>
                 </div>
-
             </div>
         </div>
     </div>
@@ -1303,7 +1291,6 @@
                 <div style="display: flex; gap: 8px; margin-bottom: 15px;">
                     <select id="admin-gift-type" class="promo-input" style="flex: 1; padding-right: 25px;">
                         <option value="pro">Pro</option>
-                        <option value="beast">Beast</option>
                         <option value="bestie">Bestie</option>
                     </select>
                     <input type="number" id="admin-gift-days" class="promo-input" style="width: 70px;" value="30">
@@ -1321,7 +1308,6 @@
                     <select id="admin-disc-target" class="promo-input" style="flex: 1.5;">
                         <option value="all">Все планы</option>
                         <option value="pro">Pro</option>
-                        <option value="beast">Beast</option>
                         <option value="bestie">Bestie</option>
                     </select>
                     <select id="admin-disc-type" class="promo-input" style="flex: 1;">
