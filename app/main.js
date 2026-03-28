@@ -6089,21 +6089,23 @@ function handleOutboundClick(e) {
         return;
     }
 
-    // Проверяем, показывали ли мы предупреждение раньше
     const hasWarned = localStorage.getItem('xch_vpn_warned');
-    
     if (!hasWarned) {
-        if (e) e.preventDefault(); // Останавливаем переход
-        
-        // Получаем ссылку, куда юзер хотел пойти
+        if (e) e.preventDefault(); 
         const btn = document.getElementById('btn-t-watch');
         pendingOutboundUrl = btn ? btn.href : '#';
-        
-        openVpnModal(); // Открываем модалку
-        return; // Прерываем выполнение, пока юзер не нажмет кнопку в модалке
+        openVpnModal(); 
+        return; 
     }
 
     if(!currentItem) return;
+
+    // ЗАПИСЫВАЕМ ИМЯ САЙТА, КУДА ПЕРЕШЕЛ ПОЛЬЗОВАТЕЛЬ
+    const btnWatch = document.getElementById('btn-t-watch');
+    window.currentWatchSite = {
+        id: btnWatch ? btnWatch.getAttribute('data-site-id') : 'unknown',
+        name: btnWatch ? btnWatch.getAttribute('data-site-name') : 'Unknown'
+    };
     
     watchStartTime = Date.now();
     itemBeingWatched = currentItem;
@@ -6480,10 +6482,8 @@ function updateLink() {
         if(btnWatch) { btnWatch.removeAttribute('href'); btnWatch.removeAttribute('target'); }
         return;
     }
-
     if(!currentItem) return;
 
-    // 1. Получаем настройки
     const userSiteId = localStorage.getItem('xch_platform') || 'xh';
     const isSmart = localStorage.getItem('xch_smart_sites') === 'true';
     const isRandom = localStorage.getItem('xch_random_sites') === 'true';
@@ -6491,13 +6491,10 @@ function updateLink() {
     
     let targetSiteId = userSiteId;
 
-    // 2. ПРИОРИТЕТ 1: RANDOM MODE
     if (isRandom) {
-        // Выбираем случайный сайт из списка SITES_DATA
         const randomSite = SITES_DATA[Math.floor(Math.random() * SITES_DATA.length)];
         targetSiteId = randomSite.id;
     }
-    // 3. ПРИОРИТЕТ 2: SMART MODE
     else if (isSmart) {
         const itemTags = currentItem.tags;
         const matches = (tags) => itemTags.some(t => tags.includes(t));
@@ -6511,14 +6508,11 @@ function updateLink() {
         else if (matches(['hd', '4k']) && userSiteId !== 'epo') targetSiteId = 'sb';
     }
 
-    // 4. Получаем объект сайта
     const allSites = [...SITES_DATA, ...customSites];
     const targetSite = allSites.find(s => s.id === targetSiteId) || SITES_DATA[0];
 
-    // 5. Формируем запрос
     const useRu = (currentLang === 'ru' && !forceEn);
     let queryName = useRu ? (currentItem.name_ru || currentItem.name) : currentItem.name;
-    
     let queryParts = [queryName];
     
     if (typeof activeMods !== 'undefined') {
@@ -6531,12 +6525,15 @@ function updateLink() {
 
     const sep = targetSite.sep || '+';
     const q = queryParts.join(sep).toLowerCase();
-    
     const finalUrl = targetSite.url.replace('{q}', q);
 
     if(btnWatch) {
         btnWatch.href = finalUrl;
         btnWatch.target = "_blank";
+        
+        // СОХРАНЯЕМ ИМЯ САЙТА В КНОПКУ ДЛЯ ИСТОРИИ
+        btnWatch.setAttribute('data-site-id', targetSite.id);
+        btnWatch.setAttribute('data-site-name', targetSite.name);
     }
 }
 
@@ -7633,12 +7630,11 @@ function performExport() {
 
     if (!expLists && !expHist && !expActivity && !expExpl) return;
 
-    // Определяем границы выбранного времени
     let finalStartTs = exportRangeStart ? exportRangeStart.getTime() : 0;
     let finalEndTs = Infinity;
     if (exportRangeEnd) {
         const e = new Date(exportRangeEnd);
-        e.setHours(23, 59, 59, 999); // Конец выбранного дня
+        e.setHours(23, 59, 59, 999);
         finalEndTs = e.getTime();
     }
 
@@ -7657,7 +7653,6 @@ function performExport() {
         data: {}
     };
 
-    // 1. Списки (Они глобальные, отдаем как есть)
     if (expLists) {
         exportObj.data.lists = {
             liked: favorites.map(getName).filter(x => x !== "Unknown"),
@@ -7666,7 +7661,6 @@ function performExport() {
         };
     }
 
-    // 2. История и время (Фильтруем по датам)
     if (expHist) {
         exportObj.data.history = historyData
             .filter(h => h.timestamp >= finalStartTs && h.timestamp <= finalEndTs)
@@ -7680,11 +7674,12 @@ function performExport() {
             .map(w => ({
                 name_en: getName(w.id),
                 dateStr: new Date(w.timestamp).toISOString(),
-                durationFormatted: w.durationStr
+                durationFormatted: w.durationStr,
+                durationSeconds: w.seconds,
+                site: w.siteName || "Unknown"
             }));
     }
 
-    // 3. Активность (Свайпы, фильтруем по датам)
     if (expActivity) {
         exportObj.data.activityLog = activityLog
             .filter(a => a.ts >= finalStartTs && a.ts <= finalEndTs)
@@ -7695,7 +7690,6 @@ function performExport() {
             }));
     }
 
-    // 4. Открытые фетиши (Глобальный массив)
     if (expExpl) {
         exportObj.data.exploredFetishes = Array.from(permanentExplored).map(getName).filter(x => x !== "Unknown");
     }
@@ -11488,38 +11482,47 @@ function getRandomNeutral(excludeSrc = null) {
 }
 
 function calculateWatchTime() {
-    // Проверка: было ли начало просмотра и есть ли сохраненный предмет
     if (watchStartTime === 0 || !itemBeingWatched) return;
 
     const now = Date.now();
     const diffInSeconds = Math.floor((now - watchStartTime) / 1000);
     
     watchStartTime = 0; 
-
-    // Игнорируем меньше 5 сек
     if (diffInSeconds < 5) return;
 
-    // ... (код расчета времени остается тем же) ...
+    // --- ЛОГИКА ОБЪЕДИНЕНИЯ ПРОСМОТРОВ ---
+    const existingIndex = watchHistory.findIndex(w => w.id === itemBeingWatched.id);
+    let totalSeconds = diffInSeconds;
+    
+    if (existingIndex !== -1) {
+        totalSeconds += watchHistory[existingIndex].seconds;
+        watchHistory.splice(existingIndex, 1);
+    }
+
     let timeString = "";
     const minLabel = currentLang === 'ru' ? 'мин' : 'min';
     const secLabel = currentLang === 'ru' ? 'сек' : 'sec';
 
-    if (diffInSeconds > 1800) {
+    if (totalSeconds > 1800) {
         timeString = `30+ ${minLabel}`;
     } else {
-        const minutes = Math.floor(diffInSeconds / 60);
-        const seconds = diffInSeconds % 60;
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
         if (minutes > 0) timeString = `${minutes} ${minLabel} ${seconds} ${secLabel}`;
         else timeString = `${seconds} ${secLabel}`;
     }
 
-    // Сохранение в историю 
+    const siteInfo = window.currentWatchSite || { id: 'unknown', name: 'Unknown' };
+
     const historyEntry = {
         id: itemBeingWatched.id,
         timestamp: Date.now(),
         durationStr: timeString,
-        seconds: diffInSeconds
+        seconds: totalSeconds,
+        siteId: siteInfo.id,
+        siteName: siteInfo.name
     };
+    
     watchHistory.unshift(historyEntry);
     if (watchHistory.length > 100) watchHistory.pop();
     localStorage.setItem(STORAGE.WATCH_HISTORY, JSON.stringify(watchHistory));
@@ -11529,8 +11532,8 @@ function calculateWatchTime() {
     const t = langData[currentLang] || langData['en'];
     let phraseTemplate = "";
     
-    if (diffInSeconds > 1800) phraseTemplate = (currentLang === 'ru') ? "Долгое погружение... 🌊" : "Deep dive... 🌊";
-    else if (diffInSeconds < 40) phraseTemplate = t.return_phrase_short || "Only {t}...";
+    if (totalSeconds > 1800) phraseTemplate = (currentLang === 'ru') ? "Долгое погружение... 🌊" : "Deep dive... 🌊";
+    else if (totalSeconds < 40) phraseTemplate = t.return_phrase_short || "Only {t}...";
     else {
         const phrases = t.return_phrases || ["{t} passed."];
         phraseTemplate = phrases[Math.floor(Math.random() * phrases.length)];
@@ -11540,9 +11543,7 @@ function calculateWatchTime() {
 
     const statusEl = document.getElementById('status-text');
     if (statusEl) {
-        // Сброс старого таймера
         if (statusHideTimeout) clearTimeout(statusHideTimeout);
-
         statusEl.style.transition = "none";
         statusEl.style.opacity = '0';
         
@@ -11552,7 +11553,6 @@ function calculateWatchTime() {
             statusEl.style.transition = "opacity 0.3s ease";
             statusEl.style.opacity = '1';
 
-            // Новый таймер на 5 секунд
             statusHideTimeout = setTimeout(() => {
                 statusEl.style.transition = "opacity 1s ease";
                 statusEl.style.opacity = "0";
@@ -11889,10 +11889,12 @@ function renderWatchHistoryList() {
             ? d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) 
             : d.toLocaleDateString([], {day:'numeric', month:'numeric'}) + ' ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
+        const siteDisplay = entry.siteName ? ` • <span style="color:var(--accent); font-weight:700;">${entry.siteName}</span>` : '';
+
         div.innerHTML = `
             <div style="display:flex; flex-direction:column; gap:4px;">
                 <div style="font-weight:600;">${name}</div>
-                <div style="font-size:11px; color:var(--text-secondary);">${dateStr}</div>
+                <div style="font-size:11px; color:var(--text-secondary);">${dateStr}${siteDisplay}</div>
             </div>
             <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px;">
                 <span style="font-weight:700; color:var(--text-main); font-size:15px;">${entry.durationStr}</span>

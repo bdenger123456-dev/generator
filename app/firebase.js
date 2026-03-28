@@ -604,7 +604,8 @@ let saveInterval = null;
 // Функция, которую вызываем при ЛЮБОМ изменении (свайп, лайк, настройка)
 window.markDirty = function() {
     window.unsavedChanges = true;
-    // Можно добавить визуальную индикацию, если хочешь (например, точка в углу)
+    // Фиксируем локальное время последнего изменения
+    localStorage.setItem('xch_local_update_ts', Date.now().toString());
 };
 
 // 1. Слушатель ухода с вкладки (Сворачивание / Закрытие)
@@ -639,26 +640,25 @@ async function loadUserData(user) {
             const cloudData = docSnap.data();
             const now = new Date();
             
+            // --- УМНАЯ СИНХРОНИЗАЦИЯ ПО ВРЕМЕНИ ---
+            const localUpdateTs = parseInt(localStorage.getItem('xch_local_update_ts') || '0');
+            const lastSyncTs = parseInt(localStorage.getItem('xch_last_sync_ts') || '0');
+            const cloudTs = cloudData.lastUpdated ? (cloudData.lastUpdated.toDate ? cloudData.lastUpdated.toDate().getTime() : new Date(cloudData.lastUpdated).getTime()) : 0;
+            
+            const isCloudNewer = cloudTs > lastSyncTs;
+            const hasUnsyncedLocalChanges = localUpdateTs > lastSyncTs;
+            const useCloud = isCloudNewer && !hasUnsyncedLocalChanges;
+            
             // --- ПРОВЕРКА ИСТЕЧЕНИЯ ПОДПИСКИ ---
             let cloudSub = cloudData.subscription || 'free';
-            
-            // Если подписка не вечная (bestie) и не бесплатная, проверяем дату
             if (cloudSub !== 'free' && cloudSub !== 'bestie' && cloudData.expiresAt) {
-                // Конвертируем Timestamp Firebase в объект Date
                 const expDate = cloudData.expiresAt.toDate ? cloudData.expiresAt.toDate() : new Date(cloudData.expiresAt);
-                
                 if (now > expDate) {
-                    console.log("🚨 Subscription expired! Resetting user to FREE.");
                     cloudSub = 'free';
-                    
-                    // Обновляем статус в облаке немедленно
-                    await updateDoc(userRef, {
-                        subscription: 'free'
-                    });
+                    await updateDoc(userRef, { subscription: 'free' });
                 }
             }
 
-            // Глобальные переменные (обновляем с учетом проверки)
             cachedUserProfile = { ...cloudData, subscription: cloudSub };
             window.cachedUserProfile = cachedUserProfile;
             lastProfileReadTime = Date.now();
@@ -669,14 +669,14 @@ async function loadUserData(user) {
             if (window.updateSubscriptionUI) window.updateSubscriptionUI();
 
             // 2. СПИСКИ (Избранное, ЧС, WL)
-            const mergeArrays = (local, cloud) => [...new Set([...local, ...cloud])];
-            
-            let mergedFav = mergeArrays(JSON.parse(localStorage.getItem('xch_favorites')) || [], cloudData.favorites || []);
-            let mergedBan = mergeArrays(JSON.parse(localStorage.getItem('xch_blacklist')) || [], cloudData.blacklist || []);
-            const mergedWL = mergeArrays(JSON.parse(localStorage.getItem('xch_watch_later')) || [], cloudData.watchLater || []);
+            let mergedFav = useCloud ? (cloudData.favorites ||[]) : (JSON.parse(localStorage.getItem('xch_favorites')) ||[]);
+            let mergedBan = useCloud ? (cloudData.blacklist ||[]) : (JSON.parse(localStorage.getItem('xch_blacklist')) || []);
+            let mergedWL  = useCloud ? (cloudData.watchLater ||[]) : (JSON.parse(localStorage.getItem('xch_watch_later')) || []);
 
-            // Если после объединения фетиш оказался и в Лайках и в Блэклисте - выкидываем из Блэклиста
+            mergedFav =[...new Set(mergedFav)];
+            mergedBan = [...new Set(mergedBan)];
             mergedBan = mergedBan.filter(id => !mergedFav.includes(id));
+            mergedWL = [...new Set(mergedWL)];
 
             localStorage.setItem('xch_favorites', JSON.stringify(mergedFav));
             window.favorites = mergedFav;
@@ -686,48 +686,28 @@ async function loadUserData(user) {
             window.watchLater = mergedWL;
 
             // 3. ИСТОРИЯ СВАЙПОВ
-            const localHist = JSON.parse(localStorage.getItem('xch_history')) || [];
-            const cloudHist = cloudData.history || [];
-            const histMap = new Map();
-            [...localHist, ...cloudHist].forEach(item => histMap.set(item.id, item));
-            const mergedHistory = Array.from(histMap.values())
-                .filter(item => item && (item.timestamp || item.ts))
-                .sort((a, b) => (b.timestamp?.seconds || b.timestamp) - (a.timestamp?.seconds || a.timestamp))
-                .slice(0, 100);
-            
+            const localHist = JSON.parse(localStorage.getItem('xch_history')) ||[];
+            const cloudHist = cloudData.history ||[];
+            const mergedHistory = useCloud ? cloudHist : localHist;
             localStorage.setItem('xch_history', JSON.stringify(mergedHistory));
             window.historyData = mergedHistory;
 
             // 4. ИСТОРИЯ ПРОСМОТРОВ
-            const localWatch = JSON.parse(localStorage.getItem('xch_watch_history')) || [];
-            const cloudWatch = cloudData.watchHistory || [];
-            const watchMap = new Map();
-            [...localWatch, ...cloudWatch].forEach(item => {
-                if (item && item.id) {
-                    const ts = item.timestamp?.seconds || item.timestamp || 0;
-                    watchMap.set(`${item.id}_${ts}`, item);
-                }
-            });
-            const mergedWatch = Array.from(watchMap.values()).sort((a, b) => b.timestamp - a.timestamp).slice(0, 200);
-            
+            const localWatch = JSON.parse(localStorage.getItem('xch_watch_history')) ||[];
+            const cloudWatch = cloudData.watchHistory ||[];
+            const mergedWatch = useCloud ? cloudWatch : localWatch;
             localStorage.setItem('xch_watch_history', JSON.stringify(mergedWatch));
             window.watchHistory = mergedWatch;
 
             // 5. ЛОГИ АКТИВНОСТИ
-            const localLog = JSON.parse(localStorage.getItem('xch_activity_log')) || [];
-            const cloudLog = cloudData.activityLog || [];
-            const logMap = new Map();
-            [...localLog, ...cloudLog].forEach(item => logMap.set((item.ts || 0) + "_" + item.id, item));
-            
-            const mergedLog = Array.from(logMap.values())
-                .filter(item => item && item.ts)
-                .sort((a, b) => (a.ts || 0) - (b.ts || 0)) // Сортируем по времени
-                .slice(-5000);
-            
+            const localLog = JSON.parse(localStorage.getItem('xch_activity_log')) ||[];
+            const cloudLog = cloudData.activityLog ||[];
+            const mergedLog = useCloud ? cloudLog : localLog;
             localStorage.setItem('xch_activity_log', JSON.stringify(mergedLog));
             window.activityLog = mergedLog;
 
             if (window.activityLog && window.activityLog.length > 0) {
+                window.permanentExplored = new Set();
                 window.activityLog.forEach(log => {
                     if (log.id) window.permanentExplored.add(log.id);
                 });
@@ -736,15 +716,17 @@ async function loadUserData(user) {
 
             // 6. КАСТОМНЫЕ САЙТЫ 
             const localSites = JSON.parse(localStorage.getItem('xch_custom_sites')) || [];
-            const cloudSites = cloudData.customSites || [];
-            
-            // Объединяем по ID, чтобы избежать дубликатов
-            const siteMap = new Map();
-            [...localSites, ...cloudSites].forEach(s => siteMap.set(s.id, s));
-            const mergedSites = Array.from(siteMap.values());
-
+            const cloudSites = cloudData.customSites ||[];
+            const mergedSites = useCloud ? cloudSites : localSites;
             localStorage.setItem('xch_custom_sites', JSON.stringify(mergedSites));
             window.customSites = mergedSites;
+
+            // 7. КАСТОМНЫЕ МОДЫ (Теги)
+            const localMods = JSON.parse(localStorage.getItem('xch_custom_mods')) || [];
+            const cloudMods = cloudData.customMods ||[];
+            const mergedMods = useCloud ? cloudMods : localMods;
+            localStorage.setItem('xch_custom_mods', JSON.stringify(mergedMods));
+            window.customModifiersList = mergedMods;
 
             // ФИНАЛ
             localStorage.setItem('xch_last_sync_ts', Date.now());
@@ -753,7 +735,6 @@ async function loadUserData(user) {
             if (typeof renderHistory === 'function') renderHistory();
             if (typeof updateActionButtons === 'function') updateActionButtons();
 
-            // Проверка алертов об окончании (за 3 дня)
             checkSubscriptionExpiry(); 
 
             if (document.getElementById('modal-sync-info-overlay').classList.contains('open')) {
@@ -780,25 +761,25 @@ window.syncToCloud = async function(immediate = false) {
     const currentPlatform = localStorage.getItem('xch_platform') || 'xh';
     const safeJSON = (key, def) => JSON.parse(localStorage.getItem(key)) || def;
 
-    // Берем актуальные данные из памяти (window) или из localStorage
-    const wHistory = window.watchHistory || safeJSON('xch_watch_history', []);
+    const wHistory = window.watchHistory || safeJSON('xch_watch_history',[]);
 
     const dataToSave = {
-        favorites: window.favorites || safeJSON('xch_favorites', []),
+        favorites: window.favorites || safeJSON('xch_favorites',[]),
         blacklist: window.blacklist || safeJSON('xch_blacklist', []),
-        watchLater: window.watchLater || safeJSON('xch_watch_later', []),
+        watchLater: window.watchLater || safeJSON('xch_watch_later',[]),
         tagScores: window.tagScores || safeJSON('xch_tag_scores', {}),
         
-        history: (window.historyData || safeJSON('xch_history', [])).slice(0, 100),
-        activityLog: (window.activityLog || safeJSON('xch_activity_log', [])).slice(-300),
+        history: (window.historyData || safeJSON('xch_history',[])).slice(0, 100),
+        activityLog: (window.activityLog || safeJSON('xch_activity_log',[])).slice(-5000),
         watchHistory: wHistory.slice(0, 200),
 
-        customSites: window.customSites || safeJSON('xch_custom_sites', []),
+        customSites: window.customSites || safeJSON('xch_custom_sites',[]),
+        customMods: window.customModifiersList || safeJSON('xch_custom_mods',[]),
         
         platform: currentPlatform,
         email: user.email,
         lastUpdated: serverTimestamp(),
-        modifiersPool: window.userModifiersPool || safeJSON('xch_user_mods', []),
+        modifiersPool: window.userModifiersPool || safeJSON('xch_user_mods',[]),
         exploredCount: (window.permanentExplored ? window.permanentExplored.size : 0)
     };
 
@@ -807,6 +788,8 @@ window.syncToCloud = async function(immediate = false) {
         
         const now = Date.now();
         localStorage.setItem('xch_last_sync_ts', now);
+        localStorage.setItem('xch_local_update_ts', now.toString()); 
+        
         window.unsavedChanges = false;
         
         const btnText = document.getElementById('sync-btn-text');
