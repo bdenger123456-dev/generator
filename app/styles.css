@@ -7937,3 +7937,43 @@ body[data-theme="noir"] .mode-circle-btn.center-btn.ai-assist {
     white-space: nowrap;
     border: 0;
 }
+
+/* CSS FOR SESSION CAPSULES */
+.session-items-overlap {
+    display: flex;
+    align-items: center;
+}
+.session-capsule {
+    background: var(--ios-card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-main);
+    white-space: nowrap;
+    position: relative;
+    margin-left: -10px;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+}
+.session-capsule:first-child {
+    margin-left: 0;
+    box-shadow: none;
+}
+.session-capsule-more {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--nav-bg);
+    border: 1px solid var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-left: -8px;
+    position: relative;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+    flex-shrink: 0;
+}

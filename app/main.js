@@ -482,6 +482,7 @@ let itemScores = JSON.parse(localStorage.getItem('xch_item_scores')) || {};
 let watchLater = JSON.parse(localStorage.getItem(STORAGE.WATCH_LATER)) || [];
 let tagScores = JSON.parse(localStorage.getItem(STORAGE.TAG_SCORES)) || {};
 let historyData = JSON.parse(localStorage.getItem(STORAGE.HISTORY)) || [];
+let appStartTime = Date.now();
 let watchHistory = JSON.parse(localStorage.getItem(STORAGE.WATCH_HISTORY)) || [];
 let activityLog = JSON.parse(localStorage.getItem(STORAGE.ACTIVITY_LOG)) || [];
 let customSites = JSON.parse(localStorage.getItem('xch_custom_sites')) || [];
@@ -1228,8 +1229,8 @@ const langData = {
         mode_ai: "AI Agent",
 
         info_header: "Information",
-        hist_tab_swipes: "Swipes",
-        hist_tab_watch: "Time",
+        hist_tab_swipes: "Sessions",
+        hist_tab_watch: "Watches",
         hist_empty_watch: "No watch data yet. Go watch something! 😏",
         hist_watched: "WATCHED",
 
@@ -2062,8 +2063,8 @@ const langData = {
         mode_ai: "ИИ Агент",
 
         info_header: "Информация",
-        hist_tab_swipes: "Свайпы",
-        hist_tab_watch: "Время",
+        hist_tab_swipes: "Сессии",
+        hist_tab_watch: "Просмотры",
         hist_empty_watch: "Данных о просмотрах нет. Иди глянь что-нибудь! 😏",
         hist_watched: "ПРОСМОТРЕНО",
 
@@ -2881,8 +2882,8 @@ const langData = {
         mode_ai: "Agente IA",
 
         info_header: "Información",
-        hist_tab_swipes: "Deslizamientos",
-        hist_tab_watch: "Tiempo",
+        hist_tab_swipes: "Sesiones",
+        hist_tab_watch: "Vistas",
         hist_empty_watch: "Aún no hay datos de visualización. ¡Ve a ver algo! 😏",
         hist_watched: "VISTO",
 
@@ -3691,8 +3692,8 @@ const langData = {
         mode_ai: "KI-Agent",
 
         info_header: "Informationen",
-        hist_tab_swipes: "Swipes",
-        hist_tab_watch: "Zeit",
+        hist_tab_swipes: "Sitzungen",
+        hist_tab_watch: "Aufrufe",
         hist_empty_watch: "Noch keine Daten. Schau dir was an! 😏",
         hist_watched: "GESEHEN",
 
@@ -4812,35 +4813,36 @@ function initInactivityListeners() {
 }
 
 function enforceDataIntegrity() {
-    // 1. Убираем дубликаты внутри самих списков
     favorites = [...new Set(favorites)];
     blacklist = [...new Set(blacklist)];
     watchLater = [...new Set(watchLater)];
 
-    // 2. Взаимоисключение: Если есть в Лайках, жестко удаляем из Дизлайков (Лайки в приоритете)
     blacklist = blacklist.filter(id => !favorites.includes(id));
 
-    // 3. Очистка от удаленных из базы фетишей (если ты менял data.json)
     favorites = favorites.filter(id => data.some(x => x.id === id));
     blacklist = blacklist.filter(id => data.some(x => x.id === id));
     watchLater = watchLater.filter(id => data.some(x => x.id === id));
 
-    // 4. Чиним счетчик "Открытых" (Explored). Если ты ставил лайк/дизлайк или смотрел - значит ты это "открыл"
     if (!permanentExplored) permanentExplored = new Set();
     favorites.forEach(id => permanentExplored.add(id));
     blacklist.forEach(id => permanentExplored.add(id));
     watchHistory.forEach(w => permanentExplored.add(w.id));
-    historyData.forEach(h => permanentExplored.add(h.id));
     activityLog.forEach(a => { if(a.id) permanentExplored.add(a.id); });
+    
+    historyData.forEach(session => {
+        if (session.id) { // Для старых немигрированных данных
+            permanentExplored.add(session.id);
+        } else if (session.items) {
+            session.items.forEach(id => permanentExplored.add(id));
+        }
+    });
 
-    // Очистка Explored от "мертвых" ID
     const validExplored = new Set();
     permanentExplored.forEach(id => {
         if (data.some(x => x.id === id)) validExplored.add(id);
     });
     permanentExplored = validExplored;
 
-    // Сохраняем почищенные данные обратно
     localStorage.setItem(STORAGE.FAVORITES, JSON.stringify(favorites));
     localStorage.setItem(STORAGE.BLACKLIST, JSON.stringify(blacklist));
     localStorage.setItem(STORAGE.WATCH_LATER, JSON.stringify(watchLater));
@@ -5689,7 +5691,18 @@ function getExplanationText(mode) {
             }
             
             if (!sourceItem && historyData.length > 0) {
-                const histItem = historyData.map(h => data.find(x => x.id === h.id)).find(item => item && item.id !== currentItem.id && item.tags.includes(bestTag));
+                let histItem = null;
+                for (const session of historyData) {
+                    if (!session.items) continue;
+                    for (const id of session.items) {
+                        const item = data.find(x => x.id === id);
+                        if (item && item.id !== currentItem.id && item.tags.includes(bestTag)) {
+                            histItem = item;
+                            break;
+                        }
+                    }
+                    if (histItem) break;
+                }
                 if (histItem) sourceItem = histItem;
             }
 
@@ -6155,11 +6168,37 @@ function openVpnModal() {
 }
 
 function addToHistory(item) {
-    const entry = { id: item.id, timestamp: Date.now() };
-    historyData = historyData.filter(x => x.id !== item.id);
-    historyData.unshift(entry);
-    if(historyData.length > 30) historyData.pop();
+    if (!historyData) historyData =[];
+    if (historyData.length > 0 && !historyData[0].sessionId) {
+        migrateHistoryToSessions();
+    }
+
+    const now = Date.now();
+    let lastSession = historyData.length > 0 ? historyData[0] : null;
+
+    if (!lastSession || (now - lastSession.lastActive > 30 * 60 * 1000)) {
+        appStartTime = now;
+        lastSession = {
+            sessionId: now,
+            startTime: appStartTime,
+            lastActive: now,
+            durationSeconds: 0,
+            items:[item.id]
+        };
+        historyData.unshift(lastSession);
+    } else {
+        lastSession.lastActive = now;
+        if (!lastSession.items.includes(item.id)) {
+            lastSession.items.unshift(item.id);
+        }
+        if (lastSession.startTime) {
+            lastSession.durationSeconds = Math.floor((now - lastSession.startTime) / 1000);
+        }
+    }
+
+    if (historyData.length > 30) historyData.pop(); // Храним 30 сессий
     localStorage.setItem(STORAGE.HISTORY, JSON.stringify(historyData));
+    
     renderHistory();
     updateExploredCount();
     if (window.markDirty) window.markDirty();
@@ -6175,6 +6214,7 @@ function getLocalizedName(item) {
 
 function renderHistory() {
     const list = document.getElementById('history-list');
+    if (!list) return;
     list.innerHTML = '';
     const t = langData[currentLang] || langData['en'];
     
@@ -6183,14 +6223,24 @@ function renderHistory() {
         return;
     }
 
-    historyData.forEach(entry => {
-        const item = data.find(x => x.id === entry.id);
+    const recentItemIds =[];
+    for (const session of historyData) {
+        if (!session.items) continue;
+        for (const id of session.items) {
+            if (!recentItemIds.includes(id)) {
+                recentItemIds.push(id);
+            }
+            if (recentItemIds.length >= 10) break;
+        }
+        if (recentItemIds.length >= 10) break;
+    }
+
+    recentItemIds.forEach(id => {
+        const item = data.find(x => x.id === id);
         if(!item) return;
         const div = document.createElement('div');
         div.className = 'history-item-ios'; 
-        
         const name = getLocalizedName(item);
-        
         div.innerHTML = `<span>${name}</span><span style="color:var(--accent); font-size:18px;">↺</span>`;
         div.onclick = () => { switchTab('home'); forceShowResult(item, 'history'); };
         list.appendChild(div);
@@ -6198,16 +6248,20 @@ function renderHistory() {
 }
 
 function filterData() {
-    // Обновленный список безопасных тегов
-    const SAFETY_NET = ['straight', 'general', 'vanilla']; 
-    const recentIds = historyData.slice(0, 50).map(entry => entry.id);
+    const SAFETY_NET =['straight', 'general', 'vanilla']; 
+    
+    // Правильный сбор ID из сессий
+    const recentIds =[];
+    for (const session of historyData) {
+        if (session.items) recentIds.push(...session.items);
+        if (recentIds.length >= 50) break;
+    }
+    const recentIdsSlice = recentIds.slice(0, 50);
 
     let candidates = data.filter(item => {
-        // 1. Черный список и История (без изменений)
         if (blacklist.includes(item.id)) return false;
-        if (recentIds.includes(item.id)) return false;
+        if (recentIdsSlice.includes(item.id)) return false;
 
-        // 2. Интенсивность (без изменений)
         if (currentIntensity === 1) {
             if (item.tags.some(t => EXTREME_TAGS.includes(t) || SPICY_TAGS.includes(t))) return false;
         }
@@ -6215,13 +6269,11 @@ function filterData() {
             if (item.tags.some(t => EXTREME_TAGS.includes(t))) return false;
         }
 
-        // 3. Ориентация (без изменений)
         const isGay = item.tags.includes('gay');
-        const isTrans = item.tags.some(t => ['trans', 'shemale', 'futanari', 'crossdresser'].includes(t));
+        const isTrans = item.tags.some(t =>['trans', 'shemale', 'futanari', 'crossdresser'].includes(t));
         const isLesbian = item.tags.includes('lesbian');
         const isStraight = item.tags.includes('straight');
         const isBi = item.tags.includes('bi');
-        
         const isLgbtForHetero = isGay || isTrans || isBi; 
 
         if (currentOrientation === 'hetero') {
@@ -6233,16 +6285,11 @@ function filterData() {
         else if (currentOrientation === 'trans') {
             if (isStraight && !isTrans) return false;
         }
-
         return true;
     });
 
-    // Fallback: Если фильтры слишком жесткие, возвращаем хотя бы General контент
     if (candidates.length < 3) {
-        candidates = data.filter(item => 
-            !blacklist.includes(item.id) && 
-            item.tags.includes('general') // Показываем только General в случае нехватки
-        );
+        candidates = data.filter(item => !blacklist.includes(item.id) && item.tags.includes('general'));
     }
     
     return candidates;
@@ -7663,10 +7710,11 @@ function performExport() {
 
     if (expHist) {
         exportObj.data.history = historyData
-            .filter(h => h.timestamp >= finalStartTs && h.timestamp <= finalEndTs)
+            .filter(h => h.sessionId >= finalStartTs && h.sessionId <= finalEndTs)
             .map(h => ({
-                name_en: getName(h.id),
-                dateStr: new Date(h.timestamp).toISOString()
+                sessionDate: new Date(h.sessionId).toISOString(),
+                durationSeconds: h.durationSeconds,
+                items_en: h.items.map(getName).filter(x => x !== "Unknown")
             }));
 
         exportObj.data.watchTime = watchHistory
@@ -11498,13 +11546,25 @@ function calculateWatchTime() {
     let totalSeconds = diffInSeconds;
     
     if (existingIndex !== -1) {
-        // Разница между началом текущего просмотра и моментом записи прошлого (в миллисекундах)
+        // Разница между началом текущего просмотра и моментом записи прошлого
         const timeSinceLastWatch = currentSessionStart - watchHistory[existingIndex].timestamp;
         
         // Объединяем, только если с момента прошлого просмотра прошло меньше 2 минут (120 000 мс)
         if (timeSinceLastWatch <= 120000) {
             totalSeconds += watchHistory[existingIndex].seconds;
-            watchHistory.splice(existingIndex, 1); // Удаляем старую запись, так как объединяем
+            watchHistory.splice(existingIndex, 1); 
+        }
+    }
+
+    // --- ОБНОВЛЕНИЕ ДЛИТЕЛЬНОСТИ СЕССИИ  ---
+    if (historyData.length > 0) {
+        let lastSession = historyData[0];
+        if (now - lastSession.lastActive <= 30 * 60 * 1000) {
+            lastSession.lastActive = now;
+            if (lastSession.startTime) {
+                lastSession.durationSeconds = Math.floor((now - lastSession.startTime) / 1000);
+            }
+            localStorage.setItem(STORAGE.HISTORY, JSON.stringify(historyData));
         }
     }
 
@@ -11787,88 +11847,76 @@ function renderSwipesHistoryList() {
         return;
     }
 
-    historyData.forEach(entry => {
-        const item = data.find(x => x.id === entry.id);
-        if(!item) return;
-        
-        // 1. Форматирование даты и времени
-        const dateObj = new Date(entry.timestamp);
+    if (historyData.length > 0 && !historyData[0].sessionId) {
+        migrateHistoryToSessions();
+    }
+
+    historyData.forEach(session => {
+        const dateObj = new Date(session.sessionId || session.startTime);
         const now = new Date();
         const isToday = dateObj.toDateString() === now.toDateString();
         
-        // Время (ЧЧ:ММ)
         const timeStr = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        
-        // Дата (ДД.ММ), если не сегодня
-        let dateDisplay = "";
-        if (!isToday) {
-            const day = dateObj.getDate().toString().padStart(2, '0');
-            const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
-            dateDisplay = `${day}.${month}`;
-        } else {
-            dateDisplay = currentLang === 'ru' ? "Сегодня" : "Today";
+        let dateDisplay = isToday ? (currentLang === 'ru' ? "Сегодня" : "Today") : dateObj.toLocaleDateString([], {day: '2-digit', month: '2-digit'});
+
+        // Форматирование времени сессии
+        let durationStr = "—";
+        if (session.durationSeconds !== null && session.durationSeconds !== undefined && session.durationSeconds > 0) {
+            const m = Math.floor(session.durationSeconds / 60);
+            const s = session.durationSeconds % 60;
+            if (m > 0) durationStr = `${m}m`;
+            else durationStr = `${s}s`;
         }
 
-        // 2. Определение статуса (Иконка)
-        let statusIcon = '⚪'; // По умолчанию (пропуск)
-        let statusOpacity = '0.3'; // Для нейтрального статуса
-        let statusColor = 'var(--text-secondary)';
-
-        // Проверяем текущее состояние (Live status)
-        if (blacklist.includes(item.id)) {
-            statusIcon = '⛔'; // Дизлайк
-            statusOpacity = '1';
-            statusColor = 'var(--highlight-red)';
-        } 
-        else if (favorites.includes(item.id)) {
-            statusIcon = '💚'; // Лайк
-            statusOpacity = '1';
-            statusColor = 'var(--accent)';
-        } 
-        else if (watchLater.includes(item.id)) {
-            statusIcon = '⏰'; // WL
-            statusOpacity = '1';
-            statusColor = '#3498db';
-        } 
-        else {
-            // Проверка на просмотр (если нет в списках, но смотрел)
-            const isWatched = watchHistory.some(w => w.id === item.id);
-            if (isWatched) {
-                statusIcon = '👁️';
-                statusOpacity = '0.8';
-                statusColor = 'var(--text-main)';
+        // Рендер капсул
+        let capsulesHtml = '';
+        const maxVisible = 2; 
+        for (let i = 0; i < session.items.length; i++) {
+            if (i < maxVisible) {
+                const item = data.find(x => x.id === session.items[i]);
+                if (item) {
+                    capsulesHtml += `<div class="session-capsule" style="z-index: ${10 - i};">${getLocalizedName(item)}</div>`;
+                }
+            } else {
+                const moreCount = session.items.length - maxVisible;
+                capsulesHtml += `<div class="session-capsule-more">+${moreCount}</div>`;
+                break;
             }
         }
 
         const div = document.createElement('div');
         div.className = 'ios-row clickable';
-        div.style.padding = '10px 20px'; 
-        
-        const name = getLocalizedName(item);
+        div.style.padding = '12px 16px'; 
+        div.style.display = 'flex';
+        div.style.alignItems = 'center';
+        div.style.justifyContent = 'space-between';
+        div.style.gap = '10px';
 
         div.innerHTML = `
-            <div style="display:flex; flex-direction:column; gap:3px;">
-                <div style="font-weight:600; font-size:15px; color:var(--text-main);">${name}</div>
-                <div style="font-size:11px; color:var(--text-secondary);">
-                    ${dateDisplay}, ${timeStr}
-                </div>
+            <div style="display:flex; flex-direction:column; flex-shrink:0; min-width:50px;">
+                <span style="font-weight:700; font-size:13px; color:var(--text-main);">${dateDisplay}</span>
+                <span style="font-size:11px; color:var(--text-secondary);">${timeStr}</span>
             </div>
             
-            <div style="display:flex; align-items:center; gap:15px;">
-                <!-- Иконка статуса -->
-                <div style="font-size:16px; opacity:${statusOpacity}; color:${statusColor};" title="Status">
-                    ${statusIcon}
-                </div>
-                
-                <!-- Кнопка повтора -->
-                <div style="color:var(--accent); font-size:20px; opacity:0.8;">↺</div>
+            <div class="session-items-overlap" style="flex-grow:1; overflow:hidden; display:flex; justify-content:flex-start; padding-left:5px;">
+                ${capsulesHtml}
+            </div>
+            
+            <div style="display:flex; flex-direction:column; align-items:flex-end; flex-shrink:0; min-width:40px;">
+                <span style="font-weight:800; font-size:14px; color:var(--accent);">${durationStr}</span>
+                <span style="font-size:10px; color:var(--text-secondary); text-transform:uppercase;">${t.act_time || 'Time'}</span>
             </div>
         `;
         
         div.onclick = () => { 
-            closeHistoryModal(null, true);
-            switchTab('home'); 
-            forceShowResult(item, 'history'); 
+            if (session.items.length > 0) {
+                const item = data.find(x => x.id === session.items[0]); // Показываем самый свежий фетиш из этой сессии
+                if (item) {
+                    closeHistoryModal(null, true);
+                    switchTab('home'); 
+                    forceShowResult(item, 'history'); 
+                }
+            }
         };
         list.appendChild(div);
     });
@@ -15695,6 +15743,36 @@ function deleteCustomSite(id, e) {
     if (window.isUserLoggedIn && window.syncToCloud) {
         window.syncToCloud(true);
     }
+}
+
+function migrateHistoryToSessions() {
+    if (!historyData || historyData.length === 0) return;
+    if (historyData[0].sessionId) return; // Уже мигрировано
+
+    const oldHistory = [...historyData];
+    const newHistory =[];
+    
+    oldHistory.reverse().forEach(entry => {
+        let lastSession = newHistory.length > 0 ? newHistory[0] : null;
+        
+        if (!lastSession || (entry.timestamp - lastSession.lastActive > 30 * 60 * 1000)) {
+            newHistory.unshift({
+                sessionId: entry.timestamp,
+                startTime: entry.timestamp,
+                lastActive: entry.timestamp,
+                durationSeconds: null, // null означает, что это старые данные без точного времени
+                items:[entry.id]
+            });
+        } else {
+            lastSession.lastActive = entry.timestamp;
+            if (!lastSession.items.includes(entry.id)) {
+                lastSession.items.unshift(entry.id);
+            }
+        }
+    });
+    
+    historyData = newHistory;
+    localStorage.setItem(STORAGE.HISTORY, JSON.stringify(historyData));
 }
 
 // === PWA PRIVACY PROTECTION ===
