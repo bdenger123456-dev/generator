@@ -11487,7 +11487,10 @@ function calculateWatchTime() {
     const now = Date.now();
     const diffInSeconds = Math.floor((now - watchStartTime) / 1000);
     
+    // Запоминаем время начала текущего просмотра перед тем, как сбросить переменную
+    const currentSessionStart = watchStartTime;
     watchStartTime = 0; 
+    
     if (diffInSeconds < 5) return;
 
     // --- ЛОГИКА ОБЪЕДИНЕНИЯ ПРОСМОТРОВ ---
@@ -11495,8 +11498,14 @@ function calculateWatchTime() {
     let totalSeconds = diffInSeconds;
     
     if (existingIndex !== -1) {
-        totalSeconds += watchHistory[existingIndex].seconds;
-        watchHistory.splice(existingIndex, 1);
+        // Разница между началом текущего просмотра и моментом записи прошлого (в миллисекундах)
+        const timeSinceLastWatch = currentSessionStart - watchHistory[existingIndex].timestamp;
+        
+        // Объединяем, только если с момента прошлого просмотра прошло меньше 2 минут (120 000 мс)
+        if (timeSinceLastWatch <= 120000) {
+            totalSeconds += watchHistory[existingIndex].seconds;
+            watchHistory.splice(existingIndex, 1); // Удаляем старую запись, так как объединяем
+        }
     }
 
     let timeString = "";
@@ -11535,7 +11544,7 @@ function calculateWatchTime() {
     if (totalSeconds > 1800) phraseTemplate = (currentLang === 'ru') ? "Долгое погружение... 🌊" : "Deep dive... 🌊";
     else if (totalSeconds < 40) phraseTemplate = t.return_phrase_short || "Only {t}...";
     else {
-        const phrases = t.return_phrases || ["{t} passed."];
+        const phrases = t.return_phrases ||["{t} passed."];
         phraseTemplate = phrases[Math.floor(Math.random() * phrases.length)];
     }
     
