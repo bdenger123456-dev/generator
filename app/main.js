@@ -11949,36 +11949,57 @@ function renderWatchHistoryList() {
     }
 
     watchHistory.forEach(entry => {
-        const item = data.find(x => x.id === entry.id);
-        if(!item) return;
+        let displayName = "Unknown";
+        let isDirect = entry.id === 'direct_platform_visit';
+        let item = null;
+
+        if (isDirect) {
+            // Если это прямой визит — берем имя сайта, которое мы сохранили
+            const prefix = (currentLang === 'ru') ? 'Сайт: ' : (currentLang === 'es' ? 'Sitio: ' : 'Site: ');
+            displayName = prefix + (entry.siteName || "Platform");
+        } else {
+            // Обычный фетиш
+            item = data.find(x => x.id === entry.id);
+            if (!item) return;
+            displayName = getLocalizedName(item);
+        }
 
         const div = document.createElement('div');
         div.className = 'ios-row clickable';
         div.style.padding = '12px 20px';
 
-        const name = getLocalizedName(item);
         const d = new Date(entry.timestamp);
         const dateStr = d.toLocaleDateString() === new Date().toLocaleDateString() 
             ? d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) 
             : d.toLocaleDateString([], {day:'numeric', month:'numeric'}) + ' ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
-        const siteDisplay = entry.siteName ? ` • <span style="color:var(--accent); font-weight:700;">${entry.siteName}</span>` : '';
+        // Если это не прямой визит, показываем на каком сайте смотрели (маленькая подпись)
+        const siteDisplay = (!isDirect && entry.siteName) ? ` • <span style="color:var(--accent); font-weight:700;">${entry.siteName}</span>` : '';
 
         div.innerHTML = `
-            <div style="display:flex; flex-direction:column; gap:4px;">
-                <div style="font-weight:600;">${name}</div>
+            <div style="display:flex; flex-direction:column; gap:4px; max-width: 70%;">
+                <div style="font-weight:600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: ${isDirect ? 'var(--accent)' : 'var(--text-main)'};">
+                    ${displayName}
+                </div>
                 <div style="font-size:11px; color:var(--text-secondary);">${dateStr}${siteDisplay}</div>
             </div>
             <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px;">
                 <span style="font-weight:700; color:var(--text-main); font-size:15px;">${entry.durationStr}</span>
-                <span style="font-size:10px; color:var(--accent);">${t.hist_watched}</span>
+                <span style="font-size:10px; color:var(--accent); text-transform: uppercase;">${t.hist_watched || 'WATCHED'}</span>
             </div>
         `;
         
         div.onclick = () => {
             closeHistoryModal(null, true);
             switchTab('home');
-            forceShowResult(item, 'history');
+            
+            if (item) {
+                switchMainMode('fetishes');
+                forceShowResult(item, 'history');
+            } else {
+                // Если кликнули по сайту в истории — открываем режим платформ
+                switchMainMode('platforms');
+            }
         };
         
         list.appendChild(div);
@@ -15916,11 +15937,9 @@ function renderPlatformsMode() {
     });
 }
 
-// 3. ОТКРЫТИЕ САЙТА
 function openPlatformDirectly(site) {
     if (isPanicMode) return;
 
-    // Вытягиваем чистый домен из URL
     let baseUrl;
     try {
         const urlObj = new URL(site.url);
@@ -15929,24 +15948,21 @@ function openPlatformDirectly(site) {
         baseUrl = site.url.split('?')[0].replace('/search', '');
     }
 
-    // Сообщаем системе, куда мы идем
     window.currentWatchSite = {
         id: site.id,
         name: site.name
     };
     
-    // Запускаем таймер
     watchStartTime = Date.now();
     
-    // Создаем фейковый предмет для истории
+    // Сохраняем имя сайта прямо в объект просмотра
     itemBeingWatched = { 
-        id: 'direct_visit', 
-        name: 'Direct Visit' 
+        id: 'direct_platform_visit', 
+        name: site.name, 
+        isPlatform: true 
     };
     
     hasWatchedCurrentItem = true; 
-
-    // Открываем сайт
     window.open(baseUrl, '_blank');
 }
 
