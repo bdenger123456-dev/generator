@@ -15775,6 +15775,163 @@ function migrateHistoryToSessions() {
     localStorage.setItem(STORAGE.HISTORY, JSON.stringify(historyData));
 }
 
+let currentMainMode = 'fetishes'; 
+
+// 1. ПЕРЕКЛЮЧЕНИЕ РЕЖИМОВ
+function switchMainMode(mode) {
+    if (currentMainMode === mode) return;
+    currentMainMode = mode;
+
+    const fetishContainer = document.getElementById('fetish-mode-container');
+    const platformsContainer = document.getElementById('platforms-view-anchor');
+    
+    // Обновляем UI переключателей
+    const switchers = [document.getElementById('mode-switcher-pc'), document.getElementById('mode-switcher-mobile')];
+    switchers.forEach(sw => {
+        if (!sw) return;
+        const btns = sw.querySelectorAll('.m-switch-btn');
+        if (mode === 'platforms') {
+            sw.classList.add('platforms-active');
+            btns[0].classList.remove('active');
+            btns[1].classList.add('active');
+        } else {
+            sw.classList.remove('platforms-active');
+            btns[0].classList.add('active');
+            btns[1].classList.remove('active');
+        }
+    });
+
+    // Переключаем отображение главных блоков с принудительным !important
+    if (mode === 'platforms') {
+        // Жёстко скрываем фетиши, перебивая старые CSS-правила
+        if (fetishContainer) fetishContainer.style.setProperty('display', 'none', 'important');
+        // Показываем платформы (в виде сетки)
+        if (platformsContainer) platformsContainer.style.setProperty('display', 'grid', 'important');
+        
+        // Скрываем фразу над карточкой 
+        const statusEl = document.getElementById('status-text');
+        if(statusEl) statusEl.style.display = 'none';
+
+        renderPlatformsMode(); 
+    } else {
+        // Возвращаем фетиши
+        if (fetishContainer) fetishContainer.style.setProperty('display', 'flex', 'important');
+        // Скрываем платформы
+        if (platformsContainer) platformsContainer.style.setProperty('display', 'none', 'important');
+        
+        const statusEl = document.getElementById('status-text');
+        if(statusEl && !document.getElementById('mode-start-overlay')?.classList.contains('hidden')) {
+            statusEl.style.display = 'flex';
+        }
+    }
+}
+
+// 2. РЕНДЕР КАРТОЧЕК ПЛАТФОРМ
+function renderPlatformsMode() {
+    const container = document.getElementById('platforms-view-anchor');
+    container.innerHTML = '';
+    
+    // Собираем все сайты (системные + кастомные)
+    const allSites = [...SITES_DATA, ...customSites];
+    
+    // Подсчет статистики из истории (watchHistory)
+    const siteStats = {};
+    allSites.forEach(s => siteStats[s.id] = { visits: 0, seconds: 0 });
+    
+    watchHistory.forEach(w => {
+        if (w.siteId && siteStats[w.siteId]) {
+            siteStats[w.siteId].visits++;
+            siteStats[w.siteId].seconds += (parseInt(w.seconds) || 0);
+        }
+    });
+
+    // Сортировка: сначала те, где больше всего времени
+    allSites.sort((a, b) => siteStats[b.id].seconds - siteStats[a.id].seconds);
+
+    // Локализация текстов
+    const tVisits = currentLang === 'ru' ? 'Визиты' : (currentLang === 'es' ? 'Visitas' : (currentLang === 'de' ? 'Besuche' : 'Visits'));
+    const tMins = currentLang === 'ru' ? 'Мин' : (currentLang === 'es' ? 'Min' : (currentLang === 'de' ? 'Min' : 'Mins'));
+    const tWatch = currentLang === 'ru' ? 'Смотреть' : (currentLang === 'es' ? 'Ver' : (currentLang === 'de' ? 'Ansehen' : 'Watch'));
+
+    allSites.forEach(site => {
+        const stats = siteStats[site.id];
+        const minutes = Math.floor(stats.seconds / 60);
+        
+        // Берем первую букву для иконки
+        const initial = site.name.charAt(0).toUpperCase();
+        
+        // Теги (до 3 штук)
+        const tagsHtml = site.tags ? site.tags.slice(0, 3).map(tag => `<div class="p-card-badge">${tag}</div>`).join('') : '';
+
+        const card = document.createElement('div');
+        card.className = 'p-card-vertical';
+
+        card.innerHTML = `
+            <div class="p-card-avatar">${initial}</div>
+            <div class="p-card-title">${site.name}</div>
+            <div class="p-card-tags-row">${tagsHtml}</div>
+            
+            <div class="p-card-stats">
+                <div class="p-stat-box">
+                    <div class="p-stat-val">${stats.visits}</div>
+                    <div class="p-stat-lbl">${tVisits}</div>
+                </div>
+                <div class="p-stat-box">
+                    <div class="p-stat-val" style="color: var(--accent);">${minutes}</div>
+                    <div class="p-stat-lbl">${tMins}</div>
+                </div>
+            </div>
+
+            <!-- Кнопка перехода -->
+            <button class="p-card-btn">${tWatch}</button>
+        `;
+        
+        // Вешаем событие именно на кнопку (и на логотип для удобства)
+        const btn = card.querySelector('.p-card-btn');
+        const avatar = card.querySelector('.p-card-avatar');
+        
+        btn.onclick = () => openPlatformDirectly(site);
+        avatar.onclick = () => openPlatformDirectly(site);
+        avatar.style.cursor = 'pointer';
+
+        container.appendChild(card);
+    });
+}
+
+// 3. ОТКРЫТИЕ САЙТА
+function openPlatformDirectly(site) {
+    if (isPanicMode) return;
+
+    // Вытягиваем чистый домен из URL
+    let baseUrl;
+    try {
+        const urlObj = new URL(site.url);
+        baseUrl = urlObj.origin;
+    } catch(e) {
+        baseUrl = site.url.split('?')[0].replace('/search', '');
+    }
+
+    // Сообщаем системе, куда мы идем
+    window.currentWatchSite = {
+        id: site.id,
+        name: site.name
+    };
+    
+    // Запускаем таймер
+    watchStartTime = Date.now();
+    
+    // Создаем фейковый предмет для истории
+    itemBeingWatched = { 
+        id: 'direct_visit', 
+        name: 'Direct Visit' 
+    };
+    
+    hasWatchedCurrentItem = true; 
+
+    // Открываем сайт
+    window.open(baseUrl, '_blank');
+}
+
 // === PWA PRIVACY PROTECTION ===
 (function() {
     const privacyScreen = document.getElementById('pwa-privacy-screen');

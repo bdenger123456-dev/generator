@@ -214,6 +214,13 @@
         <!-- Подзаголовок -->
         <div class="subtitle" data-key="subtitle">Your home for adult preferences</div>
 
+        <!-- === ПЕРЕКЛЮЧАТЕЛЬ ДЛЯ ПК === -->
+        <div class="main-mode-switcher pc-only" id="mode-switcher-pc">
+            <div class="m-switch-bg"></div>
+            <div class="m-switch-btn active" onclick="switchMainMode('fetishes')">Fetishes</div>
+            <div class="m-switch-btn" onclick="switchMainMode('platforms')">Platforms</div>
+        </div>
+
         <div id="pc-settings-mount"></div>
     </div>
 
@@ -233,7 +240,15 @@
 
             <!-- TAB 1: HOME -->
             <div id="tab-home" class="tab-content active">
-                <div class="center-wrapper">
+                
+                <!-- === ПЕРЕКЛЮЧАТЕЛЬ ДЛЯ МОБИЛЬНЫХ === -->
+                <div class="main-mode-switcher mobile-only" id="mode-switcher-mobile">
+                    <div class="m-switch-bg"></div>
+                    <div class="m-switch-btn active" onclick="switchMainMode('fetishes')">Fetishes</div>
+                    <div class="m-switch-btn" onclick="switchMainMode('platforms')">Platforms</div>
+                </div>
+
+                <div class="center-wrapper" id="fetish-mode-container">
 
                     <!-- ЯКОРЬ -->
                     <div id="card-anchor" style="position: relative; width: 100%; display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: visible;">
@@ -407,6 +422,12 @@
                         </div> <!-- Конец #card-anim-wrapper -->
                     </div>
                 </div>
+
+                <!-- === НОВЫЙ КОНТЕЙНЕР ДЛЯ СЕТКИ ПЛАТФОРМ === -->
+                <div id="platforms-view-anchor" class="platforms-grid" style="display: none;">
+                    <!-- Карточки будут генерироваться через JS -->
+                </div>
+
             </div>
 
             <!-- TAB 2: SETTINGS -->
