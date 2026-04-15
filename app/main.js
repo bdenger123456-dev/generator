@@ -1070,6 +1070,10 @@ const langData = {
             </div>
         `,
 
+        mode_fetishes: "Fetishes",
+        mode_platforms: "Platforms",
+        add_site_step_2: "Search for the word <b>test</b> (Optional if you only need the Platforms mode).",
+
         // 1. ALGORITHM
         tip_algo_title: "How the Algorithm Works",
         tip_algo_desc: "Training xFetishHub secrets",
@@ -1903,6 +1907,10 @@ const langData = {
             </div>
         `,
 
+        mode_fetishes: "Фетиши",
+        mode_platforms: "Платформы",
+        add_site_step_2: "В поиске напиши слово <b>test</b> (Необязательно, если сайт нужен только для режима Платформ).",
+
         // 1. АЛГОРИТМ
         tip_algo_title: "Как работает умная лента",
         tip_algo_desc: "Секреты обучения xFetishHub",
@@ -2731,6 +2739,10 @@ const langData = {
             </div>
         `,
 
+        mode_fetishes: "Fetiches",
+        mode_platforms: "Plataformas",
+        add_site_step_2: "Busque la palabra <b>test</b> (Opcional si solo necesita el modo Plataformas).",
+
         tip_algo_title: "Cómo funciona el Algoritmo",
         tip_algo_desc: "Secretos de xFetishHub",
         tip_algo_text: `
@@ -3542,6 +3554,10 @@ const langData = {
                 Warum nicht Pornhub? Es zeigt in der App oft einen schwarzen Bildschirm. Seiten wie SpankBang nerven mit Altersprüfung. Spar dir die Nerven: Starte mit xHamster, probiere andere nur bei Langeweile.
             </div>
         `,
+
+        mode_fetishes: "Fetische",
+        mode_platforms: "Plattformen",
+        add_site_step_2: "Suchen Sie nach dem Wort <b>test</b> (Optional, wenn Sie nur den Plattform-Modus benötigen).",
 
         tip_algo_title: "Wie der Algorithmus funktioniert",
         tip_algo_desc: "Training von xFetishHub",
@@ -15689,18 +15705,15 @@ function saveCustomSite() {
     const desc = document.getElementById('custom-site-desc').value.trim();
 
     if (!name || !url) {
-        alert("Please fill Name and URL!");
+        alert(currentLang === 'ru' ? "Пожалуйста, заполните Название и Ссылку!" : "Please fill Name and URL!");
         return;
     }
 
+    // Если пользователь ввел 'test', заменяем его на '{q}' для умного поиска в генераторе.
+    // Если слова 'test' нет — просто оставляем прямую ссылку как есть.
     if (url.toLowerCase().includes('test')) {
         url = url.replace(/test/i, '{q}');
-    } else {
-        alert(currentLang === 'ru' ? 
-            "Ссылка должна содержать слово 'test' в месте запроса!" : 
-            "URL must contain 'test' as the search query!");
-        return;
-    }
+    } 
 
     const newSite = {
         id: 'custom_' + Date.now(),
@@ -15717,6 +15730,11 @@ function saveCustomSite() {
 
     closeAddSiteModal(null, true);
     renderSitesList();
+
+    // Обновляем сетку платформ, если мы сейчас находимся в этом режиме
+    if (typeof currentMainMode !== 'undefined' && currentMainMode === 'platforms') {
+        renderPlatformsMode();
+    }
 
     // --- Синхронизация с облаком ---
     if (window.isUserLoggedIn && window.syncToCloud) {
