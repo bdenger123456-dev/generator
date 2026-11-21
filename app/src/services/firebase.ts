@@ -1,11 +1,24 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+// @ts-nocheck
+import type { WatchHistoryEntry, ActivityLogEntry } from "../types";
+
+declare const langData: any;
+declare const currentLang: string;
+declare const earlySponsors: any[];
+declare let subscriptionLevel: string;
+declare function applyLanguage(): void;
+declare function updateCounts(): void;
+declare function renderHistory(): void;
+declare function updateActionButtons(): void;
+declare function checkSubscriptionExpiry(): void;
+
+import { initializeApp } from "firebase/app";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, type User } from "firebase/auth";
 import { 
     getFirestore, doc, setDoc, addDoc, getDoc, getDocs, updateDoc, 
     serverTimestamp, writeBatch, query, where, collection, 
     deleteField, Timestamp, limit, orderBy, 
     initializeFirestore, persistentLocalCache, getCountFromServer, persistentMultipleTabManager
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+} from "firebase/firestore";
 
 const firebaseConfig = {
     apiKey: "AIzaSyC94QWRaFu0o60kDSU8Uz0VJAcXwaDWjlI",

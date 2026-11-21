@@ -37,132 +37,132 @@ const BASE_PRICES = {
 
 const TAG_ICONS = {
 
-    'general': ['deco9.png'], 
+    'general': ['assets/images/deco/deco9.png'], 
 
     // 1. ANAL & ASS (Самые частые)
-    'anal': ['anal1.png', 'anal2.png', 'anal3.png'],
-    'ass': ['anal1.png', 'anal2.png'],
-    'booty': ['anal1.png', 'anal2.png'],
-    'big-ass': ['anal1.png', 'anal2.png'],
+    'anal': ['assets/images/categories/anal1.png', 'assets/images/categories/anal2.png', 'assets/images/categories/anal3.png'],
+    'ass': ['assets/images/categories/anal1.png', 'assets/images/categories/anal2.png'],
+    'booty': ['assets/images/categories/anal1.png', 'assets/images/categories/anal2.png'],
+    'big-ass': ['assets/images/categories/anal1.png', 'assets/images/categories/anal2.png'],
 
     // 2. BREASTS (Грудь)
-    'big-tits': ['tits1.png', 'tits2.png'],
-    'boobs': ['tits1.png', 'tits2.png'],
-    'breasts': ['tits1.png', 'tits2.png'],
-    'tit-fucking': ['tits1.png', 'tits2.png'],
+    'big-tits': ['assets/images/categories/tits1.png', 'assets/images/categories/tits2.png'],
+    'boobs': ['assets/images/categories/tits1.png', 'assets/images/categories/tits2.png'],
+    'breasts': ['assets/images/categories/tits1.png', 'assets/images/categories/tits2.png'],
+    'tit-fucking': ['assets/images/categories/tits1.png', 'assets/images/categories/tits2.png'],
 
     // 3. BDSM & ROUGH (Жесткое)
-    'bdsm': ['bdsm1.png', 'bdsm2.png'],
-    'bondage': ['bondage1.png', 'bondage2.png'],
-    'rough': ['bdsm1.png', 'bdsm2.png'],
-    'submission': ['bdsm1.png', 'bondage1.png'],
-    'domination': ['bdsm2.png'],
+    'bdsm': ['assets/images/categories/bdsm1.png', 'assets/images/categories/bdsm2.png'],
+    'bondage': ['assets/images/categories/bondage1.png', 'assets/images/categories/bondage2.png'],
+    'rough': ['assets/images/categories/bdsm1.png', 'assets/images/categories/bdsm2.png'],
+    'submission': ['assets/images/categories/bdsm1.png', 'assets/images/categories/bondage1.png'],
+    'domination': ['assets/images/categories/bdsm2.png'],
 
     // 4. ORAL (Оральный)
-    'oral': ['oral1.png', 'oral2.png'],
-    'blowjob': ['oral1.png', 'oral2.png'],
-    'deepthroat': ['oral1.png', 'oral2.png'],
-    'licking': ['oral2.png'],
+    'oral': ['assets/images/categories/oral1.png', 'assets/images/categories/oral2.png'],
+    'blowjob': ['assets/images/categories/oral1.png', 'assets/images/categories/oral2.png'],
+    'deepthroat': ['assets/images/categories/oral1.png', 'assets/images/categories/oral2.png'],
+    'licking': ['assets/images/categories/oral2.png'],
 
     // 5. CUM (Финал)
-    'cum': ['cum1.png', 'cum2.png'],
-    'creampie': ['cum1.png', 'cum2.png'],
-    'cumshot': ['cum1.png', 'cum2.png'],
-    'facial': ['cum1.png'],
+    'cum': ['assets/images/categories/cum1.png', 'assets/images/categories/cum2.png'],
+    'creampie': ['assets/images/categories/cum1.png', 'assets/images/categories/cum2.png'],
+    'cumshot': ['assets/images/categories/cum1.png', 'assets/images/categories/cum2.png'],
+    'facial': ['assets/images/categories/cum1.png'],
 
     // 6. FEET (Ноги)
-    'foot-fetish': ['feet1.png', 'feet2.png'],
-    'feet': ['feet1.png', 'feet2.png'],
-    'foot-worship': ['feet1.png', 'feet2.png'],
+    'foot-fetish': ['assets/images/categories/feet1.png', 'assets/images/categories/feet2.png'],
+    'feet': ['assets/images/categories/feet1.png', 'assets/images/categories/feet2.png'],
+    'foot-worship': ['assets/images/categories/feet1.png', 'assets/images/categories/feet2.png'],
 
     // 7. GROUP (Групповое)
-    'group': ['group1.png', 'group2.png', 'group3.png'],
-    'threesome': ['group1.png', 'group2.png'],
-    'gangbang': ['group3.png'],
-    'orgy': ['group3.png'],
+    'group': ['assets/images/categories/group1.png', 'assets/images/categories/group2.png', 'assets/images/categories/group3.png'],
+    'threesome': ['assets/images/categories/group1.png', 'assets/images/categories/group2.png'],
+    'gangbang': ['assets/images/categories/group3.png'],
+    'orgy': ['assets/images/categories/group3.png'],
 
     // 8. LESBIAN (Лесби)
-    'lesbian': ['lesbian1.png', 'lesbian2.png'],
-    'tribadism': ['lesbian1.png', 'lesbian2.png'],
+    'lesbian': ['assets/images/categories/lesbian1.png', 'assets/images/categories/lesbian2.png'],
+    'tribadism': ['assets/images/categories/lesbian1.png', 'assets/images/categories/lesbian2.png'],
     'scissoring': ['lesbian3.png'],
 
     // 9. MILF (Зрелые)
-    'milf': ['milf1.png', 'milf2.png'],
-    'mature': ['milf1.png', 'milf2.png'],
-    'mom': ['milf1.png'],
+    'milf': ['assets/images/categories/milf1.png', 'assets/images/categories/milf2.png'],
+    'mature': ['assets/images/categories/milf1.png', 'assets/images/categories/milf2.png'],
+    'mom': ['assets/images/categories/milf1.png'],
 
-    'body-part': ['body1.png'],  
-    'hentai': ['hentai1.png'],
+    'body-part': ['assets/images/categories/body1.png'],  
+    'hentai': ['assets/images/categories/hentai1.png'],
 
     // 10. SOLO (Соло)
-    'masturbation': ['solo1.png', 'solo2.png'],
-    'solo': ['solo1.png', 'solo2.png'],
-    'fingering': ['solo1.png', 'solo2.png'],
+    'masturbation': ['assets/images/categories/solo1.png', 'assets/images/categories/solo2.png'],
+    'solo': ['assets/images/categories/solo1.png', 'assets/images/categories/solo2.png'],
+    'fingering': ['assets/images/categories/solo1.png', 'assets/images/categories/solo2.png'],
 
     // 11. PUBLIC/OUTDOOR (Улица)
-    'public': ['public1.png', 'public2.png'],
-    'outdoor': ['public1.png', 'public2.png'],
-    'risky': ['public1.png'],
+    'public': ['assets/images/categories/public1.png', 'assets/images/categories/public2.png'],
+    'outdoor': ['assets/images/categories/public1.png', 'assets/images/categories/public2.png'],
+    'risky': ['assets/images/categories/public1.png'],
 
     // 12. ROLEPLAY/UNIFORM (Ролевые)
-    'roleplay': ['roleplay1.png', 'roleplay2.png'],
-    'uniform': ['roleplay1.png', 'roleplay2.png'],
-    'maid': ['roleplay1.png'],
-    'nurse': ['roleplay2.png'],
-    'teacher': ['roleplay2.png'],
+    'roleplay': ['assets/images/categories/roleplay1.png', 'assets/images/categories/roleplay2.png'],
+    'uniform': ['assets/images/categories/roleplay1.png', 'assets/images/categories/roleplay2.png'],
+    'maid': ['assets/images/categories/roleplay1.png'],
+    'nurse': ['assets/images/categories/roleplay2.png'],
+    'teacher': ['assets/images/categories/roleplay2.png'],
 
     // 13. TOYS (Игрушки)
-    'toys': ['toys1.png', 'toys2.png'],
-    'dildo': ['toys1.png', 'toys2.png'],
-    'vibrator': ['toys1.png'],
+    'toys': ['assets/images/categories/toys1.png', 'assets/images/categories/toys2.png'],
+    'dildo': ['assets/images/categories/toys1.png', 'assets/images/categories/toys2.png'],
+    'vibrator': ['assets/images/categories/toys1.png'],
 
     // 14. YOUNG/SCHOOL (Молодые)
-    'schoolgirl': ['young1.png', 'young2.png'],
-    'teen': ['young1.png', 'young2.png'],
-    'student': ['young1.png'],
+    'schoolgirl': ['assets/images/categories/young1.png', 'assets/images/categories/young2.png'],
+    'teen': ['assets/images/categories/young1.png', 'assets/images/categories/young2.png'],
+    'student': ['assets/images/categories/young1.png'],
 
     // 15. TRANS (Транс)
-    'trans': ['trans1.png', 'trans2.png', 'trans3.png'],
-    'shemale': ['trans1.png', 'trans2.png'],
-    'ladyboy': ['trans3.png'],
+    'trans': ['assets/images/categories/trans1.png', 'assets/images/categories/trans2.png', 'assets/images/categories/trans3.png'],
+    'shemale': ['assets/images/categories/trans1.png', 'assets/images/categories/trans2.png'],
+    'ladyboy': ['assets/images/categories/trans3.png'],
 
     // 16. INTERRACIAL (Межрасовое)
-    'interracial': ['interracial1.png'],
-    'bbc': ['interracial1.png'],
-    'ebony': ['interracial1.png'],
+    'interracial': ['assets/images/categories/interracial1.png'],
+    'bbc': ['assets/images/categories/interracial1.png'],
+    'ebony': ['assets/images/categories/interracial1.png'],
 
     // 17. BBW (Пышки)
-    'bbw': ['bbw1.png'],
-    'fat': ['bbw1.png'],
-    'chubby': ['bbw1.png'],
+    'bbw': ['assets/images/categories/bbw1.png'],
+    'fat': ['assets/images/categories/bbw1.png'],
+    'chubby': ['assets/images/categories/bbw1.png'],
 
     // 18. LEGS/STOCKINGS (Чулки/Ноги)
-    'stockings': ['legs1.png', 'legs2.png'],
-    'legs': ['legs1.png', 'legs2.png'],
-    'pantyhose': ['legs1.png', 'legs2.png'],
-    'high-heels': ['legs2.png'],
+    'stockings': ['assets/images/categories/legs1.png', 'assets/images/categories/legs2.png'],
+    'legs': ['assets/images/categories/legs1.png', 'assets/images/categories/legs2.png'],
+    'pantyhose': ['assets/images/categories/legs1.png', 'assets/images/categories/legs2.png'],
+    'high-heels': ['assets/images/categories/legs2.png'],
 
     // 19. HARDCORE (Жесть)
-    'hardcore': ['hardcore1.png'],
-    'extreme': ['hardcore1.png'],
-    'rough-sex': ['hardcore1.png'],
+    'hardcore': ['assets/images/categories/hardcore1.png'],
+    'extreme': ['assets/images/categories/hardcore1.png'],
+    'rough-sex': ['assets/images/categories/hardcore1.png'],
 
     // 20. ROMANCE (Романтика)
-    'romance': ['romantic1.png', 'romantic2.png'],
-    'passionate': ['romantic1.png', 'romantic2.png'],
-    'kissing': ['romantic1.png']
+    'romance': ['assets/images/categories/romantic1.png', 'assets/images/categories/romantic2.png'],
+    'passionate': ['assets/images/categories/romantic1.png', 'assets/images/categories/romantic2.png'],
+    'kissing': ['assets/images/categories/romantic1.png']
 };
 
 const NEUTRAL_DECOS = [
-    'deco1.png', 'deco2.png', 'deco3.png', 'deco4.png', 'deco5.png',
-    'deco6.png', 'deco7.png', 'deco9.png', 'deco10.png', 'deco11.png'
+    'deco1.png', 'deco2.png', 'assets/images/deco/deco3.png', 'assets/images/deco/deco4.png', 'assets/images/deco/deco5.png',
+    'assets/images/deco/deco6.png', 'deco7.png', 'assets/images/deco/deco9.png', 'assets/images/deco/deco10.png', 'deco11.png'
 ];
 
 // ОБНОВЛЕННЫЙ МАССИВ ДАННЫХ
 const EXPLORED_GROUPS = [
     { 
         id: 'general', iconTag: 'general', tags: ['general', 'specific', 'softcore', 'vanilla', 'romantic', 'sensual'],
-        achIcon: 'ach_general.png', appIcon: 'icon_app_general.png', rewardDays: 30,
+        achIcon: 'assets/images/achievements/ach_general.png', appIcon: 'assets/images/categories/icon_app_general.png', rewardDays: 30,
         desc_en: "The absolute entire database of fetishes that we managed to find 😈.",
         desc_ru: "Абсолютно вся база фетишей, которую удалось найти 😈.",
         desc_es: "Toda la base de datos de fetiches que logramos encontrar 😈.",
@@ -170,7 +170,7 @@ const EXPLORED_GROUPS = [
     },
     { 
         id: 'solo', iconTag: 'solo', tags: ['solo', 'masturbation', 'fingering', 'autofellatio', 'handjob', 'hands', 'suck-off'],
-        achIcon: 'ach_solo.png',
+        achIcon: 'assets/images/achievements/ach_solo.png',
         desc_en: "Focus on the individual. Intimate moments alone.",
         desc_ru: "Фокус на одном человеке. Интимные моменты наедине с собой.",
         desc_es: "Enfoque en el individuo. Momentos íntimos a solas.",
@@ -178,7 +178,7 @@ const EXPLORED_GROUPS = [
     },
     { 
         id: 'anal', iconTag: 'anal', tags: ['anal', 'ass', 'booty', 'gap', 'rimming', 'prostate-massage', 'anal-training', 'asshole', 'fisting', 'gaping', 'pegging'],
-        achIcon: 'ach_anal.png',
+        achIcon: 'assets/images/achievements/ach_anal.png',
         desc_en: "Exploring the backdoor. From soft rimming to hardcore fisting.",
         desc_ru: "Исследование черного хода. От нежного римминга до жесткого фистинга.",
         desc_es: "Explorando la puerta trasera. Desde rimming suave hasta fisting duro.",
@@ -186,7 +186,7 @@ const EXPLORED_GROUPS = [
     },
     { 
         id: 'breasts', iconTag: 'big-tits', tags: ['tits', 'big-tits', 'small-tits', 'nipples', 'lactation', 'breast-expansion', 'tit-fucking', 'breastfeeding'],
-        achIcon: 'ach_breasts.png',
+        achIcon: 'assets/images/achievements/ach_breasts.png',
         desc_en: "Worship of the chest. Size, shape, and lactation play.",
         desc_ru: "Поклонение груди. Размер, форма и игры с лактацией.",
         desc_es: "Adoración del pecho. Tamaño, forma y juegos de lactancia.",
@@ -194,7 +194,7 @@ const EXPLORED_GROUPS = [
     },
     { 
         id: 'oral', iconTag: 'oral', tags: ['oral', 'blowjob', 'cunnilingus', 'deepthroat', 'face-fucking', 'spitting', 'gagging', 'throat', 'licking', 'tongue'],
-        achIcon: 'ach_oral.png',
+        achIcon: 'assets/images/achievements/ach_oral.png',
         desc_en: "The art of oral pleasure. Skillful tongue and throat work.",
         desc_ru: "Искусство орального удовольствия. Мастерская работа языком и горлом.",
         desc_es: "El arte del placer oral. Trabajo hábil de lengua y garganta.",
@@ -202,8 +202,8 @@ const EXPLORED_GROUPS = [
     },
     { 
         id: 'hardcore', iconTag: 'bdsm', tags: ['hardcore', 'bdsm', 'kinky', 'rough', 'pain', 'choking', 'bondage', 'rope', 'slave', 'domination', 'submission', 'spanking', 'whip', 'torture', 'humiliation', 'femdom', 'cbt'],
-        achIcon: 'ach_hardcore.png',
-        appIcon: 'icon_app_bdsm.png',
+        achIcon: 'assets/images/achievements/ach_hardcore.png',
+        appIcon: 'assets/images/categories/icon_app_bdsm.png',
         rewardDays: 7,
         desc_en: "Power exchange and intensity. Pain, control, and submission.",
         desc_ru: "Обмен властью и интенсивность. Боль, контроль и подчинение.",
@@ -212,8 +212,8 @@ const EXPLORED_GROUPS = [
     },
     { 
         id: 'lgbt', iconTag: 'lesbian', tags: ['gay', 'lesbian', 'trans', 'bi', 'shemale', 'futanari', 'crossdresser', 't4t', 'ladyboy', 'sissy', 'trap', 'yuri', 'yaoi'],
-        achIcon: 'ach_lgbt.png',
-        appIcon: 'icon_app_lgbt.png', // Иконка ЛГБТ
+        achIcon: 'assets/images/achievements/ach_lgbt.png',
+        appIcon: 'assets/images/categories/icon_app_lgbt.png', // Иконка ЛГБТ
         desc_en: "Spectrum of sexuality. Same-sex and trans experiences.",
         desc_ru: "Спектр сексуальности. Однополые отношения и транс-опыт.",
         desc_es: "Espectro de la sexualidad. Experiencias del mismo sexo y trans.",
@@ -221,7 +221,7 @@ const EXPLORED_GROUPS = [
     },
     { 
         id: 'group', iconTag: 'group', tags: ['group', 'threesome', 'gangbang', 'orgy', 'cuckold', 'sharing', 'swingers', 'double-penetration', 'bukkake'],
-        achIcon: 'ach_group.png',
+        achIcon: 'assets/images/achievements/ach_group.png',
         desc_en: "The more the merrier. Multiple partners and shared pleasure.",
         desc_ru: "Чем больше, тем веселее. Множество партнеров и общее удовольствие.",
         desc_es: "Cuantos más, mejor. Múltiples parejas y placer compartido.",
@@ -229,8 +229,8 @@ const EXPLORED_GROUPS = [
     },
     { 
         id: 'feet', iconTag: 'feet', tags: ['feet', 'foot-fetish', 'legs', 'toes', 'stockings', 'shoes', 'boots', 'socks', 'pantyhose', 'high-heels', 'soles'],
-        achIcon: 'ach_feet.png',
-        appIcon: 'icon_app_feet.png', // Иконка Ноги
+        achIcon: 'assets/images/achievements/ach_feet.png',
+        appIcon: 'assets/images/categories/icon_app_feet.png', // Иконка Ноги
         desc_en: "From toes to thighs. Appreciation of feet, legs, and footwear.",
         desc_ru: "От пальчиков до бедер. Обожание ног, ступней и обуви.",
         desc_es: "De los dedos a los muslos. Apreciación de pies, piernas y calzado.",
@@ -238,8 +238,8 @@ const EXPLORED_GROUPS = [
     },
     { 
         id: 'roleplay', iconTag: 'roleplay', tags: ['roleplay', 'uniform', 'costume', 'teacher', 'nurse', 'cosplay', 'maid', 'cheerleader', 'police', 'military', 'office', 'secretary'],
-        achIcon: 'ach_roleplay.png',
-        appIcon: 'icon_app_roleplay.png', // Иконка Ролплей
+        achIcon: 'assets/images/achievements/ach_roleplay.png',
+        appIcon: 'assets/images/categories/icon_app_roleplay.png', // Иконка Ролплей
         rewardDays: 3,
         desc_en: "Acting out fantasies. Uniforms, costumes, and scenarios.",
         desc_ru: "Воплощение фантазий. Униформа, костюмы и сценарии.",
@@ -248,7 +248,7 @@ const EXPLORED_GROUPS = [
     },
     { 
         id: 'public', iconTag: 'public', tags: ['public', 'outdoor', 'risky', 'taboo', 'voyeur', 'exhibitionism', 'incest', 'family', 'step-mom', 'step-sister', 'car', 'beach'],
-        achIcon: 'ach_public.png',
+        achIcon: 'assets/images/achievements/ach_public.png',
         desc_en: "The thrill of getting caught. Outdoor acts and forbidden taboos.",
         desc_ru: "Азарт быть пойманным. Секс на улице и запретные табу.",
         desc_es: "La emoción de ser atrapado. Actos al aire libre y tabúes prohibidos.",
@@ -256,8 +256,8 @@ const EXPLORED_GROUPS = [
     },
     { 
         id: 'body', iconTag: 'body-part', tags: ['body-type', 'body-part', 'bbw', 'skinny', 'muscle', 'face', 'hair', 'tattoo', 'piercing', 'chubby', 'fat', 'hairy', 'redhead', 'blonde', 'brunette', 'milf', 'teen', 'interracial'],
-        achIcon: 'ach_body.png',
-        appIcon: 'icon_app_body.png', // Иконка Тело
+        achIcon: 'assets/images/achievements/ach_body.png',
+        appIcon: 'assets/images/categories/icon_app_body.png', // Иконка Тело
         rewardDays: 3,
         desc_en: "Celebrating specific forms. Shapes, colors, and physical traits.",
         desc_ru: "Восхищение формами. Фигуры, цвета и физические особенности.",
@@ -266,7 +266,7 @@ const EXPLORED_GROUPS = [
     },
     { 
         id: 'toys', iconTag: 'toys', tags: ['toys', 'dildo', 'vibrator', 'machine', 'plug', 'strap-on', 'sybian', 'doll'],
-        achIcon: 'ach_toys.png',
+        achIcon: 'assets/images/achievements/ach_toys.png',
         desc_en: "Synthetic assistance. Gadgets and machines for pleasure.",
         desc_ru: "Синтетическая помощь. Гаджеты и машины для удовольствия.",
         desc_es: "Asistencia sintética. Gadgets y máquinas para el placer.",
@@ -274,7 +274,7 @@ const EXPLORED_GROUPS = [
     },
     { 
         id: 'mess', iconTag: 'cum', tags: ['cum', 'creampie', 'mess', 'squirting', 'facial', 'wet', 'piss', 'scat', 'vomit', 'sweat', 'mud', 'oil', 'slime'],
-        achIcon: 'ach_mess.png',
+        achIcon: 'assets/images/achievements/ach_mess.png',
         desc_en: "Wet and wild. Body fluids, oil, and messy fun.",
         desc_ru: "Мокро и грязно. Телесные жидкости, масло и беспорядок.",
         desc_es: "Húmedo y salvaje. Fluidos corporales, aceite y diversión desordenada.",
@@ -282,8 +282,8 @@ const EXPLORED_GROUPS = [
     },
     { 
         id: 'fantasy', iconTag: 'hentai', tags: ['fantasy', 'hentai', 'anime', 'art', 'visual', 'cartoon', 'monster', 'alien', 'giantess', 'vore', 'furry', 'transformation'],
-        achIcon: 'ach_fantasy.png',
-        appIcon: 'icon_app_fantasy.png', // Иконка Фантазия
+        achIcon: 'assets/images/achievements/ach_fantasy.png',
+        appIcon: 'assets/images/categories/icon_app_fantasy.png', // Иконка Фантазия
         rewardDays: 3,
         desc_en: "Beyond reality. Animated, drawn, and supernatural desires.",
         desc_ru: "За гранью реальности. Анимация, рисунки и сверхъестественное.",
@@ -292,7 +292,7 @@ const EXPLORED_GROUPS = [
     },
     { 
         id: 'clothing', iconTag: 'legs', tags: ['clothing', 'latex', 'leather', 'lingerie', 'spandex', 'nylon', 'satin', 'dress', 'skirt', 'underwear', 'panties', 'bikini'],
-        achIcon: 'ach_clothing.png',
+        achIcon: 'assets/images/achievements/ach_clothing.png',
         desc_en: "Material fetishism. Fabric textures and specific outfits.",
         desc_ru: "Фетишизм материалов. Текстуры тканей и специфические наряды.",
         desc_es: "Fetichismo material. Texturas de telas y atuendos específicos.",
@@ -760,26 +760,6 @@ const firstTimePhrase = {
 };
 
 let statusHideTimeout = null;
-
-function setWelcomeMessage() {
-    const statusEl = document.getElementById('status-text');
-    if(!statusEl) return;
-    
-    // Сброс предыдущего таймера
-    if (statusHideTimeout) clearTimeout(statusHideTimeout);
-    
-    // Показываем текст
-    const phrases = welcomePhrases[currentLang] || welcomePhrases.en;
-    statusEl.innerText = phrases[Math.floor(Math.random() * phrases.length)];
-    statusEl.style.color = "var(--accent)"; 
-    statusEl.style.opacity = "1"; // Убеждаемся, что видно
-    
-    // Таймер на скрытие через 5 секунд
-    statusHideTimeout = setTimeout(() => {
-        statusEl.style.transition = "opacity 1s ease";
-        statusEl.style.opacity = "0";
-    }, 5000);
-}
 const wlReminderPhrases = {
     en: [
         "Seems like you wanted to watch this... 👀",
@@ -5057,7 +5037,7 @@ function openExploredModal() {
     groupsWithStats.forEach(stats => {
         if (stats.total === 0) return;
 
-        let iconSrc = 'logo_icon.png';
+        let iconSrc = 'assets/images/icons/logo_icon.png';
         if (TAG_ICONS[stats.iconTag] && TAG_ICONS[stats.iconTag][0]) iconSrc = TAG_ICONS[stats.iconTag][0];
         else if (TAG_ICONS['general']) iconSrc = TAG_ICONS['general'][0];
 
@@ -5111,7 +5091,7 @@ function showGenreDetails(groupData) {
                         (currentLang === 'es') ? "Explorado" : 
                         (currentLang === 'de') ? "Erforscht" : "Explored";
 
-    let iconSrc = 'logo_icon.png';
+    let iconSrc = 'assets/images/icons/logo_icon.png';
     if (TAG_ICONS[groupData.iconTag]) iconSrc = TAG_ICONS[groupData.iconTag][0];
 
     let desc = groupData['desc_' + currentLang] || groupData.desc_en;
@@ -5433,7 +5413,7 @@ function shareAchievementCard() {
     const themeId = localStorage.getItem('xch_theme_id') || 'dark';
     
     // Для скриншота логотип берем из функции (предполагаем она есть в коде)
-    const logoSrc = typeof getThemeLogoSrc === 'function' ? getThemeLogoSrc(themeId) : 'logo.png';
+    const logoSrc = typeof getThemeLogoSrc === 'function' ? getThemeLogoSrc(themeId) : 'assets/images/icons/logo.png';
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=0&data=${encodeURIComponent(window.location.origin)}`;
 
     // Логика визуализации (Изображение или Эмодзи)
@@ -6725,19 +6705,19 @@ function updateIntensity(val) {
     let config = {};
     if (currentIntensity === 1) {
         config = {
-            icon: 'safe.png', key: 'val_safe', color: '#2ecc71', emoji: "🛡️",
+            icon: 'assets/images/icons/safe.png', key: 'val_safe', color: '#2ecc71', emoji: "🛡️",
             bg: colorBg,
             activeFilter: "invert(68%) sepia(61%) saturate(452%) hue-rotate(97deg) brightness(89%) contrast(85%)"
         };
     } else if (currentIntensity === 2) {
         config = {
-            icon: 'spicy.png', key: 'val_spicy', color: isNoir ? '#ffffff' : '#f39c12', emoji: "🔥",
+            icon: 'assets/images/icons/spicy.png', key: 'val_spicy', color: isNoir ? '#ffffff' : '#f39c12', emoji: "🔥",
             bg: `linear-gradient(to right, ${isNoir ? '#fff' : '#f39c12'} 0%, ${isNoir ? '#fff' : '#f39c12'} 50%, ${colorBg} 50%, ${colorBg} 100%)`,
             activeFilter: "invert(77%) sepia(33%) saturate(5427%) hue-rotate(357deg) brightness(101%) contrast(90%)"
         };
     } else {
         config = {
-            icon: 'extreme.png', key: 'val_extreme', color: isNoir ? '#ffffff' : '#e74c3c', emoji: "💀",
+            icon: 'assets/images/icons/extreme.png', key: 'val_extreme', color: isNoir ? '#ffffff' : '#e74c3c', emoji: "💀",
             bg: isNoir ? '#ffffff' : '#e74c3c',
             activeFilter: "invert(43%) sepia(97%) saturate(1874%) hue-rotate(338deg) brightness(96%) contrast(89%)"
         };
@@ -10076,38 +10056,38 @@ function buyCurrentPreview() {
 function getThemeLogoSrc(themeId) {
     const logoMap = {
         // Фиолетовая
-        'purple-dark': 'amethyst_icon.png',
-        'purple-light': 'amethyst_icon.png',
+        'purple-dark': 'assets/images/themes/amethyst_icon.png',
+        'purple-light': 'assets/images/themes/amethyst_icon.png',
         
         // Зеленая
-        'green-dark': 'forest_icon.png',
-        'green-light': 'forest_icon.png',
+        'green-dark': 'assets/images/themes/forest_icon.png',
+        'green-light': 'assets/images/themes/forest_icon.png',
         
         // Золотая
-        'gold-dark': 'gold_icon.png',
-        'gold-light': 'gold_icon.png',
+        'gold-dark': 'assets/images/themes/gold_icon.png',
+        'gold-light': 'assets/images/themes/gold_icon.png',
         
         // Оранжевая
-        'orange-dark': 'magma_icon.png',
-        'orange-light': 'magma_icon.png',
+        'orange-dark': 'assets/images/themes/magma_icon.png',
+        'orange-light': 'assets/images/themes/magma_icon.png',
         
         // Синяя
-        'blue-dark': 'midnight_icon.png', 
-        'blue-light': 'midnight_icon.png',
+        'blue-dark': 'assets/images/themes/midnight_icon.png', 
+        'blue-light': 'assets/images/themes/midnight_icon.png',
         
         // Красная
-        'red-dark': 'vampire_icon.png',
-        'red-light': 'vampire_icon.png',
+        'red-dark': 'assets/images/themes/vampire_icon.png',
+        'red-light': 'assets/images/themes/vampire_icon.png',
         
         // Нуар
-        'noir': 'noir_icon.png',
+        'noir': 'assets/images/themes/noir_icon.png',
 
         // Old Money 
-        'old-money': 'oldmoney_icon.png', 
+        'old-money': 'assets/images/themes/oldmoney_icon.png', 
     };
 
     // Если темы нет в списке (например, 'dark' или 'light'), возвращаем дефолт
-    return logoMap[themeId] || 'logo.png';
+    return logoMap[themeId] || 'assets/images/icons/logo.png';
 }
 
 function toggleCustomIcon(iconFilename) {
@@ -10155,11 +10135,11 @@ function updateGlobalLogos(themeId) {
     if (wrappedLogo) wrappedLogo.src = newSrc;
 
     // --- 2. ОБНОВЛЕНИЕ ФАВИКОНОК ---
-    // Если тема дефолтная И нет кастомной иконки -> logo_icon.png
+    // Если тема дефолтная И нет кастомной иконки -> assets/images/icons/logo_icon.png
     // Иначе -> newSrc (либо иконка темы, либо кастомная)
     let faviconSrc = newSrc;
     if (!customIcon && (themeId === 'dark' || themeId === 'light')) {
-        faviconSrc = 'logo_icon.png';
+        faviconSrc = 'assets/images/icons/logo_icon.png';
     }
 
     let linkIcon = document.querySelector("link[rel~='icon']");
@@ -13949,7 +13929,7 @@ function openWrappedUI(dataObj) {
             </div>
             <div style="margin-top:30px; display:flex; gap:15px; align-items:center; z-index: 1000;">
                 <button onclick="closeWrapped()" class="btn-gen" style="width:auto; padding:12px 40px; font-size:16px; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); backdrop-filter:blur(10px);">${t('btn_done')}</button>
-                <div class="btn-round-share" onclick="shareWrappedCard()"><img src="share.png" alt="Share"></div>
+                <div class="btn-round-share" onclick="shareWrappedCard()"><img src="assets/images/icons/share.png" alt="Share"></div>
             </div>
         </div>
     `;
@@ -14425,33 +14405,33 @@ function updateSafeSettings(isSafe) {
             { 
                 key: 'site_label', 
                 safeTxt: 'safe_label_site', 
-                normalIcon: 'site.png', 
-                safeIcon: 'watched-later.png' 
+                normalIcon: 'assets/images/icons/site.png', 
+                safeIcon: 'assets/images/icons/watched-later.png' 
             },
             { 
                 key: 'ori_label', 
                 safeTxt: 'safe_label_ori', 
-                normalIcon: 'orientation.png', 
-                safeIcon: 'roadmap.png'
+                normalIcon: 'assets/images/icons/orientation.png', 
+                safeIcon: 'assets/images/icons/roadmap.png'
             },
             { 
                 key: 'exploration_mode', 
                 safeTxt: 'safe_label_int', 
                 normalIcon: null, 
-                safeIcon: 'plan.png',
+                safeIcon: 'assets/images/icons/plan.png',
                 isSpecial: true // <--- ВАЖНЫЙ ФЛАГ: Это строка Интенсивности
             },
             { 
                 key: 'deco_label', 
                 safeTxt: 'deco_label', 
-                normalIcon: 'deco.png', 
-                safeIcon: 'funny_deco.png'
+                normalIcon: 'assets/images/deco/deco.png', 
+                safeIcon: 'assets/images/deco/funny_deco.png'
             },
             { 
                 key: 'lang_label', 
                 safeTxt: 'lang_label', 
-                normalIcon: 'language.png', 
-                safeIcon: 'site.png'
+                normalIcon: 'assets/images/icons/language.png', 
+                safeIcon: 'assets/images/icons/site.png'
             }
         ];
 
@@ -14536,7 +14516,7 @@ function openPanicSettings() {
     // --- ОБЩАЯ КАРТИНКА ---
     const iconHtml = `
         <div style="text-align:center; margin-bottom:15px;">
-            <img src="sos.png" style="width:60px; height:60px; filter: invert(1);">
+            <img src="assets/images/icons/sos.png" style="width:60px; height:60px; filter: invert(1);">
         </div>
     `;
 
@@ -14709,7 +14689,7 @@ function togglePanicMode() {
 
         // 3. Логотип
         logoTextDivs.forEach(div => {
-            div.innerHTML = `<img src="funny_icon.png" class="logo-img" alt="F" style="height:45px; margin-right:5px;">FunnyHub`;
+            div.innerHTML = `<img src="assets/images/themes/funny_icon.png" class="logo-img" alt="F" style="height:45px; margin-right:5px;">FunnyHub`;
         });
         subtitles.forEach(el => el.innerText = t.safe_subtitle || "Your safe place");
 
@@ -16026,3 +16006,329 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+// === REACT / VITE MODULE BRIDGE ===
+const __legacyFns = {
+  acceptLoyaltyOffer: typeof acceptLoyaltyOffer !== 'undefined' ? acceptLoyaltyOffer : undefined,
+  addToHistory: typeof addToHistory !== 'undefined' ? addToHistory : undefined,
+  adjustTagScores: typeof adjustTagScores !== 'undefined' ? adjustTagScores : undefined,
+  adjustTagScoresByTags: typeof adjustTagScoresByTags !== 'undefined' ? adjustTagScoresByTags : undefined,
+  adminRemoveDiscount: typeof adminRemoveDiscount !== 'undefined' ? adminRemoveDiscount : undefined,
+  adminSetDiscount: typeof adminSetDiscount !== 'undefined' ? adminSetDiscount : undefined,
+  analyzeUserRequest: typeof analyzeUserRequest !== 'undefined' ? analyzeUserRequest : undefined,
+  animateSwipeEnd: typeof animateSwipeEnd !== 'undefined' ? animateSwipeEnd : undefined,
+  animateValue: typeof animateValue !== 'undefined' ? animateValue : undefined,
+  applyCustomRange: typeof applyCustomRange !== 'undefined' ? applyCustomRange : undefined,
+  applyDecoState: typeof applyDecoState !== 'undefined' ? applyDecoState : undefined,
+  applyLanguage: typeof applyLanguage !== 'undefined' ? applyLanguage : undefined,
+  applyTheme: typeof applyTheme !== 'undefined' ? applyTheme : undefined,
+  backToExploredGrid: typeof backToExploredGrid !== 'undefined' ? backToExploredGrid : undefined,
+  backToTipsList: typeof backToTipsList !== 'undefined' ? backToTipsList : undefined,
+  blockAccess: typeof blockAccess !== 'undefined' ? blockAccess : undefined,
+  buyCurrentPreview: typeof buyCurrentPreview !== 'undefined' ? buyCurrentPreview : undefined,
+  buyFromPreview: typeof buyFromPreview !== 'undefined' ? buyFromPreview : undefined,
+  calculateDeepStats: typeof calculateDeepStats !== 'undefined' ? calculateDeepStats : undefined,
+  calculateDiscountedPrice: typeof calculateDiscountedPrice !== 'undefined' ? calculateDiscountedPrice : undefined,
+  calculateItemWeight: typeof calculateItemWeight !== 'undefined' ? calculateItemWeight : undefined,
+  calculatePsychotype: typeof calculatePsychotype !== 'undefined' ? calculatePsychotype : undefined,
+  calculateWatchTime: typeof calculateWatchTime !== 'undefined' ? calculateWatchTime : undefined,
+  cancelPreview: typeof cancelPreview !== 'undefined' ? cancelPreview : undefined,
+  changeLanguage: typeof changeLanguage !== 'undefined' ? changeLanguage : undefined,
+  changeOrientation: typeof changeOrientation !== 'undefined' ? changeOrientation : undefined,
+  checkAutomaticArchiving: typeof checkAutomaticArchiving !== 'undefined' ? checkAutomaticArchiving : undefined,
+  checkGenerationLimit: typeof checkGenerationLimit !== 'undefined' ? checkGenerationLimit : undefined,
+  checkLayout: typeof checkLayout !== 'undefined' ? checkLayout : undefined,
+  checkLoyaltyStatus: typeof checkLoyaltyStatus !== 'undefined' ? checkLoyaltyStatus : undefined,
+  checkNotificationState: typeof checkNotificationState !== 'undefined' ? checkNotificationState : undefined,
+  checkOnboarding: typeof checkOnboarding !== 'undefined' ? checkOnboarding : undefined,
+  checkSubscriptionExpiry: typeof checkSubscriptionExpiry !== 'undefined' ? checkSubscriptionExpiry : undefined,
+  checkTipIcons: typeof checkTipIcons !== 'undefined' ? checkTipIcons : undefined,
+  checkWrappedAlert: typeof checkWrappedAlert !== 'undefined' ? checkWrappedAlert : undefined,
+  claimAchievementReward: typeof claimAchievementReward !== 'undefined' ? claimAchievementReward : undefined,
+  closeAchDetail: typeof closeAchDetail !== 'undefined' ? closeAchDetail : undefined,
+  closeAchievementsModal: typeof closeAchievementsModal !== 'undefined' ? closeAchievementsModal : undefined,
+  closeAddSiteModal: typeof closeAddSiteModal !== 'undefined' ? closeAddSiteModal : undefined,
+  closeAllModals: typeof closeAllModals !== 'undefined' ? closeAllModals : undefined,
+  closeAssistantUI: typeof closeAssistantUI !== 'undefined' ? closeAssistantUI : undefined,
+  closeBlacklist: typeof closeBlacklist !== 'undefined' ? closeBlacklist : undefined,
+  closeChangelogModal: typeof closeChangelogModal !== 'undefined' ? closeChangelogModal : undefined,
+  closeDatePicker: typeof closeDatePicker !== 'undefined' ? closeDatePicker : undefined,
+  closeExpiryModal: typeof closeExpiryModal !== 'undefined' ? closeExpiryModal : undefined,
+  closeExploredModal: typeof closeExploredModal !== 'undefined' ? closeExploredModal : undefined,
+  closeExportModal: typeof closeExportModal !== 'undefined' ? closeExportModal : undefined,
+  closeHistoryModal: typeof closeHistoryModal !== 'undefined' ? closeHistoryModal : undefined,
+  closeLimitModal: typeof closeLimitModal !== 'undefined' ? closeLimitModal : undefined,
+  closeList: typeof closeList !== 'undefined' ? closeList : undefined,
+  closeLoginModal: typeof closeLoginModal !== 'undefined' ? closeLoginModal : undefined,
+  closeLoyaltyModal: typeof closeLoyaltyModal !== 'undefined' ? closeLoyaltyModal : undefined,
+  closeModifiersSettings: typeof closeModifiersSettings !== 'undefined' ? closeModifiersSettings : undefined,
+  closePanicSettings: typeof closePanicSettings !== 'undefined' ? closePanicSettings : undefined,
+  closePaymentModal: typeof closePaymentModal !== 'undefined' ? closePaymentModal : undefined,
+  closePromoTips: typeof closePromoTips !== 'undefined' ? closePromoTips : undefined,
+  closeQRModal: typeof closeQRModal !== 'undefined' ? closeQRModal : undefined,
+  closeResetModal: typeof closeResetModal !== 'undefined' ? closeResetModal : undefined,
+  closeRoadmap: typeof closeRoadmap !== 'undefined' ? closeRoadmap : undefined,
+  closeSitesModal: typeof closeSitesModal !== 'undefined' ? closeSitesModal : undefined,
+  closeSponsorsModal: typeof closeSponsorsModal !== 'undefined' ? closeSponsorsModal : undefined,
+  closeStats: typeof closeStats !== 'undefined' ? closeStats : undefined,
+  closeSubModal: typeof closeSubModal !== 'undefined' ? closeSubModal : undefined,
+  closeSupport: typeof closeSupport !== 'undefined' ? closeSupport : undefined,
+  closeThemeModal: typeof closeThemeModal !== 'undefined' ? closeThemeModal : undefined,
+  closeTipsModal: typeof closeTipsModal !== 'undefined' ? closeTipsModal : undefined,
+  closeWrapped: typeof closeWrapped !== 'undefined' ? closeWrapped : undefined,
+  closeWrappedAlert: typeof closeWrappedAlert !== 'undefined' ? closeWrappedAlert : undefined,
+  copyCryptoAddress: typeof copyCryptoAddress !== 'undefined' ? copyCryptoAddress : undefined,
+  copyCryptoAmount: typeof copyCryptoAmount !== 'undefined' ? copyCryptoAmount : undefined,
+  createMonthElement: typeof createMonthElement !== 'undefined' ? createMonthElement : undefined,
+  createRadarChartSVG: typeof createRadarChartSVG !== 'undefined' ? createRadarChartSVG : undefined,
+  createScreenshotHeader: typeof createScreenshotHeader !== 'undefined' ? createScreenshotHeader : undefined,
+  deleteCustomMod: typeof deleteCustomMod !== 'undefined' ? deleteCustomMod : undefined,
+  deleteCustomPermanent: typeof deleteCustomPermanent !== 'undefined' ? deleteCustomPermanent : undefined,
+  deleteCustomSite: typeof deleteCustomSite !== 'undefined' ? deleteCustomSite : undefined,
+  downloadFallback: typeof downloadFallback !== 'undefined' ? downloadFallback : undefined,
+  enforceDataIntegrity: typeof enforceDataIntegrity !== 'undefined' ? enforceDataIntegrity : undefined,
+  escapeHtml: typeof escapeHtml !== 'undefined' ? escapeHtml : undefined,
+  exportData: typeof exportData !== 'undefined' ? exportData : undefined,
+  fetchActiveDiscount: typeof fetchActiveDiscount !== 'undefined' ? fetchActiveDiscount : undefined,
+  filterData: typeof filterData !== 'undefined' ? filterData : undefined,
+  finishGeneration: typeof finishGeneration !== 'undefined' ? finishGeneration : undefined,
+  finishOnboarding: typeof finishOnboarding !== 'undefined' ? finishOnboarding : undefined,
+  forceShowResult: typeof forceShowResult !== 'undefined' ? forceShowResult : undefined,
+  generateAndSaveWrapped: typeof generateAndSaveWrapped !== 'undefined' ? generateAndSaveWrapped : undefined,
+  generatePanicCard: typeof generatePanicCard !== 'undefined' ? generatePanicCard : undefined,
+  getAiSuggestions: typeof getAiSuggestions !== 'undefined' ? getAiSuggestions : undefined,
+  getCombinedTags: typeof getCombinedTags !== 'undefined' ? getCombinedTags : undefined,
+  getDayWord: typeof getDayWord !== 'undefined' ? getDayWord : undefined,
+  getEditDistance: typeof getEditDistance !== 'undefined' ? getEditDistance : undefined,
+  getExplanationText: typeof getExplanationText !== 'undefined' ? getExplanationText : undefined,
+  getLocalizedName: typeof getLocalizedName !== 'undefined' ? getLocalizedName : undefined,
+  getQrUrl: typeof getQrUrl !== 'undefined' ? getQrUrl : undefined,
+  getRandomNeutral: typeof getRandomNeutral !== 'undefined' ? getRandomNeutral : undefined,
+  getRangeString: typeof getRangeString !== 'undefined' ? getRangeString : undefined,
+  getSafeItem: typeof getSafeItem !== 'undefined' ? getSafeItem : undefined,
+  getThemeLogoSrc: typeof getThemeLogoSrc !== 'undefined' ? getThemeLogoSrc : undefined,
+  getTranslation: typeof getTranslation !== 'undefined' ? getTranslation : undefined,
+  getWText: typeof getWText !== 'undefined' ? getWText : undefined,
+  getWeightedRandom: typeof getWeightedRandom !== 'undefined' ? getWeightedRandom : undefined,
+  handleManualDate: typeof handleManualDate !== 'undefined' ? handleManualDate : undefined,
+  handleNavTouch: typeof handleNavTouch !== 'undefined' ? handleNavTouch : undefined,
+  handleNotificationToggle: typeof handleNotificationToggle !== 'undefined' ? handleNotificationToggle : undefined,
+  handleOutboundClick: typeof handleOutboundClick !== 'undefined' ? handleOutboundClick : undefined,
+  handlePreviewOutsideClick: typeof handlePreviewOutsideClick !== 'undefined' ? handlePreviewOutsideClick : undefined,
+  handleSlideAnimations: typeof handleSlideAnimations !== 'undefined' ? handleSlideAnimations : undefined,
+  handleSwipeAction: typeof handleSwipeAction !== 'undefined' ? handleSwipeAction : undefined,
+  hasDailyForYesterday: typeof hasDailyForYesterday !== 'undefined' ? hasDailyForYesterday : undefined,
+  importData: typeof importData !== 'undefined' ? importData : undefined,
+  initAgeGate: typeof initAgeGate !== 'undefined' ? initAgeGate : undefined,
+  initAiRollingPrompts: typeof initAiRollingPrompts !== 'undefined' ? initAiRollingPrompts : undefined,
+  initApp: typeof initApp !== 'undefined' ? initApp : undefined,
+  initDateInputListeners: typeof initDateInputListeners !== 'undefined' ? initDateInputListeners : undefined,
+  initDecoSettings: typeof initDecoSettings !== 'undefined' ? initDecoSettings : undefined,
+  initIdleSlot: typeof initIdleSlot !== 'undefined' ? initIdleSlot : undefined,
+  initInactivityListeners: typeof initInactivityListeners !== 'undefined' ? initInactivityListeners : undefined,
+  initInfiniteRoulette: typeof initInfiniteRoulette !== 'undefined' ? initInfiniteRoulette : undefined,
+  initIntensity: typeof initIntensity !== 'undefined' ? initIntensity : undefined,
+  initLanguage: typeof initLanguage !== 'undefined' ? initLanguage : undefined,
+  initModes: typeof initModes !== 'undefined' ? initModes : undefined,
+  initSwipeCards: typeof initSwipeCards !== 'undefined' ? initSwipeCards : undefined,
+  initTheme: typeof initTheme !== 'undefined' ? initTheme : undefined,
+  isAppInstalled: typeof isAppInstalled !== 'undefined' ? isAppInstalled : undefined,
+  isFuzzyMatch: typeof isFuzzyMatch !== 'undefined' ? isFuzzyMatch : undefined,
+  isMobile: typeof isMobile !== 'undefined' ? isMobile : undefined,
+  isPWA: typeof isPWA !== 'undefined' ? isPWA : undefined,
+  launchAnimation: typeof launchAnimation !== 'undefined' ? launchAnimation : undefined,
+  loadData: typeof loadData !== 'undefined' ? loadData : undefined,
+  logActivity: typeof logActivity !== 'undefined' ? logActivity : undefined,
+  markDayActive: typeof markDayActive !== 'undefined' ? markDayActive : undefined,
+  migrateHistoryToSessions: typeof migrateHistoryToSessions !== 'undefined' ? migrateHistoryToSessions : undefined,
+  nextSlide: typeof nextSlide !== 'undefined' ? nextSlide : undefined,
+  openAchievementsModal: typeof openAchievementsModal !== 'undefined' ? openAchievementsModal : undefined,
+  openAddSiteModal: typeof openAddSiteModal !== 'undefined' ? openAddSiteModal : undefined,
+  openAssistantUI: typeof openAssistantUI !== 'undefined' ? openAssistantUI : undefined,
+  openBlacklistCatalog: typeof openBlacklistCatalog !== 'undefined' ? openBlacklistCatalog : undefined,
+  openBoosty: typeof openBoosty !== 'undefined' ? openBoosty : undefined,
+  openChangelogModal: typeof openChangelogModal !== 'undefined' ? openChangelogModal : undefined,
+  openDatePicker: typeof openDatePicker !== 'undefined' ? openDatePicker : undefined,
+  openExpiryModal: typeof openExpiryModal !== 'undefined' ? openExpiryModal : undefined,
+  openExploredModal: typeof openExploredModal !== 'undefined' ? openExploredModal : undefined,
+  openExportModal: typeof openExportModal !== 'undefined' ? openExportModal : undefined,
+  openFavoritesCatalog: typeof openFavoritesCatalog !== 'undefined' ? openFavoritesCatalog : undefined,
+  openHistoryModal: typeof openHistoryModal !== 'undefined' ? openHistoryModal : undefined,
+  openLimitModal: typeof openLimitModal !== 'undefined' ? openLimitModal : undefined,
+  openLoginModal: typeof openLoginModal !== 'undefined' ? openLoginModal : undefined,
+  openLoyaltyModal: typeof openLoyaltyModal !== 'undefined' ? openLoyaltyModal : undefined,
+  openModifiersSettings: typeof openModifiersSettings !== 'undefined' ? openModifiersSettings : undefined,
+  openPanicSettings: typeof openPanicSettings !== 'undefined' ? openPanicSettings : undefined,
+  openPaymentSelection: typeof openPaymentSelection !== 'undefined' ? openPaymentSelection : undefined,
+  openPlatformDirectly: typeof openPlatformDirectly !== 'undefined' ? openPlatformDirectly : undefined,
+  openQRModal: typeof openQRModal !== 'undefined' ? openQRModal : undefined,
+  openResetModal: typeof openResetModal !== 'undefined' ? openResetModal : undefined,
+  openRoadmap: typeof openRoadmap !== 'undefined' ? openRoadmap : undefined,
+  openSitesModal: typeof openSitesModal !== 'undefined' ? openSitesModal : undefined,
+  openSpecificTip: typeof openSpecificTip !== 'undefined' ? openSpecificTip : undefined,
+  openSponsorsModal: typeof openSponsorsModal !== 'undefined' ? openSponsorsModal : undefined,
+  openStatistics: typeof openStatistics !== 'undefined' ? openStatistics : undefined,
+  openSubModal: typeof openSubModal !== 'undefined' ? openSubModal : undefined,
+  openSupportModal: typeof openSupportModal !== 'undefined' ? openSupportModal : undefined,
+  openThemeModal: typeof openThemeModal !== 'undefined' ? openThemeModal : undefined,
+  openTipsFromPromo: typeof openTipsFromPromo !== 'undefined' ? openTipsFromPromo : undefined,
+  openTipsModal: typeof openTipsModal !== 'undefined' ? openTipsModal : undefined,
+  openVpnModal: typeof openVpnModal !== 'undefined' ? openVpnModal : undefined,
+  openWatchLaterCatalog: typeof openWatchLaterCatalog !== 'undefined' ? openWatchLaterCatalog : undefined,
+  openWrapped: typeof openWrapped !== 'undefined' ? openWrapped : undefined,
+  openWrappedUI: typeof openWrappedUI !== 'undefined' ? openWrappedUI : undefined,
+  parseAndApplyDate: typeof parseAndApplyDate !== 'undefined' ? parseAndApplyDate : undefined,
+  passAgeGate: typeof passAgeGate !== 'undefined' ? passAgeGate : undefined,
+  performExport: typeof performExport !== 'undefined' ? performExport : undefined,
+  performGoogleLogin: typeof performGoogleLogin !== 'undefined' ? performGoogleLogin : undefined,
+  performPartialReset: typeof performPartialReset !== 'undefined' ? performPartialReset : undefined,
+  prepareElementsForFadeIn: typeof prepareElementsForFadeIn !== 'undefined' ? prepareElementsForFadeIn : undefined,
+  prevSlide: typeof prevSlide !== 'undefined' ? prevSlide : undefined,
+  processAiRequest: typeof processAiRequest !== 'undefined' ? processAiRequest : undefined,
+  processOnboardingText: typeof processOnboardingText !== 'undefined' ? processOnboardingText : undefined,
+  promptPromoCode: typeof promptPromoCode !== 'undefined' ? promptPromoCode : undefined,
+  randomizeDecorations: typeof randomizeDecorations !== 'undefined' ? randomizeDecorations : undefined,
+  randomizeModeGreeting: typeof randomizeModeGreeting !== 'undefined' ? randomizeModeGreeting : undefined,
+  removeCurrentStatus: typeof removeCurrentStatus !== 'undefined' ? removeCurrentStatus : undefined,
+  removeOnbTag: typeof removeOnbTag !== 'undefined' ? removeOnbTag : undefined,
+  removeToast: typeof removeToast !== 'undefined' ? removeToast : undefined,
+  renderBadges: typeof renderBadges !== 'undefined' ? renderBadges : undefined,
+  renderCalendarList: typeof renderCalendarList !== 'undefined' ? renderCalendarList : undefined,
+  renderCurrentTags: typeof renderCurrentTags !== 'undefined' ? renderCurrentTags : undefined,
+  renderDiscountedPrices: typeof renderDiscountedPrices !== 'undefined' ? renderDiscountedPrices : undefined,
+  renderExplanation: typeof renderExplanation !== 'undefined' ? renderExplanation : undefined,
+  renderHistory: typeof renderHistory !== 'undefined' ? renderHistory : undefined,
+  renderListModal: typeof renderListModal !== 'undefined' ? renderListModal : undefined,
+  renderModifiers: typeof renderModifiers !== 'undefined' ? renderModifiers : undefined,
+  renderModifiersInCard: typeof renderModifiersInCard !== 'undefined' ? renderModifiersInCard : undefined,
+  renderModifiersModal: typeof renderModifiersModal !== 'undefined' ? renderModifiersModal : undefined,
+  renderOnbTag: typeof renderOnbTag !== 'undefined' ? renderOnbTag : undefined,
+  renderPlatformsMode: typeof renderPlatformsMode !== 'undefined' ? renderPlatformsMode : undefined,
+  renderRelatedItems: typeof renderRelatedItems !== 'undefined' ? renderRelatedItems : undefined,
+  renderResultName: typeof renderResultName !== 'undefined' ? renderResultName : undefined,
+  renderResultUI: typeof renderResultUI !== 'undefined' ? renderResultUI : undefined,
+  renderSitesList: typeof renderSitesList !== 'undefined' ? renderSitesList : undefined,
+  renderStatsContent: typeof renderStatsContent !== 'undefined' ? renderStatsContent : undefined,
+  renderSwipesHistoryList: typeof renderSwipesHistoryList !== 'undefined' ? renderSwipesHistoryList : undefined,
+  renderThemes: typeof renderThemes !== 'undefined' ? renderThemes : undefined,
+  renderTipsList: typeof renderTipsList !== 'undefined' ? renderTipsList : undefined,
+  renderWatchHistoryList: typeof renderWatchHistoryList !== 'undefined' ? renderWatchHistoryList : undefined,
+  renderWrappedArchive: typeof renderWrappedArchive !== 'undefined' ? renderWrappedArchive : undefined,
+  renewFromExpiry: typeof renewFromExpiry !== 'undefined' ? renewFromExpiry : undefined,
+  resetAppHistory: typeof resetAppHistory !== 'undefined' ? resetAppHistory : undefined,
+  resetControls: typeof resetControls !== 'undefined' ? resetControls : undefined,
+  resetInactivityTimer: typeof resetInactivityTimer !== 'undefined' ? resetInactivityTimer : undefined,
+  resetToHome: typeof resetToHome !== 'undefined' ? resetToHome : undefined,
+  runEvolutionAnimation: typeof runEvolutionAnimation !== 'undefined' ? runEvolutionAnimation : undefined,
+  runStartupChecks: typeof runStartupChecks !== 'undefined' ? runStartupChecks : undefined,
+  saveCustomSite: typeof saveCustomSite !== 'undefined' ? saveCustomSite : undefined,
+  saveLists: typeof saveLists !== 'undefined' ? saveLists : undefined,
+  savePanicKey: typeof savePanicKey !== 'undefined' ? savePanicKey : undefined,
+  savePlatform: typeof savePlatform !== 'undefined' ? savePlatform : undefined,
+  searchByTag: typeof searchByTag !== 'undefined' ? searchByTag : undefined,
+  selectDate: typeof selectDate !== 'undefined' ? selectDate : undefined,
+  selectGlobalSite: typeof selectGlobalSite !== 'undefined' ? selectGlobalSite : undefined,
+  selectTheme: typeof selectTheme !== 'undefined' ? selectTheme : undefined,
+  setAppMode: typeof setAppMode !== 'undefined' ? setAppMode : undefined,
+  setAppModeAndStart: typeof setAppModeAndStart !== 'undefined' ? setAppModeAndStart : undefined,
+  setWelcomeMessage: typeof setWelcomeMessage !== 'undefined' ? setWelcomeMessage : undefined,
+  shareAchievementCard: typeof shareAchievementCard !== 'undefined' ? shareAchievementCard : undefined,
+  shareCanvasImage: typeof shareCanvasImage !== 'undefined' ? shareCanvasImage : undefined,
+  shareStats: typeof shareStats !== 'undefined' ? shareStats : undefined,
+  shareWrappedCard: typeof shareWrappedCard !== 'undefined' ? shareWrappedCard : undefined,
+  showAchievementDetail: typeof showAchievementDetail !== 'undefined' ? showAchievementDetail : undefined,
+  showCryptoModal: typeof showCryptoModal !== 'undefined' ? showCryptoModal : undefined,
+  showForceInstallOverlay: typeof showForceInstallOverlay !== 'undefined' ? showForceInstallOverlay : undefined,
+  showGenreDetails: typeof showGenreDetails !== 'undefined' ? showGenreDetails : undefined,
+  showPushNotification: typeof showPushNotification !== 'undefined' ? showPushNotification : undefined,
+  showTipDetail: typeof showTipDetail !== 'undefined' ? showTipDetail : undefined,
+  showWrappedAlertModal: typeof showWrappedAlertModal !== 'undefined' ? showWrappedAlertModal : undefined,
+  skipInstall: typeof skipInstall !== 'undefined' ? skipInstall : undefined,
+  skipOnboarding: typeof skipOnboarding !== 'undefined' ? skipOnboarding : undefined,
+  startCryptoPolling: typeof startCryptoPolling !== 'undefined' ? startCryptoPolling : undefined,
+  startCryptoTimer: typeof startCryptoTimer !== 'undefined' ? startCryptoTimer : undefined,
+  startGeneration: typeof startGeneration !== 'undefined' ? startGeneration : undefined,
+  startKeyRecording: typeof startKeyRecording !== 'undefined' ? startKeyRecording : undefined,
+  startLoyaltyTimer: typeof startLoyaltyTimer !== 'undefined' ? startLoyaltyTimer : undefined,
+  startNewSession: typeof startNewSession !== 'undefined' ? startNewSession : undefined,
+  startPreview: typeof startPreview !== 'undefined' ? startPreview : undefined,
+  startSlideTimer: typeof startSlideTimer !== 'undefined' ? startSlideTimer : undefined,
+  startSlideTimerNew: typeof startSlideTimerNew !== 'undefined' ? startSlideTimerNew : undefined,
+  submitCustomMod: typeof submitCustomMod !== 'undefined' ? submitCustomMod : undefined,
+  submitPromoFromInput: typeof submitPromoFromInput !== 'undefined' ? submitPromoFromInput : undefined,
+  switchBilling: typeof switchBilling !== 'undefined' ? switchBilling : undefined,
+  switchHistoryTab: typeof switchHistoryTab !== 'undefined' ? switchHistoryTab : undefined,
+  switchMainMode: typeof switchMainMode !== 'undefined' ? switchMainMode : undefined,
+  switchStatsTab: typeof switchStatsTab !== 'undefined' ? switchStatsTab : undefined,
+  switchTab: typeof switchTab !== 'undefined' ? switchTab : undefined,
+  switchTimeframe: typeof switchTimeframe !== 'undefined' ? switchTimeframe : undefined,
+  syncScoresFromLists: typeof syncScoresFromLists !== 'undefined' ? syncScoresFromLists : undefined,
+  toggleBlacklist: typeof toggleBlacklist !== 'undefined' ? toggleBlacklist : undefined,
+  toggleCryptoView: typeof toggleCryptoView !== 'undefined' ? toggleCryptoView : undefined,
+  toggleCustomIcon: typeof toggleCustomIcon !== 'undefined' ? toggleCustomIcon : undefined,
+  toggleCustomInput: typeof toggleCustomInput !== 'undefined' ? toggleCustomInput : undefined,
+  toggleDecoIcons: typeof toggleDecoIcons !== 'undefined' ? toggleDecoIcons : undefined,
+  toggleFavorite: typeof toggleFavorite !== 'undefined' ? toggleFavorite : undefined,
+  toggleInstallInstruct: typeof toggleInstallInstruct !== 'undefined' ? toggleInstallInstruct : undefined,
+  toggleModInPool: typeof toggleModInPool !== 'undefined' ? toggleModInPool : undefined,
+  toggleModeDropdown: typeof toggleModeDropdown !== 'undefined' ? toggleModeDropdown : undefined,
+  toggleModeSettingsRow: typeof toggleModeSettingsRow !== 'undefined' ? toggleModeSettingsRow : undefined,
+  toggleModifiers: typeof toggleModifiers !== 'undefined' ? toggleModifiers : undefined,
+  togglePanicDouble: typeof togglePanicDouble !== 'undefined' ? togglePanicDouble : undefined,
+  togglePanicMode: typeof togglePanicMode !== 'undefined' ? togglePanicMode : undefined,
+  togglePanicSetting: typeof togglePanicSetting !== 'undefined' ? togglePanicSetting : undefined,
+  toggleRandomIncludeLight: typeof toggleRandomIncludeLight !== 'undefined' ? toggleRandomIncludeLight : undefined,
+  toggleRandomSites: typeof toggleRandomSites !== 'undefined' ? toggleRandomSites : undefined,
+  toggleRandomTheme: typeof toggleRandomTheme !== 'undefined' ? toggleRandomTheme : undefined,
+  toggleSmartSites: typeof toggleSmartSites !== 'undefined' ? toggleSmartSites : undefined,
+  toggleVoiceInput: typeof toggleVoiceInput !== 'undefined' ? toggleVoiceInput : undefined,
+  toggleWatchLater: typeof toggleWatchLater !== 'undefined' ? toggleWatchLater : undefined,
+  triggerLimitShake: typeof triggerLimitShake !== 'undefined' ? triggerLimitShake : undefined,
+  triggerWrappedBtn: typeof triggerWrappedBtn !== 'undefined' ? triggerWrappedBtn : undefined,
+  undoLastAction: typeof undoLastAction !== 'undefined' ? undoLastAction : undefined,
+  updateActionButtons: typeof updateActionButtons !== 'undefined' ? updateActionButtons : undefined,
+  updateAppBadge: typeof updateAppBadge !== 'undefined' ? updateAppBadge : undefined,
+  updateCalendarSelection: typeof updateCalendarSelection !== 'undefined' ? updateCalendarSelection : undefined,
+  updateCapsuleUI: typeof updateCapsuleUI !== 'undefined' ? updateCapsuleUI : undefined,
+  updateCardStatusVisuals: typeof updateCardStatusVisuals !== 'undefined' ? updateCardStatusVisuals : undefined,
+  updateCounts: typeof updateCounts !== 'undefined' ? updateCounts : undefined,
+  updateExploredCount: typeof updateExploredCount !== 'undefined' ? updateExploredCount : undefined,
+  updateExportPeriodLabel: typeof updateExportPeriodLabel !== 'undefined' ? updateExportPeriodLabel : undefined,
+  updateGlobalLogos: typeof updateGlobalLogos !== 'undefined' ? updateGlobalLogos : undefined,
+  updateIntensity: typeof updateIntensity !== 'undefined' ? updateIntensity : undefined,
+  updateItemScore: typeof updateItemScore !== 'undefined' ? updateItemScore : undefined,
+  updateLink: typeof updateLink !== 'undefined' ? updateLink : undefined,
+  updateNavIcons: typeof updateNavIcons !== 'undefined' ? updateNavIcons : undefined,
+  updateSafeSettings: typeof updateSafeSettings !== 'undefined' ? updateSafeSettings : undefined,
+  updateSiteLabelUI: typeof updateSiteLabelUI !== 'undefined' ? updateSiteLabelUI : undefined,
+  updateStatsLocks: typeof updateStatsLocks !== 'undefined' ? updateStatsLocks : undefined,
+  updateSubscriptionUI: typeof updateSubscriptionUI !== 'undefined' ? updateSubscriptionUI : undefined,
+  updateThemeLabel: typeof updateThemeLabel !== 'undefined' ? updateThemeLabel : undefined,
+  updateToggleLabels: typeof updateToggleLabels !== 'undefined' ? updateToggleLabels : undefined,
+};
+Object.entries(__legacyFns).forEach(([k, v]) => { if (typeof v === 'function') window[k] = v; });
+try { if (typeof permanentExplored !== 'undefined') Object.defineProperty(window, 'permanentExplored', { get: () => permanentExplored, set: (val) => { permanentExplored = val; }, configurable: true }); } catch {}
+try { if (typeof blacklist !== 'undefined') Object.defineProperty(window, 'blacklist', { get: () => blacklist, set: (val) => { blacklist = val; }, configurable: true }); } catch {}
+try { if (typeof favorites !== 'undefined') Object.defineProperty(window, 'favorites', { get: () => favorites, set: (val) => { favorites = val; }, configurable: true }); } catch {}
+try { if (typeof watchLater !== 'undefined') Object.defineProperty(window, 'watchLater', { get: () => watchLater, set: (val) => { watchLater = val; }, configurable: true }); } catch {}
+try { if (typeof tagScores !== 'undefined') Object.defineProperty(window, 'tagScores', { get: () => tagScores, set: (val) => { tagScores = val; }, configurable: true }); } catch {}
+try { if (typeof historyData !== 'undefined') Object.defineProperty(window, 'historyData', { get: () => historyData, set: (val) => { historyData = val; }, configurable: true }); } catch {}
+try { if (typeof watchHistory !== 'undefined') Object.defineProperty(window, 'watchHistory', { get: () => watchHistory, set: (val) => { watchHistory = val; }, configurable: true }); } catch {}
+try { if (typeof activityLog !== 'undefined') Object.defineProperty(window, 'activityLog', { get: () => activityLog, set: (val) => { activityLog = val; }, configurable: true }); } catch {}
+try { if (typeof customSites !== 'undefined') Object.defineProperty(window, 'customSites', { get: () => customSites, set: (val) => { customSites = val; }, configurable: true }); } catch {}
+try { if (typeof userModifiersPool !== 'undefined') Object.defineProperty(window, 'userModifiersPool', { get: () => userModifiersPool, set: (val) => { userModifiersPool = val; }, configurable: true }); } catch {}
+try { if (typeof customModifiersList !== 'undefined') Object.defineProperty(window, 'customModifiersList', { get: () => customModifiersList, set: (val) => { customModifiersList = val; }, configurable: true }); } catch {}
+try { if (typeof subscriptionLevel !== 'undefined') Object.defineProperty(window, 'subscriptionLevel', { get: () => subscriptionLevel, set: (val) => { subscriptionLevel = val; }, configurable: true }); } catch {}
+try { if (typeof currentLang !== 'undefined') Object.defineProperty(window, 'currentLang', { get: () => currentLang, set: (val) => { currentLang = val; }, configurable: true }); } catch {}
+try { if (typeof langData !== 'undefined') Object.defineProperty(window, 'langData', { get: () => langData, set: (val) => { langData = val; }, configurable: true }); } catch {}
+try { if (typeof earlySponsors !== 'undefined') Object.defineProperty(window, 'earlySponsors', { get: () => earlySponsors, set: (val) => { earlySponsors = val; }, configurable: true }); } catch {}
+
+export function initLegacyEngine() {
+  if (typeof window.__legacyInitialized !== 'undefined' && window.__legacyInitialized) return;
+  window.__legacyInitialized = true;
+  if (document.readyState !== 'loading') {
+    if (typeof loadData === 'function') loadData();
+    if (typeof fetchActiveDiscount === 'function') fetchActiveDiscount();
+    document.dispatchEvent(new Event('DOMContentLoaded'));
+  }
+}
