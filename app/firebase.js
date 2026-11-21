@@ -629,6 +629,34 @@ saveInterval = setInterval(() => {
     }
 }, 180 * 1000); // 180 секунд = 3 минуты
 
+function mergeWatchHistories(localList, cloudList, maxItems = 200) {
+    const map = new Map();
+    [...(cloudList || []), ...(localList || [])].forEach(entry => {
+        if (!entry || !entry.id) return;
+        const ts = entry.timestamp || 0;
+        const key = `${entry.id}_${ts}`;
+        const existing = map.get(key);
+        if (!existing || (parseInt(entry.seconds) || 0) > (parseInt(existing.seconds) || 0)) {
+            map.set(key, entry);
+        }
+    });
+    return Array.from(map.values())
+        .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
+        .slice(0, maxItems);
+}
+
+function mergeActivityLogs(localList, cloudList, maxItems = 5000) {
+    const map = new Map();
+    [...(cloudList || []), ...(localList || [])].forEach(entry => {
+        if (!entry) return;
+        const key = `${entry.ts || 0}_${entry.id || ''}_${entry.type || ''}`;
+        if (!map.has(key)) map.set(key, entry);
+    });
+    return Array.from(map.values())
+        .sort((a, b) => (a.ts || 0) - (b.ts || 0))
+        .slice(-maxItems);
+}
+
 // === ЗАГРУЗКА И СЛИЯНИЕ ДАННЫХ (СЕРДЦЕ СИНХРОНИЗАЦИИ) ===
 async function loadUserData(user) {
     const userRef = doc(db, "users", user.uid);
@@ -692,27 +720,32 @@ async function loadUserData(user) {
             localStorage.setItem('xch_history', JSON.stringify(mergedHistory));
             window.historyData = mergedHistory;
 
-            // 4. ИСТОРИЯ ПРОСМОТРОВ
-            const localWatch = JSON.parse(localStorage.getItem('xch_watch_history')) ||[];
-            const cloudWatch = cloudData.watchHistory ||[];
-            const mergedWatch = useCloud ? cloudWatch : localWatch;
+            // 4. ИСТОРИЯ ПРОСМОТРОВ (Всегда объединяем, чтобы просмотры не откатывались)
+            const localWatch = JSON.parse(localStorage.getItem('xch_watch_history')) || [];
+            const cloudWatch = cloudData.watchHistory || [];
+            const mergedWatch = mergeWatchHistories(localWatch, cloudWatch, 200);
             localStorage.setItem('xch_watch_history', JSON.stringify(mergedWatch));
             window.watchHistory = mergedWatch;
 
-            // 5. ЛОГИ АКТИВНОСТИ
-            const localLog = JSON.parse(localStorage.getItem('xch_activity_log')) ||[];
-            const cloudLog = cloudData.activityLog ||[];
-            const mergedLog = useCloud ? cloudLog : localLog;
+            // 5. ЛОГИ АКТИВНОСТИ (Всегда объединяем без потерь)
+            const localLog = JSON.parse(localStorage.getItem('xch_activity_log')) || [];
+            const cloudLog = cloudData.activityLog || [];
+            const mergedLog = mergeActivityLogs(localLog, cloudLog, 5000);
             localStorage.setItem('xch_activity_log', JSON.stringify(mergedLog));
             window.activityLog = mergedLog;
 
-            if (window.activityLog && window.activityLog.length > 0) {
-                window.permanentExplored = new Set();
-                window.activityLog.forEach(log => {
-                    if (log.id) window.permanentExplored.add(log.id);
-                });
-                localStorage.setItem('xch_permanent_explored', JSON.stringify([...window.permanentExplored]));
-            }
+            // Объединяем permanentExplored из локального хранилища, логов, просмотров и списков
+            const storedExplored = JSON.parse(localStorage.getItem('xch_permanent_explored') || '[]');
+            const mergedExplored = new Set([
+                ...(window.permanentExplored || []),
+                ...storedExplored
+            ]);
+            mergedLog.forEach(log => { if (log && log.id) mergedExplored.add(log.id); });
+            mergedWatch.forEach(w => { if (w && w.id) mergedExplored.add(w.id); });
+            mergedFav.forEach(id => mergedExplored.add(id));
+            mergedBan.forEach(id => mergedExplored.add(id));
+            window.permanentExplored = mergedExplored;
+            localStorage.setItem('xch_permanent_explored', JSON.stringify([...mergedExplored]));
 
             // 6. КАСТОМНЫЕ САЙТЫ 
             const localSites = JSON.parse(localStorage.getItem('xch_custom_sites')) || [];
@@ -739,6 +772,14 @@ async function loadUserData(user) {
 
             if (document.getElementById('modal-sync-info-overlay').classList.contains('open')) {
                 window.openSyncInfoModal();
+            }
+
+            const hasNewMergedEntries =
+                mergedWatch.length > cloudWatch.length ||
+                mergedLog.length > cloudLog.length ||
+                mergedExplored.size > (cloudData.exploredCount || 0);
+            if (hasUnsyncedLocalChanges || hasNewMergedEntries) {
+                await window.syncToCloud(true);
             }
 
         } else {

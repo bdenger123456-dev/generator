@@ -335,7 +335,7 @@ const CHANGELOG_DATA = [
 
 let watchStartTime = 0; // Время ухода с сайта
 
-let permanentExplored = new Set(JSON.parse(localStorage.getItem('xch_permanent_explored')) || []);
+var permanentExplored = new Set(JSON.parse(localStorage.getItem('xch_permanent_explored')) || []);
 
 let achievementDates = JSON.parse(localStorage.getItem('xch_achievement_dates')) || {};
 
@@ -475,17 +475,17 @@ const APP_THEMES = [
     }
 ];
 
-let blacklist = JSON.parse(localStorage.getItem(STORAGE.BLACKLIST)) || [];
-let favorites = JSON.parse(localStorage.getItem(STORAGE.FAVORITES)) || [];
+var blacklist = JSON.parse(localStorage.getItem(STORAGE.BLACKLIST)) || [];
+var favorites = JSON.parse(localStorage.getItem(STORAGE.FAVORITES)) || [];
 let protectedFavorites = JSON.parse(localStorage.getItem('xch_protected_favorites')) || [];
 let itemScores = JSON.parse(localStorage.getItem('xch_item_scores')) || {};
-let watchLater = JSON.parse(localStorage.getItem(STORAGE.WATCH_LATER)) || [];
-let tagScores = JSON.parse(localStorage.getItem(STORAGE.TAG_SCORES)) || {};
-let historyData = JSON.parse(localStorage.getItem(STORAGE.HISTORY)) || [];
+var watchLater = JSON.parse(localStorage.getItem(STORAGE.WATCH_LATER)) || [];
+var tagScores = JSON.parse(localStorage.getItem(STORAGE.TAG_SCORES)) || {};
+var historyData = JSON.parse(localStorage.getItem(STORAGE.HISTORY)) || [];
 let appStartTime = Date.now();
-let watchHistory = JSON.parse(localStorage.getItem(STORAGE.WATCH_HISTORY)) || [];
-let activityLog = JSON.parse(localStorage.getItem(STORAGE.ACTIVITY_LOG)) || [];
-let customSites = JSON.parse(localStorage.getItem('xch_custom_sites')) || [];
+var watchHistory = JSON.parse(localStorage.getItem(STORAGE.WATCH_HISTORY)) || [];
+var activityLog = JSON.parse(localStorage.getItem(STORAGE.ACTIVITY_LOG)) || [];
+var customSites = JSON.parse(localStorage.getItem('xch_custom_sites')) || [];
 
 let activeDiscount = null;
 
@@ -643,7 +643,7 @@ const SITES_DATA = [
 const DEFAULT_MODS_POOL = []; 
 
 // Загрузка
-let userModifiersPool = [];
+var userModifiersPool = [];
 try {
     const saved = JSON.parse(localStorage.getItem('xch_user_mods'));
     // Если в памяти что-то есть (массив), берем его. Иначе — пустой массив.
@@ -653,7 +653,7 @@ try {
 }
 
 // Хранилище всех кастомных модов
-let customModifiersList = [];
+var customModifiersList = [];
 try {
     const savedCustom = JSON.parse(localStorage.getItem('xch_custom_mods'));
     customModifiersList = Array.isArray(savedCustom) ? savedCustom : [];
@@ -11609,7 +11609,7 @@ function calculateWatchTime() {
     };
     
     watchHistory.unshift(historyEntry);
-    if (watchHistory.length > 100) watchHistory.pop();
+    if (watchHistory.length > 200) watchHistory.pop();
     localStorage.setItem(STORAGE.WATCH_HISTORY, JSON.stringify(watchHistory));
     if (window.markDirty) window.markDirty();
 
