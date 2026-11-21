@@ -16,6 +16,7 @@ let currentBillingCycle = '1';
 let originalThemeId = null;
 let previewThemeId = null;
 let isPreviewActive = false;
+let isModeSelectionActive = false;
 
 let isPanicEnabled = localStorage.getItem('xch_panic_enabled') !== 'false';
 let panicKey = localStorage.getItem('xch_panic_key') || 'Escape';
@@ -154,8 +155,8 @@ const TAG_ICONS = {
 };
 
 const NEUTRAL_DECOS = [
-    'deco1.png', 'deco2.png', 'assets/images/deco/deco3.png', 'assets/images/deco/deco4.png', 'assets/images/deco/deco5.png',
-    'assets/images/deco/deco6.png', 'deco7.png', 'assets/images/deco/deco9.png', 'assets/images/deco/deco10.png', 'deco11.png'
+    'assets/images/deco/deco3.png', 'assets/images/deco/deco4.png', 'assets/images/deco/deco5.png',
+    'assets/images/deco/deco6.png', 'assets/images/deco/deco9.png', 'assets/images/deco/deco10.png'
 ];
 
 // ОБНОВЛЕННЫЙ МАССИВ ДАННЫХ
@@ -5231,6 +5232,7 @@ function backToExploredGrid() {
     const title = document.getElementById('explored-modal-title');
     const subtitle = document.getElementById('explored-subtitle');
     const backBtn = document.getElementById('explored-back-btn');
+    const mainCloseBtn = document.getElementById('explored-main-close');
     if (mainCloseBtn) mainCloseBtn.style.display = 'flex';
     const t = langData[currentLang] || langData['en'];
 
