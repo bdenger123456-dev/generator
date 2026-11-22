@@ -6969,7 +6969,7 @@ function updateNavIcons(activeTab) {
         if (img) {
             // Если таб активен — ставим _fill, иначе _outline
             const suffix = (t === activeTab) ? '_fill' : '_outline';
-            img.src = `${t}${suffix}.png`;
+            img.src = `assets/images/icons/${t}${suffix}.png`;
         }
     });
 }
